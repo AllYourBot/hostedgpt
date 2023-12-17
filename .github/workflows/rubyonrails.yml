@@ -31,11 +31,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Ruby and gems
-        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+      - name: Cache gems
+        uses: actions/cache@v2
         with:
-          bundler-cache: true
-
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      
+      - name: Install Bundler
+        run: gem install bundler
+      
+      - name: Install gems
+        run: |
+          bundle config set path vendor/bundle
+          bundle install
+          
       - name: Set up database schema
         run: bin/rails db:schema:load
 
@@ -49,10 +60,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Install Ruby and gems
-        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+
+      - name: Cache gems
+        uses: actions/cache@v2
         with:
-          bundler-cache: true
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      
+      - name: Install Bundler
+        run: gem install bundler
+      
+      - name: Install gems
+        run: |
+          bundle config set path vendor/bundle
+          bundle install
 
       - name: Security audit dependencies
         run: bin/bundler-audit --update
