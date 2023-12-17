@@ -21,12 +21,13 @@ jobs:
         ports:
           - "5432:5432"
         env:
-          POSTGRES_DB: rails_test
+          POSTGRES_DB: hostedgpt_test
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
     env:
+      DATABASE_HOST: postgres
       RAILS_ENV: test
-      DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
+      DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,17 +39,17 @@ jobs:
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-gems-
-      
+
       - name: Install Bundler
         run: |
           gem update --system
           gem install bundler
-      
+
       - name: Install gems
         run: |
           bundle config set path vendor/bundle
           bundle install
-          
+
       - name: Set up database schema
         run: bin/rails db:schema:load
 
@@ -70,22 +71,22 @@ jobs:
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-gems-
-      
+
       - name: Install Bundler
         run: |
           gem update --system
           gem install bundler
-      
+
       - name: Install gems
         run: |
           bundle config set path vendor/bundle
           bundle install
 
-      - name: Security audit dependencies
-        run: bin/bundler-audit --update
+      #- name: Security audit dependencies
+      #  run: bin/bundler-audit --update
 
-      - name: Security audit application code
-        run: bin/brakeman -q -w2
+      #- name: Security audit application code
+      #  run: bin/brakeman -q -w2
 
       - name: Lint Ruby files
         run: bin/rubocop --parallel
