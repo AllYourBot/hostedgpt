@@ -26,43 +26,68 @@ jobs:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
     steps:
+      - name: Cache gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Install Ruby 3.3.0-preview2
         run: |
           git clone https://github.com/rbenv/ruby-build.git
-          PREFIX=/usr/local ./ruby-build/install.sh
-          ruby-build 3.3.0-preview2 ~/.rbenv/versions/3.3.0-preview2
+          PREFIX="$HOME/ruby-build" ./ruby-build/install.sh
+          $HOME/ruby-build/bin/ruby-build 3.3.0-preview2 ~/.rbenv/versions/3.3.0-preview2
           echo "export PATH=$HOME/.rbenv/versions/3.3.0-preview2/bin:$PATH" >> $GITHUB_ENV
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.3.0-preview2
-          bundler-cache: true
+
+      - name: Install Bundler and cache gems
+        run: |
+          gem install bundler
+          bundle config set --local path 'vendor/bundle'
+          bundle install
+          
       - name: Set up database schema
         run: bin/rails db:schema:load
+        
       - name: Run tests
         run: bin/rake
 
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Cache gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Install Ruby 3.3.0-preview2
         run: |
           git clone https://github.com/rbenv/ruby-build.git
-          PREFIX=/usr/local ./ruby-build/install.sh
-          ruby-build 3.3.0-preview2 ~/.rbenv/versions/3.3.0-preview2
+          PREFIX="$HOME/ruby-build" ./ruby-build/install.sh
+          $HOME/ruby-build/bin/ruby-build 3.3.0-preview2 ~/.rbenv/versions/3.3.0-preview2
           echo "export PATH=$HOME/.rbenv/versions/3.3.0-preview2/bin:$PATH" >> $GITHUB_ENV
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.3.0-preview2
-          bundler-cache: true
+
+      - name: Install Bundler and cache gems
+        run: |
+          gem install bundler
+          bundle config set --local path 'vendor/bundle'
+          bundle install
+
       - name: Security audit dependencies
         run: bin/bundler-audit --update
+
       - name: Security audit application code
         run: bin/brakeman -q -w2
+
       - name: Lint Ruby files
         run: bin/rubocop --parallel
