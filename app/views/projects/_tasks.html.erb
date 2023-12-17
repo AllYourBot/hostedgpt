@@ -1,0 +1,23 @@
+<table id="tasks" class="table is-fullwidth is-stripped">
+  <thead>
+  <tr>
+    <th style="width: 4rem;"></th>
+    <th>Name</th>
+    <th style="width: 4rem;"></th>
+  </tr>
+  </thead>
+
+  <%= render partial: "projects/task", locals: { project: project }, collection: tasks %>
+
+  <tfoot>
+  <tr>
+    <th>
+      <%= render "projects/complete_count", project: project %>
+    </th>
+    <th>
+    </th>
+    <th>
+    </th>
+  </tr>
+  </tfoot>
+</table>

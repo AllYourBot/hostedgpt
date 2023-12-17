@@ -1,0 +1,11 @@
+<%= form_with model: Project.new do |form| %>
+  <div class="field is-grouped">
+    <div class="control">
+      <%= form.text_field :name, placeholder: "Add new project...", class: "input", autofocus: true %>
+    </div>
+
+    <div class="control">
+      <%= form.submit "Create", class: "button is-info" %>
+    </div>
+  </div>
+<% end %>

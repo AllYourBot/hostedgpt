@@ -1,0 +1,17 @@
+<div class="level">
+  <div class="level-left">
+    <div class="level-item">
+      <h1 class="title">
+        <%= project.name %>
+      </h1>
+    </div>
+  </div>
+  <div class="level-right">
+    <div class="level-item">
+      <%= button_to "Delete this project", project, class: "button is-danger", method: :delete, data: { turbo_confirm: ("There are uncompleted tasks. Are you sure?" unless project.completed?) } %>
+    </div>
+  </div>
+</div>
+
+<%= project_progress_bar_for(project) %>
+

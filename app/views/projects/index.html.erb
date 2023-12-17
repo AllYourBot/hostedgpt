@@ -1,0 +1,20 @@
+<% @projects.each do |project| %>
+  <%= turbo_stream_from project %>
+<% end %>
+
+<%= turbo_stream_from :projects %>
+
+<h1 class="title">
+  You have <span><%= @projects.count %> </span> projects:
+</h1>
+
+<%= render "projects/add_project_form" %>
+
+<table class="table is-fullwidth is-stripped">
+  <tr>
+    <th>Name</th>
+    <th>Completion</th>
+  </tr>
+
+  <%= render partial: "projects/project", collection: @projects %>
+</table>
