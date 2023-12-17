@@ -11,13 +11,6 @@ on:
   pull_request:
     branches: [ "main" ]
 jobs:
-- name: Install Ruby 3.3.0-preview2
-  run: |
-    git clone https://github.com/rbenv/ruby-build.git
-    PREFIX=/usr/local ./ruby-build/install.sh
-    ruby-build 3.3.0-preview2 ~/.rbenv/versions/3.3.0-preview2
-    echo "export PATH=$HOME/.rbenv/versions/3.3.0-preview2/bin:$PATH" >> $GITHUB_ENV
-
   test:
     runs-on: ubuntu-latest
     services:
