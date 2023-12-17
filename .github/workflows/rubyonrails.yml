@@ -40,7 +40,9 @@ jobs:
             ${{ runner.os }}-gems-
       
       - name: Install Bundler
-        run: gem install bundler
+        run: |
+          gem update --system
+          gem install bundler
       
       - name: Install gems
         run: |
@@ -70,7 +72,9 @@ jobs:
             ${{ runner.os }}-gems-
       
       - name: Install Bundler
-        run: gem install bundler
+        run: |
+          gem update --system
+          gem install bundler
       
       - name: Install gems
         run: |
