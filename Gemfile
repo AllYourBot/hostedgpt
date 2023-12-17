@@ -65,6 +65,7 @@ group :development do
   # gem "spring"
 
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'pry-rails'
   gem 'rubocop', require: false
   gem 'rubocop-capybara', require: false
   gem 'rubocop-minitest', require: false

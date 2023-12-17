@@ -53,7 +53,7 @@ jobs:
         run: bin/rails db:schema:load
 
       - name: Run tests
-        run: bin/rake
+        run: bin/rails test
 
   lint:
     runs-on: ubuntu-latest
