@@ -1,0 +1,12 @@
+  [1m[35m (52.8ms)[0m  [1m[35mCREATE DATABASE "samantha_development" ENCODING = 'unicode'[0m
+  [1m[35m (46.5ms)[0m  [1m[35mCREATE DATABASE "samantha_test" ENCODING = 'unicode'[0m
+Started HEAD "/" for 127.0.0.1 at 2023-12-05 15:46:05 -0800
+  [1m[35m (10.8ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)[0m
+  [1m[35m (8.9ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by Rails::WelcomeController#index as */*
+  Rendering /home/eng/.asdf/installs/ruby/3.3.0-preview1/lib/ruby/gems/3.3.0+0/gems/railties-7.1.2/lib/rails/templates/rails/welcome/index.html.erb
+  Rendered /home/eng/.asdf/installs/ruby/3.3.0-preview1/lib/ruby/gems/3.3.0+0/gems/railties-7.1.2/lib/rails/templates/rails/welcome/index.html.erb (Duration: 1.0ms | Allocations: 378)
+Completed 200 OK in 36ms (Views: 8.8ms | ActiveRecord: 0.0ms | Allocations: 7906)
+
+
