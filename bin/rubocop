@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+if ! gem list rubocop -i --silent; then
+  echo "Installing rubocop..."
+  gem install rubocop
+fi
+
+bundle exec rubocop --parallel

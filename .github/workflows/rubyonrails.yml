@@ -89,4 +89,4 @@ jobs:
       #  run: bin/brakeman -q -w2
 
       - name: Lint Ruby files
-        run: rubocop --parallel
+        run: bin/rubocop
