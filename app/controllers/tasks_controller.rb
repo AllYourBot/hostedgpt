@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
   before_action :set_project
-  before_action :set_task, only: %i[ show edit update destroy ]
+  before_action :set_task, only: %i[show edit update destroy]
 
   def index
     @tasks = @project.tasks
@@ -35,15 +35,16 @@ class TasksController < ApplicationController
   end
 
   private
-    def set_project
-      @project = Project.find(params[:project_id])
-    end
 
-    def set_task
-      @task = @project.tasks.find(params[:id])
-    end
+  def set_project
+    @project = Project.find(params[:project_id])
+  end
 
-    def task_params
-      params.require(:task).permit(:title, :completed, :project_id)
-    end
+  def set_task
+    @task = @project.tasks.find(params[:id])
+  end
+
+  def task_params
+    params.require(:task).permit(:title, :completed, :project_id)
+  end
 end
