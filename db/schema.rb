@@ -10,9 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_26_073255) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_19_014006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "people", force: :cascade do |t|
+    t.string "email"
+    t.string "type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "projects", force: :cascade do |t|
     t.string "name"
@@ -29,5 +36,24 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_26_073255) do
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 
+  create_table "tombstones", force: :cascade do |t|
+    t.bigint "person_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id"], name: "index_tombstones_on_person_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.bigint "person_id", null: false
+    t.string "password"
+    t.datetime "registered_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id"], name: "index_users_on_person_id"
+  end
+
   add_foreign_key "tasks", "projects"
+  add_foreign_key "tombstones", "people"
+  add_foreign_key "users", "people"
 end
