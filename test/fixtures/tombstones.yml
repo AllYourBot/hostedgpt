@@ -2,8 +2,8 @@
 
 one:
   person: one
-  deleted_at: 2023-12-19 08:40:05
+  erected_at: 2023-12-19 08:40:05
 
 two:
   person: two
-  deleted_at: 2023-12-19 08:40:05
+  erected_at: 2023-12-19 08:40:05
