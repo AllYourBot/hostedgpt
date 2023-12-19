@@ -6,9 +6,15 @@ class UserTest < ActiveSupport::TestCase
     person = Person.new(email: "example@gmail.com", personable: user)
     assert_raises(ActiveRecord::RecordInvalid) { person.save! }
   end
+  j
+  test "should not save user without password confirmation" do
+    user = User.new(password: "password")
+    person = Person.new(email: "example@gmail.com", personable: user)
+    assert_raises(ActiveRecord::RecordInvalid) { person.save! }
+  end
 
   test "should save user with password" do
-    user = User.new(password: "password")
+    user = User.new(password: "password", password_confirmation: "password")
     person = Person.new(email: "exmaple@gmail.com", personable: user)
     assert person.save!
   end
