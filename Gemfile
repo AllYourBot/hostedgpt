@@ -68,7 +68,7 @@ group :development do
   gem "pry-rails"
   gem "standard"
   gem "ruby-lsp"
-  gem 'pgreset'
+  gem "pgreset"
 end
 
 group :test do
