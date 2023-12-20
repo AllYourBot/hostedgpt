@@ -12,7 +12,7 @@ class UsersController < ApplicationController
       @person.personable = @user
 
       if @person.save
-        Current.user = @user
+        session[:user_id] = @user.id
         redirect_to projects_path, notice: 'Account was successfully created.'
       else
         render :new
