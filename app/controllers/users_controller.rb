@@ -1,16 +1,22 @@
 class UsersController < ApplicationController
+  skip_before_action :authenticate_user!, only: [:new, :create]
+
   def new
     @user = User.new
   end
 
   def create
-    @user = User.new(user_params)
-    if @user.save
-      session[:user_id] = @user.id 
-      Current.user = @user
-      redirect_to some_path, notice: 'Account was successfully created.'
-    else
-      render :new
+    ActiveRecord::Base.transaction do
+      @person = Person.new(email: user_params[:email])
+      @user = User.new(password: user_params[:password], password_confirmation: user_params[:password_confirmation])
+      @person.personable = @user
+
+      if @person.save
+        Current.user = @user
+        redirect_to projects_path, notice: 'Account was successfully created.'
+      else
+        render :new
+      end
     end
   end
 
