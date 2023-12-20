@@ -69,6 +69,7 @@ group :development do
   gem "standard"
   gem "ruby-lsp"
   gem "pgreset"
+  gem "htmlbeautifier"
 end
 
 group :test do
