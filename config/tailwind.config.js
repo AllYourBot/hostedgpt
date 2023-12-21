@@ -9,12 +9,32 @@ module.exports = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+      typography: {
+        DEFAULT: {
+          css: {
+            pre: { padding: 0, margin: 0 },
+            ul: {
+              'list-style-type': 'none',
+            },
+          },
+        },
       },
       colors: {
-        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
-      }
+        gray: {
+          50: '#f7f7f8',
+          100: '#ececf1',
+          200: '#d9d9e3',
+          300: '#d1d5db',
+          400: '#acacbe',
+          500: '#8e8ea0',
+          600: '#4b5563',
+          650: '#444654',
+          700: '#40414f',
+          800: '#343541',
+          850: '#2A2B32',
+          900: '#202123',
+        },
+      },
     },
   },
   plugins: [
