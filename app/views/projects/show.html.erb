@@ -1,19 +1,49 @@
 <%= turbo_stream_from @project %>
-
-<nav class="breadcrumb" aria-label="breadcrumbs">
-  <ul>
-    <li>
-      <%= link_to "Project", projects_path %>
-    </li>
-    <li class="is-active">
-      <%= link_to @project.name, project_path(@project) %>
-    </li>
-  </ul>
-</nav>
-
-<%= render "projects/header", project: @project %>
-<%= render "projects/add_task_form", project: @project %>
-<%= render "projects/tasks", project: @project, tasks: @tasks %>
-
-
-
+<section class="bg-white dark:bg-gray-900">
+  <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="px-6 py-3">
+              Task title
+            </th>
+            <th scope="col" class="px-6 py-3">
+              Completed
+            </th>
+            <th scope="col" class="px-6 py-3">
+              Created at
+            </th>
+            <th scope="col" class="px-6 py-3">
+              Updated at
+            </th>
+            <th scope="col" class="px-6 py-3">
+              <span class="sr-only">Edit</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @project.tasks.each do |task| %>
+            <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
+              <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                <%= task.title %>
+              </th>
+              <td class="px-6 py-4">
+                <%= task.completed ? "Yes" : "No" %>
+              </td>
+              <td class="px-6 py-4">
+                <%= time_ago_in_words task.created_at %>
+              </td>
+              <td class="px-6 py-4">
+                <%= time_ago_in_words task.created_at %>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <a href="javascript:;" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

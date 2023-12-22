@@ -1,0 +1,29 @@
+<div class='w-full h-screen bg-white flex justify-center items-center flex-col space-y-5'>
+  <div><img src="/logo.svg" alt="HostedGPT" width="40" height="40" /></div>
+  <h2 class='text-3xl font-semibold text-black/90'>Welcome back</h2>
+    <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
+    <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded text-black p-3"%>
+    <%= f.password_field :password, id: "email", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded text-black p-3"%>
+    <%= f.submit "Continue", class: 'bg-teal-600 hover:bg-teal-700 rounded-sm font-light text-white p-4 px-4 text-center' %>
+    <span class='text-sm text-center'>Don't have an account ? <a href="/login" class='text-teal-600'>Sign up</a></span>
+    <% end %>
+  
+  <div class='w-80 relative '>
+    <div class='absolute inset-0 flex items-center'>
+      <div class='w-full border-t border-gray-400'></div>
+    </div>
+    <div class='relative flex justify-center'>
+      <span class='bg-white px-2 text-gray-700 uppercase text-sm'>or</span>
+    </div>
+  </div>
+  <div class='w-80 space-y-2'>
+    <a href="/" class='border border-gray-400 hover:bg-gray-300 rounded text-black flex space-x-4 p-4 px-4'>
+      <img src="/google.svg" alt="Open AI Logo" width="20" height="20" />
+      <p>Continue With Google</p>
+    </a>
+    <a href="/" class='border border-gray-400 hover:bg-gray-300 rounded text-black flex space-x-4 p-4 px-4'>
+      <img src="/microsoft.svg" alt="Open AI Logo" width="20" height="20" />
+      <p>Continue With Microsoft</p>
+    </a>
+  </div>
+</div>
