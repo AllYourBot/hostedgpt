@@ -1,11 +1,13 @@
 <div class='w-full h-screen bg-white flex justify-center items-center flex-col space-y-5'>
   <div><img src="/logo.svg" alt="HostedGPT" width="40" height="40" /></div>
   <h2 class='text-3xl font-semibold text-black/90'>Welcome back</h2>
-  <div class='flex flex-col space-y-4 w-80'>
-    <input placeholder='Email Address' class='border border-gray-400 rounded text-black p-3' />
-    <a href="/home" class='bg-teal-600 hover:bg-teal-700 rounded-sm font-light text-white p-4 px-4 text-center'>Continue</a>
+    <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
+    <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded text-black p-3"%>
+    <%= f.password_field :password, id: "email", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded text-black p-3"%>
+    <%= f.submit "Continue", class: 'bg-teal-600 hover:bg-teal-700 rounded-sm font-light text-white p-4 px-4 text-center' %>
     <span class='text-sm text-center'>Don't have an account ? <a href="/login" class='text-teal-600'>Sign up</a></span>
-  </div>
+    <% end %>
+  
   <div class='w-80 relative '>
     <div class='absolute inset-0 flex items-center'>
       <div class='w-full border-t border-gray-400'></div>

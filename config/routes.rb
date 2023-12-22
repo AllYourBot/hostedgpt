@@ -9,7 +9,7 @@ Rails.application.routes.draw do
 
   resources :users, only: [:new, :create]
   get '/register', to: 'users#new'
-  get "/home", to: "home#show"
+  get "/home", to: "home#show", as: :dashboard
 
 
   get "up" => "rails/health#show", :as => :rails_health_check

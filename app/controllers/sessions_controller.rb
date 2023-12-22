@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
 
     if user && user.authenticate(params[:password])
       session[:user_id] = user.id
-      redirect_to projects_path, notice: 'Successfully logged in.'
+      redirect_to dashboard_path, notice: 'Successfully logged in.'
     else
       flash.now[:alert] = 'Invalid email or password'
       render :new
