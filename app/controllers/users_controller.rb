@@ -13,7 +13,7 @@ class UsersController < ApplicationController
 
       if @person.save
         session[:user_id] = @user.id
-        redirect_to projects_path, notice: 'Account was successfully created.'
+        redirect_to projects_path, notice: "Account was successfully created."
       else
         render :new
       end
