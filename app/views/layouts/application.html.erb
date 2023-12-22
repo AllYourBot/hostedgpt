@@ -6,129 +6,17 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", 'https://fonts.googleapis.com/css?family=Inter', "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
-
-<style>
-
-html {
-    line-height: 1.5;
-    -webkit-text-size-adjust: 100%;
-    -moz-tab-size: 4;
-    -o-tab-size: 4;
-    tab-size: 4;
-    font-family: S\f6hne,Roboto,ui-sans-serif,system-ui,-apple-system,Ubuntu,Cantarell,Noto Sans,sans-serif,Helvetica Neue,Arial,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
-    font-feature-settings: normal
-}
-
-*,:before,:after {
-    box-sizing: border-box;
-    border-width: 0;
-    border-style: solid;
-    border-color: #d9d9e3
-}
-
-.btn {
-    align-items: center;
-    border-color: transparent;
-    border-radius: .25rem;
-    border-width: 1px;
-    display: inline-flex;
-    font-size: .875rem;
-    line-height: 1.25rem;
-    padding: .5rem .75rem;
-    pointer-events: auto
-}
-
-.btn-neutral {
-    --tw-bg-opacity: 1;
-    --tw-text-opacity: 1;
-    background-color: rgba(255,255,255,var(--tw-bg-opacity));
-    border-color: #0000001a;
-    border-width: 1px;
-    color: rgba(64,65,79,var(--tw-text-opacity));
-    font-size: .875rem;
-    line-height: 1.25rem
-}
-
-.btn-neutral:hover {
-    --tw-bg-opacity: 1;
-    background-color: rgba(236,236,241,var(--tw-bg-opacity))
-}
-
-.dark .btn-neutral {
-    --tw-border-opacity: 1;
-    --tw-bg-opacity: 1;
-    --tw-text-opacity: 1;
-    background-color: rgba(52,53,65,var(--tw-bg-opacity));
-    border-color: rgba(86,88,105,var(--tw-border-opacity));
-    color: rgba(217,217,227,var(--tw-text-opacity))
-}
-
-.dark .btn-neutral:hover {
-    --tw-bg-opacity: 1;
-    background-color: rgba(64,65,79,var(--tw-bg-opacity))
-}
-
-.btn-dark {
-    --tw-border-opacity: 1;
-    --tw-bg-opacity: 1;
-    --tw-text-opacity: 1;
-    background-color: rgba(52,53,65,var(--tw-bg-opacity));
-    border-color: rgba(86,88,105,var(--tw-border-opacity));
-    border-width: 1px;
-    color: rgba(255,255,255,var(--tw-text-opacity))
-}
-
-.btn-primary {
-    --tw-bg-opacity: 1;
-    --tw-text-opacity: 1;
-    background-color: rgba(16,163,127,var(--tw-bg-opacity));
-    color: rgba(255,255,255,var(--tw-text-opacity))
-}
-
-.btn-primary:hover {
-    --tw-bg-opacity: 1;
-    background-color: rgba(26,127,100,var(--tw-bg-opacity))
-}
-
-.btn-small {
-    padding: .25rem .5rem
-}
-
-button,input,optgroup,select,textarea {
-    font-family: inherit;
-    font-size: 100%;
-    font-weight: inherit;
-    line-height: inherit;
-    color: inherit;
-    margin: 0;
-    padding: 0
-}
-textarea {
-    resize: vertical
-}
-textarea:focus {
-    outline: none
-}
-
-input::-moz-placeholder,textarea::-moz-placeholder {
-    opacity: 1;
-    color: #acacbe
-}
-
-input::placeholder,textarea::placeholder {
-    opacity: 1;
-    color: #acacbe
-}
-
-</style>
+    <style>
+      body{
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
     <%= yield :head %>
   </head>
   <body>
-    <main class="overflow-hidden w-full h-full relative">
-      <%= yield %>
-    </main>
+    <%= yield %>
   </body>
 </html>
