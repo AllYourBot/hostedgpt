@@ -5,10 +5,10 @@ class ChatsController < ApplicationController
 
   def show
     @chats = Current.user.chats
-    @chat = @chats.find(params[:id])
+    @chat = @chats.find_by(id: params[:id]) || @chats.last
     # Fetch only those messages that are not replies
     @messages = @chat.messages.where(parent_id: nil).includes(:replies)
-    @has_answered = true
+    @has_answered = @messages.blank?
     render "home/show"
   end
 end

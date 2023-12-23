@@ -16,20 +16,8 @@
 
       <div class='absolute bottom-0 inset-x-0 border-t border-gray-200/50 mx-2 py-6 px-2'>
         <a href="/home" class='flex space-x-2 p-2 hover:bg-black/80 mx-2 rounded text-white text-sm items-center'>
-          <%= heroicon "trash" , options: { class: 'h-5 w-5 text-gray-300' } %>
-          <p>Clear conversations</p>
-        </a>
-        <a href="/home" class='flex space-x-2 p-2 hover:bg-black/80 mx-2 rounded text-white text-sm items-center'>
-          <%= heroicon "user" , options: { class: 'h-5 w-5 text-gray-300' } %>
-          <p>Upgrade to plus</p>
-        </a>
-        <a href="/home" class='flex space-x-2 p-2 hover:bg-black/80 mx-2 rounded text-white text-sm items-center'>
-          <%= heroicon "moon" , options: { class: 'h-5 w-5 text-gray-300' } %>
-          <p>Dark Mode</p>
-        </a>
-        <a href="/home" class='flex space-x-2 p-2 hover:bg-black/80 mx-2 rounded text-white text-sm items-center'>
-          <%= heroicon "link" , options: { class: 'h-5 w-5 text-gray-300' } %>
-          <p>Updates</p>
+          <%= heroicon "cog" , options: { class: 'h-5 w-5 text-gray-300' } %>
+          <p>Settings</p>
         </a>
         <a href="/logout" class='flex space-x-2 p-2 hover:bg-black/80 mx-2 rounded text-white text-sm items-center'>
           <%= heroicon "logout" , options: { class: 'h-5 w-5 text-gray-300' } %>
@@ -39,7 +27,7 @@
     </div>
   </div>
   <div class='relative flex flex-1 flex-col h-full'>
-    <% if @chat.messages.blank? %>
+    <% if @has_answered %>
       <div class='flex flex-col space-y-4 justify-center items-center absolute inset-x-0 top-0 bottom-0'>
         <h1 class='text-3xl font-bold pb-12'>ChatGPT</h1>
         <div class='space-y-2'>
