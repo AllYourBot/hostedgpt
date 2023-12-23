@@ -12,6 +12,7 @@ class SessionsController < ApplicationController
     if person.blank?
       render :new
       flash.now[:alert] = "Invalid email or password"
+      return
     end
 
     user = person&.personable
