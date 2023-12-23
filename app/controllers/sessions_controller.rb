@@ -28,4 +28,10 @@ class SessionsController < ApplicationController
       render :new
     end
   end
+
+  def destroy
+    reset_session
+    Current.user = nil
+    redirect_to login_path, notice: "Successfully logged out."
+  end
 end
