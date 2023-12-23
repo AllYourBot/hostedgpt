@@ -1,10 +1,11 @@
-PROJECT_COUNT = 10
-TASKS_PER_PROJECT_COUNT = 6
+withchats = Person.new(email: "withchats@example.com")
+withchats.personable = User.new(password: "hostedgpt", password_confirmation: "hostedgpt")
+withchats.save!
 
-PROJECT_COUNT.times.each do |project_index|
-  project = Project.create!(name: "Project #{project_index + 1}")
+nochats = Person.new(email: "nochats@example.com")
+nochats.personable = User.new(password: "hostedgpt", password_confirmation: "hostedgpt")
+nochats.save!
 
-  TASKS_PER_PROJECT_COUNT.times.each do |task_index|
-    project.tasks.create!(title: "Task #{task_index + 1}")
-  end
-end
+chat = Chat.create!(user: withchats.personable, name: "Create Rails Model: Message")
+message = chat.messages.create!(content: "AuthenticatedController better name")
+message.replies.create!(chat: chat, content: "For a more descriptive and intuitive name than AuthenticatedController, yet still conveying the essence of handling authenticated actions, consider:")

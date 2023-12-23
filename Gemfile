@@ -69,6 +69,10 @@ group :development do
   gem "pry-rails"
   gem "standard"
   gem "ruby-lsp"
+  gem "rubocop-rails"
+  gem "rubocop-capybara"
+  gem "rubocop-minitest"
+
   gem "pgreset"
   gem "htmlbeautifier"
 end
@@ -78,4 +82,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "simplecov", require: false
+  gem "rails-controller-testing"
 end
