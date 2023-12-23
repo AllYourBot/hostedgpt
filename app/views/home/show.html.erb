@@ -5,12 +5,15 @@
           <%= heroicon "plus" , options: { class: 'h-5 w-5 text-gray-300' } %>
         New Chat
       </button>
-      <div class='mt-5 flex flex-col text-white'>
+      <% @chats.each do |chat| %>
+            <div class='mt-5 flex flex-col text-white'>
         <a href="/home" class='flex space-x-2 p-2 hover:bg-black/80 mx-2 bg-gray-700 rounded text-white items-center'>
           <%= heroicon "chat" , options: { class: 'h-5 w-5 text-gray-300' } %>
           <p>Translation Request</p>
         </a>
       </div>
+      <% end %>
+
       <div class='absolute bottom-0 inset-x-0 border-t border-gray-200/50 mx-2 py-6 px-2'>
         <a href="/home" class='flex space-x-2 p-2 hover:bg-black/80 mx-2 rounded text-white text-sm items-center'>
           <%= heroicon "trash" , options: { class: 'h-5 w-5 text-gray-300' } %>

@@ -2,12 +2,11 @@ class UsersController < ApplicationController
   skip_before_action :authenticate_user!, only: [:new, :create]
 
   def new
-    if Current.user.present? || session[:user_id].present?
-      redirect_to dashboard_path, notice: "You are already logged in."
-      return
+    if user_signed_in?
+      redirect_to dashboard_path
+    else
+      render
     end
-
-    @user = User.new
   end
 
   def create
@@ -16,12 +15,16 @@ class UsersController < ApplicationController
       @user = User.new(password: user_params[:password], password_confirmation: user_params[:password])
       @person.personable = @user
 
-      if @person.save
-        session[:user_id] = @user.id
-        Current.user = @user
-        redirect_to dashboard_path, notice: "Account was successfully created."
-      else
-        render :new
+      respond_to do |format|
+        if @person.save
+          reset_session
+          session[:current_user_id] = @user.id
+          format.html { redirect_to dashboard_path, notice: "Account was successfully created." }
+          format.json { render :show, status: :created, location: @user }
+        else
+          format.html { render :new }
+          format.json { render json: @user.errors, status: :unprocessable_entity }
+        end
       end
     end
   end

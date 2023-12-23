@@ -207,6 +207,10 @@ GEM
       activesupport (= 7.1.2)
       bundler (>= 1.15.0)
       railties (= 7.1.2)
+    rails-controller-testing (1.0.5)
+      actionpack (>= 5.0.1.rc1)
+      actionview (>= 5.0.1.rc1)
+      activesupport (>= 5.0.1.rc1)
     rails-dom-testing (2.2.0)
       activesupport (>= 5.0.0)
       minitest
@@ -247,9 +251,19 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.30.0)
       parser (>= 3.2.1.0)
+    rubocop-capybara (2.19.0)
+      rubocop (~> 1.41)
+    rubocop-minitest (0.34.1)
+      rubocop (>= 1.39, < 2.0)
+      rubocop-ast (>= 1.30.0, < 2.0)
     rubocop-performance (1.19.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
+    rubocop-rails (2.23.0)
+      activesupport (>= 4.2.0)
+      rack (>= 1.1)
+      rubocop (>= 1.33.0, < 2.0)
+      rubocop-ast (>= 1.30.0, < 2.0)
     ruby-lsp (0.13.2)
       language_server-protocol (~> 3.17.0)
       prism (>= 0.19.0, < 0.20)
@@ -329,7 +343,11 @@ DEPENDENCIES
   pry-rails
   puma (>= 5.0)
   rails (~> 7.1.2)
+  rails-controller-testing
   redis (>= 4.0.1)
+  rubocop-capybara
+  rubocop-minitest
+  rubocop-rails
   ruby-lsp
   selenium-webdriver
   simplecov
