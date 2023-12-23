@@ -41,21 +41,6 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_23_025948) do
     t.index ["personable_type", "personable_id"], name: "index_people_on_personable"
   end
 
-  create_table "projects", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "tasks", force: :cascade do |t|
-    t.string "title"
-    t.boolean "completed", default: false
-    t.bigint "project_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["project_id"], name: "index_tasks_on_project_id"
-  end
-
   create_table "tombstones", force: :cascade do |t|
     t.datetime "erected_at"
   end
@@ -67,5 +52,4 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_23_025948) do
 
   add_foreign_key "chats", "users"
   add_foreign_key "messages", "chats"
-  add_foreign_key "tasks", "projects"
 end
