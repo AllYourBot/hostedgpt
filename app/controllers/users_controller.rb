@@ -1,12 +1,7 @@
 class UsersController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:new, :create]
+  include Accessible
 
   def new
-    if user_signed_in?
-      redirect_to dashboard_path
-    else
-      render
-    end
   end
 
   def create
