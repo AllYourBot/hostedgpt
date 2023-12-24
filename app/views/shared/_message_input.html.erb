@@ -1,5 +1,5 @@
 <%= turbo_frame_tag "message_form" do %>
-  <%= form_with url: chats_path, method: :post, html: { class: 'absolute bottom-0 inset-x-0 mx-auto px-4 py-6 max-w-3xl' } do |form| %>
+  <%= form_with url: chats_path, method: :post, html: { class: 'absolute bottom-0 inset-x-0 mx-auto px-4 py-6 max-w-3xl' }, data: { turbo: true }  do |form| %>
     <div class='text-black border border-gray-300 flex justify-center items-center space-x-2 shadow-md rounded px-2'>
       <%= form.text_field :message_content, class: 'flex-1 bg-white p-2 border-0 focus:outline-none', placeholder: 'Type your message here...' %>
       <%= form.button type: 'submit', class: 'h-4 w-4 text-right rotate-45 cursor-pointer' do %>

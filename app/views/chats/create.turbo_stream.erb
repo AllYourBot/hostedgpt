@@ -1,1 +1,1 @@
-<%= turbo_stream.append "chat_messages", partial: "messages/message", locals: { message: @message } %>
+<%= turbo_stream.replace "chat_messages", partial: "shared/chat_messages", locals: { messages: @messages } %>

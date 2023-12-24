@@ -8,7 +8,7 @@ class ChatsController < ApplicationController
 
   def create
     @message = current_chat.messages.new(content: params[:message_content]) # Adjust this as per your message creation logic
-
+    @messages = current_chat.messages
     if @message.save
       respond_to do |format|
         format.turbo_stream
