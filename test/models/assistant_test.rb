@@ -9,6 +9,10 @@ class AssistantTest < ActiveSupport::TestCase
     assert_instance_of Conversation, assistants(:samantha).conversations.first
   end
 
+  test "has associated messages (through conversations)" do
+    assert_instance_of Message, assistants(:samantha).messages.first
+  end
+
   test "has associated documents" do
     assert_instance_of Document, assistants(:samantha).documents.first
   end

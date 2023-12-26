@@ -1,5 +1,6 @@
 class Message < ApplicationRecord
   belongs_to :conversation
+  delegate :assistant, to: :conversation
   belongs_to :content_document, class_name: "Document", optional: true
   belongs_to :run, optional: true
 

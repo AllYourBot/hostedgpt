@@ -1,9 +1,9 @@
 guest:
   email: nil
 
-ali_invited:
-  email: ali@hostedgpt.com
-
 keith_registered:
   email: keith@hostedgpt.com
+
+ali_invited:
+  email: ali@hostedgpt.com
 

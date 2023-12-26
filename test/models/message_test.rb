@@ -1,6 +1,10 @@
 require "test_helper"
 
 class MessageTest < ActiveSupport::TestCase
+  test "has an associated assistant (it's through conversation)" do
+    assert_instance_of Assistant, messages(:hear_me).assistant
+  end
+
   test "has an associated conversation" do
     assert_instance_of Conversation, messages(:hear_me).conversation
   end
