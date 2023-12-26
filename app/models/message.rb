@@ -8,4 +8,5 @@ class Message < ApplicationRecord
   enum role: %w[ user assistant ].index_by(&:to_sym)
 
   validates :run, presence: true, if: ->{ assistant? }
+  validates :role, presence: true
 end

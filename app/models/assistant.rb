@@ -5,4 +5,6 @@ class Assistant < ApplicationRecord
   has_many :documents, dependent: :destroy
   has_many :runs, dependent: :destroy
   has_many :steps, dependent: :destroy
+
+  validates :tools, presence: true, allow_blank: true
 end
