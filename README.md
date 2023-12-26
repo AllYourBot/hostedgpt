@@ -1,24 +1,5 @@
-# README
+# HostedGPT
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Deployment
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/hostedgpt/hostedgpt)

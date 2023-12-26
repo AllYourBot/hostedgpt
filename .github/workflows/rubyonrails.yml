@@ -14,7 +14,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: ruby:3.3.0-preview2
+      image: ruby:3.2.2
     services:
       postgres:
         image: postgres:11-alpine
@@ -58,7 +58,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     container:
-      image: ruby:3.3.0-preview2
+      image: ruby:3.2.2
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
