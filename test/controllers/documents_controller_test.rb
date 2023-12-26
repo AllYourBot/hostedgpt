@@ -17,7 +17,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create document" do
     assert_difference("Document.count") do
-      post documents_url, params: { document: { user_id: @document.user_id, assistant_id: @document.assistant_id, message_id: @document.message_id, filename: @document.filename, purpose: @document.purpose, bytes: @document.bytes } }
+      post documents_url, params: {document: {user_id: @document.user_id, assistant_id: @document.assistant_id, message_id: @document.message_id, filename: @document.filename, purpose: @document.purpose, bytes: @document.bytes}}
     end
 
     assert_redirected_to document_url(Document.last)
@@ -34,7 +34,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update document" do
-    patch document_url(@document), params: { document: { user_id: @document.user_id, assistant_id: @document.assistant_id, message_id: @document.message_id, filename: @document.filename, purpose: @document.purpose, bytes: @document.bytes } }
+    patch document_url(@document), params: {document: {user_id: @document.user_id, assistant_id: @document.assistant_id, message_id: @document.message_id, filename: @document.filename, purpose: @document.purpose, bytes: @document.bytes}}
     assert_redirected_to document_url(@document)
   end
 

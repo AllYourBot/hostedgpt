@@ -24,8 +24,8 @@ class RunTest < ActiveSupport::TestCase
         conversation: conversations(:greeting),
         model: assistants(:samantha).model,
         instructions: assistants(:samantha).instructions,
-        status: 'queued',
-        expired_at: 1.minute.from_now,
+        status: "queued",
+        expired_at: 1.minute.from_now
       )
     end
   end

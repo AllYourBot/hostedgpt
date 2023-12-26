@@ -19,8 +19,8 @@ class StepTest < ActiveSupport::TestCase
         assistant: assistants(:samantha),
         conversation: conversations(:greeting),
         run: runs(:hear_me_response),
-        kind: 'message_creation',
-        status: 'in_progress',
+        kind: "message_creation",
+        status: "in_progress",
         details: {}
       )
     end

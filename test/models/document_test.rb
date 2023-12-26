@@ -17,8 +17,8 @@ class DocumentTest < ActiveSupport::TestCase
     assert_nothing_raised do
       Document.create!(
         user: users(:keith),
-        filename: 'dog_photo.jpg',
-        purpose: 'assistants',
+        filename: "dog_photo.jpg",
+        purpose: "assistants",
         bytes: 123
       )
     end

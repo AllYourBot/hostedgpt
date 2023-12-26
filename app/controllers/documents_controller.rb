@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
   skip_before_action :authenticate_user!
-  before_action :set_document, only: %i[ show edit update destroy ]
+  before_action :set_document, only: %i[show edit update destroy]
 
   def index
     @documents = Document.all
@@ -44,7 +44,6 @@ class DocumentsController < ApplicationController
   def set_document
     @document = Document.find(params[:id])
   end
-
 
   def document_params
     params.require(:document).permit(:user_id, :assistant_id, :message_id, :filename, :purpose, :bytes)

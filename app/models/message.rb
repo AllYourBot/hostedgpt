@@ -5,8 +5,8 @@ class Message < ApplicationRecord
 
   has_many :documents, dependent: :destroy
 
-  enum role: %w[ user assistant ].index_by(&:to_sym)
+  enum role: %w[user assistant].index_by(&:to_sym)
 
-  validates :run, presence: true, if: ->{ assistant? }
+  validates :run, presence: true, if: -> { assistant? }
   validates :role, presence: true
 end

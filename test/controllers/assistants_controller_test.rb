@@ -17,7 +17,7 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create assistant" do
     assert_difference("Assistant.count") do
-      post assistants_url, params: { assistant: { description: @assistant.description, instructions: @assistant.instructions, model: @assistant.model, name: @assistant.name, tools: @assistant.tools, user_id: @assistant.user_id } }
+      post assistants_url, params: {assistant: {description: @assistant.description, instructions: @assistant.instructions, model: @assistant.model, name: @assistant.name, tools: @assistant.tools, user_id: @assistant.user_id}}
     end
 
     assert_redirected_to assistant_url(Assistant.last)
@@ -34,7 +34,7 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update assistant" do
-    patch assistant_url(@assistant), params: { assistant: { description: @assistant.description, instructions: @assistant.instructions, model: @assistant.model, name: @assistant.name, tools: @assistant.tools, user_id: @assistant.user_id } }
+    patch assistant_url(@assistant), params: {assistant: {description: @assistant.description, instructions: @assistant.instructions, model: @assistant.model, name: @assistant.name, tools: @assistant.tools, user_id: @assistant.user_id}}
     assert_redirected_to assistant_url(@assistant)
   end
 

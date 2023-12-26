@@ -25,7 +25,7 @@ class MessageTest < ActiveSupport::TestCase
     assert_nothing_raised do
       Message.create!(
         conversation: conversations(:greeting),
-        role: 'user'
+        role: "user"
       )
     end
   end
@@ -33,7 +33,7 @@ class MessageTest < ActiveSupport::TestCase
   test "creating an assistant message requires a run to be associated" do
     m = Message.new(
       conversation: conversations(:greeting),
-      role: 'assistant'
+      role: "assistant"
     )
 
     refute m.valid?
