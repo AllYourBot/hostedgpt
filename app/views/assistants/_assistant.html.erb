@@ -1,0 +1,32 @@
+<div id="<%= dom_id assistant %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">User ID:</strong>
+    <%= assistant.user_id %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Model:</strong>
+    <%= assistant.model %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Name:</strong>
+    <%= assistant.name %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Description:</strong>
+    <%= assistant.description %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Instructions:</strong>
+    <%= assistant.instructions %>
+  </p>
+
+  <% if action_name != "show" %>
+    <%= link_to "Show this assistant", assistant, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to "Edit this assistant", edit_assistant_path(assistant), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>
