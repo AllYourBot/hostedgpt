@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  resources :assistants
+  resources :conversations
+  resources :messages
+  resources :documents
+
   resources :users, only: [:new, :create]
   resources :chats, only: [:index, :show, :create]
 
