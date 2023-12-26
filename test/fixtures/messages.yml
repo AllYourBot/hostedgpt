@@ -1,0 +1,27 @@
+hear_me:
+  conversation: greeting
+  role: user
+  content_text: Can you hear me?
+  content_document:
+  run:
+
+yes_i_do:
+  conversation: greeting
+  role: assistant
+  content_text: Yes, I can hear you. How can I help you today?
+  content_document:
+  run: hear_me_response
+
+identify_photo:
+  conversation: greeting
+  role: user
+  content_text: What do you see in this photo?
+  content_document: # the cat photo is not attached in this field, currently it's attached at the document level. info: https://platform.openai.com/docs/assistants/tools/knowledge-retrieval and https://platform.openai.com/docs/guides/vision
+  run:
+
+photo_identified:
+  conversation: greeting
+  role: assistant
+  content_text: That looks like a cat.
+  content_document:
+  run: identify_photo_response

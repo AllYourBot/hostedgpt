@@ -1,11 +1,3 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  person: one
-  password: MyString
-  registered_at: 2023-12-19 08:40:05
-
-two:
-  person: two
-  password: MyString
+keith:
+  password_digest: <%= BCrypt::Password.create('secret') %>
   registered_at: 2023-12-19 08:40:05

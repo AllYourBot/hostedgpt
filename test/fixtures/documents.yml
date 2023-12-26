@@ -1,0 +1,15 @@
+background:
+  user: keith
+  assistant: samantha
+  message:
+  filename: background.docx
+  purpose: assistants
+  bytes: 100
+
+cat_photo:
+  user: keith
+  assistant: samantha
+  message: identify_photo
+  filename: cat_photo.jpg
+  purpose: assistants
+  bytes: 100

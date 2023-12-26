@@ -1,0 +1,7 @@
+samantha:
+  user: keith
+  model: gpt-4
+  name: Samantha
+  description: My personal assistant
+  instructions: You are a helpful assistant
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]

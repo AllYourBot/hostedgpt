@@ -1,9 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  person: one
   erected_at: 2023-12-19 08:40:05
 
 two:
-  person: two
   erected_at: 2023-12-19 08:40:05
