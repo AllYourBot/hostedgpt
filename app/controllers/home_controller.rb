@@ -15,7 +15,7 @@ class HomeController < ApplicationController
     @chats = current_user.chats
     @chat = @chats.find_by(id: params[:id]) || @chats.last
     # Fetch only those messages that are not replies
-    @messages = @chat && @chat.messages.where(parent_id: nil).includes(:replies)
+    @messages = @chat && @chat.notes.where(parent_id: nil).includes(:replies)
     @has_answered = @messages.blank?
   end
 end

@@ -1,3 +1,3 @@
 class ApplicationController < ActionController::Base
-  include Authenticated
+  include Authenticate
 end
