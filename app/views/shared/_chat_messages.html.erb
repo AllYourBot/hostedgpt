@@ -29,9 +29,9 @@
 <% if notes.present? %>
   <div class='flex flex-col bg-gray-800 text-white overflow-y-scroll'>
     <% notes.each do |message| %>
-      <div class='w-full flex items-center justify-center'>
-        <div class='flex space-x-4 items-center justify-between px-6 py-6 w-1/2'>
-          <div class='flex space-x-4 items-center'>
+      <div class='w-full flex items-start justify-start'>
+        <div class='flex space-x-4 px-6 py-6 w-1/2'>
+          <div class='flex space-x-4 items-start'>
               <div class='bg-white text-center rounded text-white relative'>
                 <img src="https://i.pravatar.cc/57" class="max-w-min rounded" alt='Open AI logo' />
               </div>
@@ -42,9 +42,9 @@
       </div>
       <% if message.replies.any? %>
 
-        <div class='w-full flex items-center justify-center'>
-          <div class='flex space-x-4 items-center justify-between px-6 py-6 w-1/2'>
-            <div class='flex space-x-4 items-center'>
+        <div class='w-full flex items-start justify-start'>
+          <div class='flex space-x-4 items-start justify-between px-6 py-6'>
+            <div class='flex space-x-4 items-start'>
               <div class='bg-teal-600 text-center p-2 rounded text-white relative'>
                 <img src="/logo.svg" class="max-w-min" alt='Open AI logo' />
               </div>
