@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
   resources :assistants
-  resources :conversations
-  resources :messages
+  resources :conversations do
+    resources :messages
+   end
   resources :documents
 
   resources :users, only: [:new, :create]

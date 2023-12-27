@@ -1,26 +1,34 @@
-<div class="flex h-screen">
-  <!-- Left Column -->
-  <div id="left-column" class="bg-zinc-950 overflow-auto w-72">
+<div class="flex flex-row h-screen">
+
+  <div id="left-column" class="flex flex-col h-screen w-72 bg-zinc-950 overflow-auto">
     <!-- Content for the left column -->
   </div>
 
-  <!-- Right Column -->
-  <div id="right-column" class="flex-1 flex flex-col bg-zinc-700">
-    <div class="ml-6 my-4">
+
+  <div id="right-column" class="flex flex-1 flex-col h-screen bg-zinc-700">
+    <!-- Header that does not grow -->
+    <div id="header" class="flex-none ml-6 my-4 h-10">
       <%= @conversation.assistant.name %>
     </div>
 
-    <div id="inner-right-column" class="w-full md:max-w-none lg:max-w-[750px] xl:max-w-[870px] mx-auto flex-1 flex flex-col">
-      <div class="flex-1 overflow-auto ml-6">
-        <turbo-frame id="messages" src="<%= conversation_messages_path(@conversation) %>">
-          Loading...
-        </turbo-frame>
+    <!-- Content container that grows and takes remaining space, but does not overflow -->
+    <div id="content-container" class="flex flex-col flex-grow overflow-auto">
+      <!-- Scrollable content that does not stretch the parent -->
+      <div id="content" class="flex-grow overflow-auto">
+        <div class="w-full md:max-w-none lg:max-w-[750px] xl:max-w-[870px] mx-auto">
+          <turbo-frame id="messages" src="<%= conversation_messages_path(@conversation) %>">
+            Loading...
+          </turbo-frame>
+        </div>
       </div>
-
-      <!-- Fixed Input Area at the bottom, inside the right column -->
-      <div class="py-3 border-gray-300">
-        <input type="text" class="w-full h-12"/>
+      <!-- Anchored element at the bottom of the content-container -->
+      <div id="anchored-element" class="flex-none flex">
+        <div class="flex-1 px-3 w-full md:max-w-none lg:max-w-[750px] xl:max-w-[870px] mx-auto">
+          <input type="text" class="w-full h-14 rounded-2xl mb-2 bg-zinc-700 text-gray-200 pl-16 text-lg"/>
+          <div class="text-center text-gray-200 text-xs mb-2">HostedGPT can make mistakes. Consider checking important information.</div>
+        </div>
       </div>
     </div>
   </div>
+
 </div>
