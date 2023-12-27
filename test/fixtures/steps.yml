@@ -1,0 +1,25 @@
+hear_me_response:
+  assistant: samantha
+  conversation: greeting
+  run: hear_me_response
+  kind: message_creation
+  status: completed
+  details: {"type": "message_creation", "message_id": "<%= ActiveRecord::FixtureSet.identify(:yes_i_do) %>"}
+  last_error:
+  expired_at: 2023-12-25 15:07:10
+  cancelled_at: 2023-12-25 15:07:10
+  failed_at: 2023-12-25 15:07:10
+  completed_at: 2023-12-25 15:07:10
+
+identify_photo_response:
+  assistant: samantha
+  conversation: greeting
+  run: identify_photo_response
+  kind: message_creation
+  status: completed
+  details: {"type": "message_creation", "message_id": "<%= ActiveRecord::FixtureSet.identify(:yes_i_do) %>"}
+  last_error:
+  expired_at: 2023-12-25 15:07:10
+  cancelled_at: 2023-12-25 15:07:10
+  failed_at: 2023-12-25 15:07:10
+  completed_at: 2023-12-25 15:07:10

@@ -1,0 +1,22 @@
+<div id="<%= dom_id conversation %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">User:</strong>
+    <%= conversation.user_id %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Assistant:</strong>
+    <%= conversation.assistant_id %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Title:</strong>
+    <%= conversation.title %>
+  </p>
+
+  <% if action_name != "show" %>
+    <%= link_to "Show this conversation", conversation, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to "Edit this conversation", edit_conversation_path(conversation), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>

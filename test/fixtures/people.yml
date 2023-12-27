@@ -1,7 +1,9 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+guest:
+  email: nil
 
-one:
-  email: MyString
+keith_registered:
+  email: keith@hostedgpt.com
 
-two:
-  email: MyString
+ali_invited:
+  email: ali@hostedgpt.com
+

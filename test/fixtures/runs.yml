@@ -1,0 +1,33 @@
+hear_me_response:
+  assistant: samantha
+  conversation: greeting
+  status: completed
+  required_action:
+  last_error:
+  started_at: 2023-12-25 15:03:41
+  completed_at: 2023-12-25 15:04:41
+  expired_at: 2023-12-25 15:05:41
+  cancelled_at:
+  failed_at:
+  model: gpt-4
+  instructions: You are a helpful assistant
+  additional_instructions:
+  tools: [{"type": "retrieval"}, {"type": "code_interpreter"}]
+
+identify_photo_response:
+  assistant: samantha
+  conversation: greeting
+  status: completed
+  required_action:
+  last_error:
+  started_at: 2023-12-25 15:06:41
+  completed_at: 2023-12-25 15:07:41
+  expired_at: 2023-12-25 15:08:41
+  cancelled_at:
+  failed_at:
+  model: gpt-4
+  instructions: You are a helpful assistant
+  additional_instructions:
+  tools: [{"type": "retrieval"}, {"type": "code_interpreter"}]
+  file_ids: ["file-abc123"]
+
