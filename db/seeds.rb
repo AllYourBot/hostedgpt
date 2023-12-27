@@ -16,4 +16,4 @@ nochats.save!
 
 chat = Chat.create!(user: withchats.personable, name: "Create Rails Model: Note")
 message = chat.notes.create!(content: "AuthenticatedController better name")
-message.replies.create!(chat: chat, content: "For a more descriptive and intuitive name than AuthenticatedController, yet still conveying the essence of handling authenticated actions, consider:")
+message.replies.create!(content: "For a more descriptive and intuitive name than AuthenticatedController, yet still conveying the essence of handling authenticated actions, consider:")
