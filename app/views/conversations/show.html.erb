@@ -1,31 +1,75 @@
 <div class="flex flex-row h-screen">
 
-  <div id="left-column" class="flex flex-col h-screen w-72 bg-zinc-950 overflow-auto">
-    <!-- Content for the left column -->
+  <div id="left-column" class="flex-col h-screen w-64 bg-sidebar overflow-auto hidden md:flex">
+    <div id="left-header" class="flex-none flex h-10 mt-3 pl-2">
+      <%= gpt("HostedGPT") %>
+    </div>
+
+    <div id="left-content-container" class="flex flex-col flex-grow overflow-auto">
+      <div id="left-content" class="flex-grow overflow-auto pl-2">
+        <%= gpt("Samantha") %>
+        <%= gpt("Samantha") %>
+        <%= gpt("Samantha") %>
+        <%= gpt("Samantha") %>
+
+        <div class="text-white text-opacity-40 text-xs mx-3 mt-10 mb-2">
+          Today
+        </div>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+
+        <div class="text-white text-opacity-40 text-xs mx-3 mt-10 mb-2">
+          Yesterday
+        </div>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+        <%= conversation("Custom opacity in tailwind") %>
+      </div>
+
+      <div id="left-footer" class="flex-none flex text-white mb-4 mt-3 pl-2">
+        <%= gpt("Keith Schacht2") %>
+      </div>
+    </div>
   </div>
 
 
-  <div id="right-column" class="flex flex-1 flex-col h-screen bg-zinc-700">
+  <div id="right-column" class="flex flex-1 flex-col h-screen bg-body">
     <!-- Header that does not grow -->
-    <div id="header" class="flex-none ml-6 my-4 h-10">
+    <div id="header" class="flex-none ml-6 my-4 h-10 text-white text-lg hidden md:block ">
       <%= @conversation.assistant.name %>
     </div>
 
-    <!-- Content container that grows and takes remaining space, but does not overflow -->
-    <div id="content-container" class="flex flex-col flex-grow overflow-auto">
-      <!-- Scrollable content that does not stretch the parent -->
-      <div id="content" class="flex-grow overflow-auto">
+    <div id="right-header" class="flex-none flex h-14 text-lg text-center bg-shadow md:hidden">
+      <div class="flex-1 mb-2 bg-body border-b border-zinc-600  text-white flex items-center justify-center">
+        <%= @conversation.assistant.name %>
+      </div>
+    </div>
+
+    <div id="right-content-container" class="flex flex-col flex-grow overflow-auto">
+      <div id="right-content" class="flex-grow overflow-auto">
         <div class="w-full md:max-w-none lg:max-w-[750px] xl:max-w-[870px] mx-auto">
           <turbo-frame id="messages" src="<%= conversation_messages_path(@conversation) %>">
             Loading...
           </turbo-frame>
         </div>
       </div>
-      <!-- Anchored element at the bottom of the content-container -->
-      <div id="anchored-element" class="flex-none flex">
+
+      <div id="right-footer" class="flex-none flex">
         <div class="flex-1 px-3 w-full md:max-w-none lg:max-w-[750px] xl:max-w-[870px] mx-auto">
-          <input type="text" class="w-full h-14 rounded-2xl mb-2 bg-zinc-700 text-gray-200 pl-16 text-lg"/>
-          <div class="text-center text-gray-200 text-xs mb-2">HostedGPT can make mistakes. Consider checking important information.</div>
+          <input type="text"
+            placeholder="Message <%= @conversation.assistant.name %>..."
+            class="w-full h-14 rounded-2xl mb-2 bg-body text-gray-200 pl-16 text-lg placeholder-text-light border-zinc-500 focus:ring-0 focus:border-zinc-500"/>
+          <div class="text-center text-light text-xs mb-2">HostedGPT can make mistakes. Consider checking important information.</div>
         </div>
       </div>
     </div>

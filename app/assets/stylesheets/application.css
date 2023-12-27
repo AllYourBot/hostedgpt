@@ -30,3 +30,23 @@
   text-decoration: line-through;
 }
 
+.bg-sidebar {
+  background-color: #000000;
+}
+
+.bg-body {
+  background-color: rgba(52,53,65,1);
+}
+
+.bg-shadow {
+  background-color: rgba(32,33,35,1);
+}
+
+.text-light {
+  color: rgba(191,191,202,1);
+}
+
+.placeholder-text-light::placeholder {
+  --tw-placeholder-opacity: 1;
+  color: rgba(191,191,202,0.7);
+}
