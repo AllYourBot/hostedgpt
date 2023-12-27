@@ -1,4 +1,4 @@
-<% if notes.blank? %>
+<% if @chat.notes.blank? %>
   <div class='flex flex-col space-y-4 justify-center items-center absolute inset-x-0 top-0 bottom-0'>
     <h1 class='text-3xl font-bold pb-12'>ChatGPT</h1>
     <div class='space-y-2'>
@@ -26,11 +26,11 @@
   </div>
 <% end %>
 
-<% if notes.present? %>
+<% if @chat.notes.present? %>
   <div class='flex flex-col bg-gray-800 text-white overflow-y-scroll'>
-    <% notes.each do |message| %>
+    <% @chat.notes.each do |message| %>
       <div class='w-full flex items-start justify-start'>
-        <div class='flex space-x-4 px-6 py-6 w-1/2'>
+        <div class='flex space-x-4 px-6 py-6'>
           <div class='flex space-x-4 items-start'>
               <div class='bg-white text-center rounded text-white relative'>
                 <img src="https://i.pravatar.cc/57" class="max-w-min rounded" alt='Open AI logo' />
