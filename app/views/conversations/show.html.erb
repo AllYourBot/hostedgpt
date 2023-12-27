@@ -1,15 +1,26 @@
-<div class="mx-auto md:w-2/3 w-full flex">
-  <div class="mx-auto">
-    <% if notice.present? %>
-      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
-    <% end %>
+<div class="flex h-screen">
+  <!-- Left Column -->
+  <div id="left-column" class="bg-zinc-950 overflow-auto w-72">
+    <!-- Content for the left column -->
+  </div>
 
-    <%= render @conversation %>
-
-    <%= link_to "Edit this conversation", edit_conversation_path(@conversation), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-    <div class="inline-block ml-2">
-      <%= button_to "Destroy this conversation", conversation_path(@conversation), method: :delete, class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 font-medium" %>
+  <!-- Right Column -->
+  <div id="right-column" class="flex-1 flex flex-col bg-zinc-700">
+    <div class="ml-6 my-4">
+      <%= @conversation.assistant.name %>
     </div>
-    <%= link_to "Back to conversations", conversations_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+
+    <div id="inner-right-column" class="w-full md:max-w-none lg:max-w-[750px] xl:max-w-[870px] mx-auto flex-1 flex flex-col">
+      <div class="flex-1 overflow-auto ml-6">
+        <turbo-frame id="messages" src="<%= conversation_messages_path(@conversation) %>">
+          Loading...
+        </turbo-frame>
+      </div>
+
+      <!-- Fixed Input Area at the bottom, inside the right column -->
+      <div class="py-3 border-gray-300">
+        <input type="text" class="w-full h-12"/>
+      </div>
+    </div>
   </div>
 </div>

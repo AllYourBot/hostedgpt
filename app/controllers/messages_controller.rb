@@ -1,9 +1,10 @@
 class MessagesController < ApplicationController
   skip_before_action :authenticate_user!
+  before_action :set_conversation
   before_action :set_message, only: %i[show edit update destroy]
 
   def index
-    @messages = Message.all
+    @messages = @conversation.messages
   end
 
   def show
@@ -40,6 +41,10 @@ class MessagesController < ApplicationController
   end
 
   private
+
+  def set_conversation
+    @conversation = Conversation.find(params[:conversation_id])
+  end
 
   def set_message
     @message = Message.find(params[:id])
