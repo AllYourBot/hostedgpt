@@ -1,7 +1,7 @@
 <%= turbo_stream_from @chat %>
 <div class='h-screen bg-white text-black flex'>
   <%= render 'shared/chat_sidebar' %>
-  <div class='relative flex flex-1 flex-col h-full'>
+  <div class='relative flex flex-1 flex-col h-full bg-gray-800'>
     <%= render 'shared/chat_messages', notes: @chat.notes.no_replies %>
     <%= render 'shared/message_input' %>
   </div>
