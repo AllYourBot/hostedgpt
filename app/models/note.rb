@@ -1,10 +1,13 @@
 class Note < ApplicationRecord
   belongs_to :chat, touch: true
   belongs_to :parent, class_name: "Note", optional: true, touch: true
-  has_many :replies, class_name: "Note", foreign_key: :parent_id, dependent: :destroy
+  has_many :replies, dependent: :destroy
 
   validates :content, presence: true
-  scope :no_replies, -> { where(parent_id: nil).includes(:replies) }
 
   broadcasts_refreshes
+
+  def send_to_openai!
+    ProcessNoteJob.perform_later(self.id)
+  end
 end

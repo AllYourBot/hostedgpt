@@ -2,7 +2,8 @@ class ChatsController < ApplicationController
   before_action :set_chat
 
   def create
-    @chat.notes.no_replies.create!(content: params[:content])
+    note = @chat.notes.create!(content: params[:content])
+    note.send_to_openai!
     redirect_to chat_path(@chat)
   end
 
