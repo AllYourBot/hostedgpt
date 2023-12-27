@@ -14,7 +14,8 @@
         font-family: 'Inter', sans-serif;
       }
     </style>
-    <%= yield :head %>
+    <%= turbo_refreshes_with method: :morph, scroll: :preserve  %>
+    <%= content_for :head %>
   </head>
   <body>
     <%= yield %>
