@@ -8,6 +8,6 @@ class Note < ApplicationRecord
   broadcasts_refreshes
 
   def send_to_openai!
-    ProcessNoteJob.perform_later(self.id)
+    ProcessNoteJob.perform_later(id)
   end
 end
