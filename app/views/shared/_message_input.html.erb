@@ -1,5 +1,5 @@
     
-<div class='absolute flex bottom-0 inset-x-0 mx-auto px-4 py-6 justify-center items-center bg-[#343541]'>
+<div class='flex bottom-0 inset-x-0 mx-auto w-full px-4 py-6 justify-center items-center bg-[#343541]'>
   <%= form_with(url: chats_path, method: :post, data: { remote: "true" }, class: "border border-gray-300 flex justify-center items-center space-x-2 shadow-md rounded px-2 w-1/2") do |f| %>
     <input name="content" class='flex-1 bg-[#343541] text-white p-2 border-0 focus:outline-none' />
     <button type="submit">
