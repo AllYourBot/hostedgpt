@@ -8,7 +8,7 @@ class Reply < ApplicationRecord
     broadcast_append_later_to(
       "#{dom_id(chat)}_messages",
       partial: "shared/reply",
-      locals: { message: self, scroll_to: true },
+      locals: {message: self, scroll_to: true},
       target: "#{dom_id(chat)}_messages"
     )
   end
