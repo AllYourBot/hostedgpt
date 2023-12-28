@@ -10,7 +10,8 @@ class ProcessNoteJob < ApplicationJob
         temperature: 0.7
       }
     )
-    note.replies.create!(content: response.dig("choices", 0, "message", "content"))
+    reply = note.replies.create!(content: response.dig("choices", 0, "message", "content"))
+    reply.broadcast_created
   end
 
   def openai
