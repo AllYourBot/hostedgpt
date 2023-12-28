@@ -1,4 +1,4 @@
-<% if @has_answered %>
+<% if @chat.notes.blank? %>
   <div class='flex flex-col space-y-4 justify-center items-center absolute inset-x-0 top-0 bottom-0'>
     <h1 class='text-3xl font-bold pb-12'>ChatGPT</h1>
     <div class='space-y-2'>
@@ -26,24 +26,26 @@
   </div>
 <% end %>
 
-<% if @messages.present? %>
-  <div class='flex flex-col bg-white text-black'>
-    <% @messages.each do |message| %>
-      <div class='w-full flex items-center justify-center'>
-        <div class='flex space-x-4 bg-white items-center justify-between px-6 py-6 w-1/2'>
-          <div class='flex space-x-4 items-center'>
-            <div class=' bg-indigo-500 text-center p-1 px-2 rounded text-white'>You</div>
+<% if @chat.notes.present? %>
+  <%= turbo_stream_from "#{dom_id(@chat)}_messages" %>
+  <div class='flex flex-col text-white overflow-y-scroll' id="<%= dom_id(@chat) %>_messages">
+    <% @chat.notes.each do |message| %>
+      <div class='w-full flex items-start justify-start' id="<%= dom_id(message) %>">
+        <div class='flex space-x-4 px-6 py-6'>
+          <div class='flex space-x-4 items-start'>
+              <div class='bg-white text-center rounded text-white relative'>
+                <img src="https://i.pravatar.cc/57" class="max-w-min rounded" alt='Open AI logo' />
+              </div>
             <p><%= message.content %></p>
           </div>
           <%= heroicon "pencil-suqare" , options: { class: 'h-6 w-6' } %>
         </div>
       </div>
       <% if message.replies.any? %>
-
-        <div class='w-full flex items-center justify-center bg-gray-200 border-t border-b border-gray-500/40'>
-          <div class='flex space-x-4 items-center justify-between px-6 py-6 w-1/2'>
-            <div class='flex space-x-4 items-center'>
-              <div class='bg-teal-600 text-center p-2 rounded text-white relative'>
+        <div class='w-full flex items-start justify-start' id="<%= dom_id(message.replies.first) %>">
+          <div class='flex space-x-4 items-start justify-between px-6 py-6'>
+            <div class='flex space-x-4 items-start'>
+              <div class='bg-white text-center p-2 rounded text-white relative'>
                 <img src="/logo.svg" class="max-w-min" alt='Open AI logo' />
               </div>
               <p><%= message.replies.first.content %></p>

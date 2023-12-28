@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount GoodJob::Engine => "good_job"
+
   resources :assistants
   resources :conversations
   resources :messages

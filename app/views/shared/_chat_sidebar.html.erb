@@ -6,8 +6,7 @@
     </button>
     <% @chats.each do |chat| %>
       <div class='mt-5 flex flex-col text-white'>
-        <a href="<%= chat_path(chat) %>" class='flex space-x-2 p-2  <%= chat != @chat ? 'bg-black/80' : 'bg-gray-700'  %> mx-2 hover:bg-gray-700 rounded text-white items-center'>
-          <%= heroicon "chat" , options: { class: 'h-5 w-5 text-gray-300' } %>
+        <a href="<%= chat_path(chat) %>" class='flex space-x-2 p-2  mx-2 hover:bg-gray-800 rounded text-white items-center'>
           <p><%= chat.name %></p>
         </a>
       </div>
