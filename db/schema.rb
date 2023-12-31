@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_12_27_073756) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_31_043532) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -246,6 +246,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_27_073756) do
   create_table "users", force: :cascade do |t|
     t.string "password_digest"
     t.datetime "registered_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.string "first_name"
+    t.string "last_name"
+    t.string "openai_key"
   end
 
   add_foreign_key "assistants", "users"
