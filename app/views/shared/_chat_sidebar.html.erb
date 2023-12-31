@@ -11,52 +11,7 @@
         </a>
       </div>
     <% end %>
-    <div 
-      data-controller="settings-modal"
-      data-modal="settingsModal"
-      data-settings-modal-update-url-value="users/<%=Current.user.id%>"
-      class='absolute bottom-0 inset-x-0 border-t border-gray-200/50 mx-2 py-6 px-2'>
-      <button
-          data-target="openButton"
-          data-action="click->settings-modal#openModal"
-        class="flex space-x-2 p-2 hover:bg-black/80 mx-2 rounded text-white text-sm items-center">
-        <%= heroicon "cog" , options: { class: 'h-5 w-5 text-gray-300' } %>
-        <p>Settings</p>
-      </button>
-      <a href="/logout" class='flex space-x-2 p-2 hover:bg-black/80 mx-2 rounded text-white text-sm items-center'>
-        <%= heroicon "logout" , options: { class: 'h-5 w-5 text-gray-300' } %>
-        <p>Logout</p>
-      </a>
-      <div data-settings-modal-target="modal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-        <div class="modal-bg absolute inset-0 bg-black opacity-50"></div>
-        <div class="modal-content bg-[#343541] text-gray-200 p-6 rounded shadow-lg">
-          <h2 class="text-2xl font-bold mb-4">Settings</h2>
-          <form id="settingsForm">
-            <div class="mb-4">
-              <label for="apiKey" class="block text-gray-300 font-medium">OpenAI API Key:</label>
-              <input type="text" id="apiKey" name="apiKey" data-settings-modal-target="apiKeyEl" class="w-full border border-gray-300 rounded px-3 py-2">
-            </div>
-            <div class="mb-4">
-              <label for="firstName" class="block text-gray-300 font-medium">First Name:</label>
-              <input type="text" id="firstName" name="firstName" data-settings-modal-target="firstNameEl" class="w-full border border-gray-300 rounded px-3 py-2">
-            </div>
-            <div class="mb-4">
-              <label for="lastName" class="block text-gray-300 font-medium">Last Name:</label>
-              <input type="text" id="lastName" name="lastName" data-settings-modal-target="lastNameEl" class="w-full border border-gray-300 rounded px-3 py-2">
-            </div>
-            <div class="text-right">
-              <button 
-                 data-action="click->settings-modal#saveSettings"
-                data-target="saveButton"
-                type="button" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
-              <button type="button" 
-                      data-target="closeButton"
-                      data-action="click->settings-modal#closeModal"
-                id="closeModal" class="ml-2 text-gray-300 hover:text-gray-800">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+
+    <%= render partial: "shared/settings_modal" %>
   </div>
 </div>
