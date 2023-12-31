@@ -14,9 +14,7 @@
     <div 
       data-controller="settings-modal"
       data-modal="settingsModal"
-      data-settings-modal-api-key-value="yourApiKey"
-      data-settings-modal-first-name-value="yourFirstName"
-      data-settings-modal-last-name-value="yourLastName"
+      data-settings-modal-update-url-value="users/<%=Current.user.id%>"
       class='absolute bottom-0 inset-x-0 border-t border-gray-200/50 mx-2 py-6 px-2'>
       <button
           data-target="openButton"
@@ -36,15 +34,15 @@
           <form id="settingsForm">
             <div class="mb-4">
               <label for="apiKey" class="block text-gray-300 font-medium">OpenAI API Key:</label>
-              <input type="text" id="apiKey" name="apiKey" class="w-full border border-gray-300 rounded px-3 py-2">
+              <input type="text" id="apiKey" name="apiKey" data-settings-modal-target="apiKeyEl" class="w-full border border-gray-300 rounded px-3 py-2">
             </div>
             <div class="mb-4">
               <label for="firstName" class="block text-gray-300 font-medium">First Name:</label>
-              <input type="text" id="firstName" name="firstName" class="w-full border border-gray-300 rounded px-3 py-2">
+              <input type="text" id="firstName" name="firstName" data-settings-modal-target="firstNameEl" class="w-full border border-gray-300 rounded px-3 py-2">
             </div>
             <div class="mb-4">
               <label for="lastName" class="block text-gray-300 font-medium">Last Name:</label>
-              <input type="text" id="lastName" name="lastName" class="w-full border border-gray-300 rounded px-3 py-2">
+              <input type="text" id="lastName" name="lastName" data-settings-modal-target="lastNameEl" class="w-full border border-gray-300 rounded px-3 py-2">
             </div>
             <div class="text-right">
               <button 
