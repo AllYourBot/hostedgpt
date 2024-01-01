@@ -25,7 +25,6 @@ class UsersController < ApplicationController
   end
 
   def update
-    byebug
     Current.user.update!(update_params)
   end
 
