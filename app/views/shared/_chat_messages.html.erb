@@ -27,7 +27,6 @@
 <% end %>
 
 <% if @chat.notes.present? %>
-  <%= turbo_stream_from "#{dom_id(@chat)}_messages" %>
   <div class='flex flex-col text-white overflow-y-scroll' id="<%= dom_id(@chat) %>_messages">
     <% @chat.notes.each do |message| %>
       <div class='w-full flex items-start justify-start' id="<%= dom_id(message) %>">

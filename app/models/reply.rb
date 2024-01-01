@@ -18,11 +18,11 @@ class Reply < ApplicationRecord
   end
 
   def broadcast_updated
-    broadcast_append_to(
-      "#{dom_id(note)}_content",
-      partial: "shared/reply_content",
-      locals: {message: self, scroll_to: true},
-      target: "#{dom_id(note)}_content"
-    )
+    # broadcast_append_to(
+    #   "#{dom_id(note)}_content",
+    #   partial: "shared/reply_content",
+    #   locals: {message: self, scroll_to: true},
+    #   target: "#{dom_id(note)}_content"
+    # )
   end
 end
