@@ -28,7 +28,7 @@ class ProcessNoteJob < ApplicationJob
   end
 
   def for_openai(messages)
-    messages.map { |message| { role: "user", content: message.content } }
+    [@note].map { |message| { role: "user", content: message.content } }
   end
 
   def create_messages(note:)
