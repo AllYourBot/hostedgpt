@@ -1,10 +1,12 @@
+<% if reply.present? %>
 <div class='w-full flex items-start justify-start'>
   <div class='flex space-x-4 items-start justify-between px-6 py-6'>
-    <div class='flex space-x-4 items-start' id="<%= dom_id(message.note) %>_content">
+    <div class='flex space-x-4 items-start' id="<%= dom_id(reply.note) %>_content">
       <div class='bg-white text-center p-2 rounded text-white relative'>
         <img src="/logo.svg" class="max-w-min" alt='Open AI logo' />
       </div>
-      <p><%= message.content %></p>
+      <p><%= reply.content %></p>
     </div>
   </div>
 </div>
+<% end %>

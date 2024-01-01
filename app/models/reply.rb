@@ -4,16 +4,16 @@ class Reply < ApplicationRecord
   belongs_to :note, touch: true
   has_one :chat, through: :note
 
-  def self.for(message)
-    find_by(note: note)&.content || ""
+  def self.for(note)
+    find_by(note: note)
   end
 
   def broadcast_created
     broadcast_append_later_to(
-      "#{dom_id(chat)}_messages",
+      "#{dom_id(chat)}_notes",
       partial: "shared/reply",
-      locals: {message: self, scroll_to: true},
-      target: "#{dom_id(chat)}_messages"
+      locals: {reply: self, scroll_to: true},
+      target: "#{dom_id(chat)}_notes"
     )
   end
 
