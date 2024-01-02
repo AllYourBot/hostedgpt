@@ -21,7 +21,7 @@ class Reply < ApplicationRecord
     broadcast_append_to(
       "#{dom_id(self)}_content",
       partial: "shared/reply_content",
-      locals: {message: self, scroll_to: true},
+      locals: {message: Struct.new(:content).new(new_content), scroll_to: true},
       target: "#{dom_id(self)}_content"
     )
   end
