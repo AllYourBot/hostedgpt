@@ -1,6 +1,6 @@
 class ProcessNoteJob < ApplicationJob
   QUEUE_AS = :default
-  RESPONSES_PER_MESSAGE = 1
+  RESPONSES_PER_note = 1
 
   queue_as QUEUE_AS
 
@@ -37,47 +37,47 @@ class ProcessNoteJob < ApplicationJob
   end
 
   def process_note_with_openai
-    messages = create_and_broadcast_messages_for(@note)
+    notes = create_and_broadcast_replies_for(@note)
 
     @client.chat(
-      parameters: chat_parameters(messages)
+      parameters: chat_parameters(notes)
     )
   end
 
-  def chat_parameters(messages)
+  def chat_parameters(notes)
     {
       model: "gpt-3.5-turbo",
-      messages: format_messages_for_openai(messages),
+      messages: format_notes_for_openai(notes),
       temperature: 0.8,
-      stream: process_stream(messages),
-      n: RESPONSES_PER_MESSAGE
+      stream: process_stream(notes),
+      n: RESPONSES_PER_note
     }
   end
 
-  def format_messages_for_openai(messages)
-    [@note].map { |message| { role: "user", content: message.content } }
+  def format_notes_for_openai(notes)
+    [@note].map { |note| { role: "user", content: note.content } }
   end
 
-  def create_and_broadcast_messages_for(note)
-    Array.new(RESPONSES_PER_MESSAGE) do
-      message = note.replies.create!(content: "")
-      message.broadcast_created
-      message
+  def create_and_broadcast_replies_for(note)
+    Array.new(RESPONSES_PER_note) do
+      note = note.replies.create!(content: "")
+      note.broadcast_created
+      note
     end
   end
 
-  def process_stream(messages)
+  def process_stream(notes)
     proc do |chunk, _bytesize|
       new_content = chunk.dig("choices", 0, "delta", "content")
       finish_reason = chunk.dig("choices", 0, "finish_reason")
-      message = messages.first
+      note = notes.first
 
       if new_content.present?
-        message.content += new_content
-        message.broadcast_updated
+        note.content += new_content
+        note.broadcast_updated(new_content)
       end
 
-      message.save! if finish_reason.present?
+      note.save! if finish_reason.present?
     end
   end
 end
