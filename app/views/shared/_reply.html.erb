@@ -6,7 +6,7 @@
           <img src="/logo.svg" class="max-w-min" alt='Open AI logo' />
         </div>
         <%= turbo_stream_from "#{dom_id(reply)}_content" %>
-        <span id="<%= dom_id(reply) %>_content"><%= reply.content if reply.content.present? %></span>
+        <span id="<%= dom_id(reply) %>_content"><%=reply.content if reply.content.present?%></span>
       </div>
     </div>
   </div>

@@ -73,7 +73,6 @@ class ProcessNoteJob < ApplicationJob
       note = notes.first
 
       if new_content.present?
-        new_content += " "
         note.content += new_content
         note.broadcast_updated(new_content)
       end
