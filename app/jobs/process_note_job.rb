@@ -7,10 +7,6 @@ class ProcessNoteJob < ApplicationJob
   def perform(note_id, user_id)
     @user = find_user(user_id)
     @note = find_note(note_id)
-
-    configure_openai_with_user_key
-    init_client
-
     process_note_with_openai
   end
 
@@ -24,60 +20,54 @@ class ProcessNoteJob < ApplicationJob
     Note.find(note_id)
   end
 
-  def configure_openai_with_user_key
-    raise ArgumentError, "openai_key is missing" if @user.openai_key.blank?
-
-    OpenAI.configure do |config|
-      config.access_token = @user.openai_key
-    end
-  end
-
   def init_client
-    @client ||= OpenAI::Client.new(api_key: @user.openai_key)
+    @client ||= OpenAI::Client.new(access_token: @user.openai_key)
   end
 
   def process_note_with_openai
-    notes = create_and_broadcast_replies_for(@note)
+    init_client
+
+    replies = create_and_broadcast_replies_for(@note)
 
     @client.chat(
-      parameters: chat_parameters(notes)
+      parameters: chat_parameters(replies)
     )
   end
 
-  def chat_parameters(notes)
+  def chat_parameters(replies)
     {
       model: "gpt-3.5-turbo",
-      messages: format_notes_for_openai(notes),
+      messages: format_notes_for_openai(replies),
       temperature: 0.8,
-      stream: process_stream(notes),
+      stream: process_stream(replies),
       n: RESPONSES_PER_note
     }
   end
 
-  def format_notes_for_openai(notes)
+  def format_notes_for_openai(replies)
     [@note].map { |note| { role: "user", content: note.content } }
   end
 
   def create_and_broadcast_replies_for(note)
     Array.new(RESPONSES_PER_note) do
-      note = note.replies.create!(content: "")
-      note.broadcast_created
-      note
+      reply = note.replies.create!(content: "")
+      reply.broadcast_created
+      reply
     end
   end
 
-  def process_stream(notes)
+  def process_stream(replies)
     proc do |chunk, _bytesize|
       new_content = chunk.dig("choices", 0, "delta", "content")
       finish_reason = chunk.dig("choices", 0, "finish_reason")
-      note = notes.first
+      reply = replies.first
 
       if new_content.present?
-        note.content += new_content
-        note.broadcast_updated(new_content)
+        reply.content += new_content
+        reply.broadcast_updated(new_content)
       end
 
-      note.save! if finish_reason.present?
+      reply.save! if finish_reason.present?
     end
   end
 end
