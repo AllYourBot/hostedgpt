@@ -3,6 +3,8 @@ guest:
 
 keith_registered:
   email: keith@hostedgpt.com
+  personable_type: User
+  personable_id: <%= ActiveRecord::FixtureSet.identify(:keith) %>
 
 ali_invited:
   email: ali@hostedgpt.com
