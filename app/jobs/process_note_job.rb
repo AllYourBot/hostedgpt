@@ -45,7 +45,13 @@ class ProcessNoteJob < ApplicationJob
   end
 
   def format_notes_for_openai(replies)
-    [@note].map { |note| { role: "user", content: note.content } }
+    user_messages = @note.chat.notes.pluck(:content)
+
+    formatted_messages = user_messages.map do |content|
+      { role: "user", content: content }
+    end
+
+    formatted_messages
   end
 
   def create_and_broadcast_replies_for(note)
