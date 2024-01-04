@@ -88,3 +88,5 @@ end
 gem "good_job", "~> 3.21"
 
 gem "ruby-openai", "~> 6.3"
+
+gem "tiktoken_ruby", "~> 0.0.6"

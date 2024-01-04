@@ -1,8 +1,13 @@
 class ProcessNoteJob < ApplicationJob
   QUEUE_AS = :default
   RESPONSES_PER_note = 1
+  MAX_TOKENS = 500
+  MAX_RETRIES = 2
+  MAX_MESSAGE_LENGTH = 100000
 
   queue_as QUEUE_AS
+
+  retry_on RestClient::Exceptions::ReadTimeout, attempts: MAX_RETRIES, wait: :exponentially_longer
 
   def perform(note_id, user_id)
     @user = find_user(user_id)
@@ -27,11 +32,15 @@ class ProcessNoteJob < ApplicationJob
   def process_note_with_openai
     init_client
 
-    replies = create_and_broadcast_replies_for(@note)
+    retries ||= 0
+    begin
+      verify_token_count!
 
-    @client.chat(
-      parameters: chat_parameters(replies)
-    )
+      replies = create_and_broadcast_replies_for(@note)
+      @client.chat(parameters: chat_parameters(replies))
+    rescue 'TokenLimitExceeded' => e
+      handle_token_limit_exceeded
+    end
   end
 
   def chat_parameters(replies)
@@ -68,15 +77,9 @@ class ProcessNoteJob < ApplicationJob
       finish_reason = chunk.dig("choices", 0, "finish_reason")
       reply = replies.first
 
-      # Check if last character of reply.content and first character of new_content are both numbers
-      if reply.content.present? && new_content.present?
-        if reply.content[-1].match?(/\d/) && new_content[0].match?(/\d/)
-          # Do not prepend a space if both are numbers
-        else
-          # Prepend a space if new_content starts with a number
-          new_content = " " + new_content if new_content[0].match?(/\d/)
-        end
-      end
+      # Check if last character of reply.content and first character of
+      # new_content are both numbers
+      new_content = format_content(reply, new_content)
 
       if new_content.present?
         reply.content += new_content
@@ -85,5 +88,42 @@ class ProcessNoteJob < ApplicationJob
 
       reply.save! if finish_reason.present?
     end
+  end
+
+  def format_content(reply, new_content)
+    return unless reply.content.present? && new_content.present?
+    # Do not prepend a space if both are numbers
+    return if reply.content[-1].match?(/\d/) && new_content[0].match?(/\d/)
+    # Prepend a space if new_content starts with a number
+    return unless new_content[0].match?(/\d/)
+
+    " " + new_content
+  end
+
+  def model_token_limit(name)
+    {
+        'gpt-4-1106-preview': 128000,
+        'gpt-4-vision-preview': 128000,
+        'gpt-4': 8192,
+        'gpt-4-32k': 32768,
+        'gpt-4-0613': 8192,
+        'gpt-4-32k-0613': 32768,
+        'gpt-3.5-turbo-1106': 16385,
+        'gpt-3.5-turbo': 4096,
+        'gpt-3.5-turbo-16k': 16385,
+        'gpt-3.5-turbo-instruct': 4096
+    }[name.to_sym]
+  end
+
+  def verify_token_count!
+    # Assuming @note.chat is the chat object associated with the note
+    messages = @note.chat.notes.pluck(:content)
+    total_count = messages.sum { |msg| token_count(msg) } + MAX_TOKENS
+    raise 'TokenLimitExceeded' if total_count > model_token_limit('gpt-3.5-turbo')
+  end
+
+
+  def handle_token_limit_exceeded
+    Rails.logger.error "Token limit exceeded for ProcessNoteJob"
   end
 end

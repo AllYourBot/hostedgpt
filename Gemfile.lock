@@ -322,6 +322,8 @@ GEM
     tailwindcss-rails (2.0.32-x86_64-linux)
       railties (>= 6.0.0)
     thor (1.3.0)
+    tiktoken_ruby (0.0.6-arm64-darwin)
+    tiktoken_ruby (0.0.6-x86_64-linux)
     timeout (0.4.1)
     turbo-rails (2.0.0.pre.beta.1)
       actionpack (>= 6.0.0)
@@ -377,6 +379,7 @@ DEPENDENCIES
   standard
   stimulus-rails
   tailwindcss-rails
+  tiktoken_ruby (~> 0.0.6)
   turbo-rails (~> 2.0.0.pre.beta)
   tzinfo-data
   web-console
