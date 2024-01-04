@@ -62,6 +62,16 @@ class ProcessNoteJob < ApplicationJob
       finish_reason = chunk.dig("choices", 0, "finish_reason")
       reply = replies.first
 
+      # Check if last character of reply.content and first character of new_content are both numbers
+      if reply.content.present? && new_content.present?
+        if reply.content[-1].match?(/\d/) && new_content[0].match?(/\d/)
+          # Do not prepend a space if both are numbers
+        else
+          # Prepend a space if new_content starts with a number
+          new_content = " " + new_content if new_content[0].match?(/\d/)
+        end
+      end
+
       if new_content.present?
         reply.content += new_content
         reply.broadcast_updated(new_content)
