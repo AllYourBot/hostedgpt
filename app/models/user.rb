@@ -7,4 +7,12 @@ class User < ApplicationRecord
   validates :password_confirmation, presence: true, on: :create
 
   has_many :chats, dependent: :destroy
+
+  after_create_commit :create_blank_chat
+
+  private
+
+  def create_blank_chat
+    chats.create!(name: "HostedGPT")
+  end
 end
