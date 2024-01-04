@@ -1,4 +1,6 @@
 class ProcessNoteJob < ApplicationJob
+  class TokenLimitExceeded < StandardError; end
+
   QUEUE_AS = :default
   RESPONSES_PER_note = 1
   MAX_TOKENS = 500
@@ -7,7 +9,7 @@ class ProcessNoteJob < ApplicationJob
 
   queue_as QUEUE_AS
 
-  retry_on RestClient::Exceptions::ReadTimeout, attempts: MAX_RETRIES, wait: :exponentially_longer
+  #retry_on Faraday::Error, attempts: MAX_RETRIES, wait: :exponentially_longer
 
   def perform(note_id, user_id)
     @user = find_user(user_id)
@@ -38,7 +40,7 @@ class ProcessNoteJob < ApplicationJob
 
       replies = create_and_broadcast_replies_for(@note)
       @client.chat(parameters: chat_parameters(replies))
-    rescue 'TokenLimitExceeded' => e
+    rescue TokenLimitExceeded => e
       handle_token_limit_exceeded
     end
   end
@@ -91,11 +93,11 @@ class ProcessNoteJob < ApplicationJob
   end
 
   def format_content(reply, new_content)
-    return unless reply.content.present? && new_content.present?
+    return new_content unless reply.content.present? && new_content.present?
     # Do not prepend a space if both are numbers
-    return if reply.content[-1].match?(/\d/) && new_content[0].match?(/\d/)
+    return new_content if reply.content[-1].match?(/\d/) && new_content[0].match?(/\d/)
     # Prepend a space if new_content starts with a number
-    return unless new_content[0].match?(/\d/)
+    return new_content unless new_content[0].match?(/\d/)
 
     " " + new_content
   end
@@ -115,11 +117,18 @@ class ProcessNoteJob < ApplicationJob
     }[name.to_sym]
   end
 
+  def token_count(string, model)
+    encoding = Tiktoken.encoding_for_model(model)
+    encoding.encode(string).length
+  end
+
   def verify_token_count!
+    model = 'gpt-3.5-turbo'
+
     # Assuming @note.chat is the chat object associated with the note
     messages = @note.chat.notes.pluck(:content)
-    total_count = messages.sum { |msg| token_count(msg) } + MAX_TOKENS
-    raise 'TokenLimitExceeded' if total_count > model_token_limit('gpt-3.5-turbo')
+    total_count = messages.sum { |msg| token_count(msg, model) } + MAX_TOKENS
+    raise TokenLimitExceeded if total_count > model_token_limit(model)
   end
 
 
