@@ -294,6 +294,8 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
+    solid_queue (0.1.2)
+      rails (>= 7.0.3.1)
     sorbet-runtime (0.5.11156)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
@@ -375,6 +377,7 @@ DEPENDENCIES
   ruby-openai (~> 6.3)
   selenium-webdriver
   simplecov
+  solid_queue (~> 0.1.2)
   sprockets-rails
   standard
   stimulus-rails
