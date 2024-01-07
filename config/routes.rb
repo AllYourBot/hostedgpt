@@ -5,7 +5,7 @@ Rails.application.routes.draw do
    end
   resources :documents
 
-  resources :users, only: [:new, :create]
+  resources :users, only: [:new, :create, :update]
   resources :chats, only: [:index, :show, :create]
 
   get "/register", to: "users#new"

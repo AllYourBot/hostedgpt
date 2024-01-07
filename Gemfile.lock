@@ -1,13 +1,3 @@
-GIT
-  remote: https://github.com/hotwired/turbo-rails
-  revision: 75b25b5e25d0cf22b7eaf82fd8c5fbad3e256057
-  branch: main
-  specs:
-    turbo-rails (2.0.0.pre.beta.1)
-      actionpack (>= 6.0.0)
-      activejob (>= 6.0.0)
-      railties (>= 6.0.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -117,6 +107,14 @@ GEM
     drb (2.2.0)
       ruby2_keywords
     erubi (1.12.0)
+    event_stream_parser (1.0.0)
+    faraday (2.8.1)
+      base64
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-multipart (1.0.4)
+      multipart-post (~> 2)
+    faraday-net_http (3.0.2)
     globalid (1.2.1)
       activesupport (>= 6.1)
     heroicon (0.4.0)
@@ -149,6 +147,7 @@ GEM
     mini_mime (1.1.5)
     minitest (5.20.0)
     msgpack (1.7.2)
+    multipart-post (2.3.0)
     mutex_m (0.2.0)
     net-imap (0.4.7)
       date
@@ -265,6 +264,10 @@ GEM
       language_server-protocol (~> 3.17.0)
       prism (>= 0.19.0, < 0.20)
       sorbet-runtime (>= 0.5.5685)
+    ruby-openai (6.3.1)
+      event_stream_parser (>= 0.3.0, < 2.0.0)
+      faraday (>= 1)
+      faraday-multipart (>= 1)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
@@ -278,6 +281,8 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
+    solid_queue (0.1.2)
+      rails (>= 7.0.3.1)
     sorbet-runtime (0.5.11156)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
@@ -306,7 +311,13 @@ GEM
     tailwindcss-rails (2.0.32-x86_64-linux)
       railties (>= 6.0.0)
     thor (1.3.0)
+    tiktoken_ruby (0.0.6-arm64-darwin)
+    tiktoken_ruby (0.0.6-x86_64-linux)
     timeout (0.4.1)
+    turbo-rails (2.0.0.pre.beta.1)
+      actionpack (>= 6.0.0)
+      activejob (>= 6.0.0)
+      railties (>= 6.0.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
@@ -349,13 +360,16 @@ DEPENDENCIES
   rubocop-minitest
   rubocop-rails
   ruby-lsp
+  ruby-openai (~> 6.3)
   selenium-webdriver
   simplecov
+  solid_queue (~> 0.1.2)
   sprockets-rails
   standard
   stimulus-rails
   tailwindcss-rails
-  turbo-rails!
+  tiktoken_ruby (~> 0.0.6)
+  turbo-rails (~> 2.0.0.pre.beta)
   tzinfo-data
   web-console
 

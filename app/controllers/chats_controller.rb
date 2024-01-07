@@ -1,14 +1,23 @@
 class ChatsController < ApplicationController
-  def chat_messages_with_replies(chat_id)
-    Chat.find(chat_id).notes.where(parent_id: nil).includes(:replies)
+  before_action :set_chat
+
+  def create
+    note = @chat.notes.create!(content: params[:content])
+    note.send_to_openai!
+    redirect_to chat_path(@chat)
   end
 
   def show
-    @chats = Current.user.chats
-    @chat = @chats.find_by(id: params[:id]) || @chats.last
-    # Fetch only those messages that are not replies
-    @messages = @chat.notes.where(parent_id: nil).includes(:replies)
-    @has_answered = @notes.blank?
     render "home/show"
+  end
+
+  private
+
+  def set_chat
+    @chats = Current.user.chats
+    @chat = Current.user.chats.find_by(id: params[:id]) || Current.user.chats.last
+  end
+
+  def talk_to_openai(note)
   end
 end

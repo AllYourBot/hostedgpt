@@ -11,3 +11,16 @@
 }
 
 */
+
+
+  /* Add this to center the modal */
+  .modal-bg {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .modal-content {
+    width: 400px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
