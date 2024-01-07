@@ -17,7 +17,7 @@ jobs:
       image: ruby:3.2.2
     services:
       postgres:
-        image: postgres:11-alpine
+        image: postgres:16.1
         ports:
           - "5432:5432"
         env:
