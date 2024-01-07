@@ -107,8 +107,6 @@ GEM
     drb (2.2.0)
       ruby2_keywords
     erubi (1.12.0)
-    et-orbi (1.2.7)
-      tzinfo
     event_stream_parser (1.0.0)
     faraday (2.8.1)
       base64
@@ -117,18 +115,8 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
-    fugit (1.9.0)
-      et-orbi (~> 1, >= 1.2.7)
-      raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    good_job (3.21.5)
-      activejob (>= 6.0.0)
-      activerecord (>= 6.0.0)
-      concurrent-ruby (>= 1.0.2)
-      fugit (>= 1.1)
-      railties (>= 6.0.0)
-      thor (>= 0.14.1)
     heroicon (0.4.0)
       rails (>= 5.2)
     htmlbeautifier (1.4.2)
@@ -192,7 +180,6 @@ GEM
     public_suffix (5.0.4)
     puma (6.4.0)
       nio4r (~> 2.0)
-    raabro (1.4.0)
     racc (1.7.3)
     rack (3.0.8)
     rack-session (2.0.0)
@@ -294,6 +281,8 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
+    solid_queue (0.1.2)
+      rails (>= 7.0.3.1)
     sorbet-runtime (0.5.11156)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
@@ -322,6 +311,8 @@ GEM
     tailwindcss-rails (2.0.32-x86_64-linux)
       railties (>= 6.0.0)
     thor (1.3.0)
+    tiktoken_ruby (0.0.6-arm64-darwin)
+    tiktoken_ruby (0.0.6-x86_64-linux)
     timeout (0.4.1)
     turbo-rails (2.0.0.pre.beta.1)
       actionpack (>= 6.0.0)
@@ -355,7 +346,6 @@ DEPENDENCIES
   byebug
   capybara
   debug
-  good_job (~> 3.21)
   heroicon (~> 0.4.0)
   htmlbeautifier
   importmap-rails
@@ -373,10 +363,12 @@ DEPENDENCIES
   ruby-openai (~> 6.3)
   selenium-webdriver
   simplecov
+  solid_queue (~> 0.1.2)
   sprockets-rails
   standard
   stimulus-rails
   tailwindcss-rails
+  tiktoken_ruby (~> 0.0.6)
   turbo-rails (~> 2.0.0.pre.beta)
   tzinfo-data
   web-console

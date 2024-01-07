@@ -85,6 +85,6 @@ group :test do
   gem "rails-controller-testing"
 end
 
-gem "good_job", "~> 3.21"
-
 gem "ruby-openai", "~> 6.3"
+gem "tiktoken_ruby", "~> 0.0.6"
+gem "solid_queue", "~> 0.1.2"
