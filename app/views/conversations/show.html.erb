@@ -1,43 +1,43 @@
 <div class="flex flex-row h-screen">
 
-  <div id="left-column" class="flex-col h-screen w-64 bg-sidebar overflow-auto hidden md:flex">
+  <div id="left-column" class="flex-col h-screen w-[260px] bg-black overflow-auto hidden md:flex">
     <div id="left-header" class="flex-none flex h-10 mt-3 pl-2">
-      <%= gpt("HostedGPT") %>
+      <%= render 'gpt_sidebar', title: "HostedGPT" %>
     </div>
 
     <div id="left-content-container" class="flex flex-col flex-grow overflow-auto">
       <div id="left-content" class="flex-grow overflow-auto pl-2">
-        <%= gpt("Samantha") %>
-        <%= gpt("Samantha") %>
-        <%= gpt("Samantha") %>
-        <%= gpt("Samantha") %>
+        <%= render 'gpt_sidebar', title: "Samantha" %>
+        <%= render 'gpt_sidebar', title: "Samantha" %>
+        <%= render 'gpt_sidebar', title: "Samantha" %>
+        <%= render 'gpt_sidebar', title: "Samantha" %>
 
         <div class="text-white text-opacity-40 text-xs mx-3 mt-10 mb-2">
           Today
         </div>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
 
         <div class="text-white text-opacity-40 text-xs mx-3 mt-10 mb-2">
           Yesterday
         </div>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
-        <%= conversation("Custom opacity in tailwind") %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
       </div>
 
       <div id="left-footer" class="flex-none flex text-white mb-4 mt-3 pl-2">
-        <%= gpt("Keith Schacht2") %>
+        <%= render 'gpt_sidebar', title: "Keith Schacht2" %>
       </div>
     </div>
   </div>
@@ -45,19 +45,23 @@
 
   <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite">
     <!-- Header that does not grow -->
-    <div id="wide-header" class="flex-none ml-6 my-4 h-10 text-black dark:text-white text-lg hidden md:block ">
-      <%= @conversation.assistant.name %>
+    <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-10 text-black dark:text-white text-lg hidden md:flex">
+      <%= render 'gpt_header', conversation: @conversation %>
+
+      <div id="right-aligned-content" class="hover:bg-gray-100 cursor-pointer inline-flex mr-3 border border-grey-200 rounded-xl px-2 py-2">
+        <%= heroicon "logout", variant: :outline, options: { class: 'h-5 w-5 text-gray-500 rotate-[270deg]' } %>
+      </div>
     </div>
 
-    <div id="narrow-header" class="flex-none flex h-14 text-lg text-center bg-white dark:bg-zinc-800 md:hidden">
+    <div id="narrow-header" class="flex-none h-14 text-lg text-center bg-white dark:bg-zinc-800 md:hidden">
       <div class="flex-1 mb-2 border-b border-zinc-300 dark:border-zinc-600 text-black dark:text-white dark:bg-graphite flex items-center justify-center">
-        <%= @conversation.assistant.name %>
+        <%= render 'gpt_header', conversation: @conversation %>
       </div>
     </div>
 
     <div id="right-content-container" class="flex flex-col flex-grow overflow-auto">
       <div id="right-content" class="flex-grow overflow-auto">
-        <div class="w-full md:max-w-none lg:max-w-[750px] xl:max-w-[870px] mx-auto">
+        <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
           <turbo-frame id="messages" src="<%= conversation_messages_path(@conversation) %>">
             Loading...
           </turbo-frame>

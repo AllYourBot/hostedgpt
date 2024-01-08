@@ -1,17 +1,26 @@
-<div id="<%= dom_id message %>" class="my-5 ml-9">
+<div id="<%= dom_id message %>" class="ml-9 md:ml-8 sm:ml-3 mb-5 group">
   <div class="flex">
-    <div class="w-6 flex flex-col items-center">
-      <div class="w-6 h-6 bg-white rounded-full mt-1"></div>
+    <div class="w-6 flex flex-col items-center ml-1">
+      <div class="w-6 h-6 bg-black dark:bg-white rounded-full mt-1"></div>
     </div>
 
     <!-- Right Column -->
-    <div class="flex-1 min-w-0 ml-4 mr-8 text-black dark:text-gray-200">
-      <div class="my-1 font-black">
+    <div class="flex-1 min-w-0 ml-3 mr-8 text-black dark:text-gray-200 text-base">
+      <div class="mt-1 font-black">
         <%= message.user? ? 'You' : conversation.assistant.name %>
       </div>
 
-      <div class="flex-1">
+      <div class="text-gray-700">
         <%= message.content_text %>
+      </div>
+
+      <div class="mt-2 flex justify-start gap-2 text-gray-400 invisible group-hover:visible">
+        <% if message.user? %>
+          <%= heroicon "pencil", variant: :outline, options: { class: 'h-4 w-4 hover:text-black cursor-pointer' } %>
+        <% else %>
+          <%= heroicon "clipboard", variant: :outline, options: { class: 'h-4 w-4 hover:text-black cursor-pointer' } %>
+          <%= heroicon "refresh", variant: :outline, options: { class: 'h-4 w-4 hover:text-black cursor-pointer' } %>
+        <% end %>
       </div>
     </div>
   </div>

@@ -13,16 +13,3 @@
  *= require_tree .
  *= require_self
  */
-
-.bg-sidebar {
-  background-color: #000000;
-}
-
-.bg-shadow {
-  background-color: rgba(32,33,35,1);
-}
-
-.placeholder-text-light::placeholder {
-  --tw-placeholder-opacity: 1;
-  color: rgba(191,191,202,0.7);
-}
