@@ -58,14 +58,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_07_233601) do
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
-  create_table "events", force: :cascade do |t|
-    t.uuid "request_id"
-    t.string "user_agent"
-    t.string "ip_address"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.string "role", null: false
@@ -96,12 +88,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_07_233601) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["personable_type", "personable_id"], name: "index_people_on_personable"
-  end
-
-  create_table "projects", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "replies", force: :cascade do |t|
@@ -246,15 +232,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_07_233601) do
     t.index ["run_id"], name: "index_steps_on_run_id"
   end
 
-  create_table "tasks", force: :cascade do |t|
-    t.string "title"
-    t.boolean "completed", default: false
-    t.bigint "project_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["project_id"], name: "index_tasks_on_project_id"
-  end
-
   create_table "tombstones", force: :cascade do |t|
     t.datetime "erected_at"
   end
@@ -289,5 +266,4 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_07_233601) do
   add_foreign_key "steps", "assistants"
   add_foreign_key "steps", "conversations"
   add_foreign_key "steps", "runs"
-  add_foreign_key "tasks", "projects"
 end
