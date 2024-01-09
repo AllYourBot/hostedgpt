@@ -21,3 +21,18 @@ services:
         sync: false
       - key: WEB_CONCURRENCY
         value: 2 # sensible default
+  - type: worker
+    name: solidqueue
+    runtime: ruby
+    plan: free
+    buildCommand: bundle install
+    startCommand: ./bin/rake solid_queue:start 
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hostedgpt
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+      - key: WEB_CONCURRENCY
+        value: 2 # sensible default
+        sync: false
