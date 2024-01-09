@@ -50,6 +50,11 @@ class ActionDispatch::IntegrationTest
   def response
     JSON.parse(@response.body, object_class: OpenStruct)&.data
   end
+
+  def login_as(user)
+    post login_path, params: { email: user.person.email, password: "secret" }
+    assert_redirected_to dashboard_path
+  end
 end
 
 module ActiveSupport
