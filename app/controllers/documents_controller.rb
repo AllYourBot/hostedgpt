@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
   skip_before_action :authenticate_user!
-  before_action :set_document, only: %i[show edit update destroy]
+  before_action :set_document, only: [:show, :edit, :update, :destroy]
 
   def index
     @documents = Document.all

@@ -1,0 +1,353 @@
+# The rules defined here are based on Rails:
+# https://raw.githubusercontent.com/rails/rails/master/.rubocop.yml
+# But with some modifications to fit our needs.
+
+require:
+  - rubocop-rails
+  - rubocop-capybara
+  - rubocop-minitest
+  - rubocop-performance
+
+AllCops:
+  TargetRubyVersion: 3.0
+  # RuboCop has a bunch of cops enabled by default. This setting tells RuboCop
+  # to ignore them, so only the ones explicitly set in this file are enabled.
+  DisabledByDefault: true
+  SuggestExtensions: false
+  Exclude:
+    - '**/tmp/**/*'
+    - '**/vendor/**/*'
+    - '**/node_modules/**/*'
+    - 'bin/*'
+    - 'native/**/*'
+
+Performance:
+  Exclude:
+    - '**/test/**/*'
+
+# Method definitions after `private` or `protected` isolated calls do NOT
+# need extra level of indentation.
+Layout/IndentationConsistency:
+  Enabled: true
+
+# Detect hard tabs, no hard tabs
+Layout/IndentationStyle:
+  Enabled: true
+
+# Four spaces, no tabs (for indentation)
+Layout/IndentationWidth:
+  Enabled: true
+  Width: 2
+  Exclude:
+    - '**/test/**/*'
+
+# No spaces at the end of a line
+Layout/TrailingWhitespace:
+  Enabled: true
+
+# Prefer Foo.method over Foo::method
+Style/ColonMethodCall:
+  Enabled: true
+
+# Prefer brackets for array of symbols
+Style/SymbolArray:
+  Enabled: true
+  EnforcedStyle: brackets
+  Include:
+    - 'routes.rb'
+    - 'app/controllers/**/*'
+
+# Rules below this line are disabled
+
+# Prefer assert_not over assert !
+Rails/AssertNot:
+  Enabled: false
+  Include:
+    - '**/test/**/*'
+
+# Prefer assert_not_x over refute_x
+Rails/RefuteMethods:
+  Enabled: false
+  Include:
+    - '**/test/**/*'
+
+Rails/IndexBy:
+  Enabled: false
+
+Rails/IndexWith:
+  Enabled: false
+
+# Prefer &&/|| over and/or.
+Style/AndOr:
+  Enabled: false
+
+# Align `when` with `case`.
+Layout/CaseIndentation:
+  Enabled: false
+
+Layout/ClosingHeredocIndentation:
+  Enabled: false
+
+Layout/ClosingParenthesisIndentation:
+  Enabled: false
+
+# Align comments with method definitions.
+Layout/CommentIndentation:
+  Enabled: false
+
+Layout/ElseAlignment:
+  Enabled: false
+
+# Align `end` with the matching keyword or starting expression except for
+# assignments, where it should be aligned with the LHS.
+Layout/EndAlignment:
+  Enabled: false
+  EnforcedStyleAlignWith: variable
+  AutoCorrect: true
+
+Layout/EndOfLine:
+  Enabled: false
+
+Layout/EmptyLineAfterMagicComment:
+  Enabled: false
+
+Layout/EmptyLinesAroundAccessModifier:
+  Enabled: false
+  EnforcedStyle: only_before
+
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+# In a regular class definition, no empty lines around the body.
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+# In a regular method definition, no empty lines around the body.
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: false
+
+# In a regular module definition, no empty lines around the body.
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+# Use Ruby >= 1.9 syntax for hashes. Prefer { a: :b } over { :a => :b }.
+Style/HashSyntax:
+  Enabled: false
+
+Layout/LeadingCommentSpace:
+  Enabled: false
+
+Layout/SpaceAfterColon:
+  Enabled: false
+
+Layout/SpaceAfterComma:
+  Enabled: false
+
+Layout/SpaceAfterSemicolon:
+  Enabled: false
+
+Layout/SpaceAroundEqualsInParameterDefault:
+  Enabled: false
+
+Layout/SpaceAroundKeyword:
+  Enabled: false
+
+Layout/SpaceAroundOperators:
+  Enabled: false
+
+Layout/SpaceBeforeComma:
+  Enabled: false
+
+Layout/SpaceBeforeComment:
+  Enabled: false
+
+Layout/SpaceBeforeFirstArg:
+  Enabled: false
+
+Style/DefWithParentheses:
+  Enabled: false
+
+# Defining a method with parameters needs parentheses.
+Style/MethodDefParentheses:
+  Enabled: false
+
+Style/ExplicitBlockArgument:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/MapToHash:
+  Enabled: false
+
+Style/RedundantFreeze:
+  Enabled: false
+
+# Use `foo {}` not `foo{}`.
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
+
+# Use `foo { bar }` not `foo {bar}`.
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+  EnforcedStyleForEmptyBraces: space
+
+# Use `{ a: 1 }` not `{a:1}`.
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Layout/SpaceInsideParens:
+  Enabled: false
+
+# Use quotes for string literals when they are enough.
+Style/RedundantPercentQ:
+  Enabled: false
+
+Lint/AmbiguousOperator:
+  Enabled: false
+
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+Lint/Debugger:
+  Enabled: true
+
+Lint/DuplicateRequire:
+  Enabled: false
+
+Lint/DuplicateMagicComment:
+  Enabled: false
+
+Lint/DuplicateMethods:
+  Enabled: false
+
+Lint/ErbNewArguments:
+  Enabled: false
+
+Lint/EnsureReturn:
+  Enabled: false
+
+# Use my_method(my_arg) not my_method( my_arg ) or my_method my_arg.
+Lint/RequireParentheses:
+  Enabled: false
+
+Lint/RedundantStringCoercion:
+  Enabled: false
+
+Lint/UriEscapeUnescape:
+  Enabled: false
+
+Lint/UselessAssignment:
+  Enabled: false
+
+Lint/DeprecatedClassMethods:
+  Enabled: false
+
+Style/EvalWithLocation:
+  Enabled: false
+  Exclude:
+    - '**/test/**/*'
+
+Style/ParenthesesAroundCondition:
+  Enabled: false
+
+Style/HashTransformKeys:
+  Enabled: false
+
+Style/HashTransformValues:
+  Enabled: false
+
+Style/RedundantBegin:
+  Enabled: false
+
+Style/RedundantReturn:
+  Enabled: false
+  AllowMultipleReturnValues: true
+
+Style/RedundantRegexpEscape:
+  Enabled: false
+
+Style/Semicolon:
+  Enabled: false
+  AllowAsExpressionSeparator: true
+
+Style/TrivialAccessors:
+  Enabled: false
+
+# Prefer a = b || c over a = b ? b : c
+Style/RedundantCondition:
+  Enabled: false
+
+Performance/BindCall:
+  Enabled: false
+
+Performance/FlatMap:
+  Enabled: false
+
+Performance/MapCompact:
+  Enabled: false
+
+Performance/SelectMap:
+  Enabled: false
+
+Performance/RedundantMerge:
+  Enabled: false
+
+Performance/StartWith:
+  Enabled: false
+
+Performance/EndWith:
+  Enabled: false
+
+Performance/RegexpMatch:
+  Enabled: false
+
+Performance/ReverseEach:
+  Enabled: false
+
+Performance/StringReplacement:
+  Enabled: false
+
+Performance/UnfreezeString:
+  Enabled: false
+
+Performance/DeletePrefix:
+  Enabled: false
+
+Performance/DeleteSuffix:
+  Enabled: false
+
+Performance/OpenStruct:
+  Enabled: false
+
+Performance/InefficientHashSearch:
+  Enabled: false
+
+Performance/ConstantRegexp:
+  Enabled: false
+
+Performance/RedundantStringChars:
+  Enabled: false
+
+Performance/StringInclude:
+  Enabled: false
+
+Minitest/AssertRaisesWithRegexpArgument:
+  Enabled: false
+
+Minitest/AssertWithExpectedArgument:
+  Enabled: false
+
+Minitest/SkipEnsure:
+  Enabled: false
+
+Minitest/UnreachableAssertion:
+  Enabled: false
+
+# Check quotes usage according to lint rule below.
+Style/StringLiterals:
+  Enabled: false
+
+# Files should always have a new line at the end
+Layout/TrailingEmptyLines:
+  Enabled: false
