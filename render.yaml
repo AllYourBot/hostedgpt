@@ -5,9 +5,9 @@ databases:
     plan: free
 
 envVarGroups:
-- name: generated-secrets
+- name: hostedgpt-secrets
   envVars:
-    - key: rails_master_key
+    - key: SECRET_KEY_BASE
       generateValue: true
 
 services:
@@ -22,7 +22,7 @@ services:
         fromDatabase:
           name: hostedgpt
           property: connectionString
-      - fromGroup: generated-secrets
+      - fromGroup: hostedgpt-secrets
       - key: WEB_CONCURRENCY
         value: 2 # sensible default
   - type: web
@@ -37,6 +37,6 @@ services:
         fromDatabase:
           name: hostedgpt
           property: connectionString
-      - fromGroup: generated-secrets
+      - fromGroup: hostedgpt-secrets
       - key: WEB_CONCURRENCY
         value: 2 # sensible default
