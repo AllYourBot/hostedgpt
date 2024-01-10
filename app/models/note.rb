@@ -6,6 +6,8 @@ class Note < ApplicationRecord
 
   validates :content, presence: true
 
+  has_one_attached :image
+
   broadcasts_refreshes
 
   def send_to_openai!
