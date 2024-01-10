@@ -14,11 +14,11 @@ HostedGPT is an open source project that provides all the same baseline function
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login
-2. View your newly created fork within github.com and click the button below:
+3. View your newly created fork within github.com and click the button below:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
-3. Find hostedgpt in the list of repositories and click **Connect**
+4. Find hostedgpt in the list of repositories and click **Connect**
 5. Provide a unique Blueprint name such as "hostedgpt-<yourname>".
 6. Click **Apply**
 7. Wait for the hostedgpt database and web service to be deployed. After they are, click "Dashboard" at the top of the Render screen.
