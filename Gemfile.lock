@@ -117,8 +117,6 @@ GEM
     faraday-net_http (3.0.2)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    heroicon (0.4.0)
-      rails (>= 5.2)
     htmlbeautifier (1.4.2)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
@@ -214,6 +212,9 @@ GEM
     rails-html-sanitizer (1.6.0)
       loofah (~> 2.21)
       nokogiri (~> 1.14)
+    rails_heroicon (2.2.0)
+      actionview
+      railties
     railties (7.1.2)
       actionpack (= 7.1.2)
       activesupport (= 7.1.2)
@@ -346,7 +347,6 @@ DEPENDENCIES
   byebug
   capybara
   debug
-  heroicon (~> 0.4.0)
   htmlbeautifier
   importmap-rails
   pg (~> 1.1)
@@ -355,6 +355,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 7.1.2)
   rails-controller-testing
+  rails_heroicon (~> 2.2.0)
   redis (>= 4.0.1)
   rubocop-capybara
   rubocop-minitest
