@@ -28,7 +28,7 @@ class ConversationAi
 
   def build_chat_parameters(replies)
     {
-      model: "gpt-3.5-turbo",
+      model: @note.image.presence ? "gpt-4-vision-preview" : "gpt-3.5-turbo",
       messages: prepare_messages_for_openai,
       temperature: 0.8,
       stream: handle_stream(replies),
@@ -41,7 +41,23 @@ class ConversationAi
   end
 
   def prepare_messages_for_openai
-    @chat.notes.pluck(:content).map { |content| {role: "user", content: content} }
+    @chat.notes.map do |note|
+      if note.image.present?
+        blob = note.image.blob
+        base64_image = blob.open do |file|
+          Base64.strict_encode64(file.read)
+        end
+        {
+          role: "user",
+          content: [
+            {type: "text", text: note.content},
+            {type: "image_url", image_url: { url: "data:image/jpeg;base64,#{base64_image}" }}
+          ]
+        }
+      else
+        {role: "user", content: note.content}
+      end
+    end
   end
 
   def handle_stream(replies)
