@@ -1,15 +1,15 @@
 <div class="flex flex-row h-screen">
 
-  <div id="left-column" class="flex-col h-screen w-[260px] bg-black overflow-auto hidden md:flex">
-    <div id="left-header" class="flex-none flex h-10 mt-3 pl-2">
-      <%= render 'gpt_sidebar', title: "HostedGPT" %>
+  <div id="left-column" class="flex-col h-screen w-[260px] bg-black overflow-auto hidden md:flex pl-3 pr-5 scrollbar-hide">
+    <div id="left-header" class="flex-none flex h-10 mt-3 mb-1">
+      <%= render 'gpt_sidebar', title: "ChatGPT", selected: false, settings: false %>
     </div>
 
-    <div id="left-content-container" class="flex flex-col flex-grow overflow-auto">
-      <div id="left-content" class="flex-grow overflow-auto pl-2">
+    <div id="left-content-container" class="flex flex-col flex-grow overflow-auto scrollbar-hide">
+      <div id="left-content" class="flex-grow overflow-auto scrollbar-hide">
         <%= render 'gpt_sidebar', title: "Samantha" %>
-        <%= render 'gpt_sidebar', title: "Samantha" %>
-        <%= render 'gpt_sidebar', title: "Samantha" %>
+        <%= render 'gpt_sidebar', title: "Samantha but really long so it wraps" %>
+        <%= render 'gpt_sidebar', title: "Samantha", selected: true %>
         <%= render 'gpt_sidebar', title: "Samantha" %>
 
         <div class="text-white text-opacity-40 text-xs mx-3 mt-10 mb-2">
@@ -17,7 +17,7 @@
         </div>
         <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
         <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind", selected: true %>
         <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
         <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
         <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
@@ -36,8 +36,13 @@
         <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
       </div>
 
-      <div id="left-footer" class="flex-none flex text-white mb-4 mt-3 pl-2">
-        <%= render 'gpt_sidebar', title: "Keith Schacht2" %>
+      <div id="left-footer" class="flex-none flex text-white mb-4 mt-3">
+        <div class="h-10 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 justify-between items-center w-full group cursor-pointer mb-1">
+          <div id="profile" class="ml-2 mr-2 w-7 h-7 bg-white rounded-full"></div>
+          <div class="flex-1 text-white truncate">
+            Keith Schacht
+          </div>
+        </div>
       </div>
     </div>
   </div>

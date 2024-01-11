@@ -1,7 +1,17 @@
-<div class="h-9 flex mr-6 rounded-lg hover:bg-zinc-400 hover:bg-opacity-20">
-  <div class="flex-1 flex mx-1 my-1">
-    <div class="flex-1 flex items-center ml-2 text-white text-sm text-opacity-80">
-      <%= title %>
-    </div>
+
+<div class="h-9 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 <%= defined?(selected) && selected ? 'bg-zinc-400 bg-opacity-25' : '' %> justify-between items-center w-full group cursor-pointer">
+<div class="flex-1 ml-2 text-white truncate text-sm text-opacity-80">
+    Some long text that might be too long and needs to be truncated
+  </div>
+  <div class="<%= defined?(selected) && selected ? 'flex' : 'hidden' %> group-hover:flex gap-2 pl-2">
+    <% if !defined?(settings) || settings %>
+      <%= heroicon("dots-horizontal", variant: :solid, options: { class: 'ml-1 h-4 w-4 inline text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer' }) %>
+    <% end %>
+
+    <% if defined?(selected) && selected %>
+      <%= heroicon("archive", variant: :solid, options: { class: 'ml-1 h-4 w-4 inline text-gray-400 text-white cursor-pointer' }) %>
+    <% else %>
+      <%= heroicon("archive", variant: :solid, options: { class: 'ml-1 h-4 w-4 inline text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer' }) %>
+    <% end %>
   </div>
 </div>
