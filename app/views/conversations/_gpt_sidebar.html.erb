@@ -5,13 +5,9 @@
     </div>
     <div class="<%= defined?(selected) && selected ? 'flex' : 'hidden' %> group-hover:flex gap-2 pl-2">
       <% if !defined?(settings) || settings %>
-        <div class="inline tooltip tooltip-top hover:tooltip-open" data-tip="More">
-          <%= heroicon("dots-horizontal", variant: :solid, options: { class: 'ml-1 h-4 w-4 inline text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer' }) %>
-        </div>
+        <%= icon "ellipsis-horizontal", variant: :micro, size: 18, class: "inline ml-1 text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer", title: "More" %>
       <% end %>
 
-      <div class="inline tooltip tooltip-top hover:tooltip-open" data-tip="New chat">
-        <%= heroicon("pencil-alt", variant: :solid, options: { class: "ml-1 h-4 w-4 inline text-gray-400 #{defined?(selected) && selected ? 'text-white' : 'invisible group-hover:visible hover:text-white'}" }) %>
-      </div>
+      <%= icon "pencil-square", variant: :micro, size: 18, class: "inline ml-1 text-gray-400 cursor-pointer #{defined?(selected) && selected ? 'text-white' : 'invisible group-hover:visible hover:text-white'}", title: "New chat" %>
     </div>
   </div>

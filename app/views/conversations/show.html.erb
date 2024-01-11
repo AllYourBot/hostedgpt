@@ -53,8 +53,8 @@
     <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-10 text-black dark:text-white text-lg hidden md:flex">
       <%= render 'gpt_header', conversation: @conversation %>
 
-      <div id="right-aligned-content" class="hover:bg-gray-100 cursor-pointer inline-flex mr-3 border border-grey-200 rounded-xl px-2 py-2">
-        <%= heroicon "logout", variant: :outline, options: { class: 'h-5 w-5 text-gray-500 rotate-[270deg]' } %>
+      <div id="right-aligned-content" class="hover:bg-gray-100 cursor-pointer inline-flex mr-5 border border-gray-300 rounded-lg px-2 py-2 mt-1">
+        <%= icon "arrow-up-tray", variant: :outline, size: 18, class: 'text-black', title: "Share", tooltip: :bottom %>
       </div>
     </div>
 
