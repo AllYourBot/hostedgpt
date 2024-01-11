@@ -7,12 +7,12 @@
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" %>
     <%= javascript_importmap_tags %>
     <style>
       body{
         font-family: 'Inter', sans-serif;
       }
-
     </style>
     <%= turbo_refreshes_with method: :morph, scroll: :preserve  %>
     <%= content_for :head %>
