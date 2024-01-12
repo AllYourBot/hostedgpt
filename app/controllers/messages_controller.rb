@@ -19,9 +19,10 @@ class MessagesController < ApplicationController
 
   def create
     @message = @conversation.messages.build(message_params)
+    @message.role = :user
 
     if @message.save
-      redirect_to @message, notice: "Message was successfully created."
+      redirect_to @message.conversation, notice: "Message was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -44,7 +45,7 @@ class MessagesController < ApplicationController
   private
 
   def set_conversation
-    @conversation = Conversation.find(params[:conversation_id])
+    @conversation = Current.user.conversations.find(params[:conversation_id])
   end
 
   def set_message
@@ -52,6 +53,6 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:role, :content_text)
+    params.require(:message).permit(:content_text)
   end
 end

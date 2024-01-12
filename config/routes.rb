@@ -4,9 +4,12 @@ Rails.application.routes.draw do
     patch :instructions, to: "assistants/instructions#update"
   end
 
-  resources :conversations do
-    resources :messages, shallow: true
+  shallow do
+    resources :conversations do
+      resources :messages
+    end
   end
+
   resources :documents
 
   resources :users, only: [:new, :create, :update]
