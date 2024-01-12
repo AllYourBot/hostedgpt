@@ -19,7 +19,7 @@ module ApplicationHelper
     title = opts.delete(:title)
 
     if title
-      direction = opts[:tooltip] || 'bottom'
+      direction = opts.delete(:tooltip) || 'bottom'
 
       content_tag(:div, class: classes + " tooltip tooltip-#{direction} hover:tooltip-open", data: { tip: title.to_s }) do
         heroicon name, **opts

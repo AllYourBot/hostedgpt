@@ -53,8 +53,8 @@
     <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-10 text-black dark:text-white text-lg hidden md:flex">
       <%= render 'gpt_header', conversation: @conversation %>
 
-      <div id="right-aligned-content" class="hover:bg-gray-100 cursor-pointer inline-flex mr-5 border border-gray-300 rounded-lg px-2 py-2 mt-1">
-        <%= icon "arrow-up-tray", variant: :outline, size: 18, class: 'text-black', title: "Share", tooltip: :bottom %>
+      <div id="right-aligned-content" class="hover:bg-gray-100 cursor-pointer inline-flex mr-5 border border-gray-300 rounded-lg px-2 py-2 mt-1 tooltip tooltip-bottom hover:tooltip-open" data-tip="Share">
+        <%= icon "arrow-up-tray", variant: :outline, size: 18, class: 'text-black' %>
       </div>
     </div>
 
@@ -73,13 +73,26 @@
         </div>
       </div>
 
-      <div id="right-footer" class="flex-none flex">
-        <div class="flex-1 px-3 w-full md:max-w-none lg:max-w-[750px] xl:max-w-[870px] mx-auto">
+      <div id="right-footer" class="flex-none flex flex-col relative">
+        <div class="text-center absolute -top-14 left-1/2 -ml-9">
+          <div class="rounded-full border border-gray-300 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer bg-white" data-tip="Scroll down">
+            <%= icon "chevron-down", variant: :outline, size: 19, class: 'text-gray-800 cursor-pointer hover:text-black stroke-2' %>
+          </div>
+        </div>
+
+        <div class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative">
+          <div class="absolute left-9 bottom-6 w-[24px] h-[24px]">
+            <%= icon "paper-clip", variant: :mini, size: 24, class: 'text-gray-800 cursor-pointer hover:text-black', title: 'Attach', tooltip: :top %>
+          </div>
           <input type="text"
             placeholder="Message <%= @conversation.assistant.name %>..."
-            class="w-full h-14 rounded-2xl mb-2 bg-transparent text-gray-200 pl-16 text-md placeholder-zinc-500 border-zinc-500 focus:ring-0 focus:border-zinc-500"/>
-          <div class="text-center text-gray-500 dark:text-gray-400 text-xs mb-2">HostedGPT can make mistakes. Consider checking important information.</div>
+            class="w-full h-14 rounded-2xl mb-2 bg-transparent text-black dark:text-gray-200 pl-14 text-md placeholder-zinc-500 border-zinc-500 focus:ring-0 focus:border-zinc-500"/>
+
+          <div class="absolute right-8 bottom-4 w-[39px] h-[39px]">
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, class: 'text-gray-800 cursor-pointer hover:text-black', title: 'Send message', tooltip: :top %>
+          </div>
         </div>
+        <div class="text-center text-gray-500 dark:text-gray-400 text-xs mb-2 w-full">HostedGPT can make mistakes. Consider checking important information.</div>
       </div>
     </div>
   </div>
