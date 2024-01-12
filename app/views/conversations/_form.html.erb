@@ -1,4 +1,11 @@
-<%= form_with(model: conversation, class: "contents") do |form| %>
+<% 
+submit_path = if conversation.new_record?
+  my_conversations_path
+else
+  edit_my_conversation_path(conversation)
+end
+%>
+<%= form_with(model: conversation, class: "contents", url: submit_path) do |form| %>
   <% if conversation.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(conversation.errors.count, "error") %> prohibited this conversation from being saved:</h2>

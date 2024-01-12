@@ -4,8 +4,16 @@ Rails.application.routes.draw do
     patch :instructions, to: "assistants/instructions#update"
   end
 
-  resources :conversations
-  resources :messages
+  namespace "my" do
+    resources :conversations, only: [:new, :create, :index]
+  end
+
+  shallow do
+    resources :conversations, except: [:index, :new, :create] do
+      resources :messages
+    end
+  end
+
   resources :documents
 
   resources :users, only: [:new, :create, :update]

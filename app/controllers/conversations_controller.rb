@@ -2,15 +2,7 @@ class ConversationsController < ApplicationController
   skip_before_action :authenticate_user!
   before_action :set_conversation, only: [:show, :edit, :update, :destroy]
 
-  def index
-    @conversations = Conversation.all
-  end
-
   def show
-  end
-
-  def new
-    @conversation = Conversation.new
   end
 
   def edit
