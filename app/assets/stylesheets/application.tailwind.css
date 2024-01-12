@@ -26,6 +26,25 @@
   scrollbar-width: none;
 }
 
+*, ::before, ::after {
+  --tooltip-tail: 7px;
+  --tooltip-tail-offset: calc(100% + 7px - var(--tooltip-tail));
+  --tooltip-offset: calc(100% + 7px + var(--tooltip-tail, 0px));
+  /* https://unused-css.com/blog/css-outer-glow/ */
+}
+
+.tooltip-bottom:before {
+  padding: 0.4rem 0.7rem !important;
+  box-shadow: 0px 3px 4px 0px #eeeeee29;
+}
+
+.tooltip-top:before {
+  padding: 0.4rem 0.7rem !important;
+  box-shadow: 0px -3px 4px 0px #eeeeee29;
+}
+
+
+
   /* Add this to center the modal */
   .modal-bg {
     background-color: rgba(0, 0, 0, 0.5);

@@ -14,12 +14,12 @@
         <%= message.content_text %>
       </div>
 
-      <div class="mt-2 flex justify-start gap-2 text-gray-400 invisible group-hover:visible">
+      <div class="mt-2 flex justify-start gap-2 text-gray-500 invisible group-hover:visible">
         <% if message.user? %>
-          <%= icon "pencil", variant: :micro, size: 18, class: 'hover:text-gray-600 cursor-pointer', title: "Edit", tooltip: :left %>
+          <%= icon "pencil-square", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Edit" %>
         <% else %>
-          <%= icon "clipboard", variant: :micro, size: 18, class: 'hover:text-gray-600 cursor-pointer', title: "Copy", tooltip: :left %>
-          <%= icon "arrow-path", variant: :micro, size: 18, class: 'hover:text-gray-600 cursor-pointer', title: "Retry", tooltip: :right %>
+          <%= icon "clipboard", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Copy" %>
+          <%= icon "arrow-path", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Retry" %>
         <% end %>
       </div>
     </div>

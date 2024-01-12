@@ -16,11 +16,12 @@ module ApplicationHelper
     classes = opts[:class] || ""
     raise "Do not include w-# or h-# in the class, use :size instead" if classes.match?(/(\bw-|\bh-)/)
     classes += " w-[#{size}px] h-[#{size}px]"
+    title = opts.delete(:title)
 
-    if opts[:title]
-      direction = opts[:tooltip] || 'top'
+    if title
+      direction = opts[:tooltip] || 'bottom'
 
-      content_tag(:div, class: classes + " tooltip tooltip-#{direction} hover:tooltip-open", data: { tip: opts[:title].to_s }) do
+      content_tag(:div, class: classes + " tooltip tooltip-#{direction} hover:tooltip-open", data: { tip: title.to_s }) do
         heroicon name, **opts
       end
     else
