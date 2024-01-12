@@ -1,6 +1,9 @@
 class ConversationsController < ApplicationController
-  skip_before_action :authenticate_user!
   before_action :set_conversation, only: [:show, :edit, :update, :destroy]
+
+  def index
+    @conversations = Current.user.conversations
+  end
 
   def show
   end
@@ -8,8 +11,12 @@ class ConversationsController < ApplicationController
   def edit
   end
 
+  def new
+    @conversation = Current.user.conversations.new
+  end
+
   def create
-    @conversation = Conversation.new(conversation_params)
+    @conversation = Current.user.conversations.new(conversation_params)
 
     if @conversation.save
       redirect_to @conversation, notice: "Conversation was successfully created."

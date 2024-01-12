@@ -1,7 +1,9 @@
 <div class="mx-auto md:w-2/3 w-full">
   <h1 class="font-bold text-4xl">New message</h1>
 
-  <%= render "form", message: @message %>
+  <%= form_with(model: @message, class: "contents", url: conversation_messages_path(@conversation)) do |form| %>
+    <%= render "form_fields", message: @message, form: form %>
+  <% end %>
 
-  <%= link_to "Back to messages", messages_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  <%= link_to "Back to messages", conversation_messages_path(@conversation), class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
 </div>

@@ -2,22 +2,23 @@ require "test_helper"
 
 class MessagesControllerTest < ActionDispatch::IntegrationTest
   setup do
+    @conversation = conversations(:greeting)
     @message = messages(:hear_me)
   end
 
   test "should get index" do
-    get messages_url
+    get conversation_messages_url(@conversation)
     assert_response :success
   end
 
   test "should get new" do
-    get new_message_url
+    get new_conversation_message_url(@conversation)
     assert_response :success
   end
 
   test "should create message" do
     assert_difference("Message.count") do
-      post messages_url, params: {message: {conversation_id: @message.conversation_id, role: @message.role, content_text: @message.content_text}}
+      post conversation_messages_url(@conversation), params: {message: {conversation_id: @message.conversation_id, role: @message.role, content_text: @message.content_text}}
     end
 
     assert_redirected_to message_url(Message.last)
@@ -43,6 +44,6 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       delete message_url(@message)
     end
 
-    assert_redirected_to messages_url
+    assert_redirected_to conversation_messages_url(@message.conversation_id)
   end
 end

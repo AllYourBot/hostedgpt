@@ -10,6 +10,7 @@ class MessagesController < ApplicationController
   end
 
   def new
+    @conversation = Conversation.find params[:conversation_id]
     @message = Message.new
   end
 
@@ -36,7 +37,7 @@ class MessagesController < ApplicationController
 
   def destroy
     @message.destroy!
-    redirect_to messages_url, notice: "Message was successfully destroyed.", status: :see_other
+    redirect_to conversation_messages_url(@message.conversation), notice: "Message was successfully destroyed.", status: :see_other
   end
 
   private

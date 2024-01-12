@@ -3,6 +3,7 @@ require "test_helper"
 class ConversationsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @conversation = conversations(:greeting)
+    login_as @conversation.user
   end
 
   test "should get index" do
