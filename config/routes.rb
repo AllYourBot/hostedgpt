@@ -1,8 +1,11 @@
 Rails.application.routes.draw do
-  resources :assistants
-  resources :conversations do
-    resources :messages
+  resources :assistants do
+    get :instructions, to: "assistants/instructions#edit"
+    patch :instructions, to: "assistants/instructions#update"
   end
+
+  resources :conversations
+  resources :messages
   resources :documents
 
   resources :users, only: [:new, :create, :update]
