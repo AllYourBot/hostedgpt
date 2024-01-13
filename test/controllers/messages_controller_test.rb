@@ -21,28 +21,28 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       post conversation_messages_url(@conversation), params: { message: { role: @message.role, content_text: @message.content_text } }
     end
 
-    assert_redirected_to conversation_message_url(@conversation, Message.last)
+    assert_redirected_to message_url(Message.last)
     assert_equal @conversation.id, Message.last.conversation_id
   end
 
   test "should show message" do
-    get conversation_message_url(@conversation, @message)
+    get message_url(@message)
     assert_response :success
   end
 
   test "should get edit" do
-    get edit_conversation_message_url(@conversation, @message)
+    get edit_message_url(@message)
     assert_response :success
   end
 
   test "should update message" do
-    patch conversation_message_url(@conversation, @message), params: { message: { role: @message.role, content_text: @message.content_text } }
-    assert_redirected_to conversation_message_url(@conversation, @message)
+    patch message_url(@message), params: { message: { role: @message.role, content_text: @message.content_text } }
+    assert_redirected_to message_url(@message)
   end
 
   test "should destroy message" do
     assert_difference("Message.count", -1) do
-      delete conversation_message_url(@conversation, @message)
+      delete message_url(@message)
     end
 
     assert_redirected_to conversation_messages_url(@conversation)

@@ -1,8 +1,8 @@
 <div class="mx-auto md:w-2/3 w-full">
   <h1 class="font-bold text-4xl">Editing message</h1>
 
-  <%= render "form", message: @message %>
+  <%= render "edit_form", message: @message %>
 
-  <%= link_to "Show this message", [@message.conversation, @message], class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  <%= link_to "Show this message", @message, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
   <%= link_to "Back to messages", conversation_messages_path(@message.conversation), class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
 </div>
