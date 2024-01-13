@@ -5,6 +5,7 @@
 
 # Ignore bundler config.
 /.bundle
+/node_modules
 
 # Ignore all environment files (except templates).
 /.env*
@@ -38,4 +39,15 @@
 
 # Code coverage
 /coverage
+
+# Ignore files for development
 .byebug_history
+/.vscode
+
+# Mac
+
+.DS_Store
+
+# JetBrains
+/.idea/*
+/client/.idea/*

@@ -1,0 +1,15 @@
+<%# locals: (title:, settings: true, selected: false) %>
+
+  <div class="h-10 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 justify-between items-center group cursor-pointer mb-1 mr-5">
+    <div id="profile" class="ml-2 mr-2 w-7 h-7 bg-white rounded-full"></div>
+    <div class="flex-1 text-white truncate">
+      <%= title %>
+    </div>
+    <div class="<%= selected ? 'flex' : 'hidden' %> group-hover:flex gap-2 pl-2">
+      <% if settings %>
+        <%= icon "ellipsis-horizontal", variant: :micro, size: 18, class: "inline ml-1 text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer", title: "More" %>
+      <% end %>
+
+      <%= icon "pencil-square", variant: :micro, size: 18, class: "inline ml-1 text-gray-400 cursor-pointer #{defined?(selected) && selected ? 'text-white' : 'invisible group-hover:visible hover:text-white'}", title: "New chat" %>
+    </div>
+  </div>
