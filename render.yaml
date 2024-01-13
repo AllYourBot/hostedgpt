@@ -14,7 +14,7 @@ services:
   - type: worker
     name: soliqueue-worker
     runtime: ruby
-    plan: free
+    plan: starter
     buildCommand: bundle install
     startCommand: ./bin/rake solid_queue:start 
     envVars:
