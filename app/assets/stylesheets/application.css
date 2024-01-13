@@ -13,20 +13,3 @@
  *= require_tree .
  *= require_self
  */
-
-.task {
-  .button {
-      visibility: hidden;
-  }
-
-  &:hover {
-      .button {
-          visibility: visible;
-      }
-  }
-}
-
-.task--completed {
-  text-decoration: line-through;
-}
-

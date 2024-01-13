@@ -5,10 +5,12 @@
 
   <div class="flex justify-between items-center">
     <h1 class="font-bold text-4xl">Messages</h1>
-    <%= link_to "New message", new_message_path, class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
+    <%= link_to "New message", new_conversation_message_path(@conversation), class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
   </div>
 
   <div id="messages" class="min-w-full">
-    <%= render @messages %>
+    <turbo-frame id="messages">
+      <%= render partial: 'message', collection: @messages, locals: { conversation: @conversation } %>
+    </turbo-frame>
   </div>
 </div>

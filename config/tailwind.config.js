@@ -9,10 +9,9 @@ module.exports = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
-      },
-
+      colors: {
+        'graphite': 'rgba(52,53,65,1)'
+      }
     },
   },
   plugins: [
