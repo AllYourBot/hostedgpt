@@ -48,7 +48,18 @@
   </div>
 
 
-  <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite">
+  <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite relative">
+    <div id="handle" class="absolute left-0 top-1/2 w-8 h-20 -mt-10 flex group z-20">
+      <div class="flex-1 flex tooltip tooltip-right hover:tooltip-open cursor-pointer" data-tip="Close sidebar">
+        <div class="flex-1 flex h-full items-center justify-center">
+          <div class="w-1 h-5 flex-col opacity-70">
+            <div class="w-1 h-3 bg-gray-400 rounded-full -mb-1 group-hover:rotate-12 group-hover:bg-black"></div>
+            <div class="w-1 h-3 bg-gray-400 rounded-full group-hover:-rotate-12 group-hover:bg-black"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Only one of these headers is visible at a time, depending on width -->
     <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-10 text-black dark:text-white text-lg hidden md:flex">
       <%= render 'gpt_header', conversation: @conversation %>
@@ -72,15 +83,15 @@
             Loading...
           </turbo-frame>
         </div>
+      </div>
 
-        <div id="scroll-button" class="text-center left-1/2 -ml-9 bottom-4 sticky">
+      <div id="right-footer" class="flex-none flex flex-col relative">
+        <div id="scroll-button" class="text-center absolute -top-14 left-1/2 transform -translate-x-1/2">
           <div class="rounded-full border border-gray-300 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer bg-white hover:bg-gray-100" data-tip="Scroll down">
             <%= icon "chevron-down", variant: :outline, size: 19, class: 'text-gray-800 cursor-pointer hover:text-black stroke-2' %>
           </div>
         </div>
-      </div>
 
-      <div id="right-footer" class="flex-none flex flex-col relative">
         <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative">
           <div id="attach-button" class="absolute left-9 bottom-6 w-[24px] h-[24px]">
             <%= icon "paper-clip", variant: :mini, size: 24, class: 'text-gray-800 cursor-pointer hover:text-black', title: 'Attach', tooltip: :top %>
