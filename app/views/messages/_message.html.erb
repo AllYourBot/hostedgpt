@@ -1,4 +1,4 @@
-<div id="<%= dom_id message %>" class="ml-9 md:ml-8 sm:ml-3 mb-5 group">
+<div id="<%= dom_id message %>" class="ml-9 sm:ml-3 md:ml-8 mb-5 group">
   <div class="flex">
     <div class="w-6 flex flex-col items-center ml-1">
       <div class="w-6 h-6 bg-black dark:bg-white rounded-full mt-1"></div>
@@ -19,7 +19,7 @@
           <%= icon "pencil-square", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Edit" %>
         <% else %>
           <%= icon "clipboard", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Copy" %>
-          <%= icon "arrow-path", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Retry" %>
+          <%= icon "arrow-path", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Regenerate" %>
         <% end %>
       </div>
     </div>

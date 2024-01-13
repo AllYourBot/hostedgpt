@@ -1,39 +1,39 @@
-<div class="flex flex-row h-screen">
+<div class="flex h-screen">
 
   <div id="left-column" class="flex-col h-screen w-[260px] bg-black overflow-auto hidden md:flex pl-3 scrollbar-hide">
 
     <div id="left-content-container" class="flex flex-col flex-grow overflow-auto scrollbar-hide">
       <div id="left-content" class="flex-grow overflow-auto scrollbar-hide">
         <div class="sticky top-0 pt-3 mb-1 bg-black z-10">
-          <%= render 'gpt_sidebar', title: "ChatGPT", selected: false %>
+          <%= render 'assistant_sidebar_link', title: "ChatGPT", selected: false %>
         </div>
-        <%= render 'gpt_sidebar', title: "Samantha" %>
-        <%= render 'gpt_sidebar', title: "Samantha but really long so it wraps" %>
-        <%= render 'gpt_sidebar', title: "Samantha", selected: true %>
-        <%= render 'gpt_sidebar', title: "Samantha" %>
+        <%= render 'assistant_sidebar_link', title: "Samantha" %>
+        <%= render 'assistant_sidebar_link', title: "Samantha but really long so it wraps" %>
+        <%= render 'assistant_sidebar_link', title: "Samantha", selected: true %>
+        <%= render 'assistant_sidebar_link', title: "Samantha" %>
 
         <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
           Today
         </div>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind", selected: true %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind", selected: true %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
 
         <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
           Yesterday
         </div>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
       </div>
 
       <div id="left-footer" class="flex-none flex text-white mb-4 mt-3">
@@ -49,7 +49,7 @@
 
 
   <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite">
-    <!-- Header that does not grow -->
+    <!-- Only one of these headers is visible at a time, depending on width -->
     <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-10 text-black dark:text-white text-lg hidden md:flex">
       <%= render 'gpt_header', conversation: @conversation %>
 
@@ -63,33 +63,37 @@
         <%= render 'gpt_header', conversation: @conversation %>
       </div>
     </div>
+    <!-- end header -->
 
     <div id="right-content-container" class="flex flex-col flex-grow overflow-auto">
-      <div id="right-content" class="flex-grow overflow-auto">
+      <div id="right-content" class="flex-grow overflow-auto relative">
         <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
           <turbo-frame id="messages" src="<%= conversation_messages_path(@conversation) %>">
             Loading...
           </turbo-frame>
         </div>
-      </div>
 
-      <div id="right-footer" class="flex-none flex flex-col relative">
-        <div class="text-center absolute -top-14 left-1/2 -ml-9">
-          <div class="rounded-full border border-gray-300 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer bg-white" data-tip="Scroll down">
+        <div id="scroll-button" class="text-center left-1/2 -ml-9 bottom-4 sticky">
+          <div class="rounded-full border border-gray-300 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer bg-white hover:bg-gray-100" data-tip="Scroll down">
             <%= icon "chevron-down", variant: :outline, size: 19, class: 'text-gray-800 cursor-pointer hover:text-black stroke-2' %>
           </div>
         </div>
+      </div>
 
-        <div class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative">
-          <div class="absolute left-9 bottom-6 w-[24px] h-[24px]">
+      <div id="right-footer" class="flex-none flex flex-col relative">
+        <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative">
+          <div id="attach-button" class="absolute left-9 bottom-6 w-[24px] h-[24px]">
             <%= icon "paper-clip", variant: :mini, size: 24, class: 'text-gray-800 cursor-pointer hover:text-black', title: 'Attach', tooltip: :top %>
           </div>
+
           <input type="text"
             placeholder="Message <%= @conversation.assistant.name %>..."
-            class="w-full h-14 rounded-2xl mb-2 bg-transparent text-black dark:text-gray-200 pl-14 text-md placeholder-zinc-500 border-zinc-500 focus:ring-0 focus:border-zinc-500"/>
+            class="w-full h-14 rounded-2xl mb-2 bg-transparent text-black dark:text-gray-200 pl-14 text-md placeholder-zinc-500 border-zinc-500 focus:ring-0 focus:border-zinc-500"
+          />
 
-          <div class="absolute right-8 bottom-4 w-[39px] h-[39px]">
-            <%= icon "arrow-up-circle", variant: :solid, size: 39, class: 'text-gray-800 cursor-pointer hover:text-black', title: 'Send message', tooltip: :top %>
+          <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
+            <% enabled = false %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, class: "#{enabled ? 'text-gray-800 hover:text-black' : 'text-gray-300'} cursor-pointer", title: 'Send message', tooltip: :top %>
           </div>
         </div>
         <div class="text-center text-gray-500 dark:text-gray-400 text-xs mb-2 w-full">HostedGPT can make mistakes. Consider checking important information.</div>
