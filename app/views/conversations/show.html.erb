@@ -92,15 +92,17 @@
           </div>
         </div>
 
-        <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative">
-          <div id="attach-button" class="absolute left-9 bottom-6 w-[24px] h-[24px]">
-            <%= icon "paper-clip", variant: :mini, size: 24, class: 'text-gray-800 cursor-pointer hover:text-black', title: 'Attach', tooltip: :top %>
+        <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
+          <div id="attach-button" class="absolute left-9 bottom-6 w-[23px] h-[23px]">
+            <%= icon "paper-clip", variant: :mini, size: 23, class: 'text-gray-800 cursor-pointer hover:text-black', title: 'Attach', tooltip: :top %>
           </div>
 
-          <input type="text"
+          <textarea
+            data-controller="textarea-autogrow"
             placeholder="Message <%= @conversation.assistant.name %>..."
-            class="w-full h-14 rounded-2xl mb-2 bg-transparent text-black dark:text-gray-200 pl-14 text-md placeholder-zinc-500 border-zinc-500 focus:ring-0 focus:border-zinc-500"
-          />
+            rows=1
+            class="w-full pt-[14px] pb-[13px] min-h-14 rounded-2xl mb-0 bg-transparent text-black dark:text-gray-200 pl-14 text-md placeholder-zinc-500 border-zinc-300 focus:ring-0 focus:border-zinc-300 focus:shadow resize-none"
+          ></textarea>
 
           <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
             <% enabled = false %>
