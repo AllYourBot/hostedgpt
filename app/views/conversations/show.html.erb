@@ -15,8 +15,6 @@
         <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
           Today
         </div>
-
-
         <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
         <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
         <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind", selected: true %>
@@ -27,7 +25,6 @@
         <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
           Yesterday
         </div>
-
         <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
         <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
         <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
@@ -64,7 +61,7 @@
     </div>
 
     <!-- Only one of these headers is visible at a time, depending on width -->
-    <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-80 bg-red-100 text-black dark:text-white text-lg hidden md:flex">
+    <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-10 text-black dark:text-white text-lg hidden md:flex">
       <%= render 'gpt_header', conversation: @conversation %>
 
       <div id="right-aligned-content" class="hover:bg-gray-100 cursor-pointer inline-flex mr-5 border border-gray-300 rounded-lg px-2 py-2 mt-1 tooltip tooltip-bottom hover:tooltip-open" data-tip="Share">
@@ -72,7 +69,11 @@
       </div>
     </div>
 
-
+    <div id="narrow-header" class="flex-none h-14 text-lg text-center bg-white dark:bg-zinc-800 md:hidden">
+      <div class="flex-1 mb-2 border-b border-zinc-300 dark:border-zinc-600 text-black dark:text-white dark:bg-graphite flex items-center justify-center">
+        <%= render 'gpt_header', conversation: @conversation %>
+      </div>
+    </div>
     <!-- end header -->
 
     <div id="right-content-container" class="flex flex-col flex-grow overflow-auto">
