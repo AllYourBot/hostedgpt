@@ -5,21 +5,21 @@
     </div>
 
     <!-- Right Column -->
-    <div class="flex-1 min-w-0 ml-3 mr-8 text-black dark:text-gray-200 text-base">
+    <div class="flex-1 min-w-0 ml-3 mr-8 text-black dark:text-zinc-200 text-base">
       <div class="mt-1 font-semibold">
         <%= message.user? ? 'You' : conversation.assistant.name %>
       </div>
 
-      <div class="text-gray-700 dark:text-white">
+      <div class="text-zinc-700 dark:text-white">
         <%= message.content_text %>
       </div>
 
-      <div class="mt-2 flex justify-start gap-2 text-gray-500 invisible group-hover:visible">
+      <div class="mt-2 flex justify-start gap-2 text-zinc-500 dark:text-zinc-400 invisible group-hover:visible">
         <% if message.user? %>
-          <%= icon "pencil", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Edit" %>
+          <%= icon "pencil", variant: :outline, size: 18, class: 'hover:text-zinc-900 dark:hover:text-white cursor-pointer stroke-2', title: "Edit" %>
         <% else %>
-          <%= icon "clipboard", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Copy" %>
-          <%= icon "arrow-path", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Regenerate" %>
+          <%= icon "clipboard", variant: :outline, size: 18, class: 'hover:text-zinc-900 dark:hover:text-white cursor-pointer stroke-2', title: "Copy" %>
+          <%= icon "arrow-path", variant: :outline, size: 18, class: 'hover:text-zinc-900 dark:hover:text-white cursor-pointer stroke-2', title: "Regenerate" %>
         <% end %>
       </div>
     </div>
