@@ -16,7 +16,7 @@
 
       <div class="mt-2 flex justify-start gap-2 text-gray-500 invisible group-hover:visible">
         <% if message.user? %>
-          <%= icon "pencil-square", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Edit" %>
+          <%= icon "pencil", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Edit" %>
         <% else %>
           <%= icon "clipboard", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Copy" %>
           <%= icon "arrow-path", variant: :outline, size: 18, class: 'hover:text-gray-900 cursor-pointer stroke-2', title: "Regenerate" %>
