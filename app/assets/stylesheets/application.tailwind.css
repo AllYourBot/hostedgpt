@@ -72,6 +72,8 @@
 }
 
 
+/* Make clickable elements push inward */
+
 .menu li>:not(ul):not(.menu-title):not(details).active,
 .menu li>:not(ul):not(.menu-title):not(details):active,
 .menu li>details>summary:active {
@@ -91,14 +93,16 @@
 
 
 
-  /* Add this to center the modal */
-  .modal-bg {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  .modal-content {
-    width: 400px;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+
+/* Clean up this CSS — I don't think we need these classes, use tailwind utilities instead */
+
+.modal-bg {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+  width: 400px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
