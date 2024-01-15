@@ -77,14 +77,17 @@
 .menu li>details>summary:active {
   background-color: var(--fallback-bc,oklch(var(--bc)/.1)) !important;
   color: inherit !important;
-  @apply active:scale-95 ease-in-out duration-300
+  @apply scale-98 ease-in-out duration-300
 }
 
 
-.cursor-pointer {
-  @apply active:scale-95 ease-in-out duration-300
+.cursor-pointer:active {
+  @apply scale-98 ease-in-out duration-300
 }
 
+.icon.cursor-pointer:active {
+  @apply scale-90 ease-in-out duration-300
+}
 
 
 

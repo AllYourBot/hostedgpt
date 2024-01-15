@@ -25,7 +25,6 @@ export default class extends Controller {
   autogrow () {
     this.element.style.height = 'auto'
     this.element.style.height = `${this.element.scrollHeight + 2}px`
-    console.log(`autogrow: ${this.element.style.height}`)
   }
 }
 

@@ -8,15 +8,29 @@
     <div class="<%= selected ? 'flex' : 'hidden' %> group-hover:flex gap-3 pl-2">
       <% if settings %>
         <div class="dropdown !inline-flex dropdown-end outline-none">
-        <%= icon "ellipsis-horizontal", variant: :micro, size: 18, tabindex: 0, role: :button, class: "inline text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer", title: "More" %>
+          <%= icon "ellipsis-horizontal",
+                variant: :micro,
+                size: 18,
+                class: "outline-none inline text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
+                'data-controller': "nested-clickable",
+                title: "More",
+                tabindex: 0,
+                role: :button
+          %>
 
-          <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-10 mt-6">
+          <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-10 mt-6" data-controller="nested-clickable">
             <li><a><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings</a></li>
             <li><a><%= icon "arrow-up-tray", variant: :outline, size: 18 %>Share</a></li>
           </ul>
         </div>
       <% end %>
 
-      <%= icon "pencil-square", variant: :micro, size: 18, class: "inline text-gray-400 cursor-pointer #{defined?(selected) && selected ? 'text-white' : 'invisible group-hover:visible hover:text-white'}", title: "New chat" %>
+      <%= icon "pencil-square",
+        variant: :micro,
+        size: 18,
+        class: "inline text-gray-400 cursor-pointer #{defined?(selected) && selected ? 'text-white' : 'invisible group-hover:visible hover:text-white'}",
+        'data-controller': "nested-clickable",
+        title: "New chat"
+      %>
     </div>
   </div>

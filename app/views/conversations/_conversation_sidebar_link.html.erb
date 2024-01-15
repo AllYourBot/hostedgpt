@@ -1,22 +1,38 @@
 <%# locals: (title:, settings: true, selected: false) %>
 
-<div class="h-9 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 <%= defined?(selected) && selected ? 'bg-zinc-400 bg-opacity-25' : '' %> justify-between items-center group cursor-pointer scale-down mr-5">
+<div class="h-9 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 <%= defined?(selected) && selected ? 'bg-zinc-400 bg-opacity-25' : '' %> justify-between items-center group cursor-pointer mr-5">
   <div class="flex-1 ml-2 text-white truncate text-sm text-opacity-80 w-5">
     <%= title %>
   </div>
   <div class="<%= selected ? 'flex' : 'hidden' %> group-hover:flex gap-2 pl-2 items-center">
     <% if settings %>
-      <%= icon "pencil", variant: :outline, size: 16, class: "text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer", title: "Rename", tooltip: :top %>
+      <%= icon "pencil",
+            variant: :outline,
+            size: 16,
+            class: "text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
+            'data-controller': "nested-clickable",
+            title: "Rename",
+            tooltip: :top
+      %>
     <% end %>
 
-
     <div class="dropdown !inline-flex dropdown-end outline-none">
-      <%= icon "x-mark", variant: :outline, size: 22, tabindex: 0, role: :button, class: "text-gray-400 cursor-pointer #{defined?(selected) && selected ? 'text-white' : 'invisible group-hover:visible hover:text-white'}", title: "Archive", tooltip: :top %>
+      <%= icon "x-mark",
+            variant: :outline,
+            size: 22,
+            class: "outline-none text-gray-400 cursor-pointer invisible group-hover:visible hover:text-white",
+            'data-controller': "nested-clickable",
+            title: "Archive",
+            tooltip: :top,
+            tabindex: 0,
+            role: :button
+      %>
 
-      <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-2 mt-6">
+      <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-3 mt-6" data-controller="nested-clickable">
         <li><a><%= icon "archive-box", variant: :outline, size: 18 %>Archive</a></li>
         <li><a><%= icon "trash", variant: :outline, size: 18 %>Delete</a></li>
       </ul>
     </div>
+
   </div>
 </div>
