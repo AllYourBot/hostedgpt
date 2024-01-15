@@ -49,15 +49,27 @@
 
 
   <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite relative">
-    <div id="handle" class="absolute left-0 top-1/2 w-8 h-20 -mt-10 flex group z-20">
-      <div class="flex-1 flex tooltip tooltip-right hover:tooltip-open cursor-pointer" data-tip="Close sidebar">
+
+    <div id="handle" class="absolute left-0 top-1/2 w-8 h-20 -mt-10 flex group z-20 cursor-pointer" data-controller="click-toggle" data-click-toggle-flippable-class="!hidden">
+
+      <div id="left-handle" class="flex-1 tooltip tooltip-right hover:tooltip-open !hidden" data-tip="Close sidebar" data-click-toggle-target="destination">
         <div class="flex-1 flex h-full items-center justify-center">
-          <div class="w-1 h-5 flex-col opacity-70">
+          <div id="left" class="w-1 h-5 flex-col opacity-70">
             <div class="w-1 h-3 bg-gray-400 rounded-full -mb-1 group-hover:rotate-12 group-hover:bg-black"></div>
             <div class="w-1 h-3 bg-gray-400 rounded-full group-hover:-rotate-12 group-hover:bg-black"></div>
           </div>
         </div>
       </div>
+
+      <div id="right-handle" class="flex-1 flex tooltip tooltip-right hover:tooltip-open" data-tip="Open sidebar" data-click-toggle-target="destination">
+        <div class="flex-1 flex h-full items-center justify-center">
+          <div id="left" class="w-1 h-5 flex-col opacity-70">
+            <div class="w-1 h-3 bg-gray-400 rounded-full -mb-1 group-hover:-rotate-12 group-hover:bg-black"></div>
+            <div class="w-1 h-3 bg-gray-400 rounded-full group-hover:rotate-12 group-hover:bg-black"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Only one of these headers is visible at a time, depending on width -->
