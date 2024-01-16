@@ -10,7 +10,7 @@
             variant: :outline,
             size: 16,
             class: "text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
-            'data-controller': "nested-clickable",
+            'data-controller': "nested-pointer",
             title: "Rename",
             tooltip: :top
       %>
@@ -21,14 +21,14 @@
             variant: :outline,
             size: 22,
             class: "outline-none text-gray-400 cursor-pointer invisible group-hover:visible hover:text-white",
-            'data-controller': "nested-clickable",
+            'data-controller': "nested-pointer",
             title: "Archive",
             tooltip: :top,
             tabindex: 0,
             role: :button
       %>
 
-      <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-2 mt-7 dark:!bg-zinc-800" data-controller="nested-clickable">
+      <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-2 mt-7 dark:!bg-zinc-800" data-controller="nested-pointer">
         <li><a><%= icon "archive-box", variant: :outline, size: 18 %>Archive</a></li>
         <li><a><%= icon "trash", variant: :outline, size: 18 %>Delete</a></li>
       </ul>
