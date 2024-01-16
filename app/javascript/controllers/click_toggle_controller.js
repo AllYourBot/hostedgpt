@@ -8,7 +8,6 @@ export default class extends Controller {
     this.triggerTargets.forEach(triggerElement => {
 
       triggerElement.addEventListener('click', () => {
-        console.log(`clicked`, this.flippableClass)
         this.destinationTargets.forEach(element => {
           element.classList.toggle(this.flippableClass)
         })
