@@ -24,6 +24,7 @@ export default class extends Controller {
   }
 
   autogrow () {
+    console.log('autogrow is called!')
     this.element.style.height = 'auto'
     this.element.style.height = `${this.element.scrollHeight + 2}px` // the +2 is a hack to make the size not jump on load. The scrollHeight differs from than actual height for the empty state
   }
@@ -32,7 +33,10 @@ export default class extends Controller {
 function debounce (callback, delay) {
   return (...args) => {
     const context = this
-    clearTimeout(timeout)
+    if (typeof timeout !== 'undefined')
+      clearTimeout(timeout)
+    else
+      var timeout = undefined
 
     timeout = setTimeout(() => callback.apply(context, args), delay)
   }
