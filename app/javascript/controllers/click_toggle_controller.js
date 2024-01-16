@@ -12,17 +12,19 @@ export default class extends Controller {
   connect () {
     this.triggerTargets.forEach(triggerElement => {
 
-      triggerElement.addEventListener('click', () => {
-        this.destinationTargets.forEach(element => {
-          element.classList.toggle(this.flippableClass)
-        })
-      })
+      triggerElement.addEventListener('click', () => this.clicked())
     })
   }
 
   disconnect () {
     this.triggerTargets.forEach(triggerElement => {
-      triggerElement.removeEventListener('click')
+      triggerElement.removeEventListener('click', () => this.clicked())
+    })
+  }
+
+  clicked () {
+    this.destinationTargets.forEach(element => {
+      element.classList.toggle(this.flippableClass)
     })
   }
 }

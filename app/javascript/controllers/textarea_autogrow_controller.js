@@ -14,17 +14,16 @@ export default class extends Controller {
 
     this.autogrow()
 
-    this.element.addEventListener('input', this.autogrow)
-    window.addEventListener('resize', this.onResize)
+    this.element.addEventListener('input', () => this.autogrow())
+    window.addEventListener('resize', () => this.onResize())
   }
 
   disconnect () {
-    this.element.removeEventListener('input')
-    window.removeEventListener('resize')
+    this.element.removeEventListener('input', () => this.autogrow())
+    window.removeEventListener('resize', () => this.onResize())
   }
 
   autogrow () {
-    console.log('autogrow is called!')
     this.element.style.height = 'auto'
     this.element.style.height = `${this.element.scrollHeight + 2}px` // the +2 is a hack to make the size not jump on load. The scrollHeight differs from than actual height for the empty state
   }
