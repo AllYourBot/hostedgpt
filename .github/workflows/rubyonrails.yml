@@ -13,8 +13,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container:
-      image: ruby:3.2.2
     services:
       postgres:
         image: postgres:16.1
@@ -24,30 +22,21 @@ jobs:
           POSTGRES_DB: hostedgpt_test
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       RAILS_ENV: test
-      DATABASE_URL: "postgres://rails:password@postgres:5432/hostedgpt_test"
+      DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Cache gems
-        uses: actions/cache@v2
+      - uses: ruby/setup-ruby@v1
         with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - name: Install Bundler
-        run: |
-          gem update --system
-          gem install bundler
-
-      - name: Install gems
-        run: |
-          bundle config set path vendor/bundle
-          bundle install
+          bundler-cache: true
 
       - name: Set up database schema
         run: bin/rails db:schema:load
@@ -55,37 +44,68 @@ jobs:
       - name: Run tests
         run: bin/rails test
 
+  system_tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.1
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_DB: hostedgpt_test
+          POSTGRES_USER: rails
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
+      DISPLAY: "=:99"
+
+    steps:
+      - uses: nanasess/setup-chromedriver@v2
+      - name: Start chromedriver
+        run: |
+          set -x
+          chromedriver --url-base=/wd/hub &
+          # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Set up database schema
+        run: bin/rails db:schema:load
+
+      - name: Build CSS
+        run: bin/rails tailwindcss:build
+
+      - name: Run system tests
+        run: bin/rails test test/system
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: System Test Screenshots
+          path: tmp/screenshots/
+          if-no-files-found: ignore
+
   lint:
     runs-on: ubuntu-latest
-    container:
-      image: ruby:3.2.2
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Cache gems
-        uses: actions/cache@v2
+      - uses: ruby/setup-ruby@v1
         with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - name: Install Bundler
-        run: |
-          gem update --system
-          gem install bundler
-
-      - name: Install gems
-        run: |
-          bundle config set path vendor/bundle
-          bundle install
-
-      #- name: Security audit dependencies
-      #  run: bin/bundler-audit --update
-
-      #- name: Security audit application code
-      #  run: bin/brakeman -q -w2
+          bundler-cache: true
 
       - name: Lint Ruby files
         run: bin/rubocop
