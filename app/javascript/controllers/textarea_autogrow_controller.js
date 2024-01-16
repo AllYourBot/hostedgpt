@@ -14,13 +14,13 @@ export default class extends Controller {
 
     this.autogrow()
 
-    this.element.addEventListener('input', this.autogrow)
-    window.addEventListener('resize', this.onResize)
+    this.element.addEventListener('input', () => this.autogrow())
+    window.addEventListener('resize', () => this.onResize())
   }
 
   disconnect () {
-    this.element.removeEventListener('input')
-    window.removeEventListener('resize')
+    this.element.removeEventListener('input', () => this.autogrow())
+    window.removeEventListener('resize', () => this.onResize())
   }
 
   autogrow () {
@@ -32,7 +32,10 @@ export default class extends Controller {
 function debounce (callback, delay) {
   return (...args) => {
     const context = this
-    clearTimeout(timeout)
+    if (typeof timeout !== 'undefined')
+      clearTimeout(timeout)
+    else
+      var timeout = undefined
 
     timeout = setTimeout(() => callback.apply(context, args), delay)
   }
