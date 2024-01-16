@@ -1,4 +1,10 @@
-<div id="<%= dom_id message %>" class="ml-9 sm:ml-3 md:ml-8 mb-5 group">
+<%# locals: (message:, conversation:, scroll_into_view: false, request_id: nil) -%>
+<div 
+  id="<%= dom_id message %>"
+  class="ml-9 sm:ml-3 md:ml-8 mb-5 group"
+  data-controller="conversation-message"
+  data-conversation-message-scroll-into-view-value="<%= scroll_into_view %>"
+  >
   <div class="flex">
     <div class="w-6 flex flex-col items-center ml-1">
       <div class="w-6 h-6 bg-black dark:bg-white rounded-full mt-1"></div>

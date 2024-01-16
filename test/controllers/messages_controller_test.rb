@@ -4,6 +4,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @message = messages(:hear_me)
     @conversation = @message.conversation
+    login_as @conversation.user
   end
 
   test "should get index" do
@@ -21,7 +22,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       post conversation_messages_url(@conversation), params: { message: { role: @message.role, content_text: @message.content_text } }
     end
 
-    assert_redirected_to message_url(Message.last)
+    assert_redirected_to conversation_url(@conversation)
     assert_equal @conversation.id, Message.last.conversation_id
   end
 

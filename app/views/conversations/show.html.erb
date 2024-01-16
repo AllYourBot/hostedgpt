@@ -1,3 +1,4 @@
+<%= turbo_stream_from @conversation %>
 <div class="flex h-screen" data-controller="click-toggle" data-click-toggle-flippable-class="md:flex">
 
   <div id="left-column" class="flex-col h-screen w-[260px] bg-black overflow-y-auto overflow-x-clip hidden md:flex pl-3 scrollbar-hide" data-click-toggle-target="destination">
@@ -118,20 +119,43 @@
             <%= icon "paper-clip", variant: :mini, size: 23, class: 'cursor-pointer text-zinc-600 hover:text-zinc-900 stroke-2 dark:text-gray-300 dark:hover:text-white', title: 'Attach', tooltip: :top %>
           </div>
 
-          <textarea
-            data-controller="textarea-autogrow"
-            placeholder="Message <%= @conversation.assistant.name %>..."
-            rows=1
-            class="w-full pt-[14px] pb-[13px] min-h-14 rounded-2xl mb-0 bg-transparent text-black dark:text-gray-200 pl-14 pr-12 text-md placeholder-zinc-500 border-zinc-300 focus:ring-0 focus:border-zinc-300 focus:shadow resize-none"
-          ></textarea>
+          <turbo-frame id="new-message-form">
+            <%= form_with(model: @new_message, url: conversation_messages_path(@conversation), data: { controller: 'new-message' }) do |form| %>
+              <%= form.text_area :content_text,
+                data: {
+                  new_message_target: "input",
+                  controller: "textarea-autogrow"
+                },
+                rows: 1,
+                placeholder: "Message #{@conversation.assistant.name} ...",
+                class: %|
+                  w-full pt-[14px] pb-[13px] min-h-14
+                  mb-0 pl-14 pr-12
+                  bg-transparent
+                  text-black placeholder-zinc-500 dark:text-gray-200
+                  text-md
+                  rounded-2xl border-zinc-300
+                  focus:ring-0 focus:border-zinc-300 focus:shadow
+                  resize-none
+                |
+              %>
 
-          <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
-            <% enabled = false %>
-            <%= icon "arrow-up-circle", variant: :solid, size: 39, class: "#{enabled ? 'text-gray-800 hover:text-black dark:text-gray-300 dark:hover:text-white' : 'text-gray-300 dark:text-zinc-600'} cursor-pointer", title: 'Send message', tooltip: :top %>
-          </div>
+              <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
+              <%= form.button data: { new_message_target: "submit" }, disabled: true, class: %w|
+                  text-gray-300 dark:text-zinc-600
+                  enabled:text-gray-800 enabled:hover:text-black
+                  enabled:dark:text-gray-300 enabled:dark:hover:text-white
+                | do %>
+                  <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
+                <% end %>
+              </div>
+            <% end %>
+          </turbo-frame>
         </div>
-        <div class="text-center text-gray-500 dark:text-gray-400 text-xs mb-2 w-full">HostedGPT can make mistakes. Consider checking important information.</div>
-      </div>
+
+        <div class="text-center text-gray-500 dark:text-gray-400 text-xs mb-2 w-full">
+          HostedGPT can make mistakes. Consider checking important information.
+        </div>
     </div>
   </div>
 

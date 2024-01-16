@@ -27,4 +27,20 @@ class UserTest < ActiveSupport::TestCase
     user = users(:keith)
     assert user.authenticate("secret")
   end
+
+  test "it destroys assistantes on destroy" do
+    assistant = assistants(:samantha)
+    assistant.user.destroy
+    assert_raises ActiveRecord::RecordNotFound do
+      assistant.reload
+    end
+  end
+
+  test "it destroys conversations on destroy" do
+    conversation = conversations(:greeting)
+    conversation.user.destroy
+    assert_raises ActiveRecord::RecordNotFound do
+      conversation.reload
+    end
+  end
 end
