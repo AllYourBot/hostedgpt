@@ -16,12 +16,12 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
 
   connect () {
-    this.element.addEventListener('mouseover', () => this.removeParentClickable())
+    this.element.addEventListener('mouseover', (event) => this.removeParentClickable(event))
     this.element.addEventListener('mouseout', () => this.addParentClickable())
   }
 
   disconnect () {
-    this.element.removeEventListener('mouseover', () => this.removeParentClickable())
+    this.element.removeEventListener('mouseover', (event) => this.removeParentClickable(event))
     this.element.removeEventListener('mouseout', () => this.addParentClckable())
   }
 
@@ -30,7 +30,7 @@ export default class extends Controller {
     this.parent.classList.remove('cursor-pointer')
   }
 
-  addParentClickable (event) {
+  addParentClickable () {
     this.parent.classList.add('cursor-pointer')
   }
 }
