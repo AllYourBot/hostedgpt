@@ -11,7 +11,7 @@
   <div id="messages" class="min-w-full">
     <turbo-frame id="messages">
       <% last_index = @messages.count - 1 %>
-      <% @messages.each.with_index do |message, index| %>
+      <% @messages.find_each.with_index do |message, index| %>
         <%= render partial: 'message', locals: { message: message, conversation: @conversation, scroll_into_view: index == last_index } %>
       <% end %>
     </turbo-frame>
