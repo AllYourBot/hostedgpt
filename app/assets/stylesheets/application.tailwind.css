@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 
+/* Scrollbar */
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -33,6 +35,10 @@
   /* https://unused-css.com/blog/css-outer-glow/ */
 }
 
+
+
+/* DaisyUI tooltip */
+
 .tooltip-bottom:before {
   padding: 0.4rem 0.7rem !important;
   box-shadow: 0px 3px 4px 0px #eeeeee29;
@@ -43,16 +49,60 @@
   box-shadow: 0px -3px 4px 0px #eeeeee29;
 }
 
+.tooltip-right:before {
+  padding: 0.4rem 0.7rem !important;
+  box-shadow: 3px 0px 4px 0px #eeeeee29;
+}
+
+.tooltip-left:before {
+  padding: 0.4rem 0.7rem !important;
+  box-shadow: -3px 0px 4px 0px #eeeeee29;
+}
+
+.tooltip.tooltip-open:active:before,
+.tooltip:hover:active:before {
+  opacity: 0 !important;
+  transition-delay: 0ms;
+}
+
+.tooltip.tooltip-open:active:after,
+.tooltip:hover:active:after {
+  opacity: 0 !important;
+  transition-delay: 0ms;
+}
 
 
-  /* Add this to center the modal */
-  .modal-bg {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  .modal-content {
-    width: 400px;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+/* Make clickable elements push inward */
+
+.menu li>:not(ul):not(.menu-title):not(details).active,
+.menu li>:not(ul):not(.menu-title):not(details):active,
+.menu li>details>summary:active {
+  background-color: var(--fallback-bc,oklch(var(--bc)/.1)) !important;
+  color: inherit !important;
+  @apply scale-98 ease-in-out duration-300
+}
+
+
+.cursor-pointer:active {
+  @apply scale-98 ease-in-out duration-300
+}
+
+.icon.cursor-pointer:active {
+  @apply scale-90 ease-in-out duration-300
+}
+
+
+
+
+/* Clean up this CSS — I don't think we need these classes, use tailwind utilities instead */
+
+.modal-bg {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+  width: 400px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
