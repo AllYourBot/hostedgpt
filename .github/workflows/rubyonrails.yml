@@ -41,6 +41,9 @@ jobs:
       - name: Set up database schema
         run: bin/rails db:schema:load
 
+      - name: Build CSS
+        run: bin/rails tailwindcss:build
+
       - name: Run tests
         run: bin/rails test
 
