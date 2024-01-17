@@ -7,6 +7,10 @@ module Authenticate
     before_action :authenticate_user!
   end
 
+  def login_as(user)
+    session[:current_user_id] = user.id
+  end
+
   def current_user
     Current.user ||= User.find_by(id: session[:current_user_id])
   end

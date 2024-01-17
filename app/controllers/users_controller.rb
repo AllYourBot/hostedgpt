@@ -13,7 +13,8 @@ class UsersController < ApplicationController
       respond_to do |format|
         if @person.save
           reset_session
-          session[:current_user_id] = @user.id
+          login_as(@user)
+
           format.html { redirect_to dashboard_path, notice: "Account was successfully created." }
           format.json { render :show, status: :created, location: @user }
         else
