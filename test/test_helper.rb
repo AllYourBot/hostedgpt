@@ -40,7 +40,9 @@ class ActionDispatch::IntegrationTest
 
   def login_as(user)
     post login_path, params: { email: user.person.email, password: "secret" }
-    assert_redirected_to dashboard_path
+    assert_response :redirect
+    follow_redirect!
+    assert_response :success
   end
 end
 

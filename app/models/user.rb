@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  include Personable
+  include Personable, Registerable
 
   has_secure_password
 

@@ -2,27 +2,28 @@ class UsersController < ApplicationController
   include Accessible
 
   def new
-    @user = User.new
     @person = Person.new
+    @person.personable = User.new
   end
 
   def create
-    context = RegistrationContext.new params.permit(:email), params.permit(:password)
+    @person = Person.new
+    @person.personable_type = "User"
+    @person.update person_params
 
     respond_to do |format|
-      if context.run
+      if @person.save
         reset_session
-        login_as context.user
+        login_as @person.user
 
         format.html {
-          redirect_to conversation_path(context.first_conversation), notice: "Account was successfully created."
+          redirect_to conversation_path(@person.personable.conversations.first), notice: "Account was successfully created."
         }
-        format.json { render :show, status: :created, location: context.first_conversation }
+        format.json { render :show, status: :created, location: @person.personable.conversations.first }
       else
-        @errors = context.errors
-
+        @person.errors.delete :personable
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
+        format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -34,11 +35,7 @@ class UsersController < ApplicationController
   private
 
   def person_params
-    params.permit(:email)
-  end
-
-  def user_params
-    params.permit(:password)
+    params.require(:person).permit(:email, personable_attributes: :password)
   end
 
   def update_params

@@ -19,4 +19,10 @@ class PersonTest < ActiveSupport::TestCase
     person.save!
     assert_equal "example@gmail.com", person.email
   end
+
+  test "it can create a nested user" do
+    person = Person.new email: "example@gmail.com", personable_attributes: { password: "password" }, personable_type: "User"
+    assert person.save
+    assert_instance_of User, person.personable
+  end
 end
