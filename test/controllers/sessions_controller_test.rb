@@ -7,11 +7,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create session" do
-    email = people(:keith_registered).email
+    person = people(:keith_registered)
     password = "secret"
 
-    post login_path, params: {email: email, password: password}
-    assert_redirected_to dashboard_path
+    conversation = person.user.assistants.first.conversations.first
+
+    post login_path, params: {email: person.email, password: password}
     assert_match(/Successfully logged in/, flash.notice)
   end
 
@@ -39,7 +40,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     password = "secret"
 
     post login_path, params: {email: email, password: password}
-    assert_redirected_to dashboard_path
     assert_match(/Successfully logged in/, flash.notice)
+  end
+
+  test "it should redirect them to a conversation after login" do
+    person = people(:keith_registered)
+    post login_path, params: {email: person.email, password: "secret"}
+    assert_redirected_to conversation_path(person.user.assistants.first.conversations.first)
   end
 end

@@ -2,10 +2,10 @@
   <h2 class='text-3xl font-semibold text-black/90 dark:text-white/90'>Create your account</h2>
   <% if @errors && @errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(@errors.count, "error") %> prohibited this message from being saved:</h2>
+      <h2><%= pluralize(@errors.count, "error") %> need to be fixed before your account can be created:</h2>
 
       <ul>
-        <% @errors.each do |error| %>
+        <% @errors.full_messages.each do |error| %>
           <li><%= error %></li>
         <% end %>
       </ul>
