@@ -11,16 +11,26 @@ class UserTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordInvalid) { person.save! }
   end
 
-  test "should not save user without password confirmation" do
-    user = User.new(password: "password")
-    person = Person.new(email: "example@gmail.com", personable: user)
-    assert_raises(ActiveRecord::RecordInvalid) { person.save! }
-  end
-
   test "should save user with password" do
     user = User.new(password: "password", password_confirmation: "password")
     person = Person.new(email: "exmaple@gmail.com", personable: user)
     assert person.save!
+  end
+
+  test "passwords must be 6 characters or longer" do
+    user = User.new
+    bad_short_passwords = ["", "12345"]
+
+    bad_short_passwords.each do |bad_password|
+      user.password = bad_password
+      user.save
+      assert user.errors[:password].present?
+    end
+
+    good_password = "123456"
+    user.password = good_password
+    assert user.save
+    refute user.errors[:password].present?
   end
 
   test "it can validate a password" do

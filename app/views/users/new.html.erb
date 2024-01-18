@@ -1,10 +1,24 @@
-<div class='w-full h-screen bg-white flex justify-center items-center flex-col space-y-5'>
-  <div><img src="/logo.svg" alt="HostedGPT" width="40" height="40" /></div>
-  <h2 class='text-3xl font-semibold text-black/90'>Create your account</h2>
-    <%= form_with(model: User.new, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
+<div class='w-full h-screen flex justify-center items-center flex-col space-y-5'>
+  <h2 class='text-3xl font-semibold text-black/90 dark:text-white/90'>Create your account</h2>
+  <% if @errors && @errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(@errors.count, "error") %> prohibited this message from being saved:</h2>
+
+      <ul>
+        <% @errors.each do |error| %>
+          <li><%= error %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with(method: :post, url: users_path, class: "flex flex-col space-y-4 w-80") do |f| %>
     <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded text-black p-3"%>
     <%= f.password_field :password, id: "email", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded text-black p-3"%>
-    <%= f.submit "Continue", class: 'bg-teal-600 hover:bg-teal-700 rounded-sm font-light text-white p-4 px-4 text-center' %>
-    <span class='text-sm text-center'>Already have an account? <a href="/login" class='text-teal-600'>Login</a></span>
-    <% end %>
+    <%= f.submit "Continue", class: 'border border-teal-600 rounded text-teal-600 hover:bg-teal-700 hover:text-white font-light p-4 text-center cursor-pointer' %>
+  <% end %>
+  <span class='text-sm text-center'>
+    Already have an account?
+    <%= link_to "Log in", login_path, class: "text-teal-600" %>
+  </span>
 </div>

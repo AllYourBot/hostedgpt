@@ -12,4 +12,11 @@ class PersonTest < ActiveSupport::TestCase
 
     assert person2.errors[:email].present?
   end
+
+  test "it cleans and formats the email address before saving" do
+    user = User.new password: "password"
+    person = Person.new email: "  EXAMPLE@gmail.com  ", personable: user
+    person.save!
+    assert_equal "example@gmail.com", person.email
+  end
 end

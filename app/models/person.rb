@@ -3,4 +3,8 @@ class Person < ApplicationRecord
   validates_associated :personable
 
   validates :email, presence: true, uniqueness: true
+
+  def email=(email)
+    super(email.strip.downcase)
+  end
 end

@@ -2,12 +2,15 @@ class UsersController < ApplicationController
   include Accessible
 
   def new
+    @user = User.new
+    @person = Person.new
   end
 
   def create
     ActiveRecord::Base.transaction do
-      @person = Person.new(email: user_params[:email])
-      @user = User.new(password: user_params[:password], password_confirmation: user_params[:password])
+      @user = User.new user_params
+      @person = Person.new person_params
+
       @person.personable = @user
 
       respond_to do |format|
@@ -18,7 +21,13 @@ class UsersController < ApplicationController
           format.html { redirect_to dashboard_path, notice: "Account was successfully created." }
           format.json { render :show, status: :created, location: @user }
         else
-          format.html { render :new }
+          # The personable must be present, but the error is totally useless to a user
+          @person.errors.delete(:personable)
+
+          @errors = @person.errors.to_a
+          @errors += @user.errors.to_a
+
+          format.html { render :new, status: :unprocessable_entity }
           format.json { render json: @user.errors, status: :unprocessable_entity }
         end
       end
@@ -31,8 +40,12 @@ class UsersController < ApplicationController
 
   private
 
+  def person_params
+    params.permit(:email)
+  end
+
   def user_params
-    params.require(:user).permit(:email, :password)
+    params.permit(:password)
   end
 
   def update_params

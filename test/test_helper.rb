@@ -35,22 +35,8 @@ if IS_FULL_TEST_RUN
   end
 end
 
-class OpenStruct
-  def blank?
-    self == OpenStruct.new || super
-  end
-
-  def empty?
-    self == OpenStruct.new || super
-  end
-end
-
 class ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers
-
-  def response
-    JSON.parse(@response.body, object_class: OpenStruct)&.data
-  end
 
   def login_as(user)
     post login_path, params: { email: user.person.email, password: "secret" }
