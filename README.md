@@ -14,13 +14,13 @@ HostedGPT is an open source project that provides all the same baseline function
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login
-2. View your newly created fork within github.com and click the button below.
+3. View your newly created fork within github.com and click the button below:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
-3. When you are taken to Render.com confirm that the title of the page says `You are deploying from a render.yaml file for _____` with your forked repo listed in the blank.
-4. Provide a unique Blueprint name such as "hostedgpt-<yourname>".
-5. Copy value from the file `config/master.key` and paste it as the value for the RAILS_MASTER_KEY on the page. Then click "Apply".
-6. Wait for the hostedgpt database and web service to be deployed. After they are, click "Dashboard" at the top of the Render screen.
-7. You should see two "Service Names" called **hostedgpt**, click the one that is of type "Web Service"
-8. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
+4. Find hostedgpt in the list of repositories and click **Connect**
+5. Provide a unique Blueprint name such as "hostedgpt-<yourname>".
+6. Click **Apply**
+7. Wait for the hostedgpt database and web service to be deployed. After they are, click "Dashboard" at the top of the Render screen.
+8. You should see two "Service Names" called **hostedgpt**, click the one that is of type "Web Service"
+9. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_

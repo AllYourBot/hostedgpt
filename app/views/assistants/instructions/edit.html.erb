@@ -1,0 +1,7 @@
+Your assistant <%= @assistant.name %> has the following instructions:
+
+<%= form_for @assistant, url: assistant_instructions_path(@assistant) do |f| %>
+  <%= f.text_area :instructions, rows: 10, class: "w-auto mx-20" %>
+  <br>
+  <%= f.submit "Update", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+<% end %>

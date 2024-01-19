@@ -56,4 +56,13 @@ class MessageTest < ActiveSupport::TestCase
       messages(:identify_photo).destroy
     end
   end
+
+  test "creating a message sends a turbo broadcast" do
+    message = Message.create!(conversation: conversations(:greeting), role: "user", content_text: "test message")
+    assert_turbo_stream_broadcasts conversations(:greeting)
+    broadcasts = capture_turbo_stream_broadcasts conversations(:greeting)
+    assert_equal 1, broadcasts.length
+    assert_equal "append", broadcasts.first["action"]
+    assert_match message.content_text, broadcasts.first.to_html
+  end
 end

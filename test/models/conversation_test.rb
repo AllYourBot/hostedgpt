@@ -39,4 +39,12 @@ class ConversationTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "conversations are destroyed when user is destroyed" do
+    conversation = conversations(:greeting)
+    conversation.user.destroy
+    assert_raises ActiveRecord::RecordNotFound do
+      conversation.reload
+    end
+  end
 end

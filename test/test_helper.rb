@@ -10,6 +10,7 @@ if IS_FULL_TEST_RUN
 
   SimpleCov.start "rails" do
     add_filter do |source_file|
+      next unless source_file.lines.count > 0
       source_file.lines.first.src =~ /# ignore simplecov/i ||
         source_file.filename =~ /application_.*\.rb/
     end
@@ -50,10 +51,16 @@ class ActionDispatch::IntegrationTest
   def response
     JSON.parse(@response.body, object_class: OpenStruct)&.data
   end
+
+  def login_as(user)
+    post login_path, params: { email: user.person.email, password: "secret" }
+    assert_redirected_to dashboard_path
+  end
 end
 
 module ActiveSupport
   class TestCase
+    include Turbo::Broadcastable::TestHelper
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 
