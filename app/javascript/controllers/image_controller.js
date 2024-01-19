@@ -37,13 +37,13 @@ export default class extends Controller {
       for (const item of clipboardData.items) {
         if (item.kind === "file") {
           const blob = item.getAsFile();
-          if (blob) {
-            try {
-              const dataURL = await this.readBlobAsDataURL(blob);
-              this.addImageToFileInput(dataURL, blob.type);
-            } catch (error) {
-              console.error("Error reading pasted image:", error);
-            }
+          if (!blob) return; // return if no valid blob
+
+          try {
+            const dataURL = await this.readBlobAsDataURL(blob);
+            this.addImageToFileInput(dataURL, blob.type);
+          } catch (error) {
+            console.error("Error reading pasted image:", error);
           }
         }
       }
