@@ -1,7 +1,14 @@
 <%= turbo_stream_from @conversation %>
-<div class="flex h-screen" data-controller="click-toggle" data-click-toggle-flippable-class="md:flex">
+<div class="flex h-screen"
+     data-controller="click-toggle"
+     data-click-toggle-flippable-class="md:flex"
+     data-action="keydown.meta+shift+s@document->click-toggle#handleEvent:prevent"
+     >
 
-  <div id="left-column" class="flex-col h-screen w-[260px] bg-black overflow-y-auto overflow-x-clip hidden md:flex pl-3 scrollbar-hide" data-click-toggle-target="destination">
+  <div id="left-column"
+       class="flex-col h-screen w-[260px] bg-black overflow-y-auto overflow-x-clip hidden md:flex pl-3 scrollbar-hide"
+       data-click-toggle-target="destination"
+   >
 
     <div id="left-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
       <div id="left-content" class="flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
@@ -124,7 +131,14 @@
               <%= form.text_area :content_text,
                 data: {
                   new_message_target: "input",
-                  controller: "textarea-autogrow"
+                  application_target: "newMessageField",
+                  controller: "textarea-autogrow",
+                  action: %|
+                    new-message#disableSubmitButton
+                    keydown.enter->new-message#submitForm
+                    keydown.shift+esc@document->new-message#focusKeydown
+                    keydown.slash@document->new-message#focusKeydown
+                  |
                 },
                 rows: 1,
                 placeholder: "Message #{@conversation.assistant.name} ...",
