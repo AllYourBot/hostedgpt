@@ -3,7 +3,7 @@ class User < ApplicationRecord
 
   has_secure_password
 
-  validates :password, presence: true, on: :create, length: { minimum: 6 }
+  validates :password, length: { minimum: 6 }, allow_nil: true
 
   has_many :chats, dependent: :destroy
   has_many :assistants, dependent: :destroy
