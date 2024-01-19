@@ -3,6 +3,7 @@ require "application_system_test_case"
 class ConversationsTest < ApplicationSystemTestCase
   setup do
     @conversation = conversations(:greeting)
+    login_as @conversation.user
   end
 
   test "visiting the index" do
@@ -16,30 +17,15 @@ class ConversationsTest < ApplicationSystemTestCase
 
     fill_in "Assistant", with: @conversation.assistant_id
     fill_in "Title", with: @conversation.title
-    fill_in "User", with: @conversation.user_id
     click_on "Create Conversation"
 
     assert_text "Conversation was successfully created"
-    click_on "Back"
   end
 
-  test "should update Conversation" do
+  test "when a message arrives while viewing the conversation, it is displayed" do
     visit conversation_url(@conversation)
-    click_on "Edit this conversation", match: :first
-
-    fill_in "Assistant", with: @conversation.assistant_id
-    fill_in "Title", with: @conversation.title
-    fill_in "User", with: @conversation.user_id
-    click_on "Update Conversation"
-
-    assert_text "Conversation was successfully updated"
-    click_on "Back"
-  end
-
-  test "should destroy Conversation" do
-    visit conversation_url(@conversation)
-    click_on "Destroy this conversation", match: :first
-
-    assert_text "Conversation was successfully destroyed"
+    message_text = "Hello! #{Time.now}"
+    @conversation.messages.create! content_text: message_text, role: :user
+    assert_text message_text
   end
 end

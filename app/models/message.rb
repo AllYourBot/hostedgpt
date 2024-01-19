@@ -10,4 +10,8 @@ class Message < ApplicationRecord
 
   validates :run, presence: true, if: -> { assistant? }
   validates :role, presence: true
+
+  after_create_commit -> {
+    broadcast_append_to conversation, partial: "messages/message", locals: {scroll_into_view: true, conversation: conversation}
+  }
 end

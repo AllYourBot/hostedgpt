@@ -1,23 +1,24 @@
 class ConversationsController < ApplicationController
-  skip_before_action :authenticate_user!
-  before_action :set_conversation, only: [:show, :edit, :update, :destroy]
+  before_action :set_conversation, only: [:edit, :update, :destroy]
 
   def index
-    @conversations = Conversation.all
+    @conversations = Current.user.conversations
   end
 
   def show
-  end
-
-  def new
-    @conversation = Conversation.new
+    @conversation = Current.user.conversations.includes(:messages).find(params[:id])
+    @new_message = @conversation.messages.new
   end
 
   def edit
   end
 
+  def new
+    @conversation = Current.user.conversations.new
+  end
+
   def create
-    @conversation = Conversation.new(conversation_params)
+    @conversation = Current.user.conversations.new(conversation_params)
 
     if @conversation.save
       redirect_to @conversation, notice: "Conversation was successfully created."
@@ -42,7 +43,7 @@ class ConversationsController < ApplicationController
   private
 
   def set_conversation
-    @conversation = Conversation.find(params[:id])
+    @conversation = Current.user.conversations.find params[:id]
   end
 
   def conversation_params

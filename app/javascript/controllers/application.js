@@ -1,6 +1,14 @@
-import { Application } from "@hotwired/stimulus"
+import { Application, defaultSchema } from "@hotwired/stimulus"
 
-const application = Application.start()
+const applicationSchema = {
+  ...defaultSchema,
+  keyMappings: {
+    ...defaultSchema.keyMappings,
+    "slash": "/",
+  }
+}
+
+const application = Application.start(document.documentElement, applicationSchema)
 
 // Configure Stimulus development experience
 application.debug = false
