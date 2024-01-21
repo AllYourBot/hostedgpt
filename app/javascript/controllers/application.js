@@ -5,6 +5,7 @@ const applicationSchema = {
   keyMappings: {
     ...defaultSchema.keyMappings,
     "slash": "/",
+    "period": "."
   }
 }
 

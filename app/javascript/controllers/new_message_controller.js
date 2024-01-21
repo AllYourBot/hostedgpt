@@ -47,4 +47,11 @@ export default class extends Controller {
     this.focusInput()
     event.preventDefault()
   }
+
+  unfocusKeydown(event) {
+    if (event.key === "Escape" && event.target.tagName === "TEXTAREA") {
+      document.activeElement.blur()
+      event.preventDefault()
+    }
+  }
 }

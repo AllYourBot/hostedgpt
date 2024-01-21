@@ -2,7 +2,8 @@
 <div class="flex h-screen"
      data-controller="click-toggle"
      data-click-toggle-flippable-class="md:flex"
-     data-action="keydown.meta+shift+s@document->click-toggle#handleEvent:prevent"
+     data-action="keydown.meta+shift+s@document->click-toggle#handleEvent:prevent
+                  keydown.meta+period@document->click-toggle#handleEvent:prevent"
      >
 
   <div id="left-column"
@@ -59,7 +60,12 @@
   <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite relative">
 
     <div id="handle-container" class="absolute left-0 top-1/2 w-8 h-20 -mt-10 z-20 hidden md:flex" data-click-toggle-target="trigger">
-      <div id="handle" class="flex-1 flex cursor-pointer group" data-controller="click-toggle" data-click-toggle-target="trigger" data-click-toggle-flippable-class="!hidden">
+      <div  id="handle"
+            class="flex-1 flex cursor-pointer group"
+            data-controller="click-toggle"
+            data-click-toggle-target="trigger"
+            data-click-toggle-flippable-class="!hidden"
+            >
         <div id="left-handle" class="flex-1 tooltip tooltip-right hover:tooltip-open" data-tip="Close sidebar" data-click-toggle-target="destination">
           <div class="flex-1 flex h-full items-center justify-center">
             <div id="left" class="w-1 h-5 flex-col opacity-70">
@@ -138,6 +144,7 @@
                     keydown.enter->new-message#submitForm
                     keydown.shift+esc@document->new-message#focusKeydown
                     keydown.slash@document->new-message#focusKeydown
+                    keydown.esc->new-message#unfocusKeydown
                   |
                 },
                 rows: 1,
@@ -148,8 +155,8 @@
                   bg-transparent
                   text-black placeholder-zinc-500 dark:text-gray-200
                   text-md
-                  rounded-2xl border-zinc-300
-                  focus:ring-0 focus:border-zinc-300 focus:shadow
+                  rounded-2xl border-zinc-600
+                  focus:ring-0 focus:border-zinc-500 focus:shadow
                   resize-none
                 |
               %>
@@ -167,7 +174,7 @@
           </turbo-frame>
         </div>
 
-        <div class="text-center text-gray-500 dark:text-gray-400 text-xs mb-2 w-full">
+        <div class="text-center text-zinc-500 dark:text-zinc-400 text-xs mb-2 w-full">
           HostedGPT can make mistakes. Consider checking important information.
         </div>
     </div>
