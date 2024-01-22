@@ -5,22 +5,48 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
-  test "should not save user without password" do
+  test "should not validate a new user without password" do
     user = User.new
     person = Person.new(email: "example@gmail.com", personable: user)
-    assert_raises(ActiveRecord::RecordInvalid) { person.save! }
+    refute person.valid?
   end
 
-  test "should not save user without password confirmation" do
-    user = User.new(password: "password")
-    person = Person.new(email: "example@gmail.com", personable: user)
-    assert_raises(ActiveRecord::RecordInvalid) { person.save! }
-  end
-
-  test "should save user with password" do
+  test "should validate a user with password" do
     user = User.new(password: "password", password_confirmation: "password")
     person = Person.new(email: "exmaple@gmail.com", personable: user)
-    assert person.save!
+    assert person.valid?
+  end
+
+  test "it can update a user with a password" do
+    user = users(:keith)
+    old_password_hash = user.password_digest
+    user.update(password: "password")
+    assert user.valid?
+    refute_equal old_password_hash, user.password_digest
+  end
+
+  test "it can update a user without a password" do
+    user = users(:keith)
+    old_password_hash = user.password_digest
+    user.update(first_name: "New Name")
+    assert user.valid?
+    assert_equal old_password_hash, user.password_digest
+  end
+
+  test "passwords must be 6 characters or longer" do
+    user = User.new
+    bad_short_passwords = ["", "12345"]
+
+    bad_short_passwords.each do |bad_password|
+      user.password = bad_password
+      user.valid?
+      assert user.errors[:password].present?
+    end
+
+    good_password = "123456"
+    user.password = good_password
+    assert user.valid?
+    refute user.errors[:password].present?
   end
 
   test "it can validate a password" do

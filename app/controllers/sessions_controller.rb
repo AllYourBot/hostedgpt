@@ -5,10 +5,11 @@ class SessionsController < ApplicationController
   end
 
   def create
-    person = Person.find_by(email: params[:email])
+    person = Person.find_by(email: params[:email].strip)
+
     if person.blank?
-      render :new
       flash.now[:alert] = "Invalid email or password"
+      render :new, status: :unprocessable_entity
       return
     end
 
@@ -16,11 +17,11 @@ class SessionsController < ApplicationController
 
     if @user&.authenticate(params[:password])
       reset_session
-      session[:current_user_id] = @user.id
-      redirect_to dashboard_path, notice: "Successfully logged in."
+      login_as @user
+      redirect_to post_login_destination, notice: "Successfully logged in."
     else
       flash.now[:alert] = "Invalid email or password"
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -28,5 +29,16 @@ class SessionsController < ApplicationController
     reset_session
     Current.user = nil
     redirect_to login_path, notice: "Successfully logged out."
+  end
+
+  private
+  def post_login_destination
+    conversation = @user.assistants.first&.conversations&.first
+
+    if conversation
+      conversation_path conversation
+    else
+      dashboard_path
+    end
   end
 end

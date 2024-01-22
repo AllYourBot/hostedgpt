@@ -1,10 +1,9 @@
 class User < ApplicationRecord
-  include Personable
+  include Personable, Registerable
 
   has_secure_password
 
-  validates :password, presence: true, on: :create
-  validates :password_confirmation, presence: true, on: :create
+  validates :password, length: { minimum: 6 }, allow_nil: true
 
   has_many :chats, dependent: :destroy
   has_many :assistants, dependent: :destroy
