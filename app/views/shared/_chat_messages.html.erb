@@ -8,6 +8,7 @@
               <img src="https://i.pravatar.cc/57" class="max-w-min rounded" alt='Open AI logo' />
             </div>
             <p><%= note.content %></p>
+            <p><%= image_tag(note.image) if note.image.present? %></p>
           </div>
           <%= heroicon "pencil-square" , options: { class: 'h-6 w-6' } %>
         </div>
