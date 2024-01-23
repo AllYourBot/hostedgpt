@@ -1,5 +1,10 @@
 <div id="<%= dom_id conversation %>">
   <p class="flex gap-2">
+    <strong class="block font-medium mb-1">ID:</strong>
+    <%= conversation.id %>
+  </p>
+
+  <p class="flex gap-2">
     <strong class="block font-medium mb-1">Assistant:</strong>
     <%= conversation.assistant.name %>
   </p>
