@@ -28,7 +28,7 @@ class ConversationAi
 
   def build_chat_parameters(replies)
     {
-      model: @note.image.presence ? "gpt-4-vision-preview" : "gpt-3.5-turbo",
+      model: @note.image.presence ? "gpt-4-vision-preview" : "gpt-4-vision-preview", # once a single note includes an image, all subsequent notes must also use this model so let's just default, for now
       messages: prepare_messages_for_openai,
       temperature: 0.8,
       stream: handle_stream(replies),
