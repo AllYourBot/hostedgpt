@@ -6,7 +6,7 @@ class Note < ApplicationRecord
 
   validates :content, presence: true
 
-  has_one_attached :image
+  has_one_attached :image  # These are not just images. Let's rename this to :file when we move to message.rb
 
   broadcasts_refreshes
 

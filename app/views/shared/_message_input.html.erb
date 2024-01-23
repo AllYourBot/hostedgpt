@@ -1,4 +1,4 @@
-<%= form_with(url: chats_path, method: :post, data: { controller: 'image', remote: 'true' }, class: 'border border-gray-300 flex justify-center items-center space-x-2 shadow-md rounded px-2 w-1/2') do |f| %>
+<%= form_with(url: chats_path, method: :post, data: { controller: 'image-upload', remote: 'true' }, class: 'border border-gray-300 flex justify-center items-center space-x-2 shadow-md rounded px-2 w-1/2') do |f| %>
   <%= f.file_field :image, data: { image_target: 'file' } %>
   <%= f.text_field :content, data: { image_target: 'content'}, class: 'flex-1 bg-[#343541] text-white p-2 border-0 focus:outline-none' %>
   <button type='submit'>
