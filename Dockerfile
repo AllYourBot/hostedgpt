@@ -21,6 +21,8 @@ COPY . .
 RUN bundle exec bootsnap precompile --gemfile app/ lib/
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
+RUN mkdir -p log tmp bin
+
 RUN adduser rails -D -h /rails -s /bin/sh && \
     chown -R rails:rails db log tmp bin && \
     chmod 755 /rails/bin/docker-entrypoint
