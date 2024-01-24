@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-ruby "3.2.2"
+ruby File.readlines(File.join(__dir__ , '.tool-versions')).select{|l| l =~ /ruby/}.first.strip.split.last
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.2"
