@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import debounce from "../utils/debounce.js"
 
 // This controller listens for a click on the "trigger" element. When it receives one, it toggles the "flippable" class on the "destination" element:
 //
@@ -21,7 +22,7 @@ export default class extends Controller {
     })
   }
 
-  handleEvent = _.debounce(this.toggleClasses, 100)
+  handleEvent = debounce(this.toggleClasses, 100)
 
   toggleClasses() {
     this.destinationTargets.forEach(element => {

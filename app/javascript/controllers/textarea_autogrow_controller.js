@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import debounce from "../utils/debounce.js"
 
 export default class extends Controller {
 
@@ -20,7 +21,7 @@ export default class extends Controller {
     window.removeEventListener('resize', () => this.debouncedAutogrow())
   }
 
-  debouncedAutogrow = _.debounce(this.autogrow, 100)
+  debouncedAutogrow = debounce(this.autogrow, 100)
 
   autogrow() {
     this.element.style.height = 'auto'
