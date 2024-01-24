@@ -47,4 +47,9 @@ export default class extends Controller {
     this.focusInput()
     event.preventDefault()
   }
+
+  unfocusKeydown(event) {
+    document.activeElement.blur()
+    event.preventDefault()
+  }
 }
