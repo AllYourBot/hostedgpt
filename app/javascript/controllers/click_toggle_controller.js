@@ -9,19 +9,21 @@ export default class extends Controller {
   static classes = [ "flippable" ]
   static targets = [ "trigger", "destination" ]
 
-  connect () {
+  connect() {
     this.triggerTargets.forEach(triggerElement => {
       triggerElement.addEventListener('click', this)
     })
   }
 
-  disconnect () {
+  disconnect() {
     this.triggerTargets.forEach(triggerElement => {
       triggerElement.removeEventListener('click', this)
     })
   }
 
-  handleEvent () {
+  handleEvent = _.debounce(this.toggleClasses, 100)
+
+  toggleClasses() {
     this.destinationTargets.forEach(element => {
       element.classList.toggle(this.flippableClass)
     })
