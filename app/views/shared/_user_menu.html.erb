@@ -1,0 +1,63 @@
+<div
+    class="w-full border-t border-gray-200/50 pt-6 pb-2 pr-2 bg-black flex flex-col gap-2"
+    data-controller="modal"
+    >
+
+    <a href="#"
+       data-action="click->modal#open:prevent"
+       class="flex justfiy-left gap-2 rounded-lg text-white text-sm hover:bg-[#28282b] p-2"
+    >
+      <%= icon "cog" , size: 20 %>
+      Settings
+    </a>
+
+    <a href="/logout" class="flex justify-left gap-2 hover:bg-[#28282b] rounded-lg text-white text-sm p-2">
+    <%= heroicon "arrow-right-start-on-rectangle" , options: { class: 'h-5 w-5 text-gray-300' } %>
+    <p>Logout</p>
+  </a>
+
+  <div data-modal-target="modal"
+       class="fixed inset-0 z-50 hidden"
+       >
+    <div
+      class="absolute inset-0 bg-[rgba(0,0,0,0.5)] flex justify-center items-center"
+      data-action="click->modal#close:self"
+    >
+    <div class="bg-[#343541] w-[400px] text-gray-200 p-6 rounded shadow-lg flex flex-col gap-4">
+      <div class="flex justify-between items-baseline">
+        <h2 class="text-2xl font-bold">Settings</h2>
+        <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click->modal#close">
+          &times;
+        </button>
+      </div>
+
+        <%= form_with(
+          model: Current.user,
+          method: :put,
+          url: user_path(current_user),
+          id: "settingsForm",
+          class: "contents",
+          data: { action: "ajax:success->modal#close"}
+        ) do |form| %>
+          <div>
+            <%= form.label :openai_key, "OpenAI API Key:", class: "block text-gray-300 font-medium" %>
+            <%= form.text_field :openai_key, data: { "settings-modal-target": "apiKeyEl" }, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+          </div>
+          <div>
+            <%= form.label :first_name, "First Name:", class: "block text-gray-300 font-medium" %>
+            <%= form.text_field :first_name, data: { "settings-modal-target": "firstNameEl" }, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+          </div>
+          <div>
+            <%= form.label :last_name, "Last Name:", class: "block text-gray-300 font-medium" %>
+            <%= form.text_field :last_name, data: { "settings-modal-target": "lastNameEl" }, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+          </div>
+          <div class="flex justify-between">
+            <button class="ml-2 text-gray-300 hover:text-gray-800" data-action="click->modal#close">Cancel</button>
+            <%= form.button "Save", type: "button", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
