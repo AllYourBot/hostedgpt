@@ -30,4 +30,4 @@ RUN adduser rails -D -h /rails -s /bin/sh && \
 USER rails:rails
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
-CMD ["bin/rails", "server", "-b", "0.0.0.0"]
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]

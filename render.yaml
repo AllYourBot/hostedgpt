@@ -13,11 +13,8 @@ envVarGroups:
 services:
   - type: web
     name: hostedgpt
-    runtime: ruby
+    runtime: docker
     plan: free
-    buildCommand: "./bin/render-build.sh"
-    # preDeployCommand: "./bin/rails db:migrate" # preDeployCommand only available on paid instance types
-    startCommand: "./bin/rails server"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
