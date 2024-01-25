@@ -1,10 +1,11 @@
 <div
     class="w-full border-t border-gray-200/50 pt-6 pb-2 pr-2 bg-black flex flex-col gap-2"
-    data-controller="modal"
+    data-controller="click-toggle"
+    data-click-toggle-flippable-class="hidden"
     >
 
     <a href="#"
-       data-action="click->modal#open:prevent"
+       data-action="click->click-toggle#toggleClasses:prevent"
        class="flex justfiy-left gap-2 rounded-lg text-white text-sm hover:bg-[#28282b] p-2"
     >
       <%= icon "cog" , size: 20 %>
@@ -16,17 +17,17 @@
     <p>Logout</p>
   </a>
 
-  <div data-modal-target="modal"
+  <div data-click-toggle-target="destination"
        class="fixed inset-0 z-50 hidden"
        >
     <div
       class="absolute inset-0 bg-[rgba(0,0,0,0.5)] flex justify-center items-center"
-      data-action="click->modal#close:self"
+      data-action="click->click-toggle#toggleClasses:self"
     >
     <div class="bg-[#343541] w-[400px] text-gray-200 p-6 rounded shadow-lg flex flex-col gap-4">
       <div class="flex justify-between items-baseline">
         <h2 class="text-2xl font-bold">Settings</h2>
-        <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click->modal#close">
+        <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click->click-toggle#toggleClasses">
           &times;
         </button>
       </div>
@@ -37,22 +38,22 @@
           url: user_path(current_user),
           id: "settingsForm",
           class: "contents",
-          data: { action: "ajax:success->modal#close"}
+          data: { action: "ajax:success->click-toggle#toggleClasses"}
         ) do |form| %>
           <div>
             <%= form.label :openai_key, "OpenAI API Key:", class: "block text-gray-300 font-medium" %>
-            <%= form.text_field :openai_key, data: { "settings-modal-target": "apiKeyEl" }, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+            <%= form.text_field :openai_key, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
           </div>
           <div>
             <%= form.label :first_name, "First Name:", class: "block text-gray-300 font-medium" %>
-            <%= form.text_field :first_name, data: { "settings-modal-target": "firstNameEl" }, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+            <%= form.text_field :first_name, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
           </div>
           <div>
             <%= form.label :last_name, "Last Name:", class: "block text-gray-300 font-medium" %>
-            <%= form.text_field :last_name, data: { "settings-modal-target": "lastNameEl" }, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+            <%= form.text_field :last_name, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
           </div>
           <div class="flex justify-between">
-            <button class="ml-2 text-gray-300 hover:text-gray-800" data-action="click->modal#close">Cancel</button>
+            <button class="ml-2 text-gray-300 hover:text-gray-800" data-action="click->click-toggle#toggleClasses">Cancel</button>
             <%= form.button "Save", type: "button", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>
           </div>
         <% end %>
