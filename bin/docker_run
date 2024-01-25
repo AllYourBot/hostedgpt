@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+user_name=$(whoami)
+
+docker build . -t gpt
+docker run \
+  --rm \
+  -it \
+  -e SECRET_KEY_BASE=0 \
+  -e RAILS_ENV=development \
+  -e DATABASE_URL=postgresql://${user_name}@host.docker.internal:5432/hostedgpt_development \
+  -p 3000:3000 \
+  -e PORT=3000 \
+  gpt
