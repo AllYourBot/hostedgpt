@@ -25,26 +25,37 @@ class MessageTest < ActiveSupport::TestCase
     assert_instance_of Run, messages(:yes_i_do).run
   end
 
-  test "simple create works" do
-    assert_nothing_raised do
-      Message.create!(
-        conversation: conversations(:greeting),
-        role: "user"
-      )
+  test "create without setting Current or conversation raises" do
+    assert_raises do
+      Message.create!(content_text: "Hello")
     end
+  end
+
+  test "minimal create works when Current is set" do
+    Current.user = users(:keith)
+    Current.assistant = assistants(:samantha)
+
+    assert_nothing_raised do
+      Message.create!(content_text: "Hello")
+    end
+
+    assert_equal assistants(:samantha), Message.last.assistant
+    assert_not_nil Message.last.conversation
+    assert_equal users(:keith), Message.last.conversation.user
   end
 
   test "creating an assistant message requires a run to be associated" do
     m = Message.new(
       conversation: conversations(:greeting),
-      role: "assistant"
+      role: :assistant,
+      content_text: "I am here."
     )
 
     refute m.valid?
     assert m.errors.map(&:attribute).include? :run
 
     m.run = runs(:identify_photo_response)
-    assert m.valid?
+    assert m.valid?, m.errors.full_messages
 
     assert_nothing_raised do
       m.save!
