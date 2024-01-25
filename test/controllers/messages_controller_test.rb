@@ -4,7 +4,9 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @message = messages(:hear_me)
     @conversation = @message.conversation
-    login_as @conversation.user
+    @user = @conversation.user
+    @assistant = @conversation.assistant
+    login_as @user
   end
 
   test "should get index" do
@@ -13,17 +15,40 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get new" do
-    get new_conversation_message_url(@conversation)
+    get new_assistant_message_url(@assistant)
     assert_response :success
   end
 
-  test "should create message" do
-    assert_difference("Message.count") do
-      post conversation_messages_url(@conversation), params: { message: { role: @message.role, content_text: @message.content_text } }
+  test "should create message when conversation_id is provided" do
+    assert_difference "Message.count" do
+      post assistant_messages_url(@assistant), params: { message: { conversation_id: @message.conversation_id, content_text: @message.content_text } }
     end
 
-    assert_redirected_to conversation_url(@conversation)
+    assert_redirected_to message_url(Message.last)
     assert_equal @conversation.id, Message.last.conversation_id
+  end
+
+  test "should create message AND create conversation when conversation_id is nil" do
+    assert_difference "Message.count" do
+      assert_difference "Conversation.count" do
+        post assistant_messages_url(@assistant), params: { message: { content_text: @message.content_text } }
+      end
+    end
+
+    assert_redirected_to message_url(Message.last)
+    assert_instance_of Conversation, Message.last.conversation
+    assert_equal @assistant, Message.last.conversation.assistant
+    assert_equal @user, Message.last.conversation.user
+  end
+
+  test "should fail to create message when there is no content_text" do
+    post assistant_messages_url(@assistant), params: { message: { content_text: nil } }
+    assert_response :unprocessable_entity
+  end
+
+  test "should fail to create message when there are no params" do
+    post assistant_messages_url(@assistant)
+    assert_response :bad_request
   end
 
   test "should show message" do

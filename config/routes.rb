@@ -2,14 +2,14 @@ Rails.application.routes.draw do
   resources :assistants do
     get :instructions, to: "assistants/instructions#edit"
     patch :instructions, to: "assistants/instructions#update"
+    resources :messages, only: [:new, :create]
   end
 
-  shallow do
-    resources :conversations do
-      resources :messages
-    end
+  resources :conversations do
+    resources :messages, only: :index
   end
 
+  resources :messages, except: [:new, :create, :index]
   resources :documents
 
   resources :users, only: [:new, :create, :update]
