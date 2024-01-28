@@ -144,7 +144,7 @@
                   controller: "textarea-autogrow",
                   action: %|
                     new-message#disableSubmitButton
-                    keydown.enter->new-message#submitForm
+                    keydown.enter->new-message#submitForm:prevent
                     keydown.shift+esc@document->new-message#focusKeydown
                     keydown.slash@document->new-message#focusKeydown
                     keydown.esc->new-message#unfocusKeydown
