@@ -33,10 +33,9 @@ class MessageTest < ActiveSupport::TestCase
 
   test "minimal create works when Current is set" do
     Current.user = users(:keith)
-    Current.assistant = assistants(:samantha)
 
     assert_nothing_raised do
-      Message.create!(content_text: "Hello")
+      Message.create!(assistant: assistants(:samantha), content_text: "Hello")
     end
 
     assert_equal assistants(:samantha), Message.last.assistant
@@ -46,6 +45,7 @@ class MessageTest < ActiveSupport::TestCase
 
   test "creating an assistant message requires a run to be associated" do
     m = Message.new(
+      assistant: assistants(:samantha),
       conversation: conversations(:greeting),
       role: :assistant,
       content_text: "I am here."
@@ -69,7 +69,12 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   test "creating a message sends a turbo broadcast" do
-    message = Message.create!(conversation: conversations(:greeting), role: "user", content_text: "test message")
+    message = Message.create!(
+      assistant: assistants(:samantha),
+      conversation: conversations(:greeting),
+      role: :user,
+      content_text: "test message"
+    )
     assert_turbo_stream_broadcasts conversations(:greeting)
     broadcasts = capture_turbo_stream_broadcasts conversations(:greeting)
     assert_equal 1, broadcasts.length

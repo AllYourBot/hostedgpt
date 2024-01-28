@@ -1,4 +1,5 @@
 hear_me:
+  assistant: samantha
   conversation: greeting
   role: user
   content_text: Can you hear me?
@@ -6,6 +7,7 @@ hear_me:
   run:
 
 yes_i_do:
+  assistant: samantha
   conversation: greeting
   role: assistant
   content_text: Yes, I can hear you. How can I help you today?
@@ -13,6 +15,7 @@ yes_i_do:
   run: hear_me_response
 
 identify_photo:
+  assistant: samantha
   conversation: greeting
   role: user
   content_text: What do you see in this photo?
@@ -20,6 +23,7 @@ identify_photo:
   run:
 
 photo_identified:
+  assistant: samantha
   conversation: greeting
   role: assistant
   content_text: That looks like a cat.
