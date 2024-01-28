@@ -1,0 +1,188 @@
+
+<% content_for :messages_layout_yield do %>
+  <%= turbo_stream_from @conversation %>
+
+  <div class="flex h-screen"
+      data-controller="click-toggle"
+      data-click-toggle-flippable-class="md:flex"
+      data-action="keydown.meta+shift+s@document->click-toggle#handleEvent
+                    keydown.meta+period@document->click-toggle#handleEvent"
+      >
+
+    <div id="left-column"
+        class="flex-col h-screen w-[260px] bg-black overflow-y-auto overflow-x-clip hidden md:flex pl-3 scrollbar-hide"
+        data-click-toggle-target="destination"
+    >
+
+      <div id="left-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
+        <div id="left-content" class="flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
+          <div class="sticky top-0 pt-3 mb-1 bg-black z-10">
+            <%= render 'assistant_sidebar_link', title: "ChatGPT", settings: false %>
+          </div>
+          <%= render 'assistant_sidebar_link', title: "Samantha" %>
+          <%= render 'assistant_sidebar_link', title: "Samantha but really long so it wraps" %>
+          <%= render 'assistant_sidebar_link', title: "Samantha", selected: true %>
+          <%= render 'assistant_sidebar_link', title: "Samantha" %>
+
+          <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
+            Today
+          </div>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind", selected: true %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+
+          <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
+            Yesterday
+          </div>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        </div>
+
+        <div id="left-footer" class="flex-none flex text-white mb-4 mt-3">
+          <div class="h-10 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 justify-between items-center w-full group cursor-pointer mb-1">
+            <div id="profile" class="ml-2 mr-2 w-7 h-7 bg-white rounded-full"></div>
+            <div class="flex-1 text-white truncate">
+              Keith Schacht
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite relative">
+
+      <div id="handle-container" class="absolute left-0 top-1/2 w-8 h-20 -mt-10 z-20 hidden md:flex" data-click-toggle-target="trigger">
+        <div  id="handle"
+              class="flex-1 flex cursor-pointer group"
+              data-controller="click-toggle"
+              data-click-toggle-target="trigger"
+              data-click-toggle-flippable-class="!hidden"
+              data-action="keydown.meta+shift+s@document->click-toggle#handleEvent
+                          keydown.meta+period@document->click-toggle#handleEvent"
+              >
+          <div id="left-handle" class="flex-1 tooltip tooltip-right hover:tooltip-open" data-tip="Close sidebar" data-click-toggle-target="destination">
+            <div class="flex-1 flex h-full items-center justify-center">
+              <div id="left" class="w-1 h-5 flex-col opacity-70">
+                <div class="w-1 h-3 bg-gray-400 rounded-full -mb-1 group-hover:rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
+                <div class="w-1 h-3 bg-gray-400 rounded-full group-hover:-rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="right-handle" class="flex-1 tooltip tooltip-right hover:tooltip-open !hidden" data-tip="Open sidebar" data-click-toggle-target="destination">
+            <div class="flex-1 flex h-full items-center justify-center">
+              <div id="left" class="w-1 h-5 flex-col opacity-70">
+                <div class="w-1 h-3 bg-gray-400 rounded-full -mb-1 -rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
+                <div class="w-1 h-3 bg-gray-400 rounded-full rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Only one of these headers is visible at a time, depending on width -->
+      <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-10 text-black dark:text-white text-lg hidden md:flex">
+        <%= render 'assistant_header' %>
+
+        <div class="cursor-pointer inline-flex mr-3 px-2 py-2 group">
+          <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white', title: "New chat", tooltip: :left %>
+        </div>
+      </div>
+
+      <div id="narrow-header" class="flex-none h-14 text-lg text-center bg-white dark:bg-zinc-800 md:hidden">
+        <div class="flex-1 mb-2 border-b border-zinc-300 dark:border-zinc-600 text-black dark:text-white dark:bg-graphite flex items-center justify-between">
+          <div class="cursor-pointer inline-flex ml-1 px-2 group">
+            <%= icon "bars-3", variant: :outline, size: 22, class: 'stroke-2 text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white', title: "Menu", tooltip: :right %>
+          </div>
+
+          <%= render 'assistant_header' %>
+
+          <div class="cursor-pointer inline-flex mr-1 px-2 group">
+            <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white', title: "New chat", tooltip: :left %>
+          </div>
+        </div>
+      </div>
+      <!-- end header -->
+
+      <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
+        <div id="right-content" class="flex-grow overflow-y-auto overflow-x-clip relative">
+          <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
+            <%= yield %>
+          </div>
+        </div>
+
+        <div id="right-footer" class="flex-none flex flex-col relative">
+          <div id="scroll-button" class="text-center absolute -top-14 left-1/2 transform -translate-x-1/2">
+            <div class="rounded-full bg-white dark:bg-graphite border border-gray-300 dark:border-zinc-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 group" data-tip="Scroll down">
+              <%= icon "chevron-down", variant: :outline, size: 19, class: 'text-gray-800 dark:text-zinc-400 cursor-pointer group-hover:text-black dark:group-hover:text-white stroke-2' %>
+            </div>
+          </div>
+
+          <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
+            <div id="attach-button" class="absolute left-9 bottom-6 w-[23px] h-[23px]">
+              <%= icon "paper-clip", variant: :mini, size: 23, class: 'cursor-pointer text-zinc-600 hover:text-zinc-900 stroke-2 dark:text-gray-300 dark:hover:text-white', title: 'Attach', tooltip: :top %>
+            </div>
+
+            <%= form_with(model: [@assistant, @new_message], data: { controller: 'new-message' }) do |form| %>
+              <%= form.hidden_field :conversation_id %>
+              <%= form.text_area :content_text,
+                data: {
+                  new_message_target: "input",
+                  application_target: "newMessageField",
+                  controller: "textarea-autogrow",
+                  action: %|
+                    new-message#disableSubmitButton
+                    keydown.enter->new-message#submitForm
+                    keydown.shift+esc@document->new-message#focusKeydown
+                    keydown.slash@document->new-message#focusKeydown
+                    keydown.esc->new-message#unfocusKeydown
+                  |
+                },
+                rows: 1,
+                placeholder: "Message #{@assistant.name} ...",
+                class: %|
+                  w-full pt-[14px] pb-[13px] min-h-14
+                  mb-2 block
+                  pl-14 pr-12
+                  bg-transparent
+                  text-black placeholder-zinc-500 dark:text-gray-200
+                  text-md
+                  rounded-2xl border-zinc-600
+                  focus:ring-0 focus:border-zinc-500 focus:shadow
+                  resize-none
+                |
+              %>
+
+              <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
+              <%= form.button data: { new_message_target: "submit" }, disabled: true, class: %w|
+                  text-gray-300 dark:text-zinc-600
+                  enabled:text-gray-800 enabled:hover:text-black
+                  enabled:dark:text-gray-300 enabled:dark:hover:text-white
+                | do %>
+                  <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="text-center text-zinc-500 text-xs mb-2 w-full">
+            HostedGPT can make mistakes. Consider checking important information.
+          </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= render template: "layouts/application" %>
