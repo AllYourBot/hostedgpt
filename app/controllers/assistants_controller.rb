@@ -3,7 +3,7 @@ class AssistantsController < ApplicationController
   before_action :set_assistant, only: [:show, :edit, :update, :destroy]
 
   def index
-    @assistants = Assistant.all
+    @assistants = Current.user.assistants.order(:pinned, :id)
   end
 
   def show

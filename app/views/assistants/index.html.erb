@@ -8,7 +8,7 @@
     <%= link_to "New assistant", new_assistant_path, class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
   </div>
 
-  <div id="assistants" class="min-w-full">
+  <turbo-frame id="assistants">
     <%= render @assistants %>
-  </div>
+  </turbo-frame>
 </div>
