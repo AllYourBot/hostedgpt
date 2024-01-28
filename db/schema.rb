@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_10_111346) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_28_211815) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -102,6 +102,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_10_111346) do
     t.datetime "updated_at", null: false
     t.bigint "content_document_id"
     t.bigint "run_id"
+    t.bigint "assistant_id", null: false
+    t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["run_id"], name: "index_messages_on_run_id"
@@ -304,6 +306,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_10_111346) do
   add_foreign_key "documents", "assistants"
   add_foreign_key "documents", "messages"
   add_foreign_key "documents", "users"
+  add_foreign_key "messages", "assistants"
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "documents", column: "content_document_id"
   add_foreign_key "messages", "runs"

@@ -1,6 +1,6 @@
 class MessagesController < ApplicationController
   skip_before_action :authenticate_user!
-  before_action :set_current_assistant, only: [:new, :create]
+  before_action :set_assistant, only: [:new, :create]
   before_action :set_conversation, only: [:index]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
 
@@ -12,14 +12,14 @@ class MessagesController < ApplicationController
   end
 
   def new
-    @message = Current.assistant.messages.new
+    @message = @assistant.messages.new
   end
 
   def edit
   end
 
   def create
-    @message = Message.new(message_params)
+    @message = @assistant.messages.new(message_params)
 
     if @message.save
       redirect_to @message, notice: "Message was successfully created."
@@ -45,8 +45,8 @@ class MessagesController < ApplicationController
 
   private
 
-  def set_current_assistant
-    Current.assistant = Current.user.assistants.find(params[:assistant_id])
+  def set_assistant
+    @assistant = Current.user.assistants.find(params[:assistant_id])
   end
 
   def set_conversation

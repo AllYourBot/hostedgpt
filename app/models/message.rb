@@ -1,6 +1,6 @@
 class Message < ApplicationRecord
+  belongs_to :assistant
   belongs_to :conversation
-  delegate :assistant, to: :conversation
   belongs_to :content_document, class_name: "Document", optional: true
   belongs_to :run, optional: true
 
@@ -20,7 +20,7 @@ class Message < ApplicationRecord
   private
 
   def create_conversation
-    self.conversation = Conversation.create!(user: Current.user, assistant: Current.assistant)
+    self.conversation = Conversation.create!(user: Current.user, assistant: assistant)
   end
 
   def set_default_role
