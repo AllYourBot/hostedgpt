@@ -4,9 +4,7 @@
     <%= link_to "New conversation", new_conversation_path, class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
   </div>
 
-  <div id="conversations" class="min-w-full">
-    <% @conversations.each do |conversation| %>
-      <%= render conversation %>
-    <% end %>
+  <turbo-frame id="conversations">
+    <%= render @conversations %>
   </div>
 </div>

@@ -4,13 +4,14 @@ class MessagesController < ApplicationController
   before_action :set_conversation, only: [:index]
   before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
+  before_action :set_sidebar_assistants_conversations, only: [:index, :new]
 
   def index
     @messages = @conversation.messages
     @new_message = @assistant.messages.new(conversation: @conversation)
   end
 
-  def show
+  def show  # show & edit will be used when we make messages editable
   end
 
   def new
@@ -24,7 +25,7 @@ class MessagesController < ApplicationController
     @message = @assistant.messages.new(message_params)
 
     if @message.save
-      redirect_to @message, notice: "Message was successfully created."
+      redirect_to conversation_messages_url(@message.conversation)
     else
       render :new, status: :unprocessable_entity
     end
@@ -47,10 +48,6 @@ class MessagesController < ApplicationController
 
   private
 
-  def set_assistant
-    @assistant = Current.user.assistants.find(params[:assistant_id])
-  end
-
   def set_conversation
     @conversation = Current.user.conversations.find(params[:conversation_id])
   end
@@ -62,6 +59,11 @@ class MessagesController < ApplicationController
 
   def set_message
     @message = Message.find(params[:id])
+  end
+
+  def set_sidebar_assistants_conversations
+    @assistants = Current.user.assistants.order(:pinned, :id)
+    @conversations = Current.user.conversations.order(created_at: :desc)
   end
 
   def message_params

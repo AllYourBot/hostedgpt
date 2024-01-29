@@ -8,7 +8,7 @@ module User::Registerable
   private
 
   def create_initial_assistant
-    assistant = assistants.create! name: "HostedGPT"
-    conversations.create! title: "HostedGPT", assistant: assistant
+    assistants.create! name: "GPT-4", pinned: true
+    assistants.create! name: "GPT-3.5", pinned: false
   end
 end

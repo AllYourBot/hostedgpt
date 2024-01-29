@@ -1,16 +1,68 @@
-<div id="<%= dom_id conversation %>">
-  <p class="flex gap-2">
-    <strong class="block font-medium mb-1">ID:</strong>
-    <%= conversation.id %>
-  </p>
+<%
+  selected = (conversation == @conversation)
+  days_ago = (Date.today - conversation.created_at.to_date).to_i
 
-  <p class="flex gap-2">
-    <strong class="block font-medium mb-1">Assistant:</strong>
-    <%= conversation.assistant.name %>
-  </p>
+  if conversation_counter == 0
+    previous_days_ago = nil
+  else
+    previous_days_ago = (Date.today - @conversations[conversation_counter-1].created_at.to_date).to_i
+  end
 
-  <p class="flex gap-2">
-    <strong class="block font-medium mb-1">Title:</strong>
-    <%= conversation.title %>
-  </p>
+  days_ago_changed_to = days_ago  if previous_days_ago != days_ago
+
+  header = case days_ago_changed_to
+    when 0
+      "Today"
+    when 1
+      "Yesterday"
+    when 2..6
+      "Previous 7 days"   unless previous_days_ago.in? 2..6
+    when 7..29
+      "Previous 30 days"  unless previous_days_ago.in? 7..29
+    when 30..365
+      "Older"             unless previous_days_ago.in? 30..365
+  end
+%>
+
+<% if header %>
+  <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
+    <%= header %>
+  </div>
+<% end %>
+
+<div class="h-9 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 <%= defined?(selected) && selected ? 'bg-zinc-400 bg-opacity-25' : '' %> justify-between items-center group cursor-pointer mr-5">
+  <%= link_to conversation.title || "[Untitled]",
+      conversation_messages_path(conversation),
+      class: "block flex-1 ml-2 text-white truncate text-sm text-opacity-80 w-5",
+      data: { turbo_frame: '_top' }
+  %>
+  <div class="<%= selected ? 'flex' : 'hidden' %> group-hover:flex gap-2 pl-2 items-center">
+    <%= icon "pencil",
+          variant: :outline,
+          size: 16,
+          class: "text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
+          'data-controller': "nested-pointer",
+          title: "Rename",
+          tooltip: :top
+    %>
+
+    <div class="dropdown !inline-flex dropdown-end outline-none">
+      <%= icon "x-mark",
+            variant: :outline,
+            size: 22,
+            class: "outline-none text-gray-400 cursor-pointer group-hover:visible hover:text-white focus:text-white",
+            'data-controller': "nested-pointer",
+            title: "Archive",
+            tooltip: :top,
+            tabindex: 0,
+            role: :button
+      %>
+
+      <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-2 mt-7 dark:text-white dark:!bg-zinc-800" data-controller="nested-pointer">
+        <li><a><%= icon "archive-box", variant: :outline, size: 18 %>Archive</a></li>
+        <li><a><%= icon "trash", variant: :outline, size: 18 %>Delete</a></li>
+      </ul>
+    </div>
+
+  </div>
 </div>

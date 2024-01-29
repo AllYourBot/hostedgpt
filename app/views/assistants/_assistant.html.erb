@@ -6,9 +6,11 @@
 
   <div class="h-10 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 justify-between items-center group cursor-pointer scale-down mb-1 mr-5 text-sm">
     <div id="profile" class="ml-2 mr-2 w-7 h-7 bg-white rounded-full"></div>
-    <div class="flex-1 text-white truncate">
-      <%= assistant.name %>
-    </div>
+    <%= link_to assistant.name,
+        new_assistant_message_path(assistant),
+        class: "flex-1 text-white truncate",
+        data: { turbo_frame: '_top' }
+    %>
     <div class="<%= selected ? 'flex' : 'hidden' %> group-hover:flex gap-3 pl-2">
       <% if assistant.custom %>
         <div class="dropdown !inline-flex dropdown-end outline-none">
@@ -29,13 +31,15 @@
         </div>
       <% end %>
 
-      <%= icon "pencil-square",
-        variant: :micro,
-        size: 18,
-        class: "inline text-gray-400 cursor-pointer #{defined?(selected) && selected ? 'text-white' : 'invisible group-hover:visible hover:text-white'}",
-        'data-controller': "nested-pointer",
-        title: "New"
-      %>
+      <%= link_to new_assistant_message_path(assistant), data: { turbo_frame: '_top' } do %>
+        <%= icon "pencil-square",
+          variant: :micro,
+          size: 18,
+          class: "inline text-gray-400 cursor-pointer #{defined?(selected) && selected ? 'text-white' : 'invisible group-hover:visible hover:text-white'}",
+          'data-controller': "nested-pointer",
+          title: "New"
+        %>
+      <% end %>
     </div>
   </div>
 

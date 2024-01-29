@@ -2,12 +2,7 @@ class ConversationsController < ApplicationController
   before_action :set_conversation, only: [:edit, :update, :destroy]
 
   def index
-    @conversations = Current.user.conversations
-  end
-
-  def show
-    @conversation = Current.user.conversations.includes(:messages).find(params[:id])
-    @new_message = @conversation.messages.new
+    @conversations = Current.user.conversations.order(created_at: :desc)
   end
 
   def edit
