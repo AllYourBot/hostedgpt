@@ -6,7 +6,7 @@ class ChatCompletionAPI
   #
 
   def self.api_key
-    Rails.env.test? ? "" : Current.user.openai_key
+    Current.user.openai_key
   end
 
   def self.get_next_response(system_message, chat_messages, params = {})
