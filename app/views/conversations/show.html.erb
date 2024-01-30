@@ -7,47 +7,24 @@
      >
 
   <div id="left-column"
-       class="flex-col h-screen w-[260px] bg-black overflow-y-auto overflow-x-clip hidden md:flex pl-3 scrollbar-hide"
+       class="flex-col h-screen w-[260px] bg-black hidden md:flex overflow-y-auto overflow-x-clip scrollbar-hide"
        data-click-toggle-target="destination"
    >
 
-    <div id="left-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
-      <div id="left-content" class="flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
-        <div class="sticky top-0 pt-3 mb-1 bg-black z-10">
-          <%= render 'assistant_sidebar_link', title: "ChatGPT", settings: false %>
-        </div>
-        <%= render 'assistant_sidebar_link', title: "Samantha" %>
-        <%= render 'assistant_sidebar_link', title: "Samantha but really long so it wraps" %>
-        <%= render 'assistant_sidebar_link', title: "Samantha", selected: true %>
-        <%= render 'assistant_sidebar_link', title: "Samantha" %>
+    <div id="left-content-container" class="flex flex-col flex-grow">
+      <div class="pl-3 pr-5">
+        <%= render partial: "shared/assistant_sidebar_link", collection: @sidebar_assistants, as: :assistant %>
 
-        <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
-          Today
-        </div>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind", selected: true %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+        <% @sidebar_conversations.each do |named_time_span, conversations| %>
+          <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
+            <%= named_time_span %>
+          </div>
 
-        <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
-          Yesterday
-        </div>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
-        <%= render 'conversation_sidebar_link', title: "Custom opacity in tailwind" %>
+          <%= render partial: 'shared/conversation_sidebar_link', collection: conversations, as: :conversation %>
+        <% end %>
       </div>
 
-      <div id="left-footer" class="flex-none flex text-white mb-4 mt-3">
-        <%= render partial: "shared/user_menu" %>
-      </div>
+      <%= render partial: "shared/user_menu" %>
     </div>
   </div>
 
