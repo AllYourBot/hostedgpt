@@ -104,7 +104,6 @@ GEM
       irb (>= 1.5.0)
       reline (>= 0.3.1)
     docile (1.4.0)
-    domain_name (0.6.20240107)
     drb (2.2.0)
       ruby2_keywords
     erubi (1.12.0)
@@ -120,9 +119,6 @@ GEM
     globalid (1.2.1)
       activesupport (>= 6.1)
     htmlbeautifier (1.4.2)
-    http-accept (1.7.0)
-    http-cookie (1.0.5)
-      domain_name (~> 0.5)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     image_processing (1.12.2)
@@ -150,9 +146,6 @@ GEM
     marcel (1.0.2)
     matrix (0.4.2)
     method_source (1.0.0)
-    mime-types (3.5.2)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2023.1205)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     minitest (5.20.0)
@@ -170,7 +163,6 @@ GEM
       timeout
     net-smtp (0.4.0)
       net-protocol
-    netrc (0.11.0)
     nio4r (2.7.0)
     nokogiri (1.15.5-aarch64-linux)
       racc (~> 1.4)
@@ -251,11 +243,6 @@ GEM
     regexp_parser (2.8.3)
     reline (0.4.1)
       io-console (~> 0.5)
-    rest-client (2.1.0)
-      http-accept (>= 1.7.0, < 2.0)
-      http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 4.0)
-      netrc (~> 0.8)
     rexml (3.2.6)
     rubocop (1.57.2)
       json (~> 2.3)
@@ -387,7 +374,6 @@ DEPENDENCIES
   rails-controller-testing
   rails_heroicon (~> 2.2.0)
   redis (>= 4.0.1)
-  rest-client
   rubocop-capybara
   rubocop-minitest
   rubocop-rails

@@ -79,7 +79,7 @@ class ChatCompletionAPI
         }))
       end
     rescue => e
-      if retries < 2 && e.class == RestClient::Exceptions::ReadTimeout
+      if retries < 2 && e.class == nil # this was RestClient::Exceptions::ReadTimeout but I need to see what gets thrown now that the library switched to HTTParty and then update this
         retries = retries + 1
         sleep (1*retries)
         retry
