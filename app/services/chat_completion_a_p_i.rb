@@ -99,7 +99,7 @@ class ChatCompletionAPI
   end
 
   def self.formatted_api_response
-    raise "In your test you need to add: ChatCompletionAPI.stubs(:formatted_api_response).returns(...)"
+    raise "In your test you need to wrap with: ChatCompletionAPI.stub :formatted_api_response, 'value' do; end"
   end
 
 
