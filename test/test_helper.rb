@@ -2,7 +2,8 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 require "pry"
-require 'webmock/minitest'
+require "webmock/minitest"
+require "mocha/minitest"
 
 IS_FULL_TEST_RUN = ARGV.none? { |arg| arg.include?("_test.rb") || arg.include?("test/") }
 

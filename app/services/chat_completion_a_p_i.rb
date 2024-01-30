@@ -48,7 +48,8 @@ class ChatCompletionAPI
   end
 
   def self.call_api(params)
-    params = default_params.symbolize_keys.merge(params.symbolize_keys)
+    params = default_params.deep_symbolize_keys.merge(params.symbolize_keys)
+    verify_params!(params)
 
     client = OpenAI::Client.new(
       access_token: api_key,
@@ -58,6 +59,7 @@ class ChatCompletionAPI
     response = ""
     retries = 0
     keep_retrying = true
+
     begin
       verify_token_count!(params)
       response = ""
@@ -96,7 +98,22 @@ class ChatCompletionAPI
       end
     end
 
-    response
+    if params[:response_format]&.dig(:type) == "json_object"
+      JSON.parse(response)
+    else
+      response
+    end
+  end
+
+
+  private
+
+  def self.verify_params!(params)
+    if response_format = params[:response_format]
+      if !response_format.is_a?(Hash) || !response_format.dig(:type)&.in?(%w{ json_object text })
+        raise "Your response_format is invalid. e.g. response_format: { 'type': 'json_object' }"
+      end
+    end
   end
 
   def self.verify_token_count!(params)

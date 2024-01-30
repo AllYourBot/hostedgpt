@@ -84,6 +84,7 @@ group :test do
   gem "simplecov", require: false
   gem "rails-controller-testing"
   gem "webmock"
+  gem "mocha"
 end
 
 gem "ruby-openai", "~> 6.3"
