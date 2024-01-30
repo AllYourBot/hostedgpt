@@ -6,7 +6,7 @@ class ChatCompletionAPI
   #
 
   def self.api_key
-    Current.user.openai_key
+    Rails.env.test? ? "" : Current.user.openai_key
   end
 
   def self.get_next_response(system_message, chat_messages, params = {})
@@ -52,16 +52,17 @@ class ChatCompletionAPI
 
     response = ""
     retries = 0
-    keep_retrying = true
 
     begin
-      verify_token_count!(params)
-      response = ""
-      finished_reason = nil
+      verify_token_count!(params)  # the rescue block handles excessive token count
 
       if Rails.env.test?
         response = formatted_api_response
       else
+        # We are streaming the response even though we queue it all up before returning because this avoids some timeouts with the
+        # OpenAI API. If we disable streaming, then requests with really long system prompts and messages struggle to return the
+        # full response before OpenAI kills it.
+
         client.chat(parameters: params.merge(stream: proc { |chunk, _bytesize|
           finished_reason = chunk&.dig("choices", 0, "finish_reason")
 
@@ -73,21 +74,18 @@ class ChatCompletionAPI
         }))
       end
     rescue => e
-      if retries < 2 && e.class == nil # this was RestClient::Exceptions::ReadTimeout but I need to see what gets thrown now that the library switched to HTTParty and then update this
-        retries = retries + 1
-        sleep (1*retries)
-        retry
-      elsif retries < 2 && e.message == 'length' && (content = params[:messages].last[:content]).length > 100000
+      if retries < 2 && e.message == 'length' && (content = params[:messages].last[:content]).length > 100000
+        # This is heavy handed but if a message was passed in which was REALLY long then cut some contents out of the middle of it.
         retries = retries + 1
         sleep (1*retries)
 
         params[:messages][-1][:content] = content[0...50000] + "\n...\n" + content[-50000...]
         retry
-      elsif !e.message.include?('stubs')
+      elsif retries < 2
+        retries = retries + 1
+        sleep (1*retries)
         puts "Error: retried #{retries} times. Error: #{e}"
-        #binding.pry  unless e.message == 'length'
-        sleep 2
-        retry  if keep_retrying
+        retry
       end
 
       raise e
