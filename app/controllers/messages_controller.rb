@@ -1,6 +1,7 @@
 class MessagesController < ApplicationController
   skip_before_action :authenticate_user!
-  before_action :set_conversation, only: [:index, :new, :create]
+  before_action :set_conversation, only: [:index]
+  before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -11,18 +12,17 @@ class MessagesController < ApplicationController
   end
 
   def new
-    @message = @conversation.messages.build
+    @message = @assistant.messages.new
   end
 
   def edit
   end
 
   def create
-    @message = @conversation.messages.build(message_params)
-    @message.role = :user
+    @message = @assistant.messages.new(message_params)
 
     if @message.save
-      redirect_to @message.conversation, notice: "Message was successfully created."
+      redirect_to @message, notice: "Message was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -42,10 +42,16 @@ class MessagesController < ApplicationController
     redirect_to conversation_messages_url(@conversation), notice: "Message was successfully destroyed.", status: :see_other
   end
 
+
   private
 
   def set_conversation
     @conversation = Current.user.conversations.find(params[:conversation_id])
+  end
+
+  def set_assistant
+    @assistant = Current.user.assistants.find_by(id: params[:assistant_id])
+    @assistant ||= @conversation.assistant
   end
 
   def set_message
@@ -53,6 +59,6 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:content_text)
+    params.require(:message).permit(:conversation_id, :content_text)
   end
 end

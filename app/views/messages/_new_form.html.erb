@@ -1,4 +1,4 @@
-<%= form_with(model: [message.conversation, message], class: "contents") do |form| %>
+<%= form_with(model: [assistant, message], class: "contents") do |form| %>
   <% if message.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(message.errors.count, "error") %> prohibited this message from being saved:</h2>
