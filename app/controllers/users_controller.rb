@@ -29,7 +29,14 @@ class UsersController < ApplicationController
   end
 
   def update
-    Current.user.update!(update_params)
+    user = Current.user
+    user.update(update_params)
+
+    if user.save
+      redirect_back fallback_location: "/", notice: "Account information saved.", status: :see_other
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   private

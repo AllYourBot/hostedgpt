@@ -160,19 +160,3 @@
 .icon.cursor-pointer:active {
   @apply scale-90 ease-in-out duration-300
 }
-
-
-
-
-/* Clean up this CSS — I don't think we need these classes, use tailwind utilities instead */
-
-.modal-bg {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-.modal-content {
-  width: 400px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}

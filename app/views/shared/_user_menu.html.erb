@@ -1,0 +1,58 @@
+<div class="w-full border-t border-gray-200/50 pt-6 pb-2 pr-2 bg-black flex flex-col gap-2"
+     data-controller="click-toggle"
+     data-click-toggle-flippable-class="hidden"
+     >
+
+    <a href="#"
+       data-action="click->click-toggle#toggleClasses:prevent"
+       class="flex justfiy-left gap-2 rounded-lg text-white text-sm hover:bg-[#28282b] p-2">
+      <%= icon "cog" , size: 20 %>
+      Settings
+    </a>
+
+    <a href="/logout" class="flex justify-left gap-2 hover:bg-[#28282b] rounded-lg text-white text-sm p-2">
+    <%= icon "arrow-right-start-on-rectangle", size: 5 %>
+    <p>Logout</p>
+  </a>
+
+  <div data-click-toggle-target="destination" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-[rgba(0,0,0,0.5)] flex justify-center items-center"
+         data-action="click->click-toggle#toggleClasses:self"
+    >
+    <div class="bg-[#343541] w-[400px] text-gray-200 p-6 rounded shadow-lg flex flex-col gap-4">
+      <div class="flex justify-between items-baseline">
+        <h2 class="text-2xl font-bold">Settings</h2>
+        <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click->click-toggle#toggleClasses">
+          &times;
+        </button>
+      </div>
+
+        <%= form_with(
+          model: Current.user,
+          method: :put,
+          url: user_path(Current.user),
+          id: "settingsForm",
+          class: "contents",
+          data: { action: "ajax:success->click-toggle#toggleClasses"}
+        ) do |form| %>
+          <div>
+            <%= form.label :openai_key, "OpenAI API Key:", class: "block text-gray-300 font-medium" %>
+            <%= form.text_field :openai_key, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+          </div>
+          <div>
+            <%= form.label :first_name, "First Name:", class: "block text-gray-300 font-medium" %>
+            <%= form.text_field :first_name, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+          </div>
+          <div>
+            <%= form.label :last_name, "Last Name:", class: "block text-gray-300 font-medium" %>
+            <%= form.text_field :last_name, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
+          </div>
+          <div class="flex justify-between">
+            <button class="text-gray-300 border rounded px-4 py-2" data-action="click-toggle#toggleClasses">Cancel</button>
+            <%= form.submit "Save", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-grey-500 cursor-pointer" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
