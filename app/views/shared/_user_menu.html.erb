@@ -30,7 +30,7 @@
         <%= form_with(
           model: Current.user,
           method: :put,
-          url: user_path(current_user),
+          url: user_path(Current.user),
           id: "settingsForm",
           class: "contents",
           data: { action: "ajax:success->click-toggle#toggleClasses"}
@@ -48,8 +48,8 @@
             <%= form.text_field :last_name, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
           </div>
           <div class="flex justify-between">
-            <button class="ml-2 text-gray-300 hover:text-gray-800" data-action="click->click-toggle#toggleClasses">Cancel</button>
-            <%= form.button "Save", type: "button", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>
+            <button class="text-gray-300 border rounded px-4 py-2" data-action="click-toggle#toggleClasses">Cancel</button>
+            <%= form.submit "Save", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-grey-500 cursor-pointer" %>
           </div>
         <% end %>
       </div>
