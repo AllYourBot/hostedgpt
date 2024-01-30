@@ -21,7 +21,7 @@ class AutotitleConversationJob < ApplicationJob
   def system_message
     <<~END
       You extract a 2-4 word topic from text. I will give the text of a chat message that someone sent. You reply with the
-      topic of this message, but summarize the topic in 3 words.
+      topic of this message, but summarize the topic in 2-4 words.
 
       Example:
       ```
