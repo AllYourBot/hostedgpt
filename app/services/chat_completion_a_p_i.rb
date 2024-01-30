@@ -50,45 +50,26 @@ class ChatCompletionAPI
       request_timeout: 240,
     )
 
+    verify_token_count!(params)  # the rescue block handles excessive token count
+
     response = ""
-    retries = 0
 
-    begin
-      verify_token_count!(params)  # the rescue block handles excessive token count
+    if Rails.env.test?
+      response = formatted_api_response
+    else
+      # We are streaming the response even though we queue it all up before returning because this avoids some timeouts with the
+      # OpenAI API. If we disable streaming, then requests with really long system prompts and messages struggle to return the
+      # full response before OpenAI kills it.
 
-      if Rails.env.test?
-        response = formatted_api_response
-      else
-        # We are streaming the response even though we queue it all up before returning because this avoids some timeouts with the
-        # OpenAI API. If we disable streaming, then requests with really long system prompts and messages struggle to return the
-        # full response before OpenAI kills it.
+      client.chat(parameters: params.merge(stream: proc { |chunk, _bytesize|
+        finished_reason = chunk&.dig("choices", 0, "finish_reason")
 
-        client.chat(parameters: params.merge(stream: proc { |chunk, _bytesize|
-          finished_reason = chunk&.dig("choices", 0, "finish_reason")
-
-          if !finished_reason
-            response += chunk&.dig("choices", 0, "delta", "content")&.to_s
-          else
-            raise finished_reason  unless finished_reason == "stop"
-          end
-        }))
-      end
-    rescue => e
-      if retries < 2 && e.message == 'length' && (content = params[:messages].last[:content]).length > 100000
-        # This is heavy handed but if a message was passed in which was REALLY long then cut some contents out of the middle of it.
-        retries = retries + 1
-        sleep (1*retries)
-
-        params[:messages][-1][:content] = content[0...50000] + "\n...\n" + content[-50000...]
-        retry
-      elsif retries < 2
-        retries = retries + 1
-        sleep (1*retries)
-        puts "Error: retried #{retries} times. Error: #{e}"
-        retry
-      end
-
-      raise e
+        if !finished_reason
+          response += chunk&.dig("choices", 0, "delta", "content")&.to_s
+        else
+          raise finished_reason  unless finished_reason == "stop"
+        end
+      }))
     end
 
     if params[:response_format]&.dig(:type) == "json_object"
@@ -146,6 +127,6 @@ class ChatCompletionAPI
       'gpt-3.5-turbo' => 4096,
       'gpt-3.5-turbo-16k' => 16385,
       'gpt-3.5-turbo-instruct' => 4096
-    }
+    }[name]
   end
 end
