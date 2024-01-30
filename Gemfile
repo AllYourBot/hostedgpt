@@ -83,6 +83,7 @@ group :test do
   gem "selenium-webdriver"
   gem "simplecov", require: false
   gem "rails-controller-testing"
+  gem "webmock"
 end
 
 gem "ruby-openai", "~> 6.3"
