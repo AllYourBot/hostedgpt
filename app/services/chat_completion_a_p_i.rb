@@ -81,9 +81,6 @@ class ChatCompletionAPI
     response
   end
 
-
-  private
-
   def self.verify_params!(params)
     if response_format = params[:response_format]
       if !response_format.is_a?(Hash) || !response_format.dig(:type)&.in?(%w{ json_object text })
