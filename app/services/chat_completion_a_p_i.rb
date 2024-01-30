@@ -10,6 +10,8 @@ class ChatCompletionAPI
   end
 
   def self.get_next_response(system_message, chat_messages, params = {})
+    # docs for this format:  https://platform.openai.com/docs/api-reference/chat
+
     message_payload = [{
       role: 'system',
       content: system_message
@@ -24,23 +26,15 @@ class ChatCompletionAPI
       }
     end
 
-    response = call_api({messages: message_payload}.merge(params)) # format: https://platform.openai.com/docs/api-reference/chat
+    response = call_api({messages: message_payload}.merge(params))
   end
 
 
   private
 
-  def self.model_or_engine
-    "gpt-3.5-turbo-1106"
-  end
-
-  def self.url
-    "https://api.openai.com/v1/chat/completions"
-  end
-
   def self.default_params
     {
-      model: model_or_engine,
+      model: "gpt-3.5-turbo-1106",
       max_tokens: 500,                      # a sensible default
       n: 1,
       response_format: { "type": "text" },  # or json_object
@@ -140,7 +134,7 @@ class ChatCompletionAPI
   end
 
   def self.model_token_limit(name)
-    # https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
+    # Docs for available models:  https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
 
     {
       'gpt-4-0125-preview': 128000,
