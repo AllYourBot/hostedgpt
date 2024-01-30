@@ -2,6 +2,7 @@ class MessagesController < ApplicationController
   skip_before_action :authenticate_user! # TODO: finish authentication
 
   before_action :set_conversation, only: [:index]
+  before_action :set_assistant, only: [:index]
   before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
   before_action :set_sidebar_assistants_conversations, only: [:index, :new]
@@ -46,10 +47,16 @@ class MessagesController < ApplicationController
   end
 
 
+
   private
 
   def set_conversation
     @conversation = Current.user.conversations.find(params[:conversation_id])
+  end
+
+  def set_assistant
+    @assistant = Current.user.assistants.find_by(id: params[:assistant_id])
+    @assistant ||= @conversation.assistant
   end
 
   def set_assistant
