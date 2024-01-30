@@ -1,6 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "minitest/autorun"
 require "pry"
 
 IS_FULL_TEST_RUN = ARGV.none? { |arg| arg.include?("_test.rb") || arg.include?("test/") }
