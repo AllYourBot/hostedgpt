@@ -1,11 +1,9 @@
 class MessagesController < ApplicationController
-  skip_before_action :authenticate_user! # TODO: finish authentication
-
   before_action :set_conversation, only: [:index]
-  before_action :set_assistant, only: [:index]
   before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
-  before_action :set_sidebar_assistants_conversations, only: [:index, :new]
+  before_action :set_sidebar_conversations, only: [:index, :new]
+  before_action :set_sidebar_assistants, only: [:index, :new]
 
   def index
     @messages = @conversation.messages
@@ -68,9 +66,12 @@ class MessagesController < ApplicationController
     @message = Message.find(params[:id])
   end
 
-  def set_sidebar_assistants_conversations
-    @assistants = Current.user.assistants.order(:pinned, :id)
-    @conversations = Current.user.conversations.order(created_at: :desc)
+  def set_sidebar_conversations
+    @sidebar_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
+  end
+
+  def set_sidebar_assistants
+    @sidebar_assistants = Current.user.assistants.order(:id)
   end
 
   def message_params

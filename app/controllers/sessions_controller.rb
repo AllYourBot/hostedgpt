@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
     if @user&.authenticate(params[:password])
       reset_session
       login_as @user
-      redirect_to root_path, notice: "Successfully logged in."
+      redirect_to root_path
     else
       flash.now[:alert] = "Invalid email or password"
       render :new, status: :unprocessable_entity

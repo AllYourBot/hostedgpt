@@ -5,25 +5,31 @@
       data-controller="click-toggle"
       data-click-toggle-flippable-class="md:flex"
       data-action="keydown.meta+shift+s@document->click-toggle#handleEvent
-                    keydown.meta+period@document->click-toggle#handleEvent"
-      >
+                   keydown.meta+period@document->click-toggle#handleEvent"
+  >
 
     <div id="left-column"
-        class="flex-col h-screen w-[260px] bg-black overflow-y-auto overflow-x-clip hidden md:flex pl-3 scrollbar-hide"
+        class="flex-col h-screen w-[260px] bg-black hidden md:flex pl-3 scrollbar-hide"
         data-click-toggle-target="destination"
     >
 
       <div id="left-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
         <div id="left-content" class="flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
           <turbo-frame id="assistants">
-            <% if @assistants %>
-              <%= render @assistants %>
-            <% end %>
+            <%= render partial: 'shared/assistant_sidebar_link', collection: @sidebar_assistants, as: :assistant %>
           </turbo-frame>
 
           <turbo-frame id="conversations">
-            <% if @conversations %>
-              <%= render @conversations %>
+            <% @sidebar_conversations.each do |named_time_span, conversations| %>
+              <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
+                <%= named_time_span %>
+              </div>
+
+              <% conversations.each do |conversation| %>
+                <%= render 'shared/conversation_sidebar_link',
+                  conversation: conversation,
+                  selected: conversation == @conversation %>
+              <% end %>
             <% end %>
           </turbo-frame>
         </div>
