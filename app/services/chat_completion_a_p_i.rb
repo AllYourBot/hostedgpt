@@ -5,10 +5,6 @@ class ChatCompletionAPI
   # ChatCompletionAPI.get_next_response("You are a comedian", ["Tell me a joke"], model: "gpt-4")
   #
 
-  def self.api_key
-    Rails.env.test? ? "" : Current.user.openai_key
-  end
-
   def self.get_next_response(system_message, chat_messages, params = {})
     # docs for this format:  https://platform.openai.com/docs/api-reference/chat
 
@@ -43,34 +39,11 @@ class ChatCompletionAPI
 
   def self.call_api(params)
     params = default_params.deep_symbolize_keys.merge(params.symbolize_keys)
+
     verify_params!(params)
+    verify_token_count!(params)
 
-    client = OpenAI::Client.new(
-      access_token: api_key,
-      request_timeout: 240,
-    )
-
-    verify_token_count!(params)  # the rescue block handles excessive token count
-
-    response = ""
-
-    if Rails.env.test?
-      response = formatted_api_response
-    else
-      # We are streaming the response even though we queue it all up before returning because this avoids some timeouts with the
-      # OpenAI API. If we disable streaming, then requests with really long system prompts and messages struggle to return the
-      # full response before OpenAI kills it.
-
-      client.chat(parameters: params.merge(stream: proc { |chunk, _bytesize|
-        finished_reason = chunk&.dig("choices", 0, "finish_reason")
-
-        if !finished_reason
-          response += chunk&.dig("choices", 0, "delta", "content")&.to_s
-        else
-          raise finished_reason  unless finished_reason == "stop"
-        end
-      }))
-    end
+    response = formatted_api_response
 
     if params[:response_format]&.dig(:type) == "json_object"
       JSON.parse(response)
@@ -80,7 +53,32 @@ class ChatCompletionAPI
   end
 
   def self.formatted_api_response
-    raise "In your test you need to wrap with: ChatCompletionAPI.stub :formatted_api_response, 'value' do; end"
+    if Rails.env.test?
+      raise "In your test you need to wrap with: ChatCompletionAPI.stub :formatted_api_response, 'value' do; end"
+    end
+
+    client = OpenAI::Client.new(
+      access_token: Current.user.openai_key,
+      request_timeout: 240,
+    )
+
+    # We are streaming the response even though we queue it all up before returning because this avoids some timeouts with the
+    # OpenAI API. If we disable streaming, then requests with really long system prompts and messages struggle to return the
+    # full response before OpenAI kills it.
+
+    response = ""
+
+    client.chat(parameters: params.merge(stream: proc { |chunk, _bytesize|
+      finished_reason = chunk&.dig("choices", 0, "finish_reason")
+
+      if !finished_reason
+        response += chunk&.dig("choices", 0, "delta", "content")&.to_s
+      else
+        raise finished_reason  unless finished_reason == "stop"
+      end
+    }))
+
+    response
   end
 
 
