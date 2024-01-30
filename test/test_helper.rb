@@ -2,7 +2,6 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 require "pry"
-require "webmock/minitest"
 require "mocha/minitest"
 
 IS_FULL_TEST_RUN = ARGV.none? { |arg| arg.include?("_test.rb") || arg.include?("test/") }
@@ -58,13 +57,5 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
-
-    def setup
-      WebMock.enable!
-    end
-
-    def teardown
-      WebMock.disable!
-    end
   end
 end

@@ -66,8 +66,7 @@ class ChatCompletionAPI
       finished_reason = nil
 
       if Rails.env.test?
-        raw_response = client.chat(parameters: params)
-        response = JSON.parse(raw_response)&.dig("choices", 0, "message", "content")
+        response = formatted_api_response
       else
         client.chat(parameters: params.merge(stream: proc { |chunk, _bytesize|
           finished_reason = chunk&.dig("choices", 0, "finish_reason")
@@ -90,12 +89,14 @@ class ChatCompletionAPI
 
         params[:messages][-1][:content] = content[0...50000] + "\n...\n" + content[-50000...]
         retry
-      else
+      elsif !e.message.include?('stubs')
         puts "Error: retried #{retries} times. Error: #{e}"
         #binding.pry  unless e.message == 'length'
         sleep 2
         retry  if keep_retrying
       end
+
+      raise e
     end
 
     if params[:response_format]&.dig(:type) == "json_object"
@@ -103,6 +104,10 @@ class ChatCompletionAPI
     else
       response
     end
+  end
+
+  def self.formatted_api_response
+    raise "In your test you need to add: ChatCompletionAPI.stubs(:formatted_api_response).returns(...)"
   end
 
 
