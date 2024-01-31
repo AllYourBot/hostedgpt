@@ -51,10 +51,10 @@ class Conversation < ApplicationRecord
       .delete_if { |_, v| v.empty? }
   end
 
+
   private
 
   def set_title_async
     AutotitleConversationJob.perform_later(id)
   end
-
 end
