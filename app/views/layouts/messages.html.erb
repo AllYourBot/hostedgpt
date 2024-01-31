@@ -9,40 +9,26 @@
   >
 
     <div id="left-column"
-        class="flex-col h-screen w-[260px] bg-black hidden md:flex pl-3 scrollbar-hide"
+        class="flex-col h-screen w-[260px] bg-black hidden md:block overflow-y-auto overflow-x-clip scrollbar-hide"
         data-click-toggle-target="destination"
     >
 
-      <div id="left-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
-        <div id="left-content" class="flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
-          <turbo-frame id="assistants">
-            <%= render partial: 'shared/assistant_sidebar_link', collection: @sidebar_assistants, as: :assistant %>
-          </turbo-frame>
+      <div id="left-content-container" class="flex flex-col flex-grow">
+        <div class="pl-3 pr-5 flex flex-col mb-28">
+          <%= render partial: "shared/assistant_sidebar_link", collection: @sidebar_assistants, as: :assistant %>
 
-          <turbo-frame id="conversations">
-            <% @sidebar_conversations.each do |named_time_span, conversations| %>
-              <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
-                <%= named_time_span %>
-              </div>
-
-              <% conversations.each do |conversation| %>
-                <%= render 'shared/conversation_sidebar_link', conversation: conversation %>
-              <% end %>
-            <% end %>
-          </turbo-frame>
-        </div>
-
-        <div id="left-footer" class="flex-none flex text-white mb-4 mt-3">
-          <div class="h-10 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 justify-between items-center w-full group cursor-pointer mb-1">
-            <div id="profile" class="ml-2 mr-2 w-7 h-7 bg-white rounded-full"></div>
-            <div class="flex-1 text-white truncate">
-              Keith Schacht
+          <% @sidebar_conversations.each do |named_time_span, conversations| %>
+            <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
+              <%= named_time_span %>
             </div>
-          </div>
+
+            <%= render partial: 'shared/conversation_sidebar_link', collection: conversations, as: :conversation %>
+          <% end %>
         </div>
+
+        <%= render partial: "shared/user_menu" %>
       </div>
     </div>
-
 
     <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite relative">
 
@@ -100,24 +86,18 @@
       </div>
       <!-- end header -->
 
-      <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
-        <div id="right-content" class="flex-grow overflow-y-auto overflow-x-clip relative" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
+      <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
+        <div id="right-content" class="flex-grow overflow-y-auto overflow-x-clip relative">
           <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
             <%= yield %>
           </div>
         </div>
 
         <div id="right-footer" class="flex-none flex flex-col relative">
-          <div id="scroll-button" class="text-center absolute -top-14 left-1/2 transform -translate-x-1/2 hidden" data-scrollable-target="widget">
-            <%= link_to "#",
-                  data: {
-                    tip: "Scroll down",
-                    action: "scrollable#scrollToBottom"
-                  },
-                  class: "block rounded-full bg-white dark:bg-graphite border border-gray-300 dark:border-zinc-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 group" do
-            %>
+          <div id="scroll-button" class="text-center absolute -top-14 left-1/2 transform -translate-x-1/2">
+            <div class="rounded-full bg-white dark:bg-graphite border border-gray-300 dark:border-zinc-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 group" data-tip="Scroll down">
               <%= icon "chevron-down", variant: :outline, size: 19, class: 'text-gray-800 dark:text-zinc-400 cursor-pointer group-hover:text-black dark:group-hover:text-white stroke-2' %>
-            <% end %>
+            </div>
           </div>
 
           <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
