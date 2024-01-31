@@ -15,7 +15,7 @@
     <%= content_for :head %>
   </head>
   <body class="font-sans">
-    <%= content_for?(:messages_layout_yield) ? yield(:messages_layout_yield) : yield %>
+    <%= content_for?(:body) ? yield(:body) : yield %>
     <%= render "layouts/toast" %>
   </body>
 </html>
