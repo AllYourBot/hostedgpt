@@ -11,14 +11,20 @@ class Message < ApplicationRecord
   before_validation :set_default_role, on: :create
   before_validation :create_conversation, on: :create, if: -> { conversation.blank? }
 
-  validates :content_text, :role, presence: true
-  validates :run, presence: true, if: -> { assistant? }
+  validates :role, presence: true
+  validates :content_text, presence: true, unless: :assistant?
   validate :validate_conversation_user, if: -> { conversation.present? && Current.user }
-
-  after_create_commit :broadcast_message
 
   scope :sorted, -> { order(:created_at) }
 
+  after_create_commit :broadcast_message
+
+  def for_openai
+    {
+      role: role,
+      content: content_text
+    }
+  end
 
   private
 

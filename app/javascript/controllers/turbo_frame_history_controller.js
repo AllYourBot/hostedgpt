@@ -2,15 +2,15 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
 
-  connect() {
-    document.addEventListener('turbo:before-fetch-request', this.beforeFetchRequest)
-    window.addEventListener("popstate", this.popState)
-  }
+  // connect() {
+  //   document.addEventListener('turbo:before-fetch-request', this.beforeFetchRequest)
+  //   window.addEventListener("popstate", this.popState)
+  // }
 
-  disconnect() {
-    document.removeEventListener('turbo:before-fetch-request', this.beforeFetchRequest)
-    window.removeEventListener("popstate", this.popState)
-  }
+  // disconnect() {
+  //   document.removeEventListener('turbo:before-fetch-request', this.beforeFetchRequest)
+  //   window.removeEventListener("popstate", this.popState)
+  // }
 
   beforeFetchRequest(event) {
     // Solution from: https://github.com/hotwired/turbo/issues/792

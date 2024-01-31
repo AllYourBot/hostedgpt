@@ -24,7 +24,9 @@ class MessagesController < ApplicationController
     @message = @assistant.messages.new(message_params)
 
     if @message.save
-      redirect_to conversation_messages_url(@message.conversation)
+      GetNextAiMessageJob.perform_later(@message.conversation.id)
+
+      redirect_to conversation_messages_path(@message.conversation)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
       set_sidebar_conversations
@@ -54,11 +56,6 @@ class MessagesController < ApplicationController
 
   def set_conversation
     @conversation = Current.user.conversations.find(params[:conversation_id])
-  end
-
-  def set_assistant
-    @assistant = Current.user.assistants.find_by(id: params[:assistant_id])
-    @assistant ||= @conversation.assistant
   end
 
   def set_assistant
