@@ -24,7 +24,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       post assistant_messages_url(@assistant), params: { message: { conversation_id: @message.conversation_id, content_text: @message.content_text } }
     end
 
-    assert_redirected_to message_url(Message.last)
+    assert_redirected_to conversation_messages_url(@conversation)
     assert_equal @conversation.id, Message.last.conversation_id
   end
 
@@ -35,10 +35,11 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    assert_redirected_to message_url(Message.last)
-    assert_instance_of Conversation, Message.last.conversation
-    assert_equal @assistant, Message.last.conversation.assistant
-    assert_equal @user, Message.last.conversation.user
+    conversation = Message.last.conversation
+    assert_instance_of Conversation, conversation
+    assert_redirected_to conversation_messages_url(conversation)
+    assert_equal @assistant, conversation.assistant
+    assert_equal @user, conversation.user
   end
 
   test "should fail to create message when there is no content_text" do

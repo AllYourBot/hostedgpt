@@ -63,7 +63,7 @@
 
     <!-- Only one of these headers is visible at a time, depending on width -->
     <div id="wide-header" class="flex-none justify-between ml-2 mt-2 mb-3 h-10 text-black dark:text-white text-lg hidden md:flex">
-      <%= render 'assistant_header', conversation: @conversation %>
+      <%# render 'shared/assistant_header' %>
 
       <div class="cursor-pointer inline-flex mr-3 px-2 py-2 group">
         <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white', title: "New chat", tooltip: :left %>
@@ -76,7 +76,7 @@
           <%= icon "bars-3", variant: :outline, size: 22, class: 'stroke-2 text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white', title: "Menu", tooltip: :right %>
         </div>
 
-        <%= render 'assistant_header', conversation: @conversation %>
+        <%# render 'shared/assistant_header' %>
 
         <div class="cursor-pointer inline-flex mr-1 px-2 group">
           <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white', title: "New chat", tooltip: :left %>

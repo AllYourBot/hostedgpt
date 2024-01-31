@@ -3,11 +3,13 @@ require "test_helper"
 class AssistantsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @assistant = assistants(:samantha)
+    @user = @assistant.user
+    login_as @user
   end
 
   test "should get index" do
     get assistants_url
-    assert_response :success
+    assert_redirected_to new_assistant_message_path(@assistant)
   end
 
   test "should get new" do
