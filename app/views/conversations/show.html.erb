@@ -1,18 +1,18 @@
 <%= turbo_stream_from @conversation %>
 <div class="flex h-screen"
      data-controller="click-toggle"
-     data-click-toggle-flippable-class="md:flex"
+     data-click-toggle-flippable-class="md:block"
      data-action="keydown.meta+shift+s@document->click-toggle#handleEvent
                   keydown.meta+period@document->click-toggle#handleEvent"
      >
 
   <div id="left-column"
-       class="flex-col h-screen w-[260px] bg-black hidden md:flex overflow-y-auto overflow-x-clip scrollbar-hide"
+       class="flex-col h-screen w-[260px] bg-black hidden md:block overflow-y-auto overflow-x-clip scrollbar-hide"
        data-click-toggle-target="destination"
    >
 
     <div id="left-content-container" class="flex flex-col flex-grow">
-      <div class="pl-3 pr-5">
+      <div class="pl-3 pr-5 flex flex-col mb-28">
         <%= render partial: "shared/assistant_sidebar_link", collection: @sidebar_assistants, as: :assistant %>
 
         <% @sidebar_conversations.each do |named_time_span, conversations| %>
