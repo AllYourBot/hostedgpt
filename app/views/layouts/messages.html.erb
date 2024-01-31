@@ -86,18 +86,24 @@
       </div>
       <!-- end header -->
 
-      <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
-        <div id="right-content" class="flex-grow overflow-y-auto overflow-x-clip relative">
+      <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
+        <div id="right-content" class="flex-grow overflow-y-auto overflow-x-clip relative" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
           <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
             <%= yield %>
           </div>
         </div>
 
         <div id="right-footer" class="flex-none flex flex-col relative">
-          <div id="scroll-button" class="text-center absolute -top-14 left-1/2 transform -translate-x-1/2">
-            <div class="rounded-full bg-white dark:bg-graphite border border-gray-300 dark:border-zinc-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 group" data-tip="Scroll down">
+          <div id="scroll-button" class="text-center absolute -top-14 left-1/2 transform -translate-x-1/2 hidden" data-scrollable-target="widget">
+            <%= link_to "#",
+                  data: {
+                    tip: "Scroll down",
+                    action: "scrollable#scrollToBottom"
+                  },
+                  class: "block rounded-full bg-white dark:bg-graphite border border-gray-300 dark:border-zinc-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 group" do
+            %>
               <%= icon "chevron-down", variant: :outline, size: 19, class: 'text-gray-800 dark:text-zinc-400 cursor-pointer group-hover:text-black dark:group-hover:text-white stroke-2' %>
-            </div>
+            <% end %>
           </div>
 
           <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
