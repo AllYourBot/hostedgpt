@@ -1,9 +1,9 @@
 class AssistantsController < ApplicationController
-  skip_before_action :authenticate_user!
   before_action :set_assistant, only: [:show, :edit, :update, :destroy]
 
   def index
-    @assistants = Assistant.all
+    assistant = Current.user.assistants.order(:pinned, :id).first
+    redirect_to new_assistant_message_path(assistant)
   end
 
   def show
