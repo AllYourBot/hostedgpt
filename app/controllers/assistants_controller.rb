@@ -2,7 +2,7 @@ class AssistantsController < ApplicationController
   before_action :set_assistant, only: [:show, :edit, :update, :destroy]
 
   def index
-    assistant = Current.user.assistants.order(:pinned, :id).first
+    assistant = Current.user.assistants.order(:id).first
     redirect_to new_assistant_message_path(assistant)
   end
 
