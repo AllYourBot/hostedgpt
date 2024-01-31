@@ -26,9 +26,7 @@
               </div>
 
               <% conversations.each do |conversation| %>
-                <%= render 'shared/conversation_sidebar_link',
-                  conversation: conversation,
-                  selected: conversation == @conversation %>
+                <%= render 'shared/conversation_sidebar_link', conversation: conversation %>
               <% end %>
             <% end %>
           </turbo-frame>
