@@ -43,6 +43,7 @@ class ActionDispatch::IntegrationTest
     post login_path, params: { email: user.person.email, password: "secret" }
     assert_response :redirect
     follow_redirect!
+    follow_redirect!
     assert_response :success
   end
 end

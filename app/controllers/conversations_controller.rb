@@ -54,7 +54,7 @@ class ConversationsController < ApplicationController
   end
 
   def set_conversation
-    @conversation = Current.user.conversations.find params[:id]
+    @conversation = Current.user.conversations.find(params[:id])
   end
 
   def conversation_params
