@@ -1,4 +1,5 @@
-<%# locals: (assistant:, settings: true, selected: false, assistant_counter: -1) %>
+<%# locals: (assistant:, settings: true, assistant_counter: -1) %>
+<% selected = assistant == @assistant %>
 <% first = assistant_counter == 0 %>
 
 <div class="
@@ -20,7 +21,7 @@
         <%= icon "ellipsis-horizontal",
               variant: :micro,
               size: 18,
-              class: "outline-none inline text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
+              class: "outline-none text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
               'data-controller': "nested-pointer",
               title: "More",
               tabindex: 0,
@@ -34,11 +35,11 @@
       </div>
     <% end %>
 
-    <%= link_to new_assistant_message_path(assistant) do %>
+    <%= link_to new_assistant_message_path(assistant), class: "inline-flex" do %>
       <%= icon "pencil-square",
         variant: :micro,
         size: 18,
-        class: "inline text-gray-400 cursor-pointer group-hover:visible hover:text-white #{selected ? 'text-white visible' : 'invisible'}",
+        class: "text-gray-400 cursor-pointer group-hover:visible hover:text-white #{selected ? 'text-white visible' : 'invisible'}",
         'data-controller': "nested-pointer",
         title: "New"
       %>
