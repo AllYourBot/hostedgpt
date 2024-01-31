@@ -12,7 +12,8 @@
     >
 
       <div id="left-content-container" class="flex flex-col flex-grow">
-        <div class="pl-3 pr-5 flex flex-col mb-28">
+        <div class="pl-3 flex flex-col mb-28">
+          <div class="sticky top-0 h-4 z-10 bg-black"></div>
           <%= render partial: "shared/assistant_sidebar_link", collection: @sidebar_assistants, as: :assistant %>
 
           <% @sidebar_conversations.each do |named_time_span, conversations| %>
