@@ -8,29 +8,15 @@ import debounce from "../utils/debounce.js"
 
 export default class extends Controller {
   static classes = [ "flippable" ]
-  static targets = [ "trigger", "destination" ]
+  static targets = [ "destination" ]
 
-  connect() {
-    this.triggerTargets.forEach(triggerElement => {
-      triggerElement.addEventListener('click', this)
-    })
-  }
-
-  disconnect() {
-    this.triggerTargets.forEach(triggerElement => {
-      triggerElement.removeEventListener('click', this)
-    })
-  }
-
-  handleEvent = debounce(this.toggleClasses, 100)
-
-  toggleClasses() {
+  toggleClass() {
     this.destinationTargets.forEach(element => {
       element.classList.toggle(this.flippableClass)
     })
 
-    // Showing and hiding elements can cause the page to flow differently, very similarly to what happens when the browser size changes. Throw
-    // this event in case we have other listeners on the resize event.
+    // Showing and hiding elements can cause the page to flow differently, very similarly to what happens when the
+    // browser size changes. Throw this event in case we have other listeners on the resize event.
     window.dispatchEvent(new Event('resize'))
   }
 }
