@@ -1,18 +1,19 @@
-<%# locals: (assistant:, settings: true, selected: false, assistant_counter: -1) %>
+<%# locals: (assistant:, settings: true, assistant_counter: -1) %>
+<% selected = assistant == @assistant %>
 <% first = assistant_counter == 0 %>
-<div class="
-            <%= first && 'sticky top-0 pt-3' %>
-            flex justify-between items-center
-            mb-1 p-1 pr-2
-            bg-black hover:bg-zinc-800
-            group cursor-pointer 
-            text-sm rounded-lg 
-">
-  <%= link_to assistant, class: "ml-2 flex-1 flex items-center text-white truncate" do %>
-    <div id="profile" class="mr-2 w-7 h-7 bg-white rounded-full"></div>
-     <%= assistant.name %>
-  <% end %>
 
+<div class="
+            <%= first && 'sticky top-4 z-10' %>
+            flex justify-between items-center
+            mb-1 p-1 pl-2 pr-2 mr-5
+            bg-black hover:bg-zinc-800
+            group cursor-pointer
+            text-sm rounded-lg
+">
+  <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-white truncate" do %>
+    <div id="profile" class="mr-2 w-7 h-7 bg-white rounded-full"></div>
+    <%= assistant.name %>
+  <% end %>
 
   <div class="<%= selected ? 'flex' : 'hidden' %> group-hover:flex gap-3 pl-2">
     <% if settings %>
@@ -20,7 +21,7 @@
         <%= icon "ellipsis-horizontal",
               variant: :micro,
               size: 18,
-              class: "outline-none inline text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
+              class: "outline-none text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
               'data-controller': "nested-pointer",
               title: "More",
               tabindex: 0,
@@ -34,12 +35,11 @@
       </div>
     <% end %>
 
-    <%= link_to new_assistant_message_path(assistant) do %>
+    <%= link_to new_assistant_message_path(assistant), class: "inline-flex" do %>
       <%= icon "pencil-square",
         variant: :micro,
         size: 18,
-        class: "inline text-gray-400 cursor-pointer group-hover:visible hover:text-white #{selected ? 'text-white visible' : 'invisible'}",
-        data: { selected: selected },
+        class: "text-gray-400 cursor-pointer group-hover:visible hover:text-white #{selected ? 'text-white visible' : 'invisible'}",
         'data-controller': "nested-pointer",
         title: "New"
       %>

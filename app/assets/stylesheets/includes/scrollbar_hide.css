@@ -1,0 +1,22 @@
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 9999px;
+}
+
+.scrollbar-hide::-webkit-scrollbar-thumb {
+  visibility: hidden;
+  background-color: transparent;
+  --tw-border-opacity: 0;
+}
+
+.scrollbar-hide {
+  /* IE ad Edge */
+  -ms-overflow-style: none;
+
+  /* Firefox */
+  scrollbar-width: none;
+}
