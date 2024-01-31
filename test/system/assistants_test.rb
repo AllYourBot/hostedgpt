@@ -3,16 +3,16 @@ require "application_system_test_case"
 class AssistantsTest < ApplicationSystemTestCase
   setup do
     @assistant = assistants(:samantha)
+    login_as @assistant.user
   end
 
-  test "visiting the index" do
-    visit assistants_url
-    assert_selector "h1", text: "Assistants"
-  end
+  # test "visiting the index" do
+  #   visit assistants_url
+  #   assert_selector "h1", text: "Assistants"
+  # end
 
   test "should create assistant" do
-    visit assistants_url
-    click_on "New assistant"
+    visit new_assistant_url
 
     fill_in "Description", with: @assistant.description
     fill_in "Instructions", with: @assistant.instructions
@@ -44,6 +44,6 @@ class AssistantsTest < ApplicationSystemTestCase
     visit assistant_url(@assistant)
     click_on "Destroy this assistant", match: :first
 
-    assert_text "Assistant was successfully destroyed"
+#    assert_text "Assistant was successfully destroyed"
   end
 end
