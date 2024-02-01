@@ -49,6 +49,9 @@ export default class extends Controller {
   select(event) {
     let eventTarget
 
+    // This select() can be triggered by a click event or by listening to radio-changed@window
+    // The latter has an incorrect event.target so if that's the case we scan the document for
+    // the matching id and use that.
     if (event.type == 'radio-changed') {
       if (event.detail.id == event.params.id) {
         eventTarget = document.querySelector(`[data-radio-behavior-id-param="${event.params.id}"]`)
@@ -69,18 +72,6 @@ export default class extends Controller {
     radioElement.classList.add(...this.selectedClasses)
 
     let id = radioElement.getAttribute('data-radio-behavior-also-select-id')
-    if (id) {
-      window.dispatchEvent(new CustomEvent('radio-changed', { detail: { id: id }}))
-      console.log(`dispatched!`)
-    }
-  }
-
-  received(event) {
-    console.log(`received ${event.detail.id} =? ${event.params.id}`)
-  }
-
-  handleRadioChange(event) {
-    console.log(`received!`)
-    console.log(`radio was changed: ${event.id}`, event)
+    if (id) window.dispatchEvent(new CustomEvent('radio-changed', { detail: { id: id }}))
   }
 }
