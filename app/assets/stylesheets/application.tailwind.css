@@ -25,6 +25,14 @@
 
 /* Parent utility classes which activate children */
 
-.relationship-flex .relationship\:flex {
+.relationship .relationship\:flex {
   @apply !flex
+}
+
+.relationship .relationship\:visible {
+  @apply !visible
+}
+
+.relationship .relationship\:text-white {
+  @apply !text-white
 }

@@ -9,13 +9,14 @@
             bg-black hover:bg-zinc-800
             group cursor-pointer
             text-sm rounded-lg
+            <%= selected && 'relationship' %>
 ">
   <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-white truncate" do %>
     <div id="profile" class="mr-2 w-7 h-7 bg-white rounded-full"></div>
     <%= assistant.name %>
   <% end %>
 
-  <div class="<%= selected ? 'flex' : 'hidden' %> group-hover:flex gap-3 pl-2">
+  <div class="hidden relationship:flex group-hover:flex gap-3 pl-2">
     <% if settings %>
       <div class="dropdown inline-flex dropdown-end outline-none">
         <%= icon "ellipsis-horizontal",
@@ -39,7 +40,7 @@
       <%= icon "pencil-square",
         variant: :micro,
         size: 18,
-        class: "text-gray-400 cursor-pointer group-hover:visible hover:text-white #{selected ? 'text-white visible' : 'invisible'}",
+        class: "text-gray-400 cursor-pointer group-hover:visible hover:text-white invisible relationship:visible relationship:text-white",
         'data-controller': "nested-pointer",
         title: "New"
       %>
