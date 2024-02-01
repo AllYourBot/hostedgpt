@@ -34,7 +34,7 @@ class MessagesController < ApplicationController
     if @message.update(message_params)
       redirect_to @message, notice: "Message was successfully updated.", status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_entity  # what's the right flow for a failed message create?
     end
   end
 
