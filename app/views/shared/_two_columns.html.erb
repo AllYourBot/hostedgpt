@@ -15,7 +15,11 @@
         <div id="spacer-above-sticky-assistant" class="sticky top-0 h-4 z-10 bg-black"></div>
         <%= render partial: "shared/assistant_sidebar_link", collection: @sidebar_assistants, as: :assistant %>
 
-        <turbo-frame id="conversations" target="conversation" data-controller="radio-behavior" data-radio-behavior-selected-class="bg-zinc-800 relationship-flex">
+        <turbo-frame  id="conversations"
+                      target="conversation"
+                      data-controller="radio-behavior"
+                      data-radio-behavior-selected-class="bg-zinc-800 relationship-flex"
+        >
           <% @sidebar_conversations.each do |named_time_span, conversations| %>
             <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
               <%= named_time_span %>
@@ -31,7 +35,9 @@
   </div>
 
   <div id="right-column" class="flex flex-1 h-screen bg-white dark:bg-graphite">
-    <turbo-frame id="conversation" class="flex flex-1 flex-col relative">
+    <turbo-frame  id="conversation"
+                  class="flex flex-1 flex-col relative"
+    >
       <div  id="handle-container"
             class="absolute left-0 top-1/2 w-8 h-20 -mt-10 z-20 hidden md:flex"
             data-action= "keydown.meta+shift+s@document->click-toggle#toggleClass
