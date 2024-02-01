@@ -10,7 +10,11 @@
             group cursor-pointer
             text-sm rounded-lg
             <%= selected && 'relationship' %>
-">
+          "
+    data-radio-behavior-target="radio"
+    data-action="radio-changed@window->radio-behavior#select"
+    data-radio-behavior-id-param="<%= assistant.id %>"
+>
   <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-white truncate" do %>
     <div id="profile" class="mr-2 w-7 h-7 bg-white rounded-full"></div>
     <%= assistant.name %>

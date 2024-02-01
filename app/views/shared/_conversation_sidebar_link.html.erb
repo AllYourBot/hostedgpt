@@ -4,8 +4,9 @@
 <div
   class=" flex justify-between items-center
           rounded-lg mr-5 cursor-pointer group
-          hover:bg-zinc-800 <%= selected && 'bg-zinc-800 relationship' %>"
+          hover:bg-zinc-800 relationship:bg-zinc-800 <%= selected && 'relationship' %>"
   data-radio-behavior-target="radio"
+  data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
 >
 
   <%= link_to conversation.title || "[Untitled]",
