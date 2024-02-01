@@ -1,21 +1,29 @@
-<% content_for :body do %>
-  <%= turbo_stream_from @conversation %>
+<%= turbo_stream_from @conversation %>
 
-  <div class="flex h-screen"
-      data-controller="click-toggle"
-      data-click-toggle-flippable-class="!hidden"
+<div class="flex h-screen"
+    data-controller="click-toggle"
+    data-click-toggle-flippable-class="!hidden"
+>
+
+  <div id="left-column"
+      class="flex-col h-screen w-[260px] bg-black hidden md:block overflow-y-auto overflow-x-clip scrollbar-hide"
+      data-click-toggle-target="destination"
   >
 
-    <div id="left-column"
-        class="flex-col h-screen w-[260px] bg-black hidden md:block overflow-y-auto overflow-x-clip scrollbar-hide"
-        data-click-toggle-target="destination"
-    >
-
-      <div id="left-content-container" class="flex flex-col flex-grow">
-        <div class="pl-3 flex flex-col mb-28">
-          <div id="spacer-above-sticky-assistant" class="sticky top-0 h-4 z-10 bg-black"></div>
+    <div id="left-content-container" class="flex flex-col flex-grow">
+      <div class="pl-3 flex flex-col mb-28">
+        <div id="spacer-above-sticky-assistant" class="sticky top-0 h-4 z-10 bg-black"></div>
+        <div  data-controller="radio-behavior"
+              data-radio-behavior-selected-class="relationship"
+        >
           <%= render partial: "shared/assistant_sidebar_link", collection: @sidebar_assistants, as: :assistant %>
+        </div>
 
+        <turbo-frame  id="conversations"
+                      target="conversation"
+                      data-controller="radio-behavior"
+                      data-radio-behavior-selected-class="relationship"
+        >
           <% @sidebar_conversations.each do |named_time_span, conversations| %>
             <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
               <%= named_time_span %>
@@ -23,14 +31,17 @@
 
             <%= render partial: 'shared/conversation_sidebar_link', collection: conversations, as: :conversation %>
           <% end %>
-        </div>
-
-        <%= render partial: "shared/user_menu" %>
+        </turbo-frame>
       </div>
+
+      <%= render partial: "shared/user_menu" %>
     </div>
+  </div>
 
-    <div id="right-column" class="flex flex-1 flex-col h-screen bg-white dark:bg-graphite relative">
-
+  <div id="right-column" class="flex flex-1 h-screen bg-white dark:bg-graphite">
+    <turbo-frame  id="conversation"
+                  class="flex flex-1 flex-col relative"
+    >
       <div  id="handle-container"
             class="absolute left-0 top-1/2 w-8 h-20 -mt-10 z-20 hidden md:flex"
             data-action= "keydown.meta+shift+s@document->click-toggle#toggleClass
@@ -86,7 +97,7 @@
       <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
         <div id="right-content" class="flex-grow overflow-y-auto overflow-x-clip relative" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
           <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
-            <%= yield %>
+            <%= yield :messages_content %>
           </div>
         </div>
 
@@ -154,8 +165,6 @@
             HostedGPT can make mistakes. Consider checking important information.
           </div>
       </div>
-    </div>
+    </turbo-frame>
   </div>
-<% end %>
-
-<%= render template: "layouts/application" %>
+</div>

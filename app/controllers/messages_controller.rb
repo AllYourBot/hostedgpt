@@ -2,8 +2,8 @@ class MessagesController < ApplicationController
   before_action :set_conversation, only: [:index]
   before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
-  before_action :set_sidebar_conversations, only: [:index, :new]  # because these two routes use a different layout than the others, better solution?
-  before_action :set_sidebar_assistants, only: [:index, :new]     # because these two routes use a different layout than the others, better solution?
+  before_action :set_sidebar_conversations, only: [:index, :new]
+  before_action :set_sidebar_assistants, only: [:index, :new]
 
   def index
     @messages = @conversation.messages
@@ -11,7 +11,6 @@ class MessagesController < ApplicationController
   end
 
   def show  # show & edit will be used when we make messages editable
-    render layout: "application"
   end
 
   def new
@@ -19,7 +18,6 @@ class MessagesController < ApplicationController
   end
 
   def edit
-    render layout: "application"
   end
 
   def create
@@ -28,7 +26,12 @@ class MessagesController < ApplicationController
     if @message.save
       redirect_to conversation_messages_url(@message.conversation)
     else
-      render :new, layout: "application", status: :unprocessable_entity  # what's the right flow for a failed message create?
+      # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
+      set_sidebar_conversations
+      set_sidebar_assistants
+      @new_message = @assistant.messages.new
+
+      render :new, status: :unprocessable_entity
     end
   end
 

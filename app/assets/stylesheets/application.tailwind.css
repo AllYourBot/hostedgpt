@@ -21,3 +21,26 @@
 .icon.cursor-pointer:active {
   @apply scale-90 ease-in-out duration-300
 }
+
+
+/* Parent utility classes which activate children */
+
+.relationship .relationship\:flex,
+.relationship.relationship\:flex {
+  @apply !flex
+}
+
+.relationship .relationship\:visible,
+.relationship.relationship\:visible {
+  @apply !visible
+}
+
+.relationship .relationship\:text-white,
+.relationship.relationship\:text-white {
+  @apply !text-white
+}
+
+.relationship .relationship\:bg-zinc-800,
+.relationship.relationship\:bg-zinc-800 {
+  @apply !bg-zinc-800
+}

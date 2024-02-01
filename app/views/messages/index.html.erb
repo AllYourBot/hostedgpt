@@ -1,9 +1,11 @@
+<%= content_for :messages_content do %>
 
-<div class="min-w-full">
-  <turbo-frame id="messages">
-    <% last_index = @messages.count - 1 %>
-    <% @messages.find_each.with_index do |message, index| %>
-      <%= render partial: 'message', locals: { message: message, conversation: @conversation, scroll_into_view: index == last_index } %>
-    <% end %>
-  </turbo-frame>
-</div>
+  <div class="min-w-full">
+    <turbo-frame id="messages">
+      <%= render @conversation.messages %>
+    </turbo-frame>
+  </div>
+
+<% end %>
+
+<%= render "shared/two_columns" %>
