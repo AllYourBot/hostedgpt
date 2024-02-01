@@ -1,9 +1,12 @@
-<%# locals: (message:, conversation:, scroll_into_view: false, request_id: nil) -%>
-<div 
+<%# locals: (message:, scroll_into_view: nil, message_counter: -1) -%>
+<% max_index = message.conversation.messages.length - 1 %>
+<% last_message = message_counter == max_index %>
+
+<div
   id="<%= dom_id message %>"
   class="ml-9 sm:ml-3 md:ml-8 mb-5 group"
   data-controller="conversation-message"
-  data-conversation-message-scroll-into-view-value="<%= scroll_into_view %>"
+  data-conversation-message-scroll-into-view-value="<%= scroll_into_view.nil? ? () : scroll_into_view %>"
   >
   <div class="flex">
     <div class="w-6 flex flex-col items-center ml-1">
@@ -13,7 +16,7 @@
     <!-- Right Column -->
     <div class="flex-1 min-w-0 ml-3 mr-8 text-black dark:text-zinc-200 text-base">
       <div class="mt-1 font-semibold">
-        <%= message.user? ? 'You' : conversation.assistant.name %>
+        <%= message.user? ? 'You' : message.conversation.assistant.name %>
       </div>
 
       <div class="text-zinc-700 dark:text-white">
