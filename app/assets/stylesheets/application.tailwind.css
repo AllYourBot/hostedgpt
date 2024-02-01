@@ -21,3 +21,10 @@
 .icon.cursor-pointer:active {
   @apply scale-90 ease-in-out duration-300
 }
+
+
+/* Parent utility classes which activate children */
+
+.relationship-flex .relationship\:flex {
+  @apply !flex
+}
