@@ -41,10 +41,6 @@ import { Controller } from '@hotwired/stimulus'
 //   </a>
 // </div>
 
-// If there is any
-// other radio-behavior target element anywhere on the page which has this
-// a radio-changed event will be fired and event.id will be equal to this.
-
 
 export default class extends Controller {
   static classes = [ "selected" ]
