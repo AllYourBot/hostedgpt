@@ -2,3 +2,8 @@ greeting:
   user: keith
   assistant: samantha
   title: Meeting Samantha
+
+debugging:
+  user: rob
+  assistant: gpt4
+  title: Verifying Ruby syntax

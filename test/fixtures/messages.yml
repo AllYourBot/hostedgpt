@@ -1,3 +1,5 @@
+# Conversation
+
 hear_me:
   assistant: samantha
   conversation: greeting
@@ -29,3 +31,22 @@ photo_identified:
   content_text: That looks like a cat.
   content_document:
   run: identify_photo_response
+
+
+# Next conversation
+
+filter_map:
+  assistant: gpt4
+  conversation: debugging
+  role: user
+  content_text: what is the syntax of filter_map ruby?
+  content_document:
+  run:
+
+example:
+  assistant: gpt4
+  conversation: debugging
+  role: assistant
+  content_text: array.filter_map { |item| expression if condition }
+  content_document:
+  run: filter_map_response

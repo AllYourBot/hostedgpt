@@ -12,7 +12,7 @@ hear_me_response:
   model: gpt-4
   instructions: You are a helpful assistant
   additional_instructions:
-  tools: [{"type": "retrieval"}, {"type": "code_interpreter"}]
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
 identify_photo_response:
   assistant: samantha
@@ -28,6 +28,21 @@ identify_photo_response:
   model: gpt-4
   instructions: You are a helpful assistant
   additional_instructions:
-  tools: [{"type": "retrieval"}, {"type": "code_interpreter"}]
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
   file_ids: ["file-abc123"]
 
+filter_map_response:
+  assistant: gpt4
+  conversation: debugging
+  status: completed
+  required_action:
+  last_error:
+  started_at: 2023-12-27 15:03:41
+  completed_at: 2023-12-27 15:04:41
+  expired_at: 2023-12-27 15:05:41
+  cancelled_at:
+  failed_at:
+  model: gpt-4
+  instructions:
+  additional_instructions:
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
