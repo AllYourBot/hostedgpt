@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_30_225910) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_02_162322) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -155,7 +155,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_30_225910) do
     t.datetime "failed_at", precision: nil
     t.datetime "completed_at", precision: nil
     t.string "model", null: false
-    t.string "instructions", null: false
+    t.string "instructions"
     t.string "additional_instructions"
     t.jsonb "tools", default: [], null: false
     t.jsonb "file_ids", default: [], null: false
