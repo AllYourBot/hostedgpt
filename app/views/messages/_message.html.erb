@@ -15,11 +15,11 @@
 
     <!-- Right Column -->
     <div class="flex-1 min-w-0 ml-3 mr-8 text-black dark:text-zinc-200 text-base">
-      <div class="mt-1 font-semibold">
+      <div class="role mt-1 font-semibold">
         <%= message.user? ? 'You' : message.conversation.assistant.name %>
       </div>
 
-      <div class="text-zinc-700 dark:text-white">
+      <div class="content_text text-zinc-700 dark:text-white">
         <%= message.content_text %>
       </div>
 

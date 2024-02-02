@@ -13,10 +13,12 @@
     <div id="left-content-container" class="flex flex-col flex-grow">
       <div class="pl-3 flex flex-col mb-28">
         <div id="spacer-above-sticky-assistant" class="sticky top-0 h-4 z-10 bg-black"></div>
-        <div  data-controller="radio-behavior"
-              data-radio-behavior-selected-class="relationship"
-        >
-          <%= render partial: "shared/assistant_sidebar_link", collection: @sidebar_assistants, as: :assistant %>
+        <div id="assistants">
+          <div  data-controller="radio-behavior"
+                data-radio-behavior-selected-class="relationship"
+          >
+            <%= render partial: "shared/assistant_sidebar_link", collection: @sidebar_assistants, as: :assistant %>
+          </div>
         </div>
 
         <turbo-frame  id="conversations"
