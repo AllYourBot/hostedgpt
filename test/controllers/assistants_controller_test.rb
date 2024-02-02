@@ -2,8 +2,8 @@ require "test_helper"
 
 class AssistantsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @assistant = assistants(:samantha)
-    @user = @assistant.user
+    @user = users(:keith)
+    @assistant = @user.assistants.order(:id).first
     login_as @user
   end
 
