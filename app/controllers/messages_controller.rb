@@ -6,7 +6,7 @@ class MessagesController < ApplicationController
   before_action :set_sidebar_assistants, only: [:index, :new]
 
   def index
-    @messages = @conversation.messages
+    @messages = @conversation.messages.order(:created_at)
     @new_message = @assistant.messages.new(conversation: @conversation)
   end
 
