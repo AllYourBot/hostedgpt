@@ -81,4 +81,49 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal "append", broadcasts.first["action"]
     assert_match message.content_text, broadcasts.first.to_html
   end
+
+  test "creating a message with a conversation and Current.user set fails if conversation is not owned by the user" do
+    Current.user = users(:rob)
+    assistant = users(:rob).assistants.first
+    conversation_owned_by_someone_else = users(:keith).conversations.first
+
+    assert_raises do
+      Message.create!(
+        assistant: assistant,
+        conversation: conversation_owned_by_someone_else,
+        content_text: "This should fail"
+      )
+    end
+  end
+
+  test "creating a message with a conversation and Current.user succeeds when conversation is owned by the user" do
+    Current.user = users(:rob)
+    assistant = users(:rob).assistants.first
+    conversation = users(:rob).conversations.first
+
+    assert_nothing_raised do
+      message = Message.create!(
+        assistant: assistant,
+        conversation: conversation,
+        content_text: "This works since Conversation is owned by Current.user"
+      )
+      assert_equal Current.user, message.conversation.user
+    end
+  end
+
+  test "creating a message with conversation user that does not match the assistant user succeeds when Current.user is not set" do
+    assistant = users(:rob).assistants.first
+    conversation = users(:keith).conversations.first
+    Current.user = nil
+
+    assert_not_equal assistant.user, conversation.user
+
+    assert_nothing_raised do
+      message = Message.create!(
+        assistant: assistant,
+        conversation: conversation,
+        content_text: "This works since Current.user not set"
+      )
+    end
+  end
 end

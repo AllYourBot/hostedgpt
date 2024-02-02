@@ -13,9 +13,9 @@ class Message < ApplicationRecord
 
   validates :content_text, :role, presence: true
   validates :run, presence: true, if: -> { assistant? }
+  validate :validate_conversation_user, if: -> { conversation.present? && Current.user }
 
   after_create_commit :broadcast_message
-
 
   private
 
@@ -29,5 +29,9 @@ class Message < ApplicationRecord
 
   def broadcast_message
     broadcast_append_to conversation, partial: "messages/message", locals: { scroll_into_view: true }
+  end
+
+  def validate_conversation_user
+    errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
   end
 end
