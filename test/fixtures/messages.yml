@@ -35,16 +35,54 @@ photo_identified:
 
 # Next conversation
 
+popstate:
+  assistant: keith_gpt4
+  conversation: javascript
+  role: user
+  content_text: what does popstate do in javascript?
+  content_document:
+  run:
+
+popstate_event:
+  assistant: keith_gpt4
+  conversation: javascript
+  role: assistant
+  content_text: popstate is an event in JavaScript that fires when the active history entry changes, typically due to the user navigating back or forward in their browser history.
+  content_document:
+  run: popstate_response
+
+
+# Next conversation
+
+ruby_version:
+  assistant: samantha
+  conversation: ruby_version
+  role: user
+  content_text: what is the latest version of ruby?
+  content_document:
+  run:
+
+latest_ruby_version:
+  assistant: samantha
+  conversation: ruby_version
+  role: assistant
+  content_text: The latest version of Ruby can vary, but as of my last update, it was Ruby 3.1.2. For the most current version, checking the official Ruby website or its GitHub page is recommended.
+  content_document:
+  run: ruby_version_response
+
+
+# Next conversation
+
 filter_map:
-  assistant: gpt4
+  assistant: rob_gpt4
   conversation: debugging
   role: user
   content_text: what is the syntax of filter_map ruby?
   content_document:
   run:
 
-example:
-  assistant: gpt4
+filter_map_example:
+  assistant: rob_gpt4
   conversation: debugging
   role: assistant
   content_text: array.filter_map { |item| expression if condition }
