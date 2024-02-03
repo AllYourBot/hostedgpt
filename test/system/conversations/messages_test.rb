@@ -20,16 +20,23 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     last_message = all("#conversation .message").last
 
     scroll_to second_message
-    sleep 0.1
-    assert_visible "#scroll-button"
+    assert_visible "#scroll-button", wait: 0.2
 
     scroll_to first_message
-    sleep 0.1
-    assert_visible "#scroll-button"
+    assert_visible "#scroll-button", wait: 0.2
 
     scroll_to last_message
-    sleep 0.1
-    assert_hidden "#scroll-button"
+    assert_hidden "#scroll-button", wait: 0.2
+  end
+
+  test "clicking scroll down button scrolls the page to the bottom" do
+    click_on @long_conversation.title
+
+    scroll_to all("#conversation .message").first
+    assert_visible "#scroll-button", wait: 0.2
+
+    find("#scroll-button a").click
+    assert_hidden "#scroll-button", wait: 0.2
   end
 
   # This behavior is actually broken right now but I think Rob's PR will fix

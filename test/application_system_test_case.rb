@@ -21,32 +21,28 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_current_path login_path, wait: 2
   end
 
-  def assert_active(selector, error_msg = nil)
-    assert_equal find(selector), page.active_element, "Expected #{selector} to be the active element, but it is not. #{error_msg}"
+  def assert_active(selector, error_msg = nil, wait: nil)
+    element = find(selector, wait: wait)
+    assert_equal element, page.active_element, "Expected #{selector} to be the active element, but it is not. #{error_msg}"
   end
 
-  def assert_selected_assistant(assistant)
-    assert_selector "#assistants .relationship", text: assistant.name
-  end
-
-  def assert_first_message(message)
-    assert_selector "#messages > :first-child .content_text", text: message.content_text
-  end
-
-  def assert_visible(selector, error_msg = nil)
-    element = find(selector, visible: false) rescue nil
+  def assert_visible(selector, error_msg = nil, wait: nil)
+    element = find(selector, visible: false, wait: wait) rescue nil
     assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
-    assert element.visible?, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
+
+    element = find(selector, visible: true, wait: wait) rescue nil
+    assert element&.visible?, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
   end
 
-  def assert_hidden(selector, error_msg = nil)
-    element = find(selector, visible: false) rescue nil
+  def assert_hidden(selector, error_msg = nil, wait: nil)
+    element = find(selector, visible: false, wait: wait) rescue nil
     assert element, "Expected to find hidden css #{selector}, but the element was not found. #{error_msg}"
+    sleep wait  if wait.present?  # we can wait until an element is visible, but if we want to be sure it's disappearing we need to sleep
     refute element.visible?, "Expected to find hidden css #{selector}. It was found but it is visible. #{error_msg}"
   end
 
-  def assert_shows_tooltip(selector, text, error_msg = nil)
-    assert_selector selector, class: "tooltip"
+  def assert_shows_tooltip(selector, text, error_msg = nil, wait: nil)
+    assert_selector selector, class: "tooltip", wait: wait
     assert_equal text, find(selector)[:'data-tip'], "Expected element #{selector} to have tooltip #{text}. #{error_msg}"
   end
 
