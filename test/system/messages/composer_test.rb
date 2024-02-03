@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class MessagesTest < ApplicationSystemTestCase
+class MessagesComposerTest < ApplicationSystemTestCase
   setup do
     login_as users(:keith)
     @submit = find("#composer #submit")

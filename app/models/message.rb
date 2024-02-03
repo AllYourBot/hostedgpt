@@ -17,6 +17,8 @@ class Message < ApplicationRecord
 
   after_create_commit :broadcast_message
 
+  scope :sorted, -> { order(:created_at) }
+
 
   private
 

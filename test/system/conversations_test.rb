@@ -26,6 +26,6 @@ class ConversationsTest < ApplicationSystemTestCase
     visit conversation_url(@conversation)
     message_text = "Hello! #{Time.now}"
     @conversation.messages.create! assistant: @conversation.assistant, content_text: message_text, role: :user
-    assert_text message_text
+    assert_text message_text, wait: 2
   end
 end

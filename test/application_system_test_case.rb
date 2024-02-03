@@ -1,12 +1,12 @@
 require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium, using: :chrome, screen_size: [1400, 1400]
+  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400]
 
   fixtures :all
 
   def login_as(user, password = "secret")
-    assistant = user.assistants.order(:id).first
+    assistant = user.assistants.sorted.first
 
     visit logout_path
     assert_current_path login_path, wait: 2

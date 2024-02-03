@@ -5,7 +5,7 @@ class AutotitleConversationJob < ApplicationJob
     conversation = Conversation.find(conversation_id)
     Current.user = conversation.user
 
-    message = conversation.messages.order(:id).first
+    message = conversation.messages.sorted.first
     new_title = generate_title_for(message.content_text)
     conversation.update!(title: new_title)
   end

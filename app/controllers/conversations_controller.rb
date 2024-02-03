@@ -50,7 +50,7 @@ class ConversationsController < ApplicationController
   end
 
   def set_sidebar_assistants
-    @sidebar_assistants = Current.user.assistants.order(id: :desc)
+    @sidebar_assistants = Current.user.assistants.sorted
   end
 
   def set_conversation

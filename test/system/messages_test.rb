@@ -7,12 +7,12 @@ class MessagesTest < ApplicationSystemTestCase
   end
 
   test "after logging in, the user is redirected to the right path" do
-    assistant = @user.assistants.order(:id).first
+    assistant = @user.assistants.sorted.first
     assert_current_path new_assistant_message_path(assistant)
   end
 
   test "visiting the index defaults to GPT-4 and starts a new conversation" do
-    assistant = @user.assistants.order(:id).first
+    assistant = @user.assistants.sorted.first
 
     visit root_url
 
