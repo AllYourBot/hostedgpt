@@ -1,4 +1,6 @@
-<%# locals: (message:, scroll_into_view: nil, message_counter: -1) -%>
+<%# locals: (message:, scroll_into_view: nil, request_id: nil, message_counter: -1) -%>
+<%# request_id is not used, but broadcasting turbo stream messages provides it as a local so it needs to be accepted %>
+
 <% max_index = message.conversation.messages.length - 1 %>
 <% last_message = message_counter == max_index %>
 

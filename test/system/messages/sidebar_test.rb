@@ -44,7 +44,7 @@ class MessagesTest < ApplicationSystemTestCase
     assert_selected_assistant assistant
   end
 
-  test "sidebar handle shows proper tooltip and hides/shows column when clicked" do
+  test "sidebar close handle shows proper tooltip and hides/shows column when clicked" do
     assert_visible "#left-column"
 
     assert_visible "#left-handle"
