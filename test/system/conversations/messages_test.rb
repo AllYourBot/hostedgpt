@@ -39,6 +39,16 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_hidden "#scroll-button", wait: 0.2
   end
 
+  test "clicking new compose icon in the top-right starts a new conversation" do
+    click_on @long_conversation.title
+
+    assert_selector "#conversation a.pencil"
+    assert_shows_tooltip "#conversation a.pencil", "New chat"
+
+    find("#conversation a.pencil").click
+    assert_current_path new_assistant_message_path(@long_conversation.assistant)
+  end
+
   # This behavior is actually broken right now but I think Rob's PR will fix
   #
   # test "when a message arrives while viewing the conversation, it is displayed and scrolled into view" do

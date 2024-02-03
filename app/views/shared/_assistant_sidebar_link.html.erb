@@ -15,7 +15,7 @@
     data-action="radio-changed@window->radio-behavior#select"
     data-radio-behavior-id-param="<%= assistant.id %>"
 >
-  <%= link_to new_assistant_message_path(assistant), class: "assistant-name flex-1 flex items-center text-white truncate" do %>
+  <%= link_to new_assistant_message_path(assistant), class: "name flex-1 flex items-center text-white truncate" do %>
     <div id="profile" class="mr-2 w-7 h-7 bg-white rounded-full"></div>
     <%= assistant.name %>
   <% end %>
@@ -40,7 +40,7 @@
       </div>
     <% end %>
 
-    <%= link_to new_assistant_message_path(assistant), class: "assistant-pencil inline-flex" do %>
+    <%= link_to new_assistant_message_path(assistant), class: "pencil inline-flex" do %>
       <%= icon "pencil-square",
         variant: :micro,
         size: 18,

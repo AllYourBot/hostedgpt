@@ -41,9 +41,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     refute element.visible?, "Expected to find hidden css #{selector}. It was found but it is visible. #{error_msg}"
   end
 
-  def assert_shows_tooltip(selector, text, error_msg = nil, wait: nil)
-    assert_selector selector, class: "tooltip", wait: wait
-    assert_equal text, find(selector)[:'data-tip'], "Expected element #{selector} to have tooltip #{text}. #{error_msg}"
+  def assert_shows_tooltip(selector_or_element, text, error_msg = nil, wait: nil)
+    element = if selector_or_element.is_a?(Capybara::Node::Element)
+      selector_or_element
+    else
+      find(selector_or_element, wait: wait)
+    end
+
+    unless element.matches_css?(".tooltip") # sometimes we're checking the tooltip on a link but within the link is an icon, check that instead
+      element = element.find(:xpath, './*', match: :first, wait: wait)
+    end
+
+    assert element.matches_css?(".tooltip")
+    assert_equal text, element[:'data-tip'], "Expected element to have tooltip #{text}. #{error_msg}"
   end
 
   def send_keys(keys)

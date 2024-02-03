@@ -122,7 +122,8 @@ class MessagesSidebarTest < ApplicationSystemTestCase
     assistant2 = @user.assistants.sorted.second
     second_assistant_container = all("#assistants .assistant", visible: :false)[1]
     second_assistant_container.hover
-    pencil_on_second_assistant = all("#assistants a.assistant-pencil", visible: :false)[1]
+    pencil_on_second_assistant = all("#assistants a.pencil", visible: :false)[1]
+    assert_shows_tooltip pencil_on_second_assistant, "New"
     pencil_on_second_assistant.click
     assert_current_path new_assistant_message_path(assistant2)
   end
