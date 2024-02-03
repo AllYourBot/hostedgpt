@@ -1,7 +1,7 @@
 require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400]
+  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 800]
 
   fixtures :all
 
@@ -21,8 +21,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_current_path login_path, wait: 2
   end
 
-  def assert_active(selector)
-    assert_equal find(selector), page.active_element, "Expected #{selector} to be the active element, but it is not."
+  def assert_active(selector, error_msg = nil)
+    assert_equal find(selector), page.active_element, "Expected #{selector} to be the active element, but it is not. #{error_msg}"
   end
 
   def assert_selected_assistant(assistant)
@@ -33,21 +33,21 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_selector "#messages > :first-child .content_text", text: message.content_text
   end
 
-  def assert_visible(selector)
+  def assert_visible(selector, error_msg = nil)
     element = find(selector, visible: false) rescue nil
-    assert element, "Expected to find visible css #{selector}, but the element was not found."
-    assert element.visible?, "Expected to find visible css #{selector}. It was found but it is hidden."
+    assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
+    assert element.visible?, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
   end
 
-  def assert_hidden(selector)
+  def assert_hidden(selector, error_msg = nil)
     element = find(selector, visible: false) rescue nil
-    assert element, "Expected to find hidden css #{selector}, but the element was not found."
-    refute element.visible?, "Expected to find hidden css #{selector}. It was found but it is visible."
+    assert element, "Expected to find hidden css #{selector}, but the element was not found. #{error_msg}"
+    refute element.visible?, "Expected to find hidden css #{selector}. It was found but it is visible. #{error_msg}"
   end
 
-  def assert_shows_tooltip(selector, text)
+  def assert_shows_tooltip(selector, text, error_msg = nil)
     assert_selector selector, class: "tooltip"
-    assert_equal text, find(selector)[:'data-tip']
+    assert_equal text, find(selector)[:'data-tip'], "Expected element #{selector} to have tooltip #{text}. #{error_msg}"
   end
 
   def send_keys(keys)
