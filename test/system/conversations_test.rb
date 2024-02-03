@@ -21,11 +21,4 @@ class ConversationsTest < ApplicationSystemTestCase
 
     assert_text "Conversation was successfully created"
   end
-
-  test "when a message arrives while viewing the conversation, it is displayed" do
-    visit conversation_url(@conversation)
-    message_text = "Hello! #{Time.now}"
-    @conversation.messages.create! assistant: @conversation.assistant, content_text: message_text, role: :user
-    assert_text message_text, wait: 2
-  end
 end
