@@ -27,9 +27,8 @@ export default class extends Controller {
   }
 
   submitForm() {
-    if (this.cleanInputValue.length > 0) {
+    if (this.cleanInputValue.length > 0)
       this.element.requestSubmit()
-    }
   }
 
   // Focus the input, and place the cursor at the end of the text.
