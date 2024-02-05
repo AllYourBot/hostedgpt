@@ -8,6 +8,8 @@ class Conversation < ApplicationRecord
 
   after_create_commit :set_title_async, if: -> { title.blank? }
 
+  scope :sorted, -> { order(updated_at: :desc) }
+
 
   # Builds a hash of date interval keys and queries which fetch the records for that internal.
   #
@@ -22,7 +24,7 @@ class Conversation < ApplicationRecord
   #  "Older" => relation
   # }
   def self.grouped_by_increasing_time_interval_for_user(user)
-    sidebar_conversations = user.conversations.order(updated_at: :desc)
+    sidebar_conversations = user.conversations.sorted
 
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
     values = [

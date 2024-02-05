@@ -3,7 +3,7 @@ require "test_helper"
 class AssistantsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:keith)
-    @assistant = @user.assistants.order(:id).first
+    @assistant = @user.assistants.sorted.first
     login_as @user
   end
 

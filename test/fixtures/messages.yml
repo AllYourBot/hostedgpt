@@ -7,6 +7,7 @@ hear_me:
   content_text: Can you hear me?
   content_document:
   run:
+  created_at: 2023-12-30 1:00:00
 
 yes_i_do:
   assistant: samantha
@@ -15,6 +16,7 @@ yes_i_do:
   content_text: Yes, I can hear you. How can I help you today?
   content_document:
   run: hear_me_response
+  created_at: 2023-12-30 1:01:00
 
 identify_photo:
   assistant: samantha
@@ -23,6 +25,7 @@ identify_photo:
   content_text: What do you see in this photo?
   content_document: # the cat photo is not attached in this field, currently it's attached at the document level. info: https://platform.openai.com/docs/assistants/tools/knowledge-retrieval and https://platform.openai.com/docs/guides/vision
   run:
+  created_at: 2023-12-30 1:02:00
 
 photo_identified:
   assistant: samantha
@@ -31,6 +34,43 @@ photo_identified:
   content_text: That looks like a cat.
   content_document:
   run: identify_photo_response
+  created_at: 2023-12-30 1:03:00
+
+what_day:
+  assistant: samantha
+  conversation: greeting
+  role: assistant
+  content_text: Do you know what day it is?
+  content_document:
+  run:
+  created_at: 2023-12-30 1:04:00
+
+dont_know_day:
+  assistant: samantha
+  conversation: greeting
+  role: assistant
+  content_text: I do not know the current day.
+  content_document:
+  run: what_day_response
+  created_at: 2023-12-30 1:05:00
+
+alive:
+  assistant: samantha
+  conversation: greeting
+  role: assistant
+  content_text: Are you alive?
+  content_document:
+  run:
+  created_at: 2023-12-30 1:06:00
+
+im_a_bot:
+  assistant: samantha
+  conversation: greeting
+  role: assistant
+  content_text: No, I'm a bot.
+  content_document:
+  run: alive_response
+  created_at: 2023-12-30 1:06:00
 
 
 # Next conversation
@@ -42,6 +82,7 @@ popstate:
   content_text: what does popstate do in javascript?
   content_document:
   run:
+  created_at: 2023-12-30 1:00:00
 
 popstate_event:
   assistant: keith_gpt4
@@ -50,6 +91,7 @@ popstate_event:
   content_text: popstate is an event in JavaScript that fires when the active history entry changes, typically due to the user navigating back or forward in their browser history.
   content_document:
   run: popstate_response
+  created_at: 2023-12-30 1:01:00
 
 
 # Next conversation
@@ -61,6 +103,7 @@ ruby_version:
   content_text: what is the latest version of ruby?
   content_document:
   run:
+  created_at: 2023-12-30 1:00:00
 
 latest_ruby_version:
   assistant: samantha
@@ -69,6 +112,7 @@ latest_ruby_version:
   content_text: The latest version of Ruby can vary, but as of my last update, it was Ruby 3.1.2. For the most current version, checking the official Ruby website or its GitHub page is recommended.
   content_document:
   run: ruby_version_response
+  created_at: 2023-12-30 1:01:00
 
 
 # Next conversation
@@ -80,6 +124,7 @@ filter_map:
   content_text: what is the syntax of filter_map ruby?
   content_document:
   run:
+  created_at: 2023-12-30 1:00:00
 
 filter_map_example:
   assistant: rob_gpt4
@@ -88,3 +133,4 @@ filter_map_example:
   content_text: array.filter_map { |item| expression if condition }
   content_document:
   run: filter_map_response
+  created_at: 2023-12-30 1:01:00

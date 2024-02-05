@@ -8,4 +8,6 @@ class Assistant < ApplicationRecord
   has_many :messages
 
   validates :tools, presence: true, allow_blank: true
+
+  scope :sorted, -> { order(:id) }
 end

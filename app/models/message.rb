@@ -1,6 +1,6 @@
 class Message < ApplicationRecord
   belongs_to :assistant
-  belongs_to :conversation
+  belongs_to :conversation, touch: true
   belongs_to :content_document, class_name: "Document", optional: true
   belongs_to :run, optional: true
 
@@ -16,6 +16,8 @@ class Message < ApplicationRecord
   validate :validate_conversation_user, if: -> { conversation.present? && Current.user }
 
   after_create_commit :broadcast_message
+
+  scope :sorted, -> { order(:created_at) }
 
 
   private
