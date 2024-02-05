@@ -2,3 +2,18 @@ greeting:
   user: keith
   assistant: samantha
   title: Meeting Samantha
+
+javascript:
+  user: keith
+  assistant: keith_gpt4
+  title: Javascript popstate
+
+ruby_version:
+  user: keith
+  assistant: samantha
+  title: Ruby version
+
+debugging:
+  user: rob
+  assistant: rob_gpt4
+  title: Verifying Ruby syntax

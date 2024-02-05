@@ -5,3 +5,19 @@ samantha:
   description: My personal assistant
   instructions: You are a helpful assistant
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+
+keith_gpt4:
+  user: keith
+  model: gpt-4
+  name: GPT-4
+  description: OpenAI's GPT-4
+  instructions:
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+
+rob_gpt4:
+  user: rob
+  model: gpt-4
+  name: GPT-4
+  description: OpenAI's GPT-4
+  instructions:
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]

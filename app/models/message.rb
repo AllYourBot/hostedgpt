@@ -13,6 +13,7 @@ class Message < ApplicationRecord
 
   validates :content_text, :role, presence: true
   validates :run, presence: true, if: -> { assistant? }
+  validate :validate_conversation_user, if: -> { conversation.present? && Current.user }
 
   after_create_commit :broadcast_message
 
@@ -25,6 +26,10 @@ class Message < ApplicationRecord
 
   def set_default_role
     self.role ||= :user
+  end
+
+  def validate_conversation_user
+    errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
   end
 
   def broadcast_message

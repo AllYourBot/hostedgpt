@@ -41,11 +41,17 @@ class AssistantTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted upon destroy" do
-    assert_difference "Conversation.count", -1 do
-      assert_difference "Document.count", -2 do
-        assert_difference "Run.count", -2 do
-          assert_difference "Step.count", -2 do
-            assistants(:samantha).destroy
+    assistant = assistants(:samantha)
+    conversation_count = assistant.conversations.count * -1
+    document_count = assistant.documents.count * -1
+    run_count = assistant.runs.count * -1
+    step_count = assistant.steps.count * -1
+
+    assert_difference "Conversation.count", conversation_count do
+      assert_difference "Document.count", document_count do
+        assert_difference "Run.count", run_count do
+          assert_difference "Step.count", step_count do
+            assistant.destroy
           end
         end
       end
