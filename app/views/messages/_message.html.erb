@@ -6,7 +6,8 @@
 
 <div
   id="<%= dom_id message %>"
-  class="message ml-9 sm:ml-3 md:ml-8 mb-5 group"
+  class="ml-9 sm:ml-3 md:ml-8 mb-5 group"
+  data-role="message"
   data-controller="conversation-message"
   data-conversation-message-scroll-into-view-value="<%= scroll_into_view.nil? ? last_message : scroll_into_view %>"
   >
@@ -17,11 +18,11 @@
 
     <!-- Right Column -->
     <div class="flex-1 min-w-0 ml-3 mr-8 text-black dark:text-zinc-200 text-base">
-      <div class="role mt-1 font-semibold">
+      <div class="mt-1 font-semibold" data-role="role">
         <%= message.user? ? 'You' : message.conversation.assistant.name %>
       </div>
 
-      <div class="content_text text-zinc-700 dark:text-white">
+      <div class="text-zinc-700 dark:text-white" data-role="content_text">
         <%= message.content_text %>
       </div>
 

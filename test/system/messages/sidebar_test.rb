@@ -120,9 +120,9 @@ class MessagesSidebarTest < ApplicationSystemTestCase
     assert_current_path new_assistant_message_path(assistant1)
 
     assistant2 = @user.assistants.sorted.second
-    second_assistant_container = all("#assistants .assistant", visible: :false)[1]
+    second_assistant_container = all("#assistants [data-role='assistant']", visible: :false)[1]
     second_assistant_container.hover
-    pencil_on_second_assistant = all("#assistants a.pencil", visible: :false)[1]
+    pencil_on_second_assistant = all("#assistants a[data-role='pencil']", visible: :false)[1]
     assert_shows_tooltip pencil_on_second_assistant, "New"
     pencil_on_second_assistant.click
     assert_current_path new_assistant_message_path(assistant2)
@@ -136,6 +136,6 @@ class MessagesSidebarTest < ApplicationSystemTestCase
   end
 
   def assert_first_message(message)
-    assert_selector "#messages > :first-child .content_text", text: message.content_text
+    assert_selector "#messages > :first-child [data-role='content_text']", text: message.content_text
   end
 end

@@ -2,7 +2,7 @@
 <% selected = assistant == @assistant %>
 <% first = assistant_counter == 0 %>
 
-<div class="assistant
+<div class="
             <%= first && 'sticky top-4 z-10' %>
             flex justify-between items-center
             mb-1 p-1 pl-2 pr-2 mr-5
@@ -11,11 +11,12 @@
             text-sm rounded-lg
             <%= selected && 'relationship' %>
           "
+    data-role="assistant"
     data-radio-behavior-target="radio"
     data-action="radio-changed@window->radio-behavior#select"
     data-radio-behavior-id-param="<%= assistant.id %>"
 >
-  <%= link_to new_assistant_message_path(assistant), class: "name flex-1 flex items-center text-white truncate" do %>
+  <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-white truncate", data: { role: "name" } do %>
     <div id="profile" class="mr-2 w-7 h-7 bg-white rounded-full"></div>
     <%= assistant.name %>
   <% end %>
@@ -40,7 +41,7 @@
       </div>
     <% end %>
 
-    <%= link_to new_assistant_message_path(assistant), class: "pencil inline-flex" do %>
+    <%= link_to new_assistant_message_path(assistant), class: "inline-flex", data: { role: "pencil" } do %>
       <%= icon "pencil-square",
         variant: :micro,
         size: 18,
