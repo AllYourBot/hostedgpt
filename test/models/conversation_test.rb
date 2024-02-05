@@ -31,9 +31,14 @@ class ConversationTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted upon destroy" do
-    assert_difference "Message.count", -4 do
-      assert_difference "Run.count", -2 do
-        assert_difference "Step.count", -2 do
+    conversation = conversations(:greeting)
+    message_count = conversation.messages.count * -1
+    run_count = conversation.runs.count * -1
+    step_count = conversation.steps.count * -1
+
+    assert_difference "Message.count", message_count do
+      assert_difference "Run.count", run_count do
+        assert_difference "Step.count", step_count do
           conversations(:greeting).destroy
         end
       end
