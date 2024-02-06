@@ -3,7 +3,7 @@
                       w-[260px]
                       flex-none
                       flex flex-col
-                      border-t border-gray-200/50 text-white 
+                      border-t border-gray-200/50 text-white
                       pt-2 pb-4 pl-3 pr-5
                       bg-black
                       "
@@ -12,7 +12,7 @@
      >
 
     <a href="#"
-       data-action="click->click-toggle#toggleClasses:prevent"
+       data-action="click->click-toggle#toggleClass:prevent"
        class="flex justfiy-left gap-2 rounded-lg text-white text-sm hover:bg-[#28282b] p-2">
       <%= icon "cog" , size: 20 %>
       Settings
@@ -25,12 +25,12 @@
 
   <div data-click-toggle-target="destination" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-[rgba(0,0,0,0.5)] flex justify-center items-center"
-         data-action="click->click-toggle#toggleClasses:self"
+         data-action="click->click-toggle#toggleClass:self"
     >
     <div class="bg-[#343541] w-[400px] text-gray-200 p-6 rounded shadow-lg flex flex-col gap-4">
       <div class="flex justify-between items-baseline">
         <h2 class="text-2xl font-bold">Settings</h2>
-        <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click->click-toggle#toggleClasses">
+        <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click->click-toggle#toggleClass">
           &times;
         </button>
       </div>
@@ -41,7 +41,7 @@
           url: user_path(Current.user),
           id: "settingsForm",
           class: "contents",
-          data: { action: "ajax:success->click-toggle#toggleClasses"}
+          data: { action: "ajax:success->click-toggle#toggleClass"}
         ) do |form| %>
           <div>
             <%= form.label :openai_key, "OpenAI API Key:", class: "block text-gray-300 font-medium" %>
@@ -56,7 +56,7 @@
             <%= form.text_field :last_name, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
           </div>
           <div class="flex justify-between">
-            <button class="text-gray-300 border rounded px-4 py-2" data-action="click-toggle#toggleClasses">Cancel</button>
+            <button class="text-gray-300 border rounded px-4 py-2" data-action="click-toggle#toggleClass">Cancel</button>
             <%= form.submit "Save", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-grey-500 cursor-pointer" %>
           </div>
         <% end %>
