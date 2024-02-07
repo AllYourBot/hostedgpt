@@ -2,15 +2,15 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
 
-  // connect() {
-  //   document.addEventListener('turbo:before-fetch-request', this.beforeFetchRequest)
-  //   window.addEventListener("popstate", this.popState)
-  // }
+  connect() {
+    document.addEventListener('turbo:before-fetch-request', this.beforeFetchRequest)
+    window.addEventListener("popstate", this.popState)
+  }
 
-  // disconnect() {
-  //   document.removeEventListener('turbo:before-fetch-request', this.beforeFetchRequest)
-  //   window.removeEventListener("popstate", this.popState)
-  // }
+  disconnect() {
+    document.removeEventListener('turbo:before-fetch-request', this.beforeFetchRequest)
+    window.removeEventListener("popstate", this.popState)
+  }
 
   beforeFetchRequest(event) {
     // Solution from: https://github.com/hotwired/turbo/issues/792
@@ -22,9 +22,10 @@ export default class extends Controller {
     // This "fixes" history state for turbo frames, but it doesn't use the Turbo page cache.
     // This simply means that going back will cuase a new server request, but that's okay for our
     // purposes.
-    let fetchTargetingFrame = (event.detail.fetchOptions.headers['Turbo-Frame'] != undefined)
+    let getFetchTargetingFrame =  (event.detail.fetchOptions.headers['Turbo-Frame'] != undefined) &&
+                                  (event.detail.fetchOptions.method == "get")
 
-    if (fetchTargetingFrame) {
+    if (getFetchTargetingFrame) {
       Turbo.cache.exemptPageFromPreview()
       history.replaceState({page: document.title, refresh_on_back: true}, '', window.location.pathname);
       history.pushState({page: 'new title', refresh_on_back: true}, '', event.detail.url.pathname) // not sure how to get page title
