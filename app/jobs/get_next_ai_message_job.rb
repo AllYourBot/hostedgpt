@@ -20,7 +20,6 @@ class GetNextAiMessageJob < ApplicationJob
     )
 
     @new_message.save!
-    @conversation.broadcast_refresh
     puts "Finished GetNextAiMessageJob.perform(#{conversation_id})"
 
   rescue => e
