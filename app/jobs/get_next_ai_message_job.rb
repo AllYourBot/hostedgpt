@@ -3,7 +3,7 @@ class GetNextAiMessageJob < ApplicationJob
     puts "GetNextAiMessageJob.perform(#{conversation_id})"
 
     @conversation = Conversation.find conversation_id
-    messages = @conversation.messages.order(:id).map(&:for_openai)
+    messages = @conversation.messages.sorted.map(&:for_openai)
     @new_message = @conversation.messages.create! role: :assistant, content_text: "", assistant: @conversation.assistant
     @new_message.broadcast_append_to @conversation
 

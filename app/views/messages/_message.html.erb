@@ -22,6 +22,7 @@
         <%= message.user? ? 'You' : message.conversation.assistant.name %>
       </div>
 
+      <%# This div needs to be tightly wrapped around the content_text output because the whitespace formatting is important. %>
       <div class="text-zinc-700 dark:text-white whitespace-pre-wrap" data-role="content_text"><%= message.content_text %></div>
 
       <div class="mt-2 flex justify-start gap-2 text-zinc-500 dark:text-zinc-400 invisible group-hover:visible">
