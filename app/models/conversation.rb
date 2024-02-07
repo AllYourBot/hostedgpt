@@ -6,7 +6,7 @@ class Conversation < ApplicationRecord
   has_many :runs, dependent: :destroy
   has_many :steps, dependent: :destroy
 
-  after_create_commit :set_title_async, if: -> { title.blank? }
+  after_create_commit :set_title_async, if: -> { title.blank? && messages.count >= 1 }
 
   scope :sorted, -> { order(updated_at: :desc) }
 
@@ -58,6 +58,6 @@ class Conversation < ApplicationRecord
   private
 
   def set_title_async
-    AutotitleConversationJob.perform_later(id)
+    AutotitleConversationJob.set(wait: 2.seconds).perform_later(id) # it's more important to let the queue prioritize the message response so we delay this a bit
   end
 end

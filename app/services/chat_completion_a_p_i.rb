@@ -43,7 +43,7 @@ class ChatCompletionAPI
     verify_params!(params)
     verify_token_count!(params)
 
-    response = formatted_api_response
+    response = formatted_api_response(params)
 
     if params[:response_format]&.dig(:type) == "json_object"
       JSON.parse(response)
@@ -52,7 +52,7 @@ class ChatCompletionAPI
     end
   end
 
-  def self.formatted_api_response
+  def self.formatted_api_response(params)
     if Rails.env.test?
       raise "In your test you need to wrap with: ChatCompletionAPI.stub :formatted_api_response, 'value' do; end"
     end
