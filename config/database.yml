@@ -17,6 +17,9 @@ default: &default
   encoding: unicode
   host: localhost
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+<% if RUBY_PLATFORM =~ /darwin/ %>
+  gssencmode: disable
+<% end %>
 
 development:
   <<: *default
