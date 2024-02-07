@@ -5,6 +5,7 @@ samantha:
   description: My personal assistant
   instructions: You are a helpful assistant
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+  images: true
 
 keith_gpt4:
   user: keith
@@ -13,6 +14,7 @@ keith_gpt4:
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+  images: true
 
 rob_gpt4:
   user: rob
@@ -21,3 +23,4 @@ rob_gpt4:
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+  images: true
