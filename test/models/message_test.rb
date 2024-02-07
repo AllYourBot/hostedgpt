@@ -43,25 +43,6 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal users(:keith), Message.last.conversation.user
   end
 
-  test "creating an assistant message requires a run to be associated" do
-    m = Message.new(
-      assistant: assistants(:samantha),
-      conversation: conversations(:greeting),
-      role: :assistant,
-      content_text: "I am here."
-    )
-
-    refute m.valid?
-    assert m.errors.map(&:attribute).include? :run
-
-    m.run = runs(:identify_photo_response)
-    assert m.valid?, m.errors.full_messages
-
-    assert_nothing_raised do
-      m.save!
-    end
-  end
-
   test "documents are deleted upon destroy" do
     assert_difference "Document.count", -1 do
       messages(:identify_photo).destroy

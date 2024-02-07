@@ -3,7 +3,7 @@ class GetNextAiMessageJob < ApplicationJob
     puts "GetNextAiMessageJob.perform(#{conversation_id})"
 
     @conversation = Conversation.find conversation_id
-    messages = @conversation.messages.order(:id).map(&:for_openai)
+    messages = @conversation.messages.sorted.map(&:for_openai)
     @new_message = @conversation.messages.create! role: :assistant, content_text: "", assistant: @conversation.assistant
     @new_message.broadcast_append_to @conversation
 
@@ -19,7 +19,7 @@ class GetNextAiMessageJob < ApplicationJob
       }
     )
 
-    @conversation.broadcast_refresh
+    @new_message.save!
     puts "Finished GetNextAiMessageJob.perform(#{conversation_id})"
 
   rescue => e
@@ -35,7 +35,6 @@ class GetNextAiMessageJob < ApplicationJob
         print new_content if Rails.env.development?
         @new_message.content_text += new_content
         @new_message.broadcast_replace_to @new_message.conversation, locals: { scroll_into_view: true }
-        @new_message.save!
       end
     rescue => e
       puts "Error in response handler: #{e.inspect}"
