@@ -4,7 +4,7 @@ class AutotitleConversationJob < ApplicationJob
   queue_as :default
   retry_on ConverstionNotReady
 
-  def perform(conversation_id, retry_count: 0)
+  def perform(conversation_id)
     conversation = Conversation.find(conversation_id)
     Current.user = conversation.user
 
