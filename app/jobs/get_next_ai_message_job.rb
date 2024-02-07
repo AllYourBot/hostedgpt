@@ -19,6 +19,7 @@ class GetNextAiMessageJob < ApplicationJob
       }
     )
 
+    @new_message.save!
     @conversation.broadcast_refresh
     puts "Finished GetNextAiMessageJob.perform(#{conversation_id})"
 
@@ -35,7 +36,6 @@ class GetNextAiMessageJob < ApplicationJob
         print new_content if Rails.env.development?
         @new_message.content_text += new_content
         @new_message.broadcast_replace_to @new_message.conversation, locals: { scroll_into_view: true }
-        @new_message.save!
       end
     rescue => e
       puts "Error in response handler: #{e.inspect}"
