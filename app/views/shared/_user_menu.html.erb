@@ -23,14 +23,14 @@
     <p>Logout</p>
   </a>
 
-  <div data-click-toggle-target="destination" class="fixed inset-0 z-50 hidden">
+  <div data-click-toggle-target="destination" class="fixed inset-0 z-50 <%= Current.user.openai_key && 'hidden' %>">
     <div class="absolute inset-0 bg-[rgba(0,0,0,0.5)] flex justify-center items-center"
          data-action="click->click-toggle#toggleClass:self"
     >
     <div class="bg-[#343541] w-[400px] text-gray-200 p-6 rounded shadow-lg flex flex-col gap-4">
       <div class="flex justify-between items-baseline">
         <h2 class="text-2xl font-bold">Settings</h2>
-        <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click->click-toggle#toggleClass">
+        <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click-toggle#toggleClass">
           &times;
         </button>
       </div>
