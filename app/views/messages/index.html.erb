@@ -1,5 +1,7 @@
 <%= content_for :messages_content do %>
 
+  <%= turbo_stream_from @conversation %>
+
   <div class="min-w-full">
     <turbo-frame id="messages">
       <%= render @messages %>
