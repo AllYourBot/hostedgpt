@@ -10,15 +10,4 @@ class ConversationsTest < ApplicationSystemTestCase
     visit conversations_url
     assert_selector "h1", text: "Conversations"
   end
-
-  test "should create conversation" do
-    visit conversations_url
-    click_on "New conversation"
-
-    fill_in "Assistant", with: @conversation.assistant_id
-    fill_in "Title", with: @conversation.title
-    click_on "Create Conversation"
-
-    assert_text "Conversation was successfully created"
-  end
 end

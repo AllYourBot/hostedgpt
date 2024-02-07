@@ -2,7 +2,7 @@ require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium,
-    using: :headless_chrome,
+    using: :headles_chrome,
     screen_size: [1400, 800]  # this is a short height (800 px) so the viewport scrolls so we can test some scroll interactions
 
   fixtures :all
