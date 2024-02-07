@@ -1,11 +1,16 @@
+class ConverstionNotReady < StandardError; end
+
 class AutotitleConversationJob < ApplicationJob
   queue_as :default
+  retry_on ConverstionNotReady
 
-  def perform(conversation_id)
+  def perform(conversation_id, retry_count: 0)
     conversation = Conversation.find(conversation_id)
     Current.user = conversation.user
 
     message = conversation.messages.sorted.first
+    raise ConverstionNotReady  if message.nil?
+
     new_title = generate_title_for(message.content_text)
     conversation.update!(title: new_title)
   end
