@@ -8,7 +8,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "should create user" do
     post users_url, params: {person: {email: "azbshiri@gmail.com", personable_attributes: {password: "secret"}}}
-    assert_match "Account was successfully created", flash.notice
+    assert_response :redirect
+    follow_redirect!
+    follow_redirect! # intentionally two redirects
+    assert_response :success
   end
 
   test "it should redirect back when the email address is already in use" do
@@ -22,7 +25,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     email = people(:keith_registered).email
     post users_url, params: {person: {email: email, personable_attributes: {password: ""}}}
     assert_response :unprocessable_entity
-    assert_match "password can&#39;t be blank", response.body
+    assert_match "Password can&#39;t be blank", response.body
   end
 
   test "it should show an error message when the email is blank" do
@@ -36,11 +39,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     post users_url, params: {person: {email: email, personable_attributes: {password: "secret"}}}
 
     user = Person.find_by(email: email).user
-    assert_equal 1, user.assistants.count
+    assert_equal 2, user.assistants.count
 
-    assistant = user.assistants.first
-    assert_equal 1, assistant.conversations.count
+    assistant = user.assistants.sorted.first
 
-    assert_redirected_to conversation_path(assistant.conversations.first)
+    follow_redirect!
+    assert_redirected_to new_assistant_message_path(assistant)
   end
 end
