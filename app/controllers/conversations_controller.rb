@@ -7,12 +7,6 @@ class ConversationsController < ApplicationController
     @conversations = Current.user.conversations
   end
 
-  def show
-    @conversation = Current.user.conversations.includes(:messages).find(params[:id])
-    set_sidebar_assistants
-    @new_message = @conversation.messages.new
-  end
-
   def edit
   end
 
