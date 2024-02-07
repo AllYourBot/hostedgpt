@@ -3,7 +3,7 @@ require "application_system_test_case"
 class MessagesComposerTest < ApplicationSystemTestCase
   setup do
     login_as users(:keith)
-    @submit = find("#composer #submit")
+    @submit = find("#composer #send") # oddly, when I changed id="submit" on the button the form fails to submit
     @input_selector = "#composer textarea"
     @input = find(@input_selector)
   end
