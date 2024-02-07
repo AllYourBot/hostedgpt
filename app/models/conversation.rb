@@ -6,7 +6,7 @@ class Conversation < ApplicationRecord
   has_many :runs, dependent: :destroy
   has_many :steps, dependent: :destroy
 
-  after_create_commit :set_title_async, if: -> { title.blank? && messages.count >= 1 }
+  after_create_commit :set_title_async, if: -> { title.blank? }
 
   scope :sorted, -> { order(updated_at: :desc) }
 
