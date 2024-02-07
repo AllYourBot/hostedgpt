@@ -1,8 +1,9 @@
-class ConverstionNotReady < StandardError; end
 
 class AutotitleConversationJob < ApplicationJob
-  queue_as :default
+  class ConverstionNotReady < StandardError; end
   retry_on ConverstionNotReady
+
+  queue_as :default
 
   def perform(conversation_id)
     conversation = Conversation.find(conversation_id)

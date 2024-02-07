@@ -28,5 +28,4 @@ class ChatCompletionAPITest < ActiveSupport::TestCase
       assert_equal({"response"=>"yes"}, response)
     end
   end
-
 end
