@@ -24,6 +24,13 @@
 
 
 /* Parent utility classes which activate children */
+/*
+  If we supported 3rd party tailwind plugins we could stop declaring them individually:
+
+  plugin(function({ addVariant }) {
+    addVariant('relationship', '&.relationship, &.relationship *')
+  }),
+*/
 
 .relationship .relationship\:flex,
 .relationship.relationship\:flex {
@@ -43,4 +50,14 @@
 .relationship .relationship\:bg-zinc-800,
 .relationship.relationship\:bg-zinc-800 {
   @apply !bg-zinc-800
+}
+
+.relationship .relationship\:hidden,
+.relationship.relationship\:hidden {
+  @apply !hidden
+}
+
+.relationship .relationship\:pl-4,
+.relationship.relationship\:pl-4 {
+  @apply !pl-4
 }

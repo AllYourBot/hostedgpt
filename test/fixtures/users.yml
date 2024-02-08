@@ -1,7 +1,9 @@
 keith:
   password_digest: <%= BCrypt::Password.create('secret') %>
   registered_at: 2023-12-19 08:40:05
+  openai_key: abc123
 
 rob:
   password_digest: <%= BCrypt::Password.create('secret') %>
   registered_at: 2023-12-26 08:40:05
+  openai_key: abc123
