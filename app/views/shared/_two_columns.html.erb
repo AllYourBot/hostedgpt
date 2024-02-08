@@ -114,8 +114,8 @@
             <% end %>
           </div>
 
-          <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
-            <div id="attach-button" class="absolute left-9 bottom-6 w-[23px] h-[23px]">
+          <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>">
+            <div id="attach-button" class="absolute left-9 bottom-6 w-[23px] h-[23px] relationship:hidden">
               <%= icon "paper-clip", variant: :mini, size: 23, class: 'cursor-pointer text-zinc-600 hover:text-zinc-900 stroke-2 dark:text-gray-300 dark:hover:text-white', title: 'Attach', tooltip: :top %>
             </div>
 
@@ -139,7 +139,7 @@
                 class: %|
                   w-full pt-[14px] pb-[13px] min-h-14
                   mb-2 block
-                  pl-14 pr-12
+                  pl-14 pr-12 relationship:pl-4
                   bg-transparent
                   text-black placeholder-zinc-500 dark:text-gray-200
                   text-md

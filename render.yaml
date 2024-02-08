@@ -1,5 +1,5 @@
 databases:
-  - name: hostedgpt
+  - name: hostedgpt-postgres
     databaseName: hostedgpt
     user: hostedgpt
     plan: free
@@ -18,10 +18,18 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: hostedgpt
+          name: hostedgpt-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: hostedgpt-redis
           property: connectionString
       - fromGroup: hostedgpt-secrets
       - key: RUN_SOLID_QUEUE_IN_PUMA
         value: true
       - key: WEB_CONCURRENCY
         value: 2 # sensible default
+  - type: redis
+    name: hostedgpt-redis
+    ipAllowList: [] # no external connections

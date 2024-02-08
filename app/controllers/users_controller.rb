@@ -11,20 +11,14 @@ class UsersController < ApplicationController
     @person.personable_type = "User"
     @person.update person_params
 
-    respond_to do |format|
-      if @person.save
-        reset_session
-        login_as @person.user
+    if @person.save
+      reset_session
+      login_as @person.user
 
-        format.html {
-          redirect_to conversation_path(@person.personable.conversations.first), notice: "Account was successfully created."
-        }
-        format.json { render :show, status: :created, location: @person.personable.conversations.first }
-      else
-        @person.errors.delete :personable
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
-      end
+      redirect_to root_path
+    else
+      @person.errors.delete :personable
+      render :new, status: :unprocessable_entity
     end
   end
 
