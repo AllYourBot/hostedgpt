@@ -1,9 +1,41 @@
-<!-- finish this view when we implement editing of a message -->
+<!-- saving this scaffold view just because we'll implement editing messages soon -->
 
 <div class="mx-auto md:w-2/3 w-full">
   <h1 class="font-bold text-4xl">Editing message</h1>
 
-  <%= render "edit_form", message: @message %>
+  <%= form_with(model: message, class: "contents") do |form| %>
+  <% if message.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(message.errors.count, "error") %> prohibited this message from being saved:</h2>
+
+      <ul>
+        <% message.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :conversation_id, "Conversation ID" %>
+    <%= form.text_field :conversation_id, value: Conversation.first.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :role %>
+    <%= form.text_field :role, value: "user", class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :content_text, "Text" %>
+    <%= form.text_field :content_text, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>
+
 
   <%= link_to "Show this message", @message, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
   <%= link_to "Back to messages", conversation_messages_path(@message.conversation), class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
