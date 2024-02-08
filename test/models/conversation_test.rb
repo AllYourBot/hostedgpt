@@ -59,6 +59,7 @@ class ConversationTest < ActiveSupport::TestCase
 
       # Create 3 conversations in each of these intervals
       [
+        Date.today,
         1.week.ago,
         1.month.ago,
         1.year.ago
@@ -76,7 +77,7 @@ class ConversationTest < ActiveSupport::TestCase
       grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user)
 
       # Creating a user automatically creates a conversation
-      assert_equal 1, grouped_conversations["Today"].count
+      assert_equal 3, grouped_conversations["Today"].count
       assert_equal 3, grouped_conversations["This Week"].count
       assert_equal 3, grouped_conversations["This Month"].count
       assert_equal 3, grouped_conversations["Older"].count
