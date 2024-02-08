@@ -10,6 +10,7 @@ class Conversation < ApplicationRecord
 
   scope :sorted, -> { order(updated_at: :desc) }
 
+  broadcasts_refreshes
 
   # Builds a hash of date interval keys and queries which fetch the records for that internal.
   #

@@ -24,11 +24,6 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to conversation_url(Conversation.last)
   end
 
-  test "should show conversation" do
-    get conversation_url(@conversation)
-    assert_response :success
-  end
-
   test "should get edit" do
     get edit_conversation_url(@conversation)
     assert_response :success

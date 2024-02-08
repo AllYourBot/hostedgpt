@@ -88,4 +88,4 @@ end
 
 gem "ruby-openai", "~> 6.3"
 gem "tiktoken_ruby", "~> 0.0.6"
-gem "solid_queue", "~> 0.1.2"
+gem "solid_queue", "~> 0.2.1"
