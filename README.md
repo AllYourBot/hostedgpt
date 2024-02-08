@@ -12,7 +12,7 @@ HostedGPT is an open source project that provides all the same functionality as 
 * **Don't commit yourself to $20 per month when you may not use ChatGPT a lot. You only pay as much as you use!**
 * **You will never hit the 'You've reached the current usage cap for GPT-4'.** You pay per mesage based on the API rates so you can keep using it as much as you want.
 
-## Get Started
+## Set Up Live App
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login
@@ -20,9 +20,31 @@ HostedGPT is an open source project that provides all the same functionality as 
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
-4. Find hostedgpt in the list of repositories and click **Connect**
-5. Provide a unique Blueprint name such as "hostedgpt-<yourname>".
+4. Find hostedgpt in the list of repositories and click **Connect**. If you don't see an option to connect then skip this step, sometimes it's automatic.
+5. In Blueprint Name, type anything such as "hostedgpt-<yourname>"
 6. Click **Apply**
-7. Wait for the hostedgpt database and web service to be deployed. After they are, click "Dashboard" at the top of the Render screen.
-8. You should see two "Service Names" called **hostedgpt**, click the one that is of type "Web Service"
+7. Wait for the hostedgpt database and web service to be deployed. After they are, click **Dashboard** at the top of the Render screen. If an error occurs, skip to Troubleshooting below.
+8. You should see two "Service Names" called "hostedgpt-..." (the name you picked), click the one that is of type **Web Service**
 9. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
+
+## Troubleshooting Render
+
+1. If you encountered an eerror while waiting for the services to be deployed on Render, click **Dashboard** at the top of the Render screen and click the Service that failed.
+2. It should take you to the Events section and the top event should explain the error. It will probably contain a link to click to the **deploy logs**
+3. Scroll back up through the logs and find any instances of errors. [Open a new Issue for us](https://github.com/hostedgpt/hostedgpt/issues/new) and share this.
+
+# Contributing
+
+We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.8. [View 0.8 Milestone](https://github.com/hostedgpt/hostedgpt/milestone/3). Look for any issues tagged with **Good first issue**.
+
+## Setting up Development
+
+1. Use the same GitHub fork you created when you "Set Up Live App" or create a new one: Click Fork > Create New Fork
+2. On your newly created fork page, click the green Code button and copy the URL to the clipboard
+3. On your machine (e.g. these instructions are for Mac) run the usual `git clone [url you copied]`
+4. `cd ` into that directory and `cat .tool-versions` to see what version of ruby the project is using. Check your local ruby version (`ruby --version`) and install the version the project is using.
+5. `psql --version` to ensure you have postgres installed and running. Any version 16.x should work.
+6. `bundle install`
+7. `bin/rails db:setup`  < Note: This will load the sample fixture data into your database
+8. `bin/rails dev`  < Starts up all the services
+9. Point your browser to `localhost:3000` and register as a new user
