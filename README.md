@@ -14,24 +14,29 @@ HostedGPT is an open source project that provides all the same functionality as 
 
 ## Set Up Live App
 
+You can deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working. You will need to upgrade to a paid version of the database which is $7 / month.
+
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login
 3. View your newly created fork within github.com and click the button below:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
-4. Find hostedgpt in the list of repositories and click **Connect**. If you don't see an option to connect then skip this step, sometimes it's automatic.
-5. In Blueprint Name, type anything such as "hostedgpt-<yourname>"
-6. Click **Apply**
-7. Wait for the hostedgpt database and web service to be deployed. After they are, click **Dashboard** at the top of the Render screen. If an error occurs, skip to Troubleshooting below.
-8. You should see two "Service Names" called "hostedgpt-..." (the name you picked), click the one that is of type **Web Service**
-9. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
+4. In Blueprint Name, type anything such as "hostedgpt-<yourname>"
+5. Click **Apply**
+6. Wait for the hostedgpt database and web service to be deployed. The first deploy takes a good 5 minutes so be patient. After they are all deployed, click **Dashboard** at the top of the Render screen. Or if an error occurs, skip to Troubleshooting Render below.
+7. You should see two "Service Names" called "hostedgpt-..." (the name you picked), click the one that is of type **Web Service**
+8. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
 
 ## Troubleshooting Render
 
 1. If you encountered an eerror while waiting for the services to be deployed on Render, click **Dashboard** at the top of the Render screen and click the Service that failed.
 2. It should take you to the Events section and the top event should explain the error. It will probably contain a link to click to the **deploy logs**
-3. Scroll back up through the logs and find any instances of errors. [Open a new Issue for us](https://github.com/hostedgpt/hostedgpt/issues/new) and share this.
+3. Scroll back up through the logs and find any instances of errors. [Open a new Issue for us](https://github.com/hostedgpt/hostedgpt/issues/new) and share details.
+4. When you are ready to try Render again, it's best to do the following:
+5. First, ensure your repo is caught up. Open your fork in github, click the Sync Fork button so that any bug fixes are pulled in.
+6. Second, in Render navigate to the Dashboard, Bluebrint, and Env Groups and delete any details associated with **hostedgpt**
+7. Now you can go back to your repo and click **Deploy to Render**
 
 # Contributing
 
