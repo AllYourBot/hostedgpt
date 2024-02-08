@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import debounce from "../utils/debounce.js"
+import debounce from "utils/debounce"
 
 export default class extends Controller {
   static classes = [ "top", "notTop", "bottom", "notBottom" ]
