@@ -22,13 +22,14 @@ class AutotitleConversationJob < ApplicationJob
 
   def generate_title_for(text)
     json_response = ChatCompletionAPI.get_next_response(system_message, [text], response_format: {type: 'json_object'})
-    json_response['topic'].capitalize
+    json_response['topic']
   end
 
   def system_message
     <<~END
       You extract a 2-4 word topic from text. I will give the text of a chat. You reply with the topic of this chat,
-      but summarize the topic in 2-4 words.
+      but summarize the topic in 2-4 words. Even though it's not a complete sentence, capitalize the first letter of
+      the first word unless it's some odd anomaly like "iPhone".
 
       Example:
       ```
