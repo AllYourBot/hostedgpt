@@ -23,7 +23,7 @@
     <p>Logout</p>
   </a>
 
-  <div data-click-toggle-target="destination" class="fixed inset-0 z-50 <%= Current.user.openai_key && 'hidden' %>">
+  <div data-click-toggle-target="destination" class="fixed inset-0 z-50 <%= Current.user.openai_key.present? && 'hidden' %>">
     <div class="absolute inset-0 bg-[rgba(0,0,0,0.5)] flex justify-center items-center"
          data-action="click->click-toggle#toggleClass:self"
     >
