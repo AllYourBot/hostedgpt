@@ -51,6 +51,8 @@ end
 module ActiveSupport
   class TestCase
     include Turbo::Broadcastable::TestHelper
+    include ActiveJob::TestHelper
+
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 

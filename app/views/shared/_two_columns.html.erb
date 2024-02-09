@@ -150,11 +150,19 @@
               %>
 
               <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
-                <%= form.button data: { new_message_target: "submit" }, disabled: true, id: "send", class: %w|
+                <%= form.button type: "button",
+                  data: {
+                    new_message_target: "submit",
+                    action: "new-message#submitForm"
+                  },
+                  id: "send",
+                  disabled: true,
+                  class: %w|
                     text-gray-300 dark:text-zinc-600
                     enabled:text-gray-800 enabled:hover:text-black
                     enabled:dark:text-gray-300 enabled:dark:hover:text-white
-                  | do %>
+                  | do
+                %>
                   <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
                 <% end %>
               </div>

@@ -2,7 +2,8 @@ require "application_system_test_case"
 
 class MessagesComposerTest < ApplicationSystemTestCase
   setup do
-    login_as users(:keith)
+    @user = users(:keith)
+    login_as @user
     @submit = find("#composer #send") # oddly, when I changed id="submit" on the button the form fails to submit
     @input_selector = "#composer textarea"
     @input = find(@input_selector)
@@ -39,7 +40,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "Entered text so we can now submit"
     refute @submit.disabled?
     @submit.click
-    # assert_not_equal path, current_path
+    assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
   end
 
   test "enter works to submit but only when text has been entered" do
@@ -52,7 +53,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "Entered text so we can now submit"
     refute @submit.disabled?
     send_keys "enter"
-    assert_not_equal path, current_path, "Path should have changed because form should have submitted"
+    assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
   end
 
   test "shift+enter inserts a newline and then enter submits" do
@@ -65,6 +66,6 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
     send_keys "enter"
-    assert_not_equal path, current_path, "Path should have changed because form should have submitted"
+    assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
   end
 end

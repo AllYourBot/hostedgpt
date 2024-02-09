@@ -9,7 +9,7 @@
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
 >
 
-  <%= link_to conversation.title || "[Untitled]",
+  <%= link_to conversation.title || "New chat",
     conversation_messages_path(conversation),
     class: "flex-1 pl-2 py-2 text-white truncate text-sm text-opacity-80 w-5 radio-behavior",
     data: { action: "radio-behavior#select" }
