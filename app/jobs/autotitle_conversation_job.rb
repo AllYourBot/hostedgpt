@@ -10,7 +10,7 @@ class AutotitleConversationJob < ApplicationJob
     conversation = Conversation.find(conversation_id)
     Current.user = conversation.user
 
-    messages = conversation.messages.sorted.limit(2)
+    messages = conversation.messages.sorted.limit(4)
     raise ConverstionNotReady  if messages.empty?
 
     new_title = generate_title_for(messages.map(&:content_text).join("\n"))
@@ -22,7 +22,7 @@ class AutotitleConversationJob < ApplicationJob
 
   def generate_title_for(text)
     json_response = ChatCompletionAPI.get_next_response(system_message, [text], response_format: {type: 'json_object'})
-    json_response['topic']
+    json_response['topic'].capitalize
   end
 
   def system_message
