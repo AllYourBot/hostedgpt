@@ -103,7 +103,7 @@
 
         <div id="right-footer" class="flex-none flex flex-col relative">
           <div id="scroll-button" class="text-center absolute -top-14 left-1/2 transform -translate-x-1/2 hidden" data-scrollable-target="widget">
-            <%= link_to "#",
+            <%= button_tag type: "button",
                   data: {
                     tip: "Scroll down",
                     action: "scrollable#scrollToBottom"
