@@ -9,16 +9,17 @@
                       "
      data-controller="click-toggle"
      data-click-toggle-flippable-class="hidden"
-     >
+>
 
-    <a href="#"
-       data-action="click-toggle#toggleClass:prevent"
-       class="flex justfiy-left gap-2 rounded-lg text-white text-sm hover:bg-[#28282b] p-2">
-      <%= icon "cog" , size: 20 %>
-      Settings
-    </a>
+  <%= button_tag type: "button",
+        data: { action: "click-toggle#toggleClass" },
+        class: "flex justfiy-left gap-2 rounded-lg text-white text-sm hover:bg-[#28282b] p-2" do
+  %>
+    <%= icon "cog" , size: 20 %>
+    Settings
+  <% end %>
 
-    <a href="/logout" class="flex justify-left gap-2 hover:bg-[#28282b] rounded-lg text-white text-sm p-2">
+  <a href="/logout" class="flex justify-left gap-2 hover:bg-[#28282b] rounded-lg text-white text-sm p-2">
     <%= icon "arrow-right-start-on-rectangle", size: 20 %>
     <p>Logout</p>
   </a>
