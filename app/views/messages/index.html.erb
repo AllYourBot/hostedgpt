@@ -3,9 +3,7 @@
   <%= turbo_stream_from @conversation %>
 
   <div class="min-w-full">
-    <turbo-frame id="messages">
-      <%= render @messages %>
-    </turbo-frame>
+    <%= render @messages %>
   </div>
 
 <% end %>
