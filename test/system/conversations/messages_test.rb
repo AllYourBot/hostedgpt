@@ -35,8 +35,8 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     scroll_to all("#conversation [data-role='message']").first
     assert_visible "#scroll-button", wait: 0.2
 
-    find("#scroll-button a").click
-    assert_hidden "#scroll-button", wait: 0.2
+    find("#scroll-button button").click
+    assert_hidden "#scroll-button", wait: 0.5
   end
 
   test "clicking new compose icon in the top-right starts a new conversation" do
