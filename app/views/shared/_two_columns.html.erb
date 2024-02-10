@@ -119,7 +119,7 @@
               <%= icon "paper-clip", variant: :mini, size: 23, class: 'cursor-pointer text-zinc-600 hover:text-zinc-900 stroke-2 dark:text-gray-300 dark:hover:text-white', title: 'Attach', tooltip: :top %>
             </div>
 
-            <%= form_with(model: [@assistant, @new_message], data: { controller: 'new-message' }) do |form| %>
+            <%= form_with(model: [@assistant, @new_message], data: { controller: "new-message", turbo_frame: "_top" }) do |form| %>
               <%= form.hidden_field :conversation_id %>
               <%= form.text_area :content_text,
                 data: {
