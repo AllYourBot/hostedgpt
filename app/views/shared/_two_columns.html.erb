@@ -1,5 +1,5 @@
 <div class="flex h-screen"
-    data-controller="click-toggle turbo-frame-history"
+    data-controller="click-toggle"
     data-click-toggle-flippable-class="!hidden"
 >
 
@@ -41,6 +41,7 @@
   <div id="right-column" class="flex flex-1 h-screen bg-white dark:bg-graphite">
     <turbo-frame  id="conversation"
                   class="flex flex-1 flex-col relative"
+                  data-turbo-action="advance"
     >
       <div  id="handle-container"
             class="absolute left-0 top-1/2 w-8 h-20 -mt-10 z-20 hidden md:flex"
