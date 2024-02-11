@@ -40,7 +40,10 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "Entered text so we can now submit"
     refute @submit.disabled?
     @submit.click
+    sleep 0.3
+
     assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
+    assert @input.value.blank?
   end
 
   test "enter works to submit but only when text has been entered" do
@@ -53,7 +56,10 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "Entered text so we can now submit"
     refute @submit.disabled?
     send_keys "enter"
+    sleep 0.3
+
     assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
+    assert @input.value.blank?
   end
 
   test "shift+enter inserts a newline and then enter submits" do
@@ -66,6 +72,49 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
     send_keys "enter"
+    sleep 0.3
+
     assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
+    assert @input.value.blank?
+  end
+
+  test "submitting a couple messages to an existing conversation with ENTER works" do
+    click_on conversations(:greeting).title
+    sleep 0.3
+    path = current_path
+
+    send_keys "This is a message"
+    send_keys "enter"
+    sleep 0.3
+
+    assert_equal path, current_path, "The page should not have changed urls"
+    assert @input.value.blank?, "The composer should have cleared itself"
+
+    send_keys "This is a second message"
+    send_keys "enter"
+    sleep 0.3
+
+    assert_equal path, current_path, "The page should not have changed urls"
+    assert @input.value.blank?, "The composer should have cleared itself"
+  end
+
+  test "submitting a couple messages to an existing conversation with CLICKING works" do
+    click_on conversations(:greeting).title
+    sleep 0.3
+    path = current_path
+
+    send_keys "This is a message"
+    @submit.click
+    sleep 0.3
+
+    assert_equal path, current_path, "The page should not have changed urls"
+    assert @input.value.blank?, "The composer should have cleared itself"
+
+    send_keys "This is a second message"
+    @submit.click
+    sleep 0.3
+
+    assert_equal path, current_path, "The page should not have changed urls"
+    assert @input.value.blank?, "The composer should have cleared itself"
   end
 end
