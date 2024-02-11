@@ -41,6 +41,7 @@ class Message < ApplicationRecord
   end
 
   def broadcast_message
+    puts "broadcasting!!"
     broadcast_append_to conversation, partial: "messages/message", locals: { scroll_into_view: true }
   end
 end

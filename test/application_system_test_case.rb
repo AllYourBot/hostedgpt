@@ -2,7 +2,7 @@ require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium,
-    using: :headless_chrome,
+    using: :chrome,
     screen_size: [1400, 800]  # this is a short height (800 px) so the viewport scrolls so we can test some scroll interactions
 
   fixtures :all
@@ -14,7 +14,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_current_path login_path, wait: 2
     fill_in "email", with: user.person.email
     fill_in "password", with: password
-    click_on "Continue"
+    click_text "Continue"
     assert_current_path new_assistant_message_path(assistant), wait: 2
   end
 
@@ -79,5 +79,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
 
     element.send_keys key_array
+  end
+
+  def click_text(text)
+    click_on text
+  end
+
+  def click_element(selector_or_element, wait: nil)
+    element = if selector_or_element.is_a?(Capybara::Node::Element)
+      selector_or_element
+    else
+      find(selector_or_element, wait: wait)
+    end
+
+    element.click
   end
 end
