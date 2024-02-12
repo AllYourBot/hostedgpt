@@ -44,12 +44,25 @@ We welcome contributors! After you get your developoment environment setup, revi
 
 ## Setting up Development
 
-1. Use the same GitHub fork you created when you "Set Up Live App" or create a new one: Click Fork > Create New Fork
-2. On your newly created fork page, click the green Code button and copy the URL to the clipboard
-3. On your machine (e.g. these instructions are for Mac) run the usual `git clone [url you copied]`
-4. `cd ` into that directory and `cat .tool-versions` to see what version of ruby the project is using. Check your local ruby version (`ruby --version`) and install the version the project is using.
-5. `psql --version` to ensure you have postgres installed and running. Any version 16.x should work.
-6. `bundle install`
-7. `bin/rails db:setup`  < Note: This will load the sample fixture data into your database
-8. `bin/rails dev`  < Starts up all the services
-9. Point your browser to `localhost:3000` and register as a new user
+The easiest way to get up and running is to use the provided docker compose workflow:
+
+1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running.
+2. Clone your fork `git clone [repository url]`
+3. `cd` into your clone.
+4. Run `docker-compose up --build` to start the app.
+5. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
+
+Alternatively, you can set up your development environment locally:
+
+HostedGPT requires these services to be running:
+
+- Postgres ([installation instructions](https://www.postgresql.org/download/))
+- Redis ([installation instructions](https://redis.io/download))
+- asdf-vm ([installation instructions](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf))
+
+1. `cd ` into your local repository clone
+2. `asdf install` to install the correct ruby version
+4. `bundle install` to install ruby gems
+5. `bin/rails db:setup`  < Note: This will load the sample fixture data into your database
+6. `bin/rails dev`  < Starts up all the services
+5. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
