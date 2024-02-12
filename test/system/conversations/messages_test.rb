@@ -97,6 +97,14 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   end
 
   def watch_page_for_morphing
+    # Within automated system tests, it's difficult to know if a page morphed or not. When a page does morph
+    # it should only replace the DOM elements which changed. This has the side effect of preserving scroll position.
+    # However, full page Turbo transitions also have other hacks in place to preserve scroll position so that
+    # is not enough. The best solution I found was to test for the scroll position *and* to test if a couple
+    # elements we expect NOT to be replaced stay put. The way I test this is by "tagging" an element; this adds an
+    # attribute to the element which morphdom ignores so it does not recognize this as a changed element. A full
+    # page body replacement or a turbo-frame replacement does not re-add these attributes, so if the tag is no longer
+    # present then we know morphing did not occur.
     tag("#left-column")
     tag(find_messages.first)
     @left_scroll_position = get_scroll_position("#left-column")
