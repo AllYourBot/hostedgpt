@@ -3,7 +3,9 @@
   <%= turbo_stream_from @conversation %>
 
   <div class="min-w-full">
-    <%= render @messages %>
+    <turbo-frame id="messages">  <%# development works w/o this frame but test does not %>
+      <%= render @messages %>
+    </turbo-frame>
   </div>
 
 <% end %>

@@ -2,7 +2,7 @@ require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium,
-    using: :chrome,
+    using: :headless_chrome,
     screen_size: [1400, 800]  # this is a short height (800 px) so the viewport scrolls so we can test some scroll interactions
 
   fixtures :all
@@ -81,8 +81,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     element.send_keys key_array
   end
 
-  def click_text(text)
-    click_on text
+  def click_text(text, params = {})
+    click_on text, **params
   end
 
   def click_element(selector_or_element, wait: nil)

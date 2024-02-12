@@ -43,6 +43,8 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     visit conversation_messages_path(@long_conversation.id)
     scroll_to find_conversations.last
     sleep 0.5
+    # Note: instead of these 3 lines if we do "click_text @long_conversation.title" the test fails. There is a bug
+    # and the page won't morph after a click with turbo-action="advance"
 
     watch_page_for_morphing
 
@@ -60,7 +62,6 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
     watch_page_for_morphing
 
-    binding.pry
     @long_conversation.messages.create! assistant: @long_conversation.assistant, content_text: "Watch me appear", role: :user
     sleep 0.5
 
@@ -97,23 +98,37 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   def watch_page_for_morphing
     tag("#left-column")
+    tag(find_messages.first)
     @left_scroll_position = get_scroll_position("#left-column")
     @body_scroll_position = get_scroll_position("#right-content")
     assert_not_equal 0, @body_scroll_position, "The page should be scrolled down before acting on it"
   end
 
-  def tag(selector)
-    page.execute_script("arguments[0]._morphMonitor = true", find(selector))
+  def tag(selector_or_element)
+    element = if selector_or_element.is_a?(Capybara::Node::Element)
+      selector_or_element
+    else
+      find(selector_or_element)
+    end
+
+    page.execute_script("arguments[0]._morphMonitor = true", element)
   end
 
   def assert_page_morphed
     assert get_scroll_position("#right-content") > @body_scroll_position, "The page should have scrolled down further"
     assert_hidden "#scroll-button", "The page did not scroll all the way down"
     assert tagged?("#left-column"), "The page did not morph; a tagged element got replaced."
+    assert tagged?(find_messages.first), "The page did not morph; a tagged element got replaced."
     assert_equal @left_scroll_position, get_scroll_position("#left-column"), "The left column lost it's scroll position"
   end
 
-  def tagged?(selector)
-    find(selector)[:'_morphMonitor']
+  def tagged?(selector_or_element)
+    element = if selector_or_element.is_a?(Capybara::Node::Element)
+      selector_or_element
+    else
+      find(selector_or_element)
+    end
+
+    element[:'_morphMonitor']
   end
 end
