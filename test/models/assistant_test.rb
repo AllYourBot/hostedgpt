@@ -43,7 +43,7 @@ class AssistantTest < ActiveSupport::TestCase
   test "associations are deleted upon destroy" do
     assistant = assistants(:samantha)
     conversation_count = assistant.conversations.count * -1
-    document_count = assistant.documents.count * -1
+    document_count = (assistant.documents.count+assistant.conversations.sum { |c| c.messages.sum { |m| m.documents.count }}) * -1
     run_count = assistant.runs.count * -1
     step_count = assistant.steps.count * -1
 

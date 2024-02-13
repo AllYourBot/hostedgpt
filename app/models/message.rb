@@ -21,13 +21,6 @@ class Message < ApplicationRecord
 
   after_create_commit :broadcast_message
 
-  def for_openai
-    {
-      role: role,
-      content: content_text
-    }
-  end
-
   private
 
   def create_conversation
