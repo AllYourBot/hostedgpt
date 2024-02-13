@@ -24,7 +24,7 @@ class MessagesController < ApplicationController
     @message = @assistant.messages.new(message_params)
 
     if @message.save
-      GetNextAiMessageJob.perform_later(@message.conversation.id)
+      GetNextAIMessageJob.perform_later(@message.conversation.id, @assistant.id)
 
       redirect_to conversation_messages_path(@message.conversation)
     else

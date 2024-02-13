@@ -22,7 +22,7 @@
         <%= message.user? ? 'You' : message.conversation.assistant.name %>
       </div>
 
-      <% if message.documents.present? && message.documents.first.file.attached? %>
+      <% if message.documents.present? && message.documents.present? %>
         <%= image_tag message.documents.first.file, class: "w-full h-auto border-2 border-zinc-100 rounded-md" %>
       <% end %>
 
