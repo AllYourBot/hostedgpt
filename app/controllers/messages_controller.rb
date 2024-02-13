@@ -76,6 +76,6 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:conversation_id, :content_text)
+    params.require(:message).permit(:conversation_id, :content_text, documents_attributes: [:file])
   end
 end

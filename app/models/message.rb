@@ -8,6 +8,8 @@ class Message < ApplicationRecord
 
   enum role: %w[user assistant].index_by(&:to_sym)
 
+  accepts_nested_attributes_for :documents
+
   before_validation :set_default_role, on: :create
   before_validation :create_conversation, on: :create, if: -> { conversation.blank? }
 

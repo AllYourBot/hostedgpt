@@ -61,3 +61,11 @@
 .relationship.relationship\:pl-4 {
   @apply !pl-4
 }
+
+.show-previews .show-previews\:preview-container {
+  @apply !flex
+}
+
+.show-previews .show-previews\:pt-24 {
+  @apply pt-24
+}
