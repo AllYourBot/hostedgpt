@@ -36,7 +36,7 @@ class Document < ApplicationRecord
   end
 
   def set_default_user
-    self.user ||= message.conversation.user
+    self.user ||= message.conversation.user # this won't work when multiple people are in a conversation
   end
 
   def set_default_purpose
