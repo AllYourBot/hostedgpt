@@ -166,6 +166,7 @@
               <%= form.fields_for :documents, @new_message.documents.build, child_index: Time.now.to_i do |document_form| %>
                 <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
               <% end %>
+
               <%= form.text_area :content_text,
                 data: {
                   new_message_target: "input",
@@ -194,6 +195,7 @@
                   resize-none
                 |
               %>
+
               <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
                 <%= form.button type: "button",
                   data: {
