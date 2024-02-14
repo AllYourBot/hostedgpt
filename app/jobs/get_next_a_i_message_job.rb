@@ -20,7 +20,7 @@ class GetNextAIMessageJob < ApplicationJob
     end
 
     @new_message.save!
-    puts "Finished GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})"
+    puts "\nFinished GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})"
 
   rescue => e
     puts "Error in GetNextAIMessageJob: #{e.inspect}"

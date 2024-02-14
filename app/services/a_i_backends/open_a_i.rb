@@ -36,6 +36,7 @@ class AIBackends::OpenAI
       model: @assistant.model,
       messages: existing_messages,
       stream: response_handler,
+      max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
     })
   end
 
