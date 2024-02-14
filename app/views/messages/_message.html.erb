@@ -23,7 +23,7 @@
       </div>
 
       <% if message.documents.present? && message.documents.present? %>
-        <%= image_tag message.documents.first.file, class: "w-full h-auto border-2 border-zinc-100 rounded-md" %>
+        <%= image_tag( (file = message.documents.first.file), class: "w-full h-auto border-2 border-zinc-100 rounded-md") if file  %>
       <% end %>
 
       <%# This div needs to be tightly wrapped around the content_text output because the whitespace formatting is important. %>

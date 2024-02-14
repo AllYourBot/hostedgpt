@@ -14,7 +14,7 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "create fails without a file" do
-    assert_raises do
+    assert_raises ActiveRecord::RecordInvalid do
       Document.create!(
         user: users(:keith),
         filename: "dog_photo.jpg",

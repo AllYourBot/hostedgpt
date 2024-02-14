@@ -1,6 +1,6 @@
 class GetNextAIMessageJob < ApplicationJob
   def perform(conversation_id, assistant_id)
-    puts "GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})"
+    puts "GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})" if Rails.env.development?
 
     @conversation = Conversation.find conversation_id
     @assistant = Assistant.find assistant_id
@@ -20,7 +20,7 @@ class GetNextAIMessageJob < ApplicationJob
     end
 
     @new_message.save!
-    puts "\nFinished GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})"
+    puts "\nFinished GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})" if Rails.env.development?
 
   rescue => e
     puts "Error in GetNextAIMessageJob: #{e.inspect}"
