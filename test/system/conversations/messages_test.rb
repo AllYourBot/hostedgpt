@@ -108,8 +108,8 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     tag("#left-column")
     tag(find_messages.first)
     @left_scroll_position = get_scroll_position("#left-column")
-    @body_scroll_position = get_scroll_position("#right-content")
     sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
+    @body_scroll_position = get_scroll_position("#right-content")
     assert_not_equal 0, @body_scroll_position, "The page should be scrolled down before acting on it"
   end
 
@@ -124,6 +124,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   end
 
   def assert_page_morphed
+    sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
     assert get_scroll_position("#right-content") > @body_scroll_position, "The page should have scrolled down further"
     assert_hidden "#scroll-button", "The page did not scroll all the way down"
     assert tagged?("#left-column"), "The page did not morph; a tagged element got replaced."
