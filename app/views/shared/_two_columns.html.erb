@@ -137,25 +137,30 @@
             <% end %>
 
             <div id="document-previews" class="absolute left-7 top-3 space-x-3 hidden show-previews:preview-container" data-image-upload-target="preview">
-                <div class="w-16 h-16 rounded-xl flex flex-col items-stretch overflow-hidden border-2 border-zinc-100 group">
+                <div  class="w-16 h-16 rounded-xl flex flex-col items-stretch overflow-hidden border-2 border-zinc-100 group"
+                      data-role="preview"
+                >
                   <%= button_tag type: "button",
                       class: "rounded-full absolute -top-2 -right-2 border border-zinc-300 bg-zinc-200 hidden group-hover:block",
-                      data: { action: "image-upload#remove" } do
+                      data: {
+                        action: "image-upload#remove",
+                        role: "preview-remove"
+                      } do
                   %>
-                  <%= icon "x-mark",
-                        variant: :mini,
-                        class: %|
-                          text-zinc-600 hover:text-zinc-900 dark:text-gray-300 dark:hover:text-white
-                          cursor-pointer stroke-2
-                        |,
-                        title: 'Remove file',
-                        tooltip: :top
-                  %>
-                <% end %>
+                    <%= icon "x-mark",
+                          variant: :mini,
+                          class: %|
+                            text-zinc-600 hover:text-zinc-900 dark:text-gray-300 dark:hover:text-white
+                            cursor-pointer stroke-2
+                          |,
+                          title: 'Remove file',
+                          tooltip: :top
+                    %>
+                  <% end %>
 
-                <%= button_tag type: "button",
-                      class: "w-full h-full flex-1 p-0" do
-                %>
+                  <%= button_tag type: "button",
+                        class: "w-full h-full flex-1 p-0" do
+                  %>
                   <%= image_tag "", class: "w-full h-full object-cover" %>
                 <% end %>
               </div>
@@ -163,7 +168,7 @@
 
             <%= form_with(model: [@assistant, @new_message], data: { controller: "new-message", turbo_frame: "_top" }) do |form| %>
               <%= form.hidden_field :conversation_id %>
-              <%= form.fields_for :documents, @new_message.documents.build, child_index: Time.now.to_i do |document_form| %>
+              <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
                 <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
               <% end %>
 

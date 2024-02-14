@@ -25,7 +25,7 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "simple create works" do
-    file_path = File.join(File.dirname(__FILE__), 'documents/cat-image-for-attaching.png')
+    file_path = File.join(File.dirname(__FILE__), '../assets/cat-image-for-attaching.png')
     file = Rack::Test::UploadedFile.new(file_path, 'image/png')
 
     document = nil
@@ -40,7 +40,7 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "file_data_url returns for a file" do
-    file_path = File.join(File.dirname(__FILE__), 'documents/cat-image-for-attaching.png')
+    file_path = File.join(File.dirname(__FILE__), '../assets/cat-image-for-attaching.png')
     file = Rack::Test::UploadedFile.new(file_path, 'image/png')
 
     document = Document.create!(user: users(:keith), file: file)

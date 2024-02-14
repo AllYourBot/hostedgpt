@@ -36,7 +36,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     click_element @submit
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
-    click_element @input # focus is lost after the attempted click on submit
+    click_element @input # focus is lost after the attempted click on submit so we need to refocus
     send_keys "Entered text so we can now submit"
     refute @submit.disabled?
     click_element @submit
