@@ -28,7 +28,7 @@ services:
     tty: true
     build:
       context: .
-      target: base
+      target: development
     environment:
       - REDIS_URL=redis://redis/0
       - DATABASE_URL=postgres://app:secret@postgres/app_development
@@ -42,15 +42,6 @@ services:
     tty: false
     ports: []
     command: bin/rails solid_queue:start
-
-  test:
-    <<: *server
-    ports: []
-    profiles: ["test"]
-    environment:
-      - REDIS_URL=redis://redis/1
-      - DATABASE_URL=postgres://app:secret@postgres/app_test
-    command: bin/rails test
 
 volumes:
   pgdata:

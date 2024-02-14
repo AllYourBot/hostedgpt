@@ -16,6 +16,9 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
 
 
+FROM base as development
+
+RUN apk add --no-cache postgresql-client
 
 
 FROM base AS deployment
