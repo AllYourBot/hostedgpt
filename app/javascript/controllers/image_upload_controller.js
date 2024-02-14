@@ -5,18 +5,14 @@ export default class extends Controller {
 
   connect() {
     this.fileTarget.addEventListener("change", this.boundPreviewUpdate)
-    this.contentTarget.addEventListener("dragover", this.boundIgnore)
-    this.contentTarget.addEventListener("dragenter", this.boundIgnore)
-    this.contentTarget.addEventListener("drop", this.boundDrop)
-    this.contentTarget.addEventListener("paste", this.boundPasteHandler)
+    this.contentTarget.addEventListener("drop", this.boundDropped)
+    this.contentTarget.addEventListener("paste", this.boundPasted)
   }
 
   disconnect() {
     this.fileTarget.removeEventListener("change", this.boundPreviewUpdate)
-    this.contentTarget.removeEventListener("dragover", this.boundIgnore)
-    this.contentTarget.removeEventListener("dragenter", this.boundIgnore)
-    this.contentTarget.removeEventListener("drop", this.boundDrop)
-    this.contentTarget.removeEventListener("paste", this.boundPasteHandler)
+    this.contentTarget.removeEventListener("drop", this.boundDropped)
+    this.contentTarget.removeEventListener("paste", this.boundPasted)
   }
 
   boundPreviewUpdate = () => { this.previewUpdate() }
@@ -41,21 +37,16 @@ export default class extends Controller {
     window.dispatchEvent(new Event('resize')) // Throw this event will cause textarea_autogrow to reprocess
   }
 
-  boundIgnore = (event) => { this.ignore(event) }
-  ignore(event) {
-    event.preventDefault()
-    event.stopPropagation()
-  }
-
-  boundDrop = (event) => { this.drop(event) }
-  drop(event) {
-    this.preventDefaults(event)
+  boundDropped = (event) => { this.dropped(event) }
+  dropped(event) {
+    event.preventDefault() // w/o this chrome opens a new browser tab w/ the image
     let files = event.dataTransfer.files
     this.fileTarget.files = files
+    this.previewUpdate()
   }
 
-  boundPasteHandler = async (event) => { this.pasteHandler(event) }
-  async pasteHandler(event) {
+  boundPasted = async (event) => { this.pasted(event) }
+  async pasted(event) {
     const clipboardData =
       event.clipboardData || event.originalEvent.clipboardData
 
@@ -64,14 +55,11 @@ export default class extends Controller {
         const blob = item.getAsFile()
         if (!blob) return
 
-        try {
-          const dataURL = await this.readPastedBlobAsDataURL(blob)
-          this.addImageToFileInput(dataURL, blob.type)
-        } catch (error) {
-          console.error("Error reading pasted image:", error)
-        }
+        const dataURL = await this.readPastedBlobAsDataURL(blob)
+        this.addImageToFileInput(dataURL, blob.type)
       }
     }
+    this.previewUpdate()
   }
 
   async readPastedBlobAsDataURL(blob) {
