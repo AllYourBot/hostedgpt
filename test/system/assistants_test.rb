@@ -19,30 +19,30 @@ class AssistantsTest < ApplicationSystemTestCase
     fill_in "Model", with: @assistant.model
     fill_in "Name", with: @assistant.name
     fill_in "User", with: @assistant.user_id
-    click_on "Create Assistant"
+    click_text "Create Assistant"
 
     assert_text "Assistant was successfully created"
-    click_on "Back"
+    click_text "Back"
   end
 
   test "should update Assistant" do
     visit assistant_url(@assistant)
-    click_on "Edit this assistant", match: :first
+    click_text "Edit this assistant", match: :first
 
     fill_in "Description", with: @assistant.description
     fill_in "Instructions", with: @assistant.instructions
     fill_in "Model", with: @assistant.model
     fill_in "Name", with: @assistant.name
     fill_in "User", with: @assistant.user_id
-    click_on "Update Assistant"
+    click_text "Update Assistant"
 
     assert_text "Assistant was successfully updated"
-    click_on "Back"
+    click_text "Back"
   end
 
   test "should destroy Assistant" do
     visit assistant_url(@assistant)
-    click_on "Destroy this assistant", match: :first
+    click_text "Destroy this assistant", match: :first
 
 #    assert_text "Assistant was successfully destroyed"
   end
