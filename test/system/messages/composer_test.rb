@@ -42,7 +42,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     click_element @submit
     sleep 0.3
 
-    assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
+    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert @input.value.blank?
   end
 
@@ -58,7 +58,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "enter"
     sleep 0.3
 
-    assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
+    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert @input.value.blank?
   end
 
@@ -74,7 +74,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "enter"
     sleep 0.3
 
-    assert_equal conversation_messages_path(@user.conversations.sorted.first), current_path, "Should have redirected to newly created conversation"
+    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert @input.value.blank?
   end
 

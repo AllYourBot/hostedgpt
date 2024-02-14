@@ -9,5 +9,5 @@ class Assistant < ApplicationRecord
 
   validates :tools, presence: true, allow_blank: true
 
-  scope :sorted, -> { order(:id) }
+  scope :ordered, -> { order(:id) }
 end
