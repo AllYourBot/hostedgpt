@@ -29,7 +29,8 @@ export default class extends Controller {
   submitForm() {
     if (this.cleanInputValue.length > 0) {
       this.element.requestSubmit()
-      this.inputTarget.reset()
+      this.element.reset()
+      window.dispatchEvent(new Event('resize')) // Throw this event will cause textarea_autogrow to reprocess
     }
   }
 
