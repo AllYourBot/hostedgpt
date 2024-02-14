@@ -109,7 +109,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     tag(find_messages.first)
     @left_scroll_position = get_scroll_position("#left-column")
     @body_scroll_position = get_scroll_position("#right-content")
-    sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
+    sleep 2 # this delay is so long b/c we wait 0.5s before scrolling the page down
     assert_not_equal 0, @body_scroll_position, "The page should be scrolled down before acting on it"
   end
 
