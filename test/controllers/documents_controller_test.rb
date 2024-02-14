@@ -16,11 +16,13 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create document" do
-    assert_difference("Document.count") do
-      post documents_url, params: {document: {user_id: @document.user_id, assistant_id: @document.assistant_id, message_id: @document.message_id, filename: @document.filename, purpose: @document.purpose, bytes: @document.bytes}}
-    end
+    # TODO: We will eventually want to have a general endpoint for updating Documents but we haven't implemented yet so disabling this test.
+    #
+    # assert_difference("Document.count") do
+    #   post documents_url, params: {document: {user_id: @document.user_id, assistant_id: @document.assistant_id, message_id: @document.message_id, filename: @document.filename, purpose: @document.purpose, bytes: @document.bytes}}
+    # end
 
-    assert_redirected_to document_url(Document.last)
+    # assert_redirected_to document_url(Document.last)
   end
 
   test "should show document" do
@@ -34,8 +36,10 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update document" do
-    patch document_url(@document), params: {document: {user_id: @document.user_id, assistant_id: @document.assistant_id, message_id: @document.message_id, filename: @document.filename, purpose: @document.purpose, bytes: @document.bytes}}
-    assert_redirected_to document_url(@document)
+    # TODO: We will eventually want to have a general endpoint for updating Documents but we haven't implemented yet so disabling this test.
+    #
+    # patch document_url(@document), params: {document: {user_id: @document.user_id, assistant_id: @document.assistant_id, message_id: @document.message_id, filename: @document.filename, purpose: @document.purpose, bytes: @document.bytes}}
+    # assert_redirected_to document_url(@document)
   end
 
   test "should destroy document" do

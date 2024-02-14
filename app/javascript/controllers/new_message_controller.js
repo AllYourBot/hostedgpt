@@ -3,7 +3,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["input", "submit"]
+  static targets = [ "input", "submit" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -29,7 +29,8 @@ export default class extends Controller {
   submitForm() {
     if (this.cleanInputValue.length > 0) {
       this.element.requestSubmit()
-      this.inputTarget.value = ''
+      this.element.reset()
+      window.dispatchEvent(new Event('resize')) // Throw this event will cause textarea_autogrow to reprocess
     }
   }
 

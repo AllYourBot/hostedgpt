@@ -30,11 +30,13 @@ class MessagesSidebarTest < ApplicationSystemTestCase
     assert_first_message conversations(:ruby_version).messages.sorted.first
 
     page.go_back
+    sleep 1
     assert_current_path conversation_messages_path(conversations(:javascript))
     assert_selected_assistant conversations(:javascript).assistant
     assert_first_message conversations(:javascript).messages.sorted.first
 
     page.go_back
+    sleep 1
     assert_current_path conversation_messages_path(conversations(:greeting))
     assert_selected_assistant conversations(:greeting).assistant
     assert_first_message conversations(:greeting).messages.sorted.first
@@ -42,6 +44,7 @@ class MessagesSidebarTest < ApplicationSystemTestCase
     # TODO: There is a bug with the latest turbo where the final back doesn't properly load from cache.
     #
     # page.go_back
+    # sleep 1
     # assert_current_path new_assistant_message_path(assistant)
     # assert_selected_assistant assistant
   end

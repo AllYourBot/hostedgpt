@@ -26,7 +26,7 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   test "create without setting Current or conversation raises" do
-    assert_raises do
+    assert_raises ActiveRecord::RecordInvalid do
       Message.create!(content_text: "Hello")
     end
   end
@@ -68,7 +68,7 @@ class MessageTest < ActiveSupport::TestCase
     assistant = users(:rob).assistants.first
     conversation_owned_by_someone_else = users(:keith).conversations.first
 
-    assert_raises do
+    assert_raises ActiveRecord::RecordInvalid do
       Message.create!(
         assistant: assistant,
         conversation: conversation_owned_by_someone_else,

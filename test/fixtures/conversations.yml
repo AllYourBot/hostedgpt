@@ -3,6 +3,11 @@ greeting:
   assistant: samantha
   title: Meeting Samantha
 
+attachments:
+  user: keith
+  assistant: samantha
+  title: Testing attachments
+
 javascript:
   user: keith
   assistant: keith_gpt4

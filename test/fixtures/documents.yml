@@ -8,8 +8,32 @@ background:
 
 cat_photo:
   user: keith
-  assistant: samantha
+  assistant:
   message: identify_photo
   filename: cat_photo.jpg
   purpose: assistants
   bytes: 100
+
+cute_cat_photo:
+  user: keith
+  assistant:
+  message: one_attachment
+  filename: cute_cat_photo.png
+  purpose: assistants
+  bytes: 200
+
+single_cat_photo:
+  user: keith
+  assistant:
+  message: two_attachments
+  filename: single_cat_photo.png
+  purpose: assistants
+  bytes: 300
+
+single_dog_photo:
+  user: keith
+  assistant:
+  message: two_attachments
+  filename: single_doc_photo.png
+  purpose: assistants
+  bytes: 400

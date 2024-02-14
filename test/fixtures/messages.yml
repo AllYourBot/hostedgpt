@@ -39,7 +39,7 @@ photo_identified:
 what_day:
   assistant: samantha
   conversation: greeting
-  role: assistant
+  role: user
   content_text: Do you know what day it is?
   content_document:
   run:
@@ -57,7 +57,7 @@ dont_know_day:
 alive:
   assistant: samantha
   conversation: greeting
-  role: assistant
+  role: user
   content_text: Are you alive?
   content_document:
   run:
@@ -72,6 +72,62 @@ im_a_bot:
   run: alive_response
   created_at: 2023-12-30 1:06:00
 
+
+# Next conversation
+
+can_you_hear:
+  assistant: samantha
+  conversation: attachments
+  role: user
+  content_text: Can you hear me?
+  content_document:
+  run:
+  created_at: 2023-12-30 1:00:00
+
+yes_i_can:
+  assistant: samantha
+  conversation: attachments
+  role: assistant
+  content_text: Yes, I can hear you.
+  content_document:
+  run: can_you_hear_response
+  created_at: 2023-12-30 1:01:00
+
+one_attachment:
+  assistant: samantha
+  conversation: attachments
+  role: user
+  content_text: What is this?
+  content_document:
+  run:
+  created_at: 2023-12-30 1:02:00
+
+its_a_cat:
+  assistant: samantha
+  conversation: attachments
+  role: assistant
+  content_text: It's a cat
+  content_document:
+  run: one_attachment_response
+  created_at: 2023-12-30 1:03:00
+
+two_attachments:
+  assistant: samantha
+  conversation: attachments
+  role: user
+  content_text: Can you see both files?
+  content_document:
+  run:
+  created_at: 2023-12-30 1:04:00
+
+yes_cat_and_dog:
+  assistant: samantha
+  conversation: attachments
+  role: assistant
+  content_text: Yes, I see a cat and a dog.
+  content_document:
+  run: two_attachments_response
+  created_at: 2023-12-30 1:05:00
 
 # Next conversation
 
