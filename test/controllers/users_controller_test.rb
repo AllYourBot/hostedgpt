@@ -41,7 +41,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     user = Person.find_by(email: email).user
     assert_equal 2, user.assistants.count
 
-    assistant = user.assistants.sorted.first
+    assistant = user.assistants.ordered.first
 
     follow_redirect!
     assert_redirected_to new_assistant_message_path(assistant)

@@ -17,7 +17,7 @@ class Message < ApplicationRecord
   validates :content_text, presence: true, unless: :assistant?
   validate :validate_conversation_user, if: -> { conversation.present? && Current.user }
 
-  scope :sorted, -> { order(:created_at) }
+  scope :ordered, -> { order(:created_at) }
 
   after_create_commit :broadcast_message
 

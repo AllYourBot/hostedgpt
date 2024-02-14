@@ -21,7 +21,7 @@ module AIBackends
 
       assert_equal @conversation.messages.length, existing_messages.length
 
-      @conversation.messages.sorted.each_with_index do |message, i|
+      @conversation.messages.ordered.each_with_index do |message, i|
         if message.documents.present?
           assert_instance_of Array, existing_messages[i][:content]
           assert_equal message.documents.length+1, existing_messages[i][:content].length

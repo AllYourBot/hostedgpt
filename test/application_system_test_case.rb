@@ -8,7 +8,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   fixtures :all
 
   def login_as(user, password = "secret")
-    assistant = user.assistants.sorted.first
+    assistant = user.assistants.ordered.first
 
     visit logout_path
     assert_current_path login_path, wait: 2

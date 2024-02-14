@@ -43,7 +43,7 @@ class AIBackends::OpenAI
   private
 
   def existing_messages
-    @conversation.messages.sorted.collect do |message|
+    @conversation.messages.ordered.collect do |message|
       if @assistant.images && message.documents.present?
 
         content = [{ type: "text", text: message.content_text }]

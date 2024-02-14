@@ -7,7 +7,7 @@ class MessagesSidebarTest < ApplicationSystemTestCase
   end
 
   test "clicking conversations in the left side updates the right column, the path, and back button works as expected" do
-    assistant = @user.assistants.sorted.first
+    assistant = @user.assistants.ordered.first
 
     visit root_url
 
@@ -17,29 +17,29 @@ class MessagesSidebarTest < ApplicationSystemTestCase
     click_text conversations(:greeting).title
     assert_current_path conversation_messages_path(conversations(:greeting))
     assert_selected_assistant conversations(:greeting).assistant
-    assert_first_message conversations(:greeting).messages.sorted.first
+    assert_first_message conversations(:greeting).messages.ordered.first
 
     click_text conversations(:javascript).title
     assert_current_path conversation_messages_path(conversations(:javascript))
     assert_selected_assistant conversations(:javascript).assistant
-    assert_first_message conversations(:javascript).messages.sorted.first
+    assert_first_message conversations(:javascript).messages.ordered.first
 
     click_text conversations(:ruby_version).title
     assert_current_path conversation_messages_path(conversations(:ruby_version))
     assert_selected_assistant conversations(:ruby_version).assistant
-    assert_first_message conversations(:ruby_version).messages.sorted.first
+    assert_first_message conversations(:ruby_version).messages.ordered.first
 
     page.go_back
     sleep 1
     assert_current_path conversation_messages_path(conversations(:javascript))
     assert_selected_assistant conversations(:javascript).assistant
-    assert_first_message conversations(:javascript).messages.sorted.first
+    assert_first_message conversations(:javascript).messages.ordered.first
 
     page.go_back
     sleep 1
     assert_current_path conversation_messages_path(conversations(:greeting))
     assert_selected_assistant conversations(:greeting).assistant
-    assert_first_message conversations(:greeting).messages.sorted.first
+    assert_first_message conversations(:greeting).messages.ordered.first
 
     # TODO: There is a bug with the latest turbo where the final back doesn't properly load from cache.
     #
@@ -120,11 +120,11 @@ class MessagesSidebarTest < ApplicationSystemTestCase
     visit conversation_path
     assert_current_path conversation_path
 
-    assistant1 = @user.assistants.sorted.first
+    assistant1 = @user.assistants.ordered.first
     click_text assistant1.name, match: :first
     assert_current_path new_assistant_message_path(assistant1)
 
-    assistant2 = @user.assistants.sorted.second
+    assistant2 = @user.assistants.ordered.second
     second_assistant_container = all("#assistants [data-role='assistant']", visible: :false)[1]
     second_assistant_container.hover
     pencil_on_second_assistant = all("#assistants a[data-role='pencil']", visible: :false)[1]
