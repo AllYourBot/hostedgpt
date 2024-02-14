@@ -19,12 +19,12 @@
           data-click-toggle-target="destination"
       >
           <p><%= text %></p>
-          <a href="#"
-              class="p-4"
-              data-action="click-toggle#toggleClass:prevent"
-          >
-          &times;
-          </a>
+          <%= button_tag type: "button",
+                data: { action: "click-toggle#toggleClass" },
+                class: "p-4" do
+          %>
+            &times;
+          <% end %>
         </div>
       <% end %>
   </div>

@@ -10,7 +10,7 @@ class AssistantsInstructionsTest < ApplicationSystemTestCase
     visit assistant_instructions_url(@assistant)
 
     fill_in "assistant[instructions]", with: "Updated Instructions"
-    click_on "Update"
+    click_text "Update"
 
     assert_text "Instructions have been saved."
   end

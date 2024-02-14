@@ -1,56 +1,68 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["file", "content"]
+  static targets = [ "file", "content", "preview" ]
 
   connect() {
-    this.dropHandler()
-    this.pasteHandler()
+    this.fileTarget.addEventListener("change", this.boundPreviewUpdate)
+    this.contentTarget.addEventListener("drop", this.boundDropped)
+    this.contentTarget.addEventListener("paste", this.boundPasted)
   }
 
-  dropHandler() {
-    this.fileTarget.addEventListener("dragover", (event) =>
-      this.preventDefaults(event),
-    )
-    this.fileTarget.addEventListener("dragenter", (event) =>
-      this.preventDefaults(event),
-    )
-    this.fileTarget.addEventListener("drop", (event) => this.drop(event))
+  disconnect() {
+    this.fileTarget.removeEventListener("change", this.boundPreviewUpdate)
+    this.contentTarget.removeEventListener("drop", this.boundDropped)
+    this.contentTarget.removeEventListener("paste", this.boundPasted)
   }
 
-  preventDefaults(event) {
-    event.preventDefault()
-    event.stopPropagation()
+  boundPreviewUpdate = () => { this.previewUpdate() }
+  previewUpdate() {
+    const input = this.fileTarget
+    if (input.files && input.files[0]) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        this.previewTarget.querySelector("img").src = e.target.result
+        this.element.classList.add("show-previews")
+        this.contentTarget.focus()
+        window.dispatchEvent(new Event('resize')) // Throw this event will cause textarea_autogrow to reprocess
+      }
+      reader.readAsDataURL(input.files[0])
+    }
   }
 
-  drop(event) {
-    this.preventDefaults(event)
+  previewRemove() {
+    this.previewTarget.querySelector("img").src = ''
+    this.element.classList.remove("show-previews")
+    this.contentTarget.focus()
+    window.dispatchEvent(new Event('resize')) // Throw this event will cause textarea_autogrow to reprocess
+  }
+
+  boundDropped = (event) => { this.dropped(event) }
+  dropped(event) {
+    event.preventDefault() // w/o this chrome opens a new browser tab w/ the image
     let files = event.dataTransfer.files
     this.fileTarget.files = files
+    this.previewUpdate()
   }
 
-  pasteHandler() {
-    this.contentTarget.addEventListener("paste", async (event) => {
-      const clipboardData =
-        event.clipboardData || event.originalEvent.clipboardData
+  boundPasted = async (event) => { this.pasted(event) }
+  async pasted(event) {
+    const clipboardData =
+      event.clipboardData || event.originalEvent.clipboardData
 
-      for (const item of clipboardData.items) {
-        if (item.kind === "file") {
-          const blob = item.getAsFile()
-          if (!blob) return // return if no valid blob
+    for (const item of clipboardData.items) {
+      if (item.kind === "file") {
+        const blob = item.getAsFile()
+        if (!blob) return
 
-          try {
-            const dataURL = await this.readBlobAsDataURL(blob)
-            this.addImageToFileInput(dataURL, blob.type)
-          } catch (error) {
-            console.error("Error reading pasted image:", error)
-          }
-        }
+        const dataURL = await this.readPastedBlobAsDataURL(blob)
+        this.addImageToFileInput(dataURL, blob.type)
       }
-    })
+    }
+    this.previewUpdate()
   }
 
-  async readBlobAsDataURL(blob) {
+  async readPastedBlobAsDataURL(blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.onload = (event) => {
@@ -80,5 +92,14 @@ export default class extends Controller {
       uint8Array[i] = binaryString.charCodeAt(i)
     }
     return new Blob([uint8Array], { type: fileType })
+  }
+
+  choose() {
+    this.fileTarget.click()
+  }
+
+  remove() {
+    this.fileTarget.value = ''
+    this.previewRemove()
   }
 }
