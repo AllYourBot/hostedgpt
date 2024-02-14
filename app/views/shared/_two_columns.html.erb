@@ -1,11 +1,11 @@
-<div class="flex h-screen"
-    data-controller="click-toggle turbo-frame-history"
-    data-click-toggle-flippable-class="!hidden"
+<div  class="flex h-screen"
+      data-controller="click-toggle"
+      data-click-toggle-flippable-class="!hidden"
 >
 
-  <div id="left-column"
-      class="flex-col h-screen w-[260px] bg-black hidden md:block overflow-y-auto overflow-x-clip scrollbar-hide"
-      data-click-toggle-target="destination"
+  <div  id="left-column"
+        class="flex-col h-screen w-[287px] bg-black hidden md:block overflow-y-auto overflow-x-clip scrollbar-hide"
+        data-click-toggle-target="destination"
   >
 
     <div id="left-content-container" class="flex flex-col flex-grow">
@@ -41,6 +41,7 @@
   <div id="right-column" class="flex flex-1 h-screen bg-white dark:bg-graphite">
     <turbo-frame  id="conversation"
                   class="flex flex-1 flex-col relative"
+                  data-turbo-action="advance"
     >
       <div  id="handle-container"
             class="absolute left-0 top-1/2 w-8 h-20 -mt-10 z-20 hidden md:flex"
@@ -104,26 +105,77 @@
         <div id="right-footer" class="flex-none flex flex-col relative">
           <div id="scroll-button" class="text-center absolute -top-14 left-1/2 transform -translate-x-1/2 hidden" data-scrollable-target="widget">
             <%= button_tag type: "button",
+                  class: "block rounded-full bg-white dark:bg-graphite border border-gray-300 dark:border-zinc-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 group",
                   data: {
                     tip: "Scroll down",
                     action: "scrollable#scrollToBottom"
-                  },
-                  class: "block rounded-full bg-white dark:bg-graphite border border-gray-300 dark:border-zinc-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 group" do
+                  } do
             %>
               <%= icon "chevron-down", variant: :outline, size: 19, class: 'text-gray-800 dark:text-zinc-400 cursor-pointer group-hover:text-black dark:group-hover:text-white stroke-2' %>
             <% end %>
           </div>
 
-          <div id="composer" class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>">
-            <div id="attach-button" class="absolute left-9 bottom-6 w-[23px] h-[23px] relationship:hidden">
-              <%= icon "paper-clip", variant: :mini, size: 23, class: 'cursor-pointer text-zinc-600 hover:text-zinc-900 stroke-2 dark:text-gray-300 dark:hover:text-white', title: 'Attach', tooltip: :top %>
+          <div  id="composer"
+                class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
+                data-controller="image-upload"
+          >
+            <%= button_tag type: "button",
+                  id: "attach-button",
+                  class: "absolute left-9 bottom-6 w-[23px] h-[23px] relationship:hidden",
+                  data: { action: "image-upload#choose" } do
+            %>
+              <%= icon "paper-clip",
+                    variant: :mini,
+                    size: 23,
+                    class: %|
+                      text-zinc-600 hover:text-zinc-900 dark:text-gray-300 dark:hover:text-white
+                      cursor-pointer stroke-2
+                    |,
+                    title: 'Attach',
+                    tooltip: :top
+              %>
+            <% end %>
+
+            <div id="document-previews" class="absolute left-7 top-3 space-x-3 hidden show-previews:preview-container" data-image-upload-target="preview">
+                <div  class="w-16 h-16 rounded-xl flex flex-col items-stretch overflow-hidden border-2 border-zinc-100 group"
+                      data-role="preview"
+                >
+                  <%= button_tag type: "button",
+                      class: "rounded-full absolute -top-2 -right-2 border border-zinc-300 bg-zinc-200 hidden group-hover:block",
+                      data: {
+                        action: "image-upload#remove",
+                        role: "preview-remove"
+                      } do
+                  %>
+                    <%= icon "x-mark",
+                          variant: :mini,
+                          class: %|
+                            text-zinc-600 hover:text-zinc-900 dark:text-gray-300 dark:hover:text-white
+                            cursor-pointer stroke-2
+                          |,
+                          title: 'Remove file',
+                          tooltip: :top
+                    %>
+                  <% end %>
+
+                  <%= button_tag type: "button",
+                        class: "w-full h-full flex-1 p-0" do
+                  %>
+                  <%= image_tag "", class: "w-full h-full object-cover" %>
+                <% end %>
+              </div>
             </div>
 
-            <%= form_with(model: [@assistant, @new_message], data: { controller: 'new-message' }) do |form| %>
+            <%= form_with(model: [@assistant, @new_message], data: { controller: "new-message", turbo_frame: "_top" }) do |form| %>
               <%= form.hidden_field :conversation_id %>
+              <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
+                <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
+              <% end %>
+
               <%= form.text_area :content_text,
                 data: {
                   new_message_target: "input",
+                  image_upload_target: "content",
                   application_target: "newMessageField",
                   controller: "textarea-autogrow",
                   action: %|
@@ -139,7 +191,7 @@
                 class: %|
                   w-full pt-[14px] pb-[13px] min-h-14
                   mb-2 block
-                  pl-14 pr-12 relationship:pl-4
+                  pl-14 pr-12 relationship:pl-4 show-previews:pt-24
                   bg-transparent
                   text-black placeholder-zinc-500 dark:text-gray-200
                   text-md

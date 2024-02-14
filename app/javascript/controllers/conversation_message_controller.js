@@ -9,7 +9,14 @@ export default class extends Controller {
 
   connect() {
     if (this.scrollIntoViewValue) {
-      this.element.scrollIntoView(true, { behavior: "smooth" })
+      const scrollableTarget = this.element.closest('[data-scrollable-target="scrollable"]')
+
+      setTimeout(() => {
+        scrollableTarget.scrollTo({
+          top: scrollableTarget.scrollHeight,
+          behavior: "smooth"
+        })
+      }, 500) // without the delay sometimes the page hasn't finished rendering and it doesn't go to the bottom
     }
   }
 }

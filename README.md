@@ -1,18 +1,26 @@
 # HostedGPT
 
+Would you like to implement and hack on your own chat bot?
 Do you love using ChatGPT but want more control over your data? Would you like to experiment with new, advanced features that ChatGPT has not implemented yet?
 
-HostedGPT is an open source project that provides all the same functionality as ChatGPT \[_that's the goal at least, we aren't there yet!_\]. When you switch from ChatGPT to HostedGPT, you \[_will_\] get the same full-featured desktop and mobile app! It's free to use, just bring your own OpenAI API key. And thanks to a community of contributors, HostedGPT \[_will have_\] *many* features and extensions that regular ChatGPT does not have yet. And thanks to active development, whenever ChatGPT adds to new features, those same features are quickly added to HostedGPT so that you won't miss out.
+HostedGPT is an open source project that provides all the same functionality as ChatGPT \[_that's the goal at least, we aren't there yet_\]! When you switch from ChatGPT to HostedGPT, you \[_will_\] get the same full-featured desktop and mobile app! It's free to use, just bring your own OpenAI API key. And thanks to a community of contributors, HostedGPT \[_will have_\] *many* features and extensions that regular ChatGPT does not have yet. And thanks to active development, whenever ChatGPT adds to new features, those same features are quickly added to HostedGPT so that you won't miss out.
+
+For anyone looking to do development of a chat bot, HostedGPT is a solid foundation to build upon.
 
 ### Some favorite features of HostedGPT
 
 * **Enjoy chat history, but without your private conversations being used for training!**
 
-  In ChatGPT, it's quite nice to have a history of your past conversations in the left sidebar so you can easily resume later. This is the default behavior. But did you realize that keeping chat history enabled opts you in to allowing all your private, personal conversations to be used for OpenAI training? [It's explained in this OpenAI article.](https://help.openai.com/en/articles/7730893-data-controls-faq) HostedGPT fixes this: it keeps past conversations but excludes this data from being used by OpenAI training.
-* **Don't commit yourself to $20 per month when you may not use ChatGPT a lot. You only pay as much as you use!**
+  Did you know that all your private, personal past conversations in the left sidebar are allowed to be used for OpenAI training? [Disclosed in this OpenAI article.](https://help.openai.com/en/articles/7730893-data-controls-faq) HostedGPT excludes your history from OpenAI training.
+* **Don't commit yourself to $20 per month when you may not use ChatGPT a lot.** You only pay as much as you use!
 * **You will never hit the 'You've reached the current usage cap for GPT-4'.** You pay per mesage based on the API rates so you can keep using it as much as you want.
 
-## Set Up Live App
+# Table of Contents
+
+- [Set Up Live App](#set-up-live-app)
+- [Contribute as a Developer](#contribute-as-a-developer)
+
+# Set Up Live App
 
 You can deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working. You will need to upgrade to a paid version of the database which is $7 / month.
 
@@ -28,9 +36,15 @@ You can deploy a full version of HostedGPT to the hosting service, Render, for f
 7. You should see two "Service Names" called "hostedgpt-..." (the name you picked), click the one that is of type **Web Service**
 8. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
 
+**NOTE: After 15 minutes of not using the app your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. If this annoys you, upgrade Render for $7 per month:**
+
+1. Go to your [Render Dashboard](https://dashboard.render.com/)
+2. Click "HostedGPT" or whatever you named your Web Service
+3. Click "Upgrade" and select $7 per month
+
 ## Troubleshooting Render
 
-1. If you encountered an eerror while waiting for the services to be deployed on Render, click **Dashboard** at the top of the Render screen and click the Service that failed.
+1. If you encountered an error while waiting for the services to be deployed on Render, click **Dashboard** at the top of the Render screen and click the Service that failed.
 2. It should take you to the Events section and the top event should explain the error. It will probably contain a link to click to the **deploy logs**
 3. Scroll back up through the logs and find any instances of errors. [Open a new Issue for us](https://github.com/hostedgpt/hostedgpt/issues/new) and share details.
 4. When you are ready to try Render again, it's best to do the following:
@@ -38,9 +52,9 @@ You can deploy a full version of HostedGPT to the hosting service, Render, for f
 6. Second, in Render navigate to the Dashboard, Bluebrint, and Env Groups and delete any details associated with **hostedgpt**
 7. Now you can go back to your repo and click **Deploy to Render**
 
-# Contributing
+# Contribute as a Developer
 
-We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.8. [View 0.8 Milestone](https://github.com/hostedgpt/hostedgpt/milestone/3). Look for any issues tagged with **Good first issue**.
+We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.6. [View 0.6 Milestone](https://github.com/hostedgpt/hostedgpt/milestone/5). Look for any issues tagged with **Good first issue**.
 
 ## Setting up Development
 

@@ -1,5 +1,6 @@
 <div class='w-full h-screen flex justify-center items-center flex-col space-y-4'>
   <h2 class='text-3xl font-semibold text-black/90 dark:text-white/90'>Create your account</h2>
+
   <% if @person.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <ul>
@@ -20,6 +21,6 @@
     <%= f.fields_for :personable_attributes, @person.personable do |user_fields| %>
       <%= user_fields.password_field :password, id: "email", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded text-black p-3 w-full"%>
     <% end %>
-    <%= f.submit "Continue", class: 'border border-teal-600 rounded text-teal-600 hover:bg-teal-700 hover:text-white font-light p-4 text-center cursor-pointer' %>
+    <%= f.submit "Sign Up", class: 'border border-teal-600 rounded text-teal-600 hover:bg-teal-700 hover:text-white font-light p-4 text-center cursor-pointer' %>
   <% end %>
 </div>

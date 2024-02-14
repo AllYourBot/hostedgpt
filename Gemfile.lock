@@ -328,7 +328,7 @@ GEM
     tiktoken_ruby (0.0.6-x86_64-linux)
     timecop (0.9.8)
     timeout (0.4.1)
-    turbo-rails (2.0.0.pre.beta.1)
+    turbo-rails (2.0.2)
       actionpack (>= 6.0.0)
       activejob (>= 6.0.0)
       railties (>= 6.0.0)
@@ -386,7 +386,7 @@ DEPENDENCIES
   tailwindcss-rails
   tiktoken_ruby (~> 0.0.6)
   timecop
-  turbo-rails (~> 2.0.0.pre.beta)
+  turbo-rails (~> 2.0.2)
   tzinfo-data
   web-console
 

@@ -6,7 +6,7 @@ class MessagesController < ApplicationController
   before_action :set_sidebar_assistants, only: [:index, :new]
 
   def index
-    @messages = @conversation.messages.sorted
+    @messages = @conversation.messages.ordered
     @new_message = @assistant.messages.new(conversation: @conversation)
   end
 
@@ -24,7 +24,7 @@ class MessagesController < ApplicationController
     @message = @assistant.messages.new(message_params)
 
     if @message.save
-      GetNextAiMessageJob.perform_later(@message.conversation.id)
+      GetNextAIMessageJob.perform_later(@message.conversation.id, @assistant.id)
 
       redirect_to conversation_messages_path(@message.conversation)
     else
@@ -72,10 +72,10 @@ class MessagesController < ApplicationController
   end
 
   def set_sidebar_assistants
-    @sidebar_assistants = Current.user.assistants.sorted
+    @sidebar_assistants = Current.user.assistants.ordered
   end
 
   def message_params
-    params.require(:message).permit(:conversation_id, :content_text)
+    params.require(:message).permit(:conversation_id, :content_text, documents_attributes: [:file])
   end
 end

@@ -8,7 +8,7 @@ class Conversation < ApplicationRecord
 
   after_update_commit :set_title_async, if: -> { title.blank? && messages.count >= 2 }
 
-  scope :sorted, -> { order(updated_at: :desc) }
+  scope :ordered, -> { order(updated_at: :desc) }
 
   broadcasts_refreshes
 
@@ -25,7 +25,7 @@ class Conversation < ApplicationRecord
   #  "Older" => relation
   # }
   def self.grouped_by_increasing_time_interval_for_user(user)
-    sidebar_conversations = user.conversations.sorted
+    sidebar_conversations = user.conversations.ordered
 
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
     values = [
