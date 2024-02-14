@@ -10,8 +10,8 @@ export default class extends Controller {
   checkScroll() {
     const target = this.scrollableTarget
     const isAtTop = target.scrollTop === 0
-    const scrollOffset = Math.round(target.scrollHeight - target.scrollTop) // this can be fractional! rounding fixes
-    const isAtBottom = scrollOffset === target.clientHeight
+    const scrollOffset = target.scrollHeight - target.scrollTop
+    const isAtBottom = Math.abs(scrollOffset - target.clientHeight) <= 2 // occasionally these differ by a pixel or two
 
     if (isAtTop && !isAtBottom) {  // if everything is in view then it's at the top & bottom, we'll count that as bottom
       if (this.hasTopClass)       this.widgetTarget.classList.add(this.topClass)
