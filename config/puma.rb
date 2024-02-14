@@ -37,3 +37,5 @@ plugin :tmp_restart
 if ENV.fetch("RUN_SOLID_QUEUE_IN_PUMA") { false }
   plugin :solid_queue
 end
+
+plugin :tailwindcss if ENV.fetch("RAILS_ENV", "development") == "development"

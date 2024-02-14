@@ -1,3 +1,2 @@
 web: env RUBY_DEBUG_OPEN=true bin/rails server -p 3000
 worker: ./bin/rake solid_queue:start
-css: bin/rails tailwindcss:watch[debug]
