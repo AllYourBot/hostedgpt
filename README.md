@@ -15,6 +15,9 @@ For anyone looking to do development of a chat bot, HostedGPT is a solid foundat
 * **Don't commit yourself to $20 per month when you may not use ChatGPT a lot.** You only pay as much as you use!
 * **You will never hit the 'You've reached the current usage cap for GPT-4'.** You pay per mesage based on the API rates so you can keep using it as much as you want.
 
+[![](https://img.youtube.com/vi/GuqPne2yl6w/2.jpg)](https://www.youtube.com/watch?v=GuqPne2yl6w)
+Watch a demo of the app
+
 # Table of Contents
 
 - [Set Up Live App](#set-up-live-app)
