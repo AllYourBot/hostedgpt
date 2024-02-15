@@ -49,7 +49,7 @@ You can deploy a full version of HostedGPT to the hosting service, Render, for f
 
 1. If you encountered an error while waiting for the services to be deployed on Render, click **Dashboard** at the top of the Render screen and click the Service that failed.
 2. It should take you to the Events section and the top event should explain the error. It will probably contain a link to click to the **deploy logs**
-3. Scroll back up through the logs and find any instances of errors. [Open a new Issue for us](https://github.com/hostedgpt/hostedgpt/issues/new) and share details.
+3. Scroll back up through the logs and find any instances of errors. [Open a new Issue for us](https://github.com/the-dot-bot/hostedgpt/issues/new) and share details.
 4. When you are ready to try Render again, it's best to do the following:
 5. First, ensure your repo is caught up. Open your fork in github, click the Sync Fork button so that any bug fixes are pulled in.
 6. Second, in Render navigate to the Dashboard, Bluebrint, and Env Groups and delete any details associated with **hostedgpt**
@@ -57,7 +57,7 @@ You can deploy a full version of HostedGPT to the hosting service, Render, for f
 
 # Contribute as a Developer
 
-We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.6. [View 0.6 Milestone](https://github.com/hostedgpt/hostedgpt/milestone/5). Look for any issues tagged with **Good first issue**.
+We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.6. [View 0.6 Milestone](https://github.com/the-dot-bot/hostedgpt/milestone/5). Look for any issues tagged with **Good first issue**.
 
 ## Setting up Development
 
