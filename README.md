@@ -57,7 +57,7 @@ You can deploy a full version of HostedGPT to the hosting service, Render, for f
 
 # Contribute as a Developer
 
-We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.6. [View 0.6 Milestone](https://github.com/the-dot-bot/hostedgpt/milestone/5). Look for any issues tagged with **Good first issue** and assign it to yourself so we know you're working on it.
+We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.6. [View 0.6 Milestone](https://github.com/the-dot-bot/hostedgpt/milestone/5). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
 ## Setting up Development
 
