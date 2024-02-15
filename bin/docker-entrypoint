@@ -2,7 +2,15 @@
 
 # If running the rails server then create or migrate existing database
 if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+  echo "Running db:prepare"
   ./bin/rails db:prepare
+else
+  echo "Skipping db:prepare"
+fi
+
+if [ "${1}" == "psql" ]; then
+  echo "Running psql to connect to development database"
+  exec psql -d "$DATABASE_URL"
 fi
 
 exec "${@}"

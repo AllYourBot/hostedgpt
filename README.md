@@ -65,9 +65,9 @@ The easiest way to get up and running is to use the provided docker compose work
 3. `cd` into your clone.
 4. Run `docker compose up` to start the app.
 5. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
-6. Run tests: `docker compose run server rails test`
-7. Open the rails console: `docker compose run server rails console`
-8. Run a psql console: `docker compose run server psql`
+6. Run tests: `docker compose run base rails test`
+7. Open the rails console: `docker compose run base rails console`
+8. Run a psql console: `docker compose run base psql`
 
 Alternatively, you can set up your development environment locally:
 

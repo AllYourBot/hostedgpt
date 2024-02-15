@@ -51,3 +51,4 @@
 # JetBrains
 /.idea/*
 /client/.idea/*
+vendor/bundle
