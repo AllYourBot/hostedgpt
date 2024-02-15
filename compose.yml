@@ -22,7 +22,7 @@ services:
       interval: 1s
       retries: 5
 
-  server: &server
+  base: &base
     depends_on: ["redis", "postgres"]
     restart: on-failure:3
     tty: true
@@ -37,7 +37,7 @@ services:
       - .:/rails
 
   worker:
-    <<: *server
+    <<: *base
     restart: on-failure:3
     tty: false
     ports: []
