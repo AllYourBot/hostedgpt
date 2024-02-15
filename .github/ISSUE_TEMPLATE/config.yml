@@ -2,4 +2,4 @@ blank_issues_enabled: false
 contact_links:
   - name: DON'T POST ISSUES. Have a bug, feature idea, or any question? Start a discussion
     about: Please start Discussions for everything. Project maintainers will create issues.
-    url: https://github.com/hostedgpt/hostedgpt/discussions/new?category=general
+    url: https://github.com/the-dot-bot/hostedgpt/discussions/new?category=general
