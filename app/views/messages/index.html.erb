@@ -1,4 +1,8 @@
-<%= content_for :messages_content do %>
+<%= content_for :left_column do %>
+  <%= render 'left_column' %>
+<% end %>
+
+<%= content_for :messages do %>
 
   <%= turbo_stream_from @conversation %>
 
@@ -10,4 +14,4 @@
 
 <% end %>
 
-<%= render "shared/two_columns" %>
+<%= render 'right_column' %>

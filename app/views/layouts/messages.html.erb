@@ -1,0 +1,20 @@
+<% content_for :body do %>
+  <div  class="flex h-screen"
+        data-controller="click-toggle"
+        data-click-toggle-flippable-class="!hidden"
+  >
+
+    <div  id="left-column"
+          class="flex-col h-screen w-[287px] bg-black hidden md:block overflow-y-auto overflow-x-clip scrollbar-hide"
+          data-click-toggle-target="destination"
+    >
+      <%= yield :left_column %>
+    </div>
+
+    <div id="right-column" class="flex flex-1 h-screen bg-white dark:bg-graphite">
+      <%= yield %>
+    </div>
+  </div>
+<% end %>
+
+<%= render template: "layouts/application" %>
