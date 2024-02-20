@@ -3,7 +3,8 @@
 
 <% max_index = message.conversation.messages.length - 1 %>
 <% last_message = message_counter == max_index %>
-<% scroll_down = scroll_down || last_message %>
+<% initial_page_load = last_message && !scroll_down %>
+<% scroll_down = scroll_down || initial_page_load %>
 
 <div
   id="<%= dom_id message %>"
@@ -11,6 +12,7 @@
   data-role="message"
   data-controller="<%= (scroll_down || only_scroll_down_if_near_bottom) && 'message-scroller' %>"
   data-message-scroller-scroll-down-value="<%= scroll_down %>"
+  data-message-scroller-instant-value="<%= initial_page_load %>"
   data-message-scroller-only-scroll-down-if-near-bottom-value="<%= only_scroll_down_if_near_bottom %>"
 >
   <div class="flex">

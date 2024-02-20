@@ -23,11 +23,11 @@ export default class extends Controller {
 
   debouncedAutogrow = debounce(() => this.autogrow(), 50)
   autogrow() {
+    const prevHeight = this.element.style.height
+    this.element.style.height = 'auto'
     const newHeight = `${this.element.scrollHeight + 2}px` // the +2 is a hack to make the size not jump on load. The scrollHeight differs from than actual height for the empty state
-    if (this.element.style.height && this.element.style.height != newHeight) {
-      this.element.style.height = 'auto'
-      this.element.style.height = newHeight
-      window.dispatchEvent(new Event('resize'))
-    }
+    this.element.style.height = newHeight
+
+    if (prevHeight != newHeight) window.dispatchEvent(new Event('resize'))
   }
 }

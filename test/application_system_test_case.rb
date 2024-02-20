@@ -67,6 +67,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
         :command
       when 'esc'
         :escape
+      when 'backspace'
+        :backspace
       when 'slash'
         '/'
       when 'period'
@@ -93,5 +95,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
 
     element.click
+  end
+
+  def get_scroll_position(selector)
+    page.evaluate_script("arguments[0].scrollTop", find(selector))
   end
 end

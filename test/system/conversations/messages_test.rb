@@ -92,10 +92,6 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     all("#conversations [data-role='conversation']").to_a
   end
 
-  def get_scroll_position(selector)
-    page.evaluate_script("arguments[0].scrollTop", find(selector))
-  end
-
   def watch_page_for_morphing
     # Within automated system tests, it's difficult to know if a page morphed or not. When a page does morph
     # it should only replace the DOM elements which changed. This has the side effect of preserving scroll position.
