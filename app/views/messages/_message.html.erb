@@ -1,4 +1,4 @@
-<%# locals: (message:, scroll_down: false, only_scroll_down_if_near_bottom: false, request_id: nil, message_counter: -1) -%>
+<%# locals: (message:, scroll_down: false, only_scroll_down_if_was_bottom: false, request_id: nil, message_counter: -1) -%>
 <%# request_id is not used, but broadcasting turbo stream messages provides it as a local so it needs to be accepted %>
 
 <% max_index = message.conversation.messages.length - 1 %>
@@ -10,10 +10,10 @@
   id="<%= dom_id message %>"
   class="ml-9 sm:ml-3 md:ml-8 mb-5 group"
   data-role="message"
-  data-controller="<%= (scroll_down || only_scroll_down_if_near_bottom) && 'message-scroller' %>"
+  data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && 'message-scroller' %>"
   data-message-scroller-scroll-down-value="<%= scroll_down %>"
   data-message-scroller-instant-value="<%= initial_page_load %>"
-  data-message-scroller-only-scroll-down-if-near-bottom-value="<%= only_scroll_down_if_near_bottom %>"
+  data-message-scroller-only-scroll-down-if-was-bottom-value="<%= only_scroll_down_if_was_bottom %>"
 >
   <div class="flex">
     <div class="w-6 flex flex-col items-center ml-1">
