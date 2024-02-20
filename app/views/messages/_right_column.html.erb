@@ -140,6 +140,7 @@
               action: %|
                 new-message#disableSubmitButton
                 keydown.enter->new-message#submitForm:prevent
+                keydown.meta+enter->new-message#submitForm
                 keydown.shift+esc@document->new-message#focusKeydown
                 keydown.slash@document->new-message#focusKeydown
                 keydown.esc->new-message#unfocusKeydown
