@@ -6,12 +6,12 @@ class GetNextAIMessageJob < ApplicationJob
     @assistant = Assistant.find assistant_id
 
     @new_message = @conversation.messages.create! role: :assistant, content_text: "", assistant: @conversation.assistant
-    @new_message.broadcast_append_to @conversation
+    @new_message.broadcast_append_to @conversation, locals: { scroll_down: true }
 
     response = AIBackends::OpenAI.new(@conversation.user, @assistant, @conversation)
       .get_next_chat_message do |content_chunk|
         @new_message.content_text += content_chunk
-        @new_message.broadcast_replace_to @new_message.conversation, locals: { scroll_into_view: true }
+        @new_message.broadcast_replace_to @new_message.conversation, locals: { only_scroll_down_if_near_bottom: true }
       end
 
     if @new_message.content_text.blank? # this shouldn't be needed b/c the += above will build up the response, but test

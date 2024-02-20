@@ -1,5 +1,3 @@
-"use strict";
-
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
@@ -30,7 +28,7 @@ export default class extends Controller {
     if (this.cleanInputValue.length > 0) {
       this.element.requestSubmit()
       this.element.reset()
-      window.dispatchEvent(new Event('resize')) // Throw this event will cause textarea_autogrow to reprocess
+      window.dispatchEvent(new Event('resize'))
     }
   }
 
