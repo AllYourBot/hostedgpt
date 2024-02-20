@@ -1,7 +1,9 @@
-<!-- add some guidance for a new conversation -->
-
-<%= content_for :messages_content do %>
-  <div class=""></div>
+<%= content_for :left_column do %>
+  <%= render 'left_column' %>
 <% end %>
 
-<%= render "shared/two_columns" %>
+<%= content_for :messages do %>
+  <!-- add some guidance for a new conversation -->
+<% end %>
+
+<%= render 'right_column' %>
