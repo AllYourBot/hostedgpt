@@ -24,7 +24,7 @@ export default class extends Controller {
         this.previewTarget.querySelector("img").src = e.target.result
         this.element.classList.add("show-previews")
         this.contentTarget.focus()
-        window.dispatchEvent(new Event('resize')) // Throw this event will cause textarea_autogrow to reprocess
+        window.dispatchEvent(new Event('resize'))
       }
       reader.readAsDataURL(input.files[0])
     }
@@ -34,7 +34,7 @@ export default class extends Controller {
     this.previewTarget.querySelector("img").src = ''
     this.element.classList.remove("show-previews")
     this.contentTarget.focus()
-    window.dispatchEvent(new Event('resize')) // Throw this event will cause textarea_autogrow to reprocess
+    window.dispatchEvent(new Event('resize'))
   }
 
   boundDropped = (event) => { this.dropped(event) }

@@ -1,4 +1,4 @@
-import { Controller } from '@hotwired/stimulus'
+import { Controller } from "@hotwired/stimulus"
 import debounce from "utils/debounce"
 
 export default class extends Controller {
@@ -23,7 +23,11 @@ export default class extends Controller {
 
   debouncedAutogrow = debounce(() => this.autogrow(), 50)
   autogrow() {
+    const prevHeight = this.element.style.height
     this.element.style.height = 'auto'
-    this.element.style.height = `${this.element.scrollHeight + 2}px` // the +2 is a hack to make the size not jump on load. The scrollHeight differs from than actual height for the empty state
+    const newHeight = `${this.element.scrollHeight + 2}px` // the +2 is a hack to make the size not jump on load. The scrollHeight differs from than actual height for the empty state
+    this.element.style.height = newHeight
+
+    if (prevHeight != newHeight) window.dispatchEvent(new Event('resize'))
   }
 }
