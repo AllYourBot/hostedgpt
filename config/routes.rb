@@ -7,8 +7,6 @@ Rails.application.routes.draw do
   root to: "assistants#index"
 
   resources :assistants do
-    get :instructions, to: "assistants/instructions#edit"
-    patch :instructions, to: "assistants/instructions#update"
     resources :messages, only: [:new, :create]
   end
 

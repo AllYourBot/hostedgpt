@@ -1,2 +1,2 @@
-module Settings::UsersHelper
+module Settings::PeopleHelper
 end
