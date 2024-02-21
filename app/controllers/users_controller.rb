@@ -7,9 +7,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    @person = Person.new
-    @person.personable_type = "User"
-    @person.update person_params
+    @person = Person.new(person_params)
 
     if @person.save
       reset_session
@@ -36,7 +34,7 @@ class UsersController < ApplicationController
   private
 
   def person_params
-    params.require(:person).permit(:email, personable_attributes: :password)
+    params.require(:person).permit(:email, :personable_type, personable_attributes: :password)
   end
 
   def update_params

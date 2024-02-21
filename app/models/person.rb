@@ -7,6 +7,8 @@ class Person < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validate :proper_personable_id, on: :update
 
+  scope :ordered, -> { order(:created_at) }
+
   def email=(email)
     super(email.strip.downcase)
   end

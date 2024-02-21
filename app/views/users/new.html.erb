@@ -18,6 +18,7 @@
 
   <%= form_with(method: :post, model: @person, url: users_path, class: "flex flex-col space-y-4 w-80") do |f| %>
     <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded text-black p-3 w-full"%>
+    <%= f.hidden_field :personable_type, id: "personable_type", value: "User" %>
     <%= f.fields_for :personable_attributes, @person.personable do |user_fields| %>
       <%= user_fields.password_field :password, id: "email", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded text-black p-3 w-full"%>
     <% end %>
