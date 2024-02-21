@@ -6,11 +6,41 @@ class UsersTest < ApplicationSystemTestCase
     visit root_url
   end
 
+  test "the new user form reveals more fields when password is focused" do
+    click_text "Sign up", match: :first
+
+    assert_visible "#person_email"
+    assert_visible "#person_personable_attributes_password"
+
+    assert_hidden "#person_personable_attributes_first_name"
+    assert_hidden "#person_personable_attributes_last_name"
+    assert_hidden "#person_personable_attributes_openai_key"
+
+    fill_in "Email", with: "tester@test.com"
+    fill_in "Password", with: "secret"
+
+    assert_visible "#person_personable_attributes_first_name"
+    assert_visible "#person_personable_attributes_last_name"
+    assert_visible "#person_personable_attributes_openai_key"
+  end
+
+  test "should display errors if fields are left blank" do
+    click_text "Sign up", match: :first
+    fill_in "Email", with: "tester@test.com"
+    click_text "Sign Up"
+
+    assert_text "can't be blank"
+  end
+
   test "should create a new user" do
     click_text "Sign up", match: :first
 
-    fill_in "Email address", with: "tester@test.com"
+    fill_in "Email", with: "tester@test.com"
     fill_in "Password", with: "secret"
+    fill_in "First name", with: "John"
+    fill_in "Last name", with: "Doe"
+    fill_in "OpenAI Key", with: "abc123"
+
     click_text "Sign Up"
 
     sleep 0.3

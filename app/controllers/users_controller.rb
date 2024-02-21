@@ -34,7 +34,7 @@ class UsersController < ApplicationController
   private
 
   def person_params
-    params.require(:person).permit(:email, :personable_type, personable_attributes: :password)
+    params.require(:person).permit(:email, :personable_type, personable_attributes: [:first_name, :last_name, :password, :openai_key])
   end
 
   def update_params

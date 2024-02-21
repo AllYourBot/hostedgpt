@@ -16,11 +16,61 @@
     <%= link_to "Log in", login_path, class: "text-teal-600" %>
   </span>
 
-  <%= form_with(method: :post, model: @person, url: users_path, class: "flex flex-col space-y-4 w-80") do |f| %>
-    <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded text-black p-3 w-full"%>
+  <%= form_with method: :post,
+        model: @person,
+        url: users_path,
+        class: "flex flex-col space-y-4 w-80",
+        data: {
+          controller: "click-toggle",
+          click_toggle_flippable_class: "!flex"
+        } do
+  |f| %>
     <%= f.hidden_field :personable_type, id: "personable_type", value: "User" %>
+
+    <%= f.label :email, class: "input input-bordered flex items-center justify-between" do %>
+      <span>Email <span class="text-teal-600">*</span></span>
+      <%= f.email_field :email,
+        autofocus: true,
+        placeholder: "Email",
+        class: "w-48 border-0"
+      %>
+    <% end %>
+
     <%= f.fields_for :personable_attributes, @person.personable do |user_fields| %>
-      <%= user_fields.password_field :password, id: "email", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded text-black p-3 w-full"%>
+        <%= user_fields.label :password, class: "input input-bordered flex items-center justify-between" do %>
+          <span>Password <span class="text-teal-600">*</span></span>
+          <%= user_fields.password_field :password,
+            placeholder: "Password",
+            class: "w-48 border-0",
+            data: { action: "focus->click-toggle#toggleClass click-toggle#toggleClass" }
+          %>
+        <% end %>
+
+        <div class="<%= @person.errors.any? ? 'flex' : 'hidden' %> flex-col space-y-4" data-click-toggle-target="destination">
+          <%= user_fields.label :first_name, class: "input input-bordered flex items-center justify-between" do %>
+            <span>First name <span class="text-teal-600">*</span></span>
+            <%= user_fields.text_field :first_name,
+              placeholder: "First name",
+              class: "w-48 border-0"
+            %>
+          <% end %>
+
+          <%= user_fields.label :last_name, class: "input input-bordered flex items-center justify-between" do %>
+            <span>Last name <span class="text-teal-600">*</span></span>
+            <%= user_fields.text_field :last_name,
+              placeholder: "Last name",
+              class: "w-48 border-0"
+            %>
+          <% end %>
+
+          <%= user_fields.label :openai_key, class: "input input-bordered flex items-center justify-between" do %>
+            OpenAI Key
+            <%= user_fields.text_field :openai_key,
+              placeholder: "OpenAI API Key",
+              class: "w-48 border-0"
+            %>
+          <% end %>
+        </div>
     <% end %>
     <%= f.submit "Sign Up", class: 'border border-teal-600 rounded text-teal-600 hover:bg-teal-700 hover:text-white font-light p-4 text-center cursor-pointer' %>
   <% end %>

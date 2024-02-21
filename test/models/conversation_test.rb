@@ -72,7 +72,7 @@ class ConversationTest < ActiveSupport::TestCase
 
   test "#grouped_by_increasing_time_interval_for_user" do
     Timecop.freeze do
-      user = User.create!(password: "secret")
+      user = User.create!(password: "secret", first_name: "John", last_name: "Doe")
 
       # Create 3 conversations in each of these intervals
       [
