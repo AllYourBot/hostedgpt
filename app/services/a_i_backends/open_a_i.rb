@@ -34,13 +34,22 @@ class AIBackends::OpenAI
 
     @client.chat(parameters: {
       model: @assistant.model,
-      messages: existing_messages,
+      messages: system_message + existing_messages,
       stream: response_handler,
       max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
     })
   end
 
   private
+
+  def system_message
+    return [] if @assistant.instructions.blank?
+
+    [{
+      role: 'system',
+      content: @assistant.instructions
+    }]
+  end
 
   def existing_messages
     @conversation.messages.ordered.collect do |message|
