@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class AssistantsTest < ApplicationSystemTestCase
+class Settings::AssistantsTest < ApplicationSystemTestCase
   setup do
     @assistant = assistants(:samantha)
     login_as @assistant.user

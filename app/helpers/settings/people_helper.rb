@@ -1,0 +1,2 @@
+module Settings::UsersHelper
+end

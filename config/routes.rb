@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  namespace :settings do
+    resources :assistants, except: [:index, :show]
+    resource :person, only: [:edit, :update]
+  end
 
   root to: "assistants#index"
 

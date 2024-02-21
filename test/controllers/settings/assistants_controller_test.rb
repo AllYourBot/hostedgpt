@@ -19,6 +19,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to edit_settings_assistant_url(Assistant.last)
+    assert_nil flash[:error]
     assert_equal params, Assistant.last.slice(:name, :description, :instructions)
   end
 
@@ -32,6 +33,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     patch settings_assistant_url(@assistant), params: { assistant: params }
 
     assert_redirected_to edit_settings_assistant_url(@assistant)
+    assert_nil flash[:error]
     assert_equal params, @assistant.reload.slice(:name, :description, :instructions)
   end
 
