@@ -143,6 +143,6 @@ class MessagesSidebarTest < ApplicationSystemTestCase
   end
 
   def assert_first_message(message)
-    assert_selector "#messages > :first-child [data-role='content_text']", text: message.content_text
+    assert_selector "#messages > :first-child [data-role='content-text']", text: message.content_text
   end
 end

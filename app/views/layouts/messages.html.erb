@@ -5,8 +5,8 @@
   >
 
     <div  id="left-column"
-          class="flex-col h-screen w-[287px] bg-black hidden md:block overflow-y-auto overflow-x-clip scrollbar-hide"
-          data-click-toggle-target="destination"
+          class="flex-col h-screen w-[287px] bg-black hidden md:flex overflow-x-clip relative"
+          data-click-toggle-target="destination" style="display: relative;"
     >
       <%= yield :left_column %>
     </div>

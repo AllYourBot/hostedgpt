@@ -1,12 +1,8 @@
-<div id="left-content-container" class="flex flex-col flex-grow">
-  <div class="pl-3 flex flex-col mb-28">
-    <div id="spacer-above-sticky-assistant" class="sticky top-0 h-4 z-10 bg-black"></div>
-    <div id="assistants">
-      <div  data-controller="radio-behavior"
-            data-radio-behavior-selected-class="relationship"
-      >
-        <%= render @sidebar_assistants %>
-      </div>
+<div id="left-content-container" class="flex-1 h-screen flex flex-col">
+  <div id="left-scrollable" class="pl-3 flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
+    <div id="spacer-above-fixed-assistant" class="absolute top-0 h-5 w-full z-10 bg-black"></div>
+    <div id="assistants" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship" class="pt-14">
+      <%= render @sidebar_assistants %>
     </div>
 
     <turbo-frame  id="conversations"
@@ -25,69 +21,23 @@
   </div>
 
   <div id="left-footer" class="
-                        absolute bottom-0
-                        w-[260px]
                         flex-none
-                        flex flex-col
-                        border-t border-gray-200/50 text-white
                         pt-2 pb-4 pl-3 pr-5
-                        bg-black
                         "
-      data-controller="click-toggle"
-      data-click-toggle-flippable-class="hidden"
   >
-    <%= button_tag type: "button",
-          data: { action: "click-toggle#toggleClass" },
-          class: "flex justfiy-left gap-2 rounded-lg text-white text-sm hover:bg-[#28282b] p-2" do
-    %>
-      <%= icon "cog" , size: 20 %>
-      Settings
-    <% end %>
-
-    <a href="/logout" class="flex justify-left gap-2 hover:bg-[#28282b] rounded-lg text-white text-sm p-2">
-      <%= icon "arrow-right-start-on-rectangle", size: 20 %>
-      <p>Logout</p>
-    </a>
-
-    <div data-click-toggle-target="destination" class="fixed inset-0 z-50 <%= Current.user.openai_key.present? && 'hidden' %>">
-      <div class="absolute inset-0 bg-[rgba(0,0,0,0.5)] flex justify-center items-center"
-          data-action="click->click-toggle#toggleClass:self"
-      >
-      <div class="bg-[#343541] w-[400px] text-gray-200 p-6 rounded shadow-lg flex flex-col gap-4">
-        <div class="flex justify-between items-baseline">
-          <h2 class="text-2xl font-bold">Settings</h2>
-          <button class="text-gray-300 hover:text-gray-400 text-3xl" data-action="click-toggle#toggleClass">
-            &times;
-          </button>
+    <div class="dropdown dropdown-top dropdown-end w-full">
+      <div tabindex="0" role="button" class="cursor-pointer scale-down h-10 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 justify-between items-center w-full group mb-1">
+        <div id="profile" class="ml-2 mr-2 w-7 h-7 bg-white rounded-full"></div>
+        <div class="flex-1 text-white truncate">
+          Keith Schacht
         </div>
-
-          <%= form_with(
-            model: Current.user,
-            method: :put,
-            url: user_path(Current.user),
-            id: "settingsForm",
-            class: "contents",
-            data: { action: "ajax:success->click-toggle#toggleClass"}
-          ) do |form| %>
-            <div>
-              <%= form.label :openai_key, "OpenAI API Key:", class: "block text-gray-300 font-medium" %>
-              <%= form.text_field :openai_key, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
-            </div>
-            <div>
-              <%= form.label :first_name, "First Name:", class: "block text-gray-300 font-medium" %>
-              <%= form.text_field :first_name, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
-            </div>
-            <div>
-              <%= form.label :last_name, "Last Name:", class: "block text-gray-300 font-medium" %>
-              <%= form.text_field :last_name, class: "w-full border border-gray-300 rounded px-3 py-2 text-black" %>
-            </div>
-            <div class="flex justify-between">
-              <button class="text-gray-300 border rounded px-4 py-2" data-action="click-toggle#toggleClass">Cancel</button>
-              <%= form.submit "Save", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-grey-500 cursor-pointer" %>
-            </div>
-          <% end %>
-        </div>
+        <%= icon "chevron-up", variant: :mini, class: 'text-gray-500 ml-[2px]' %>
       </div>
+
+      <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-zinc-800">
+        <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
+        <li><%= link_to logout_path do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
+      </ul>
     </div>
   </div>
 
