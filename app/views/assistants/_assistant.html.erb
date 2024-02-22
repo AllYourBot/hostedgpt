@@ -3,6 +3,7 @@
 <% first = assistant_counter == 0 %>
 
 <div class="<%= first && 'absolute top-[17px] left-0 pl-3 w-full z-10' %>">
+  <%# This extra div ^ is needed because of the absolute positioning. It doesn't lay out properly if added to the div below. %>
   <div class="
               flex justify-between items-center
               mb-1 p-1 pl-2 pr-2 mr-5
