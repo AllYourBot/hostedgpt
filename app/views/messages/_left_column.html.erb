@@ -9,6 +9,7 @@
                   target="conversation"
                   data-controller="radio-behavior"
                   data-radio-behavior-selected-class="relationship"
+                  class="block mb-24" <%# ensures the last conversation's menu has room to open %>
     >
       <% @sidebar_conversations.each do |named_time_span, conversations| %>
         <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
