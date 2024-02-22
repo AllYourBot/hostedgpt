@@ -13,7 +13,6 @@ module.exports = {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        'graphite': 'rgba(52,53,65,1)',
         'gray': {
           50: '#f9f9f9',
           100: '#ececec',
