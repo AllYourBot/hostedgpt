@@ -4,7 +4,8 @@
 <div
   class=" flex justify-between items-center
           rounded-lg mr-5 cursor-pointer group
-          hover:bg-zinc-800 relationship:bg-zinc-800 <%= selected && 'relationship' %>"
+          hover:bg-gray-100 dark:hover:bg-gray-700 
+          relationship:bg-gray-100 dark:relationship:bg-gray-700 <%= selected && 'relationship' %>"
   data-role="conversation"
   data-radio-behavior-target="radio"
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
@@ -12,15 +13,16 @@
 
   <%= link_to conversation.title || "New chat",
     conversation_messages_path(conversation),
-    class: "flex-1 pl-2 py-2 text-white truncate text-sm text-opacity-80 w-5 radio-behavior",
+    class: "flex-1 pl-2 py-2 truncate text-sm text-opacity-1 w-5 radio-behavior",
     data: { action: "radio-behavior#select" }
   %>
 
-  <div class="hidden relationship:flex group-hover:flex gap-2 pl-2 items-center">
+  <div class="items-center hidden gap-2 pl-2 relationship:flex group-hover:flex">
     <%= icon "pencil",
           variant: :outline,
           size: 16,
-          class: "text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
+          class: "invisible group-hover:visible cursor-pointer 
+                  hover:text-gray-600 dark:hover:text-gray-300",
           'data-controller': "nested-pointer",
           title: "Rename",
           tooltip: :top
@@ -30,7 +32,9 @@
       <%= icon "x-mark",
             variant: :outline,
             size: 22,
-            class: "outline-none text-gray-400 cursor-pointer group-hover:visible hover:text-white focus:text-white",
+            class: "outline-none cursor-pointer group-hover:visible 
+                    hover:text-gray-600 dark:hover:text-gray-300
+                    focus:text-gray-600 dark:focus:text-gray-300",
             'data-controller': "nested-pointer",
             title: "Archive",
             tooltip: :top,

@@ -27,6 +27,7 @@ module.exports = {
           900: '#171717',
           950: '#0d0d0d',
         },
+        'brand-purple': '#ab68ff',
       },
       scale: {
         '96': '0.96',

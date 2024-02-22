@@ -7,7 +7,7 @@
   <div class="
               flex justify-between items-center
               mb-1 p-1 pl-2 pr-2 mr-5
-              bg-black hover:bg-zinc-800
+            hover:bg-gray-100 dark:hover:bg-gray-700
               group cursor-pointer
               text-sm rounded-lg
               <%= selected && 'relationship' %>
@@ -17,18 +17,18 @@
       data-action="radio-changed@window->radio-behavior#select"
       data-radio-behavior-id-param="<%= assistant.id %>"
   >
-    <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-white truncate", data: { role: "name" } do %>
-      <div id="profile" class="mr-2 w-7 h-7 bg-white rounded-full"></div>
+    <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
+      <div id="profile" class="mr-2 rounded-full bg-brand-purple w-7 h-7"></div>
       <%= assistant.name %>
     <% end %>
 
-    <div class="hidden relationship:flex group-hover:flex gap-3 pl-2">
+    <div class="hidden gap-3 pl-2 relationship:flex group-hover:flex">
       <% if settings %>
-        <div class="dropdown inline-flex dropdown-end outline-none">
+        <div class="inline-flex outline-none dropdown dropdown-end">
           <%= icon "ellipsis-horizontal",
                 variant: :micro,
                 size: 18,
-                class: "outline-none text-gray-400 invisible group-hover:visible hover:text-white cursor-pointer",
+                class: "outline-none text-gray-950 dark:text-gray-100 invisible group-hover:visible cursor-pointer",
                 'data-controller': "nested-pointer",
                 title: "More",
                 tabindex: 0,
@@ -44,9 +44,10 @@
 
       <%= link_to new_assistant_message_path(assistant), class: "inline-flex", data: { role: "pencil" } do %>
         <%= icon "pencil-square",
-          variant: :micro,
+          variant: :outline,
           size: 18,
-          class: "text-gray-400 cursor-pointer group-hover:visible hover:text-white invisible relationship:visible relationship:text-white",
+          class: "text-gray-950 dark:text-gray-100 cursor-pointer group-hover:visible invisible 
+                  relationship:visible relationship:text-gray-950 dark:relationship:text-gray-100",
           'data-controller': "nested-pointer",
           title: "New"
         %>
