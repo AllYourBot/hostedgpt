@@ -17,10 +17,13 @@ export default class extends Controller {
   }
 
   connect() {
+    console.log(`connect`)
     if (this.afterTimeoutValue) setTimeout(() => this.toggleClass(), this.afterTimeoutValue)
   }
 
   toggleClass() {
+    console.log('toggling', this.meTargets[0])
+    console.log('class', this.toggleClasses[0])
     this.meTargets.forEach(element => {
       element.classList.toggle(...this.toggleClasses)
     })

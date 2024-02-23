@@ -1,12 +1,12 @@
 <% content_for :body do %>
   <div  class="flex h-screen"
-        data-controller="click-toggle"
-        data-click-toggle-flippable-class="!hidden"
+        data-controller="transition"
+        data-transition-toggle-class="!hidden"
   >
 
     <div  id="left-column"
           class="flex-col h-screen w-[260px] bg-gray-50 dark:bg-gray-900 hidden md:flex overflow-x-clip relative"
-          data-click-toggle-target="destination"
+          data-transition-target="me"
     >
       <%= yield :left_column %>
     </div>
