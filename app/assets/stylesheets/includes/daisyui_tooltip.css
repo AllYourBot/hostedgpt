@@ -108,3 +108,42 @@
   opacity: 0 !important;
   transition-delay: 0ms;
 }
+
+/* Daisy Toast override */
+
+.toast > * {
+  animation: slide-in 0.15s ease-in !important;
+}
+
+@keyframes slide-in {
+  0%, 20% {
+      transform: translateX(100%);
+      opacity: 0;
+  }
+  80% {
+      transform: translateX(-10%);
+      opacity: 1;
+  }
+  90% {
+      transform: translateX(8%);
+  }
+  95% {
+      transform: translateX(-5%);
+      opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.alert-info {
+  /* https://oklch.com */
+  --in: 72.65% 0 19;
+  --inc: 0 0 0;
+}
+
+.alert-error {
+  --er: 0% 0 0;
+  --erc: 100% 0 0;
+}

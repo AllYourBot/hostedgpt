@@ -21,8 +21,8 @@
         url: users_path,
         class: "flex flex-col space-y-4 w-80",
         data: {
-          controller: "click-toggle",
-          click_toggle_flippable_class: "!flex"
+          controller: "transition",
+          transition_toggle_class: "!flex"
         } do
   |f| %>
     <%= f.hidden_field :personable_type, id: "personable_type", value: "User" %>
@@ -42,11 +42,11 @@
           <%= user_fields.password_field :password,
             placeholder: "Password",
             class: "w-48 border-0",
-            data: { action: "focus->click-toggle#toggleClass click-toggle#toggleClass" }
+            data: { action: "focus->transition#toggleClass transition#toggleClass" }
           %>
         <% end %>
 
-        <div class="<%= @person.errors.any? ? 'flex' : 'hidden' %> flex-col space-y-4" data-click-toggle-target="destination">
+        <div class="<%= @person.errors.any? ? 'flex' : 'hidden' %> flex-col space-y-4" data-transition-target="me">
           <%= user_fields.label :first_name, class: "input input-bordered flex items-center justify-between" do %>
             <span>First name <span class="text-teal-600">*</span></span>
             <%= user_fields.text_field :first_name,
