@@ -137,8 +137,11 @@
   }
 }
 
+/* If we were using the full version of tailwind, then we could use tailwind.config to customize the Daisy theme. */
+/* Colors from: https://oklch.com */
+
 .alert-info {
-  /* https://oklch.com */
+
   --in: 85% 0 19;
   --inc: 0 0 0;
 }
