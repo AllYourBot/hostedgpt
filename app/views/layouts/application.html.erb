@@ -14,7 +14,7 @@
     <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
     <%= content_for :head %>
   </head>
-  <body class="font-sans">
+  <body class="font-sans text-gray-950 dark:text-gray-100">
     <div  class="flex h-screen"
           data-controller="transition"
           data-transition-toggle-class="!hidden"
@@ -29,22 +29,24 @@
             <%= yield :left_column %>
           </div>
 
-          <div id="left-footer" class="flex-none pt-2 pb-4 pl-3 pr-5">
-            <div class="w-full dropdown dropdown-top dropdown-end">
-              <div tabindex="0" role="button" class="flex items-center justify-between w-full h-10 pr-2 mb-1 rounded-lg cursor-pointer scale-down hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                <div id="profile" class="ml-2 mr-2 bg-green-200 rounded-full w-7 h-7"></div>
-                <div class="flex-1 text-sm truncate text-gray-950 dark:text-gray-100">
-                  <%= Current.user.full_name || "Profile" %>
+          <% if Current.user %>
+            <div id="left-footer" class="flex-none pt-2 pb-4 pl-3 pr-5">
+              <div class="w-full dropdown dropdown-top dropdown-end">
+                <div tabindex="0" role="button" class="flex items-center justify-between w-full h-10 pr-2 mb-1 rounded-lg cursor-pointer scale-down hover:bg-gray-100 dark:hover:bg-gray-700 group !outline-0">
+                  <div id="profile" class="ml-2 mr-2 bg-green-200 rounded-full w-7 h-7"></div>
+                  <div class="flex-1 text-sm truncate text-gray-950 dark:text-gray-100">
+                    <%= Current.user.full_name || "Profile" %>
+                  </div>
+                  <%= icon "chevron-up", variant: :mini, class: 'text-gray-500 ml-[2px]' %>
                 </div>
-                <%= icon "chevron-up", variant: :mini, class: 'text-gray-500 ml-[2px]' %>
-              </div>
 
-              <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
-                <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
-                <li><%= link_to logout_path do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
-              </ul>
+                <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
+                  <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
+                  <li><%= link_to logout_path do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
+                </ul>
+              </div>
             </div>
-          </div>
+          <% end %>
         </div>
       </div>
 

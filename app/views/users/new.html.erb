@@ -1,5 +1,5 @@
 <div class='w-full h-screen flex justify-center items-center flex-col space-y-4'>
-  <h2 class='text-3xl font-semibold text-black/90 dark:text-white/90'>Create your account</h2>
+  <h2 class='text-3xl font-semibold'>Create your account</h2>
 
   <% if @person.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
@@ -13,7 +13,7 @@
 
   <span class='text-sm text-center'>
     Already have an account?
-    <%= link_to "Log in", login_path, class: "text-teal-600" %>
+    <%= link_to "Log in", login_path, class: "underline" %>
   </span>
 
   <%= form_with method: :post,
@@ -28,38 +28,38 @@
     <%= f.hidden_field :personable_type, id: "personable_type", value: "User" %>
 
     <%= f.label :email, class: "input input-bordered flex items-center justify-between" do %>
-      <span>Email <span class="text-teal-600">*</span></span>
+      <span>Email <span class="">*</span></span>
       <%= f.email_field :email,
         autofocus: true,
         placeholder: "Email",
-        class: "w-48 border-0"
+        class: "w-44 border-0"
       %>
     <% end %>
 
     <%= f.fields_for :personable_attributes, @person.personable do |user_fields| %>
         <%= user_fields.label :password, class: "input input-bordered flex items-center justify-between" do %>
-          <span>Password <span class="text-teal-600">*</span></span>
+          <span>Password <span class="">*</span></span>
           <%= user_fields.password_field :password,
             placeholder: "Password",
-            class: "w-48 border-0",
+            class: "w-44 border-0",
             data: { action: "focus->transition#toggleClass transition#toggleClass" }
           %>
         <% end %>
 
         <div class="<%= @person.errors.any? ? 'flex' : 'hidden' %> flex-col space-y-4" data-transition-target="me">
           <%= user_fields.label :first_name, class: "input input-bordered flex items-center justify-between" do %>
-            <span>First name <span class="text-teal-600">*</span></span>
+            <span>First name <span class="">*</span></span>
             <%= user_fields.text_field :first_name,
               placeholder: "First name",
-              class: "w-48 border-0"
+              class: "w-44 border-0"
             %>
           <% end %>
 
           <%= user_fields.label :last_name, class: "input input-bordered flex items-center justify-between" do %>
-            <span>Last name <span class="text-teal-600">*</span></span>
+            <span>Last name <span class="">*</span></span>
             <%= user_fields.text_field :last_name,
               placeholder: "Last name",
-              class: "w-48 border-0"
+              class: "w-44 border-0"
             %>
           <% end %>
 
@@ -67,11 +67,11 @@
             OpenAI Key
             <%= user_fields.text_field :openai_key,
               placeholder: "OpenAI API Key",
-              class: "w-48 border-0"
+              class: "w-44 border-0"
             %>
           <% end %>
         </div>
     <% end %>
-    <%= f.submit "Sign Up", class: 'border border-teal-600 rounded text-teal-600 hover:bg-teal-700 hover:text-white font-light p-4 text-center cursor-pointer' %>
+    <%= f.submit "Sign Up", class: 'rounded bg-gray-200 dark:bg-gray-900 border border-gray-400 font-medium p-4 text-center cursor-pointer' %>
   <% end %>
 </div>

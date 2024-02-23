@@ -5,10 +5,10 @@
 <div class="
             flex justify-between items-center
             mb-1 p-1 pl-2
-            bg-black hover:bg-zinc-800
-            group cursor-pointer
+            hover:bg-gray-100 dark:hover:bg-gray-700
+            group
             text-sm rounded-s-lg
-            <%= selected && "bg-white hover:bg-white !cursor-auto" %>
+            <%= selected ? "bg-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700 cursor-default" : "cursor-pointer" %>
           "
     data-role="assistant"
 >
@@ -16,15 +16,15 @@
         class: %|
           flex-1 flex
           items-center
-          text-white truncate
+          truncate
           h-7
-          #{selected && "!text-black cursor-auto" }
+          #{selected && "cursor-default" }
         |,
         data: { role: "name" } do
   %>
 
     <% if item.is_a?(Assistant) %>
-      <div id="profile" class="mr-2 w-7 h-7 bg-zinc-300 rounded-full"></div>
+      <div id="profile" class="mr-2 w-7 h-7 bg-blue-200 rounded-full"></div>
     <% end %>
 
     <span class="<%= !item.is_a?(Assistant) && "ml-1 text-base" %>">

@@ -150,3 +150,8 @@
   --er: 0% 0 0;
   --erc: 100% 0 0;
 }
+
+
+.input {
+  background-color: transparent;
+}
