@@ -1,45 +1,42 @@
-<div id="left-content-container" class="flex-1 h-screen flex flex-col">
-  <div id="left-scrollable" class="pl-3 flex-grow overflow-y-auto overflow-x-clip scrollbar-hide">
-    <div id="spacer-above-fixed-assistant" class="absolute top-0 h-5 w-full z-10 bg-black"></div>
+<div id="left-content-container" class="flex flex-col flex-1 h-screen">
+  <div id="left-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide">
+    <div id="spacer-above-fixed-assistant" class="absolute top-0 z-10 w-full h-5"></div>
     <div id="assistants" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship" class="pt-14">
       <%= render @sidebar_assistants %>
     </div>
+    <div class="text-gray-950 dark:text-gray-100">
+      <turbo-frame  id="conversations"
+                    target="conversation"
+                    data-controller="radio-behavior"
+                    data-radio-behavior-selected-class="relationship"
+                    class="block mb-24" <%# ensures the last conversation's menu has room to open %>
+      >
+        <% @sidebar_conversations.each do |named_time_span, conversations| %>
+          <div class="mx-2 mt-10 mb-2 text-xs font-medium text-gray-500 text-opacity-1">
+            <%= named_time_span %>
+          </div>
 
-    <turbo-frame  id="conversations"
-                  target="conversation"
-                  data-controller="radio-behavior"
-                  data-radio-behavior-selected-class="relationship"
-                  class="block mb-24" <%# ensures the last conversation's menu has room to open %>
-    >
-      <% @sidebar_conversations.each do |named_time_span, conversations| %>
-        <div class="text-white text-opacity-40 text-xs mx-2 mt-10 mb-2">
-          <%= named_time_span %>
-        </div>
-
-        <%= render conversations %>
-      <% end %>
-    </turbo-frame>
+          <%= render conversations %>
+        <% end %>
+      </turbo-frame>
+    </div>
   </div>
 
-  <div id="left-footer" class="
-                        flex-none
-                        pt-2 pb-4 pl-3 pr-5
-                        "
+  <div id="left-footer" class="flex-none pt-2 pb-4 pl-3 pr-5"
   >
-    <div class="dropdown dropdown-top dropdown-end w-full">
-      <div tabindex="0" role="button" class="cursor-pointer scale-down h-10 flex pr-2 rounded-lg hover:bg-zinc-400 hover:bg-opacity-25 justify-between items-center w-full group mb-1">
-        <div id="profile" class="ml-2 mr-2 w-7 h-7 bg-white rounded-full"></div>
-        <div class="flex-1 text-white truncate">
+    <div class="w-full dropdown dropdown-top dropdown-end">
+      <div tabindex="0" role="button" class="flex items-center justify-between w-full h-10 pr-2 mb-1 rounded-lg cursor-pointer scale-down hover:bg-gray-100 dark:hover:bg-gray-700 group">
+        <div id="profile" class="ml-2 mr-2 bg-green-200 rounded-full w-7 h-7"></div>
+        <div class="flex-1 text-sm truncate text-gray-950 dark:text-gray-100">
           Keith Schacht
         </div>
         <%= icon "chevron-up", variant: :mini, class: 'text-gray-500 ml-[2px]' %>
       </div>
 
-      <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-zinc-800">
+      <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
         <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
         <li><%= link_to logout_path do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
       </ul>
     </div>
   </div>
-
 </div>

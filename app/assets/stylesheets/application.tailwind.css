@@ -47,9 +47,9 @@
   @apply !text-white
 }
 
-.relationship .relationship\:bg-zinc-800,
-.relationship.relationship\:bg-zinc-800 {
-  @apply !bg-zinc-800
+.relationship .relationship\:bg-gray-700,
+.relationship.relationship\:bg-gray-700 {
+  @apply !bg-gray-700
 }
 
 .relationship .relationship\:hidden,
