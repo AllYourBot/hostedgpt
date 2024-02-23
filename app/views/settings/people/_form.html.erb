@@ -18,10 +18,7 @@
 
   <%= form.fields_for :personable_attributes, person.personable do |user_fields| %>
 
-    <div class="my-5">
-      <%= user_fields.label :id %>
-      <%= user_fields.text_field :id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-    </div>
+    <%= user_fields.hidden_field :id %>
 
     <div class="my-5">
       <%= user_fields.label :first_name %>
@@ -45,6 +42,6 @@
   <% end %>
 
   <div class="inline">
-    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+    <%= form.submit "Save", class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
   </div>
 <% end %>

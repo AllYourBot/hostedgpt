@@ -10,4 +10,8 @@ class Assistant < ApplicationRecord
   validates :tools, presence: true, allow_blank: true
 
   scope :ordered, -> { order(:id) }
+
+  def to_s
+    name
+  end
 end
