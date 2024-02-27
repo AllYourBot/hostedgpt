@@ -46,7 +46,7 @@
           %>
         <% end %>
 
-        <div class="<%= @person.errors.any? ? 'flex' : 'hidden' %> flex-col space-y-4" data-transition-target="me">
+        <div class="<%= @person.errors.any? ? 'flex' : 'hidden' %> flex-col space-y-4" data-transition-target="transitionable">
           <%= user_fields.label :first_name, class: "input input-bordered flex items-center justify-between" do %>
             <span>First name <span class="text-teal-600">*</span></span>
             <%= user_fields.text_field :first_name,

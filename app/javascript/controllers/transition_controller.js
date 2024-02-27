@@ -3,7 +3,7 @@ import { Controller } from '@hotwired/stimulus'
 // Example:
 //
 // <div data-controller="transition" data-transition-toggle-class="!hidden">
-//   <div id="element-that-shows-and-hides" class="block" data-transition-target="me"></div>
+//   <div id="element-that-shows-and-hides" class="block" data-transition-target="transitionable"></div>
 //   <a href="#" data-action="transition#toggleClass">click to toggle</a>
 // </div>
 //
@@ -11,20 +11,17 @@ import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
   static classes = [ "toggle" ]
-  static targets = [ "me" ]
+  static targets = [ "transitionable" ]
   static values = {
     afterTimeout: Number
   }
 
   connect() {
-    console.log(`connect`)
     if (this.afterTimeoutValue) setTimeout(() => this.toggleClass(), this.afterTimeoutValue)
   }
 
   toggleClass() {
-    console.log('toggling', this.meTargets[0])
-    console.log('class', this.toggleClasses[0])
-    this.meTargets.forEach(element => {
+    this.transitionableTargets.forEach(element => {
       element.classList.toggle(...this.toggleClasses)
     })
 
