@@ -14,8 +14,8 @@ class GetNextAIMessageJob < ApplicationJob
       .get_next_chat_message do |content_chunk|
         @new_message.content_text += content_chunk
 
-        if Time.current.to_f - last_sent_at > 0.5
-          @new_message.broadcast_replace_to @new_message.conversation, locals: { only_scroll_down_if_was_bottom: true }
+        if Time.current.to_f - last_sent_at >= 0.1
+          GetNextAIMessageJob.broadcast_updated_message(@new_message)
           last_sent_at = Time.current.to_f
         end
       end
@@ -25,12 +25,16 @@ class GetNextAIMessageJob < ApplicationJob
       @new_message.content_text = response.dig("choices", 0, "message", "content")
     end
 
-    @new_message.broadcast_replace_to @new_message.conversation, locals: { only_scroll_down_if_was_bottom: true }
+    GetNextAIMessageJob.broadcast_updated_message(@new_message)
     @new_message.save!
     puts "\nFinished GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})" if Rails.env.development?
 
   rescue => e
     puts "Error in GetNextAIMessageJob: #{e.inspect}"
     puts e.backtrace
+  end
+
+  def self.broadcast_updated_message(message)
+    message.broadcast_replace_to message.conversation, locals: { only_scroll_down_if_was_bottom: true }
   end
 end
