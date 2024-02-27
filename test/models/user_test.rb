@@ -75,4 +75,8 @@ class UserTest < ActiveSupport::TestCase
       conversation.reload
     end
   end
+
+  test "full_name returns nil if first_name and last_name are both blank" do
+    assert_nil users(:rob).full_name
+  end
 end

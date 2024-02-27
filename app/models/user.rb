@@ -8,4 +8,8 @@ class User < ApplicationRecord
 
   has_many :assistants, dependent: :destroy
   has_many :conversations, dependent: :destroy
+
+  def full_name
+    "#{first_name} #{last_name}".strip.presence
+  end
 end
