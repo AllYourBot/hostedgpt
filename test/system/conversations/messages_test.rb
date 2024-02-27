@@ -106,9 +106,11 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     click_text @long_conversation.title
     sleep 0.2
     scroll_to find_messages.second
+    sleep 0.1
 
     assert_did_not_scroll do
       resize_browser_to(1400, 700)
+      sleep 0.1
     end
   end
 
