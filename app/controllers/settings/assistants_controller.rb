@@ -1,4 +1,4 @@
-class Settings::AssistantsController < ApplicationController
+class Settings::AssistantsController < Settings::ApplicationController
   before_action :set_assistant, only: [:edit, :update, :destroy]
 
   def new

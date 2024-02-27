@@ -34,6 +34,15 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_user_id, @person.reload.user.id
   end
 
+  test "should fail to update when user.id is nil" do
+    params = person_params
+    params["personable_attributes"].delete("id")
+
+    patch settings_person_url, params: { person: params }
+    assert_response :unprocessable_entity
+    assert_not_nil assigns(:person).errors
+  end
+
   private
 
   def person_params
