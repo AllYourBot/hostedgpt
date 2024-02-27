@@ -14,7 +14,7 @@ class GetNextAIMessageJob < ApplicationJob
       .get_next_chat_message do |content_chunk|
         @new_message.content_text += content_chunk
 
-        if Time.current.to_f - last_sent_at > 0.5
+        if Time.current.to_f - last_sent_at >= 0.1
           @new_message.broadcast_replace_to @new_message.conversation, locals: { only_scroll_down_if_was_bottom: true }
           last_sent_at = Time.current.to_f
         end

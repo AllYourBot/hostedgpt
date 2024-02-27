@@ -1,17 +1,19 @@
-// "immediate" controls whether to execute the first call or the last call if there are multiple calls within the "wait" period
-export default function(func, wait, immediate) {
-  var timeout
+// debounce is typically used when a user is interacting with an element
+//
+// Imagine the case where a user is rage-clicking a button faster than your
+// 'wait' interval. When you use debounce, it will wait until the user has
+// stopped clicking so quickly and the last call to the function will
+// finally execute.
+//
+// See throttle.js
+
+export default function(func, wait) {
+  let timeout
 
   return function() {
-    var context = this, args = arguments
+    var context = this
 
-    var later = function() {
-      timeout = null
-      if (!immediate) func.apply(context, args)
-    }
-    var callNow = immediate && !timeout
     clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-    if (callNow) func.apply(context, args)
+    timeout = setTimeout(() => func.apply(context, arguments), wait)
   }
 }

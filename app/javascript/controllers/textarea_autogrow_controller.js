@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import debounce from "utils/debounce"
+import throttle from "utils/throttle"
 
 export default class extends Controller {
 
@@ -12,20 +12,21 @@ export default class extends Controller {
     this.element.style.overflow = 'hidden'
     this.autogrow()
 
-    this.element.addEventListener('input', this.debouncedAutogrow)
-    window.addEventListener('resize', this.debouncedAutogrow)
+    this.element.addEventListener('input', this.throttledAutogrow)
+    window.addEventListener('resize', this.throttledAutogrow)
   }
 
   disconnect() {
-    this.element.removeEventListener('input', this.debouncedAutogrow)
-    window.removeEventListener('resize', this.debouncedAutogrow)
+    this.element.removeEventListener('input', this.throttledAutogrow)
+    window.removeEventListener('resize', this.throttledAutogrow)
   }
 
-  debouncedAutogrow = debounce(() => this.autogrow(), 50)
+  throttledAutogrow = throttle(() => this.autogrow(), 50)
   autogrow() {
     const prevHeight = this.element.style.height
     this.element.style.height = 'auto'
-    const newHeight = `${this.element.scrollHeight + 2}px` // the +2 is a hack to make the size not jump on load. The scrollHeight differs from than actual height for the empty state
+    const newHeight = `${this.element.scrollHeight + 2}px`  // The +2 prevents jumping on load. The scrollHeight
+                                                            // from the actual height for the empty state.
     this.element.style.height = newHeight
 
     if (prevHeight != newHeight) window.dispatchEvent(new Event('resize'))

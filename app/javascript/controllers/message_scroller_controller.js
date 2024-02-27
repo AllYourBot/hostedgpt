@@ -2,54 +2,60 @@ window.lastMessageControllerInstance = null
 window.wasScrolledToBottom = false
 
 import { Controller } from "@hotwired/stimulus"
-import debounce from "utils/debounce"
+import throttle from "utils/throttle"
 
 export default class extends Controller {
   scrollableTarget = null
 
   static values = {
     scrollDown: { type: Boolean, default: false },
-    instant: { type: Boolean, default: false },
-    onlyScrollDownIfWasBottom: { type: Boolean, default: false }
+    instantly: { type: Boolean, default: false },
+    onlyScrollDownIfScrolledToBottom: { type: Boolean, default: false }
   }
 
   connect() {
-    if (window.lastMessageControllerInstance) {
-      window.lastMessageControllerInstance.disconnect()
-      window.lastMessageControllerInstance = this
-    }
-    this.scrollableTarget = document.getElementById('right-content')
-    window.addEventListener('resize', this.debouncedScrollDownIfWasBottom) // resizing browser & composer size changes
+    if (window.lastMessageControllerInstance) window.lastMessageControllerInstance.disconnect()
+    window.lastMessageControllerInstance = this
+
+    this.scrollableTarget = document.getElementById('right-content')  // Could not reference this as a target
+                                                                      // because it's higher in DOM than messages.
+    window.addEventListener('resize', this.throttledScrollDownIfScrolledToBottom)
 
     this.considerScroll()
   }
 
   disconnect() {
-    window.removeEventListener('resize', this.debouncedScrollDownIfWasBottom)
+    window.removeEventListener('resize', this.throttledScrollDownIfScrolledToBottom)
+    window.removeEventListener('load', this.throttledScrollDownIfScrolledToBottom)
   }
 
   considerScroll() {
     if (this.scrollDownValue)
-      this.debouncedScrollDown()
-    else if (this.onlyScrollDownIfWasBottomValue)
-      this.scrollDownIfWasBottom()
+      this.throttledScrollDown()
+    else if (this.onlyScrollDownIfScrolledToBottomValue)
+      this.scrollDownIfScrolledToBottom()
   }
 
-  debouncedScrollDownIfWasBottom = debounce(() => this.scrollDownIfWasBottom(), 50, true)
-  scrollDownIfWasBottom() {
-    if (window.wasScrolledToBottom) this.debouncedScrollDown(false)
+  throttledScrollDownIfScrolledToBottom = throttle(() => this.scrollDownIfScrolledToBottom(), 50)
+  scrollDownIfScrolledToBottom() {
+    if (window.wasScrolledToBottom) this.throttledScrollDown()
   }
 
-  debouncedScrollDown = debounce((instant) => this.scrollDown(instant), 50, true)
-  scrollDown(instant) {
-    let instantScroll = instant ?? this.instantValue
-    setTimeout(() => {
-      window.wasScrolledToBottom = true // even if we don't get the full way, it was the intention
+  throttledScrollDown = throttle(() => this.scrollDown(), 50)
+  scrollDown() {
+    window.wasScrolledToBottom = true // even if we don't get the full way, it was the intention
 
-      this.scrollableTarget.scrollTo({
-        top: this.scrollableTarget.scrollHeight,
-        behavior: instantScroll ? "auto" : "smooth"
-      })
-    }, instantScroll ? 300 : 0) // without the delay sometimes the page hasn't finished rendering and it doesn't go to the bottom
+    this.scrollableTarget.scrollTo({
+      top: this.scrollableTarget.scrollHeight,
+      behavior: this.instantlyValue ? "auto" : "smooth"
+    })
+
+    if (this.instantlyValue) {
+      // This occurs immediately after page load; we jump to the bottom as fast as we can. However,
+      // sometimes this fires and jumps before the page is fully loaded so scrollHeight it calculates
+      // may not be correct yet. As a precaution, we add one more event to fire on window load to scroll
+      // down a bit further. This was hard to test so I'm not yet certain it solves the problem.
+      window.addEventListener('load', this.throttledScrollDownIfScrolledToBottom, { once: true })
+    }
   }
 }
