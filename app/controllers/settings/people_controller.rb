@@ -1,5 +1,4 @@
-class Settings::PeopleController < ApplicationController
-
+class Settings::PeopleController < Settings::ApplicationController
   def edit
   end
 
@@ -7,6 +6,7 @@ class Settings::PeopleController < ApplicationController
     if Current.person.update(person_params)
       redirect_to edit_settings_person_path, notice: "Person was successfully updated.", status: :see_other
     else
+      @person = Current.person
       render :edit, status: :unprocessable_entity
     end
   end

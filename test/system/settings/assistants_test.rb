@@ -13,7 +13,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     fill_in "Description", with: @assistant.description
     fill_in "Instructions", with: @assistant.instructions
 
-    click_on "Create Assistant"
+    click_on "Save"
 
     assert_text "Assistant was successfully created"
   end
@@ -25,14 +25,14 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     fill_in "Description", with: @assistant.description+"-2"
     fill_in "Instructions", with: @assistant.instructions+"-2"
 
-    click_on "Update Assistant"
+    click_on "Save"
 
     assert_text "Assistant was successfully updated"
   end
 
   test "should destroy Assistant" do
     visit edit_settings_assistant_url(@assistant)
-    click_on "Destroy this assistant", match: :first
+    click_text "Delete", match: :first
 
     assert_text "Assistant was successfully destroyed"
   end
