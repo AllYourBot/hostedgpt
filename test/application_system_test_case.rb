@@ -34,11 +34,17 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_equal element, page.active_element, "Expected #{selector} to be the active element, but it is not. #{error_msg}"
   end
 
-  def assert_visible(selector, error_msg = nil, wait: nil)
+  def assert_visible(selector, error_msg = nil, wait: 0)
     element = find(selector, visible: false, wait: wait) rescue nil
     assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
 
     element = find(selector, visible: true, wait: wait) rescue nil
+
+    unless element&.visible?
+      sleep wait
+      element = find(selector, visible: true, wait: wait) rescue nil
+    end
+
     assert element&.visible?, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
   end
 

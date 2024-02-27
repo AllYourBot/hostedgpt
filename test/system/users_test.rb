@@ -9,7 +9,7 @@ class UsersTest < ApplicationSystemTestCase
   test "the new user form reveals more fields when password is focused" do
     click_text "Sign up", match: :first
 
-    assert_visible "#person_email"
+    assert_visible "#person_email", wait: 0.2
     assert_visible "#person_personable_attributes_password"
 
     assert_hidden "#person_personable_attributes_first_name"

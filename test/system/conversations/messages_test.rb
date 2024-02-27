@@ -16,9 +16,10 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   test "the scroll appears and disappears based on scroll position" do
     click_text @long_conversation.title
+    sleep 0.2
 
     scroll_to find_messages.second
-    assert_visible "#scroll-button", wait: 0.2
+    assert_visible "#scroll-button", wait: 0.01
 
     scroll_to find_messages.first
     assert_visible "#scroll-button", wait: 0.2
@@ -29,6 +30,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   test "clicking scroll down button scrolls the page to the bottom" do
     click_text @long_conversation.title
+    sleep 0.2
 
     scroll_to find_messages.first
     assert_visible "#scroll-button", wait: 0.5
