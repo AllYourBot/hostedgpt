@@ -6,6 +6,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     login_as @user
     @submit = find("#composer #send") # oddly, when I changed id="submit" on the button the form fails to submit
     @input_selector = "#composer textarea"
+    @long_conversation = conversations(:greeting)
   end
 
   test "the cursor is auto-focused in the text input for a new conversation and selecting existing conversation and ESC unfocuses" do
@@ -15,7 +16,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
     sleep 0.2
 
-    click_text conversations(:greeting).title
+    click_text @long_conversation.title
     sleep 0.2
     assert_active @input_selector
   end
@@ -78,54 +79,49 @@ class MessagesComposerTest < ApplicationSystemTestCase
   end
 
   test "textarea grows in height as newlines are added and shrinks in height when they are removed" do
-    click_text conversations(:greeting).title
+    click_text @long_conversation.title
     sleep 1
 
     send_keys "1"
-    height = input.native.property('clientHeight')
-    scroll = get_scroll_position("#right-content")
 
-    send_keys "shift+enter"
-    sleep 0.3
+    height = input.native.property('clientHeight')
+    assert_stays_at_bottom do
+      send_keys "shift+enter"
+      sleep 0.3
+    end
     assert input.native.property('clientHeight') > height, "Input should have grown taller"
-    assert get_scroll_position("#right-content") > scroll, "The page should have scrolled back down"
-    height = input.native.property('clientHeight')
-    scroll = get_scroll_position("#right-content")
 
-    send_keys "2"
-    send_keys "shift+enter"
-    sleep 0.3
+    height = input.native.property('clientHeight')
+    assert_stays_at_bottom do
+      send_keys "2"
+      send_keys "shift+enter"
+      sleep 0.3
+    end
     assert input.native.property('clientHeight') > height, "Input should have grown taller"
-    assert get_scroll_position("#right-content") > scroll, "The page should have scrolled back down"
-    height = input.native.property('clientHeight')
-    scroll = get_scroll_position("#right-content")
 
-    send_keys "backspace"
-    sleep 0.3
+    height = input.native.property('clientHeight')
+    assert_stays_at_bottom do
+      send_keys "backspace"
+      sleep 0.3
+    end
     assert input.native.property('clientHeight') < height, "Input should have gotten shorter"
-    assert get_scroll_position("#right-content") < scroll, "The page should have scrolled back up"
-    height = input.native.property('clientHeight')
-    scroll = get_scroll_position("#right-content")
 
-    send_keys "backspace+backspace"
-    sleep 0.3
+    height = input.native.property('clientHeight')
+    assert_stays_at_bottom do
+      send_keys "backspace+backspace"
+      sleep 0.3
+    end
     assert input.native.property('clientHeight') < height, "Input should have gotten shorter"
-    assert get_scroll_position("#right-content") < scroll, "The page should have scrolled back up"
-    height = input.native.property('clientHeight')
-    scroll = get_scroll_position("#right-content")
 
-    send_keys "backspace+backspace"
-    sleep 0.3
+    height = input.native.property('clientHeight')
+    assert_stays_at_bottom do
+      send_keys "backspace+backspace"
+      sleep 0.3
+    end
     assert input.native.property('clientHeight') == height, "Input should not have changed height"
-    assert get_scroll_position("#right-content") == scroll, "The page should not have scrolled"
   end
 
-  test "textarea grows in height and auto-scrolls messages when a large block of text is pasted" do
-    click_text conversations(:greeting).title
-    sleep 1
-    height = input.native.property('clientHeight')
-    scroll = get_scroll_position("#right-content")
-
+  test "when large block of text is pasted, textarea grows in height and auto-scrolls to stay at the bottom" do
     text = <<~END
       The quick brown fox jumped over the lazy dog.
       The quick brown fox jumped over the lazy dog.
@@ -139,16 +135,46 @@ class MessagesComposerTest < ApplicationSystemTestCase
       The quick brown fox jumped over the lazy dog.
       The quick brown fox jumped over the lazy dog.
     END
-    send_keys text.gsub(/\n/, ' ')
-    sleep 0.3
-    assert input.native.property('clientHeight') > height, "Input should have grown taller"
-    assert get_scroll_position("#right-content") > scroll, "The page should have scrolled back down"
+
+    click_text @long_conversation.title
+    sleep 0.2
+
     height = input.native.property('clientHeight')
-    scroll = get_scroll_position("#right-content")
+    assert_stays_at_bottom do
+      send_keys text.gsub(/\n/, ' ')
+      sleep 0.2
+    end
+    assert input.native.property('clientHeight') > height, "Input should have grown taller"
+  end
+
+  test "when large block of text is pasted, textarea grows in height and DOES NOT auto-scroll so what scrolled to stays visible" do
+    text = <<~END
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+    END
+
+    click_text @long_conversation.title
+    sleep 0.2
+    scroll_to find_messages.second
+
+    height = input.native.property('clientHeight')
+    assert_did_not_scroll do
+      send_keys text.gsub(/\n/, ' ')
+    end
+    assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
 
   test "submitting a couple messages to an existing conversation with ENTER works" do
-    click_text conversations(:greeting).title
+    click_text @long_conversation.title
     sleep 0.3
     path = current_path
 
@@ -168,7 +194,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
   end
 
   test "submitting a couple messages to an existing conversation with CLICKING works" do
-    click_text conversations(:greeting).title
+    click_text @long_conversation.title
     sleep 0.3
     path = current_path
 

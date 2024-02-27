@@ -112,4 +112,68 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def get_scroll_position(selector)
     page.evaluate_script("arguments[0].scrollTop", find(selector))
   end
+
+  def scroll_to_bottom(selector)
+    page.execute_script("document.querySelector('#{selector}').scrollTop = document.querySelector('#{selector}').scrollHeight")
+  end
+
+  def assert_did_not_scroll(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').firstElementChild.getBoundingClientRect().top")
+    yield
+    new_scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').firstElementChild.getBoundingClientRect().top")
+
+    assert_equal scroll_position_first_element_relative_viewport,
+      new_scroll_position_first_element_relative_viewport,
+      "The #{selector} should not have scrolled"
+  end
+
+  def assert_scrolled_up(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    scroll_position = get_scroll_position(selector)
+    yield
+    assert get_scroll_position(selector) > scroll_position, "The #{selector} should have scrolled up"
+  end
+
+  def assert_scrolled_down(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    scroll_position = get_scroll_position(selector)
+    yield
+    assert get_scroll_position(selector) > scroll_position, "The #{selector} should have scrolled down"
+  end
+
+  def assert_at_bottom(selector = "#right-content")
+    new_scroll_position = get_scroll_position(selector)
+    scroll_to_bottom(selector)
+    assert_equal new_scroll_position, get_scroll_position(selector), "The #{selector} did not scroll to the bottom."
+  end
+
+  def assert_scrolled_to_bottom(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    assert_scrolled_down(selector) do
+      yield
+    end
+
+    assert_at_bottom(selector)
+  end
+
+  def assert_stays_at_bottom(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    assert_at_bottom(selector)
+    yield
+    assert_at_bottom(selector)
+  end
+
+  def resize_browser_to(width, height)
+    page.driver.browser.manage.window.resize_to(width, height)
+  end
+
+  def find_messages
+    all("#conversation [data-role='message']").to_a
+  end
 end
