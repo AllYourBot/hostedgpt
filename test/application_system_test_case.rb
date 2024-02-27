@@ -110,7 +110,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def get_scroll_position(selector)
-    page.evaluate_script("arguments[0].scrollTop", find(selector))
+    page.evaluate_script("document.querySelector('#{selector}').scrollTop")
   end
 
   def scroll_to_bottom(selector)
