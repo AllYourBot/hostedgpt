@@ -28,7 +28,7 @@ export default class extends Controller {
     if (this.cleanInputValue.length > 0) {
       this.element.requestSubmit()
       this.element.reset()
-      window.dispatchEvent(new Event('resize'))
+      window.dispatchEvent(new CustomEvent('right-column-changed'))
     }
   }
 

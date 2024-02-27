@@ -24,7 +24,7 @@ export default class extends Controller {
         this.previewTarget.querySelector("img").src = e.target.result
         this.element.classList.add("show-previews")
         this.contentTarget.focus()
-        window.dispatchEvent(new Event('resize'))
+        window.dispatchEvent(new CustomEvent('right-column-changed'))
       }
       reader.readAsDataURL(input.files[0])
     }
@@ -34,7 +34,7 @@ export default class extends Controller {
     this.previewTarget.querySelector("img").src = ''
     this.element.classList.remove("show-previews")
     this.contentTarget.focus()
-    window.dispatchEvent(new Event('resize'))
+    window.dispatchEvent(new CustomEvent('right-column-changed'))
   }
 
   boundDropped = (event) => { this.dropped(event) }

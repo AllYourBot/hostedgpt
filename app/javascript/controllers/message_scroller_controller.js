@@ -20,12 +20,14 @@ export default class extends Controller {
     this.scrollableTarget = document.getElementById('right-content')  // Could not reference this as a target
                                                                       // because it's higher in DOM than messages.
     window.addEventListener('resize', this.throttledScrollDownIfScrolledToBottom)
+    window.addEventListener('right-column-changed', this.throttledScrollDownIfScrolledToBottom)
 
     this.considerScroll()
   }
 
   disconnect() {
     window.removeEventListener('resize', this.throttledScrollDownIfScrolledToBottom)
+    window.removeEventListener('right-column-changed', this.throttledScrollDownIfScrolledToBottom)
     window.removeEventListener('load', this.throttledScrollDownIfScrolledToBottom)
   }
 

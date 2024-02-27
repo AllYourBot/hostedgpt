@@ -27,6 +27,6 @@ export default class extends Controller {
 
     // Showing and hiding elements can cause the page to flow differently, very similarly to what happens when the
     // browser size changes. Throw this event in case we have other listeners on the resize event.
-    window.dispatchEvent(new Event('resize'))
+    window.dispatchEvent(new CustomEvent('right-column-changed'))
   }
 }

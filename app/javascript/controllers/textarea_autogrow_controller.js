@@ -14,11 +14,13 @@ export default class extends Controller {
 
     this.element.addEventListener('input', this.throttledAutogrow)
     window.addEventListener('resize', this.throttledAutogrow)
+    window.addEventListener('right-column-changed', this.throttledAutogrow)
   }
 
   disconnect() {
     this.element.removeEventListener('input', this.throttledAutogrow)
     window.removeEventListener('resize', this.throttledAutogrow)
+    window.removeEventListener('right-column-changed', this.throttledAutogrow)
   }
 
   throttledAutogrow = throttle(() => this.autogrow(), 50)
@@ -29,6 +31,6 @@ export default class extends Controller {
                                                             // from the actual height for the empty state.
     this.element.style.height = newHeight
 
-    if (prevHeight != newHeight) window.dispatchEvent(new Event('resize'))
+    if (prevHeight != newHeight) window.dispatchEvent(new CustomEvent('right-column-changed'))
   }
 }
