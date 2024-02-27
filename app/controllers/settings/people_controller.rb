@@ -20,7 +20,8 @@ class Settings::PeopleController < Settings::ApplicationController
   end
 
   def check_personable_id
-    if params[:person].try(:[], :personable_attributes).try(:[], :id)&.to_i != Current.person.personable_id
+    personable_id = params[:person].try(:[], :personable_attributes).try(:[], :id)
+    if personable_id.present? && personable_id.to_i != Current.person.personable_id
       return render :edit, status: :unauthorized
     end
   end
