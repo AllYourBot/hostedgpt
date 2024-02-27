@@ -1,4 +1,5 @@
 class Settings::PeopleController < ApplicationController
+  before_action :check_personable_id, only: :update
 
   def edit
   end
@@ -15,5 +16,11 @@ class Settings::PeopleController < ApplicationController
 
   def person_params
     params.require(:person).permit(:email, personable_attributes: [:id, :first_name, :last_name, :password, :openai_key])
+  end
+
+  def check_personable_id
+    if params[:person].try(:[], :personable_attributes).try(:[], :id)&.to_i != Current.person.personable_id
+      return render :edit, status: :unauthorized
+    end
   end
 end

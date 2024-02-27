@@ -25,11 +25,13 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
 
   test "should fail to update when user.id is changed" do
     params = person_params
-    params["personable_attributes"]["id"] += 1
+    original_user_id = params["personable_attributes"]["id"]
+    params["personable_attributes"]["id"] = original_user_id + 1
 
-    assert_raises ArgumentError do
-      patch settings_person_url, params: { person: params }
-    end
+    patch settings_person_url, params: { person: params }
+
+    assert_response :unauthorized
+    assert_equal original_user_id, @person.reload.user.id
   end
 
   private
