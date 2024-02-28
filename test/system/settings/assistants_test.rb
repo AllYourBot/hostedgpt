@@ -36,6 +36,8 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
       click_text "Delete", match: :first
     end
     assert_text "Deleted"
+
+    refute Assistant.exists?(id: @assistant.id)
   end
 
   test "should cancel destroy Assistant" do
@@ -44,5 +46,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
       click_text "Delete", match: :first
     end
     assert_no_text "Deleted"
+
+    assert @assistant.reload.present?
   end
 end

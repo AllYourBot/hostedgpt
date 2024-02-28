@@ -6,7 +6,7 @@
   <%= button_to "Delete",
         settings_assistant_path(@assistant),
         method: :delete,
-        data: { confirm: "Are you sure?" },
+        data: { turbo_confirm: "Are you sure?" },
         form: { class: "inline-block" },
         class: %|
           ml-5 mt-2 py-3 px-5
