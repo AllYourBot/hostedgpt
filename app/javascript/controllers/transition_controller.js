@@ -17,12 +17,12 @@ export default class extends Controller {
   }
 
   connect() {
-    this.applied = false
+    this.toggled = false
     if (this.afterTimeoutValue) setTimeout(() => this.toggleClasses(), this.afterTimeoutValue)
   }
 
   toggleClass() {
-    this.applied = !this.applied
+    this.toggled = !this.toggled
 
     this.transitionableTargets.forEach(element => {
       this.toggleClasses.forEach(className => {
@@ -35,8 +35,8 @@ export default class extends Controller {
     window.dispatchEvent(new CustomEvent('right-column-changed'))
   }
 
-  applyClass() { // will only toggle once
-    if (this.applied) return
+  toggleClassOnce() {
+    if (this.toggled) return
     this.toggleClass()
   }
 }
