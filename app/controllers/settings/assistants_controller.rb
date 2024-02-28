@@ -12,7 +12,7 @@ class Settings::AssistantsController < Settings::ApplicationController
     @assistant = Current.user.assistants.new(assistant_params)
 
     if @assistant.save
-      redirect_to edit_settings_assistant_path(@assistant), notice: "Assistant was successfully created."
+      redirect_to edit_settings_assistant_path(@assistant), notice: "Saved"
     else
       render :new, status: :unprocessable_entity
     end
@@ -20,7 +20,7 @@ class Settings::AssistantsController < Settings::ApplicationController
 
   def update
     if @assistant.update(assistant_params)
-      redirect_to edit_settings_assistant_path(@assistant), notice: "Assistant was successfully updated.", status: :see_other
+      redirect_to edit_settings_assistant_path(@assistant), notice: "Saved", status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
@@ -28,7 +28,7 @@ class Settings::AssistantsController < Settings::ApplicationController
 
   def destroy
     @assistant.destroy!
-    redirect_to new_settings_assistant_url, notice: "Assistant was successfully destroyed.", status: :see_other
+    redirect_to new_settings_assistant_url, notice: "Deleted", status: :see_other
   end
 
   private
