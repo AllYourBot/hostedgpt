@@ -6,7 +6,22 @@
 
   <div id="conversations" class="min-w-full">
     <% @conversations.each do |conversation| %>
-      <%= render conversation %>
+      <div id="<%= dom_id conversation %>">
+        <p class="flex gap-2">
+          <strong class="block font-medium mb-1">ID:</strong>
+          <%= conversation.id %>
+        </p>
+
+        <p class="flex gap-2">
+          <strong class="block font-medium mb-1">Assistant:</strong>
+          <%= conversation.assistant.name %>
+        </p>
+
+        <p class="flex gap-2">
+          <strong class="block font-medium mb-1">Title:</strong>
+          <%= conversation.title %>
+        </p>
+      </div>
     <% end %>
   </div>
 </div>

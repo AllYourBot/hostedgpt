@@ -39,7 +39,12 @@ end
 class ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers
 
-  def login_as(user)
+  def login_as(user_or_person)
+    user = if user_or_person.is_a?(Person)
+      user_or_person.user
+    else
+      user_or_person
+    end
     post login_path, params: { email: user.person.email, password: "secret" }
     assert_response :redirect
     follow_redirect!

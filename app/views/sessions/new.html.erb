@@ -1,13 +1,13 @@
 <div class='w-full h-screen flex justify-center items-center flex-col space-y-4'>
-  <h2 class='text-3xl font-semibold text-black/90 dark:text-white/90'>Welcome back</h2>
+  <h2 class='text-3xl font-semibold'>Welcome back</h2>
 
   <span class='text-sm text-center'>
-    Don't have an account? <%= link_to "Sign up", new_user_path, class: "text-teal-600" %>
+    Don't have an account? <%= link_to "Sign up", new_user_path, class: "underline" %>
   </span>
 
   <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
-    <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded text-black p-3"%>
-    <%= f.password_field :password, id: "password", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded text-black p-3"%>
-    <%= f.submit "Log In", class: 'border border-teal-600 rounded text-teal-600 hover:bg-teal-700 hover:text-white font-light p-4 text-center cursor-pointer' %>
+    <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded p-3"%>
+    <%= f.password_field :password, id: "password", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded p-3"%>
+    <%= f.submit "Log In", class: 'bg-gray-200 dark:bg-gray-900 border border-gray-400 rounded font-medium p-4 text-center cursor-pointer' %>
   <% end %>
 </div>

@@ -1,11 +1,8 @@
 # HostedGPT
 
-Would you like to implement and hack on your own chat bot?
-Do you love using ChatGPT but want more control over your data? Would you like to experiment with new, advanced features that ChatGPT has not implemented yet?
+HostedGPT is a free, open-source alternative to ChatGPT. You can run it on your own computer or any server that supports Ruby on Rails, just bring your own OpenAI API key. All the core functionality of ChatGPT is already working (e.g. GPT-3.5 and GPT-4, starting new converstions, streaming responses, asking about attached images, etc). The main thing missing is the mobile app but that's coming soon.
 
-HostedGPT is an open source project that provides all the same functionality as ChatGPT \[_that's the goal at least, we aren't there yet_\]! When you switch from ChatGPT to HostedGPT, you \[_will_\] get the same full-featured desktop and mobile app! It's free to use, just bring your own OpenAI API key. And thanks to a community of contributors, HostedGPT \[_will have_\] *many* features and extensions that regular ChatGPT does not have yet. And thanks to active development, whenever ChatGPT adds to new features, those same features are quickly added to HostedGPT so that you won't miss out.
-
-For anyone looking to do development of a chat bot, HostedGPT is a solid foundation to build upon.
+This project is actively looking for contributors to help make it great. The goal is for *every* feature that exists in ChatGPT to exist in this app, then we can start adding lots of new features and extensions beyond what ChatGPT supports.
 
 ### Some favorite features of HostedGPT
 
@@ -25,10 +22,10 @@ Watch a demo of the app
 
 # Set Up Live App
 
-You can deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working. You will need to upgrade to a paid version of the database which is $7 / month.
+You can deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working. You will need to upgrade to a paid version of the database which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
 
 1. Click Fork > Create New Fork at the top of this repository
-2. Create an account on Render.com and login
+2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
 3. View your newly created fork within github.com and click the button below:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
@@ -61,7 +58,7 @@ We welcome contributors! After you get your developoment environment setup, revi
 
 ## Setting up Development
 
-The easiest way to get up and running is to use the provided docker compose workflow:
+The easiest way to get up and running is to use the provided docker compose workflow. The only things you need installed on your computer are Docker and Git.
 
 1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running.
 2. Clone your fork `git clone [repository url]`

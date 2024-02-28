@@ -1,10 +1,12 @@
 Rails.application.routes.draw do
+  namespace :settings do
+    resources :assistants, except: [:index, :show]
+    resource :person, only: [:edit, :update]
+  end
 
   root to: "assistants#index"
 
   resources :assistants do
-    get :instructions, to: "assistants/instructions#edit"
-    patch :instructions, to: "assistants/instructions#update"
     resources :messages, only: [:new, :create]
   end
 

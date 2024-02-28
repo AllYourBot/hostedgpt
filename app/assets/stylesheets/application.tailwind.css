@@ -47,9 +47,9 @@
   @apply !text-white
 }
 
-.relationship .relationship\:bg-zinc-800,
-.relationship.relationship\:bg-zinc-800 {
-  @apply !bg-zinc-800
+.relationship .relationship\:bg-gray-700,
+.relationship.relationship\:bg-gray-700 {
+  @apply !bg-gray-700
 }
 
 .relationship .relationship\:hidden,
@@ -68,4 +68,18 @@
 
 .show-previews .show-previews\:pt-24 {
   @apply pt-24
+}
+
+/* Override the style change that chrome brings when it autofills fields */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+input:focus {
+  --tw-ring-color: #ffffff !important;
 }

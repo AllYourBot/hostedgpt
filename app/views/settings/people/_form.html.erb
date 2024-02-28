@@ -1,0 +1,47 @@
+<%= form_with(model: [:settings, person], class: "contents") do |form| %>
+  <% if person.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
+
+      <ul>
+        <% person.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :email %>
+    <%= form.text_field :email, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <%= form.fields_for :personable_attributes, person.personable do |user_fields| %>
+
+    <%= user_fields.hidden_field :id %>
+
+    <div class="my-5">
+      <%= user_fields.label :first_name %>
+      <%= user_fields.text_field :first_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+    </div>
+
+    <div class="my-5">
+      <%= user_fields.label :last_name %>
+      <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+    </div>
+
+    <div class="my-5">
+      <%= user_fields.label :password %>
+      <%= user_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+    </div>
+
+    <div class="my-5">
+      <%= user_fields.label :openai_key %>
+      <%= user_fields.text_field :openai_key, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+    </div>
+  <% end %>
+
+  <div class="inline">
+    <%= form.submit "Save", class: "rounded-lg py-3 px-5 bg-gray-200 dark:bg-gray-900 border border-gray-400 inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>

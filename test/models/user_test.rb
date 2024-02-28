@@ -11,10 +11,16 @@ class UserTest < ActiveSupport::TestCase
     refute person.valid?
   end
 
-  test "should validate a user with password" do
-    user = User.new(password: "password", password_confirmation: "password")
+  test "should validate a user with minimum information" do
+    user = User.new(password: "password", password_confirmation: "password", first_name: "John", last_name: "Doe")
     person = Person.new(email: "exmaple@gmail.com", personable: user)
     assert person.valid?
+  end
+
+  test "although first & last name is required for create it's not required for update" do
+    assert_nothing_raised do
+      users(:keith).update!(first_name: nil, last_name: nil)
+    end
   end
 
   test "it can update a user with a password" do
@@ -34,7 +40,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "passwords must be 6 characters or longer" do
-    user = User.new
+    user = User.new(first_name: "John", last_name: "Doe")
     bad_short_passwords = ["", "12345"]
 
     bad_short_passwords.each do |bad_password|
@@ -68,5 +74,9 @@ class UserTest < ActiveSupport::TestCase
     assert_raises ActiveRecord::RecordNotFound do
       conversation.reload
     end
+  end
+
+  test "full_name returns nil if first_name and last_name are both blank" do
+    assert_nil users(:rob).full_name
   end
 end

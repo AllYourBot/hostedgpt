@@ -7,7 +7,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   fixtures :all
 
-  def login_as(user, password = "secret")
+  def login_as(user_or_person, password = "secret")
+    user = if user_or_person.is_a?(Person)
+      user_or_person.user
+    else
+      user_or_person
+    end
+
     assistant = user.assistants.ordered.first
 
     visit logout_path
@@ -28,11 +34,17 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_equal element, page.active_element, "Expected #{selector} to be the active element, but it is not. #{error_msg}"
   end
 
-  def assert_visible(selector, error_msg = nil, wait: nil)
+  def assert_visible(selector, error_msg = nil, wait: 0)
     element = find(selector, visible: false, wait: wait) rescue nil
     assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
 
     element = find(selector, visible: true, wait: wait) rescue nil
+
+    unless element&.visible?
+      sleep wait
+      element = find(selector, visible: true, wait: wait) rescue nil
+    end
+
     assert element&.visible?, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
   end
 
@@ -67,6 +79,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
         :command
       when 'esc'
         :escape
+      when 'backspace'
+        :backspace
       when 'slash'
         '/'
       when 'period'
@@ -93,5 +107,73 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
 
     element.click
+  end
+
+  def get_scroll_position(selector)
+    page.evaluate_script("document.querySelector('#{selector}').scrollTop")
+  end
+
+  def scroll_to_bottom(selector)
+    page.execute_script("document.querySelector('#{selector}').scrollTop = document.querySelector('#{selector}').scrollHeight")
+  end
+
+  def assert_did_not_scroll(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').firstElementChild.getBoundingClientRect().top")
+    yield
+    new_scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').firstElementChild.getBoundingClientRect().top")
+
+    assert_equal scroll_position_first_element_relative_viewport,
+      new_scroll_position_first_element_relative_viewport,
+      "The #{selector} should not have scrolled"
+  end
+
+  def assert_scrolled_up(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    scroll_position = get_scroll_position(selector)
+    yield
+    assert get_scroll_position(selector) > scroll_position, "The #{selector} should have scrolled up"
+  end
+
+  def assert_scrolled_down(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    scroll_position = get_scroll_position(selector)
+    yield
+    assert get_scroll_position(selector) > scroll_position, "The #{selector} should have scrolled down"
+  end
+
+  def assert_at_bottom(selector = "#right-content")
+    new_scroll_position = get_scroll_position(selector)
+    scroll_to_bottom(selector)
+    assert_equal new_scroll_position, get_scroll_position(selector), "The #{selector} did not scroll to the bottom."
+  end
+
+  def assert_scrolled_to_bottom(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    assert_scrolled_down(selector) do
+      yield
+    end
+
+    assert_at_bottom(selector)
+  end
+
+  def assert_stays_at_bottom(selector = "#right-content")
+    raise "No block given" unless block_given?
+
+    assert_at_bottom(selector)
+    yield
+    assert_at_bottom(selector)
+  end
+
+  def resize_browser_to(width, height)
+    page.driver.browser.manage.window.resize_to(width, height)
+  end
+
+  def find_messages
+    all("#conversation [data-role='message']").to_a
   end
 end
