@@ -17,16 +17,26 @@ export default class extends Controller {
   }
 
   connect() {
-    if (this.afterTimeoutValue) setTimeout(() => this.toggleClass(), this.afterTimeoutValue)
+    this.applied = false
+    if (this.afterTimeoutValue) setTimeout(() => this.toggleClasses(), this.afterTimeoutValue)
   }
 
   toggleClass() {
+    this.applied = !this.applied
+
     this.transitionableTargets.forEach(element => {
-      element.classList.toggle(...this.toggleClasses)
+      this.toggleClasses.forEach(className => {
+        element.classList.toggle(className)
+      })
     })
 
     // Showing and hiding elements can cause the page to flow differently, very similarly to what happens when the
     // browser size changes. Throw this event in case we have other listeners on the resize event.
     window.dispatchEvent(new CustomEvent('right-column-changed'))
+  }
+
+  applyClass() { // will only toggle once
+    if (this.applied) return
+    this.toggleClass()
   }
 }

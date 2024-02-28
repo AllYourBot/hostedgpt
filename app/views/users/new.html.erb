@@ -22,7 +22,7 @@
         class: "flex flex-col space-y-4 w-80",
         data: {
           controller: "transition",
-          transition_toggle_class: "!flex"
+          transition_toggle_class: "max-h-0 max-h-40"
         } do
   |f| %>
     <%= f.hidden_field :personable_type, id: "personable_type", value: "User" %>
@@ -42,11 +42,18 @@
           <%= user_fields.password_field :password,
             placeholder: "Password",
             class: "w-44 border-0",
-            data: { action: "focus->transition#toggleClass transition#toggleClass" }
+            data: { action: "focus->transition#applyClass" }
           %>
         <% end %>
 
-        <div class="<%= @person.errors.any? ? 'flex' : 'hidden' %> flex-col space-y-4" data-transition-target="transitionable">
+        <div  class="
+                    <%= @person.errors.any? ? 'max-h-40' : 'max-h-0' %> overflow-hidden
+                    flex flex-col
+                    transition-all duration-100 ease-in
+                    space-y-4
+                    "
+              data-transition-target="transitionable">
+
           <%= user_fields.label :first_name, class: "input input-bordered flex items-center justify-between" do %>
             <span>First name <span class="">*</span></span>
             <%= user_fields.text_field :first_name,
