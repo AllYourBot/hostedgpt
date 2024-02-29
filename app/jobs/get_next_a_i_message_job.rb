@@ -27,6 +27,8 @@ class GetNextAIMessageJob < ApplicationJob
 
     GetNextAIMessageJob.broadcast_updated_message(@message)
     @message.save!
+    @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
+
     puts "\nFinished GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})" if Rails.env.development?
 
   rescue => e
@@ -35,6 +37,6 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def self.broadcast_updated_message(message)
-    message.broadcast_replace_to message.conversation, locals: { only_scroll_down_if_was_bottom: true }
+    message.broadcast_replace_to message.conversation, locals: { only_scroll_down_if_was_bottom: true, timestamp: (Time.current.to_f*1000).to_i }
   end
 end

@@ -3,9 +3,10 @@ require "test_helper"
 class GetNextAIMessageJobTest < ActiveJob::TestCase
   test "adds a new message from the assistant" do
     @conversation = conversations(:greeting)
+    @conversation.messages.create! role: :assistant, content_text: "", assistant: @conversation.assistant
     @test_client = TestClients::OpenAI.new(access_token: 'abc')
 
-    assert_difference "@conversation.messages.reload.length", 1 do
+    assert_no_difference "@conversation.messages.reload.length" do
       GetNextAIMessageJob.perform_now(@conversation.id, assistants(:samantha).id)
     end
 

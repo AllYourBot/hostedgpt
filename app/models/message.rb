@@ -41,6 +41,6 @@ class Message < ApplicationRecord
   end
 
   def broadcast_message
-    broadcast_append_to conversation, partial: "messages/message", locals: { scroll_down: true }
+    broadcast_append_to conversation, partial: "messages/message", locals: { scroll_down: true, timestamp: (Time.current.to_f*1000).to_i }
   end
 end
