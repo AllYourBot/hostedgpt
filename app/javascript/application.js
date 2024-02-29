@@ -2,38 +2,19 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 
-console.log(`binding new replace()`)
-let lastElementId = null
+// TODO: Remove this debug code
+// This is included in main just for awhile to aid with some debugging
+// Also remove "timestamp:" from message broadcasts
+
+let oldTimestamp
 
 document.addEventListener('turbo:before-stream-render', (event) => {
   const stream = event.target
-  let newElement, oldElement
-  console.log(`event came`, stream)
+  const newElement = stream.children[0].content.children[0]
+  let newTimestamp
+  //const oldElement = document.getElementById(newElement.id.toString())
+  if (newElement) newTimestamp = parseInt(newElement.getAttribute('data-timestamp'))
 
-  if (stream.getAttribute('action') === 'append') {
-    console.log(`append?`, stream)
-  }
-
-  if (stream.getAttribute('action') === 'replace') {
-    newElement = stream.children[0].content.children[0]
-    oldElement = document.getElementById(newElement.id.toString())
-
-    if (!newElement.hasAttribute('data-timestamp')) return
-
-    if (!oldElement) {
-      console.log('No old element so discarding this one', stream)
-      event.preventDefault()
-      return
-    }
-
-    const oldTimestamp = parseInt(oldElement.getAttribute('data-timestamp') || '0')
-    const newTimestamp = parseInt(newElement.getAttribute('data-timestamp'))
-
-    console.log(`${newTimestamp > oldTimestamp ? 'REPLACE' : 'SKIP'} (${newTimestamp} ?> ${oldTimestamp}`)
-
-    if (newTimestamp <= oldTimestamp)
-      event.preventDefault()
-    else
-      oldElement.setAttribute('data-timestamp', newTimestamp)
-  }
+  console.log(`${stream.getAttribute('action')} event - ${newTimestamp} ${newTimestamp <= oldTimestamp ? 'REORDER!' : ''}`, stream)
+  oldTimestamp = newTimestamp
 })
