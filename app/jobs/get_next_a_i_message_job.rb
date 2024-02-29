@@ -4,29 +4,29 @@ class GetNextAIMessageJob < ApplicationJob
 
     @conversation = Conversation.find conversation_id
     @assistant = Assistant.find assistant_id
+    @message = @conversation.messages.ordered.last
 
-    @new_message = @conversation.messages.create! role: :assistant, content_text: "", assistant: @conversation.assistant
-    @new_message.broadcast_append_to @conversation, locals: { scroll_down: true }
+    return if @message.user?
 
-    last_sent_at = Time.current.to_f
+    last_sent_at = Time.current
 
     response = AIBackends::OpenAI.new(@conversation.user, @assistant, @conversation)
       .get_next_chat_message do |content_chunk|
-        @new_message.content_text += content_chunk
+        @message.content_text += content_chunk
 
-        if Time.current.to_f - last_sent_at >= 0.1
-          GetNextAIMessageJob.broadcast_updated_message(@new_message)
-          last_sent_at = Time.current.to_f
+        if Time.current.to_f - last_sent_at.to_f >= 0.1
+          GetNextAIMessageJob.broadcast_updated_message(@message)
+          last_sent_at = Time.current
         end
       end
 
-    if @new_message.content_text.blank? # this shouldn't be needed b/c the += above will build up the response, but test
+    if @message.content_text.blank? # this shouldn't be needed b/c the += above will build up the response, but test
                                         # env just returns a response w/o streaming and maybe that will happen in prod
-      @new_message.content_text = response.dig("choices", 0, "message", "content")
+      @message.content_text = response.dig("choices", 0, "message", "content")
     end
 
-    GetNextAIMessageJob.broadcast_updated_message(@new_message)
-    @new_message.save!
+    GetNextAIMessageJob.broadcast_updated_message(@message)
+    @message.save!
     puts "\nFinished GetNextAIMessageJob.perform(#{conversation_id}, #{assistant_id})" if Rails.env.development?
 
   rescue => e
