@@ -3,11 +3,13 @@
 <% first = assistant_counter == 0 %>
 
 <%# Define keyboard shortcuts for launching new conversations %>
-<div data-controller="<%= first && "new-conversation" %>"
-     data-action="keydown.meta+shift+o@document->new-conversation#navigate
-                  keydown.meta+j@document->new-conversation#navigate"
-     data-new-conversation-path-value="<%= new_assistant_message_path(assistant) %>">
-</div>
+<% if first %>
+  <div data-controller="new-conversation"
+       data-action="keydown.meta+shift+o@document->new-conversation#navigate
+                    keydown.meta+j@document->new-conversation#navigate"
+       data-new-conversation-path-value="<%= new_assistant_message_path(assistant) %>">
+  </div>
+<% end %>
 
 <div class="<%= first && 'absolute top-[17px] left-0 pl-3 w-full z-10' %>">
   <%# This extra div ^ is needed because of the absolute positioning. It doesn't lay out properly if added to the div below. %>
