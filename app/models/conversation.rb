@@ -12,6 +12,10 @@ class Conversation < ApplicationRecord
 
   broadcasts_refreshes
 
+  def latest_message
+    messages.ordered.last
+  end
+
   # Builds a hash of date interval keys and queries which fetch the records for that internal.
   #
   # Empty intervals are removed from the hash.
