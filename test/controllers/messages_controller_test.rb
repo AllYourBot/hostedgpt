@@ -20,7 +20,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create message when conversation_id is provided" do
-    assert_difference "Message.count" do
+    assert_difference "Message.count", 2 do
       post assistant_messages_url(@assistant), params: { message: { conversation_id: @message.conversation_id, content_text: @message.content_text } }
     end
 
@@ -29,8 +29,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create message AND create conversation when conversation_id is nil" do
-    assert_difference "Message.count" do
-      assert_difference "Conversation.count" do
+    assert_difference "Message.count", 2 do
+      assert_difference "Conversation.count", 1 do
         post assistant_messages_url(@assistant), params: { message: { content_text: @message.content_text } }
       end
     end

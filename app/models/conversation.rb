@@ -6,11 +6,15 @@ class Conversation < ApplicationRecord
   has_many :runs, dependent: :destroy
   has_many :steps, dependent: :destroy
 
-  after_update_commit :set_title_async, if: -> { title.blank? && messages.count >= 2 }
+  after_touch :set_title_async, if: -> { title.blank? && messages.count >= 2 }
 
   scope :ordered, -> { order(updated_at: :desc) }
 
   broadcasts_refreshes
+
+  def latest_message
+    messages.ordered.last
+  end
 
   # Builds a hash of date interval keys and queries which fetch the records for that internal.
   #

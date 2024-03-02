@@ -57,7 +57,9 @@ class ConversationMessagesTest < ApplicationSystemTestCase
       sleep 0.5
     end
 
-    assert find_messages.last.text.include?("Watch me appear"), "The last message should have contained the submitted text"
+    len = find_messages.length
+    assert find_messages[len-2].text.include?("Watch me appear"), "The last message should have contained the submitted text"
+    assert find_messages.last.text.include?(@long_conversation.assistant.name), "The last message should have contained the assistant stub"
   end
 
   test "when the AI replies with a message it appears with morphing and scrolls down" do
@@ -66,7 +68,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     new_message = nil
 
     assert_page_morphed do
-      new_message = @long_conversation.messages.create! assistant: @long_conversation.assistant, content_text: "Stub: ", role: :user
+      new_message = @long_conversation.messages.create! assistant: @long_conversation.assistant, content_text: "Stub: ", role: :assistant
       sleep 0.5
       assert find_messages.last.text.include?("Stub:"), "The last message should have contained the submitted text"
     end
