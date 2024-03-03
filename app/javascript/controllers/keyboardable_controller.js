@@ -7,6 +7,6 @@ export default class extends Controller {
 
   navigate() {
     const new_conversation_path = this.pathValue
-    window.location.href = new_conversation_path
+    Turbo.visit(new_conversation_path) 
   }
 }

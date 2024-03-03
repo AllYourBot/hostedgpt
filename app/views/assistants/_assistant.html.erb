@@ -4,10 +4,10 @@
 
 <%# Define keyboard shortcuts for launching new conversations %>
 <% if first %>
-  <div data-controller="new-conversation"
-       data-action="keydown.meta+shift+o@document->new-conversation#navigate
-                    keydown.meta+j@document->new-conversation#navigate"
-       data-new-conversation-path-value="<%= new_assistant_message_path(assistant) %>">
+  <div data-controller="keyboardable"
+       data-action="keydown.meta+shift+o@document->keyboardable#navigate
+                    keydown.meta+j@document->keyboardable#navigate"
+       data-keyboardable-path-value="<%= new_assistant_message_path(assistant) %>">
   </div>
 <% end %>
 
