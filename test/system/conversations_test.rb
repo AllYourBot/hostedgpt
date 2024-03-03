@@ -14,13 +14,7 @@ class ConversationsTest < ApplicationSystemTestCase
 
   test "creating new chat with meta+shift+o" do
     visit conversation_messages_path(@conversation)
-
-    page.driver.browser.action.key_down(:meta)
-                              .key_down(:shift)
-                              .send_keys("o")
-                              .key_up(:meta)
-                              .key_up(:shift)
-                              .perform
+    send_keys("meta+shift+o")
 
     expected_path = new_assistant_message_path(@assistant)
 
@@ -29,11 +23,7 @@ class ConversationsTest < ApplicationSystemTestCase
 
   test "creating new chat with meta+j" do
     visit conversation_messages_path(@conversation)
-
-    page.driver.browser.action.key_down(:meta)
-                              .send_keys("j")
-                              .key_up(:meta)
-                              .perform
+    send_keys("meta+j")
 
     expected_path = new_assistant_message_path(@assistant)
 
