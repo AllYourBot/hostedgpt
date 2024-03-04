@@ -2,6 +2,15 @@
 <% selected = assistant == @assistant %>
 <% first = assistant_counter == 0 %>
 
+<%# Define keyboard shortcuts for launching new conversations %>
+<% if first %>
+  <div data-controller="keyboardable"
+       data-action="keydown.meta+shift+o@document->keyboardable#navigate
+                    keydown.meta+j@document->keyboardable#navigate"
+       data-keyboardable-path-value="<%= new_assistant_message_path(assistant) %>">
+  </div>
+<% end %>
+
 <div class="<%= first && 'absolute top-[17px] left-0 pl-3 w-full z-10' %>">
   <%# This extra div ^ is needed because of the absolute positioning. It doesn't lay out properly if added to the div below. %>
   <div class="

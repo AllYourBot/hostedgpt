@@ -6,7 +6,7 @@ class UsersTest < ApplicationSystemTestCase
     visit root_url
   end
 
-  test "the new user form reveals more fields when password is focused" do
+  test "the new user form reveals more fields when password is focused and those fields stay" do
     click_text "Sign up", match: :first
 
     assert_visible "#person_email", wait: 0.2
@@ -16,8 +16,19 @@ class UsersTest < ApplicationSystemTestCase
     assert_hidden "#person_personable_attributes_last_name"
     assert_hidden "#person_personable_attributes_openai_key"
 
-    fill_in "Email", with: "tester@test.com"
+    fill_in "Email", with: "email@email.com"
     fill_in "Password", with: "secret"
+
+    sleep 0.1
+
+    assert_visible "#person_personable_attributes_first_name"
+    assert_visible "#person_personable_attributes_last_name"
+    assert_visible "#person_personable_attributes_openai_key"
+
+    fill_in "Email", with: "changed@email.com"
+    fill_in "Password", with: "secret" # this triggers a second focus event
+
+    sleep 0.1
 
     assert_visible "#person_personable_attributes_first_name"
     assert_visible "#person_personable_attributes_last_name"

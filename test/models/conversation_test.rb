@@ -21,6 +21,10 @@ class ConversationTest < ActiveSupport::TestCase
     assert_instance_of Step, conversations(:greeting).steps.first
   end
 
+  test "latest_message works" do
+    assert_equal messages(:im_a_bot), conversations(:greeting).latest_message
+  end
+
   test "simple create works" do
     assert_nothing_raised do
       Conversation.create!(
@@ -53,7 +57,7 @@ class ConversationTest < ActiveSupport::TestCase
     end
   end
 
-  test "the title of a conversation is automatically set when the second message is created" do
+  test "the title of a conversation is automatically set when the second message is created by the job" do
     perform_enqueued_jobs do
       ChatCompletionAPI.stub :get_next_response, {"topic" => "Hear me"} do
 
@@ -61,9 +65,12 @@ class ConversationTest < ActiveSupport::TestCase
         assert_nil conversation.title
 
         conversation.messages.create!(assistant: conversation.assistant, role: :user, content_text: "Can you hear me?")
-        assert_nil conversation.reload.title
 
-        conversation.messages.create!(assistant: conversation.assistant, role: :assistant, content_text: "Yes, I can hear you.")
+        latest_message = conversation.latest_message
+        assert latest_message.assistant?
+
+        GetNextAIMessageJob.perform_now(latest_message.id, assistants(:samantha).id)
+
         assert_equal "Hear me", conversation.reload.title
 
       end

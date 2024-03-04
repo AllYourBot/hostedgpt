@@ -13,7 +13,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
 
   test "sets conversation title automatically even if there is only one message" do
     conversation = conversations(:javascript)
-    conversation.messages.ordered.last.destroy!
+    conversation.latest_message.destroy!
 
     ChatCompletionAPI.stub :get_next_response, {"topic" => "Javascript popState"} do
       AutotitleConversationJob.perform_now(conversation.id)

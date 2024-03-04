@@ -1,6 +1,6 @@
 class Message < ApplicationRecord
   belongs_to :assistant
-  belongs_to :conversation, touch: true
+  belongs_to :conversation
   belongs_to :content_document, class_name: "Document", optional: true
   belongs_to :run, optional: true
 
@@ -19,6 +19,7 @@ class Message < ApplicationRecord
 
   scope :ordered, -> { order(:created_at) }
 
+  after_create :start_assistant_reply, if: -> { user? }
   after_create_commit :broadcast_message
 
   private
@@ -35,7 +36,11 @@ class Message < ApplicationRecord
     errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
   end
 
+  def start_assistant_reply
+    conversation.messages.create! role: :assistant, content_text: "", assistant: conversation.assistant
+  end
+
   def broadcast_message
-    broadcast_append_to conversation, partial: "messages/message", locals: { scroll_down: true }
+    broadcast_append_to conversation, partial: "messages/message", locals: { scroll_down: true, timestamp: (Time.current.to_f*1000).to_i }
   end
 end
