@@ -2,9 +2,7 @@ require "application_system_test_case"
 
 class ConversationsTest < ApplicationSystemTestCase
   setup do
-    @conversation = conversations(:greeting)
-    @assistant = assistants(:keith_gpt4)
-    login_as @conversation.user
+    login_as users(:keith)
   end
 
   test "visiting the index" do
@@ -13,20 +11,22 @@ class ConversationsTest < ApplicationSystemTestCase
   end
 
   test "creating new chat with meta+shift+o" do
-    visit conversation_messages_path(@conversation)
+    visit conversation_messages_path(conversations(:greeting))
     send_keys("meta+shift+o")
 
-    expected_path = new_assistant_message_path(@assistant)
+    expected_path = new_assistant_message_path(conversations(:greeting).assistant)
 
     assert_current_path(expected_path)
   end
 
   test "creating new chat with meta+j" do
-    visit conversation_messages_path(@conversation)
+    visit conversation_messages_path(conversations(:javascript))
     send_keys("meta+j")
 
-    expected_path = new_assistant_message_path(@assistant)
+    expected_path = new_assistant_message_path(conversations(:javascript).assistant)
 
     assert_current_path(expected_path)
   end
+
+
 end
