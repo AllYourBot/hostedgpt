@@ -40,6 +40,9 @@
       <div class="flex justify-start invisible gap-2 mt-2 text-gray-600 dark:text-gray-300 group-hover:visible">
         <% if message.user? %>
           <%= button_tag type: "button",
+                data: {
+                  role: "edit",
+                },
                 class: "cursor-pointer hover:text-gray-900 dark:hover:text-white" do
           %>
             <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
@@ -47,16 +50,21 @@
         <% else %>
           <%= button_tag type: "button",
                 class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
-                data: { action: %|
-                  clipboard#copy
-                  transition#toggleClassOn
-                  mouseleave->transition#toggleClassOff
-                | } do
-          %>
+                data: {
+                  role: "clipboard",
+                  action: %|
+                    clipboard#copy
+                    transition#toggleClassOn
+                    mouseleave->transition#toggleClassOff
+                  |
+          } do %>
             <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
             <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
           <% end %>
           <%= button_tag type: "button",
+                data: {
+                  role: "regenerate",
+                },
                 class: "cursor-pointer hover:text-gray-900 dark:hover:text-white" do
           %>
             <%= icon "arrow-path", variant: :outline, size: 18, title: "Regenerate" %>
