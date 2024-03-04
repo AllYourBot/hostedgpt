@@ -17,12 +17,12 @@ export default class extends Controller {
   }
 
   connect() {
-    this.toggled = false
-    if (this.afterTimeoutValue) setTimeout(() => this.toggleClasses(), this.afterTimeoutValue)
+    this.on = false
+    if (this.afterTimeoutValue) setTimeout(() => this.toggleClass(), this.afterTimeoutValue)
   }
 
   toggleClass() {
-    this.toggled = !this.toggled
+    this.on = !this.on
 
     this.transitionableTargets.forEach(element => {
       this.toggleClasses.forEach(className => {
@@ -35,8 +35,13 @@ export default class extends Controller {
     window.dispatchEvent(new CustomEvent('right-column-changed'))
   }
 
-  toggleClassOnce() {
-    if (this.toggled) return
+  toggleClassOn() {
+    if (this.on) return
+    this.toggleClass()
+  }
+
+  toggleClassOff() {
+    if (!this.on) return
     this.toggleClass()
   }
 }

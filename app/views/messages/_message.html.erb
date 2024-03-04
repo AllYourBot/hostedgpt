@@ -47,7 +47,11 @@
         <% else %>
           <%= button_tag type: "button",
                 class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
-                data: { action: "clipboard#copy transition#toggleClass" } do
+                data: { action: %|
+                  clipboard#copy
+                  transition#toggleClassOn
+                  mouseleave->transition#toggleClassOff
+                | } do
           %>
             <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
             <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
