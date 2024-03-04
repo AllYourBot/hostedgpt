@@ -8,6 +8,22 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     @long_conversation = conversations(:greeting)
   end
 
+  test "clipboard icon shows properly, changes on click, and reverts back" do
+    click_text @long_conversation.title
+    sleep 0.2
+    msg = find_messages.last
+    msg.hover
+
+    msg_clipboard = msg.find("button[data-role='clipboard']")
+    assert_shows_tooltip msg_clipboard, "Copy"
+    msg_clipboard.click
+    assert_shows_tooltip msg_clipboard, "Copied!"
+
+    msg_regenerate = msg.find("button[data-role='regenerate']")
+    msg_regenerate.hover
+    assert_shows_tooltip msg_clipboard, "Copy"
+  end
+
   test "the conversation auto-scrolls to bottom when page loads" do
     click_text @long_conversation.title
     sleep 0.2

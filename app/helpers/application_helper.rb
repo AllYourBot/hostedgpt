@@ -1,6 +1,6 @@
 module ApplicationHelper
   def icon(name, opts = {})
-    opts = opts.symbolize_keys
+    opts = opts.deep_symbolize_keys
 
     variant = opts[:variant]&.to_sym || :solid
     default_size = case variant
@@ -20,12 +20,23 @@ module ApplicationHelper
 
     if title
       direction = opts.delete(:tooltip) || 'bottom'
+      data = opts.delete(:data) || {}
 
-      content_tag(:div, class: classes + " tooltip tooltip-#{direction} hover:tooltip-open", style: "width: #{size}px; height: #{size}px;", data: { tip: title.to_s }, **opts.except(:class, :size, :variant)) do
+      content_tag(:div,
+        class: classes + " tooltip tooltip-#{direction} hover:tooltip-open",
+        style: "width: #{size}px; height: #{size}px;",
+        data: { tip: title.to_s }.merge(data),
+        **opts.except(:class, :size, :variant)
+      ) do
         heroicon name, **opts.slice(:size, :variant)
       end
+
     else
-      content_tag(:div, class: classes, style: "width: #{size}px; height: #{size}px;", **opts.except(:class, :size, :variant)) do
+      content_tag(:div,
+        class: classes,
+        style: "width: #{size}px; height: #{size}px;",
+        **opts.except(:class, :size, :variant)
+      ) do
         heroicon name, **opts
       end
     end
