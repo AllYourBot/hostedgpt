@@ -98,3 +98,16 @@ input:focus {
     opacity: 1;
   }
 }
+
+.animate-breathe {
+  animation: breathe 1.3s linear infinite;
+}
+
+@keyframes breathe {
+  0%, 80%, 100% {
+    transform: scale(1)
+  }
+  40% {
+    transform: scale(1.3)
+  }
+}
