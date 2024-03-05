@@ -14,10 +14,11 @@ class AIBackends::OpenAI
     end
   end
 
-  def initialize(user, assistant, conversation)
+  def initialize(user, assistant, conversation, message)
     @client = self.class.client.new(access_token: user.openai_key)
     @assistant = assistant
     @conversation = conversation
+    @message = message
   end
 
   def get_next_chat_message(&chunk_received_handler)
@@ -54,7 +55,7 @@ class AIBackends::OpenAI
   end
 
   def existing_messages
-    @conversation.messages.ordered.collect do |message|
+    @conversation.messages.ordered.where("id < ?", @message.id).collect do |message|
       if @assistant.images && message.documents.present?
 
         content = [{ type: "text", text: message.content_text }]

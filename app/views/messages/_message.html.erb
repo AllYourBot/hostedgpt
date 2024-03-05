@@ -1,10 +1,17 @@
-<%# locals: (message:, scroll_down: false, only_scroll_down_if_was_bottom: false, request_id: nil, timestamp: nil, message_counter: -1) -%>
+<%# locals: (message:, scroll_down: false, only_scroll_down_if_was_bottom: false, request_id: nil, timestamp: nil, thinking: nil, message_counter: -1) -%>
 <%# request_id is not used, but broadcasting turbo stream messages provides it as a local so it needs to be accepted %>
 
 <% max_index = message.conversation.messages.length - 1 %>
 <% last_message = message_counter == max_index %>
 <% initial_page_load = last_message && !scroll_down %>
 <% scroll_down = scroll_down || initial_page_load %>
+<% thinking = if thinking.nil?
+                (last_message && message.content_text.blank?) ||
+                (message.rerequested? && message.content_text.blank?)
+              else
+                thinking
+              end
+%>
 
 <div
   id="<%= dom_id message %>"
@@ -35,7 +42,8 @@
       <% end %>
 
       <%# This div needs to be tightly wrapped around the content_text output because the whitespace formatting is important. %>
-      <div class="whitespace-pre-wrap" data-role="content-text" data-clipboard-target="text"><%= message.content_text %></div>
+      <div class="whitespace-pre-wrap" data-role="content-text" data-clipboard-target="text"
+        ><%= message.content_text %><div class="animate-blink w-3 h-1 bg-black inline-block ml-1 -mb-1 <%= !thinking && 'hidden' %>"></div></div>
 
       <div class="flex justify-start invisible gap-2 mt-2 text-gray-600 dark:text-gray-300 group-hover:visible">
         <% if message.user? %>
@@ -61,11 +69,13 @@
             <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
             <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
           <% end %>
-          <%= button_tag type: "button",
+          <%= button_to message_path(message),
+                method: :patch,
                 data: {
                   role: "regenerate",
                 },
-                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white" do
+                params: { message: { content_text: nil, rerequested_at: Time.current } },
+                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white contents" do
           %>
             <%= icon "arrow-path", variant: :outline, size: 18, title: "Regenerate" %>
           <% end %>

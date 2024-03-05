@@ -1,5 +1,5 @@
 class GetNextAIMessageJob < ApplicationJob
-  class ResponseAborted < StandardError; end
+  class ResponseCancelled < StandardError; end
 
   def perform(message_id, assistant_id)
     puts "GetNextAIMessageJob.perform(#{message_id}, #{assistant_id})" if Rails.env.development?
@@ -8,21 +8,21 @@ class GetNextAIMessageJob < ApplicationJob
     @conversation = @message.conversation
     @assistant = Assistant.find_by(id: assistant_id)
 
-    return false if user_has_replied_to_chat_since_queuing
+    return false if generation_should_be_cancelled?
 
     last_sent_at = Time.current
 
-    response = AIBackends::OpenAI.new(@conversation.user, @assistant, @conversation)
+    response = AIBackends::OpenAI.new(@conversation.user, @assistant, @conversation, @message)
       .get_next_chat_message do |content_chunk|
         @message.content_text += content_chunk
 
         if Time.current.to_f - last_sent_at.to_f >= 0.1
-          GetNextAIMessageJob.broadcast_updated_message(@message)
+          GetNextAIMessageJob.broadcast_updated_message(@message, thinking: true)
           last_sent_at = Time.current
         end
 
-        if @conversation.latest_message != @message
-          raise ResponseAborted
+        if generation_should_be_cancelled?
+          raise ResponseCancelled
         end
       end
 
@@ -31,15 +31,14 @@ class GetNextAIMessageJob < ApplicationJob
       @message.content_text = response.dig("choices", 0, "message", "content")
     end
 
-    GetNextAIMessageJob.broadcast_updated_message(@message)
-    @message.save!
-    @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
-
+    wrap_up_the_message
     puts "\nFinished GetNextAIMessageJob.perform(#{message_id}, #{assistant_id})" if Rails.env.development?
-
     return true
-  rescue ResponseAborted => e
-    puts "\nResponse aborted" if Rails.env.development?
+
+  rescue ResponseCancelled => e
+    puts "\nResponse cancelled" if Rails.env.development?
+    wrap_up_the_message
+    return true
   rescue => e
     unless Rails.env.test?
       puts "\nError in GetNextAIMessageJob: #{e.inspect}"
@@ -48,11 +47,30 @@ class GetNextAIMessageJob < ApplicationJob
     return false # there may be some exceptions we want to re-raise?
   end
 
-  def self.broadcast_updated_message(message)
-    message.broadcast_replace_to message.conversation, locals: { only_scroll_down_if_was_bottom: true, timestamp: (Time.current.to_f*1000).to_i }
+  def wrap_up_the_message
+    GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
+    @message.save!
+    @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
   end
 
-  def user_has_replied_to_chat_since_queuing
-    @message.user? || @message != @conversation.latest_message || @message.content_text.present?
+  def self.broadcast_updated_message(message, locals = {})
+    message.broadcast_replace_to message.conversation, locals: {
+      only_scroll_down_if_was_bottom: true,
+      timestamp: (Time.current.to_f*1000).to_i
+  }.merge(locals)
+  end
+
+  def generation_should_be_cancelled?
+    @message.cancelled? ||
+      @message_is_populated ||
+      (message_is_not_latest_in_conversation && @message.not_rerequested?)
+  end
+
+  def message_is_populated
+    @message.content_text.present?
+  end
+
+  def message_is_not_latest_in_conversation
+    @message != @conversation.latest_message
   end
 end
