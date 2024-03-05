@@ -40,7 +40,7 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
 
     patch settings_person_url, params: { person: params }
     assert_response :unprocessable_entity
-    assert_not_nil assigns(:person).errors
+    assert_not_nil @controller.instance_variable_get('@person').errors
   end
 
   private
