@@ -24,6 +24,19 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_shows_tooltip msg_clipboard, "Copy"
   end
 
+  test "regenerate icon shows properly, clears when clicked" do
+    click_text @long_conversation.title
+    sleep 0.2
+    msg = find_messages.last
+    msg.hover
+
+    msg_regenerate = msg.find("button[data-role='regenerate']")
+    msg_regenerate.hover
+    assert_shows_tooltip msg_regenerate, "Regenerate"
+
+    msg_regenerate.click
+  end
+
   test "the conversation auto-scrolls to bottom when page loads" do
     click_text @long_conversation.title
     sleep 0.2
