@@ -47,12 +47,6 @@ class GetNextAIMessageJob < ApplicationJob
     return false # there may be some exceptions we want to re-raise?
   end
 
-  def wrap_up_the_message
-    GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
-    @message.save!
-    @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
-  end
-
   def self.broadcast_updated_message(message, locals = {})
     message.broadcast_replace_to message.conversation, locals: {
       only_scroll_down_if_was_bottom: true,
@@ -60,13 +54,21 @@ class GetNextAIMessageJob < ApplicationJob
   }.merge(locals)
   end
 
+  private
+
+  def wrap_up_the_message
+    GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
+    @message.save!
+    @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
+  end
+
   def generation_should_be_cancelled?
     @message.cancelled? ||
-      @message_is_populated ||
+      message_is_populated? ||
       (message_is_not_latest_in_conversation && @message.not_rerequested?)
   end
 
-  def message_is_populated
+  def message_is_populated?
     @message.content_text.present?
   end
 

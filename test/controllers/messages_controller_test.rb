@@ -62,9 +62,9 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should update message" do
-    patch message_url(@message), params: { message: { role: @message.role, content_text: @message.content_text } }
-    assert_redirected_to message_url(@message)
+  test "should update message with a re-request" do
+    patch message_url(@conversation.latest_message), params: { message: { content_text: nil, rerequested_at: Time.current } }
+    assert_redirected_to conversation_messages_url(@conversation)
   end
 
   test "should destroy message" do

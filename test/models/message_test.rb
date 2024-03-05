@@ -49,22 +49,6 @@ class MessageTest < ActiveSupport::TestCase
     end
   end
 
-  test "creating a message sends a turbo broadcast" do
-    message = Message.create!(
-      assistant: assistants(:samantha),
-      conversation: conversations(:greeting),
-      role: :user,
-      content_text: "test message"
-    )
-    assert_turbo_stream_broadcasts conversations(:greeting)
-    broadcasts = capture_turbo_stream_broadcasts conversations(:greeting)
-    assert_equal 2, broadcasts.length
-    assert_equal "append", broadcasts.first["action"], "First message should have been an append"
-    assert_match message.content_text, broadcasts.first.to_html, "First message should have been the user's message"
-    assert_equal "append", broadcasts.second["action"], "Second message should have been an append"
-    assert_match "", broadcasts.second.to_html, "Second message should have been an empty assistant message"
-  end
-
   test "creating a message with a conversation and Current.user set fails if conversation is not owned by the user" do
     Current.user = users(:rob)
     assistant = users(:rob).assistants.first

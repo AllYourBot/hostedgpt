@@ -75,7 +75,8 @@
                   role: "regenerate",
                 },
                 params: { message: { content_text: nil, rerequested_at: Time.current } },
-                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white contents" do
+                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
+                form_class: "inline-block h-[18px]" do
           %>
             <%= icon "arrow-path", variant: :outline, size: 18, title: "Regenerate" %>
           <% end %>

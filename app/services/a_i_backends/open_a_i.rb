@@ -55,7 +55,7 @@ class AIBackends::OpenAI
   end
 
   def existing_messages
-    @conversation.messages.ordered.where("id < ?", @message.id).collect do |message|
+    @conversation.messages.ordered.where("created_at < ?", @message.created_at).collect do |message|
       if @assistant.images && message.documents.present?
 
         content = [{ type: "text", text: message.content_text }]
