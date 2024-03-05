@@ -140,7 +140,7 @@
           </div>
         </div>
 
-        <%= form_with(model: [@assistant, @new_message], data: { controller: "new-message", turbo_frame: "_top" }) do |form| %>
+        <%= form_with(model: [@assistant, @new_message], data: { controller: "features--composer", turbo_frame: "_top" }) do |form| %>
           <%= form.hidden_field :conversation_id %>
           <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
             <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
@@ -148,22 +148,22 @@
 
           <%= form.text_area :content_text,
             data: {
-              new_message_target: "input",
+              features__composer_target: "input",
               image_upload_target: "content",
               application_target: "newMessageField",
               controller: "textarea-autogrow",
               action: %|
-                new-message#disableSubmitButton
-                keydown.enter->new-message#submitForm:prevent
-                keydown.meta+enter->new-message#submitForm
-                keydown.ctrl+enter->new-message#submitForm
-                keydown.shift+esc@document->new-message#focusKeydown
-                keydown.slash@document->new-message#focusKeydown
-                keydown.esc->new-message#unfocusKeydown
-                keydown.meta+shift+o->new-message#unfocusKeydown
-                keydown.ctrl+shift+o->new-message#unfocusKeydown
-                keydown.meta+j->new-message#unfocusKeydown
-                keydown.ctrl+j->new-message#unfocusKeydown
+                features--composer#disableSubmitButton
+                keydown.enter->features--composer#submitForm:prevent
+                keydown.meta+enter->features--composer#submitForm
+                keydown.ctrl+enter->features--composer#submitForm
+                keydown.shift+esc@document->features--composer#focusKeydown
+                keydown.slash@document->features--composer#focusKeydown
+                keydown.esc->features--composer#unfocusKeydown
+                keydown.meta+shift+o->features--composer#unfocusKeydown
+                keydown.ctrl+shift+o->features--composer#unfocusKeydown
+                keydown.meta+j->features--composer#unfocusKeydown
+                keydown.ctrl+j->features--composer#unfocusKeydown
               |
             },
             rows: 1,
@@ -184,8 +184,8 @@
           <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
             <%= form.button type: "button",
               data: {
-                new_message_target: "submit",
-                action: "new-message#submitForm"
+                features__composer_target: "submit",
+                action: "features--composer#submitForm"
               },
               id: "send",
               disabled: true,
