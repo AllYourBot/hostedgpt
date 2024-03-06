@@ -8,7 +8,7 @@ class GetNextAIMessageJob < ApplicationJob
     @conversation = @message.conversation
     @assistant = Assistant.find_by(id: assistant_id)
 
-    return false if generation_should_be_cancelled?
+    return false if generation_was_cancelled? || message_is_populated?
 
     last_sent_at = Time.current
 
@@ -21,7 +21,7 @@ class GetNextAIMessageJob < ApplicationJob
           last_sent_at = Time.current
         end
 
-        if generation_should_be_cancelled?
+        if generation_was_cancelled?
           raise ResponseCancelled
         end
       end
@@ -62,10 +62,8 @@ class GetNextAIMessageJob < ApplicationJob
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
   end
 
-  def generation_should_be_cancelled?
-    @message.cancelled? ||
-      message_is_populated? ||
-      (message_is_not_latest_in_conversation? && @message.not_rerequested?)
+  def generation_was_cancelled?
+    @message.cancelled? || (message_is_not_latest_in_conversation? && @message.not_rerequested?)
   end
 
   def message_is_populated?
