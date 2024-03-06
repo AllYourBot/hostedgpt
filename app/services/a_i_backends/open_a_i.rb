@@ -26,7 +26,7 @@ class AIBackends::OpenAI
       chunk = intermediate_response.dig("choices", 0, "delta", "content")
       print chunk if Rails.env.development?
       yield chunk if chunk
-    rescue ::GetNextAIMessageJob::ResponseAborted => e
+    rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue => e
       puts "\nError in AiBackends::OpenAi response handler: #{e.message}"
