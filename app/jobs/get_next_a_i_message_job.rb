@@ -65,14 +65,14 @@ class GetNextAIMessageJob < ApplicationJob
   def generation_should_be_cancelled?
     @message.cancelled? ||
       message_is_populated? ||
-      (message_is_not_latest_in_conversation && @message.not_rerequested?)
+      (message_is_not_latest_in_conversation? && @message.not_rerequested?)
   end
 
   def message_is_populated?
     @message.content_text.present?
   end
 
-  def message_is_not_latest_in_conversation
+  def message_is_not_latest_in_conversation?
     @message != @conversation.latest_message
   end
 end
