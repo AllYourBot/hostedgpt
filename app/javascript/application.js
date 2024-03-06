@@ -1,6 +1,10 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
 import "controllers"
+import "blocks"
+import "blocks/lib/array"
+import "blocks/lib/number"
+import "blocks/lib/string"
 
 // TODO: Remove this debug code
 // This is included in main just for awhile to aid with some debugging

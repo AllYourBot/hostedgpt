@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+
+const { spawn } = require('child_process')
+const path = require('path')
+const fs = require('fs')
+requireLib()
+
+// Check for arguments
+const args = process.argv.slice(2)
+
+if (args.length == 0 || args[0] == '-h' || args[0] == '--help') {
+  console.log("The most common blocks commands are:")
+  console.log("  console          Start the Blocks console")
+  console.log("  test             Runs the test suite (--help for options)")
+
+} else if (args[0] == 'console') {
+  const initPath = path.join(__dirname, '..', 'vendor', 'javascript', 'blocks-console.js')
+  console.log(`For debugging, open chrome://inspect`)
+  spawn('node', ['--inspect', initPath], { stdio: 'inherit' })
+
+} else if (args[0] == 'test') {
+
+  if (args[1] == '-h' || args[1] == '--help') {
+    console.log("blocks test [OPTIONS]:")
+    console.log("")
+    console.log("options:")
+    console.log("  (path)         Run only this test or all tests in this directory")
+    console.log("  -d, --debug    Run tests in debugger mode")
+
+  } else {
+    const opts = args.slice(1).select(e => e.startsWith('-'))
+    const paths = args.slice(1).reject(e => e.startsWith('-'))
+
+    if (opts.include('-d') || opts.include('--debug'))
+      spawn('node', ['inspect', './node_modules/.bin/jest', '--runInBand'].concat(paths), { stdio: 'inherit' })
+    else
+      spawn('node', ['./node_modules/.bin/jest'].concat(paths), { stdio: 'inherit' })
+  }
+}
+
+function requireLib() {
+  const libPath = path.join(__dirname, '.')
+
+  fs.readdirSync(libPath)
+    .filter(file => !file.endsWith('all.js') && path.extname(file) === '.js')
+    .forEach(file => require(path.join(libPath, file)))
+}
