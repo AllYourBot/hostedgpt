@@ -20,7 +20,6 @@ class Message < ApplicationRecord
   scope :ordered, -> { order(:created_at) }
 
   after_create :start_assistant_reply, if: -> { user? }
-  after_create_commit :broadcast_message
 
   private
 
@@ -38,9 +37,5 @@ class Message < ApplicationRecord
 
   def start_assistant_reply
     conversation.messages.create! role: :assistant, content_text: "", assistant: conversation.assistant
-  end
-
-  def broadcast_message
-    broadcast_append_to conversation, partial: "messages/message", locals: { scroll_down: true, timestamp: (Time.current.to_f*1000).to_i }
   end
 end

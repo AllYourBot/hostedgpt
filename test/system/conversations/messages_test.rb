@@ -24,6 +24,19 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_shows_tooltip msg_clipboard, "Copy"
   end
 
+  test "regenerate icon shows properly, clears when clicked" do
+    click_text @long_conversation.title
+    sleep 0.2
+    msg = find_messages.last
+    msg.hover
+
+    msg_regenerate = msg.find("button[data-role='regenerate']")
+    msg_regenerate.hover
+    assert_shows_tooltip msg_regenerate, "Regenerate"
+
+    msg_regenerate.click
+  end
+
   test "the conversation auto-scrolls to bottom when page loads" do
     click_text @long_conversation.title
     sleep 0.2
@@ -60,7 +73,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     end
   end
 
-  test "submitting a message with ENTER inserts a new message with morphing & scrolls down" do
+  test "submitting a message with ENTER inserts two new messages with morphing & scrolls down" do
     visit conversation_messages_path(@long_conversation.id)
     scroll_to_bottom "#right-content"
 
@@ -79,15 +92,11 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   end
 
   test "when the AI replies with a message it appears with morphing and scrolls down" do
+    new_message = @long_conversation.messages.create! assistant: @long_conversation.assistant, content_text: "Stub: ", role: :assistant
     click_text @long_conversation.title
     sleep 0.5
-    new_message = nil
 
-    assert_page_morphed do
-      new_message = @long_conversation.messages.create! assistant: @long_conversation.assistant, content_text: "Stub: ", role: :assistant
-      sleep 0.5
-      assert find_messages.last.text.include?("Stub:"), "The last message should have contained the submitted text"
-    end
+    assert find_messages.last.text.include?("Stub:"), "The last message should have contained the submitted text"
 
     assert_page_morphed do
       new_message.content_text = "The quick brown fox jumped over the lazy dog and this line needs to wrap to scroll." +

@@ -83,3 +83,31 @@ input:-webkit-autofill:active {
 input:focus {
   --tw-ring-color: #ffffff !important;
 }
+
+/* Animations */
+
+.animate-blink {
+  animation: blink 1.2s steps(1, start) infinite;
+}
+
+@keyframes blink {
+  0%, 40% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-breathe {
+  animation: breathe 1.3s linear infinite;
+}
+
+@keyframes breathe {
+  0%, 80%, 100% {
+    transform: scale(1)
+  }
+  40% {
+    transform: scale(1.3)
+  }
+}
