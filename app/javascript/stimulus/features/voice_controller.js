@@ -6,11 +6,11 @@ await importAll('triggers')
 export default class extends Controller {
   initialize() {
     console.log('init')
-    window.microphoneService = new MicrophoneService()
+    //window.microphoneService = new MicrophoneService()
   }
 
   connect() {
-    window.microphoneService.start()
+    //window.microphoneService.start()
   }
 
   disconnect() {

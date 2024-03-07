@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import throttle from "utils/throttle"
+import throttle from "stimulus/utils/throttle"
 
 export default class extends Controller {
   static classes = [ "top", "notTop", "bottom", "notBottom" ]

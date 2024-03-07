@@ -1,6 +1,6 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
-import "controllers"
+import "stimulus"
 import "blocks"
 import "blocks/lib/array"
 import "blocks/lib/number"
