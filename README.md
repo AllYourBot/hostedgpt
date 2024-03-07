@@ -1,6 +1,6 @@
 # HostedGPT
 
-HostedGPT is a free, open-source alternative to ChatGPT. You can run it on your own computer or any server that supports Ruby on Rails, just bring your own OpenAI API key. All the core functionality of ChatGPT is already working (e.g. GPT-3.5 and GPT-4, starting new converstions, streaming responses, asking about attached images, etc). The main thing missing is the mobile app but that's coming soon.
+HostedGPT is a free, open-source alternative to ChatGPT. You can run it on your own computer or any server that supports Ruby on Rails, just bring your own OpenAI API key. All the core functionality of ChatGPT is already working (e.g. GPT-3.5 and GPT-4, starting new conversations, streaming responses, asking about attached images, etc). The main thing missing is the mobile app but that's coming soon.
 
 This project is actively looking for contributors to help make it great. The goal is for *every* feature that exists in ChatGPT to exist in this app, then we can start adding lots of new features and extensions beyond what ChatGPT supports.
 
