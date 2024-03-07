@@ -1,41 +1,19 @@
 const path = require('path')
 const fs = require('fs')
 
+const debug = false
+
 beforeAll(async () => {
   const blocksDir = path.join(__dirname, '../app/javascript/blocks/')
-  await import(path.join(blocksDir, 'index.js'))
+  const subdirs = subdirsExceptLib(blocksDir)
 
-  const files = fs.readdirSync(path.join(blocksDir, 'lib'))
-  for (const file of files) {
-    if (file.endsWith('.js')) {
-      const filepath = path.join(blocksDir, 'lib', file)
-      await import(filepath)
-    }
-  }
+  await importFile(blocksDir, 'index.js')
 
-  process.stdout.write('Loading all Blocks modules...\n')
-  const subdirs = fs.readdirSync(blocksDir, { withFileTypes: true })
-                    .filter(dir => dir.isDirectory())
-                    .map(dir => dir.name)
-                    .filter(name => name != 'lib')
+  if (debug) process.stdout.write('Loading all Blocks modules...\n')
+  await importDir('lib')
+  for (const subdir of subdirs) await importDir(subdir)
 
-  for (const subdir of subdirs) {
-    process.stdout.write(`Loading blocks/${subdir}/*\n`)
-
-    const files = fs.readdirSync(path.join(blocksDir, subdir))
-    for (const file of files) {
-      if (file.endsWith('.js')) {
-        const modulePath = path.join(blocksDir, subdir, file)
-        const className = path.basename(file, '.js')
-                          .split('_')
-                          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-                          .join('')
-        const { default: moduleClass } = await import(modulePath)
-        global[className] = moduleClass
-      }
-    }
-  }
-  process.stdout.write('\n')
+  if (debug) process.stdout.write('\n')
 })
 
 // Mock AudioContext
@@ -72,3 +50,37 @@ global.AudioProcessingEvent = jest.fn().mockImplementation(() => ({
     getChannelData: jest.fn().mockReturnValue(new Float32Array(2048).fill(0.04)),
   },
 }))
+
+async function importFile(dir, name) {
+  const filepath = path.join(dir, name)
+  return import(filepath)
+}
+
+function subdirsExceptLib(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true })
+    .filter(dir => dir.isDirectory())
+    .map(dir => dir.name)
+    .filter(name => name != 'lib')
+}
+
+async function importDir(name) {
+  const blocksDir = path.join(__dirname, '../app/javascript/blocks/')
+  const nameDir = path.join(blocksDir, name)
+  const all = fs.readdirSync(nameDir, { withFileTypes: true })
+  const files = all.filter(f => f.name.endsWith('.js')).map(f => f.name)
+
+  if (debug) process.stdout.write(`Loading blocks/${name}/*\n`)
+
+  for (const file of files) {
+    const imported = await importFile(nameDir, file)
+    if (name != 'lib') {
+      const { default: moduleClass } = imported
+      const className = file
+        .split('.')[0]
+        .split('_')
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join('')
+      global[className] = moduleClass
+    }
+  }
+}

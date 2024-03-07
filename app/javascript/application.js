@@ -2,9 +2,6 @@
 import "@hotwired/turbo-rails"
 import "stimulus"
 import "blocks"
-import "blocks/lib/array"
-import "blocks/lib/number"
-import "blocks/lib/string"
 
 // TODO: Remove this debug code
 // This is included in main just for awhile to aid with some debugging

@@ -117,7 +117,7 @@ export default class {
 
   log(str, level = 'info') {
     let logLevel
-    if (node.env.isTest())
+    if (node.env.isTest)
       logLevel = 'error'
     else
       logLevel = this._declarationsFor('log').first() || 'error'

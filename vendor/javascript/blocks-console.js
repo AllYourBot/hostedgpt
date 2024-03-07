@@ -7,6 +7,10 @@ const path = require('path')
 let cmd = ''
 let suppressOutput = false
 
+String.prototype.capitalize = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1)
+}
+
 
 // Configure REPL
 
@@ -15,7 +19,7 @@ process.stdin.resume()
 process.stdin.setEncoding('utf8')
 
 const replInput = new stream.PassThrough()
-const rootPath = path.join(__dirname, '..', '..', 'app', 'javascript', 'blocks')
+const blocksDir = path.join(__dirname, '..', '..', 'app', 'javascript', 'blocks')
 class DummyOutput extends stream.Writable { _write(chunk, encoding, callback) { callback() }}
 
 const r = repl.start({ input: replInput, output: process.stdout, terminal: true })
@@ -46,6 +50,7 @@ function exit() {
 }
 
 function output(on) {
+  //console.log(`output(${on})`)
   if (on)
     r.output = process.stdout
   else
@@ -56,42 +61,37 @@ function output(on) {
 
 function init() {
   output(false)
-  const libPath = path.join(rootPath, 'lib');
+  const subdirs = subdirsExceptLib(blocksDir);
 
   (async () => {
-    await import(path.join(rootPath, 'index.js'))
-    const files = fs.readdirSync(libPath)
+    importFile(blocksDir, 'index.js')
+    importDir('lib')
+    for (const subdir of subdirs) await importDir(subdir)
 
-    for (const file of files) {
-      const filePath = path.join(libPath, file)
-      await import(filePath)
-    }
-    loadFile(path.join(rootPath, 'index.js'))
-    loadFilesFrom('services')
-    // loadFilesFrom('controls')
-    //loadFilesFrom('.')
-    // loadFilesFrom('lib')
-    // loadFilesFrom('triggers')
-    output(true)
+    setTimeout(() => output(true), 1000)
   })()
 }
 
-function loadFile(fullpath) {
-  [dir, filename] = fullpath.split('/').slice(-2)
-  classname = filename.split('.')[0].split('_').map(s => s.capitalize()).join('')
-  if (dir == 'lib' || dir == 'blocks')
-    replInput.write(`.load ${fullpath}\n`)
-  else {
-    replInput.write(`const ${classname} = await import('${fullpath}')`)
-  }
+async function importFile(dir, name) {
+  const filepath = path.join(dir, name)
+
+  classname = name.split('.')[0].split('_').map(s => s.capitalize()).join('')
+  if (dir.endsWith('/lib') || dir.endsWith('blocks'))
+    replInput.write(`.load ${filepath}\n`)
+  else
+    replInput.write(`const ${classname} = await import('${filepath}')\n`)
 }
 
-function loadFilesFrom(dir) {
-  const dirPath = path.join(rootPath, dir)
-  fs.readdirSync(dirPath).forEach(file => {
-    const filePath = path.join(dirPath, file)
-    if (file.endsWith('.js')) loadFile(filePath)
+function importDir(dir) {
+  const dirPath = path.join(blocksDir, dir)
+  fs.readdirSync(dirPath).filter(f => f.endsWith('.js')).forEach(file => {
+    importFile(dirPath, file)
   })
 }
 
-
+function subdirsExceptLib(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true })
+    .filter(dir => dir.isDirectory())
+    .map(dir => dir.name)
+    .filter(name => name != 'lib')
+}
