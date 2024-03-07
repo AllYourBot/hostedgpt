@@ -1,5 +1,3 @@
-console.log('readable model')
-
 export default class {
   logLevels = {
     'debug': 0,
@@ -9,7 +7,6 @@ export default class {
   }
 
   constructor() {
-    console.log('constructor')
     this.attributes = {}
     this.$ = this.attributes // Define '$' as a property of 'this'
     this._haveSetDefaultAttributes = false

@@ -35,7 +35,6 @@ process.stdin.on('data', (key) => {
 })
 
 init()
-output(true)
 replInput.write('')
 
 
@@ -56,39 +55,39 @@ function output(on) {
 }
 
 function init() {
-  //output(false)
+  output(false)
   const libPath = path.join(rootPath, 'lib');
 
   (async () => {
+    await import(path.join(rootPath, 'index.js'))
     const files = fs.readdirSync(libPath)
 
     for (const file of files) {
       const filePath = path.join(libPath, file)
       await import(filePath)
     }
+    loadFile(path.join(rootPath, 'index.js'))
     loadFilesFrom('services')
-    // Lib is loaded for use now
+    // loadFilesFrom('controls')
     //loadFilesFrom('.')
     // loadFilesFrom('lib')
-    // loadFilesFrom('controls')
     // loadFilesFrom('triggers')
+    output(true)
   })()
 }
 
 function loadFile(fullpath) {
   [dir, filename] = fullpath.split('/').slice(-2)
   classname = filename.split('.')[0].split('_').map(s => s.capitalize()).join('')
-  if (dir == 'lib')
+  if (dir == 'lib' || dir == 'blocks')
     replInput.write(`.load ${fullpath}\n`)
   else {
-    console.log(`const ${classname} = await import('${fullpath}')`)
     replInput.write(`const ${classname} = await import('${fullpath}')`)
   }
 }
 
 function loadFilesFrom(dir) {
   const dirPath = path.join(rootPath, dir)
-  console.log(dirPath)
   fs.readdirSync(dirPath).forEach(file => {
     const filePath = path.join(dirPath, file)
     if (file.endsWith('.js')) loadFile(filePath)

@@ -1,4 +1,4 @@
-(typeof window !== 'undefined' ? window : global).g = () => (typeof window !== 'undefined' ? window : global)
+((typeof window !== 'undefined' && window.mock === undefined) ? window : global).g = () => ((typeof window !== 'undefined' && window.mock === undefined) ? window : global)
 g().process = (typeof process === 'undefined') ? {} : process
 g().node= {
   env: (() => {
@@ -9,8 +9,6 @@ g().node= {
     return envFunc
   })()
 }
-
-console.log('loading blocks')
 
 
 // const importAll = (r) => r.keys().forEach(key => { console.log('each'); r(key) })
