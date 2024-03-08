@@ -12,6 +12,7 @@ This project is actively looking for contributors to help make it great. The goa
 * **Don't commit yourself to $20 per month when you may not use ChatGPT a lot.** You only pay as much as you use!
 * **You will never hit the 'You've reached the current usage cap for GPT-4'.** You pay per mesage based on the API rates so you can keep using it as much as you want.
 
+**The app has progressed quite a bit since this demo was recorded. TODO: Update this demo.**
 [![](https://img.youtube.com/vi/GuqPne2yl6w/2.jpg)](https://www.youtube.com/watch?v=GuqPne2yl6w)
 Watch a demo of the app
 
