@@ -3,7 +3,7 @@ test('start() initializes active and volume values', async() => {
   expect(microphone.$.active).toBeUndefined()
   expect(microphone.volume).toBeUndefined()
   await microphone.start()
-  expect(microphone.$.active).toBe(true)
+  expect(microphone.$.active).toStrictEqual(true)
   expect(microphone.volume).toBe(0)
 })
 
@@ -16,24 +16,34 @@ describe('tests on an instance', () => {
   })
 
   test('stop() after start makes things inactive', async() => {
-    expect(microphone.$.active).toBe(true)
+    expect(microphone.$.active).toStrictEqual(true)
     microphone.stop()
-    expect(microphone.$.active).toBe(false)
+    expect(microphone.$.active).toStrictEqual(false)
   })
 
   test('start() still works after a stop()', async() => {
     microphone.stop()
-    expect(microphone.$.active).toBe(false)
+    expect(microphone.$.active).toStrictEqual(false)
     await microphone.start()
-    expect(microphone.$.active).toBe(true)
+    expect(microphone.$.active).toStrictEqual(true)
   })
 
   test('onaudioprocess sets the volume by calling processVolume', async() => {
     expect(microphone.volume).toBe(0)
 
-    const mockEvent = new AudioProcessingEvent() // mocked in test_helper
-    microphone.$.audioProcessor.onaudioprocess(mockEvent)
+    const mockVolumeEvent = new AudioProcessingEvent() // mocked in test_helper
+    microphone.$.audioProcessor.onaudioprocess(mockVolumeEvent)
 
     expect(microphone.volume).toBe(4)
   })
+
+  test('onVolumeChange fires when the volume changes sets the volume by calling processVolume', async() => {
+    expect(microphone.volume).toBe(0)
+
+    const mockVolumeEvent = new AudioProcessingEvent() // mocked in test_helper
+    microphone.$.audioProcessor.onaudioprocess(mockVolumeEvent)
+
+    expect(microphone.volume).toBe(4)
+  })
+
 })
