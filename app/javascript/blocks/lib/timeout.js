@@ -19,3 +19,7 @@ g().runEvery = (timeInMs, func) => {
   timeout.handler = handler
   return timeout
 }
+
+g().sleep = async(ms) => {
+  return await new Promise(r => setTimeout(r, ms))
+}
