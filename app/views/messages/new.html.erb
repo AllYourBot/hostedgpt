@@ -10,60 +10,7 @@
       </span>
     </div>
     <div class="grid w-full grid-cols-1 gap-2 px-6 md:grid-cols-2">
-      
-      <%= button_tag type: "button", 
-                     class: "border border-gray-200 rounded-xl px-4 py-3 text-left hover:bg-gray-50 group relative" do %>   
-        <div class="text-sm">
-          <div class="flex flex-col flex-1 min-w-0">
-            <span class="font-bold truncate">Help me pick</span>
-            <span class="truncate opacity-50">an outfit that will look good on camera</span>
-          </div>
-          <div class="p-1.5 bg-white rounded-full hidden group-hover:block absolute right-2 top-1/2 transform -translate-y-1/2">
-            <%= icon "arrow-up", variant: :outline, size: 12, class: "text-gray-800 dark:text-white cursor-pointer stroke-3" %>
-          </div>
-        </div>
-      <% end %>
-
-      <%= button_tag type: "button", 
-                     class: "border border-gray-200 rounded-xl px-4 py-3 text-left hover:bg-gray-50 group relative" do %>   
-        <div class="text-sm">
-          <div class="flex flex-col flex-1 min-w-0">
-            <span class="font-bold truncate">Help me pick</span>
-            <span class="truncate opacity-50">an outfit that will look good on camera</span>
-          </div>
-          <div class="p-1.5 bg-white rounded-full hidden group-hover:block absolute right-2 top-1/2 transform -translate-y-1/2">
-            <%= icon "arrow-up", variant: :outline, size: 12, class: "text-gray-800 dark:text-white cursor-pointer stroke-3" %>
-          </div>
-        </div>
-      <% end %>
-
-      <%= button_tag type: "button", 
-                     class: "border border-gray-200 rounded-xl px-4 py-3 text-left hover:bg-gray-50 group relative" do %>   
-        <div class="text-sm">
-          <div class="flex flex-col flex-1 min-w-0">
-            <span class="font-bold truncate">Help me pick</span>
-            <span class="truncate opacity-50">an outfit that will look good on camera</span>
-          </div>
-          <div class="p-1.5 bg-white rounded-full hidden group-hover:block absolute right-2 top-1/2 transform -translate-y-1/2">
-            <%= icon "arrow-up", variant: :outline, size: 12, class: "text-gray-800 dark:text-white cursor-pointer stroke-3" %>
-          </div>
-        </div>
-      <% end %>
-
-      <%= button_tag type: "button", 
-                     class: "border border-gray-200 rounded-xl px-4 py-3 text-left hover:bg-gray-50 group relative" do %>   
-        <div class="text-sm">
-          <div class="flex flex-col flex-1 min-w-0">
-            <span class="font-bold truncate">Help me pick</span>
-            <span class="truncate opacity-50">an outfit that will look good on camera</span>
-          </div>
-          <div class="p-1.5 bg-white rounded-full hidden group-hover:block absolute right-2 top-1/2 transform -translate-y-1/2">
-            <%= icon "arrow-up", variant: :outline, size: 12, class: "text-gray-800 dark:text-white cursor-pointer stroke-3" %>
-          </div>
-        </div>
-      <% end %>
-      
-      
+      <%= render "messages/right_column/conversation_starters" %>
     </div>
   </div>
 <% end %>
