@@ -40,8 +40,8 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_message
     return true
   rescue OpenAI::ConfigurationError => e
-    @message.content_text = "You do not have a valid API key for OpenAI. Click your Profile in the bottom left and " +
-      "then Settings. You will find OpenAI Key instructions."
+    @message.content_text = "You do not have a valid API key for OpenAI. Click your Profile in the bottom " +
+      "left and then Settings. You will find OpenAI Key instructions."
     wrap_up_the_message
     return true
   rescue => e
