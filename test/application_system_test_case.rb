@@ -20,7 +20,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_current_path login_path, wait: 2
     fill_in "email", with: user.person.email
     fill_in "password", with: password
-    click_on "Log In"
+    click_text "Log In"
     assert_current_path new_assistant_message_path(assistant), wait: 2
   end
 
