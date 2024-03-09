@@ -3,14 +3,41 @@
 <% end %>
 
 <%= content_for :messages do %>
-  <div class="absolute flex flex-col items-center justify-between w-full h-full">
+  <div class="absolute flex flex-col items-center justify-between w-full h-[96%] lg:max-w-[700px] xl:max-w-[810px]">
     <div class="flex flex-row items-center h-full">
       <span class="text-2xl font-semibold tracking-tighter">
         How can I help you today?
       </span>
     </div>
-    <div class="p-5">
-        Placeholder
+    <div class="grid w-full grid-cols-1 gap-2 px-6 md:grid-cols-2">
+      <%= button_tag type: "button", 
+                     class: "border border-gray-200 rounded-xl px-4 py-3 text-left hover:bg-gray-50" do %>
+        <div class="text-sm">
+          <span class="font-bold">Write an email</span><br/>
+          <span class="opacity-50">to request a quote from a local plumber</span>
+        </div>
+      <% end %>
+      <%= button_tag type: "button", 
+                     class: "border border-gray-200 rounded-xl px-4 py-3 text-left hover:bg-gray-50" do %>
+        <div class="text-sm">
+          <span class="font-bold">Help me pick</span><br/>
+          <span class="opacity-50">an outfit that will look good on camera</span>
+        </div>
+      <% end %>
+      <%= button_tag type: "button", 
+                     class: "border border-gray-200 rounded-xl px-4 py-3 text-left hover:bg-gray-50" do %>
+        <div class="text-sm">
+          <span class="font-bold">Help me pick</span><br/>
+          <span class="opacity-50">an outfit that will look good on camera</span>
+        </div>
+      <% end %>
+      <%= button_tag type: "button", 
+                     class: "border border-gray-200 rounded-xl px-4 py-3 text-left hover:bg-gray-50" do %>
+        <div class="text-sm">
+          <span class="font-bold">Help me pick</span><br/>
+          <span class="opacity-50">an outfit that will look good on camera</span>
+        </div>
+      <% end %>
     </div>
   </div>
 <% end %>
