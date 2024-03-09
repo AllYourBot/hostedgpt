@@ -39,7 +39,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     post users_url, params: {person: {personable_type: "User", email: email, personable_attributes: user_attr}}
 
     user = Person.find_by(email: email).user
-    assert_equal user_attr.except(:password), user.slice(:first_name, :last_name, :openai_key).symbolize_keys
+    assert_equal user_attr.except(:password), user.slice(:first_name, :last_name).symbolize_keys
     assert_equal 2, user.assistants.count
 
     assistant = user.assistants.ordered.first
@@ -51,6 +51,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   private
 
   def user_attr
-    { password: "secret", first_name: "John", last_name: "Doe", openai_key: "abc123xyz890" }
+    { password: "secret", first_name: "John", last_name: "Doe" }
   end
 end

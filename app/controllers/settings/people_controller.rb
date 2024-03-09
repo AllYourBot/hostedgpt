@@ -6,7 +6,7 @@ class Settings::PeopleController < Settings::ApplicationController
 
   def update
     if Current.person.update(person_params)
-      redirect_to edit_settings_person_path, notice: "Person was successfully updated.", status: :see_other
+      redirect_to edit_settings_person_path, notice: "Saved", status: :see_other
     else
       @person = Current.person
       render :edit, status: :unprocessable_entity
@@ -16,7 +16,9 @@ class Settings::PeopleController < Settings::ApplicationController
   private
 
   def person_params
-    params.require(:person).permit(:email, personable_attributes: [:id, :first_name, :last_name, :password, :openai_key])
+    params.require(:person).permit(:email, personable_attributes: [
+      :id, :first_name, :last_name, :password, :openai_key, :anthropic_key
+    ])
   end
 
   def check_personable_id

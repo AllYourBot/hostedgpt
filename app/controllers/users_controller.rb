@@ -20,26 +20,15 @@ class UsersController < ApplicationController
     end
   end
 
-  def update
-    user = Current.user
-    user.update(user_params)
-
-    if user.save
-      redirect_back fallback_location: "/", notice: "Account information saved.", status: :see_other
-    else
-      render :edit, status: :unprocessable_entity
-    end
-  end
-
   private
 
   def person_params
     params.require(:person).permit(:email, :personable_type, personable_attributes: [
-      :first_name, :last_name, :password, :openai_key, :anthropic_key
+      :first_name, :last_name, :password
     ])
   end
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :openai_key, :anthropic_key)
+    params.require(:user).permit(:first_name, :last_name)
   end
 end
