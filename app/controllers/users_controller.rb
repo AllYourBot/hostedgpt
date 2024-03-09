@@ -22,7 +22,7 @@ class UsersController < ApplicationController
 
   def update
     user = Current.user
-    user.update(update_params)
+    user.update(user_params)
 
     if user.save
       redirect_back fallback_location: "/", notice: "Account information saved.", status: :see_other
@@ -34,10 +34,12 @@ class UsersController < ApplicationController
   private
 
   def person_params
-    params.require(:person).permit(:email, :personable_type, personable_attributes: [:first_name, :last_name, :password, :openai_key])
+    params.require(:person).permit(:email, :personable_type, personable_attributes: [
+      :first_name, :last_name, :password, :openai_key, :anthropic_key
+    ])
   end
 
-  def update_params
-    params.require(:user).permit(:first_name, :last_name, :openai_key)
+  def user_params
+    params.require(:user).permit(:first_name, :last_name, :openai_key, :anthropic_key)
   end
 end
