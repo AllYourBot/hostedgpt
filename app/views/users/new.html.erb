@@ -69,14 +69,6 @@
               class: "w-44 border-0"
             %>
           <% end %>
-
-          <%= user_fields.label :openai_key, class: "input input-bordered flex items-center justify-between" do %>
-            OpenAI Key
-            <%= user_fields.text_field :openai_key,
-              placeholder: "OpenAI API Key",
-              class: "w-44 border-0"
-            %>
-          <% end %>
         </div>
     <% end %>
     <%= f.submit "Sign Up", class: 'rounded bg-gray-200 dark:bg-gray-900 border border-gray-400 font-medium p-4 text-center cursor-pointer' %>

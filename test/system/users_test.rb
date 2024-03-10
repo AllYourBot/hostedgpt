@@ -14,7 +14,6 @@ class UsersTest < ApplicationSystemTestCase
 
     assert_hidden "#person_personable_attributes_first_name"
     assert_hidden "#person_personable_attributes_last_name"
-    assert_hidden "#person_personable_attributes_openai_key"
 
     fill_in "Email", with: "email@email.com"
     fill_in "Password", with: "secret"
@@ -23,7 +22,6 @@ class UsersTest < ApplicationSystemTestCase
 
     assert_visible "#person_personable_attributes_first_name"
     assert_visible "#person_personable_attributes_last_name"
-    assert_visible "#person_personable_attributes_openai_key"
 
     fill_in "Email", with: "changed@email.com"
     fill_in "Password", with: "secret" # this triggers a second focus event
@@ -32,7 +30,6 @@ class UsersTest < ApplicationSystemTestCase
 
     assert_visible "#person_personable_attributes_first_name"
     assert_visible "#person_personable_attributes_last_name"
-    assert_visible "#person_personable_attributes_openai_key"
   end
 
   test "should display errors if fields are left blank" do
@@ -50,7 +47,6 @@ class UsersTest < ApplicationSystemTestCase
     fill_in "Password", with: "secret"
     fill_in "First name", with: "John"
     fill_in "Last name", with: "Doe"
-    fill_in "OpenAI Key", with: "abc123"
 
     click_text "Sign Up"
 

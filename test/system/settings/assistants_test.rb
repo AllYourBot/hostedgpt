@@ -13,7 +13,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     fill_in "Description", with: @assistant.description
     fill_in "Instructions", with: @assistant.instructions
 
-    click_on "Save"
+    click_text "Save"
 
     assert_text "Saved"
   end
@@ -25,7 +25,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     fill_in "Description", with: @assistant.description+"-2"
     fill_in "Instructions", with: @assistant.instructions+"-2"
 
-    click_on "Save"
+    click_text "Save"
 
     assert_text "Saved"
   end
