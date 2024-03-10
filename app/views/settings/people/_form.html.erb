@@ -13,7 +13,7 @@
 
   <div class="my-5">
     <%= form.label :email %>
-    <%= form.text_field :email, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+    <%= form.text_field :email, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <%= form.fields_for :personable_attributes, person.personable do |user_fields| %>
@@ -22,17 +22,17 @@
 
     <div class="my-5">
       <%= user_fields.label :first_name %>
-      <%= user_fields.text_field :first_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+      <%= user_fields.text_field :first_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <div class="my-5">
       <%= user_fields.label :last_name %>
-      <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+      <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <div class="my-5">
       <%= user_fields.label :password %>
-      <%= user_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+      <%= user_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
@@ -51,7 +51,7 @@
           class="
                   list-decimal
                   my-3 p-2 pl-7
-                  border bg-gray-50 border-gray-200
+                  border bg-gray-50 border-gray-200 dark:bg-gray-900
                   hidden
                 "
       >
@@ -76,7 +76,7 @@
         <li>Add a "Payment method."</li>
       </ol>
       <%= user_fields.text_field :openai_key,
-        class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full",
+        class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black",
         placeholder: "OpenAI Key"
       %>
     </div>
@@ -97,7 +97,7 @@
           class="
                   list-decimal
                   my-3 p-2 pl-7
-                  border bg-gray-50 border-gray-200
+                  border bg-gray-50 border-gray-200 dark:bg-gray-900
                   hidden
                 "
       >
@@ -126,7 +126,7 @@
         </li>
       </ol>
       <%= user_fields.text_field :anthropic_key,
-        class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full",
+        class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black",
         placeholder: "Anthropic Key"
       %>
     </div>
