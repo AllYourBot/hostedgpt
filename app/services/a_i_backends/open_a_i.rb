@@ -4,7 +4,7 @@ class AIBackends::OpenAI
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
   #
-  # In regular tests, mock this method or the TestClients::OpenAi class to do
+  # In regular tests, mock this method or the TestClients::OpenAI class to do
   # what you want instead.
   def self.client
     if Rails.env.test?
@@ -29,7 +29,7 @@ class AIBackends::OpenAI
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue => e
-      puts "\nError in AiBackends::OpenAi response handler: #{e.message}"
+      puts "\nError in AIBackends::OpenAI response handler: #{e.message}"
       puts e.backtrace
     end
 
