@@ -85,5 +85,6 @@ group :test do
 end
 
 gem "ruby-openai", "~> 6.3"
+gem "anthropic"
 gem "tiktoken_ruby", "~> 0.0.6"
 gem "solid_queue", "~> 0.2.1"
