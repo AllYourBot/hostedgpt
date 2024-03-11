@@ -37,61 +37,15 @@
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :openai_key, "OpenAI Key (for GPT-3.5 & 4)" %>
-        <%= button_tag type: "button",
-          id: "how-openai",
-          class: "underline text-blue-600",
-          data: {
-            transition_target: "transitionable",
-            action: "transition#toggleClass",
-          } do
+      <%= button_tag type: "button",
+        id: "how-openai",
+        class: "underline text-blue-600",
+        data: {
+          transition_target: "transitionable",
+          action: "transition#toggleClass",
+        } do
         %>How do I get?
-        <% end %>
-      <ol id="openai-instructions"
-          data-transition-target="transitionable"
-          class="
-                  list-decimal
-                  my-3 p-2 pl-7
-                  border bg-gray-50 border-gray-200 dark:bg-gray-900
-                  hidden
-                "
-      >
-        <li>Sign up for OpenAI's
-          <%= link_to "Platform", "https://platform.openai.com/",
-            class: "underline text-blue-600",
-            target: "_blank"
-          %>, you can sign in with your ChatGPT account.
-        </li>
-        <li>Click "API Keys" on the left (or
-          <%= link_to "take me to API Keys", "https://platform.openai.com/api-keys",
-            class: "underline text-blue-600",
-            target: "_blank"
-          %>).</li>
-        <li>Verify your phone number.</li>
-        <li>Click "Create new secret key", name it something like "HostedGPT" and paste it below.</li>
-        <li>Ensure you have billing set up by clicking "Settings" and "Billing" (or
-          <%= link_to "take me to Billing", "https://platform.openai.com/account/billing/overview",
-            class: "underline text-blue-600",
-            target: "_blank"
-          %>).</li>
-        <li>Add a "Payment method."</li>
-      </ol>
-      <%= user_fields.text_field :openai_key,
-        class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black",
-        placeholder: "OpenAI Key"
-      %>
-    </div>
-
-    <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-      <%= user_fields.label :openai_key, "OpenAI Key (for GPT-3.5 & 4)" %>
-        <%= button_tag type: "button",
-          id: "how-openai",
-          class: "underline text-blue-600",
-          data: {
-            transition_target: "transitionable",
-            action: "transition#toggleClass",
-          } do
-        %>How do I get?
-        <% end %>
+      <% end %>
       <ol id="openai-instructions"
           data-transition-target="transitionable"
           class="
@@ -129,15 +83,15 @@
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :anthropic_key, "Anthropic Key (for Claude 3)" %>
-        <%= button_tag type: "button",
-          id: "how-anthropic",
-          class: "underline text-blue-600",
-          data: {
-            transition_target: "transitionable",
-            action: "transition#toggleClass",
-          } do
-        %>How do I get?
-        <% end %>
+      <%= button_tag type: "button",
+        id: "how-anthropic",
+        class: "underline text-blue-600",
+        data: {
+          transition_target: "transitionable",
+          action: "transition#toggleClass",
+        } do
+       %>How do I get?
+      <% end %>
       <ol id="anthropic-instructions"
           data-transition-target="transitionable"
           class="
