@@ -10,9 +10,9 @@ cat_photo:
   user: keith
   assistant:
   message: identify_photo
-  filename: cat_photo.jpg
+  filename: cat.png
   purpose: assistants
-  bytes: 100
+  bytes: 51452
 
 cute_cat_photo:
   user: keith
@@ -34,6 +34,6 @@ single_dog_photo:
   user: keith
   assistant:
   message: two_attachments
-  filename: single_doc_photo.png
+  filename: single_dog_photo.png
   purpose: assistants
   bytes: 400
