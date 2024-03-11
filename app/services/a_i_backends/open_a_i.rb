@@ -35,12 +35,18 @@ class AIBackends::OpenAI
 
     response_handler = nil unless block_given?
 
-    @client.chat(parameters: {
+    response = @client.chat(parameters: {
       model: @assistant.model,
       messages: system_message + existing_messages,
       stream: response_handler,
       max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
     })
+
+    if response.dig("choices")
+      response.dig("choices", 0, "message", "content")
+    else
+      response
+    end
   end
 
   private
