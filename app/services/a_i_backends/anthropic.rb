@@ -45,7 +45,7 @@ class AIBackends::Anthropic
       }
     )
 
-    if response.dig("content")
+    if response.is_a?(Hash) && response.dig("content")
       response.dig("content", 0, "text")
     else
       response

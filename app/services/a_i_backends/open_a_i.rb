@@ -42,7 +42,7 @@ class AIBackends::OpenAI
       max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
     })
 
-    if response.dig("choices")
+    if response.is_a?(Hash) && response.dig("choices")
       response.dig("choices", 0, "message", "content")
     else
       response

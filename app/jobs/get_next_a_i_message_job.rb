@@ -64,6 +64,10 @@ class GetNextAIMessageJob < ApplicationJob
     set_anthropic_error
     wrap_up_the_message
     return true
+  rescue Faraday::ConnectionFailed => e
+    @message.content_text = "I experienced a connection error. #{e.message}"
+    wrap_up_the_message
+    return true
   rescue => e
     unless Rails.env.test?
       puts "\nError in GetNextAIMessageJob: #{e.inspect}"
