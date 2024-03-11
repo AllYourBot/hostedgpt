@@ -1,6 +1,8 @@
 class SessionsController < ApplicationController
   include Accessible
 
+  layout "login"
+
   def new
   end
 

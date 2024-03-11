@@ -1,31 +1,17 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>HostedGPT</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-    <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" %>
-    <%# daisyui (^) is declared above application (v) so we can override classes from it %>
-    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "application", 'https://fonts.googleapis.com/css?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap', "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-    <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
-    <%= content_for :head %>
-  </head>
+  <%= render "head" %>
   <body class="font-sans text-gray-950 dark:text-gray-100">
-    <div  class="flex h-screen"
-          data-controller="transition"
-          data-transition-toggle-class="!hidden"
+    <div class="flex h-screen"
+         data-controller="transition"
+         data-transition-toggle-class="!hidden"
     >
-      <div  id="left-column"
-            class="flex-col h-screen w-[260px] bg-gray-50 dark:bg-gray-900 hidden md:flex overflow-x-clip relative"
-            data-transition-target="transitionable"
+      <div id="left-column"
+           class="flex-col h-screen w-[260px] bg-gray-50 dark:bg-gray-900 hidden md:flex overflow-x-clip relative"
+           data-transition-target="transitionable"
       >
         <div id="left-content-container" class="flex-1 flex flex-col h-screen">
           <div id="left-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide">
-
             <%= yield :left_column %>
           </div>
 
