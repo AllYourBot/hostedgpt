@@ -4,6 +4,7 @@ class MessagesController < ApplicationController
   before_action :set_message, only: [:show, :edit, :update, :destroy]
   before_action :set_sidebar_conversations, only: [:index, :new]
   before_action :set_sidebar_assistants, only: [:index, :new]
+  before_action :set_conversation_starters, only: [:new]
 
   def index
     @messages = @conversation.messages.ordered
@@ -74,6 +75,10 @@ class MessagesController < ApplicationController
 
   def set_sidebar_assistants
     @sidebar_assistants = Current.user.assistants.ordered
+  end
+
+  def set_conversation_starters
+    @conversation_starters = ConversationStarter.sample
   end
 
   def message_params
