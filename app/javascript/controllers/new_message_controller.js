@@ -27,7 +27,8 @@ export default class extends Controller {
   submitForm() {
     if (this.cleanInputValue.length > 0) {
       this.element.requestSubmit()
-      this.element.reset()
+      this.inputTarget.disabled = true
+      this.submitTarget.disabled = true
       window.dispatchEvent(new CustomEvent('right-column-changed'))
     }
   }
