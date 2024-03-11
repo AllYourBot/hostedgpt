@@ -1,6 +1,8 @@
 class UsersController < ApplicationController
   include Accessible
 
+  layout "public"
+
   def new
     @person = Person.new
     @person.personable = User.new
