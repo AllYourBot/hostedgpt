@@ -3,7 +3,19 @@
 <% end %>
 
 <%= content_for :messages do %>
-  <!-- add some guidance for a new conversation -->
+  <div class="absolute flex flex-col items-center justify-between w-full h-[96%] lg:max-w-[700px] xl:max-w-[810px]">
+    <div class="flex flex-row items-center h-full">
+      <span class="text-2xl font-semibold tracking-tighter">
+        How can I help you today?
+      </span>
+    </div>
+
+    <div class="grid w-full grid-cols-1 gap-2 px-6 md:grid-cols-2">
+      <%= render partial: "messages/right_column/conversation_starter", 
+                 collection: @conversation_starters,
+                 with_index: true %>
+    </div>
+  </div>
 <% end %>
 
 <%= render 'right_column' %>
