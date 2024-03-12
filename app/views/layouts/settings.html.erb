@@ -1,5 +1,4 @@
 <% content_for :left_column do %>
-
   <div class="pl-2 py-7 text-3xl">
     Settings
   </div>
@@ -10,11 +9,9 @@
       </div>
     <% end %>
   </div>
-
 <% end %>
 
 <% content_for :body do %>
-
   <div id="wide-header" class="absolute right-0 ml-2 mt-2 mb-3 h-10 text-lg">
     <%= link_to root_path, class: "block cursor-pointer inline-flex mr-3 px-2 py-2 group", data: { role: "pencil" } do %>
       <%= icon "x-mark",
@@ -35,7 +32,6 @@
       <%= yield %>
     </div>
   </div>
-
 <% end %>
 
 <%= render template: "layouts/application" %>

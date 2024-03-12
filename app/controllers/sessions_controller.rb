@@ -1,6 +1,8 @@
 class SessionsController < ApplicationController
   include Accessible
 
+  layout "public"
+
   def new
   end
 
