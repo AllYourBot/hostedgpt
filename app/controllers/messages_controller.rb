@@ -1,4 +1,6 @@
 class MessagesController < ApplicationController
+  include HasConversationStarter
+
   before_action :set_conversation, only: [:index]
   before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
@@ -75,10 +77,6 @@ class MessagesController < ApplicationController
 
   def set_sidebar_assistants
     @sidebar_assistants = Current.user.assistants.ordered
-  end
-
-  def set_conversation_starters
-    @conversation_starters = ConversationStarter.sample
   end
 
   def message_params

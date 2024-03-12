@@ -1,5 +1,9 @@
-class ConversationStarter
-  def self.sample
+module HasConversationStarter
+  extend ActiveSupport::Concern
+
+  private
+
+  def set_conversation_starters
     conversation_starters = [
       ["Suggest a healthy meal plan", "for a week for someone with a busy schedule"],
       ["Plan a solo travel itinerary", "for a weekend getaway in a mountainous region"],
@@ -16,6 +20,6 @@ class ConversationStarter
       ["Help me plan", "a roadtrip from Charleston to Key West"]
     ]
 
-    conversation_starters.shuffle[0..3]
+    @conversation_starters = conversation_starters.shuffle[0..3]
   end
 end
