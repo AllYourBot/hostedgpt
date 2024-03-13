@@ -24,6 +24,7 @@ class TestClients::OpenAI
       ],
       "usage"=>{"prompt_tokens"=>8, "completion_tokens"=>9, "total_tokens"=>17},
       "system_fingerprint"=>nil
-    }
+
+    }.dig("choices", 0, "message", "content")
   end
 end

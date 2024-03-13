@@ -18,6 +18,11 @@ ruby_version:
   assistant: samantha
   title: Ruby version
 
+hello_claude:
+  user: keith
+  assistant: keith_claude3
+  title: Meeting Claude
+
 debugging:
   user: rob
   assistant: rob_gpt4

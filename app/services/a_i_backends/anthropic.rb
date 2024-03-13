@@ -15,6 +15,7 @@ class AIBackends::Anthropic
   end
 
   def initialize(user, assistant, conversation, message)
+    raise Anthropic::ConfigurationError if user.anthropic_key.blank?
     @client = self.class.client.new(access_token: user.anthropic_key)
     @assistant = assistant
     @conversation = conversation
@@ -29,7 +30,7 @@ class AIBackends::Anthropic
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue => e
-      puts "\nError in AIBackends::OpenAI response handler: #{e.message}"
+      puts "\nError in AIBackends::Anthropic response handler: #{e.message}"
       puts e.backtrace
     end
 

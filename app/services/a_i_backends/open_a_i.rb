@@ -15,6 +15,7 @@ class AIBackends::OpenAI
   end
 
   def initialize(user, assistant, conversation, message)
+    raise OpenAI::ConfigurationError if user.openai_key.blank?
     @client = self.class.client.new(access_token: user.openai_key)
     @assistant = assistant
     @conversation = conversation

@@ -18,6 +18,7 @@ class TestClients::Anthropic
       "stop_reason"=>"end_turn",
       "stop_sequence"=>nil,
       "usage"=>{"input_tokens"=>10, "output_tokens"=>19}
-    }
+
+    }.dig("content", 0, "text")
   end
 end
