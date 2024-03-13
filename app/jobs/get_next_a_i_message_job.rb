@@ -34,6 +34,8 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
 
+    # TODO: With an invalid API key, anthropic is not throwing an exception and it's ending up here with an empty response
+
     if @message.content_text.blank? # this shouldn't be needed b/c the += above will build up the response, but test
                                     # env just returns a response w/o streaming and maybe that will happen in prod
       @message.content_text = response

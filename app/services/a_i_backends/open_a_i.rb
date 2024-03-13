@@ -16,7 +16,11 @@ class AIBackends::OpenAI
 
   def initialize(user, assistant, conversation, message)
     raise OpenAI::ConfigurationError if user.openai_key.blank?
-    @client = self.class.client.new(access_token: user.openai_key)
+    begin
+      @client = self.class.client.new(access_token: user.openai_key)
+    rescue ::Faraday::UnauthorizedError => e
+      raise OpenAI::ConfigurationError
+    end
     @assistant = assistant
     @conversation = conversation
     @message = message
@@ -32,18 +36,22 @@ class AIBackends::OpenAI
     rescue ::Faraday::UnauthorizedError => e
       raise OpenAI::ConfigurationError
     rescue => e
-      puts "\nError in AIBackends::OpenAI response handler: #{e.message}"
+      puts "\nUnhandled error in AIBackends::OpenAI response handler: #{e.message}"
       puts e.backtrace
     end
 
     response_handler = nil unless block_given?
 
-    response = @client.chat(parameters: {
-      model: @assistant.model,
-      messages: system_message + existing_messages,
-      stream: response_handler,
-      max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
-    })
+    begin
+      response = @client.chat(parameters: {
+        model: @assistant.model,
+        messages: system_message + existing_messages,
+        stream: response_handler,
+        max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
+      })
+    rescue ::Faraday::UnauthorizedError => e
+      raise OpenAI::ConfigurationError
+    end
 
     if response.is_a?(Hash) && response.dig("choices")
       response.dig("choices", 0, "message", "content")

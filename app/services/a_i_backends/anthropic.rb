@@ -16,7 +16,11 @@ class AIBackends::Anthropic
 
   def initialize(user, assistant, conversation, message)
     raise Anthropic::ConfigurationError if user.anthropic_key.blank?
-    @client = self.class.client.new(access_token: user.anthropic_key)
+    begin
+      @client = self.class.client.new(access_token: user.anthropic_key)
+    rescue ::Faraday::UnauthorizedError => e
+      raise Anthropic::ConfigurationError
+    end
     @assistant = assistant
     @conversation = conversation
     @message = message
@@ -32,21 +36,25 @@ class AIBackends::Anthropic
     rescue ::Faraday::UnauthorizedError => e
       raise Anthropic::ConfigurationError
     rescue => e
-      puts "\nError in AIBackends::Anthropic response handler: #{e.message}"
+      puts "\nUnhandled error in AIBackends::Anthropic response handler: #{e.message}"
       puts e.backtrace
     end
 
     response_handler = nil unless block_given?
 
-    response = @client.messages(
-      model: @assistant.model,
-      system: @assistant.instructions,
-      messages: existing_messages,
-      parameters: {
-        max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
-        stream: response_handler,
-      }
-    )
+    begin
+      response = @client.messages(
+        model: @assistant.model,
+        system: @assistant.instructions,
+        messages: existing_messages,
+        parameters: {
+          max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
+          stream: response_handler,
+        }
+      )
+    rescue ::Faraday::UnauthorizedError => e
+      raise Anthropic::ConfigurationError
+    end
 
     if response.is_a?(Hash) && response.dig("content")
       response.dig("content", 0, "text")
