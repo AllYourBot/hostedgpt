@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <%= render "head" %>
+  <body class="font-sans text-gray-950 dark:text-gray-100">
+    <div class="flex h-screen">
+      <div class="flex flex-1 h-screen bg-white dark:bg-gray-800">
+        <%= content_for?(:body) ? yield(:body) : yield %>
+      </div>
+    </div>
+  </body>
+</html>

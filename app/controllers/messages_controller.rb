@@ -1,9 +1,12 @@
 class MessagesController < ApplicationController
+  include HasConversationStarter
+
   before_action :set_conversation, only: [:index]
   before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
   before_action :set_sidebar_conversations, only: [:index, :new]
   before_action :set_sidebar_assistants, only: [:index, :new]
+  before_action :set_conversation_starters, only: [:new]
 
   def index
     @messages = @conversation.messages.ordered
