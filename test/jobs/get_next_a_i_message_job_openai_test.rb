@@ -1,6 +1,6 @@
 require "test_helper"
 
-class GetNextAIMessageJobTest < ActiveJob::TestCase
+class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   setup do
     @conversation = conversations(:greeting)
     @message = @conversation.messages.create! role: :assistant, content_text: "", assistant: @conversation.assistant

@@ -29,6 +29,8 @@ class AIBackends::Anthropic
       yield chunk if chunk
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
+    rescue ::Faraday::UnauthorizedError => e
+      raise Anthropic::ConfigurationError
     rescue => e
       puts "\nError in AIBackends::Anthropic response handler: #{e.message}"
       puts e.backtrace

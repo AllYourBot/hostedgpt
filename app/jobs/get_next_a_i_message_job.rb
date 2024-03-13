@@ -47,15 +47,6 @@ class GetNextAIMessageJob < ApplicationJob
     puts "\nResponse cancelled" if Rails.env.development?
     wrap_up_the_message
     return true
-  rescue Faraday::UnauthorizedError => e # TODO: Catch this within anthropic & re-throw OpenAI::ConfigurationError
-    msg = e.response.dig(:body, "error", "message")
-    if (msg && msg.include?('openai'))
-      set_openai_error
-    else
-      @message.content_text = "There was an error: " + e.response.to_json
-    end
-    wrap_up_the_message
-    return true
   rescue OpenAI::ConfigurationError => e
     set_openai_error
     wrap_up_the_message

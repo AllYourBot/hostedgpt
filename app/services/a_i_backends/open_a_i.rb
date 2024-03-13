@@ -29,6 +29,8 @@ class AIBackends::OpenAI
       yield chunk if chunk
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
+    rescue ::Faraday::UnauthorizedError => e
+      raise OpenAI::ConfigurationError
     rescue => e
       puts "\nError in AIBackends::OpenAI response handler: #{e.message}"
       puts e.backtrace

@@ -13,7 +13,7 @@ module AIBackends
     end
 
     test "get_next_chat_message works" do
-      assert_equal @test_client.messages.dig("content", 0, "text"), @anthropic.get_next_chat_message
+      assert_equal @test_client.messages, @anthropic.get_next_chat_message
     end
 
     test "existing_messages constructs a proper response and pivots on images" do
