@@ -79,9 +79,9 @@ HostedGPT requires these services to be running:
 - Redis ([installation instructions](https://redis.io/download))
 - asdf-vm ([installation instructions](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf))
 
-1. `cd ` into your local repository clone
+1. `cd` into your local repository clone
 2. `asdf install` to install the correct ruby version
 4. `bundle install` to install ruby gems
-5. `bin/rails db:setup`  < Note: This will load the sample fixture data into your database
-6. `bin/rails dev`  < Starts up all the services
+5. `bin/rails db:setup` < Note: This will load the sample fixture data into your database
+6. `bin/dev` < Starts up all the services
 5. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
