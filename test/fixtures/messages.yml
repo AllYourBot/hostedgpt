@@ -173,6 +173,45 @@ latest_ruby_version:
 
 # Next conversation
 
+hello_claude:
+  assistant: keith_claude3
+  conversation: hello_claude
+  role: user
+  content_text: Hi Claude, can you hear me?
+  content_document:
+  run:
+  created_at: 2023-12-30 1:00:00
+
+claude_replying:
+  assistant: keith_claude3
+  conversation: hello_claude
+  role: assistant
+  content_text: Yes, I can hear you.
+  content_document:
+  run:
+  created_at: 2023-12-30 1:01:00
+
+claude_age:
+  assistant: keith_claude3
+  conversation: hello_claude
+  role: assistant
+  content_text: How old are you?
+  content_document:
+  run:
+  created_at: 2023-12-30 1:02:00
+
+claude_age_replying:
+  assistant: keith_claude3
+  conversation: hello_claude
+  role: assistant
+  content_text: I am an AI assistant and I do not have an age.
+  content_document:
+  run:
+  created_at: 2023-12-30 1:03:00
+
+
+# Next conversation
+
 filter_map:
   assistant: rob_gpt4
   conversation: debugging

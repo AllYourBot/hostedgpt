@@ -13,7 +13,7 @@
 
   <div class="my-5">
     <%= form.label :email %>
-    <%= form.text_field :email, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+    <%= form.text_field :email, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <%= form.fields_for :personable_attributes, person.personable do |user_fields| %>
@@ -22,30 +22,30 @@
 
     <div class="my-5">
       <%= user_fields.label :first_name %>
-      <%= user_fields.text_field :first_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+      <%= user_fields.text_field :first_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <div class="my-5">
       <%= user_fields.label :last_name %>
-      <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+      <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <div class="my-5">
       <%= user_fields.label :password %>
-      <%= user_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+      <%= user_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :openai_key, "OpenAI Key (for GPT-3.5 & 4)" %>
-        <%= button_tag type: "button",
-          id: "how-openai",
-          class: "underline text-blue-600",
-          data: {
-            transition_target: "transitionable",
-            action: "transition#toggleClass",
-          } do
+      <%= button_tag type: "button",
+        id: "how-openai",
+        class: "underline text-blue-600",
+        data: {
+          transition_target: "transitionable",
+          action: "transition#toggleClass",
+        } do
         %>How do I get?
-        <% end %>
+      <% end %>
       <ol id="openai-instructions"
           data-transition-target="transitionable"
           class="
@@ -83,15 +83,15 @@
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :anthropic_key, "Anthropic Key (for Claude 3)" %>
-        <%= button_tag type: "button",
-          id: "how-anthropic",
-          class: "underline text-blue-600",
-          data: {
-            transition_target: "transitionable",
-            action: "transition#toggleClass",
-          } do
-        %>How do I get?
-        <% end %>
+      <%= button_tag type: "button",
+        id: "how-anthropic",
+        class: "underline text-blue-600",
+        data: {
+          transition_target: "transitionable",
+          action: "transition#toggleClass",
+        } do
+       %>How do I get?
+      <% end %>
       <ol id="anthropic-instructions"
           data-transition-target="transitionable"
           class="

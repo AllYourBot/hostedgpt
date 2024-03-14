@@ -16,6 +16,15 @@ keith_gpt4:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
   images: true
 
+keith_claude3:
+  user: keith
+  model: claude-3-opus-20240229
+  name: Claude 3 Opus
+  description: Claude 3, Opus version
+  instructions:
+  tools: []
+  images: true
+
 rob_gpt4:
   user: rob
   model: gpt-4
