@@ -24,7 +24,7 @@
 <% end %>
 
 <% content_for :main do %>
-  <div id="wide-header" class="absolute right-0 ml-2 mt-2 mb-3 h-10 text-lg">
+  <header class="absolute right-0 ml-2 mt-2 mb-3 h-10 text-lg">
     <%= link_to root_path, class: "block cursor-pointer inline-flex mr-3 px-2 py-2 group" do %>
       <%= icon "x-mark",
             variant: :outline,
@@ -37,7 +37,7 @@
             tooltip: :left
       %>
     <% end %>
-  </div>
+  </header>
 
   <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
     <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2 py-7 px-10 pr-14">

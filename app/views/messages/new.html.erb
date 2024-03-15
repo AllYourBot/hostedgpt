@@ -11,11 +11,11 @@
     </div>
 
     <div class="grid w-full grid-cols-1 gap-2 px-6 md:grid-cols-2">
-      <%= render partial: "messages/right_column/conversation_starter",
+      <%= render partial: "messages/main_column/conversation_starter",
                  collection: @conversation_starters,
                  with_index: true %>
     </div>
   </div>
 <% end %>
 
-<%= render 'right_column' %>
+<%= render "main_column" %>

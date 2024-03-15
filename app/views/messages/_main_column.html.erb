@@ -34,8 +34,8 @@
   </div>
 
   <!-- Only one of these headers is visible at a time, depending on width -->
-  <div id="wide-header" class="justify-between flex-none hidden h-10 mt-2 mb-3 ml-2 text-lg text-gray-950 dark:text-gray-100 md:flex">
-    <%= render 'messages/right_column/assistant_header' %>
+  <header id="wide-header" class="justify-between flex-none hidden h-10 mt-2 mb-3 ml-2 text-lg text-gray-950 dark:text-gray-100 md:flex">
+    <%= render 'messages/main_column/assistant_header' %>
 
     <%= link_to new_assistant_message_path(@assistant),
         class: "block cursor-pointer inline-flex mr-3 px-2 py-2 group",
@@ -52,29 +52,30 @@
         } do %>
       <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: "New chat", tooltip: :left %>
     <% end %>
-  </div>
+  </header>
 
-  <div id="narrow-header" class="flex-none text-lg text-center h-14 md:hidden">
+  <header id="narrow-header" class="flex-none text-lg text-center h-14 md:hidden">
     <div class="flex items-center justify-between flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
       <div class="inline-flex px-2 ml-1 cursor-pointer group">
         <%= icon "bars-3", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: "Menu", tooltip: :right %>
       </div>
 
-      <%= render 'messages/right_column/assistant_header' %>
+      <%= render 'messages/main_column/assistant_header' %>
 
       <%= link_to new_assistant_message_path(@assistant), class: "block cursor-pointer inline-flex mr-1 px-2 group", data: { role: "pencil" } do %>
         <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: "New chat", tooltip: :left %>
       <% end %>
     </div>
-  </div>
-  <!-- end header -->
+  </header>
+  <!-- end header possibilities -->
 
   <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
-    <div id="right-content" class="relative flex-grow overflow-y-auto overflow-x-clip" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
+
+    <section id="messages" class="relative flex-grow overflow-y-auto overflow-x-clip" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
       <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
         <%= yield :messages %>
       </div>
-    </div>
+    </section>
 
     <div id="right-footer" class="relative flex flex-col flex-none">
       <div id="scroll-button" class="absolute hidden text-center transform -translate-x-1/2 -top-14 left-1/2" data-scrollable-target="widget">
