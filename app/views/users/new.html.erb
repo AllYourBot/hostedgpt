@@ -32,7 +32,7 @@
       <%= f.email_field :email,
         autofocus: true,
         placeholder: "Email",
-        class: "w-44 border-0"
+        class: "w-44 border-0 dark:text-black"
       %>
     <% end %>
 
@@ -41,7 +41,7 @@
           <span>Password <span class="">*</span></span>
           <%= user_fields.password_field :password,
             placeholder: "Password",
-            class: "w-44 border-0",
+            class: "w-44 border-0 dark:text-black",
             data: { action: "focus->transition#toggleClassOn" }
           %>
         <% end %>
@@ -58,7 +58,7 @@
             <span>First name <span class="">*</span></span>
             <%= user_fields.text_field :first_name,
               placeholder: "First name",
-              class: "w-44 border-0"
+              class: "w-44 border-0 dark:text-black"
             %>
           <% end %>
 
@@ -66,7 +66,7 @@
             <span>Last name <span class="">*</span></span>
             <%= user_fields.text_field :last_name,
               placeholder: "Last name",
-              class: "w-44 border-0"
+              class: "w-44 border-0 dark:text-black"
             %>
           <% end %>
         </div>
