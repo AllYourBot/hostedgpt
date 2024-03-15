@@ -39,11 +39,11 @@
     <% end %>
   </header>
 
-  <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
+  <section class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
     <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2 py-7 px-10 pr-14">
       <%= yield %>
     </div>
-  </div>
+  </section>
 <% end %>
 
 <%= render template: "layouts/application" %>

@@ -69,15 +69,15 @@
   </header>
   <!-- end header possibilities -->
 
-  <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
+  <section class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
 
-    <section id="messages" class="relative flex-grow overflow-y-auto overflow-x-clip" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
+    <div id="messages" class="relative flex-grow overflow-y-auto overflow-x-clip" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
       <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
         <%= yield :messages %>
       </div>
-    </section>
+    </div>
 
-    <div id="right-footer" class="relative flex flex-col flex-none">
+    <footer class="relative flex flex-col flex-none">
       <div id="scroll-button" class="absolute hidden text-center transform -translate-x-1/2 -top-14 left-1/2" data-scrollable-target="widget">
         <%= button_tag type: "button",
               class: "block rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer group",
@@ -206,5 +206,5 @@
       <div class="w-full mb-2 text-xs text-center text-gray-600 dark:text-gray-300">
         HostedGPT can make mistakes. Consider checking important information.
       </div>
-  </div>
+  </footer>
 </turbo-frame>

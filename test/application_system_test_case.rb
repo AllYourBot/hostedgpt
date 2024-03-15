@@ -117,7 +117,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     page.execute_script("document.querySelector('#{selector}').scrollTop = document.querySelector('#{selector}').scrollHeight")
   end
 
-  def assert_did_not_scroll(selector = "section#messages")
+  def assert_did_not_scroll(selector = "section #messages")
     raise "No block given" unless block_given?
 
     scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').firstElementChild.getBoundingClientRect().top")
@@ -129,7 +129,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       "The #{selector} should not have scrolled"
   end
 
-  def assert_scrolled_up(selector = "section#messages")
+  def assert_scrolled_up(selector = "section #messages")
     raise "No block given" unless block_given?
 
     scroll_position = get_scroll_position(selector)
@@ -137,7 +137,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert get_scroll_position(selector) > scroll_position, "The #{selector} should have scrolled up"
   end
 
-  def assert_scrolled_down(selector = "section#messages")
+  def assert_scrolled_down(selector = "section #messages")
     raise "No block given" unless block_given?
 
     scroll_position = get_scroll_position(selector)
@@ -145,13 +145,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert get_scroll_position(selector) > scroll_position, "The #{selector} should have scrolled down"
   end
 
-  def assert_at_bottom(selector = "section#messages")
+  def assert_at_bottom(selector = "section #messages")
     new_scroll_position = get_scroll_position(selector)
     scroll_to_bottom(selector)
     assert_equal new_scroll_position, get_scroll_position(selector), "The #{selector} did not scroll to the bottom."
   end
 
-  def assert_scrolled_to_bottom(selector = "section#messages")
+  def assert_scrolled_to_bottom(selector = "section #messages")
     raise "No block given" unless block_given?
 
     assert_scrolled_down(selector) do
@@ -161,7 +161,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_at_bottom(selector)
   end
 
-  def assert_stays_at_bottom(selector = "section#messages")
+  def assert_stays_at_bottom(selector = "section #messages")
     raise "No block given" unless block_given?
 
     assert_at_bottom(selector)
