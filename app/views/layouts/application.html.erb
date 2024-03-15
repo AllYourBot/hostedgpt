@@ -9,13 +9,13 @@
       <nav class="flex-col h-screen w-[260px] bg-gray-50 dark:bg-gray-900 hidden md:flex overflow-x-clip relative"
            data-transition-target="transitionable"
       >
-        <div id="left-content-container" class="flex-1 flex flex-col h-screen">
-          <div id="left-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide">
+        <div id="nav-container" class="flex-1 flex flex-col h-screen">
+          <div id="nav-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide">
             <%= yield :nav_column %>
           </div>
 
           <% if Current.user %>
-            <div id="left-footer" class="flex-none pt-2 pb-4 pl-3 pr-5">
+            <footer class="flex-none pt-2 pb-4 pl-3 pr-5">
               <div class="w-full dropdown dropdown-top dropdown-end">
                 <div tabindex="0" role="button" class="flex items-center justify-between w-full h-10 pr-2 mb-1 rounded-lg cursor-pointer scale-down hover:bg-gray-100 dark:hover:bg-gray-700 group !outline-0">
                   <div id="profile" class="ml-2 mr-2 bg-green-200 rounded-full w-7 h-7"></div>
@@ -30,7 +30,7 @@
                   <li><%= link_to logout_path do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
                 </ul>
               </div>
-            </div>
+            </footer>
           <% end %>
         </div>
       </nav>
