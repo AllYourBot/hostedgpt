@@ -29,7 +29,7 @@ class Conversation < ApplicationRecord
   #  "Older" => relation
   # }
   def self.grouped_by_increasing_time_interval_for_user(user)
-    sidebar_conversations = user.conversations.ordered
+    nav_conversations = user.conversations.ordered
 
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
     values = [
@@ -50,7 +50,7 @@ class Conversation < ApplicationRecord
         range_end..range_start
       end
 
-      sidebar_conversations.where(updated_at: range)
+      nav_conversations.where(updated_at: range)
     end
 
     keys.zip(values)

@@ -4,8 +4,8 @@ class MessagesController < ApplicationController
   before_action :set_conversation, only: [:index]
   before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
-  before_action :set_sidebar_conversations, only: [:index, :new]
-  before_action :set_sidebar_assistants, only: [:index, :new]
+  before_action :set_nav_conversations, only: [:index, :new]
+  before_action :set_nav_assistants, only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
 
   def index
@@ -32,8 +32,8 @@ class MessagesController < ApplicationController
       redirect_to conversation_messages_path(@message.conversation)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
-      set_sidebar_conversations
-      set_sidebar_assistants
+      set_nav_conversations
+      set_nav_assistants
       @new_message = @assistant.messages.new
 
       render :new, status: :unprocessable_entity
@@ -71,12 +71,12 @@ class MessagesController < ApplicationController
     @message = Message.find(params[:id])
   end
 
-  def set_sidebar_conversations
-    @sidebar_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
+  def set_nav_conversations
+    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
   end
 
-  def set_sidebar_assistants
-    @sidebar_assistants = Current.user.assistants.ordered
+  def set_nav_assistants
+    @nav_assistants = Current.user.assistants.ordered
   end
 
   def message_params

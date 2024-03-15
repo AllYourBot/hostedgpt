@@ -1,7 +1,7 @@
 class ConversationsController < ApplicationController
   before_action :set_conversation, only: [:edit, :update, :destroy]
-  before_action :set_sidebar_conversations
-  before_action :set_sidebar_assistants
+  before_action :set_nav_conversations
+  before_action :set_nav_assistants
 
   def index
     @conversations = Current.user.conversations
@@ -39,12 +39,12 @@ class ConversationsController < ApplicationController
 
   private
 
-  def set_sidebar_conversations
-    @sidebar_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
+  def set_nav_conversations
+    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
   end
 
-  def set_sidebar_assistants
-    @sidebar_assistants = Current.user.assistants.ordered
+  def set_nav_assistants
+    @nav_assistants = Current.user.assistants.ordered
   end
 
   def set_conversation
