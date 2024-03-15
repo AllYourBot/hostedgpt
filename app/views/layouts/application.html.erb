@@ -6,13 +6,12 @@
          data-controller="transition"
          data-transition-toggle-class="!hidden"
     >
-      <div id="left-column"
-           class="flex-col h-screen w-[260px] bg-gray-50 dark:bg-gray-900 hidden md:flex overflow-x-clip relative"
+      <nav class="flex-col h-screen w-[260px] bg-gray-50 dark:bg-gray-900 hidden md:flex overflow-x-clip relative"
            data-transition-target="transitionable"
       >
         <div id="left-content-container" class="flex-1 flex flex-col h-screen">
           <div id="left-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide">
-            <%= yield :left_column %>
+            <%= yield :nav_column %>
           </div>
 
           <% if Current.user %>
@@ -34,11 +33,11 @@
             </div>
           <% end %>
         </div>
-      </div>
+      </nav>
 
-      <div id="right-column" class="flex flex-1 h-screen bg-white dark:bg-gray-800">
-        <%= content_for?(:body) ? yield(:body) : yield %>
-      </div>
+      <main id="right-column" class="flex flex-1 h-screen bg-white dark:bg-gray-800">
+        <%= content_for?(:main) ? yield(:main) : yield %>
+      </main>
     </div>
     <%= render "layouts/toast" %>
   </body>

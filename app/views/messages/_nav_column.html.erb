@@ -1,8 +1,9 @@
 <div id="spacer-above-fixed-assistant" class="absolute top-0 z-10 w-full h-5 bg-gray-50 dark:bg-gray-900"></div>
-<div id="assistants" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship" class="pt-14">
+<section id="assistants" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship" class="pt-14">
   <%= render @sidebar_assistants %>
-</div>
-<div class="text-gray-950 dark:text-gray-100">
+</section>
+
+<section class="text-gray-950 dark:text-gray-100">
   <turbo-frame  id="conversations"
                 target="conversation"
                 data-controller="radio-behavior"
@@ -10,11 +11,11 @@
                 class="block mb-24" <%# ensures the last conversation's menu has room to open %>
   >
     <% @sidebar_conversations.each do |named_time_span, conversations| %>
-      <div class="mx-2 mt-10 mb-2 text-xs font-medium text-gray-500 text-opacity-1">
+      <header class="mx-2 mt-10 mb-2 text-xs font-medium text-gray-500 text-opacity-1">
         <%= named_time_span %>
-      </div>
+      </header>
 
       <%= render conversations %>
     <% end %>
   </turbo-frame>
-</div>
+</section>

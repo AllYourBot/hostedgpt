@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class MessagesSidebarTest < ApplicationSystemTestCase
+class NavColumnTest < ApplicationSystemTestCase
   setup do
     @user = users(:keith)
     login_as @user
@@ -52,8 +52,8 @@ class MessagesSidebarTest < ApplicationSystemTestCase
     # assert_selected_assistant assistant
   end
 
-  test "sidebar close handle shows proper tooltip and hides/shows column when clicked" do
-    assert_visible "#left-column"
+  test "nav column close handle shows proper tooltip and hides/shows column when clicked" do
+    assert_visible "nav"
 
     assert_visible "#left-handle"
     assert_shows_tooltip "#left-handle", "Close sidebar"
@@ -61,7 +61,7 @@ class MessagesSidebarTest < ApplicationSystemTestCase
 
     click_element "#handle"
 
-    assert_hidden "#left-column"
+    assert_hidden "nav"
 
     assert_visible "#right-handle"
     assert_shows_tooltip "#right-handle", "Open sidebar"
@@ -69,56 +69,56 @@ class MessagesSidebarTest < ApplicationSystemTestCase
 
     click_element "#handle"
 
-    assert_visible "#left-column"
+    assert_visible "nav"
 
     assert_visible "#left-handle"
     assert_shows_tooltip "#left-handle", "Close sidebar"
     assert_hidden "#right-handle"
   end
 
-  test "meta+. opens and closes sidebar" do
-    assert_visible "#left-column"
+  test "meta+. opens and closes nav column" do
+    assert_visible "nav"
 
     assert_visible "#left-handle"
     assert_hidden "#right-handle"
 
     send_keys "meta+."
 
-    assert_hidden "#left-column"
+    assert_hidden "nav"
 
     assert_visible "#right-handle"
     assert_hidden "#left-handle"
 
     send_keys "meta+."
 
-    assert_visible "#left-column"
+    assert_visible "nav"
 
     assert_visible "#left-handle"
     assert_hidden "#right-handle"
   end
 
-  test "meta+shift+s opens and closes sidebar" do
-    assert_visible "#left-column"
+  test "meta+shift+s opens and closes nav column" do
+    assert_visible "nav"
 
     assert_visible "#left-handle"
     assert_hidden "#right-handle"
 
     send_keys "meta+shift+s"
 
-    assert_hidden "#left-column"
+    assert_hidden "nav"
 
     assert_visible "#right-handle"
     assert_hidden "#left-handle"
 
     send_keys "meta+shift+s"
 
-    assert_visible "#left-column"
+    assert_visible "nav"
 
     assert_visible "#left-handle"
     assert_hidden "#right-handle"
   end
 
-  test "clicking the assistant name in the sidebar starts a new conversation" do
+  test "clicking the assistant name in the nav column starts a new conversation" do
     conversation_path = conversation_messages_path(conversations(:greeting))
     visit conversation_path
     assert_current_path conversation_path

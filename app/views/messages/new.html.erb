@@ -1,5 +1,5 @@
-<%= content_for :left_column do %>
-  <%= render 'left_column' %>
+<%= content_for :nav_column do %>
+  <%= render 'nav_column' %>
 <% end %>
 
 <%= content_for :messages do %>
@@ -11,7 +11,7 @@
     </div>
 
     <div class="grid w-full grid-cols-1 gap-2 px-6 md:grid-cols-2">
-      <%= render partial: "messages/right_column/conversation_starter", 
+      <%= render partial: "messages/right_column/conversation_starter",
                  collection: @conversation_starters,
                  with_index: true %>
     </div>
