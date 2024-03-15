@@ -1,0 +1,15 @@
+<%# locals: (user:, size:, classes: nil) -%>
+<% text_size = size > 6 ? "text-sm font-bold" : "text-xs" %>
+
+<picture
+  class="
+        rounded-full
+        w-<%= size %> h-<%= size %>
+        bg-green-200 text-black
+        flex justify-center items-center
+        <%= text_size %>
+        <%= classes %>
+        "
+>
+  <%= user.initials %>
+</picture>

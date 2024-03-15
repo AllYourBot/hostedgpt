@@ -12,4 +12,10 @@ class User < ApplicationRecord
   def full_name
     "#{first_name} #{last_name}".strip.presence
   end
+
+  def initials
+    return nil if first_name.blank? || last_name.blank?
+
+    first_name[0].capitalize + last_name[0].capitalize
+  end
 end
