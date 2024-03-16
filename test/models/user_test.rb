@@ -13,7 +13,7 @@ class UserTest < ActiveSupport::TestCase
 
   test "should validate a user with minimum information" do
     user = User.new(password: "password", password_confirmation: "password", first_name: "John", last_name: "Doe")
-    person = Person.new(email: "exmaple@gmail.com", personable: user)
+    person = Person.new(email: "example@gmail.com", personable: user)
     assert person.valid?
   end
 
@@ -21,6 +21,17 @@ class UserTest < ActiveSupport::TestCase
     assert_nothing_raised do
       users(:keith).update!(first_name: nil, last_name: nil)
     end
+  end
+
+  test "initials returns the proper two letters" do
+    assert_equal "KS", users(:keith).initials
+  end
+
+  test "initials returns nothing if missing first or last name" do
+    users(:keith).update!(first_name: nil, last_name: 'Schacht')
+    assert_nil users(:keith).initials
+    users(:keith).update!(first_name: 'Keith', last_name: nil)
+    assert_nil users(:keith).initials
   end
 
   test "it can update a user with a password" do

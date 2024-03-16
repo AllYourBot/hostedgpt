@@ -16,8 +16,8 @@ class Assistant < ApplicationRecord
 
     parts = name.split(/[\- ]/)
 
-    parts[0].try(:[], 0)&.capitalize +
-      parts[1].try(:[], 0)&.capitalize
+    parts[0][0].capitalize +
+      parts[1]&.try(:[], 0)&.capitalize.to_s
   end
 
   def to_s
