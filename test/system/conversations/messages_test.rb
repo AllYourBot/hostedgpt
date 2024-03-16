@@ -75,7 +75,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   test "submitting a message with ENTER inserts two new messages with morphing & scrolls down" do
     visit conversation_messages_path(@long_conversation.id)
-    scroll_to_bottom "#right-content"
+    scroll_to_bottom "section #messages"
 
     # TODO: instead of these 2 lines if we do "click_text @long_conversation.title" the test fails. There is a bug
     # and the page won't morph after a click with turbo-action="advance". We need to fix this bug within Turbo.
@@ -112,7 +112,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   test "clicking new compose icon in the top-right starts a new conversation and preserves sidebar scroll" do
     click_text @long_conversation.title
 
-    assert_did_not_scroll("#left-column") do
+    assert_did_not_scroll("nav") do
       assert_selector "#conversation a[data-role='pencil']"
       assert_shows_tooltip "#conversation a[data-role='pencil']", "New chat"
 
@@ -156,12 +156,12 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     # attribute to the element which morphdom ignores so it does not recognize this as a changed element. A full
     # page body replacement or a turbo-frame replacement does not re-add these attributes, so if the tag is no longer
     # present then we know morphing did not occur.
-    tag("#left-column")
+    tag("nav")
     tag(find_messages.first)
-    @left_scroll_position = get_scroll_position("#left-column")
+    @nav_scroll_position = get_scroll_position("nav")
     sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
-    @body_scroll_position = get_scroll_position("#right-content")
-    assert_not_equal 0, @body_scroll_position, "The page should be scrolled down before acting on it"
+    @messages_scroll_position = get_scroll_position("section #messages")
+    assert_not_equal 0, @messages_scroll_position, "The page should be scrolled down before acting on it"
   end
 
   def tag(selector_or_element)
@@ -181,11 +181,11 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     yield
 
     sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
-    assert get_scroll_position("#right-content") > @body_scroll_position, "The page should have scrolled down further"
+    assert get_scroll_position("section #messages") > @messages_scroll_position, "The page should have scrolled down further"
     assert_hidden "#scroll-button", "The page did not scroll all the way down"
-    assert tagged?("#left-column"), "The page did not morph; a tagged element got replaced."
+    assert tagged?("nav"), "The page did not morph; a tagged element got replaced."
     assert tagged?(find_messages.first), "The page did not morph; a tagged element got replaced."
-    assert_equal @left_scroll_position, get_scroll_position("#left-column"), "The left column lost it's scroll position"
+    assert_equal @nav_scroll_position, get_scroll_position("nav"), "The left column lost it's scroll position"
   end
 
   def tagged?(selector_or_element)

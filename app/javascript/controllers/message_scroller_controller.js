@@ -17,17 +17,17 @@ export default class extends Controller {
     if (window.lastMessageControllerInstance) window.lastMessageControllerInstance.disconnect()
     window.lastMessageControllerInstance = this
 
-    this.scrollableTarget = document.getElementById('right-content')  // Could not reference this as a target
+    this.scrollableTarget = document.getElementById('messages')  // Could not reference this as a target
                                                                       // because it's higher in DOM than messages.
     window.addEventListener('resize', this.throttledScrollDownIfScrolledToBottom)
-    window.addEventListener('right-column-changed', this.throttledScrollDownIfScrolledToBottom)
+    window.addEventListener('main-column-changed', this.throttledScrollDownIfScrolledToBottom)
 
     this.considerScroll()
   }
 
   disconnect() {
     window.removeEventListener('resize', this.throttledScrollDownIfScrolledToBottom)
-    window.removeEventListener('right-column-changed', this.throttledScrollDownIfScrolledToBottom)
+    window.removeEventListener('main-column-changed', this.throttledScrollDownIfScrolledToBottom)
     window.removeEventListener('load', this.throttledScrollDownIfScrolledToBottom)
   }
 

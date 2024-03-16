@@ -29,7 +29,7 @@ export default class extends Controller {
       this.element.requestSubmit()
       this.inputTarget.disabled = true
       this.submitTarget.disabled = true
-      window.dispatchEvent(new CustomEvent('right-column-changed'))
+      window.dispatchEvent(new CustomEvent('main-column-changed'))
     }
   }
 

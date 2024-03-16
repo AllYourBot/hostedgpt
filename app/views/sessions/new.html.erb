@@ -6,8 +6,8 @@
   </span>
 
   <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
-    <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded p-3"%>
-    <%= f.password_field :password, id: "password", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded p-3"%>
+    <%= f.email_field :email, id: "email", autofocus: true, placeholder: "Email address", class: "border border-gray-400 rounded p-3 dark:text-black" %>
+    <%= f.password_field :password, id: "password", autofocus: true, placeholder: "Password", class: "border border-gray-400 rounded p-3 dark:text-black" %>
     <%= f.submit "Log In", class: 'bg-gray-200 dark:bg-gray-900 border border-gray-400 rounded font-medium p-4 text-center cursor-pointer' %>
   <% end %>
 </div>

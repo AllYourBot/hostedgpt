@@ -1,19 +1,31 @@
-<% content_for :left_column do %>
-  <div class="pl-2 py-7 text-3xl">
+<% content_for :nav_column do %>
+  <header class="pl-2 py-7 text-3xl relative">
+    <%= link_to root_path, class: "inline-block cursor-pointer py-1 pt-0 align-middle" do %>
+      <%= icon "chevron-left",
+            variant: :outline,
+            size: 22,
+            class: %|
+              stroke-2
+              text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white
+            |,
+            title: "Home",
+            tooltip: :bottom
+      %>
+    <% end %>
     Settings
-  </div>
-  <div id="menu" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship">
+  </header>
+  <section id="menu" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship">
     <% @settings_menu.each do |controller, settings_items| %>
       <div class="mb-5">
         <%= render partial: "layouts/settings_item", collection: settings_items, locals: { controller: controller } %>
       </div>
     <% end %>
-  </div>
+  </section>
 <% end %>
 
-<% content_for :body do %>
-  <div id="wide-header" class="absolute right-0 ml-2 mt-2 mb-3 h-10 text-lg">
-    <%= link_to root_path, class: "block cursor-pointer inline-flex mr-3 px-2 py-2 group", data: { role: "pencil" } do %>
+<% content_for :main do %>
+  <header class="absolute right-0 ml-2 mt-2 mb-3 h-10 text-lg">
+    <%= link_to root_path, class: "block cursor-pointer inline-flex mr-3 px-2 py-2 group" do %>
       <%= icon "x-mark",
             variant: :outline,
             size: 22,
@@ -25,13 +37,13 @@
             tooltip: :left
       %>
     <% end %>
-  </div>
+  </header>
 
-  <div id="right-content-container" class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
-    <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2 p-10 pr-14">
+  <section class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
+    <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2 py-7 px-10 pr-14">
       <%= yield %>
     </div>
-  </div>
+  </section>
 <% end %>
 
 <%= render template: "layouts/application" %>
