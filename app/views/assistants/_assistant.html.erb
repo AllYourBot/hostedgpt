@@ -19,7 +19,7 @@
       data-radio-behavior-id-param="<%= assistant.id %>"
   >
     <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
-      <div id="profile" class="mr-2 bg-blue-200 rounded-full w-7 h-7"></div>
+      <%= render partial: "layouts/assistant_avatar", locals: { assistant: assistant, size: 7, classes: "mr-2" } %>
       <%= assistant.name %>
     <% end %>
 

@@ -57,4 +57,17 @@ class AssistantTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "initials returns a single letter" do
+    assert_equal "S", assistants(:samantha).initials
+  end
+
+  test "initials returns a single two letters for two-word names" do
+    assistants(:samantha).update!(name: "Samantha Jones")
+    assert_equal "SJ", assistants(:samantha).initials
+  end
+
+  test "initials will split on - and return two characters" do
+    assert_equal "G4", assistants(:keith_gpt4).initials
+  end
 end

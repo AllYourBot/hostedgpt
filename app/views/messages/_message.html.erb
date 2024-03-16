@@ -25,13 +25,17 @@
 >
   <div class="flex">
     <div class="flex flex-col items-center w-6 ml-1">
-      <div class="w-6 h-6 mt-1 bg-black rounded-full dark:bg-white"></div>
+      <% if message.user? %>
+        <%= render partial: "layouts/user_avatar", locals: { user: Current.user, size: 6, classes: "mt-1" } %>
+      <% else %>
+        <%= render partial: "layouts/assistant_avatar", locals: { assistant: message.assistant, size: 6, classes: "mt-1" } %>
+      <% end %>
     </div>
 
     <!-- Right Column -->
     <div  data-controller="clipboard transition"
           data-transition-toggle-class="hidden"
-          class="flex-1 min-w-0 ml-3 mr-8 text-base text-gray-950 dark:text-gray-100 stroke-">
+          class="flex-1 min-w-0 ml-3 mr-8 text-base text-gray-950 dark:text-gray-100">
 
       <div class="mt-1 font-semibold" data-role="role">
         <%= message.user? ? 'You' : message.conversation.assistant.name %>
