@@ -42,9 +42,7 @@ export default class extends Controller {
   }
 
   focusKeydown(event) {
-    // Don't steal the keypress if the input field is already focused
-    if (event.key == "/" && event.target.tagName != "BODY")
-      return
+    if (event.key == "/" && ["INPUT", "TEXTAREA"].includes(event.target.tagName)) return
 
     this.focusInput()
     event.preventDefault()
