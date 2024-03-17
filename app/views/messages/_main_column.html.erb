@@ -215,10 +215,60 @@
   data-controller="modal"
   data-action="keydown@document->modal#open"
 >
-  <div class="modal-box">
-    <h3 class="font-bold text-lg">Hello!</h3>
-    <p class="py-4">Press ESC key or click outside to close</p>
-  </div>
+  <main class="modal-box max-w-4xl">
+    <header class="font-bold text-lg mb-5">
+      Keyboard shortcuts
+    </header>
+    <article class="flex flex-col md:flex-row">
+      <section class="flex-1 pr-0 md:pr-5">
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Open new chat
+          </figcaption>
+          <kbd class="w-40 text-right">
+            <div class="key">Ctrl / ⌘</div>
+            <div class="key">J</div>
+          </kbd>
+        </figure>
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Focus chat input
+          </figcaption>
+          <kbd class="w-40 text-right">
+            <div class="key">/</div>
+          </kbd>
+        </figure>
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Unfocus chat input
+          </figcaption>
+          <kbd class="w-40 text-right">
+            <div class="key">ESC</div>
+          </kbd>
+        </figure>
+
+      </section>
+      <section class="flex-1 pl-0 md:pl-5">
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Toggle sidebar
+          </figcaption>
+          <kbd class="w-40 text-right">
+            <div class="key">Ctrl / ⌘</div>
+            <div class="key">.</div>
+          </kbd>
+        </figure>
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Show shortcuts
+          </figcaption>
+          <kbd class="w-40 text-right">
+            <div class="key">?</div>
+          </kbd>
+        </figure>
+      </section>
+    </article>
+  </main>
   <form method="dialog" class="modal-backdrop no-focus-outline">
     <button>close</button>
   </form>
