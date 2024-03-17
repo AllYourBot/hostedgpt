@@ -4,8 +4,8 @@
 <div
   class=" flex justify-between items-center
           rounded-lg mr-5 cursor-pointer group
-          hover:bg-gray-100 dark:hover:bg-gray-700 
-          relationship:bg-gray-100 dark:relationship:bg-gray-700 <%= selected && 'relationship' %>"
+          hover:bg-gray-100 dark:hover:bg-gray-700
+          relationship:bg-gray-200 dark:relationship:bg-gray-700 <%= selected && 'relationship' %>"
   data-role="conversation"
   data-radio-behavior-target="radio"
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
@@ -21,7 +21,7 @@
     <%= icon "pencil",
           variant: :outline,
           size: 16,
-          class: "invisible group-hover:visible cursor-pointer 
+          class: "invisible group-hover:visible cursor-pointer
                   hover:text-gray-600 dark:hover:text-gray-300",
           'data-controller': "nested-pointer",
           title: "Rename",
@@ -32,7 +32,7 @@
       <%= icon "x-mark",
             variant: :outline,
             size: 22,
-            class: "outline-none cursor-pointer group-hover:visible 
+            class: "outline-none cursor-pointer group-hover:visible
                     hover:text-gray-600 dark:hover:text-gray-300
                     focus:text-gray-600 dark:focus:text-gray-300",
             'data-controller': "nested-pointer",
