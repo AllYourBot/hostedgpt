@@ -57,9 +57,11 @@
   @apply bg-gray-200
 }
 
-.relationship.dark\:relationship\:bg-gray-700,
-.relationship .dark\:relationship\:bg-gray-700 {
-  @apply bg-gray-700
+@media (prefers-color-scheme: dark) {
+  .relationship .dark\:relationship\:bg-gray-700,
+  .relationship.dark\:relationship\:bg-gray-700 {
+    @apply bg-gray-700
+  }
 }
 
 .relationship .relationship\:hidden,
