@@ -40,7 +40,7 @@ export default class extends Controller {
   focusKeydown(event) {
     if (event.key == "/" && ["INPUT", "TEXTAREA"].includes(event.target.tagName)) return
 
-    this.focusInput()
+    this.inputTarget.focus()
     event.preventDefault()
   }
 
