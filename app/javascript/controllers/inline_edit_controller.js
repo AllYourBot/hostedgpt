@@ -24,7 +24,6 @@ export default class extends Controller {
   }
 
   abort() {
-    console.log('abort')
     this.inputTarget.value = this.originalText
     this.submitForm()
   }
