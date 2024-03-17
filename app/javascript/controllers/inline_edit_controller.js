@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = [ "input" ]
 
   connect() {
+    this.originalText = this.inputTarget.value
     this.focusInput()
   }
 
@@ -20,5 +21,11 @@ export default class extends Controller {
     this.inputTarget.selectionStart =
       this.inputTarget.selectionEnd =
         this.inputTarget.value.length
+  }
+
+  abort() {
+    console.log('abort')
+    this.inputTarget.value = this.originalText
+    this.submitForm()
   }
 }

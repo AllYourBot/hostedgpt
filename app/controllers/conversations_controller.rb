@@ -3,28 +3,10 @@ class ConversationsController < ApplicationController
   before_action :set_nav_conversations
   before_action :set_nav_assistants
 
-  def index
-    @conversations = Current.user.conversations
-  end
-
   def show
   end
 
-  def new
-    @conversation = Current.user.conversations.new
-  end
-
   def edit
-  end
-
-  def create
-    @conversation = Current.user.conversations.new(conversation_params)
-
-    if @conversation.save
-      redirect_to @conversation
-    else
-      render :new, status: :unprocessable_entity
-    end
   end
 
   def update
@@ -37,7 +19,7 @@ class ConversationsController < ApplicationController
 
   def destroy
     @conversation.destroy!
-    redirect_to conversations_url, status: :see_other
+    redirect_to root_url, status: :see_other
   end
 
   private

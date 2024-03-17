@@ -23,9 +23,9 @@
       <%= link_to edit_conversation_path(conversation),
         data: {
           controller: "nested-pointer",
-          action: "nested-pointer#addParentClickable"
+          action: "nested-pointer#addParentClickable",
+          role: "pencil"
         },
-        id: "edit-#{conversation.id}",
         class: %|
           cursor-pointer
           invisible group-hover:visible

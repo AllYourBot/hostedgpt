@@ -1,7 +1,7 @@
 <turbo-frame id="conversation-<%= conversation.id %>">
-  <%= form_with(model: conversation, data: { controller: "edit-conversation" }, class: "contents") do |form| %>
+  <%= form_with(model: conversation, data: { controller: "inline-edit" }, class: "contents") do |form| %>
     <%= form.text_field :title,
-      value: conversation.title,
+      id: "edit-conversation",
       autofocus: true,
       class: %|
         block shadow rounded-md outline-none
@@ -12,10 +12,11 @@
         dark:text-black
       |,
       data: {
-        edit_conversation_target: "input",
+        inline_edit_target: "input",
         action: %|
-          blur->edit-conversation#submitForm
-          keydown.enter->edit-conversation#submitForm:prevent
+          blur->inline-edit#submitForm
+          keydown.enter->inline-edit#submitForm:prevent
+          keydown.esc->inline-edit#abort
         |
       }
     %>

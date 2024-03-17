@@ -5,11 +5,6 @@ class ConversationsTest < ApplicationSystemTestCase
     login_as users(:keith)
   end
 
-  test "visiting the index" do
-    visit conversations_url
-    assert_selector "h1", text: "Conversations"
-  end
-
   test "creating new chat with meta+shift+o" do
     visit conversation_messages_path(conversations(:greeting))
     send_keys("meta+shift+o")
@@ -28,5 +23,48 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_current_path(expected_path)
   end
 
+  test "clicking conversation edits it and unfocusing it submits it" do
+    c = conversations(:greeting)
 
+    assert_visible "#conversation-#{c.id} a"
+    find("#conversation-#{c.id} a").hover
+    click_element "#conversation-#{c.id} a[data-role='pencil']"
+    assert_no_selector "#conversation-#{c.id} a"
+
+    fill_in "edit-conversation", with: "Meeting Samantha Jones"
+    find("body").click
+    assert_visible "#conversation-#{c.id} a", wait: 0.5
+
+    assert_equal "Meeting Samantha Jones", c.reload.title
+  end
+
+  test "clicking conversation edits it and pressing Enter submits it" do
+    c = conversations(:greeting)
+
+    assert_visible "#conversation-#{c.id} a"
+    find("#conversation-#{c.id} a").hover
+    click_element "#conversation-#{c.id} a[data-role='pencil']"
+    assert_no_selector "#conversation-#{c.id} a"
+
+    fill_in "edit-conversation", with: "Meeting Samantha Jones"
+    send_keys "enter"
+    assert_visible "#conversation-#{c.id} a", wait: 0.5
+
+    assert_equal "Meeting Samantha Jones", c.reload.title
+  end
+
+  test "clicking conversation edits it and pressing Esc aborts the edit and does not savre" do
+    c = conversations(:greeting)
+
+    assert_visible "#conversation-#{c.id} a"
+    find("#conversation-#{c.id} a").hover
+    click_element "#conversation-#{c.id} a[data-role='pencil']"
+    assert_no_selector "#conversation-#{c.id} a"
+
+    fill_in "edit-conversation", with: "Meeting Samantha Jones"
+    send_keys "esc"
+    assert_visible "#conversation-#{c.id} a", wait: 0.5
+
+    assert_equal "Meeting Samantha", c.reload.title
+  end
 end
