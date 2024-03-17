@@ -155,3 +155,10 @@
 .input {
   background-color: transparent;
 }
+
+/* Modal override */
+
+dialog button:focus,
+dialog button:focus-visible {
+  outline: none !important;
+}
