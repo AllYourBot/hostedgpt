@@ -1,27 +1,24 @@
-<%= form_with(model: conversation, class: "contents") do |form| %>
-  <% if conversation.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(conversation.errors.count, "error") %> prohibited this conversation from being saved:</h2>
-
-      <ul>
-        <% conversation.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+<turbo-frame id="conversation-<%= conversation.id %>">
+  <%= form_with(model: conversation, data: { controller: "inline-edit" }, class: "contents") do |form| %>
+    <%= form.text_field :title,
+      id: "edit-conversation",
+      autofocus: true,
+      class: %|
+        block shadow rounded-md outline-none
+        px-[7px] pt-[7px] pb-[7px]
+        w-full
+        text-sm
+        disabled:text-gray-300
+        dark:text-black
+      |,
+      data: {
+        inline_edit_target: "input",
+        action: %|
+          blur->inline-edit#submitForm
+          keydown.enter->inline-edit#submitForm:prevent
+          keydown.esc->inline-edit#abort
+        |
+      }
+    %>
   <% end %>
-
-  <div class="my-5">
-    <%= form.label :assistant_id, "Assistant ID" %>
-    <%= form.text_field :assistant_id, value: Assistant.first.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :title %>
-    <%= form.text_field :title, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
-  </div>
-<% end %>
+</turbo-frame>

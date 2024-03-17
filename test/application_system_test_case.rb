@@ -35,10 +35,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def assert_visible(selector, error_msg = nil, wait: 0)
-    element = find(selector, visible: false, wait: wait) rescue nil
+    element = first(selector, visible: false, wait: wait) rescue nil
     assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
 
-    element = find(selector, visible: true, wait: wait) rescue nil
+    element = first(selector, visible: true, wait: wait) rescue nil
 
     unless element&.visible?
       sleep wait

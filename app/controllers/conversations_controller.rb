@@ -1,32 +1,17 @@
 class ConversationsController < ApplicationController
-  before_action :set_conversation, only: [:edit, :update, :destroy]
+  before_action :set_conversation, only: [:show, :edit, :update, :destroy]
   before_action :set_nav_conversations
   before_action :set_nav_assistants
 
-  def index
-    @conversations = Current.user.conversations
+  def show
   end
 
   def edit
   end
 
-  def new
-    @conversation = Current.user.conversations.new
-  end
-
-  def create
-    @conversation = Current.user.conversations.new(conversation_params)
-
-    if @conversation.save
-      redirect_to @conversation, notice: "Conversation was successfully created."
-    else
-      render :new, status: :unprocessable_entity
-    end
-  end
-
   def update
     if @conversation.update(conversation_params)
-      redirect_to @conversation, notice: "Conversation was successfully updated.", status: :see_other
+      redirect_to @conversation, status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
@@ -34,7 +19,7 @@ class ConversationsController < ApplicationController
 
   def destroy
     @conversation.destroy!
-    redirect_to conversations_url, notice: "Conversation was successfully destroyed.", status: :see_other
+    redirect_to root_url, status: :see_other
   end
 
   private
