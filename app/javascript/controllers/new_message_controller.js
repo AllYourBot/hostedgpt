@@ -8,11 +8,15 @@ export default class extends Controller {
   }
 
   connect() {
-    // Focus the input when the controller is connected
-    this.focusInput()
-
-    // Manage the enabled state of the submit button
+    this.inputTarget.focus()
+    this.cursorToEnd()
     this.disableSubmitButton()
+  }
+
+  cursorToEnd() {
+    this.inputTarget.selectionStart =
+      this.inputTarget.selectionEnd =
+        this.inputTarget.value.length
   }
 
   // Disable the submit button if the input is empty.
@@ -31,14 +35,6 @@ export default class extends Controller {
       this.submitTarget.disabled = true
       window.dispatchEvent(new CustomEvent('main-column-changed'))
     }
-  }
-
-  // Focus the input, and place the cursor at the end of the text.
-  focusInput() {
-    this.inputTarget.focus()
-    this.inputTarget.selectionStart =
-      this.inputTarget.selectionEnd =
-        this.inputTarget.value.length
   }
 
   focusKeydown(event) {

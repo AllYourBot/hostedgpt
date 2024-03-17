@@ -5,7 +5,14 @@ export default class extends Controller {
 
   connect() {
     this.originalText = this.inputTarget.value
-    this.focusInput()
+    this.inputTarget.focus()
+    this.cursorToEnd()
+  }
+
+  cursorToEnd() {
+    this.inputTarget.selectionStart =
+      this.inputTarget.selectionEnd =
+        this.inputTarget.value.length
   }
 
   submitForm() {
@@ -13,14 +20,6 @@ export default class extends Controller {
 
     this.element.requestSubmit()
     this.inputTarget.disabled = true
-  }
-
-  // Focus the input, and place the cursor at the end of the text.
-  focusInput() {
-    this.inputTarget.focus()
-    this.inputTarget.selectionStart =
-      this.inputTarget.selectionEnd =
-        this.inputTarget.value.length
   }
 
   abort() {
