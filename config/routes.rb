@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     resources :messages, only: [:new, :create]
   end
 
-  resources :conversations, except: :show do
+  resources :conversations do
     resources :messages, only: :index
   end
 

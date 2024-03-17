@@ -38,7 +38,7 @@ export default class extends Controller {
     this.inputTarget.focus()
     this.inputTarget.selectionStart =
       this.inputTarget.selectionEnd =
-      this.inputTarget.value.length
+        this.inputTarget.value.length
   }
 
   focusKeydown(event) {
