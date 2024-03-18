@@ -70,6 +70,17 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_equal text, element[:'data-tip'], "Expected element to have tooltip #{text}. #{error_msg}"
   end
 
+  def assert_focused(selector_or_element, error_msg = "The element you expected to be focused was not")
+    element = if selector_or_element.is_a?(Capybara::Node::Element)
+      selector_or_element
+    else
+      find(selector_or_element)
+    end
+    selenium_element = page.driver.browser.find_element(:xpath, element.path)
+
+    assert_equal selenium_element, page.driver.browser.switch_to.active_element, error_msg
+  end
+
   def send_keys(keys)
     element = page.active_element
 
