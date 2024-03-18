@@ -18,7 +18,30 @@ export default class extends Controller {
 
   connect() {
     this.on = false
-    if (this.afterTimeoutValue) setTimeout(() => this.toggleClass(), this.afterTimeoutValue)
+  }
+
+  transitionableTargetConnected() {
+    if (this.afterTimeoutValue) {
+      this.transitionableTarget.setAttribute('data-timer', 'true')
+      this.timeoutHandler = setTimeout(() => this.toggleClass(), this.afterTimeoutValue)
+    }
+
+    this.transitionableTarget.addEventListener("turbo:before-morph-element", this.boundTransitionableTargetReconnect, { once: true })
+  }
+
+  transitionableTargetDisconnected() {
+    if (!this.afterTimeoutValue) return
+
+    if (this.timeoutHandler) {
+      clearTimeout(this.timeoutHandler)
+      this.timeoutHandler = null
+    }
+  }
+
+  boundTransitionableTargetReconnect = () => { this.transitionableTargetReconnect() }
+  transitionableTargetReconnect() {
+    if (this.transitionableTargetDisconnected) this.transitionableTargetDisconnected()
+    if (this.transitionableTargetConnected) this.transitionableTargetConnected()
   }
 
   toggleClass() {

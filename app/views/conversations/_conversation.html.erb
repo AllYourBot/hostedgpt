@@ -5,7 +5,8 @@
   class="
           rounded-lg mr-5 cursor-pointer group
           hover:bg-gray-100 dark:hover:bg-gray-700
-          relationship:bg-gray-200 dark:relationship:bg-gray-700 <%= selected && 'relationship' %>"
+          relationship:bg-gray-200 dark:relationship:bg-gray-700 <%= selected && 'relationship' %>
+        "
   data-role="conversation"
   data-radio-behavior-target="radio"
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
@@ -54,8 +55,37 @@
         %>
 
         <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 mt-7 dark:text-white dark:!bg-gray-700" data-controller="nested-pointer">
-          <li><a><%= icon "archive-box", variant: :outline, size: 18 %>Archive</a></li>
-          <li><a><%= icon "trash", variant: :outline, size: 18 %>Delete</a></li>
+          <li>
+            <%= button_to conversation_path(conversation),
+              data: {
+                turbo_method: :patch,
+                role: "archive"
+              },
+              params: { conversation: { archived_at: Time.current } },
+              class: "flex gap-2 w-full",
+              form: {
+                class: "inline-block",
+                'data-turbo-frame': "_top",
+              } do
+            %>
+              <%= icon "archive-box", variant: :outline, size: 18 %>Archive
+            <% end %>
+          </li>
+          <li>
+            <%= button_to conversation_path(conversation),
+              method: :delete,
+              data: {
+                role: "delete",
+              },
+              class: "flex gap-2 w-full",
+              form: {
+                class: "inline-block",
+                data: { turbo_frame: "_top" },
+              } do
+            %>
+              <%= icon "trash", variant: :outline, size: 18 %>Delete
+            <% end %>
+          </li>
         </ul>
       </div>
 
