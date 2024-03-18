@@ -9,6 +9,7 @@ export default class extends Controller {
   }
 
   connect() {
+    console.log('connect')
     this.element.style.overflow = 'hidden'
     this.autogrow()
 
@@ -25,10 +26,10 @@ export default class extends Controller {
 
   throttledAutogrow = throttle(() => this.autogrow(), 50)
   autogrow() {
-    const prevHeight = this.element.style.height
+    console.log('autogrow')
+    const prevHeight = getComputedStyle(this.element).height
     this.element.style.height = 'auto'
-    const newHeight = `${this.element.scrollHeight + 2}px`  // The +2 prevents jumping on load. The scrollHeight
-                                                            // from the actual height for the empty state.
+    const newHeight = `${this.element.scrollHeight+2}px` // scrollHeight is two less than computedHeight, this prevents jumps
     this.element.style.height = newHeight
 
     if (prevHeight != newHeight) window.dispatchEvent(new CustomEvent('main-column-changed'))
