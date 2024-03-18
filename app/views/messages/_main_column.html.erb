@@ -83,9 +83,14 @@
 
   <header id="narrow-header" class="flex-none text-lg text-center h-14 md:hidden">
     <div class="flex items-center justify-between flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
-      <div class="inline-flex px-2 ml-1 cursor-pointer group">
+      <%= button_tag type: "button",
+        class: "inline-flex px-2 ml-1 cursor-pointer group",
+        data: {
+          action: "transition#toggleClass"
+        } do
+      %>
         <%= icon "bars-3", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: "Menu", tooltip: :right %>
-      </div>
+      <% end %>
 
       <%= render 'messages/main_column/assistant_header' %>
 
@@ -96,9 +101,9 @@
   </header>
   <!-- end header possibilities -->
 
-  <section class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
+  <section class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip scrollbar-hide" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
 
-    <div id="messages" class="relative flex-grow overflow-y-auto overflow-x-clip" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
+    <div id="messages" class="relative flex-grow overflow-y-auto overflow-x-clip scrollbar-hide overscroll-contain" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
       <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
         <%= yield :messages %>
       </div>
