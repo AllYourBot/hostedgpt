@@ -19,7 +19,11 @@ class ConversationsController < ApplicationController
 
   def destroy
     @conversation.destroy!
-    redirect_to root_url, status: :see_other
+    if request.referer == conversation_messages_url(@conversation)
+      redirect_to root_path, notice: "Deleted conversation", status: :see_other
+    else
+      redirect_back fallback_location: root_path, notice: "Deleted conversation", status: :see_other
+    end
   end
 
   private
