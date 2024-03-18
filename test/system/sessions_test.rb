@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class UsersTest < ApplicationSystemTestCase
+class SessionsTest < ApplicationSystemTestCase
   setup do
     @user = users(:keith)
     visit root_url
