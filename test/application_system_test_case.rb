@@ -29,9 +29,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_current_path login_path, wait: 2
   end
 
-  def assert_active(selector, error_msg = nil, wait: nil)
-    element = find(selector, wait: wait)
-    assert_equal element, page.active_element, "Expected #{selector} to be the active element, but it is not. #{error_msg}"
+  def assert_active(selector_or_element, error_msg = nil, wait: nil)
+    element = if selector_or_element.is_a?(Capybara::Node::Element)
+      selector_or_element
+    else
+      find(selector_or_element, wait: wait)
+    end
+    assert_equal element, page.active_element, "Expected element to be the active element, but it is not. #{error_msg}"
   end
 
   def assert_visible(selector, error_msg = nil, wait: 0)
@@ -68,17 +72,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     assert element.matches_css?(".tooltip")
     assert_equal text, element[:'data-tip'], "Expected element to have tooltip #{text}. #{error_msg}"
-  end
-
-  def assert_focused(selector_or_element, error_msg = "The element you expected to be focused was not")
-    element = if selector_or_element.is_a?(Capybara::Node::Element)
-      selector_or_element
-    else
-      find(selector_or_element)
-    end
-    selenium_element = page.driver.browser.find_element(:xpath, element.path)
-
-    assert_equal selenium_element, page.driver.browser.switch_to.active_element, error_msg
   end
 
   def send_keys(keys)

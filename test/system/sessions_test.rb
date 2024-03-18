@@ -7,7 +7,7 @@ class SessionsTest < ApplicationSystemTestCase
   end
 
   test "should login as an existing user" do
-    assert_focused "#email"
+    assert_active "#email"
 
     fill_in "Email address", with: @user.person.email
     fill_in "Password", with: "secret"
@@ -26,7 +26,7 @@ class SessionsTest < ApplicationSystemTestCase
     sleep 0.1
     assert_text "Invalid email or password"
     assert_equal @user.person.email, find("#email").value
-    assert_focused "#password"
+    assert_active "#password"
     assert_current_path previous_path
   end
 end
