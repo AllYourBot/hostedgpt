@@ -7,13 +7,18 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create session" do
-    person = people(:keith_registered)
-    password = "secret"
+    post login_path, params: {
+      email: people(:keith_registered).email,
+      password: "secret"
+    }
+    assert_redirected_to root_url # we are not actually checking that a valid session was created?
+  end
 
-    conversation = person.user.assistants.first.conversations.first
-
-    post login_path, params: {email: person.email, password: password}
-    # we are not actually checking that a valid session was created?
+  test "should ignore case of email and create a session" do
+    post login_path, params: {
+      email: people(:keith_registered).email.capitalize,
+      password: "secret"
+    }
     assert_redirected_to root_url
   end
 
