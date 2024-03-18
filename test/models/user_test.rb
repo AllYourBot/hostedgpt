@@ -90,4 +90,30 @@ class UserTest < ActiveSupport::TestCase
   test "full_name returns nil if first_name and last_name are both blank" do
     assert_nil users(:rob).full_name
   end
+
+  test "boolean values within preferences get converted back and forth properly" do
+    assert_nil users(:keith).preferences[:nav_closed]
+    assert_nil users(:keith).preferences[:dark_mode]
+    assert_nil users(:keith).preferences[:kids]
+    assert_nil users(:keith).preferences[:city]
+
+    users(:keith).update!(preferences: {
+      nav_closed: true,
+      dark_mode: false,
+      kids: 2,
+      city: "Austin"
+    })
+    users(:keith).reload
+    assert users(:keith).preferences[:nav_closed]
+    refute users(:keith).preferences[:dark_mode]
+    assert_equal 2, users(:keith).preferences[:kids]
+    assert_equal "Austin", users(:keith).preferences[:city]
+
+    users(:keith).update!(preferences: {
+      nav_closed: "false",
+      dark_mode: "true",
+    })
+    refute users(:keith).preferences[:nav_closed]
+    assert users(:keith).preferences[:dark_mode]
+  end
 end

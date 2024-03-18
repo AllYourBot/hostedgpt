@@ -3,6 +3,8 @@ class UsersController < ApplicationController
 
   layout "public"
 
+  before_action :set_user, only: [:update]
+
   def new
     @person = Person.new
     @person.personable = User.new
@@ -22,7 +24,20 @@ class UsersController < ApplicationController
     end
   end
 
+  def update
+    if @user.update(user_params)
+      Current.user.reload
+      redirect_back fallback_location: root_path, status: :see_other
+    else
+      redirect_back fallback_location: root_path, status: :unprocessable_entity
+    end
+  end
+
   private
+
+  def set_user
+    @user = Current.user if params[:id].to_i == Current.user.id
+  end
 
   def person_params
     params.require(:person).permit(:email, :personable_type, personable_attributes: [
@@ -31,6 +46,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name)
+    params.require(:user).permit(preferences: [:nav_closed])
   end
 end

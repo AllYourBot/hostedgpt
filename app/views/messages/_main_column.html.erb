@@ -1,37 +1,64 @@
-<turbo-frame  id="conversation"
-              class="relative flex flex-col flex-1"
-              data-turbo-action="advance"
+<turbo-frame
+  id="conversation"
+  class="relative flex flex-col flex-1"
+  data-turbo-action="advance"
 >
-  <div  id="handle-container"
-        class="absolute left-0 z-20 hidden w-8 h-20 -mt-10 top-1/2 md:flex"
-        data-action= "keydown.meta+shift+s@document->transition#toggleClass
-                      keydown.ctrl+shift+s@document->transition#toggleClass
-                      keydown.meta+period@document->transition#toggleClass
-                      keydown.ctrl+period@document->transition#toggleClass
-                      click->transition#toggleClass
-                     "
-  >
-    <div id="handle" class="flex flex-1 cursor-pointer group">
-      <div id="left-handle" class="flex-1 tooltip tooltip-right hover:tooltip-open" data-tip="Close sidebar" data-transition-target="transitionable">
-        <div class="flex items-center justify-center flex-1 h-full">
-          <div id="left" class="flex-col w-1 h-5 opacity-70">
-            <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full group-hover:rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
-            <div class="w-1 h-3 bg-gray-400 rounded-full group-hover:-rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="right-handle" class="flex-1 tooltip tooltip-right hover:tooltip-open !hidden" data-tip="Open sidebar" data-transition-target="transitionable">
-        <div class="flex items-center justify-center flex-1 h-full">
-          <div id="left" class="flex-col w-1 h-5 opacity-70">
-            <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full -rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
-            <div class="w-1 h-3 bg-gray-400 rounded-full rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
-          </div>
-        </div>
+  <%= button_to user_path(Current.user),
+    id: "handle",
+    form_class: %|
+      hidden md:flex
+      absolute left-0 -mt-10 top-1/2
+      z-20
+      cursor-pointer
+      group
+    |,
+    method: :patch,
+    params: { user: { preferences: { nav_closed: !Current.user.preferences[:nav_closed] } } },
+    class: %| flex-1 flex w-8 h-20
+    |,
+    data: {
+      turbo_frame: "_top",
+      controller: "keyboardable",
+      action: %|
+        keydown.meta+shift+s@document->keyboardable#click
+        keydown.ctrl+shift+s@document->keyboardable#click
+        keydown.meta+period@document->keyboardable#click
+        keydown.ctrl+period@document->keyboardable#click
+      |,
+  } do
+  %>
+    <div
+      id="left-handle"
+      class="
+        flex-1 flex h-full
+        items-center justify-center
+        tooltip tooltip-right hover:tooltip-open
+        <%= Current.user.preferences[:nav_closed] && "!hidden" %>
+      "
+      data-tip="Close sidebar"
+    >
+      <div id="left" class="flex-col w-1 h-5 opacity-70">
+        <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full group-hover:rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
+        <div class="w-1 h-3 bg-gray-400 rounded-full group-hover:-rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
       </div>
     </div>
 
-  </div>
+    <div
+      id="right-handle"
+      class="
+        flex-1 flex h-full
+        items-center justify-center
+        tooltip tooltip-right hover:tooltip-open
+        <%= !Current.user.preferences[:nav_closed] && "!hidden" %>
+      "
+      data-tip="Open sidebar"
+    >
+      <div id="right" class="flex-col w-1 h-5 opacity-70">
+        <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full -rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
+        <div class="w-1 h-3 bg-gray-400 rounded-full rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
+      </div>
+    </div>
+  <% end %>
 
   <!-- Only one of these headers is visible at a time, depending on width -->
   <header id="wide-header" class="justify-between flex-none hidden h-10 mt-2 mb-3 ml-2 text-lg text-gray-950 dark:text-gray-100 md:flex">
@@ -43,10 +70,10 @@
           role: "pencil",
           controller: "keyboardable",
           action: %|
-                    keydown.meta+shift+o@document->keyboardable#navigate
-                    keydown.ctrl+shift+o@document->keyboardable#navigate
-                    keydown.meta+j@document->keyboardable#navigate
-                    keydown.ctrl+j@document->keyboardable#navigate
+                    keydown.meta+shift+o@document->keyboardable#click
+                    keydown.ctrl+shift+o@document->keyboardable#click
+                    keydown.meta+j@document->keyboardable#click
+                    keydown.ctrl+j@document->keyboardable#click
           |,
           keyboardable_path_value: new_assistant_message_path(@assistant)
         } do %>
@@ -91,7 +118,7 @@
       </div>
 
       <div  id="composer"
-            class="flex-1 pl-4 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
+            class="flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
             data-controller="image-upload"
       >
         <%= button_tag type: "button",
@@ -203,8 +230,8 @@
         <% end %>
       </div>
 
-      <div class="w-full mb-2 text-xs text-center text-gray-600 dark:text-gray-300">
-        HostedGPT can make mistakes. Consider checking important information.
+      <div class="w-full mb-2 text-xs text-center text-gray-400 dark:text-gray-300">
+        HostedGPT can make mistakes. Double check information.
       </div>
   </footer>
 </turbo-frame>
