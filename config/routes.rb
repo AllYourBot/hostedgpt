@@ -16,7 +16,7 @@ Rails.application.routes.draw do
 
   resources :messages, except: [:new, :create, :index]
   resources :documents
-  resources :users, only: [:new, :create]
+  resources :users, only: [:new, :create, :update]
 
   get "up" => "rails/health#show", :as => :rails_health_check
 
