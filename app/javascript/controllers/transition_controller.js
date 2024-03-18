@@ -23,10 +23,17 @@ export default class extends Controller {
   transitionableTargetConnected() {
     if (this.afterTimeoutValue) {
       this.transitionableTarget.setAttribute('data-timer', 'true')
+      this.transitionableTarget.addEventListener("turbo:before-morph-element", this.boundTransitionableTargetReconnect, { once: true })
+      // These two lines above fix a tricky bug. The toast feature uses afterTimeout, however while the timeout is running if the page
+      // is refreshed and this refresh *also* includes a toast, this was causing the toast to properly reappear but the timer was not
+      // re-run with this second appearance. This is because morphing does not, properly so, trigger stimulus controllers to be
+      // reconnect. Stimulus assumes their existing connection is just fine. It only reconnects if the element disappears and re-appears.
+      //
+      // But in order to get the proper behavior, if a page morph also includes a new toast, I want the timer to re-run. I I fixed this
+      // by adding a data-timer attribute to the toast div. By modifying the element, I can guarantee a morph of this page will morph
+      // the toast back. Then I catch the fact that the toast is about to morph and do a clean disconnect and reconnect.
       this.timeoutHandler = setTimeout(() => this.toggleClass(), this.afterTimeoutValue)
     }
-
-    this.transitionableTarget.addEventListener("turbo:before-morph-element", this.boundTransitionableTargetReconnect, { once: true })
   }
 
   transitionableTargetDisconnected() {
