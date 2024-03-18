@@ -44,13 +44,15 @@
         <%= icon "x-mark",
               variant: :outline,
               size: 22,
-              class: "outline-none cursor-pointer group-hover:visible
-                      hover:text-gray-600 dark:hover:text-gray-300
-                      focus:text-gray-600 dark:focus:text-gray-300",
+              class: %|
+                outline-none cursor-pointer group-hover:visible
+                hover:text-gray-600 dark:hover:text-gray-300
+                focus:text-gray-600 dark:focus:text-gray-300
+              |,
               data: {
-                  controller: "nested-pointer",
-                  role: "delete"
-                },
+                controller: "nested-pointer",
+                role: "delete"
+              },
               title: "Delete",
               tooltip: :top,
               tabindex: 0,
