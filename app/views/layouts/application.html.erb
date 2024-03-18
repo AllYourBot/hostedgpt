@@ -1,44 +1,53 @@
 <!DOCTYPE html>
 <html>
   <%= render "head" %>
-  <body class="font-sans text-gray-950 dark:text-gray-100">
-    <div class="flex h-screen"
-         data-controller="transition"
-         data-transition-toggle-class="!hidden"
+  <body
+    class="
+      h-screen
+      font-sans text-gray-950 dark:text-gray-100
+      flex
+    "
+  >
+    <nav
+      class="
+        h-screen w-[260px]
+        bg-gray-50 dark:bg-gray-900
+        hidden md:flex <%= Current.user.preferences[:nav_closed] && "!hidden" %>
+        overflow-x-clip
+        relative
+        flex-col
+      "
     >
-      <nav class="flex-col h-screen w-[260px] bg-gray-50 dark:bg-gray-900 hidden md:flex overflow-x-clip relative"
-           data-transition-target="transitionable"
-      >
-        <div id="nav-container" class="flex-1 flex flex-col h-screen">
-          <div id="nav-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide">
-            <%= yield :nav_column %>
-          </div>
-
-          <% if Current.user %>
-            <footer class="flex-none pt-2 pb-4 pl-3 pr-5">
-              <div class="w-full dropdown dropdown-top dropdown-end">
-                <div tabindex="0" role="button" class="flex items-center justify-between w-full h-10 pr-2 mb-1 rounded-lg cursor-pointer scale-down hover:bg-gray-100 dark:hover:bg-gray-700 group !outline-0">
-                  <%= render partial: "layouts/user_avatar", locals: { user: Current.user, size: 7, classes: "ml-2 mr-2" } %>
-                  <div class="flex-1 text-sm truncate text-gray-950 dark:text-gray-100">
-                    <%= Current.user.full_name || "Profile" %>
-                  </div>
-                  <%= icon "chevron-up", variant: :mini, class: 'text-gray-500 ml-[2px]' %>
-                </div>
-
-                <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
-                  <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
-                  <li><%= link_to logout_path do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
-                </ul>
-              </div>
-            </footer>
-          <% end %>
+      <div id="nav-container" class="flex-1 flex flex-col h-screen">
+        <div id="nav-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide">
+          <%= yield :nav_column %>
         </div>
-      </nav>
 
-      <main class="flex flex-1 h-screen bg-white dark:bg-gray-800">
-        <%= content_for?(:main) ? yield(:main) : yield %>
-      </main>
-    </div>
+        <% if Current.user %>
+          <footer class="flex-none pt-2 pb-4 pl-3 pr-5">
+            <div class="w-full dropdown dropdown-top dropdown-end">
+              <div tabindex="0" role="button" class="flex items-center justify-between w-full h-10 pr-2 mb-1 rounded-lg cursor-pointer scale-down hover:bg-gray-100 dark:hover:bg-gray-700 group !outline-0">
+                <%= render partial: "layouts/user_avatar", locals: { user: Current.user, size: 7, classes: "ml-2 mr-2" } %>
+                <div class="flex-1 text-sm truncate text-gray-950 dark:text-gray-100">
+                  <%= Current.user.full_name || "Profile" %>
+                </div>
+                <%= icon "chevron-up", variant: :mini, class: 'text-gray-500 ml-[2px]' %>
+              </div>
+
+              <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
+                <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
+                <li><%= link_to logout_path do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
+              </ul>
+            </div>
+          </footer>
+        <% end %>
+      </div>
+    </nav>
+
+    <main class="flex flex-1 h-screen bg-white dark:bg-gray-800">
+      <%= content_for?(:main) ? yield(:main) : yield %>
+    </main>
+
     <%= render "layouts/toast" %>
   </body>
 </html>

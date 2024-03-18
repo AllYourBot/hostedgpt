@@ -1,12 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = {
-    path: String
+  click() {
+    if (this.elementVisible()) this.element.click()
   }
 
-  navigate() {
-    const new_conversation_path = this.pathValue
-    Turbo.visit(new_conversation_path)
+  elementVisible() {
+    return (this.element.offsetParent != null)
   }
 }
