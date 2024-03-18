@@ -23,10 +23,14 @@ export default class extends Controller {
   transitionableTargetConnected() {
     if (this.afterTimeoutValue) {
       this.transitionableTarget.setAttribute('data-timer', 'true')
+      this.transitionableTarget.addEventListener("turbo:before-morph-element", this.boundTransitionableTargetReconnect, { once: true })
+      // These two lines above fix a tricky bug. The toast feature uses afterTimeout, however while the timeout is running if the page
+      // is refreshed and this refresh *also* includes a toast, this was causing the timer to fail. Without fully understanding why
+      // this was occurring, I fixed this by adding a data-timer attribute. By modifying the toast, I can guarantee a morph of this
+      // page will morph the toast back to remove this attribute. I then catch the fact that it's about to morph and do a clean
+      // disconnect and reconnect.
       this.timeoutHandler = setTimeout(() => this.toggleClass(), this.afterTimeoutValue)
     }
-
-    this.transitionableTarget.addEventListener("turbo:before-morph-element", this.boundTransitionableTargetReconnect, { once: true })
   }
 
   transitionableTargetDisconnected() {
