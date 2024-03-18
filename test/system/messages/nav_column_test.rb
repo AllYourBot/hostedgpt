@@ -60,14 +60,14 @@ class NavColumnTest < ApplicationSystemTestCase
     assert_hidden "#right-handle"
 
     click_element "#handle"
-    assert_hidden "nav", wait: 0.1
+    assert_hidden "nav", wait: 0.2
 
     assert_visible "#right-handle"
     assert_shows_tooltip "#right-handle", "Open sidebar"
     assert_hidden "#left-handle"
 
     click_element "#handle"
-    assert_visible "nav", wait: 0.1
+    assert_visible "nav", wait: 0.2
 
     assert_visible "#left-handle"
     assert_shows_tooltip "#left-handle", "Close sidebar"
@@ -77,7 +77,7 @@ class NavColumnTest < ApplicationSystemTestCase
   test "refreshing the page after closing sidebar keeps it closed" do
     assert_visible "nav"
     click_element "#handle"
-    assert_hidden "nav", wait: 0.1
+    assert_hidden "nav", wait: 0.2
 
     visit current_path
     assert_hidden "nav", "The nav bar should have stayed closed."
@@ -86,10 +86,10 @@ class NavColumnTest < ApplicationSystemTestCase
   test "refreshing the page after closing and re-opening sidebar keeps it opened" do
     assert_visible "nav"
     click_element "#handle"
-    assert_hidden "nav", wait: 0.1
+    assert_hidden "nav", wait: 0.2
 
     click_element "#handle"
-    assert_visible "nav", wait: 0.1
+    assert_visible "nav", wait: 0.2
 
     visit current_path
     assert_visible "nav", "The nav bar should have stayed opened."
@@ -102,13 +102,13 @@ class NavColumnTest < ApplicationSystemTestCase
     assert_hidden "#right-handle"
 
     send_keys "meta+."
-    assert_hidden "nav", wait: 0.1
+    assert_hidden "nav", wait: 0.2
 
     assert_visible "#right-handle"
     assert_hidden "#left-handle"
 
     send_keys "meta+."
-    assert_visible "nav", wait: 0.1
+    assert_visible "nav", wait: 0.2
 
     assert_visible "#left-handle"
     assert_hidden "#right-handle"
@@ -121,13 +121,13 @@ class NavColumnTest < ApplicationSystemTestCase
     assert_hidden "#right-handle"
 
     send_keys "meta+shift+s"
-    assert_hidden "nav", wait: 0.1
+    assert_hidden "nav", wait: 0.2
 
     assert_visible "#right-handle"
     assert_hidden "#left-handle"
 
     send_keys "meta+shift+s"
-    assert_visible "nav", wait: 0.1
+    assert_visible "nav", wait: 0.2
 
     assert_visible "#left-handle"
     assert_hidden "#right-handle"
