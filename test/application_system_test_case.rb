@@ -2,7 +2,7 @@ require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium,
-    using: :headless_chrome,
+    using: :chrome,
     screen_size: [1400, 800]  # this is a short height (800 px) so the viewport scrolls so we can test some scroll interactions
 
   fixtures :all
@@ -157,6 +157,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def assert_at_bottom(selector = "section #messages")
+    sleep 0.1
     new_scroll_position = get_scroll_position(selector)
     scroll_to_bottom(selector)
     assert_equal new_scroll_position, get_scroll_position(selector), "The #{selector} did not scroll to the bottom."
