@@ -1,3 +1,4 @@
+<% mobile = false %>
 <!DOCTYPE html>
 <html>
   <%= render "head" %>
@@ -6,20 +7,26 @@
       h-screen
       font-sans text-gray-950 dark:text-gray-100
       flex
+      nav-closed
     "
+    data-controller="transition"
+    data-transition-toggle-class="nav-closed"
+    data-transition-target="transitionable"
   >
     <nav
       class="
         h-screen w-[260px]
         bg-gray-50 dark:bg-gray-900
-        hidden md:flex <%= Current.user.preferences[:nav_closed] && "!hidden" %>
+
+        flex nav-closed:hidden <%= !Current.user.preferences[:nav_closed] && "md:!flex" %>
+        z-30 md:z-auto nav-closed:z-auto
+        absolute md:relative nav-closed:relative
         overflow-x-clip
-        relative
         flex-col
       "
     >
       <div id="nav-container" class="flex-1 flex flex-col h-screen">
-        <div id="nav-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide">
+        <div id="nav-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide overscroll-contain">
           <%= yield :nav_column %>
         </div>
 
@@ -43,6 +50,12 @@
         <% end %>
       </div>
     </nav>
+
+    <div
+      id="mobile-nav-overlay"
+      class="fixed inset-0 bg-black z-20 bg-opacity-40 md:hidden nav-closed:hidden"
+      data-action="click->transition#toggleClass"
+    ></div>
 
     <main class="flex flex-1 h-screen bg-white dark:bg-gray-800">
       <%= content_for?(:main) ? yield(:main) : yield %>

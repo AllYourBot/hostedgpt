@@ -74,6 +74,18 @@
   @apply !pl-4
 }
 
+.nav-closed .nav-closed\:hidden {
+  @apply hidden
+}
+
+.nav-closed .nav-closed\:z-auto {
+  @apply z-auto
+}
+
+.nav-closed .nav-closed\:relative {
+  @apply relative
+}
+
 .show-previews .show-previews\:preview-container {
   @apply !flex
 }
