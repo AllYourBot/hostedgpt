@@ -30,6 +30,19 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     assert_text "Saved"
   end
 
+  test "a second save to the Assistant update page should show the notification again and it should properly dismiss itself" do
+    visit edit_settings_assistant_url(@assistant)
+    click_text "Save"
+    assert_text "Saved"
+    sleep 3.5
+    refute_text "Saved"
+
+    click_text "Save"
+    assert_text "Saved"
+    sleep 3.5
+    refute_text "Saved"
+  end
+
   test "should destroy Assistant" do
     visit edit_settings_assistant_url(@assistant)
     accept_confirm do
