@@ -33,7 +33,7 @@
         flex-1 flex h-full
         items-center justify-center
         tooltip tooltip-right hover:tooltip-open
-        <%= Current.user.preferences[:nav_closed] && "!hidden" %>
+        <%= Current.user&.preferences[:nav_closed] && "!hidden" %>
       "
       data-tip="Close sidebar"
     >
@@ -49,7 +49,7 @@
         flex-1 flex h-full
         items-center justify-center
         tooltip tooltip-right hover:tooltip-open
-        <%= !Current.user.preferences[:nav_closed] && "!hidden" %>
+        <%= !Current.user&.preferences[:nav_closed] && "!hidden" %>
       "
       data-tip="Open sidebar"
     >
