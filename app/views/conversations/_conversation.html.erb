@@ -47,7 +47,10 @@
               class: "outline-none cursor-pointer group-hover:visible
                       hover:text-gray-600 dark:hover:text-gray-300
                       focus:text-gray-600 dark:focus:text-gray-300",
-              data: { controller: "nested-pointer" },
+              data: {
+                  controller: "nested-pointer",
+                  role: "delete"
+                },
               title: "Delete",
               tooltip: :top,
               tabindex: 0,
@@ -59,7 +62,7 @@
             <%= button_to conversation_path(conversation),
               method: :delete,
               data: {
-                role: "delete",
+                role: "confirm-delete",
               },
               class: "flex gap-2 w-full",
               form: {

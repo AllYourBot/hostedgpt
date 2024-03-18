@@ -28,7 +28,7 @@ class ConversationsTest < ApplicationSystemTestCase
 
     assert_visible "#conversation-#{c.id} a"
     find("#conversation-#{c.id} a").hover
-    click_element "#conversation-#{c.id} a[data-role='pencil']"
+    click_element "#conversation-#{c.id} [data-role='pencil']"
     assert_no_selector "#conversation-#{c.id} a"
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
@@ -43,7 +43,7 @@ class ConversationsTest < ApplicationSystemTestCase
 
     assert_visible "#conversation-#{c.id} a"
     find("#conversation-#{c.id} a").hover
-    click_element "#conversation-#{c.id} a[data-role='pencil']"
+    click_element "#conversation-#{c.id} [data-role='pencil']"
     assert_no_selector "#conversation-#{c.id} a"
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
@@ -53,12 +53,12 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_equal "Meeting Samantha Jones", c.reload.title
   end
 
-  test "clicking conversation edits it and pressing Esc aborts the edit and does not savre" do
+  test "clicking conversation edits it and pressing Esc aborts the edit and does not save" do
     c = conversations(:greeting)
 
     assert_visible "#conversation-#{c.id} a"
     find("#conversation-#{c.id} a").hover
-    click_element "#conversation-#{c.id} a[data-role='pencil']"
+    click_element "#conversation-#{c.id} [data-role='pencil']"
     assert_no_selector "#conversation-#{c.id} a"
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
@@ -66,5 +66,40 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_visible "#conversation-#{c.id} a", wait: 0.5
 
     assert_equal "Meeting Samantha", c.reload.title
+  end
+
+  test "clicking the conversation delete, when you ARE NOT on this conversation, deletes it" do
+    c = conversations(:greeting)
+    starting_path = current_path
+
+    assert_visible "#conversation-#{c.id} a"
+    find("#conversation-#{c.id} a").hover
+    click_element "#conversation-#{c.id} [data-role='delete']"
+    sleep 0.1
+    assert_visible "#conversation-#{c.id} [data-role='confirm-delete']"
+    click_element "#conversation-#{c.id} [data-role='confirm-delete']"
+
+    assert_no_selector "#conversation-#{c.id} a"
+    assert_text "Deleted conversation", wait: 0.2
+
+    assert_current_path(starting_path)
+  end
+
+  test "clicking the conversation delete, when you ARE not on this conversation, deletes it and redirects you to a new conversation" do
+    c = conversations(:greeting)
+    visit conversation_messages_path(c)
+    starting_path = current_path
+
+    assert_visible "#conversation-#{c.id} a"
+    find("#conversation-#{c.id} a").hover
+    click_element "#conversation-#{c.id} [data-role='delete']"
+    sleep 0.1
+    assert_visible "#conversation-#{c.id} [data-role='confirm-delete']"
+    click_element "#conversation-#{c.id} [data-role='confirm-delete']"
+
+    assert_no_selector "#conversation-#{c.id} a"
+    assert_text "Deleted conversation", wait: 0.2
+
+    assert_current_path(new_assistant_message_path(users(:keith).assistants.ordered.first))
   end
 end
