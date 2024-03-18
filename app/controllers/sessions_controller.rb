@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    person = Person.find_by(email: params[:email].strip)
+    person = Person.find_by(email: params[:email].strip.downcase)
 
     if person.blank?
       flash.now[:alert] = "Invalid email or password"
