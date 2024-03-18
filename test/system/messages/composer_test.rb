@@ -21,12 +21,52 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_active @input_selector
   end
 
-  test "when cursor is not focused in the text input, / focuses it" do
+  test "when cursor is not focused in the text input, / focuses it and then / works as a key press" do
     send_keys "esc"
     assert_active "body"
 
     send_keys "/"
-    assert_active @input_selector
+    assert_active input
+    assert_equal "", input.value
+
+    send_keys "/"
+    assert_equal "/", input.value
+  end
+
+  test "when cursor is focused in the text input, ? works as a key press" do
+    assert_equal "", input.value
+    send_keys "?"
+    assert_equal "?", input.value
+  end
+
+  test "when not in text input, ? opens the keyboard shortcuts and ESC dismisses it and keyboard shortcuts work normally" do
+    send_keys "esc"
+    assert_active "body"
+    refute_text "Keyboard shortcuts"
+
+    send_keys "?"
+    assert_text "Keyboard shortcuts"
+
+    send_keys "esc"
+    refute_text "Keyboard shortcuts"
+
+    send_keys "/"
+    assert_active input
+  end
+
+  test "when not in text input, ? opens the keyboard shortcuts and CLICKING OUTSIZDE dismisses it and keyboard shortcuts work normally" do
+    send_keys "esc"
+    assert_active "body"
+    refute_text "Keyboard shortcuts"
+
+    send_keys "?"
+    assert_text "Keyboard shortcuts"
+
+    page.execute_script("document.querySelector('#modal-backdrop').click()") # passes a click event directly to the element
+    refute_text "Keyboard shortcuts"
+
+    send_keys "/"
+    assert_active input
   end
 
   test "submit button is disabled and cannot be clicked until text is entered" do

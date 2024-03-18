@@ -35,7 +35,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     else
       find(selector_or_element, wait: wait)
     end
-    assert_equal element, page.active_element, "Expected element to be the active element, but it is not. #{error_msg}"
+    assert_equal element, page.active_element, error_msg || "Expected element to be the active element, but it is not"
   end
 
   def assert_visible(selector, error_msg = nil, wait: 0)
