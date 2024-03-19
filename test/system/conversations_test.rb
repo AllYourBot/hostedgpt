@@ -39,7 +39,6 @@ class ConversationsTest < ApplicationSystemTestCase
 
     assert_equal "Meeting Samantha Jones", convo.text
     assert_equal "Meeting Samantha Jones", conversations(:greeting).reload.title
-    sleep 0.2
   end
 
   test "clicking conversation edits icon enables edit, pressing Enter submits it" do
@@ -55,8 +54,6 @@ class ConversationsTest < ApplicationSystemTestCase
   end
 
   test "clicking conversation edits it and pressing Esc aborts the edit and does not save" do
-    convo = hover_conversation conversations(:greeting)
-    node("edit", within: convo).click
     convo = hover_conversation conversations(:greeting)
     node("edit", within: convo).click
 
