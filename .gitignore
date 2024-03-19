@@ -24,8 +24,6 @@
 
 # Ignore storage (uploaded files in development and any SQLite databases).
 /storage/*
-!/storage/te/st/*
-# ^ Binary files for ActiveStorage blob fixtures are in this directory.
 !/storage/.keep
 /tmp/storage/*
 !/tmp/storage/
