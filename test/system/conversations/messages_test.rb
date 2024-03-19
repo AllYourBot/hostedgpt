@@ -30,7 +30,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_shows_tooltip node("regenerate", within: msg), "Regenerate"
   end
 
-  test "clicking regenerate icon shows menu and triggers re-generation" do
+  test "clicking regenerate icon triggers re-generation" do
     existing_assistant = @long_conversation.assistant
     new_assistant = @user.assistants.ordered.where.not(id: existing_assistant.id).first
 
