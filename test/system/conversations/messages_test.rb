@@ -30,7 +30,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_shows_tooltip node("regenerate", within: msg), "Regenerate"
   end
 
-  test "clicking regenerate icon triggers re-generation" do
+  test "clicking regenerate icon shows menu and triggers re-generation" do
     existing_assistant = @long_conversation.assistant
     new_assistant = @user.assistants.ordered.where.not(id: existing_assistant.id).first
 
@@ -38,6 +38,14 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     regenerate = node("regenerate", within: msg)
 
     regenerate.click
+    assert_text "Using #{existing_assistant.name}"
+    assert_text "Using #{new_assistant.name}"
+
+    assert_equal existing_assistant.name, node("from", within: last_message).text
+
+    click_text "Using #{new_assistant.name}"
+    sleep 0.1
+    assert_equal new_assistant.name, node("from", within: last_message).text
   end
 
   test "the conversation auto-scrolls to bottom when page loads" do

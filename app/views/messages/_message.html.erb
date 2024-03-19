@@ -73,17 +73,37 @@
             <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
             <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
           <% end %>
-          <%= button_to message_path(message),
-                method: :patch,
-                data: {
-                  role: "regenerate",
-                },
-                params: { message: { content_text: nil, rerequested_at: Time.current } },
-                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
-                form_class: "inline-block h-[18px]" do
-          %>
-            <%= icon "arrow-path", variant: :outline, size: 18, title: "Regenerate" %>
-          <% end %>
+
+          <div class="dropdown dropdown-top">
+            <%= icon "arrow-path",
+              tabindex: 0,
+              role: :button,
+              variant: :outline,
+              size: 18,
+              title: "Regenerate",
+              data: { role: "regenerate" }
+            %>
+
+            <menu tabindex="0" class="dropdown-content -ml-6 z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
+              <% ([message.assistant] + message.user.assistants.ordered.excluding(message.assistant)).each do |assistant| %>
+                <li class="overflow-hidden">
+                  <%= button_to message_path(message),
+                    form_class: "w-full",
+                    class: "truncate",
+                    method: :patch,
+                    params: { message: {
+                      content_text: nil,
+                      rerequested_at: Time.current,
+                      assistant_id: assistant.id
+                    } } do
+                  %>
+                    Using <%= assistant.name %>
+                  <% end %>
+                </li>
+              <% end %>
+            </menu>
+          </div>
+
         <% end %>
       </div>
     </div>

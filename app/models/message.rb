@@ -18,10 +18,12 @@ class Message < ApplicationRecord
   validates :role, presence: true
   validates :content_text, presence: true, unless: :assistant?
   validate :validate_conversation, if: -> { conversation.present? && Current.user }
+  validate :validate_assistant, if: -> { assistant.present? && Current.user }
 
   scope :ordered, -> { order(:created_at) }
 
   after_create :start_assistant_reply, if: -> { user? }
+  after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
 
   private
 
@@ -37,7 +39,16 @@ class Message < ApplicationRecord
     errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
   end
 
+  def validate_assistant
+    errors.add(:assistant, 'is invalid') unless assistant.user == Current.user
+  end
+
   def start_assistant_reply
-    conversation.messages.create! role: :assistant, content_text: "", assistant: conversation.assistant
+    conversation.messages.create! role: :assistant, content_text: "", assistant: assistant
+  end
+
+  def update_assistant_on_conversation
+    return if conversation.assistant == assistant
+    conversation.update!(assistant: assistant)
   end
 end

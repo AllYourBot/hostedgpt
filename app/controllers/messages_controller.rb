@@ -42,7 +42,7 @@ class MessagesController < ApplicationController
 
   def update
     if @message.update(message_params)
-      GetNextAIMessageJob.perform_later(@message.id, @message.conversation.assistant.id)
+      GetNextAIMessageJob.perform_later(@message.id, @message.assistant.id)
       redirect_to conversation_messages_path(@message.conversation)
     else
       render :edit, status: :unprocessable_entity
@@ -64,7 +64,7 @@ class MessagesController < ApplicationController
 
   def set_assistant
     @assistant = Current.user.assistants.find_by(id: params[:assistant_id])
-    @assistant ||= @conversation.assistant
+    @assistant ||= @conversation.messages.ordered.last.assistant
   end
 
   def set_message
@@ -80,6 +80,6 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:conversation_id, :content_text, :rerequested_at, documents_attributes: [:file])
+    params.require(:message).permit(:conversation_id, :content_text, :assistant_id, :rerequested_at, documents_attributes: [:file])
   end
 end
