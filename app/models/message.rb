@@ -38,7 +38,6 @@ class Message < ApplicationRecord
   end
 
   def validate_conversation
-  def validate_conversation
     errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
   end
 
