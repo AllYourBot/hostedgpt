@@ -37,8 +37,8 @@
           data-transition-toggle-class="hidden"
           class="flex-1 min-w-0 ml-3 mr-8 text-base text-gray-950 dark:text-gray-100">
 
-      <div class="mt-[6px] font-semibold" data-role="role">
-        <%= message.user? ? 'You' : message.conversation.assistant.name %>
+      <div class="mt-[6px] font-semibold" data-role="from">
+        <%= message.user? ? 'You' : message.assistant.name %>
       </div>
 
       <% if message.documents.present? && message.documents.first.file.attached? %>

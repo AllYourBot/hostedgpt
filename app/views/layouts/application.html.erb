@@ -41,10 +41,10 @@
                 <%= icon "chevron-up", variant: :mini, class: 'text-gray-500 ml-[2px]' %>
               </div>
 
-              <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
+              <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
                 <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
                 <li><%= link_to logout_path do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
-              </ul>
+              </menu>
             </div>
           </footer>
         <% end %>
