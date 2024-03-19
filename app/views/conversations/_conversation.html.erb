@@ -42,24 +42,24 @@
 
       <div class="dropdown !inline-flex dropdown-end outline-none pr-2">
         <%= icon "x-mark",
-              variant: :outline,
-              size: 22,
-              class: %|
-                outline-none cursor-pointer group-hover:visible
-                hover:text-gray-600 dark:hover:text-gray-300
-                focus:text-gray-600 dark:focus:text-gray-300
-              |,
-              data: {
-                controller: "nested-pointer",
-                role: "delete"
-              },
-              title: "Delete",
-              tooltip: :top,
-              tabindex: 0,
-              role: :button
+          tabindex: 0,
+          role: :button,
+          variant: :outline,
+          size: 22,
+          class: %|
+            outline-none cursor-pointer group-hover:visible
+            hover:text-gray-600 dark:hover:text-gray-300
+            focus:text-gray-600 dark:focus:text-gray-300
+          |,
+          data: {
+            controller: "nested-pointer",
+            role: "delete"
+          },
+          title: "Delete",
+          tooltip: :top
         %>
 
-        <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 mt-7 dark:text-white dark:!bg-gray-700" data-controller="nested-pointer">
+        <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 mt-7 dark:text-white dark:!bg-gray-700" data-controller="nested-pointer">
           <li>
             <%= button_to conversation_path(conversation),
               method: :delete,
@@ -75,7 +75,7 @@
               <%= icon "trash", variant: :outline, size: 18 %>Delete
             <% end %>
           </li>
-        </ul>
+        </menu>
       </div>
 
     </div>

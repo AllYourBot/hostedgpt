@@ -25,6 +25,10 @@ class MessageTest < ActiveSupport::TestCase
     assert_instance_of Run, messages(:yes_i_do).run
   end
 
+  test "has associated user (delegated)" do
+    assert_instance_of User, messages(:yes_i_do).user
+  end
+
   test "create without setting Current or conversation raises" do
     assert_raises ActiveRecord::RecordInvalid do
       Message.create!(content_text: "Hello")
