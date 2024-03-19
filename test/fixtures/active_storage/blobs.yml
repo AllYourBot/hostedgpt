@@ -1,0 +1,4 @@
+cat_blob: <%= ActiveStorage::FixtureSet.blob filename: "cat.png", service_name: "test_fixtures" %>
+cute_cat_blob: <%= ActiveStorage::FixtureSet.blob filename: "cat.png", service_name: "test_fixtures" %>
+single_cat_blob: <%= ActiveStorage::FixtureSet.blob filename: "cat.png", service_name: "test_fixtures" %>
+single_dog_blob: <%= ActiveStorage::FixtureSet.blob filename: "cat.png", service_name: "test_fixtures" %>
