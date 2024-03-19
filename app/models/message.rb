@@ -8,6 +8,8 @@ class Message < ApplicationRecord
 
   enum role: %w[user assistant].index_by(&:to_sym)
 
+  delegate :user, to: :conversation
+
   accepts_nested_attributes_for :documents
 
   before_validation :set_default_role, on: :create
@@ -15,7 +17,7 @@ class Message < ApplicationRecord
 
   validates :role, presence: true
   validates :content_text, presence: true, unless: :assistant?
-  validate :validate_conversation_user, if: -> { conversation.present? && Current.user }
+  validate :validate_conversation, if: -> { conversation.present? && Current.user }
 
   scope :ordered, -> { order(:created_at) }
 
@@ -31,7 +33,7 @@ class Message < ApplicationRecord
     self.role ||= :user
   end
 
-  def validate_conversation_user
+  def validate_conversation
     errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
   end
 

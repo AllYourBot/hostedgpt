@@ -178,7 +178,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     page.driver.browser.manage.window.resize_to(width, height)
   end
 
+  def node(label, within:)
+    within.find("[data-role='#{label}']")
+  end
+
   def find_messages
     all("#conversation [data-role='message']").to_a
+  end
+
+  def last_message
+    find_messages.last
+  end
+
+  def first_message
+    find_messages.first
   end
 end
