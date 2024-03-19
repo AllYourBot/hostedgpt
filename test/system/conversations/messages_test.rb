@@ -6,8 +6,6 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
     @user = users(:keith)
     login_as @user
-    @user = users(:keith)
-    login_as @user
     @long_conversation = conversations(:greeting)
 
     click_text @long_conversation.title
