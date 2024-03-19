@@ -66,11 +66,11 @@
               data: {
                 role: "confirm-delete",
               },
-              class: "flex gap-2 w-full",
               form: {
-                class: "inline-block",
+                class: "inline-block p-0",
                 data: { turbo_frame: "_top" },
-              } do
+              },
+              class: "flex gap-2 w-full py-2 px-4" do
             %>
               <%= icon "trash", variant: :outline, size: 18 %>Delete
             <% end %>

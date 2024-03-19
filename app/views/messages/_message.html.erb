@@ -88,8 +88,8 @@
               <% ([message.assistant] + message.user.assistants.ordered.excluding(message.assistant)).each do |assistant| %>
                 <li class="overflow-hidden">
                   <%= button_to message_path(message),
-                    form_class: "w-full",
-                    class: "truncate",
+                    form_class: "inline-block p-0",
+                    class: "truncate w-full py-2 px-4 text-left",
                     method: :patch,
                     params: { message: {
                       content_text: nil,
