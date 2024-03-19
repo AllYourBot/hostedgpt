@@ -1,0 +1,56 @@
+name: Daily Fork Auto-Update
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '11 3 * * *'
+
+jobs:
+  sync_with_upstream:
+    runs-on: ubuntu-latest
+    name: Sync main with upstream fork
+
+    steps:
+
+    - uses: actions/checkout@v2
+    - name: Merge upstream
+      run: |
+        ORIG_USER=$(git config --global --get --default="null" user.name)
+        ORIG_EMAIL=$(git config --global --get --default="null" user.email)
+
+        echo "Debug ${ORIG_USER} and ${ORIG_EMAIL}" 1>&1
+
+        git config --global user.name 'GitHub'
+        git config --global user.email ''
+
+        git checkout main
+
+        if [ $(git branch --show-current) != "main" ]; then
+          git checkout "main"
+          echo 'Target branch 'main' checked out' 1>&1
+        fi
+
+        git remote add upstream "https://${GITHUB_ACTOR}:${INPUT_GITHUB_TOKEN}@github.com/allyourbot/hostedgpt.git"
+
+        git fetch upstream "main"
+
+        LOCAL_COMMIT_HASH=$(git rev-parse "main")
+        UPSTREAM_COMMIT_HASH=$(git rev-parse upstream/"main")
+
+        echo "Debug ${LOCAL_COMMIT_HASH} vs ${UPSTREAM_COMMIT_HASH}" 1>&1
+
+        if [ "${LOCAL_COMMIT_HASH}" = "${UPSTREAM_COMMIT_HASH}" ]; then
+          echo 'No new commits to sync, exiting' 1>&1
+        else
+          echo 'New commits being synced:' 1>&1
+          git log upstream/"main" "${LOCAL_COMMIT_HASH}"..HEAD
+
+          echo 'Syncing...' 1>&1
+          git pull --ff-only upstream "main"
+          echo 'Sync successful' 1>&1
+
+          echo 'Pushing to target branch...' 1>&1
+          git push origin "main"
+          echo 'Push successful' 1>&1
+        fi
+
+        echo 'Done.' 1>&1

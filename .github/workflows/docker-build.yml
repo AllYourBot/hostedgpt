@@ -1,4 +1,4 @@
-name: "Docker Container Build"
+name: Docker Container Build
 on:
   push:
     branches: [ "main" ]
