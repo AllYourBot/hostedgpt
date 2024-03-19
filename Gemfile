@@ -88,3 +88,4 @@ gem "ruby-openai", "~> 6.3"
 gem "anthropic", "~> 0.1.0"
 gem "tiktoken_ruby", "~> 0.0.6"
 gem "solid_queue", "~> 0.2.1"
+gem "inline_svg", '~> 1.7', '>= 1.7.2'
