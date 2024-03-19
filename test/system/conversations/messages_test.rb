@@ -108,10 +108,10 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     click_text @long_conversation.title
 
     assert_did_not_scroll("nav") do
-      assert_selector "#conversation a[data-role='new']"
-      assert_shows_tooltip "#conversation a[data-role='new']", "New chat"
+      new_chat = node("new", within: this_conversation)
+      assert_shows_tooltip new_chat, "New chat"
 
-      click_element "#conversation a[data-role='new']"
+      new_chat.click
       assert_current_path new_assistant_message_path(@long_conversation.assistant)
     end
   end
@@ -135,6 +135,10 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   end
 
   private
+
+  def this_conversation
+    find("#conversation")
+  end
 
   def find_conversations
     all("#conversations [data-role='conversation']").to_a
