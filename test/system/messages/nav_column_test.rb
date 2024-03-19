@@ -145,7 +145,7 @@ class NavColumnTest < ApplicationSystemTestCase
     assistant2 = @user.assistants.ordered.second
     second_assistant_container = all("#assistants [data-role='assistant']", visible: :false)[1]
     second_assistant_container.hover
-    pencil_on_second_assistant = all("#assistants a[data-role='pencil']", visible: :false)[1]
+    pencil_on_second_assistant = all("#assistants a[data-role='new']", visible: :false)[1]
     assert_shows_tooltip pencil_on_second_assistant, "New"
     click_element pencil_on_second_assistant
     assert_current_path new_assistant_message_path(assistant2)

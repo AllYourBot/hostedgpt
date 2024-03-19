@@ -4,6 +4,16 @@ require "rails/test_help"
 require "minitest/autorun"
 require "pry"
 
+class Capybara::Node::Element
+  def obsolete?
+    inspect.include?('Obsolete')
+  end
+
+  def exists?
+    !obsolete?
+  end
+end
+
 class ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers
 

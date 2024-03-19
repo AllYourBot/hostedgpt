@@ -3,6 +3,7 @@ require "application_system_test_case"
 class ConversationsTest < ApplicationSystemTestCase
   setup do
     login_as users(:keith)
+    @starting_path = current_path
   end
 
   test "creating new chat with meta+shift+o" do
@@ -23,83 +24,89 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_current_path(expected_path)
   end
 
-  test "clicking conversation edits it and unfocusing it submits it" do
-    c = conversations(:greeting)
+  test "edit icon shows a tooltip" do
+    convo = hover_conversation conversations(:greeting)
+    assert_shows_tooltip node("edit", within: convo), "Rename"
+  end
 
-    assert_visible "#conversation-#{c.id} a"
-    find("#conversation-#{c.id} a").hover
-    click_element "#conversation-#{c.id} [data-role='pencil']"
-    assert_no_selector "#conversation-#{c.id} a"
+  test "clicking conversation edits icon enables edit, unfocusing submits it" do
+    convo = hover_conversation conversations(:greeting)
+    node("edit", within: convo).click
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
     find("body").click
-    assert_visible "#conversation-#{c.id} a", wait: 0.5
+    sleep 0.2
 
-    assert_equal "Meeting Samantha Jones", c.reload.title
+    assert_equal "Meeting Samantha Jones", convo.text
+    assert_equal "Meeting Samantha Jones", conversations(:greeting).reload.title
   end
 
-  test "clicking conversation edits it and pressing Enter submits it" do
-    c = conversations(:greeting)
-
-    assert_visible "#conversation-#{c.id} a"
-    find("#conversation-#{c.id} a").hover
-    click_element "#conversation-#{c.id} [data-role='pencil']"
-    assert_no_selector "#conversation-#{c.id} a"
+  test "clicking conversation edits icon enables edit, pressing Enter submits it" do
+    convo = hover_conversation conversations(:greeting)
+    node("edit", within: convo).click
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
     send_keys "enter"
-    assert_visible "#conversation-#{c.id} a", wait: 0.5
+    sleep 0.2
 
-    assert_equal "Meeting Samantha Jones", c.reload.title
+    assert_equal "Meeting Samantha Jones", convo.text
+    assert_equal "Meeting Samantha Jones", conversations(:greeting).reload.title
   end
 
   test "clicking conversation edits it and pressing Esc aborts the edit and does not save" do
-    c = conversations(:greeting)
-
-    assert_visible "#conversation-#{c.id} a"
-    find("#conversation-#{c.id} a").hover
-    click_element "#conversation-#{c.id} [data-role='pencil']"
-    assert_no_selector "#conversation-#{c.id} a"
+    convo = hover_conversation conversations(:greeting)
+    node("edit", within: convo).click
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
     send_keys "esc"
-    assert_visible "#conversation-#{c.id} a", wait: 0.5
+    sleep 0.2
 
-    assert_equal "Meeting Samantha", c.reload.title
+    assert_equal "Meeting Samantha", convo.text
+    assert_equal "Meeting Samantha", conversations(:greeting).reload.title
   end
 
-  test "clicking the conversation delete, when you ARE NOT on this conversation, deletes it" do
-    c = conversations(:greeting)
-    starting_path = current_path
+  test "delete icon shows a tooltip" do
+    convo = hover_conversation conversations(:greeting)
+    assert_shows_tooltip node("delete", within: convo), "Delete"
+  end
 
-    assert_visible "#conversation-#{c.id} a"
-    find("#conversation-#{c.id} a").hover
-    click_element "#conversation-#{c.id} [data-role='delete']"
+  test "clicking the conversation delete, when you ARE NOT on this conversation, deletes it and the url does not change" do
+    convo = hover_conversation conversations(:greeting)
+    delete = node("delete", within: convo)
+
+    delete.click
     sleep 0.1
-    assert_visible "#conversation-#{c.id} [data-role='confirm-delete']"
-    click_element "#conversation-#{c.id} [data-role='confirm-delete']"
+    confirm_delete = node("confirm-delete", within: convo)
+    confirm_delete.click
 
-    assert_no_selector "#conversation-#{c.id} a"
     assert_text "Deleted conversation", wait: 0.2
+    refute convo.exists?
 
-    assert_current_path(starting_path)
+    assert_current_path(@starting_path)
   end
 
   test "clicking the conversation delete, when you ARE not on this conversation, deletes it and redirects you to a new conversation" do
-    c = conversations(:greeting)
-    visit conversation_messages_path(c)
-    starting_path = current_path
+    visit conversation_messages_path(conversations(:greeting))
+    convo = hover_conversation conversations(:greeting)
+    delete = node("delete", within: convo)
 
-    assert_visible "#conversation-#{c.id} a"
-    find("#conversation-#{c.id} a").hover
-    click_element "#conversation-#{c.id} [data-role='delete']"
+    delete.click
     sleep 0.1
-    assert_visible "#conversation-#{c.id} [data-role='confirm-delete']"
-    click_element "#conversation-#{c.id} [data-role='confirm-delete']"
+    confirm_delete = node("confirm-delete", within: convo)
+    confirm_delete.click
 
-    assert_no_selector "#conversation-#{c.id} a"
     assert_text "Deleted conversation", wait: 0.2
+    refute convo.exists?
 
-    assert_current_path(new_assistant_message_path(users(:keith).assistants.ordered.first))
+    assert_current_path(new_assistant_message_path users(:keith).assistants.ordered.first)
+  end
+
+  private
+
+  def hover_conversation(c)
+    assert_visible "#conversation-#{c.id} a"
+    convo_node = find("#conversation-#{c.id}")
+    convo_node.hover
+    convo_node
   end
 end

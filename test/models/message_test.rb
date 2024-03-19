@@ -97,4 +97,55 @@ class MessageTest < ActiveSupport::TestCase
       )
     end
   end
+
+  test "creating a message with a different assistant and Current.user set fails if assistant is not owned by the user" do
+    Current.user = users(:keith)
+    conversation = users(:keith).conversations.first
+    assistant_owned_by_someone_else = users(:rob).assistants.first
+
+    assert_raises ActiveRecord::RecordInvalid do
+      conversation.messages.create!(
+        assistant: assistant_owned_by_someone_else,
+        content_text: "This should fail"
+      )
+    end
+  end
+
+  test "creating a message with a different assistant and Current.user succeeds when assistant is owned by the user" do
+    Current.user = users(:keith)
+    conversation = users(:keith).conversations.first
+    new_assistant = users(:keith).assistants.where.not(id: conversation.assistant_id).first
+
+    assert_nothing_raised do
+      message = conversation.messages.create!(
+        assistant: new_assistant,
+        content_text: "This works since Assistant is also owned by Current.user"
+      )
+      assert_equal Current.user, message.assistant.user
+    end
+  end
+
+  test "creating a message with assistant that does not match the conversation user succeeds when Current.user is not set" do
+    conversation = users(:keith).conversations.first
+    assistant_owned_by_someone_else = users(:rob).assistants.first
+    Current.user = nil
+
+    assert_not_equal conversation.user, assistant_owned_by_someone_else.user
+
+    assert_nothing_raised do
+      message = conversation.messages.create!(
+        assistant: assistant_owned_by_someone_else,
+        content_text: "This works since Current.user not set"
+      )
+      assert_not_equal conversation.user, message.assistant.user
+    end
+  end
+
+  test "when a conversation gets a message from a new assistant this propogates to the conversation" do
+    old_assistant = conversations(:greeting).assistant
+    new_assistant = assistants(:keith_claude3)
+
+    conversations(:greeting).messages.create!(assistant: new_assistant, content_text: "Hello")
+    assert_equal new_assistant, conversations(:greeting).reload.assistant
+  end
 end
