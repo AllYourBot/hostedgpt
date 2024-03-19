@@ -10,8 +10,6 @@ class Message < ApplicationRecord
 
   delegate :user, to: :conversation
 
-  delegate :user, to: :conversation
-
   accepts_nested_attributes_for :documents
 
   before_validation :set_default_role, on: :create
@@ -50,6 +48,7 @@ class Message < ApplicationRecord
   end
 
   def update_assistant_on_conversation
+    return if conversation.assistant == assistant
     conversation.update!(assistant: assistant)
   end
 end
