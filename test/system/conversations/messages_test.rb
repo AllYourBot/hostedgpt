@@ -6,10 +6,30 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
     @user = users(:keith)
     login_as @user
+    @user = users(:keith)
+    login_as @user
     @long_conversation = conversations(:greeting)
 
     click_text @long_conversation.title
     sleep 0.2
+  end
+
+  test "clipboard icon shows tooltip" do
+    msg = hover_last_message
+    assert_shows_tooltip node("clipboard", within: msg), "Copy"
+  end
+
+  test "clicking clipboard icon changes the tooltip" do
+    msg = hover_last_message
+    clipboard = node("clipboard", within: msg)
+
+    clipboard.click
+    assert_shows_tooltip clipboard, "Copied!"
+  end
+
+  test "regenerate icon shows tooltip" do
+    msg = hover_last_message
+    assert_shows_tooltip node("regenerate", within: msg), "Regenerate"
   end
 
   test "clipboard icon shows tooltip" do
@@ -58,15 +78,18 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_visible "#scroll-button", wait: 0.01
 
     scroll_to first_message
+    scroll_to first_message
     assert_visible "#scroll-button", wait: 0.2
 
     assert_scrolled_to_bottom do
+      scroll_to last_message
       scroll_to last_message
       assert_hidden "#scroll-button", wait: 0.2
     end
   end
 
   test "clicking scroll down button scrolls the page to the bottom" do
+    scroll_to first_message
     scroll_to first_message
     assert_visible "#scroll-button", wait: 0.5
 
@@ -92,6 +115,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     len = find_messages.length
     assert find_messages[len-2].text.include?("Watch me appear"), "The last message should have contained the submitted text"
     assert last_message.text.include?(@long_conversation.assistant.name), "The last message should have contained the assistant stub"
+    assert last_message.text.include?(@long_conversation.assistant.name), "The last message should have contained the assistant stub"
   end
 
   test "when the AI replies with a message it appears with morphing and scrolls down" do
@@ -100,12 +124,14 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     sleep 0.5
 
     assert last_message.text.include?("Stub:"), "The last message should have contained the submitted text"
+    assert last_message.text.include?("Stub:"), "The last message should have contained the submitted text"
 
     assert_page_morphed do
       new_message.content_text = "The quick brown fox jumped over the lazy dog and this line needs to wrap to scroll." +
                                   "But it was not long enough so I'm adding more text on this second line to ensure it."
       GetNextAIMessageJob.broadcast_updated_message(new_message)
       sleep 0.5
+      assert last_message.text.include?("The quick brown"), "The last message should have contained the submitted text"
       assert last_message.text.include?("The quick brown"), "The last message should have contained the submitted text"
     end
 
@@ -116,10 +142,10 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     click_text @long_conversation.title
 
     assert_did_not_scroll("nav") do
-      assert_selector "#conversation a[data-role='new']"
-      assert_shows_tooltip "#conversation a[data-role='new']", "New chat"
+      new_chat = node("new", within: this_conversation)
+      assert_shows_tooltip new_chat, "New chat"
 
-      click_element "#conversation a[data-role='new']"
+      new_chat.click
       assert_current_path new_assistant_message_path(@long_conversation.assistant)
     end
   end
@@ -144,8 +170,18 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   private
 
+  def this_conversation
+    find("#conversation")
+  end
+
   def find_conversations
     all("#conversations [data-role='conversation']").to_a
+  end
+
+  def hover_last_message
+    msg = last_message
+    msg.hover
+    msg
   end
 
   def hover_last_message
@@ -164,6 +200,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     # page body replacement or a turbo-frame replacement does not re-add these attributes, so if the tag is no longer
     # present then we know morphing did not occur.
     tag("nav")
+    tag(first_message)
     tag(first_message)
     @nav_scroll_position = get_scroll_position("nav")
     sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
@@ -191,6 +228,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert get_scroll_position("section #messages") > @messages_scroll_position, "The page should have scrolled down further"
     assert_hidden "#scroll-button", "The page did not scroll all the way down"
     assert tagged?("nav"), "The page did not morph; a tagged element got replaced."
+    assert tagged?(first_message), "The page did not morph; a tagged element got replaced."
     assert tagged?(first_message), "The page did not morph; a tagged element got replaced."
     assert_equal @nav_scroll_position, get_scroll_position("nav"), "The left column lost it's scroll position"
   end

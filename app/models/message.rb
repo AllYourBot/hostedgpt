@@ -10,6 +10,8 @@ class Message < ApplicationRecord
 
   delegate :user, to: :conversation
 
+  delegate :user, to: :conversation
+
   accepts_nested_attributes_for :documents
 
   before_validation :set_default_role, on: :create
@@ -35,6 +37,7 @@ class Message < ApplicationRecord
     self.role ||= :user
   end
 
+  def validate_conversation
   def validate_conversation
     errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
   end
