@@ -12,7 +12,7 @@ This project is actively looking for contributors to help make it great. The goa
 
   Did you know that all your private, personal past conversations in the left sidebar are allowed to be used for OpenAI training? [Disclosed in this OpenAI article.](https://help.openai.com/en/articles/7730893-data-controls-faq) HostedGPT excludes your history from OpenAI training.
 * **Don't commit yourself to $20 per month when you may not use ChatGPT a lot.** You only pay as much as you use!
-* **You will never hit the '*You've reached the current usage cap for GPT-4'.** You pay per mesage based on the API rates so you can keep using it as much as you want.
+* **You will never hit the '*You've reached the current usage cap for GPT-4*'.** You pay per mesage based on the API rates so you can keep using it as much as you want.
 * **Use Claude 3 and soon Gemini in the same app as GPT-4**. You won't have your conversation history split across three apps and have different interfaces for each one.
 
 
