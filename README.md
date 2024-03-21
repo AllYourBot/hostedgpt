@@ -1,8 +1,10 @@
 # HostedGPT
 
-HostedGPT is a free, open-source alternative to ChatGPT. You can run it on your own computer or any server that supports Ruby on Rails, just bring your own OpenAI API key. All the core functionality of ChatGPT is already working (e.g. GPT-3.5 and GPT-4, starting new conversations, streaming responses, asking about attached images, etc). The main thing missing is the mobile app but that's coming soon.
+HostedGPT is a free, open-source chat interface in the style of ChatGPT. You can run it on any server or even your own computer. It's a Ruby on Rails app. Just bring your own OpenAI API key. All the core functionality of ChatGPT is already working (e.g. GPT-3.5 and GPT-4, starting new conversations, streaming responses, asking about attached images, etc). The main thing missing is the mobile app but that's coming soon and it already works well as a mobile web app.
 
-This project is actively looking for contributors to help make it great. The goal is for *every* feature that exists in ChatGPT to exist in this app, then we can start adding lots of new features and extensions beyond what ChatGPT supports.
+Plus, this app has extra features. You can use Anthropic's Claude 3 in the same interface as GPT-4. You can also switch assistants in the middle of a conversation.
+
+This project is actively looking for contributors to help make it great. The goal is for *every* feature that exists in ChatGPT to exist in this app along with many improvements.
 
 ### Some favorite features of HostedGPT
 
@@ -10,12 +12,14 @@ This project is actively looking for contributors to help make it great. The goa
 
   Did you know that all your private, personal past conversations in the left sidebar are allowed to be used for OpenAI training? [Disclosed in this OpenAI article.](https://help.openai.com/en/articles/7730893-data-controls-faq) HostedGPT excludes your history from OpenAI training.
 * **Don't commit yourself to $20 per month when you may not use ChatGPT a lot.** You only pay as much as you use!
-* **You will never hit the 'You've reached the current usage cap for GPT-4'.** You pay per mesage based on the API rates so you can keep using it as much as you want.
+* **You will never hit the '*You've reached the current usage cap for GPT-4'.** You pay per mesage based on the API rates so you can keep using it as much as you want.
+* **Use Claude 3 and soon Gemini in the same app as GPT-4**. You won't have your conversation history split across three apps and have different interfaces for each one.
 
-**The app has progressed quite a bit since this demo was recorded. TODO: Update this demo.**
 
-[![](https://img.youtube.com/vi/GuqPne2yl6w/2.jpg)](https://www.youtube.com/watch?v=GuqPne2yl6w)
-Watch a demo of the app
+### Watch a demo of the app:
+
+[![](https://img.youtube.com/vi/TX2Er5Whl0E/0.jpg)](https://www.youtube.com/watch?v=TX2Er5Whl0E)
+
 
 # Table of Contents
 
@@ -56,7 +60,7 @@ You can deploy a full version of HostedGPT to the hosting service, Render, for f
 
 # Contribute as a Developer
 
-We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.6. [View 0.6 Milestone](https://github.com/allyourbot/hostedgpt/milestone/5). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
+We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.8. [View 0.8 Milestone](https://github.com/allyourbot/hostedgpt/milestone/5). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
 ## Setting up Development
 
