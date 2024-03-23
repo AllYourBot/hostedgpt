@@ -2,7 +2,7 @@
   <h2 class='text-3xl font-semibold'>Welcome back</h2>
 
   <span class='text-sm text-center'>
-    Don't have an account? <%= link_to "Sign up", new_user_path, class: "underline" %>
+    Don't have an account? <%= link_to "Sign up", register_path, class: "underline" %>
   </span>
 
   <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
