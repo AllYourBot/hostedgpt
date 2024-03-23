@@ -3,7 +3,7 @@ class UsersController < ApplicationController
 
   layout "public"
 
-  before_action :ensure_registration, only: %i[new create]
+  before_action :ensure_registration, only: [:new, :create]
   before_action :set_user, only: [:update]
 
   def new
