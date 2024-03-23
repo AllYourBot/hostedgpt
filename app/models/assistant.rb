@@ -11,6 +11,8 @@ class Assistant < ApplicationRecord
 
   scope :ordered, -> { order(:id) }
 
+  normalizes :name, with: -> name { name.strip.capitalize }
+
   def initials
     return nil if name.blank?
 

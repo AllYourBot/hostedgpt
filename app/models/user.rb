@@ -2,6 +2,7 @@ class User < ApplicationRecord
   include Personable, Registerable
 
   has_secure_password
+  has_person_name
 
   validates :password, length: { minimum: 6 }, allow_nil: true
   validates :first_name, :last_name, presence: true, on: :create
@@ -11,13 +12,5 @@ class User < ApplicationRecord
 
   serialize :preferences, coder: JsonSerializer
 
-  def full_name
-    "#{first_name} #{last_name}".strip.presence
-  end
-
-  def initials
-    return nil if first_name.blank? || last_name.blank?
-
-    first_name[0].capitalize + last_name[0].capitalize
-  end
+  normalizes :first_name, :last_name, with: -> attribute { attribute.strip.capitalize }
 end

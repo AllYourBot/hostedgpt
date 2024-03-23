@@ -23,7 +23,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "it should show an error message when the password is blank" do
     email = people(:keith_registered).email
-    post users_url, params: {person: {personable_type: "User", email: email, personable_attributes: user_attr.merge({ password: "" })}}
+    post users_url, params: {person: {personable_type: "User", email: email, personable_attributes: user_attr.merge(password: "")}}
     assert_response :unprocessable_entity
     assert_match "Password can&#39;t be blank", response.body
   end
@@ -39,7 +39,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     post users_url, params: {person: {personable_type: "User", email: email, personable_attributes: user_attr}}
 
     user = Person.find_by(email: email).user
-    assert_equal user_attr.except(:password), user.slice(:first_name, :last_name).symbolize_keys
+    assert_equal "John", user.first_name
+    assert_equal "Doe", user.last_name
     assert_equal 4, user.assistants.count, "This new user did not get the expected number of assistants"
 
     assistant = user.assistants.ordered.first
@@ -51,6 +52,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   private
 
   def user_attr
-    { password: "secret", first_name: "John", last_name: "Doe" }
+    { password: "secret", name: "John Doe" }
   end
 end

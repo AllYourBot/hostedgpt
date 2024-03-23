@@ -24,14 +24,14 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "initials returns the proper two letters" do
-    assert_equal "KS", users(:keith).initials
+    assert_equal "KS", users(:keith).name.initials
   end
 
   test "initials returns nothing if missing first or last name" do
     users(:keith).update!(first_name: nil, last_name: 'Schacht')
-    assert_nil users(:keith).initials
+    assert_nil users(:keith).name.initials
     users(:keith).update!(first_name: 'Keith', last_name: nil)
-    assert_nil users(:keith).initials
+    assert_nil users(:keith).name.initials
   end
 
   test "it can update a user with a password" do
@@ -88,7 +88,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "full_name returns nil if first_name and last_name are both blank" do
-    assert_nil users(:rob).full_name
+    assert_nil users(:rob).name.full
   end
 
   test "boolean values within preferences get converted back and forth properly" do
