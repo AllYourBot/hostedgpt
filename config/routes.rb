@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   resources :documents
   resources :users, only: [:new, :create, :update]
 
-  get "up" => "rails/health#show", :as => :rails_health_check
+  get "up" => "rails/health#show", as: :rails_health_check
 
   # routes to still be cleaned up:
 
@@ -26,5 +26,6 @@ Rails.application.routes.draw do
 
   get "/login", to: "sessions#new"
   post "/login", to: "sessions#create"
+  get "/register", to: "users#new"
   get "/logout", to: "sessions#destroy"
 end
