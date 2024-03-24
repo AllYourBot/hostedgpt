@@ -8,6 +8,12 @@ export default class extends Controller {
   }
 
   get text() {
-    return this.textTarget.innerText
+    return this.removeExclusions(this.textTarget).innerText
+  }
+
+  removeExclusions(node) {
+    let clonedNode = node.cloneNode(true)
+    clonedNode.querySelectorAll('.clipboard-exclude').forEach(el => el.remove())
+    return clonedNode
   }
 }

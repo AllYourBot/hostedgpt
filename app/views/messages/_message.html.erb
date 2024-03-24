@@ -46,8 +46,12 @@
       <% end %>
 
       <%# This div needs to be tightly wrapped around the content_text output because the whitespace formatting is important. %>
-      <div class="whitespace-pre-wrap" data-role="content-text" data-clipboard-target="text"
-        ><%= message.content_text %><div class="animate-breathe w-3 h-3 rounded-full bg-black dark:bg-white inline-block ml-1 <%= !thinking && 'hidden' %>"></div></div>
+      <div
+        data-role="content-text"
+        data-clipboard-target="text"
+        class="prose break-words whitespace-pre-wrap leading-normal"
+      ><%= parse message.content_text %><div class="animate-breathe w-3 h-3 rounded-full bg-black dark:bg-white inline-block ml-1 <%= !thinking && 'hidden' %>"></div
+      ></div>
 
       <div class="flex justify-start invisible gap-2 mt-2 text-gray-600 dark:text-gray-300 group-hover:visible">
         <% if message.user? %>
