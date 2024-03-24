@@ -1,7 +1,7 @@
 
 class AutotitleConversationJob < ApplicationJob
-  class ConverstionNotReady < StandardError; end
-  retry_on ConverstionNotReady
+  class ConversationNotReady < StandardError; end
+  retry_on ConversationNotReady
 
   queue_as :default
 
@@ -11,7 +11,7 @@ class AutotitleConversationJob < ApplicationJob
     return false if Current.user.openai_key.blank? # should we use anthropic key if that's all the user has?
 
     messages = conversation.messages.ordered.limit(4)
-    raise ConverstionNotReady  if messages.empty?
+    raise ConversationNotReady  if messages.empty?
 
     new_title = generate_title_for(messages.map(&:content_text).join("\n"))
     conversation.update!(title: new_title)
