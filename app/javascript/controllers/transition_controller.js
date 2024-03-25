@@ -12,9 +12,7 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static classes = [ "toggle" ]
   static targets = [ "transitionable" ]
-  static values = {
-    afterTimeout: Number
-  }
+  static values = { afterTimeout: Number }
 
   connect() {
     this.on = false
