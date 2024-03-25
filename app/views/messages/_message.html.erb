@@ -50,7 +50,14 @@
         data-role="content-text"
         data-clipboard-target="text"
         class="prose break-words whitespace-pre-wrap leading-normal"
-      ><%= formatted_text = format(message.content_text) %><div class="animate-breathe w-3 h-3 rounded-full bg-black dark:bg-white inline-block ml-1 <%= !thinking && 'hidden' %>"></div
+      ><%= formatted_text = format(message.content_text) %><div
+        class="
+          animate-breathe
+          w-3 h-3
+          rounded-full
+          bg-black dark:bg-white
+          inline-block
+          ml-1 <%= !thinking && 'hidden' %>"></div
       ></div>
 
       <div class="flex justify-start invisible gap-2 mt-2 text-gray-600 dark:text-gray-300 group-hover:visible">
@@ -74,6 +81,7 @@
                     mouseleave->transition#toggleClassOff
                   |,
                   keyboard_target: formatted_text.present? && formatted_text.exclude?('keyboard-target') ? "keyboardable" : nil,
+                  # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
           } do %>
             <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
             <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
