@@ -1,3 +1,2 @@
 web: env RUBY_DEBUG_OPEN=true bin/rails server -p ${PORT:-3000}
-postgres: docker-compose up postgres
 worker: ./bin/rake solid_queue:start
