@@ -231,6 +231,13 @@
               <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
             <% end %>
           </div>
+
+          <div
+            id="composer-overlay"
+            data-new-message-target="overlay"
+            class="absolute inset-0 bg-white bg-opacity-65 hidden">
+          </div>
+
         <% end %>
       </div>
 
@@ -280,6 +287,16 @@
 
       </section>
       <section class="flex-1 pl-0 md:pl-5">
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Copy last code block or response
+          </figcaption>
+          <kbd class="w-40 text-right">
+            <div class="key">Ctrl / ⌘</div>
+            <div class="key">Shift</div>
+            <div class="key">C</div>
+          </kbd>
+        </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
             Toggle sidebar
