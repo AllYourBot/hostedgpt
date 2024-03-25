@@ -70,10 +70,10 @@
           role: "new",
           controller: "keyboard",
           action: %|
-                    keydown.meta+shift+o@document->keyboard#click
-                    keydown.ctrl+shift+o@document->keyboard#click
-                    keydown.meta+j@document->keyboard#click
-                    keydown.ctrl+j@document->keyboard#click
+            keydown.meta+shift+o@document->keyboard#click
+            keydown.ctrl+shift+o@document->keyboard#click
+            keydown.meta+j@document->keyboard#click
+            keydown.ctrl+j@document->keyboard#click
           |
         } do %>
       <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: "New chat", tooltip: :left %>
