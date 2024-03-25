@@ -17,9 +17,16 @@ class UserTest < ActiveSupport::TestCase
     assert person.valid?
   end
 
-  test "although first & last name is required for create it's not required for update" do
+  test "should validate presence of first name" do
+    user = users(:keith)
+    user.update(last_name: nil)
+    refute user.valid?
+    assert_equal ["can't be blank"], user.errors[:first_name]
+  end
+
+  test "although last name is required for create it's not required for update" do
     assert_nothing_raised do
-      users(:keith).update!(first_name: nil, last_name: nil)
+      users(:keith).update!(last_name: nil)
     end
   end
 
