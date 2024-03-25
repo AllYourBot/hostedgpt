@@ -231,6 +231,13 @@
               <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
             <% end %>
           </div>
+
+          <div
+            id="composer-overlay"
+            data-new-message-target="overlay"
+            class="absolute inset-0 bg-white bg-opacity-65 hidden">
+          </div>
+
         <% end %>
       </div>
 
@@ -304,4 +311,3 @@
     <button id="modal-backdrop">close</button>
   </form>
 </dialog>
-
