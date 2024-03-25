@@ -193,4 +193,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def first_message
     find_messages.first
   end
+
+  def clipboard
+    page.evaluate_script('window.clipboard')
+  end
 end

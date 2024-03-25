@@ -53,7 +53,7 @@ module MessagesHelper
           flex items-center
         |,
         data: {
-          role: "clipboard",
+          role: "code-clipboard",
           action: %|
             clipboard#copy
             transition#toggleClassOn
@@ -62,8 +62,9 @@ module MessagesHelper
           keyboard_target: "keyboardable",
       }) do
         icon("clipboard", variant: :outline, size: 16, data: { transition_target: "transitionable" }, class: "-mt-[1px]") +
+        content_tag(:span, "Copy code", data: { transition_target: "transitionable" }, class: "ml-1") +
         icon("check",     variant: :outline, size: 16, data: { transition_target: "transitionable" }, class: "hidden") +
-        "<span class='ml-1'>Copy code</span>".html_safe
+        content_tag(:span, "Copied!", data: { transition_target: "transitionable" }, class: "hidden ml-1")
       end
     )
   end

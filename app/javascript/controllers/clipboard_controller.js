@@ -5,6 +5,7 @@ export default class extends Controller {
 
   copy() {
     navigator.clipboard.writeText(this.text)
+    window.clipboard = this.text // useful for automated system tests
   }
 
   get text() {
