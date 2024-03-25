@@ -66,6 +66,6 @@ export default class extends Controller {
 
   boundEnableComposer = () => { this.enableComposer() }
   enableComposer() {
-    this.inputTarget.reset()
+    this.element.reset()
   }
 }
