@@ -1,9 +1,12 @@
 module MessagesHelper
-  def parse(text)
+  def format(text)
     text = html_escape(text)
-    text = paired_single_backticks(text)
-    text = paired_triple_backticks(text)
-    text = copy_button(text)
+
+    if text.include?('`')
+      text = paired_single_backticks(text)
+      text = paired_triple_backticks(text)
+      text = copy_button(text)
+    end
 
     text.html_safe
   end
@@ -45,7 +48,8 @@ module MessagesHelper
             clipboard#copy
             transition#toggleClassOn
             mouseleave->transition#toggleClassOff
-          |
+          |,
+          keyboard_target: "keyboardable",
       }) do
         icon("clipboard", variant: :outline, size: 16, class: "-mt-[1px] tooltip-open", data: { transition_target: "transitionable" }) +
         icon("check", variant: :outline, size: 16, data: { transition_target: "transitionable" }, class: "hidden") +
