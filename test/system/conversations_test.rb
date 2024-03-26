@@ -93,9 +93,11 @@ class ConversationsTest < ApplicationSystemTestCase
     delete.click
     sleep 0.1
     confirm_delete = node("confirm-delete", within: convo)
-    confirm_delete.click
 
-    assert_text "Deleted conversation", wait: 0.5
+    confirm_delete.click
+    sleep 0.1
+
+    assert_text "Deleted conversation"
     refute convo.exists?
 
     assert_current_path(new_assistant_message_path users(:keith).assistants.ordered.first)
