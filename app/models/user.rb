@@ -17,8 +17,9 @@ class User < ApplicationRecord
   end
 
   def initials
-    return nil if first_name.blank? || last_name.blank?
-
-    first_name[0].capitalize + last_name[0].capitalize
+    [first_name, last_name]
+      .compact
+      .map { |name| name[0].capitalize }
+      .join
   end
 end
