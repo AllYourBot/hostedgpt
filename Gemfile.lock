@@ -173,7 +173,7 @@ GEM
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
-    pg (1.5.4)
+    pg (1.5.6)
     pgreset (0.4)
     prism (0.19.0)
     pry (0.14.2)
