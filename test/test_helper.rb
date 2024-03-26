@@ -43,5 +43,16 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+    setup do
+      if ActiveStorage::Current.respond_to?(:url_options)
+        ActiveStorage::Current.url_options = {host: 'example.com', protocol: 'https'}
+      else
+        ActiveStorage::Current.host = "https://example.com"
+      end
+    end
+
+    teardown do
+      ActiveStorage::Current.reset
+    end
   end
 end
