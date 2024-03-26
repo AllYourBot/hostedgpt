@@ -47,7 +47,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_equal existing_assistant.name, node("from", within: last_message).text
 
     click_text "Using #{new_assistant.name}"
-    sleep 0.1
+    sleep 0.3
     assert_equal new_assistant.name, node("from", within: last_message).text
   end
 
