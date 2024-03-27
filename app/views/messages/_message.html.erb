@@ -45,9 +45,9 @@
         <%= image_tag message.documents.first.file, class: "w-full h-auto border-2 border-gray-100 rounded-md" %>
       <% end %>
 
+      <div class="hidden" data-clipboard-target="text"><%= message.content_text %></div>
       <div
         data-role="content-text"
-        data-clipboard-target="text"
         class="prose break-words leading-normal"
       >
         <%= formatted_text = format(message.content_text) %>
