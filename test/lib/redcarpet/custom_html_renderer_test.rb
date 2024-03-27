@@ -22,6 +22,7 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
 
       Line after.
     MD
+
     formatted = <<~HTML
       <p>This is sql:</p>
 
@@ -42,6 +43,7 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
       ```
       Line after.
     MD
+
     formatted = <<~HTML
       <p>This is sql:</p>
 
@@ -54,7 +56,7 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
     assert_equal formatted, @renderer.render(markdown)
   end
 
-  test "block_code can be overridden with a proc" do
+  test "block_code can be provided with a proc" do
     markdown = <<~MD
       This is sql:
 
@@ -64,6 +66,7 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
 
       Line after.
     MD
+
     formatted = <<~HTML
       <p>This is sql:</p>
       <CODE lang="sql">SELECT * FROM users;
