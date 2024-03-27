@@ -7,7 +7,7 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
 
   test "code_span" do
     markdown = "This is `code` inline."
-    formatted = "<p>This is <code><span class=\"hidden\">`</span>code<code><span class=\"hidden\">`</span> inline.</p>\n"
+    formatted = "<p>This is <code><span class=\"hidden\">`</span>code<span class=\"hidden\">`</span></code> inline.</p>\n"
 
     assert_equal formatted, @renderer.render(markdown)
   end

@@ -148,7 +148,10 @@ popstate_event:
   assistant: keith_gpt4
   conversation: javascript
   role: assistant
-  content_text: popstate is an event in JavaScript that fires when the active history entry changes, typically due to the user navigating back or forward in their browser history.
+  content_text: |
+    Popstate is an event in JavaScript that fires when the active history entry changes, typically due to the user navigating back or forward in their browser history.
+
+    This is a second paragraph. This ends the response.
   content_document:
   run: popstate_response
   created_at: 2023-12-30 1:01:00

@@ -145,6 +145,14 @@ input:focus {
 
 /* Prose styling */
 
-.prose p {
+.prose :where(pre):not(:where([class~=not-prose] *)) {
+  @apply mx-0 mt-5 mb-3
+}
+
+.prose :where(.prose>:first-child):not(:where([class~=not-prose] *)) {
+  @apply mt-0
+}
+
+.prose :where(p):not(:where([class~=not-prose] *)) {
   @apply mb-3
 }

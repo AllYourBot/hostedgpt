@@ -9,7 +9,7 @@ export default class extends Controller {
   }
 
   get text() {
-    return this.removeExclusions(this.textTarget).innerText
+    return this.removeExclusions(this.textTarget).innerText?.trim()
   }
 
   removeExclusions(node) {

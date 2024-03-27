@@ -20,7 +20,7 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
   test "clicking copy on code block changes icon and copies to clipboard" do
     assert_nil clipboard
     node("code-clipboard", within: @code_msg).click
-    assert_equal "SELECT * FROM users\n", clipboard
+    assert_equal "SELECT * FROM users", clipboard
     assert_includes @code_msg.text, "Copied", "Copied should be in the header"
     refute_includes @code_msg.text, "Copy code", "Copy code should be in the header"
   end
@@ -28,7 +28,7 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
   test "using the overall keyboard shortcut for copying copies the code block within the last message" do
     assert_nil clipboard
     send_keys "meta+shift+c"
-    assert_equal "SELECT * FROM users\n", clipboard
+    assert_equal "SELECT * FROM users", clipboard
   end
 
   test "using the overall keyboard shortcut for copying copies the full last message where there is NO code block" do
@@ -38,6 +38,6 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
 
     assert_nil clipboard
     send_keys "meta+shift+c"
-    assert_equal conversation.messages.ordered.last.content_text, clipboard
+    assert_equal conversation.messages.ordered.last.content_text.strip, clipboard
   end
 end

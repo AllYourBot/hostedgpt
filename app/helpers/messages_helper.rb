@@ -6,7 +6,7 @@ module MessagesHelper
     block_code = ->(code, language) do
       content_tag(:pre,
         class: %|
-          p-0 m-0
+          p-0
           #{"language-#{language}" if language}
         |,
         data: {
