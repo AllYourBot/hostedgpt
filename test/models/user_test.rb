@@ -34,8 +34,16 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "KS", users(:keith).initials
   end
 
-  test "initials returns 1 single letter when last name is blank" do
+  test "initials returns 1 single letter when last name is nil or blank" do
+    users(:rob).update!(last_name: nil)
     assert_equal "R", users(:rob).initials
+    users(:rob).update!(last_name: "")
+    assert_equal "R", users(:rob).initials
+  end
+
+  test "initials returns nil when first name is blank" do
+    users(:rob).update_columns(first_name: "", last_name: "Smith")
+    assert_nil users(:rob).initials
   end
 
   test "full_name returns nil if first_name and last_name are both blank" do

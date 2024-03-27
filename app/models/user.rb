@@ -17,8 +17,10 @@ class User < ApplicationRecord
   end
 
   def initials
+    return nil if first_name.blank?
+
     [first_name, last_name]
-      .compact
+      .reject(&:blank?)
       .map { |name| name[0].capitalize }
       .join
   end
