@@ -19,10 +19,23 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
 
   test "clicking copy on code block changes icon and copies to clipboard" do
     assert_nil clipboard
+
     node("code-clipboard", within: @code_msg).click
     assert_equal "SELECT * FROM users", clipboard
+
     assert_includes @code_msg.text, "Copied", "Copied should be in the header"
     refute_includes @code_msg.text, "Copy code", "Copy code should be in the header"
+  end
+
+  test "clicking copy on the overall message that includes code copies everything to clipboard and adds in the backticks" do
+    assert_nil clipboard
+
+    @code_msg.hover
+    copy = node("clipboard", within: @code_msg)
+    copy.click
+
+    assert_equal messages(:im_a_bot).content_text.strip, clipboard
+    assert_shows_tooltip copy, "Copied!"
   end
 
   test "using the overall keyboard shortcut for copying copies the code block within the last message" do

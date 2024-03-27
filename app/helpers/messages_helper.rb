@@ -43,7 +43,7 @@ module MessagesHelper
           end
         end +
         div_tag(class: "px-4 py-3") do
-          span_tag("```#{language}\n", class: "hidden") +
+          span_tag("\n```#{language}\n", class: "hidden") +
           content_tag(:code, code, data: { clipboard_target: "text" }) +
           span_tag("```\n", class: "hidden")
         end
