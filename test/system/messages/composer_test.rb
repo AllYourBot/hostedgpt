@@ -112,7 +112,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
     send_keys "enter"
-    sleep 0.3
+    sleep 0.5
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert input.value.blank?

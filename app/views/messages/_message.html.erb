@@ -37,7 +37,7 @@
           data-transition-toggle-class="hidden"
           class="flex-1 min-w-0 ml-3 mr-8 text-base text-gray-950 dark:text-gray-100">
 
-      <div class="mt-[6px] font-semibold" data-role="from">
+      <div class="mt-[6px] mb-1 font-semibold" data-role="from">
         <%= message.user? ? 'You' : message.assistant.name %>
       </div>
 
@@ -45,11 +45,25 @@
         <%= image_tag message.documents.first.file, class: "w-full h-auto border-2 border-gray-100 rounded-md" %>
       <% end %>
 
-      <%# This div needs to be tightly wrapped around the content_text output because the whitespace formatting is important. %>
-      <div class="whitespace-pre-wrap" data-role="content-text" data-clipboard-target="text"
-        ><%= message.content_text %><div class="animate-breathe w-3 h-3 rounded-full bg-black dark:bg-white inline-block ml-1 <%= !thinking && 'hidden' %>"></div></div>
+      <div
+        data-role="content-text"
+        data-clipboard-target="text"
+        class="prose break-words leading-normal"
+      >
+        <%= formatted_text = format(message.content_text) %>
+        <div
+          class="
+            animate-breathe
+            w-3 h-3
+            rounded-full
+            bg-black dark:bg-white
+            inline-block
+            ml-1
+            <%= !thinking && 'hidden' %>
+          "></div>
+      </div>
 
-      <div class="flex justify-start invisible gap-2 mt-2 text-gray-600 dark:text-gray-300 group-hover:visible">
+      <div class="flex justify-start invisible gap-2 text-gray-600 dark:text-gray-300 group-hover:visible">
         <% if message.user? %>
           <%= button_tag type: "button",
                 data: {
@@ -68,7 +82,9 @@
                     clipboard#copy
                     transition#toggleClassOn
                     mouseleave->transition#toggleClassOff
-                  |
+                  |,
+                  keyboard_target: formatted_text.present? && formatted_text.exclude?('keyboard-target') ? "keyboardable" : nil,
+                  # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
           } do %>
             <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
             <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>

@@ -127,7 +127,7 @@
       >
         <%= button_tag type: "button",
               id: "attach-button",
-              class: "absolute left-9 bottom-6 w-[23px] h-[23px] relationship:hidden",
+              class: "absolute left-11 bottom-[26px] w-[23px] h-[23px] relationship:hidden",
               data: { action: "image-upload#choose" } do
         %>
           <%= icon "paper-clip",
@@ -253,7 +253,7 @@
   data-controller="modal"
   data-action="keydown@document->modal#open"
 >
-  <main class="modal-box max-w-4xl">
+  <main class="modal-box max-w-5xl">
     <header class="font-bold text-lg mb-5">
       Keyboard shortcuts
     </header>
@@ -263,7 +263,7 @@
           <figcaption class="flex-grow flex items-center">
             Open new chat
           </figcaption>
-          <kbd class="w-40 text-right">
+          <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl / ⌘</div>
             <div class="key">J</div>
           </kbd>
@@ -272,7 +272,7 @@
           <figcaption class="flex-grow flex items-center">
             Focus chat input
           </figcaption>
-          <kbd class="w-40 text-right">
+          <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">/</div>
           </kbd>
         </figure>
@@ -280,7 +280,7 @@
           <figcaption class="flex-grow flex items-center">
             Unfocus chat input
           </figcaption>
-          <kbd class="w-40 text-right">
+          <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">ESC</div>
           </kbd>
         </figure>
@@ -289,9 +289,19 @@
       <section class="flex-1 pl-0 md:pl-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
+            <span>Copy last response <span class="whitespace-nowrap">(or code)</span></span>
+          </figcaption>
+          <kbd class="w-50 text-right flex flex-row gap-1">
+            <div class="key">Ctrl / ⌘</div>
+            <div class="key">Shift</div>
+            <div class="key">C</div>
+          </kbd>
+        </figure>
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
             Toggle sidebar
           </figcaption>
-          <kbd class="w-40 text-right">
+          <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl / ⌘</div>
             <div class="key">.</div>
           </kbd>
@@ -300,7 +310,7 @@
           <figcaption class="flex-grow flex items-center">
             Show shortcuts
           </figcaption>
-          <kbd class="w-40 text-right">
+          <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">?</div>
           </kbd>
         </figure>
