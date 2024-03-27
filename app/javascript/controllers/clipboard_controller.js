@@ -5,9 +5,16 @@ export default class extends Controller {
 
   copy() {
     navigator.clipboard.writeText(this.text)
+    window.clipboard = this.text // useful for automated system tests
   }
 
   get text() {
-    return this.textTarget.innerText
+    return this.removeExclusions(this.textTarget).innerText?.trim()
+  }
+
+  removeExclusions(node) {
+    let clonedNode = node.cloneNode(true)
+    clonedNode.querySelectorAll('.clipboard-exclude').forEach(el => el.remove())
+    return clonedNode
   }
 }

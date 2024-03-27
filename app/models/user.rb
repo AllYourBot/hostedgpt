@@ -4,7 +4,8 @@ class User < ApplicationRecord
   has_secure_password
 
   validates :password, length: { minimum: 6 }, allow_nil: true
-  validates :first_name, :last_name, presence: true, on: :create
+  validates :first_name, presence: true
+  validates :last_name, presence: true, on: :create
 
   has_many :assistants, dependent: :destroy
   has_many :conversations, dependent: :destroy
@@ -16,8 +17,11 @@ class User < ApplicationRecord
   end
 
   def initials
-    return nil if first_name.blank? || last_name.blank?
+    return nil if first_name.blank?
 
-    first_name[0].capitalize + last_name[0].capitalize
+    [first_name, last_name]
+      .reject(&:blank?)
+      .map { |name| name[0].capitalize }
+      .join
   end
 end

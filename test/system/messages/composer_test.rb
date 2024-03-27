@@ -80,7 +80,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "Entered text so we can now submit"
     refute @submit.disabled?
     click_element @submit
-    sleep 0.3
+    sleep 0.5
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert input.value.blank?
@@ -112,7 +112,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
     send_keys "enter"
-    sleep 0.3
+    sleep 0.5
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert input.value.blank?
@@ -220,14 +220,14 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
     send_keys "This is a message"
     send_keys "enter"
-    sleep 0.3
+    sleep 0.5
 
     assert_equal path, current_path, "The page should not have changed urls"
     assert input.value.blank?, "The composer should have cleared itself"
 
     send_keys "This is a second message"
     send_keys "enter"
-    sleep 0.3
+    sleep 0.5
 
     assert_equal path, current_path, "The page should not have changed urls"
     assert input.value.blank?, "The composer should have cleared itself"

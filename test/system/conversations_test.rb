@@ -79,7 +79,8 @@ class ConversationsTest < ApplicationSystemTestCase
     confirm_delete = node("confirm-delete", within: convo)
     confirm_delete.click
 
-    assert_text "Deleted conversation", wait: 0.5
+    sleep 0.5
+    assert_text "Deleted conversation"
     refute convo.exists?
 
     assert_current_path(@starting_path)

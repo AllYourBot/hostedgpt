@@ -1,11 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static targets = [ "keyboardable" ]
+
   click() {
-    if (this.elementVisible()) this.element.click()
+    let element
+
+    if (this.hasKeyboardableTarget)
+      element = this.lastOfTheTargets
+    else
+      element = this.element
+
+    element.click()
   }
 
-  elementVisible() {
-    return (this.element.offsetParent != null)
+  get lastOfTheTargets() {
+    return this.keyboardableTargets.slice(-1)[0]
   }
 }

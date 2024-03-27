@@ -17,9 +17,16 @@ class UserTest < ActiveSupport::TestCase
     assert person.valid?
   end
 
-  test "although first & last name is required for create it's not required for update" do
+  test "should validate presence of first name" do
+    user = users(:keith)
+    user.update(first_name: nil)
+    refute user.valid?
+    assert_equal ["can't be blank"], user.errors[:first_name]
+  end
+
+  test "although last name is required for create it's not required for update" do
     assert_nothing_raised do
-      users(:keith).update!(first_name: nil, last_name: nil)
+      users(:keith).update!(last_name: nil)
     end
   end
 
@@ -27,11 +34,20 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "KS", users(:keith).initials
   end
 
-  test "initials returns nothing if missing first or last name" do
-    users(:keith).update!(first_name: nil, last_name: 'Schacht')
-    assert_nil users(:keith).initials
-    users(:keith).update!(first_name: 'Keith', last_name: nil)
-    assert_nil users(:keith).initials
+  test "initials returns 1 single letter when last name is nil or blank" do
+    users(:rob).update!(last_name: nil)
+    assert_equal "R", users(:rob).initials
+    users(:rob).update!(last_name: "")
+    assert_equal "R", users(:rob).initials
+  end
+
+  test "initials returns nil when first name is blank" do
+    users(:rob).update_columns(first_name: "", last_name: "Smith")
+    assert_nil users(:rob).initials
+  end
+
+  test "full_name returns nil if first_name and last_name are both blank" do
+    assert_nil User.new.full_name
   end
 
   test "it can update a user with a password" do
@@ -85,10 +101,6 @@ class UserTest < ActiveSupport::TestCase
     assert_raises ActiveRecord::RecordNotFound do
       conversation.reload
     end
-  end
-
-  test "full_name returns nil if first_name and last_name are both blank" do
-    assert_nil users(:rob).full_name
   end
 
   test "boolean values within preferences get converted back and forth properly" do
