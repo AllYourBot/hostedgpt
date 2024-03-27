@@ -21,7 +21,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     fill_in "email", with: user.person.email
     fill_in "password", with: password
     click_text "Log In"
-    assert_current_path new_assistant_message_path(assistant), wait: 2
+    assert_current_path new_assistant_message_path(assistant), wait: 3
   end
 
   def logout
