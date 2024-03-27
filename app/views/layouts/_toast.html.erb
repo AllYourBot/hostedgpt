@@ -6,19 +6,7 @@
         data-transition-after-timeout-value="3000"
   >
     <% flash.each do |type, text| %>
-      <%
-        alert_class = case type
-        when "notice"
-          "alert-info"
-        when "alert"
-          "alert-error"
-        else
-          "alert-info"
-        end
-      %>
-      <div class="alert <%= alert_class %>">
-        <span><%= text %></span>
-      </div>
+      <%= flash_tag(type, text) %>
     <% end %>
   </div>
 <% end %>

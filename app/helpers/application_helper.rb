@@ -30,7 +30,6 @@ module ApplicationHelper
       ) do
         heroicon name, **opts.slice(:size, :variant)
       end
-
     else
       content_tag(:div,
         class: classes,
@@ -39,6 +38,36 @@ module ApplicationHelper
       ) do
         heroicon name, **opts
       end
+    end
+  end
+
+  def flash_tag(type, text)
+    alert_class = case type
+      when "alert"
+        "error"
+      else
+        "info"
+      end
+    tag.div class: "alert alert-#{alert_class}" do
+      tag.span text
+    end
+  end
+
+  def span_tag(content_or_options_with_block = nil, options = nil, &block)
+    if block_given?
+      options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)
+      content_tag(:span, options, &block)
+    else
+      content_tag(:span, content_or_options_with_block, options)
+    end
+  end
+
+  def div_tag(content_or_options_with_block = nil, options = nil, &block)
+    if block_given?
+      options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)
+      content_tag(:div, options, &block)
+    else
+      content_tag(:div, content_or_options_with_block, options)
     end
   end
 end

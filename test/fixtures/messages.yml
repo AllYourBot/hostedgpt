@@ -67,7 +67,14 @@ im_a_bot:
   assistant: samantha
   conversation: greeting
   role: assistant
-  content_text: No, I'm a bot.
+  content_text: |
+    No, I'm a bot. I can also help with writing `code` such as:
+
+    ```sql
+    SELECT * FROM users
+    ```
+
+    And one more line beneath the code block.
   content_document:
   run: alive_response
   created_at: 2023-12-30 1:07:00
@@ -144,7 +151,10 @@ popstate_event:
   assistant: keith_gpt4
   conversation: javascript
   role: assistant
-  content_text: popstate is an event in JavaScript that fires when the active history entry changes, typically due to the user navigating back or forward in their browser history.
+  content_text: |
+    Popstate is an event in JavaScript that fires when the active history entry changes, typically due to the user navigating back or forward in their browser history.
+
+    This is a second paragraph. This ends the response.
   content_document:
   run: popstate_response
   created_at: 2023-12-30 1:01:00

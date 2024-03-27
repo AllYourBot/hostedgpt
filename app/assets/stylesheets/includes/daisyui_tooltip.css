@@ -170,3 +170,22 @@ dialog button:focus,
 dialog button:focus-visible {
   outline: none !important;
 }
+
+/* Code overrides — undoing */
+
+.prose :where(code):not(:where([class~=not-prose] *,pre *)) {
+  padding: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.prose :where(code):not(pre code):not(:where([class~=not-prose] *)):before,
+.prose :where(code):not(pre code):not(:where([class~=not-prose] *)):after {
+  content: '`';
+  display: inline-block;
+}
+
+:root .prose {
+  --tw-prose-pre-bg: #0d0d0d !important;
+  --tw-prose-pre-code: #ffffff !important;
+}

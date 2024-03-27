@@ -17,12 +17,15 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_shows_tooltip node("clipboard", within: msg), "Copy"
   end
 
-  test "clicking clipboard icon changes the tooltip" do
+  test "clicking clipboard icon changes the tooltip & icon to check, mousing out changes it back" do
     msg = hover_last_message
     clipboard = node("clipboard", within: msg)
 
     clipboard.click
     assert_shows_tooltip clipboard, "Copied!"
+
+    node("regenerate", within: msg).hover
+    assert_shows_tooltip clipboard, "Copy"
   end
 
   test "regenerate icon shows tooltip" do
@@ -44,7 +47,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_equal existing_assistant.name, node("from", within: last_message).text
 
     click_text "Using #{new_assistant.name}"
-    sleep 0.1
+    sleep 0.3
     assert_equal new_assistant.name, node("from", within: last_message).text
   end
 

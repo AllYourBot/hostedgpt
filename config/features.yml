@@ -1,0 +1,2 @@
+shared:
+  registration: <%= ENV.fetch("REGISTRATON_FEATURE", true) %>

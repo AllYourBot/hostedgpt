@@ -140,5 +140,19 @@ input:focus {
 /* Repeated visual components */
 
 .key {
-  @apply inline-block py-2 px-3 rounded-md border border-gray-300 text-sm min-w-9 text-center;
+  @apply py-2 px-3 rounded-md border border-gray-300 text-sm min-w-9 text-center whitespace-nowrap max-h-9 flex items-center;
+}
+
+/* Prose styling */
+
+.prose :where(pre):not(:where([class~=not-prose] *)) {
+  @apply mx-0 mt-5 mb-3
+}
+
+.prose :where(.prose>:first-child):not(:where([class~=not-prose] *)) {
+  @apply mt-0
+}
+
+.prose :where(p):not(:where([class~=not-prose] *)) {
+  @apply mb-3
 }

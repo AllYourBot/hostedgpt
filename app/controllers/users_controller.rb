@@ -3,6 +3,7 @@ class UsersController < ApplicationController
 
   layout "public"
 
+  before_action :ensure_registration, only: [:new, :create]
   before_action :set_user, only: [:update]
 
   def new
@@ -47,5 +48,9 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(preferences: [:nav_closed])
+  end
+
+  def ensure_registration
+    redirect_to root_path unless Feature.enabled?(:registration)
   end
 end

@@ -6,7 +6,14 @@
 
   <%= turbo_stream_from @conversation %>
 
-  <div class="min-w-full">
+  <div
+    class="min-w-full"
+    data-controller="keyboard"
+    data-action="
+      keydown.meta+shift+c@document->keyboard#click:prevent
+      keydown.ctrl+shift+c@document->keyboard#click:prevent
+    "
+  >
     <turbo-frame id="messages">  <%# development works w/o this frame but test does not %>
       <%= render @messages %>
     </turbo-frame>

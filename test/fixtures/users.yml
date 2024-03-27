@@ -8,6 +8,7 @@ keith:
   preferences: {}
 
 rob:
+  first_name: Rob
   password_digest: <%= BCrypt::Password.create('secret') %>
   registered_at: 2023-12-26 08:40:05
   openai_key: abc123
