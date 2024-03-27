@@ -1,9 +1,19 @@
 require "./lib/markdown_renderer"
 
 module MessagesHelper
-
   def format(text)
-    block_code = ->(code, language) do
+    safe_html = ::MarkdownRenderer.render(
+      text,
+      block_code: block_code
+    ).html_safe
+
+    return safe_html
+  end
+
+  private
+
+  def block_code
+    ->(code, language) do
       content_tag(:pre,
         class: %|
           p-0
@@ -49,12 +59,5 @@ module MessagesHelper
         end
       end
     end
-
-    safe_html = ::MarkdownRenderer.render(
-      text,
-      block_code: block_code
-    ).html_safe
-
-    return safe_html
   end
 end
