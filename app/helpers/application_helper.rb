@@ -52,4 +52,22 @@ module ApplicationHelper
       tag.span text
     end
   end
+
+  def span_tag(content_or_options_with_block = nil, options = nil, &block)
+    if block_given?
+      options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)
+      content_tag(:span, options, &block)
+    else
+      content_tag(:span, content_or_options_with_block, options)
+    end
+  end
+
+  def div_tag(content_or_options_with_block = nil, options = nil, &block)
+    if block_given?
+      options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)
+      content_tag(:div, options, &block)
+    else
+      content_tag(:div, content_or_options_with_block, options)
+    end
+  end
 end

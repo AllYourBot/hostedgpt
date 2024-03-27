@@ -142,3 +142,9 @@ input:focus {
 .key {
   @apply py-2 px-3 rounded-md border border-gray-300 text-sm min-w-9 text-center whitespace-nowrap max-h-9 flex items-center;
 }
+
+/* Prose styling */
+
+.prose p {
+  @apply mb-3
+}

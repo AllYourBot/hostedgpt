@@ -49,7 +49,7 @@
       <div
         data-role="content-text"
         data-clipboard-target="text"
-        class="prose break-words whitespace-pre-wrap leading-normal"
+        class="prose break-words leading-normal"
       ><%= formatted_text = format(message.content_text) %><div
         class="
           animate-breathe
@@ -60,7 +60,7 @@
           ml-1 <%= !thinking && 'hidden' %>"></div
       ></div>
 
-      <div class="flex justify-start invisible gap-2 mt-2 text-gray-600 dark:text-gray-300 group-hover:visible">
+      <div class="flex justify-start invisible gap-2 text-gray-600 dark:text-gray-300 group-hover:visible">
         <% if message.user? %>
           <%= button_tag type: "button",
                 data: {
