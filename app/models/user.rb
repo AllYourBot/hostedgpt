@@ -12,17 +12,4 @@ class User < ApplicationRecord
   has_many :conversations, dependent: :destroy
 
   serialize :preferences, coder: JsonSerializer
-
-  def full_name
-    "#{first_name} #{last_name}".strip.presence
-  end
-
-  def initials
-    return nil if first_name.blank?
-
-    [first_name, last_name]
-      .reject(&:blank?)
-      .map { |name| name[0].capitalize }
-      .join
-  end
 end

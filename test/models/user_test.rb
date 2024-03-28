@@ -30,17 +30,6 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "initials returns the proper two letters" do
-    assert_equal "KS", users(:keith).name.initials
-  end
-
-  test "initials returns 1 single letter when last name is nil or blank" do
-    users(:rob).update!(last_name: nil)
-    assert_equal "R", users(:rob).initials
-    users(:rob).update!(last_name: "")
-    assert_equal "R", users(:rob).initials
-  end
-
   test "it can update a user with a password" do
     user = users(:keith)
     old_password_hash = user.password_digest
