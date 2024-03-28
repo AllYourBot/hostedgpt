@@ -2,12 +2,10 @@ require "./lib/markdown_renderer"
 
 module MessagesHelper
   def format(text)
-    safe_html = ::MarkdownRenderer.render(
+    ::MarkdownRenderer.render(
       text,
       block_code: block_code
     ).html_safe
-
-    return safe_html
   end
 
   private
