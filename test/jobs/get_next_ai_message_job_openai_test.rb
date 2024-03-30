@@ -53,8 +53,6 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     refute GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
   end
 
-  # TODO: Be sure to test for cancelled_at case when we finish implementing cancelled
-
   test "returns early if the user has replied after this" do
     @conversation.messages.create! role: :user, content_text: "Ignore that, new question:", assistant: @conversation.assistant
     refute GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)

@@ -95,14 +95,21 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def generation_was_cancelled?
-    @message.cancelled? || (message_is_not_latest_in_conversation? && @message.not_rerequested?)
+    message_cancelled? ||
+      (newer_messages_in_conversation? && @message.not_rerequested?)
+  end
+
+  def message_cancelled?
+    @message.cancelled? ||
+      @message.id == redis_key("message-cancelled-id").to_i
+  end
+
+  def newer_messages_in_conversation?
+    @message != @conversation.latest_message ||
+      @message.id != redis_key("conversation-#{@conversation.id}-latest_message-id").to_i
   end
 
   def message_is_populated?
     @message.content_text.present?
-  end
-
-  def message_is_not_latest_in_conversation?
-    @message != @conversation.latest_message
   end
 end

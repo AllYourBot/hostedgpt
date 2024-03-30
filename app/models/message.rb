@@ -23,16 +23,19 @@ class Message < ApplicationRecord
   scope :ordered, -> { order(:created_at) }
 
   after_create :start_assistant_reply, if: -> { user? }
+  after_create :save_latest_message_id_to_redis
+
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
+  after_save :save_cancelled_id_to_redis, if: :cancelled_at_changed?
 
   private
 
-  def create_conversation
-    self.conversation = Conversation.create!(user: Current.user, assistant: assistant)
-  end
-
   def set_default_role
     self.role ||= :user
+  end
+
+  def create_conversation
+    self.conversation = Conversation.create!(user: Current.user, assistant: assistant)
   end
 
   def validate_conversation
@@ -47,8 +50,16 @@ class Message < ApplicationRecord
     conversation.messages.create! role: :assistant, content_text: "", assistant: assistant
   end
 
+  def save_latest_message_id_to_redis
+    redis_key("conversation-#{conversation_id}-latest_message-id") = id
+  end
+
   def update_assistant_on_conversation
     return if conversation.assistant == assistant
     conversation.update!(assistant: assistant)
+  end
+
+  def save_cancelled_id_to_redis
+    redis_key("message-cancelled-id") = id
   end
 end
