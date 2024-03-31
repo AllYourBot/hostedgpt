@@ -156,6 +156,7 @@ class MessageTest < ActiveSupport::TestCase
     end
 
     assert_equal conversation.latest_message.reload.id, redis.get("conversation-#{conversation.id}-latest_message-id")&.to_i
+    redis.set("conversation-#{conversation.id}-latest_message-id", previous_id)
   end
 
   test "when a conversation gets a message from a new assistant this propogates to the conversation" do
@@ -174,11 +175,11 @@ class MessageTest < ActiveSupport::TestCase
         messages(:im_a_bot).cancelled!
       end
     end
+
+    redis.set("message-cancelled-id", nil)
   end
 
-  private
-
   def redis
-    @redis ||= Redis.new
+    RedisConnection.client
   end
 end

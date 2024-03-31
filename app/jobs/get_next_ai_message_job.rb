@@ -126,6 +126,6 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def redis
-    @redis ||= Redis.new
+    RedisConnection.client
   end
 end

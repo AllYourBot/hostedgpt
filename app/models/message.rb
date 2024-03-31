@@ -59,7 +59,9 @@ class Message < ApplicationRecord
     redis.set("message-cancelled-id", id)
   end
 
+  private
+
   def redis
-    @redis ||= Redis.new
+    RedisConnection.client
   end
 end
