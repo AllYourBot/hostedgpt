@@ -2,6 +2,10 @@ class TestClients::OpenAI
   def initialize(access_token:)
   end
 
+  def self.text
+    nil
+  end
+
   # This response is a valid example response from the API.
   #
   # Stub this method to respond with something more specific if needed.
@@ -17,7 +21,7 @@ class TestClients::OpenAI
             "index"=>0,
             "delta"=>{
               "role"=>"assistant",
-              "content"=>"Hello! How can I assist you today?"
+              "content"=>self.class.text || "Hello! How can I assist you today?"
             },
             "logprobs"=>nil,
             "finish_reason"=>"stop"
@@ -37,7 +41,7 @@ class TestClients::OpenAI
             "index"=>0,
             "message"=>{
               "role"=>"assistant",
-              "content"=>"Hello! How can I assist you today?"
+              "content"=>self.class.text || "Hello! How can I assist you today?"
             },
             "logprobs"=>nil,
             "finish_reason"=>"stop"

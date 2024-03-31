@@ -15,4 +15,24 @@ Rails.application.config.to_prepare do
       end
     end
   end
+
+  Anthropic::HTTP.class_eval do
+    def json_post(path:, parameters:)
+      response = conn.post(uri(path: path)) do |req|
+        if parameters[:stream].is_a?(Proc)
+          req.options.on_data = to_json_stream(user_proc: parameters[:stream])
+          parameters[:stream] = true # Necessary to tell Anthropic to stream.
+        end
+
+        req.headers = headers
+        req.body = parameters.to_json
+      end
+
+      if response&.status != 200
+        raise ::Faraday::ParsingError
+      else
+        to_json(response&.body)
+      end
+    end
+  end
 end

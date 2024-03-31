@@ -36,11 +36,9 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
 
-    # TODO: With an invalid API key, anthropic is not throwing an exception and it's ending up here with an empty response
-
-    if @message.content_text.blank? # this shouldn't be needed b/c the += above will build up the response, but test
-                                    # env just returns a response w/o streaming and maybe that will happen in prod
+    if @message.content_text.blank? # this shouldn't happen b/c the += above will build up the response, but it's a final effort if things are blank
       @message.content_text = response if response.is_a?(String)
+      raise Faraday::ParsingError if @message.content_text.blank?
     end
 
     wrap_up_the_message
@@ -57,6 +55,10 @@ class GetNextAIMessageJob < ApplicationJob
     return true
   rescue Anthropic::ConfigurationError => e
     set_anthropic_error
+    wrap_up_the_message
+    return true
+  rescue Faraday::ParsingError => e
+    set_response_error
     wrap_up_the_message
     return true
   rescue Faraday::ConnectionFailed => e
@@ -81,13 +83,19 @@ class GetNextAIMessageJob < ApplicationJob
   private
 
   def set_openai_error
-    @message.content_text = "You need to enter a valid API key for OpenAI to use GPT-3.5 or GPT-4. Click your Profile in the bottom " +
-      "left and then Settings. You will find OpenAI Key instructions."
+    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT-3.5 or GPT-4. Click your Profile in the bottom " +
+      "left and then Settings. You will find OpenAI Key instructions.)"
   end
 
   def set_anthropic_error
-    @message.content_text = "You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
-      "left and then Settings. You will find Anthropic Key instructions."
+    @message.content_text = "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
+      "left and then Settings. You will find Anthropic Key instructions.)"
+  end
+
+  def set_response_error
+    @message.content_text = "(Received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
+      "experiencing trouble. Try again or ensure your API key is valid. You can change your API key by clicking your Profile in the bottom " +
+      "left and then settings."
   end
 
   def wrap_up_the_message
