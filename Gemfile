@@ -33,7 +33,7 @@ gem "tailwindcss-rails"
 
 # Use Redis adapter to run Action Cable in production
 gem "redis", ">= 4.0.1"
-gem "mock_redis"
+gem "mock_redis", "~> 0.44"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"

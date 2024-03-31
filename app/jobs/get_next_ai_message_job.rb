@@ -95,7 +95,7 @@ class GetNextAIMessageJob < ApplicationJob
   def set_response_error
     @message.content_text = "(Received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
       "experiencing trouble. Try again or ensure your API key is valid. You can change your API key by clicking your Profile in the bottom " +
-      "left and then settings."
+      "left and then settings.)"
   end
 
   def wrap_up_the_message
