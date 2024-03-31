@@ -19,6 +19,7 @@ class GetNextAIMessageJob < ApplicationJob
     return false if generation_was_cancelled? || message_is_populated?
 
     last_sent_at = Time.current
+    @message.content_text ||= ""
 
     response = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
       .get_next_chat_message do |content_chunk|
@@ -30,6 +31,7 @@ class GetNextAIMessageJob < ApplicationJob
         end
 
         if generation_was_cancelled?
+          @message.cancelled_at = Time.current
           raise ResponseCancelled
         end
       end
@@ -38,7 +40,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     if @message.content_text.blank? # this shouldn't be needed b/c the += above will build up the response, but test
                                     # env just returns a response w/o streaming and maybe that will happen in prod
-      @message.content_text = response
+      @message.content_text = response if response.is_a?(String)
     end
 
     wrap_up_the_message
@@ -95,21 +97,27 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def generation_was_cancelled?
+    @cancel_counter = @cancel_counter.to_i + 1 # we want to skip redis on first cancel check to ensure test env runs does a second check
+
     message_cancelled? ||
       (newer_messages_in_conversation? && @message.not_rerequested?)
   end
 
   def message_cancelled?
     @message.cancelled? ||
-      @message.id == redis_key("message-cancelled-id").to_i
+      (@cancel_counter > 1 && @message.id == redis.get("message-cancelled-id")&.to_i)
   end
 
   def newer_messages_in_conversation?
     @message != @conversation.latest_message ||
-      @message.id != redis_key("conversation-#{@conversation.id}-latest_message-id").to_i
+      (@cancel_counter > 1 && @message.id != redis.get("conversation-#{@conversation.id}-latest_message-id")&.to_i)
   end
 
   def message_is_populated?
     @message.content_text.present?
+  end
+
+  def redis
+    @redis ||= Redis.new
   end
 end

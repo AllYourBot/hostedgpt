@@ -3,6 +3,7 @@ require "./lib/redcarpet/custom_html_renderer"
 class MarkdownRenderer
 
   def self.render(markdown, options = {})
+    markdown ||= ""
     render_class = Redcarpet::CustomHtmlRenderer
 
     block_code_proc = options.delete(:block_code)
