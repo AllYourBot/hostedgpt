@@ -8,7 +8,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.workflow }}-${{ github.head_ref }}
+      group: ${{ github.workflow }}-${{ github.head_ref }}-test
       cancel-in-progress: true
     timeout-minutes: 2
     services:
@@ -48,7 +48,7 @@ jobs:
   system_tests:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.workflow }}-${{ github.head_ref }}
+      group: ${{ github.workflow }}-${{ github.head_ref }}-system
       cancel-in-progress: true
     services:
       postgres:
@@ -104,7 +104,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.workflow }}-${{ github.head_ref }}
+      group: ${{ github.workflow }}-${{ github.head_ref }}-lint
       cancel-in-progress: true
     steps:
       - name: Checkout code
