@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 export PORT="${PORT:-3000}"
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES # Issue https://github.com/rails/rails/issues/38560
 
 if command -v overmind > /dev/null 2>&1; then
   exec overmind start -f Procfile.dev "$@"
