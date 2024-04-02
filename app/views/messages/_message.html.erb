@@ -46,38 +46,28 @@
         <%= message.user? ? 'You' : message.assistant.name %>
       </div>
 
-      <% if message.has_document_image? %>
-        <%= button_tag type: "button",
-              class: "w-full h-auto flex",
-              data_action: "modal#open" do
-        %>
-          <%= image_tag message.document_image_url(:small),
-                class: %|
-                  flex-1
-                  border-2 border-gray-100
-                  rounded-md
-                |
-          %>
-        <% end %>
-
-        <dialog class="modal no-focus-outline">
-          <main class="modal-box max-w-5xl">
-            <article class="flex flex-col md:flex-row">
-              <%= image_tag message.document_image_url(:large), class: "w-full h-auto" %>
-            </article>
-          </main>
-          <form method="dialog" class="modal-backdrop no-focus-outline">
-            <button id="modal-backdrop">close</button>
-          </form>
-        </dialog>
-      <% end %>
-
       <div class="hidden" data-clipboard-target="text"><%= message.content_text %></div>
       <div
         data-role="content-text"
         class="prose break-words leading-normal"
         <%= thinking && "data-turbo-permanent" %>
       >
+        <% if message.has_document_image? %>
+          <%= button_tag type: "button",
+                class: "w-full h-auto flex",
+                data: { action: "modal#open" } do
+          %>
+            <%= image_tag message.document_image_url(:small),
+                  class: %|
+                    my-0
+                    mx-auto
+                    max-w-full
+                    border-2 border-gray-100
+                    rounded-md
+                  |
+            %>
+          <% end %>
+        <% end %>
         <%= formatted_text = format message.content_text,
               append_inside_tag: span_tag("", class: %|
                 animate-breathe
@@ -147,7 +137,19 @@
               <% end %>
             </menu>
           </div>
+        <% end %>
 
+        <% if message.has_document_image? %>
+          <dialog class="modal no-focus-outline" data-modal-target="dialog">
+            <main class="modal-box max-w-5xl p-0 rounded-none">
+              <article class="flex flex-col md:flex-row">
+                <%= image_tag message.document_image_url(:large), class: "w-full h-auto" %>
+              </article>
+            </main>
+            <form method="dialog" class="modal-backdrop no-focus-outline">
+              <button id="modal-backdrop">close</button>
+            </form>
+          </dialog>
         <% end %>
       </div>
     </div>

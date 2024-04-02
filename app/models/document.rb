@@ -3,7 +3,10 @@ class Document < ApplicationRecord
   belongs_to :assistant, optional: true
   belongs_to :message, optional: true
 
-  has_one_attached :file
+  has_one_attached :file do |file|
+    file.variant :small, resize_to_limit: [650, 490], preprocessed: true
+    file.variant :large, resize_to_limit: [1200, 900], preprocessed: true
+  end
 
   enum purpose: %w[fine-tune fine-tune-results assistants assistants_output].index_by(&:to_sym)
 
