@@ -84,7 +84,7 @@ class MessagesController < ApplicationController
       :conversation_id,
       :content_text,
       :assistant_id,
-      :assistant_rerequested_at,
+      :rerequested_at,
       documents_attributes: [:file])
   end
 end

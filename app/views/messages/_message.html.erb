@@ -7,7 +7,7 @@
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking = if thinking.nil?
                 (last_message && message.content_text.blank?) ||
-                (message.assistant_rerequested? && message.content_text.blank?)
+                (message.rerequested? && message.content_text.blank?)
               else
                 thinking
               end
@@ -110,7 +110,7 @@
                     method: :patch,
                     params: { message: {
                       content_text: nil,
-                      assistant_rerequested_at: Time.current,
+                      rerequested_at: Time.current,
                       assistant_id: assistant.id
                     } } do
                   %>

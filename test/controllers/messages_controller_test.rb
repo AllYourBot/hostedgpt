@@ -68,14 +68,14 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     patch message_url(@conversation.latest_message), params: { message: {
       content_text: nil,
-      assistant_rerequested_at: rerequested_at,
+      rerequested_at: rerequested_at,
       assistant_id: new_assistant_id,
     }}
     @conversation.latest_message.reload
 
     assert_redirected_to conversation_messages_url(@conversation)
     assert_nil @conversation.latest_message.content_text
-    assert_equal rerequested_at, @conversation.latest_message.assistant_rerequested_at
+    assert_equal rerequested_at, @conversation.latest_message.rerequested_at
     assert_equal new_assistant_id, @conversation.latest_message.assistant_id
   end
 

@@ -25,7 +25,7 @@ class Message < ApplicationRecord
   after_create :start_assistant_reply, if: -> { user? }
 
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
-  after_save :save_cancelled_id_to_redis, if: :saved_change_to_assistant_cancelled_at?
+  after_save :save_cancelled_id_to_redis, if: :saved_change_to_cancelled_at?
 
   private
 
