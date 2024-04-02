@@ -1,8 +1,11 @@
-<div class='w-full h-screen flex justify-center items-center flex-col space-y-4'>
+<div class='flex flex-col items-center justify-center w-full h-screen space-y-4'>
+
+  <%= inline_svg_tag("logo_iso", height: "32", width: "32", class:"text-black dark:text-brand-blue") %>
+
   <h2 class='text-3xl font-semibold'>Create your account</h2>
 
   <% if @person.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+    <div id="error_explanation" class="px-3 py-2 mt-3 font-medium text-red-500 rounded-lg bg-red-50">
       <ul>
         <% @person.errors.full_messages.reverse.each do |error| # We want the User error first %>
           <li><%= error.gsub('Personable ','').capitalize %><%# Cleanup "Personable password is ..." %></li>
@@ -71,6 +74,6 @@
           <% end %>
         </div>
     <% end %>
-    <%= f.submit "Sign Up", class: 'rounded bg-gray-200 dark:bg-gray-900 border border-gray-400 font-medium p-4 text-center cursor-pointer' %>
+    <%= f.submit "Sign Up", class: 'text-white bg-brand-blue dark:bg-gray-900 border border-white dark:border-gray-400 rounded-lg font-medium p-4 text-center cursor-pointer hover:opacity-95' %>
   <% end %>
 </div>
