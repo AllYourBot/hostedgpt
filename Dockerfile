@@ -1,6 +1,6 @@
 FROM ruby:3.2.3-alpine AS base
 
-RUN apk add --no-cache git build-base postgresql-dev curl-dev gcompat tzdata vips-dev
+RUN apk add --no-cache git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
 
 ENV BUNDLE_CACHE=/tmp/bundle \
   BUNDLE_JOBS=2 \
