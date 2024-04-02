@@ -1,4 +1,5 @@
 class MessagesController < ApplicationController
+  include ActiveStorage::SetCurrent
   include HasConversationStarter
 
   before_action :set_conversation, only: [:index]
