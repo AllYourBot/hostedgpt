@@ -98,7 +98,7 @@ class AIBackends::OpenAI
       else
         {
           role: message.role,
-          content: message.content_text
+          content: message.content_text || ""
         }
       end
     end

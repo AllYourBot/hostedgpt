@@ -18,7 +18,7 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
   end
 
   test "re-populates an earlier message from the assistant if it was provided and marked as re-requested" do
-    messages(:claude_replying).update!(rerequested_at: Time.current, content_text: nil)
+    messages(:claude_replying).update!(assistant_rerequested_at: Time.current, content_text: nil)
 
     assert_no_difference "@conversation.messages.reload.length" do
       assert GetNextAIMessageJob.perform_now(messages(:claude_replying).id, @conversation.assistant.id)

@@ -13,7 +13,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
 
     refute GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
     assert @message.content_text.blank?
-    assert_nil @message.cancelled_at
+    assert_nil @message.assistant_cancelled_at
   end
 
   test "if a new message is created AFTER job starts, it stops streaming - this tests the redis state" do
@@ -21,7 +21,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     @conversation.messages.where("id >= ?", m.id).delete_all # we are reverting the database change but the redis change persists
 
     assert_changes "@message.content_text", from: nil, to: @test_client.chat do
-      assert_changes "@message.reload.cancelled_at", from: nil do
+      assert_changes "@message.reload.assistant_cancelled_at", from: nil do
         assert GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
       end
     end
@@ -32,15 +32,15 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
 
     refute GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
     assert @message.content_text.blank?
-    assert_not_nil @message.cancelled_at
+    assert_not_nil @message.assistant_cancelled_at
   end
 
   test "if the cancel streaming button is clicked AFTER job starts, it does not process - this tests the redis state" do
     @message.cancelled! # this changes database column AND alters a redis state
-    @message.update!(cancelled_at: nil) # this undoes the column change but the redis state persists
+    @message.update!(assistant_cancelled_at: nil) # this undoes the column change but the redis state persists
 
     assert_changes "@message.content_text", from: nil, to: @test_client.chat do
-      assert_changes "@message.reload.cancelled_at", from: nil do
+      assert_changes "@message.reload.assistant_cancelled_at", from: nil do
         assert GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
       end
     end

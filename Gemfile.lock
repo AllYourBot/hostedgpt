@@ -359,7 +359,7 @@ DEPENDENCIES
   htmlbeautifier
   image_processing (~> 1.2)
   importmap-rails
-  mock_redis
+  mock_redis (~> 0.44)
   pg (~> 1.1)
   pgreset
   pry-rails

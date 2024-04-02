@@ -7,7 +7,7 @@
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking = if thinking.nil?
                 (last_message && message.content_text.blank?) ||
-                (message.rerequested? && message.content_text.blank?)
+                (message.assistant_rerequested? && message.content_text.blank?)
               else
                 thinking
               end
@@ -49,6 +49,7 @@
       <div
         data-role="content-text"
         class="prose break-words leading-normal"
+        <%= thinking && "data-turbo-permanent" %>
       >
         <%= formatted_text = format(message.content_text) %>
         <div
