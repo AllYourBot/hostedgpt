@@ -364,9 +364,9 @@ DEPENDENCIES
   htmlbeautifier
   image_processing (~> 1.2)
   importmap-rails
+  inline_svg (~> 1.7, >= 1.7.2)
   mock_redis (~> 0.44)
   name_of_person
-  inline_svg (~> 1.7, >= 1.7.2)
   pg (~> 1.1)
   pgreset
   pry-rails

@@ -97,9 +97,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_01_213532) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
-    t.datetime "assistant_rerequested_at"
-    t.datetime "assistant_cancelled_at"
-    t.datetime "assistant_started_at", precision: nil
+    t.datetime "rerequested_at"
+    t.datetime "cancelled_at"
+    t.datetime "processed_at", precision: nil
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
