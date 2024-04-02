@@ -4,8 +4,9 @@
 # This means using expiring, signed URLs that are meant for immediate access, not permanent linking.
 
 # TODO: I don't know what this next statement means. There is no BlobsController:
-# Always go through the BlobsController, or your own authenticated controller, rather than directly
-# to the service url.
+
+  # Always go through the BlobsController, or your own authenticated controller, rather than directly
+  # to the service url.
 
 class ActiveStorage::PostgresqlController < ActiveStorage::BaseController
   skip_forgery_protection

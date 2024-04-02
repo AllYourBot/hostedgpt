@@ -4,6 +4,6 @@ test:
 local:
   service: Postgresql
 
-local_public: # TODO: Figure out what this public mode is. Currently, we have a test for it.
+local_public:
   service: Postgresql
-  public: true
+  public: true # the generated URLs will not expire
