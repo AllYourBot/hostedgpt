@@ -179,6 +179,18 @@ class MessageTest < ActiveSupport::TestCase
     redis.set("message-cancelled-id", nil)
   end
 
+  test "has_document_image?" do
+    assert messages(:identify_photo).has_document_image?
+  end
+
+  test "document_image_url" do
+    assert messages(:identify_photo).document_image_url(:small)
+    assert messages(:identify_photo).document_image_url(:small).is_a?(String)
+    assert messages(:identify_photo).document_image_url(:small).starts_with?("https://")
+  end
+
+  private
+
   def redis
     RedisConnection.client
   end

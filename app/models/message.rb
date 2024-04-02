@@ -27,6 +27,15 @@ class Message < ApplicationRecord
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
   after_save :save_cancelled_id_to_redis, if: :saved_change_to_cancelled_at?
 
+  def has_document_image?
+    documents.present? && documents.first.file.attached?
+  end
+
+  def document_image_url(variant)
+    return nil unless has_document_image?
+    documents.first.file.representation(variant.to_sym).processed.url
+  end
+
   private
 
   def set_default_role
