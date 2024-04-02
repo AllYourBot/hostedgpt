@@ -77,7 +77,8 @@ class NavColumnTest < ApplicationSystemTestCase
   test "refreshing the page after closing sidebar keeps it closed" do
     assert_visible "nav"
     click_element "#handle"
-    assert_hidden "nav", wait: 0.2
+    sleep 0.3
+    assert_hidden "nav"
 
     visit current_path
     assert_hidden "nav", "The nav bar should have stayed closed."

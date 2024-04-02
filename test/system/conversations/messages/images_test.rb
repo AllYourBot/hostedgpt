@@ -15,9 +15,13 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
     assert image
     refute modal.visible?
+
     image.click
+    sleep 0.4
     assert modal.visible?
+
     send_keys "esc"
+    sleep 0.4
     refute modal.visible?
   end
 end
