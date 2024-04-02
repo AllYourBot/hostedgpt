@@ -1,11 +1,14 @@
 require "./lib/markdown_renderer"
 
 module MessagesHelper
-  def format(text)
-    ::MarkdownRenderer.render(
+  def format(text, append_inside_tag:)
+    html = ::MarkdownRenderer.render(
       text,
       block_code: block_code
-    ).html_safe
+    )
+
+    html = append(html, append_inside_tag) if append_inside_tag
+    return html.html_safe
   end
 
   private
@@ -54,6 +57,16 @@ module MessagesHelper
           content_tag(:code, code, data: { clipboard_target: "text" })
         end
       end
+    end
+  end
+
+  def append(html, to_append)
+    appended = html.html_safe.sub(/(<\/[^>]+>\n?)\z/, "#{to_append}\\1")
+
+    if appended != html
+      appended
+    else
+      html + to_append
     end
   end
 end

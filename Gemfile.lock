@@ -153,6 +153,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     minitest (5.22.3)
+    mock_redis (0.44.0)
     msgpack (1.7.2)
     multipart-post (2.3.0)
     mutex_m (0.2.0)
@@ -363,8 +364,9 @@ DEPENDENCIES
   htmlbeautifier
   image_processing (~> 1.2)
   importmap-rails
-  name_of_person
   inline_svg (~> 1.7, >= 1.7.2)
+  mock_redis (~> 0.44)
+  name_of_person
   pg (~> 1.1)
   pgreset
   pry-rails

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_25_124516) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_01_213532) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -34,6 +34,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_25_124516) do
     t.string "checksum"
     t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_files", force: :cascade do |t|
+    t.oid "oid"
+    t.string "key"
+    t.index ["key"], name: "index_active_storage_files_on_key", unique: true
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
@@ -99,6 +105,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_25_124516) do
     t.bigint "assistant_id", null: false
     t.datetime "rerequested_at"
     t.datetime "cancelled_at"
+    t.datetime "processed_at", precision: nil
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"

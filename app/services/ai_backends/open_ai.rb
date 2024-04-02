@@ -27,10 +27,15 @@ class AIBackends::OpenAI
   end
 
   def get_next_chat_message(&chunk_received_handler)
+    stream_response_text = ""
+
     response_handler = proc do |intermediate_response, bytesize|
       chunk = intermediate_response.dig("choices", 0, "delta", "content")
       print chunk if Rails.env.development?
-      yield chunk if chunk
+      if chunk
+        stream_response_text += chunk
+        yield chunk
+      end
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue ::Faraday::UnauthorizedError => e
@@ -53,10 +58,16 @@ class AIBackends::OpenAI
       raise OpenAI::ConfigurationError
     end
 
-    if response.is_a?(Hash) && response.dig("choices")
+    response_text = if response.is_a?(Hash) && response.dig("choices")
       response.dig("choices", 0, "message", "content")
     else
       response
+    end
+
+    if response_text.blank? && stream_response_text.blank?
+      raise ::Faraday::ParsingError
+    else
+      response_text
     end
   end
 
@@ -87,7 +98,7 @@ class AIBackends::OpenAI
       else
         {
           role: message.role,
-          content: message.content_text
+          content: message.content_text || ""
         }
       end
     end

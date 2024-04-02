@@ -3,7 +3,8 @@ require "test_helper"
 class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
   setup do
     @conversation = conversations(:hello_claude)
-    @message = @conversation.messages.create! role: :assistant, content_text: "", assistant: @conversation.assistant
+    @conversation.messages.create! role: :user, content_text: "Still there?", assistant: @conversation.assistant
+    @message = @conversation.latest_message
     @test_client = TestClients::Anthropic.new(access_token: 'abc')
   end
 
@@ -28,7 +29,7 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
     assert_not_equal message_text, @conversation.latest_message.content_text
   end
 
-  test "returns early if attempting to re-populate an earlier message from the assistant if it was provided but NOT marked as re-requested" do
+  test "returns early if attempting to re-populate an earlier message from the assistant was provided but it was NOT marked as re-requested" do
     messages(:claude_replying).update!(content_text: nil)
 
     assert_no_difference "@conversation.messages.reload.length" do
@@ -53,21 +54,23 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
     refute GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
   end
 
-  # TODO: Be sure to test for cancelled_at case when we finish implementing cancelled
-
   test "returns early if the user has replied after this" do
     @conversation.messages.create! role: :user, content_text: "Ignore that, new question:", assistant: @conversation.assistant
     refute GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
   end
 
-  test "when openai key is blank, a nice error message is displayed" do
+  test "when anthropic key is blank, a nice error message is displayed" do
     user = conversations(:greeting).user
     user.update!(anthropic_key: "")
 
-    assert_no_difference "@conversation.messages.reload.length" do
-      assert GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
-    end
-
+    assert GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
     assert_includes @conversation.latest_message.content_text, "need to enter a valid API key for Anthropic"
+  end
+
+  test "when API response key is, a nice error message is displayed" do
+    TestClients::Anthropic.stub :text, "" do
+      assert GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
+      assert_includes @conversation.latest_message.content_text, "a blank response"
+    end
   end
 end
