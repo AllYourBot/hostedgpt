@@ -4,10 +4,8 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
   setup do
     @user = users(:keith)
     login_as @user
-    @long_conversation = conversations(:greeting)
-
-    click_text @long_conversation.title
-    sleep 0.2
+    @conversation = conversations(:greeting)
+    visit conversation_messages_path(@conversation)
     @code_msg = last_message
   end
 

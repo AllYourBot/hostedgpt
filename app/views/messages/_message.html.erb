@@ -55,7 +55,10 @@
         <% if message.has_document_image? %>
           <%= button_tag type: "button",
                 class: "w-full h-auto flex",
-                data: { action: "modal#open" } do
+                data: {
+                  action: "modal#open",
+                  role: "image-preview"
+                } do
           %>
             <%= image_tag message.document_image_url(:small),
                   class: %|
@@ -140,7 +143,7 @@
         <% end %>
 
         <% if message.has_document_image? %>
-          <dialog class="modal no-focus-outline" data-modal-target="dialog">
+          <dialog class="modal no-focus-outline" data-modal-target="dialog" data-role="image-modal">
             <main class="modal-box max-w-5xl p-0 rounded-none">
               <article class="flex flex-col md:flex-row">
                 <%= image_tag message.document_image_url(:large), class: "w-full h-auto" %>
