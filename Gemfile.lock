@@ -156,6 +156,8 @@ GEM
     msgpack (1.7.2)
     multipart-post (2.3.0)
     mutex_m (0.2.0)
+    name_of_person (1.1.3)
+      activesupport (>= 5.2.0)
     net-imap (0.4.10)
       date
       net-protocol
@@ -361,6 +363,7 @@ DEPENDENCIES
   htmlbeautifier
   image_processing (~> 1.2)
   importmap-rails
+  name_of_person
   inline_svg (~> 1.7, >= 1.7.2)
   pg (~> 1.1)
   pgreset

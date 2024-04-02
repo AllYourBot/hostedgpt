@@ -49,26 +49,18 @@
           %>
         <% end %>
 
-        <div  class="
+        <div class="
                     <%= @person.errors.any? ? 'max-h-40' : 'max-h-0' %> overflow-hidden
                     flex flex-col
                     transition-all duration-100 ease-in
                     space-y-4
                     "
-              data-transition-target="transitionable">
+            data-transition-target="transitionable">
 
-          <%= user_fields.label :first_name, class: "input input-bordered flex items-center justify-between" do %>
-            <span>First name <span class="">*</span></span>
-            <%= user_fields.text_field :first_name,
-              placeholder: "First name",
-              class: "w-44 border-0 dark:text-black"
-            %>
-          <% end %>
-
-          <%= user_fields.label :last_name, class: "input input-bordered flex items-center justify-between" do %>
-            <span>Last name <span class="">*</span></span>
-            <%= user_fields.text_field :last_name,
-              placeholder: "Last name",
+          <%= user_fields.label :name, class: "input input-bordered flex items-center justify-between" do %>
+            <span>Name <span class="">*</span></span>
+            <%= user_fields.text_field :name,
+              placeholder: "First & Last name",
               class: "w-44 border-0 dark:text-black"
             %>
           <% end %>

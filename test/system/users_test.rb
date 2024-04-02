@@ -12,24 +12,21 @@ class UsersTest < ApplicationSystemTestCase
     assert_visible "#person_email", wait: 0.2
     assert_visible "#person_personable_attributes_password"
 
-    assert_hidden "#person_personable_attributes_first_name"
-    assert_hidden "#person_personable_attributes_last_name"
+    assert_hidden "#person_personable_attributes_name"
 
     fill_in "Email", with: "email@email.com"
     fill_in "Password", with: "secret"
 
     sleep 0.1
 
-    assert_visible "#person_personable_attributes_first_name"
-    assert_visible "#person_personable_attributes_last_name"
+    assert_visible "#person_personable_attributes_name"
 
     fill_in "Email", with: "changed@email.com"
     fill_in "Password", with: "secret" # this triggers a second focus event
 
     sleep 0.1
 
-    assert_visible "#person_personable_attributes_first_name"
-    assert_visible "#person_personable_attributes_last_name"
+    assert_visible "#person_personable_attributes_name"
   end
 
   test "should display errors if fields are left blank" do
@@ -45,8 +42,7 @@ class UsersTest < ApplicationSystemTestCase
 
     fill_in "Email", with: "tester@test.com"
     fill_in "Password", with: "secret"
-    fill_in "First name", with: "John"
-    fill_in "Last name", with: "Doe"
+    fill_in "Name", with: "John Doe"
 
     click_text "Sign Up"
 

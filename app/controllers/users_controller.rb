@@ -42,7 +42,7 @@ class UsersController < ApplicationController
 
   def person_params
     params.require(:person).permit(:email, :personable_type, personable_attributes: [
-      :first_name, :last_name, :password
+      :name, :password
     ])
   end
 

@@ -9,9 +9,7 @@ class Person < ApplicationRecord
 
   scope :ordered, -> { order(:created_at) }
 
-  def email=(email)
-    super(email.strip.downcase)
-  end
+  normalizes :email, with: -> email { email.downcase.strip }
 
   private
 
