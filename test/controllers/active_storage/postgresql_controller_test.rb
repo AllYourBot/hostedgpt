@@ -132,23 +132,14 @@ class ActiveStorage::PostgresqlControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # TODO: On Mac, this test cannot be run in a parallel process (i.e. bin/rails test). It results in:
-  #  objc[81801]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called.
-  #  We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on
-  #  objc_initializeAfterForkError to debug.
-  #  Issue: https://github.com/rails/rails/issues/38560
-  #
-  # On Mac we can do: export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES  but that cannot be added to .env or any other way
-  # to make it seamless. Commenting out this test until we have a better fix.
-  #
-  # test "showing public blob variant" do
-  #   with_service(:local_public) do
-  #     blob = create_file_blob.variant(resize_to_limit: [100, 100]).processed
-  #     get blob.send(url_method)
-  #     assert_response :ok
-  #     assert_equal "image/jpeg", response.headers["Content-Type"]
-  #   end
-  # end
+  test "showing public blob variant" do
+    with_service(:local_public) do
+      blob = create_file_blob.variant(resize_to_limit: [100, 100]).processed
+      get blob.send(url_method)
+      assert_response :ok
+      assert_equal "image/jpeg", response.headers["Content-Type"]
+    end
+  end
 
   test "directly uploading blob with invalid token" do
     put update_rails_postgresql_service_url(encoded_token: "invalid"),
