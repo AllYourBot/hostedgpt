@@ -80,6 +80,11 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:conversation_id, :content_text, :assistant_id, :rerequested_at, documents_attributes: [:file])
+    params.require(:message).permit(
+      :conversation_id,
+      :content_text,
+      :assistant_id,
+      :rerequested_at,
+      documents_attributes: [:file])
   end
 end

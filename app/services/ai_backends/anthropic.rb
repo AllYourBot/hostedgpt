@@ -27,10 +27,15 @@ class AIBackends::Anthropic
   end
 
   def get_next_chat_message(&chunk_received_handler)
+    stream_response_text = ""
+
     response_handler = proc do |intermediate_response, bytesize|
       chunk = intermediate_response.dig("delta", "text")
       print chunk if Rails.env.development?
-      yield chunk if chunk
+      if chunk
+        stream_response_text += chunk
+        yield chunk
+      end
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue ::Faraday::UnauthorizedError => e
@@ -56,10 +61,16 @@ class AIBackends::Anthropic
       raise Anthropic::ConfigurationError
     end
 
-    if response.is_a?(Hash) && response.dig("content")
+    response_text = if response.is_a?(Hash) && response.dig("content")
       response.dig("content", 0, "text")
     else
       response
+    end
+
+    if response_text.blank? && stream_response_text.blank?
+      raise ::Faraday::ParsingError
+    else
+      response_text
     end
   end
 
@@ -87,7 +98,7 @@ class AIBackends::Anthropic
       else
         {
           role: message.role,
-          content: message.content_text
+          content: message.content_text || ""
         }
       end
     end

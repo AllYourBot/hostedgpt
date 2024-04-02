@@ -49,18 +49,19 @@
       <div
         data-role="content-text"
         class="prose break-words leading-normal"
+        <%= thinking && "data-turbo-permanent" %>
       >
-        <%= formatted_text = format(message.content_text) %>
-        <div
-          class="
-            animate-breathe
-            w-3 h-3
-            rounded-full
-            bg-black dark:bg-white
-            inline-block
-            ml-1
-            <%= !thinking && 'hidden' %>
-          "></div>
+        <%= formatted_text = format message.content_text,
+              append_inside_tag: span_tag("", class: %|
+                animate-breathe
+                w-3 h-3
+                rounded-full
+                bg-black dark:bg-white
+                inline-block
+                ml-1
+                #{!thinking && 'hidden'}
+              |)
+        %>
       </div>
 
       <div class="flex justify-start invisible gap-2 text-gray-600 dark:text-gray-300 group-hover:visible">

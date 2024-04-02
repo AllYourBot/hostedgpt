@@ -7,6 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref }}-test
+      cancel-in-progress: true
     timeout-minutes: 2
     services:
       postgres:
@@ -44,6 +47,9 @@ jobs:
 
   system_tests:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref }}-system
+      cancel-in-progress: true
     services:
       postgres:
         image: postgres:16.1
@@ -97,6 +103,9 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref }}-lint
+      cancel-in-progress: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
