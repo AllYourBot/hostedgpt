@@ -28,7 +28,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   end
 
   test "if the cancel streaming button is clicked BEFORE job starts, it does not process" do
-    @message.cancelled!
+    @message.assistant_cancelled!
 
     refute GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
     assert @message.content_text.blank?
@@ -36,7 +36,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   end
 
   test "if the cancel streaming button is clicked AFTER job starts, it does not process - this tests the redis state" do
-    @message.cancelled! # this changes database column AND alters a redis state
+    @message.assistant_cancelled! # this changes database column AND alters a redis state
     @message.update!(assistant_cancelled_at: nil) # this undoes the column change but the redis state persists
 
     assert_changes "@message.content_text", from: nil, to: @test_client.chat do

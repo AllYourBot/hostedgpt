@@ -172,7 +172,7 @@ class MessageTest < ActiveSupport::TestCase
 
     assert_changes "messages(:im_a_bot).assistant_cancelled_at", from: nil do
       assert_changes "redis.get('message-cancelled-id')&.to_i", to: messages(:im_a_bot).id do
-        messages(:im_a_bot).cancelled!
+        messages(:im_a_bot).assistant_cancelled!
       end
     end
 
