@@ -26,13 +26,17 @@ class Document < ApplicationRecord
 
   def file_base64
     return nil if !file.attached?
+    wait_for_file_variant_to_process!(:large)
 
-    base64 = file.blob.open do |file|
-      Base64.strict_encode64(file.read)
-    end
+    file_contents = file.variant(:large).processed.download
+    base64 = Base64.strict_encode64(file_contents)
   end
 
   private
+
+  def wait_for_file_variant_to_process!(variant)
+    file.variant(variant.to_sym).processed # this blocks until processing is done
+  end
 
   def file_present
     errors.add(:file, "must be attached") unless file.attached?

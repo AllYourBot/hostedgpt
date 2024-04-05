@@ -51,7 +51,7 @@ class GetNextAIMessageJob < ApplicationJob
     return true
 
   rescue ResponseCancelled => e
-    puts "\nResponse cancelled" if Rails.env.development?
+    puts "\nResponse cancelled in GetNextAIMessageJob(#{message_id})" if Rails.env.development?
     wrap_up_the_message
     return true
   rescue OpenAI::ConfigurationError => e
@@ -71,6 +71,7 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_message
     return true
   rescue WaitForPrevious
+    puts "\nWaitForPrevious in GetNextAIMessageJob(#{message_id})" if Rails.env.development?
     raise WaitForPrevious
   rescue => e
     unless Rails.env.test?
