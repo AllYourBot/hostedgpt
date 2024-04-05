@@ -31,9 +31,12 @@ class Message < ApplicationRecord
     documents.present? && documents.first.file.attached?
   end
 
-  def document_image_url(variant)
+  def document_image_path(variant)
     return nil unless has_document_image?
-    documents.first.file.representation(variant.to_sym).processed.url
+    Rails.application.routes.url_helpers.rails_representation_url(
+      documents.first.file.representation(variant.to_sym),
+      only_path: true
+    )
   end
 
   private
