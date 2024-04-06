@@ -78,6 +78,18 @@ module ActiveStorage
     end
 
     def generate_url(key, expires_in:, filename:, disposition:, content_type:)
+      # This is a hack to support reliable system tests. Specifically, URLs for active_storage postgres images begin by hitting:
+      #   /rails/active_storage/representations/redirect/:key/:filename?disposition=
+      # When that is deciding where to redirect to, it ends up calling generate_url() and disposition gets passed in:
+      #   https://github.com/rails/rails/blob/main/activestorage/app/controllers/active_storage/representations/redirect_controller.rb
+      # The value of disposition is nil, inline, or attachment. In our code it's always nil but regardless we are overloading
+      # disposition by expecting something like "inline-2". If there is a dash, we split on that and assume anything after it is
+      # a counter. The only place we're doing this is in image_loader_controller.js and it's for the purpose of a test we wrote
+      # in image_test.rb.
+      disposition, counter = disposition.to_s.split("-")
+      counter = counter.to_i
+      # End hack
+
       instrument :url, key: key do |payload|
         content_disposition = content_disposition_with(type: disposition, filename: filename)
         verified_key_with_expiration = ActiveStorage.verifier.generate(
@@ -94,7 +106,8 @@ module ActiveStorage
           **url_options,
           disposition: content_disposition,
           content_type: content_type,
-          filename: filename
+          filename: filename,
+          retry_count: counter
         )
         payload[:url] = generated_url
 

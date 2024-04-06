@@ -153,6 +153,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     minitest (5.22.3)
+    minitest-stub_any_instance (1.0.3)
     mock_redis (0.44.0)
     msgpack (1.7.2)
     multipart-post (2.3.0)
@@ -365,6 +366,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   inline_svg (~> 1.7, >= 1.7.2)
+  minitest-stub_any_instance
   mock_redis (~> 0.44)
   name_of_person
   pg (~> 1.1)

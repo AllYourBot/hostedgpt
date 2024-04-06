@@ -178,10 +178,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     page.driver.browser.manage.window.resize_to(width, height)
   end
 
-  def node(label, within:)
-    within.find("[data-role='#{label}']")
-  end
-
   def find_messages
     all("#conversation [data-role='message']").to_a
   end
@@ -196,5 +192,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def clipboard
     page.evaluate_script('window.clipboard')
+  end
+end
+
+class Capybara::Node::Element
+  def find_role(label)
+    elem = find("[data-role='#{label}']", visible: false) rescue nil
+    elem = find("[data-role='#{label}']") if elem.nil?
+    elem
   end
 end

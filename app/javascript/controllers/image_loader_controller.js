@@ -43,7 +43,7 @@ export default class extends Controller {
       setTimeout(() => {
         let srcBase = this.imageTarget.src.split("?")[0]
         let separator = this.imageTarget.src.includes("?") ? "&" : "?"
-        this.imageTarget.src = `${srcBase}${separator}${new Date().getTime()}`
+        this.imageTarget.src = `${srcBase}${separator}disposition=-${this.retryCount}`
       }, this.retryAfterMs)
     }
   }

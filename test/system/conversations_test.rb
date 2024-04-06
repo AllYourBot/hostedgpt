@@ -26,12 +26,12 @@ class ConversationsTest < ApplicationSystemTestCase
 
   test "edit icon shows a tooltip" do
     convo = hover_conversation conversations(:greeting)
-    assert_shows_tooltip node("edit", within: convo), "Rename"
+    assert_shows_tooltip convo.find_role("edit"), "Rename"
   end
 
   test "clicking conversation edits icon enables edit, unfocusing submits it" do
     convo = hover_conversation conversations(:greeting)
-    node("edit", within: convo).click
+    convo.find_role("edit").click
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
     find("body").click
@@ -43,7 +43,7 @@ class ConversationsTest < ApplicationSystemTestCase
 
   test "clicking conversation edits icon enables edit, pressing Enter submits it" do
     convo = hover_conversation conversations(:greeting)
-    node("edit", within: convo).click
+    convo.find_role("edit").click
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
     send_keys "enter"
@@ -55,7 +55,7 @@ class ConversationsTest < ApplicationSystemTestCase
 
   test "clicking conversation edits it and pressing Esc aborts the edit and does not save" do
     convo = hover_conversation conversations(:greeting)
-    node("edit", within: convo).click
+    convo.find_role("edit").click
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
     send_keys "esc"
@@ -67,16 +67,16 @@ class ConversationsTest < ApplicationSystemTestCase
 
   test "delete icon shows a tooltip" do
     convo = hover_conversation conversations(:greeting)
-    assert_shows_tooltip node("delete", within: convo), "Delete"
+    assert_shows_tooltip convo.find_role("delete"), "Delete"
   end
 
   test "clicking the conversation delete, when you ARE NOT on this conversation, deletes it and the url does not change" do
     convo = hover_conversation conversations(:greeting)
-    delete = node("delete", within: convo)
+    delete = convo.find_role("delete")
 
     delete.click
     sleep 0.1
-    confirm_delete = node("confirm-delete", within: convo)
+    confirm_delete = convo.find_role("confirm-delete")
     confirm_delete.click
 
     sleep 0.5
@@ -89,11 +89,11 @@ class ConversationsTest < ApplicationSystemTestCase
   test "clicking the conversation delete, when you ARE not on this conversation, deletes it and redirects you to a new conversation" do
     visit conversation_messages_path(conversations(:greeting))
     convo = hover_conversation conversations(:greeting)
-    delete = node("delete", within: convo)
+    delete = convo.find_role("delete")
 
     delete.click
     sleep 0.1
-    confirm_delete = node("confirm-delete", within: convo)
+    confirm_delete = convo.find_role("confirm-delete")
 
     confirm_delete.click
     sleep 0.1
