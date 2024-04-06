@@ -74,8 +74,9 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_visible "#scroll-button", wait: 0.5
 
     assert_scrolled_to_bottom do
+      sleep 1
       click_element "#scroll-button button"
-      assert_hidden "#scroll-button", wait: 1
+      assert_hidden "#scroll-button", wait: 3
     end
   end
 

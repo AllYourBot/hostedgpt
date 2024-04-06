@@ -59,7 +59,8 @@
                   controller: "image-loader",
                   image_loader_url_value: message.document_image_path(:small),
                   action: "modal#open",
-                  role: "image-preview"
+                  role: "image-preview",
+                  turbo_permanent: "",
                 } do
           %>
             <%= image_tag "",
@@ -160,6 +161,7 @@
               <article
                 data-controller="image-loader"
                 data-image-loader-url-value="<%= message.document_image_path(:large) %>"
+                data-turbo-permanent
                 class="flex flex-col md:flex-row justify-center"
               >
                 <%= image_tag "",
