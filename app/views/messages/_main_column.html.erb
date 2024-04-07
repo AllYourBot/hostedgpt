@@ -103,7 +103,7 @@
   <section class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip scrollbar-hide" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
 
     <div id="messages" class="relative flex-grow overflow-y-auto overflow-x-clip scrollbar-hide overscroll-contain" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
-      <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
+      <div id="messages-container" class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
         <%= yield :messages %>
       </div>
     </div>

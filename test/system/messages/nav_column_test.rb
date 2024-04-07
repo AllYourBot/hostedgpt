@@ -6,6 +6,15 @@ class NavColumnTest < ApplicationSystemTestCase
     login_as @user
   end
 
+  test "clicking conversation in the left column updates the right and preserves scroll position of the left" do
+    resize_browser_to(1400, 500)
+    page.execute_script("document.querySelector('#nav-scrollable').scrollTop = 100") # scroll the nav column down slightly
+
+    assert_did_not_scroll "#nav-scrollable" do
+      click_text conversations(:hello_claude).title
+    end
+  end
+
   test "clicking conversations in the left side updates the right column, the path, and back button works as expected" do
     assistant = @user.assistants.ordered.first
 
