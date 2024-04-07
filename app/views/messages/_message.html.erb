@@ -54,7 +54,7 @@
       >
         <% if message.has_document_image? %>
           <%= button_tag type: "button",
-                class: "w-full h-auto flex",
+                class: "w-full h-auto flex focus:outline-none",
                 data: {
                   controller: "image-loader",
                   image_loader_url_value: message.document_image_path(:small),
@@ -75,7 +75,7 @@
                     my-0
                     mx-auto
                     max-w-full
-                    border-2 border-gray-100
+                    border-2 border-gray-100 dark:border-gray-400
                     rounded-md
                   |
             %>
