@@ -18,3 +18,9 @@ document.addEventListener('turbo:before-stream-render', (event) => {
   console.log(`${stream.getAttribute('action')} event - ${newTimestamp} ${newTimestamp <= oldTimestamp ? 'REORDER!' : ''}`, stream)
   oldTimestamp = newTimestamp
 })
+
+console.log('refresh document')
+document.addEventListener('turbo:visit', (event) => console.log(`visit ${event.detail.action}`))
+document.addEventListener('turbo:morph', () => console.log('morph render'))
+document.addEventListener('turbo:frame-render', () => console.log('frame render'))
+document.addEventListener('turbo:before-stream-render', () => console.log('stream render'))

@@ -121,12 +121,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     page.execute_script("document.querySelector('#{selector}').scrollTop = document.querySelector('#{selector}').scrollHeight")
   end
 
-  def assert_did_not_scroll(selector = "section #messages")
+  def assert_did_not_scroll(selector = "section #messages-container")
     raise "No block given" unless block_given?
 
-    scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').firstElementChild.getBoundingClientRect().top")
+    scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
     yield
-    new_scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').firstElementChild.getBoundingClientRect().top")
+    new_scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
 
     assert_equal scroll_position_first_element_relative_viewport,
       new_scroll_position_first_element_relative_viewport,
