@@ -118,7 +118,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   test "clicking new compose icon in the top-right starts a new conversation and preserves sidebar scroll" do
     click_text @long_conversation.title
 
-    assert_did_not_scroll("nav") do
+    assert_did_not_scroll("#nav-scrollable") do
       new_chat = node("new", within: this_conversation)
       assert_shows_tooltip new_chat, "New chat"
 

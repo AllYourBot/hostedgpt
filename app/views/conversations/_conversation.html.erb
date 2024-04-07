@@ -15,9 +15,11 @@
 
     <%= link_to conversation.title.presence || "New chat",
       conversation_messages_path(conversation),
-      target: "_top",
       class: "flex-1 pl-2 py-2 truncate text-sm text-opacity-1 w-5 radio-behavior",
-      data: { action: "radio-behavior#select" }
+      data: {
+        turbo_frame: "conversation",
+        action: "radio-behavior#select"
+      }
     %>
 
     <div class="items-center hidden gap-2 pl-2 relationship:flex group-hover:flex">
