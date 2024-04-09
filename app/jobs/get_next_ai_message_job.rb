@@ -70,6 +70,10 @@ class GetNextAIMessageJob < ApplicationJob
     @message.content_text = "I experienced a connection error. #{e.message}"
     wrap_up_the_message
     return true
+  rescue Faraday::TooManyRequests => e
+    set_billing_error
+    wrap_up_the_message
+    return true
   rescue WaitForPrevious
     puts "\nWaitForPrevious in GetNextAIMessageJob(#{message_id})" if Rails.env.development?
     raise WaitForPrevious
@@ -104,6 +108,14 @@ class GetNextAIMessageJob < ApplicationJob
     @message.content_text = "(Received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
       "experiencing trouble. Try again or ensure your API key is valid. You can change your API key by clicking your Profile in the bottom " +
       "left and then settings.)"
+  end
+
+  def set_billing_error
+    service = ai_backend.to_s.split('::').second
+    url = service == 'OpenAI' ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
+
+    @message.content_text = "(Received a quota error. Your API key is probably valid but you may need to adding billing details. You are using " +
+      "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan."
   end
 
   def wrap_up_the_message
