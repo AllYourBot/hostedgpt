@@ -60,10 +60,9 @@
                   image_loader_url_value: message.document_image_path(:small),
                   action: "modal#open",
                   role: "image-preview",
-                  turbo_permanent: "",
                 } do
           %>
-            <%= image_tag "",
+            <%= image_tag message.has_document_image?(:small) ? message.document_image_path(:small) : "",
                   data: {
                     image_loader_target: "image",
                     action: %|

@@ -32,11 +32,16 @@ class Document < ApplicationRecord
     base64 = Base64.strict_encode64(file_contents)
   end
 
-  private
+  def has_file_variant_processed?(variant)
+    r = file.attached? &&
+      variant.present? &&
+      (key = file.variant(variant.to_sym).key) &&
+      ActiveStorage::Blob.service.exist?(key)
 
-  def wait_for_file_variant_to_process!(variant)
-    file.variant(variant.to_sym).processed # this blocks until processing is done
+    !!r
   end
+
+  private
 
   def file_present
     errors.add(:file, "must be attached") unless file.attached?
@@ -56,5 +61,9 @@ class Document < ApplicationRecord
 
   def set_default_bytes
     self.bytes ||= file.byte_size
+  end
+
+  def wait_for_file_variant_to_process!(variant)
+    file.variant(variant.to_sym).processed # this blocks until processing is done
   end
 end
