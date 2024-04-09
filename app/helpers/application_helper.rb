@@ -22,7 +22,7 @@ module ApplicationHelper
       direction = opts.delete(:tooltip) || 'bottom'
       data = opts.delete(:data) || {}
 
-      content_tag(:div,
+      content_tag(:span,
         class: classes + " tooltip tooltip-#{direction} hover:tooltip-open",
         style: "width: #{size}px; height: #{size}px;",
         data: { tip: title.to_s }.merge(data),
@@ -31,7 +31,7 @@ module ApplicationHelper
         heroicon name, **opts.slice(:size, :variant)
       end
     else
-      content_tag(:div,
+      content_tag(:span,
         class: classes,
         style: "width: #{size}px; height: #{size}px;",
         **opts.except(:class, :size, :variant)

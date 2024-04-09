@@ -6,8 +6,8 @@
 <% initial_page_load = last_message && !scroll_down %>
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking = if thinking.nil?
-                (last_message && message.content_text.blank?) ||
-                (message.rerequested? && message.content_text.blank?)
+                (last_message && message.content_text.blank? && message.not_cancelled?) ||
+                (message.rerequested? && message.content_text.blank? && message.not_cancelled?)
               else
                 thinking
               end
@@ -50,7 +50,6 @@
       <div
         data-role="content-text"
         class="prose break-words leading-normal"
-        <%= thinking && "data-turbo-permanent" %>
       >
         <% if message.has_document_image? %>
           <%= button_tag type: "button",
@@ -80,7 +79,15 @@
                 inline-block
                 ml-1
                 #{!thinking && 'hidden'}
-              |)
+              |) +
+              span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && 'hidden') +
+              icon("stop",
+                variant: :solid,
+                size: 17,
+                title: "Stopped",
+                tooltip: :top,
+                class: "inline-block pl-1 #{message.not_cancelled? && 'hidden'}"
+              )
         %>
       </div>
 
@@ -131,6 +138,7 @@
                     params: { message: {
                       content_text: nil,
                       rerequested_at: Time.current,
+                      cancelled_at: nil,
                       assistant_id: assistant.id
                     } } do
                   %>

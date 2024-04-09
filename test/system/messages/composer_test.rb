@@ -10,6 +10,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
   end
 
   test "the cursor is auto-focused in the text input for a new conversation and selecting existing conversation and ESC unfocuses" do
+    sleep 0.2
     assert_active @input_selector
     send_keys "esc"
     assert_active "body"
@@ -17,7 +18,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.2
 
     click_text @long_conversation.title
-    sleep 0.2
+    sleep 0.4
     assert_active @input_selector
   end
 

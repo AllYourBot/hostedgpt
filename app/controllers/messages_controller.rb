@@ -12,6 +12,10 @@ class MessagesController < ApplicationController
   def index
     @messages = @conversation.messages.ordered
     @new_message = @assistant.messages.new(conversation: @conversation)
+    @streaming_message = Message.where(
+      content_text: nil,
+      cancelled_at: nil
+    ).find_by(id: redis.get("conversation-#{@conversation.id}-latest_message-id"))
   end
 
   def show  # show & edit will be used when we make messages editable
@@ -29,7 +33,6 @@ class MessagesController < ApplicationController
 
     if @message.save
       GetNextAIMessageJob.perform_later(@message.conversation.latest_message.id, @assistant.id)
-
       redirect_to conversation_messages_path(@message.conversation)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
@@ -85,7 +88,12 @@ class MessagesController < ApplicationController
       :conversation_id,
       :content_text,
       :assistant_id,
+      :cancelled_at,
       :rerequested_at,
       documents_attributes: [:file])
+  end
+
+  def redis
+    RedisConnection.client
   end
 end
