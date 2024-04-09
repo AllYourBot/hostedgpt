@@ -181,6 +181,7 @@ class MessageTest < ActiveSupport::TestCase
 
   test "has_document_image?" do
     assert messages(:identify_photo).has_document_image?
+    refute messages(:identify_photo).has_document_image?(:small)
   end
 
   test "document_image_path" do

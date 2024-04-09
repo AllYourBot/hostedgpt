@@ -40,15 +40,18 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "file_data_url returns for a file" do
-    file_path = File.join(File.dirname(__FILE__), '../assets/cat-image-for-attaching.png')
-    file = Rack::Test::UploadedFile.new(file_path, 'image/png')
-
-    document = Document.create!(user: users(:keith), file: file)
-
     prefix = "data:image/png;base64,"
-    assert document.file_data_url
-    assert document.file_data_url.starts_with?(prefix)
-    assert document.file_data_url.length > prefix.length
+    assert documents(:cat_photo).file_data_url
+    assert documents(:cat_photo).file_data_url.starts_with?(prefix)
+    assert documents(:cat_photo).file_data_url.length > 40000
+  end
+
+  test "file_base64 returns a long string" do
+    assert documents(:cat_photo).file_base64.length > 40000
+  end
+
+  test "has_file_variant_processed?" do
+    refute documents(:cat_photo).has_file_variant_processed?(:small)
   end
 
   test "associations are deleted upon destroy" do
