@@ -32,6 +32,7 @@ export default class extends Controller {
   show() {
     this.imageTarget.classList.remove("hidden")
     this.loaderTarget.classList.add("hidden")
+    window.dispatchEvent(new CustomEvent('main-column-changed'))
   }
 
   retryAfterDelay() {
