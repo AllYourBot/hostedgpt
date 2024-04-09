@@ -85,4 +85,29 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       assert modal_img.visible?
     end
   end
+
+  test "ensure page scrolls back down to the bottom after an image pops in late" do
+    decode_verified_key = ->() do
+      return nil if params[:retry_count].to_i < 5
+      ActiveStorage.verifier.verified(params[:encoded_key], purpose: :blob_key)&.symbolize_keys
+    end
+
+    ActiveStorage::PostgresqlController.stub_any_instance(:decode_verified_key, decode_verified_key) do
+      visit conversation_messages_path(@conversation)
+      image_msg       = find_messages.third
+      image_container = image_msg.find_role("image-preview")
+      img             = image_container.find("img", visible: false)
+
+      sleep 0.5
+      assert_at_bottom
+
+      while !img.visible?
+        sleep 0.25
+      end
+
+      assert img.visible?
+      sleep 0.5
+      assert_at_bottom
+    end
+  end
 end

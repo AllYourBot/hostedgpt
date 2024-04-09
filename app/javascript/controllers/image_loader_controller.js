@@ -32,7 +32,7 @@ export default class extends Controller {
   show() {
     this.imageTarget.classList.remove("hidden")
     this.loaderTarget.classList.add("hidden")
-    window.dispatchEvent(new CustomEvent('main-column-changed'))
+    setTimeout(() => window.dispatchEvent(new CustomEvent('main-column-changed')), 200)
   }
 
   retryAfterDelay() {
@@ -40,6 +40,7 @@ export default class extends Controller {
     if (this.retryCount <= this.maxRetries) {
       this.imageTarget.classList.add("hidden")
       this.loaderTarget.classList.remove("hidden")
+      setTimeout(() => window.dispatchEvent(new CustomEvent('main-column-changed')), 200)
 
       setTimeout(() => {
         let srcBase = this.imageTarget.src.split("?")[0]
