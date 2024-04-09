@@ -178,12 +178,12 @@ class MessagesComposerTest < ApplicationSystemTestCase
     END
 
     click_text @long_conversation.title
-    sleep 0.2
+    sleep 0.4
 
     height = input.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys text.gsub(/\n/, ' ')
-      sleep 0.2
+      sleep 0.4
     end
     assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
