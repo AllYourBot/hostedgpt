@@ -70,7 +70,7 @@ class GetNextAIMessageJob < ApplicationJob
     @message.content_text = "I experienced a connection error. #{e.message}"
     wrap_up_the_message
     return true
-  rescue Faraday::TooManyRequests => e
+  rescue Faraday::TooManyRequestsError => e
     set_billing_error
     wrap_up_the_message
     return true
