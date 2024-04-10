@@ -134,6 +134,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
     assert_stays_at_bottom do
       resize_browser_to(1400, 700)
+      sleep 0.5
     end
   end
 
@@ -143,7 +144,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
     assert_did_not_scroll do
       resize_browser_to(1400, 700)
-      sleep 0.1
+      sleep 0.5
     end
   end
 

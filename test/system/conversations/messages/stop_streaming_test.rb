@@ -17,7 +17,7 @@ class ConversationMessagesStopStreamingTest < ApplicationSystemTestCase
     assert msg.find_role("cancelled").visible?
   end
 
-  test "an cancelled message with some text shows the stopped icon with ..." do
+  test "a cancelled message with some text shows the stopped icon with ..." do
     messages(:dont_know_day).update!(content_text: "But I", cancelled_at: Time.current)
     visit conversation_messages_path(@conversation)
 

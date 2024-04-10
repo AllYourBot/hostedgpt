@@ -206,10 +206,12 @@ class MessagesComposerTest < ApplicationSystemTestCase
     click_text @long_conversation.title
     sleep 0.2
     scroll_to find_messages.second
+    sleep 0.5
 
     height = input.native.property('clientHeight')
     assert_did_not_scroll do
       send_keys text.gsub(/\n/, ' ')
+      sleep 0.5
     end
     assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
