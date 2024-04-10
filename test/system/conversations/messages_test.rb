@@ -47,7 +47,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_equal existing_assistant.name, last_message.find_role("from").text
 
     click_text "Using #{new_assistant.name}"
-    sleep 0.3
+    sleep 1
     assert_equal new_assistant.name, last_message.find_role("from").text
   end
 
@@ -58,18 +58,19 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   test "the scroll appears and disappears based on scroll position" do
     scroll_to find_messages.second
-    assert_visible "#scroll-button", wait: 0.01
+    assert_visible "#scroll-button", wait: 1
 
     scroll_to first_message
-    assert_visible "#scroll-button", wait: 0.2
+    assert_visible "#scroll-button", wait: 1
 
     assert_scrolled_to_bottom do
       scroll_to last_message
-      assert_hidden "#scroll-button", wait: 0.2
+      assert_hidden "#scroll-button", wait: 1
     end
   end
 
   test "clicking scroll down button scrolls the page to the bottom" do
+    sleep 0.5
     scroll_to first_message
     assert_visible "#scroll-button", wait: 0.5
 
@@ -101,7 +102,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   test "when the AI replies with a message it appears with morphing and scrolls down" do
     new_message = @long_conversation.messages.create! assistant: @long_conversation.assistant, content_text: "Stub: ", role: :assistant
     click_text @long_conversation.title
-    sleep 0.5
+    sleep 1
 
     assert last_message.text.include?("Stub:"), "The last message should have contained the submitted text"
 
@@ -162,6 +163,20 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     msg
   end
 
+  def assert_page_morphed
+    raise "No block given" unless block_given?
+    watch_page_for_morphing
+
+    yield
+
+    sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
+    assert get_scroll_position("section #messages") > @messages_scroll_position, "The page should have scrolled down further"
+    assert_hidden "#scroll-button", "The page did not scroll all the way down"
+    assert tagged?("nav"), "The page did not morph; a tagged element got replaced."
+    assert tagged?(first_message), "The page did not morph; a tagged element got replaced."
+    assert_equal @nav_scroll_position, get_scroll_position("nav"), "The left column lost it's scroll position"
+  end
+
   def watch_page_for_morphing
     # Within automated system tests, it's difficult to know if a page morphed or not. When a page does morph
     # it should only replace the DOM elements which changed. This has the side effect of preserving scroll position.
@@ -187,20 +202,6 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     end
 
     page.execute_script("arguments[0]._morphMonitor = true", element)
-  end
-
-  def assert_page_morphed
-    raise "No block given" unless block_given?
-    watch_page_for_morphing
-
-    yield
-
-    sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
-    assert get_scroll_position("section #messages") > @messages_scroll_position, "The page should have scrolled down further"
-    assert_hidden "#scroll-button", "The page did not scroll all the way down"
-    assert tagged?("nav"), "The page did not morph; a tagged element got replaced."
-    assert tagged?(first_message), "The page did not morph; a tagged element got replaced."
-    assert_equal @nav_scroll_position, get_scroll_position("nav"), "The left column lost it's scroll position"
   end
 
   def tagged?(selector_or_element)

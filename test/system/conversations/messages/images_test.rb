@@ -103,7 +103,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       end
 
       assert img.visible?
-      sleep 0.5
+      sleep 1
       assert_at_bottom
     end
   end

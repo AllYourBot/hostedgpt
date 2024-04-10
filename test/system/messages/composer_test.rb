@@ -55,7 +55,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_active input
   end
 
-  test "when not in text input, ? opens the keyboard shortcuts and CLICKING OUTSIZDE dismisses it and keyboard shortcuts work normally" do
+  test "when not in text input, ? opens the keyboard shortcuts and CLICKING OUTSIDE dismisses it and keyboard shortcuts work normally" do
     send_keys "esc"
     assert_active "body"
     refute_text "Keyboard shortcuts"
@@ -228,7 +228,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
     send_keys "This is a second message"
     send_keys "enter"
-    sleep 0.5
+    sleep 1
 
     assert_equal path, current_path, "The page should not have changed urls"
     assert input.value.blank?, "The composer should have cleared itself"

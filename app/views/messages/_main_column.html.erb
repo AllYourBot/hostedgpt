@@ -181,16 +181,27 @@
         </div>
 
         <% if @streaming_message %>
-          <%= form_with(model: @streaming_message, data: { new_message_target: "cancel", turbo_frame: "_top" }, class: "absolute top-2 right-8 z-10") do |form| %>
+          <%= form_with(
+            model: @streaming_message,
+            class: "absolute top-2 right-8 z-10",
+            data: {
+              new_message_target: "cancel",
+              turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+          }) do |form| %>
             <%= form.hidden_field :cancelled_at, value: Time.current %>
-            <%= form.button type: "submit", class: "relative" do %>
+            <%= form.button id: "cancel", type: "submit", class: "relative" do %>
               <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
               <%= icon "stop-circle", variant: :outline, size: 39, title: 'Stop', tooltip: :top %>
             <% end %>
           <% end %>
         <% end %>
 
-        <%= form_with(model: [@assistant, @new_message], data: { new_message_target: "form", turbo_frame: "_top" }) do |form| %>
+        <%= form_with(
+          model: [@assistant, @new_message],
+          data: {
+            new_message_target: "form",
+            turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+        }) do |form| %>
           <%= form.hidden_field :conversation_id %>
           <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
             <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
