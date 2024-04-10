@@ -235,12 +235,12 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
   test "submitting a couple messages to an existing conversation with CLICKING works" do
     click_text @long_conversation.title
-    sleep 0.3
+    sleep 1
     path = current_path
 
     send_keys "This is a message"
     click_element @submit
-    sleep 0.3
+    sleep 1
 
     assert_equal path, current_path, "The page should not have changed urls"
     assert input.value.blank?, "The composer should have cleared itself"

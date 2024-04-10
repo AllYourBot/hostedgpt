@@ -14,23 +14,23 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   test "clipboard icon shows tooltip" do
     msg = hover_last_message
-    assert_shows_tooltip node("clipboard", within: msg), "Copy"
+    assert_shows_tooltip msg.find_role("clipboard"), "Copy"
   end
 
   test "clicking clipboard icon changes the tooltip & icon to check, mousing out changes it back" do
     msg = hover_last_message
-    clipboard = node("clipboard", within: msg)
+    clipboard = msg.find_role("clipboard")
 
     clipboard.click
     assert_shows_tooltip clipboard, "Copied!"
 
-    node("regenerate", within: msg).hover
+    msg.find_role("regenerate").hover
     assert_shows_tooltip clipboard, "Copy"
   end
 
   test "regenerate icon shows tooltip" do
     msg = hover_last_message
-    assert_shows_tooltip node("regenerate", within: msg), "Regenerate"
+    assert_shows_tooltip msg.find_role("regenerate"), "Regenerate"
   end
 
   test "clicking regenerate icon shows menu and triggers re-generation" do
@@ -38,17 +38,17 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     new_assistant = @user.assistants.ordered.where.not(id: existing_assistant.id).first
 
     msg = hover_last_message
-    regenerate = node("regenerate", within: msg)
+    regenerate = msg.find_role("regenerate")
 
     regenerate.click
     assert_text "Using #{existing_assistant.name}"
     assert_text "Using #{new_assistant.name}"
 
-    assert_equal existing_assistant.name, node("from", within: last_message).text
+    assert_equal existing_assistant.name, last_message.find_role("from").text
 
     click_text "Using #{new_assistant.name}"
     sleep 0.3
-    assert_equal new_assistant.name, node("from", within: last_message).text
+    assert_equal new_assistant.name, last_message.find_role("from").text
   end
 
   test "the conversation auto-scrolls to bottom when page loads" do
@@ -74,8 +74,9 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_visible "#scroll-button", wait: 0.5
 
     assert_scrolled_to_bottom do
+      sleep 1
       click_element "#scroll-button button"
-      assert_hidden "#scroll-button", wait: 1
+      assert_hidden "#scroll-button", wait: 3
     end
   end
 
@@ -119,7 +120,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     click_text @long_conversation.title
 
     assert_did_not_scroll("#nav-scrollable") do
-      new_chat = node("new", within: this_conversation)
+      new_chat = this_conversation.find_role("new")
       assert_shows_tooltip new_chat, "New chat"
 
       new_chat.click

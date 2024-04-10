@@ -189,3 +189,9 @@ dialog button:focus-visible {
   --tw-prose-pre-bg: #0d0d0d !important;
   --tw-prose-pre-code: #ffffff !important;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root .prose {
+    --tw-prose-body: rgb(236, 236, 236);
+  }
+}
