@@ -7,7 +7,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   fixtures :all
 
-  parallelize(workers: [4, Etc.nprocessors].min) # otherwise tests fail on a new Macbook Air b/c max_processors is too much
+  parallelize(workers: [3, Etc.nprocessors].min) # otherwise tests fail on a new Macbook Air b/c max_processors is too much
 
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
