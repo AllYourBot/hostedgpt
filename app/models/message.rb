@@ -36,12 +36,16 @@ class Message < ApplicationRecord
     !!has_image
   end
 
-  def document_image_path(variant)
+  def document_image_path(variant, fallback: nil)
     return nil unless has_document_image?
-    Rails.application.routes.url_helpers.rails_representation_url(
-      documents.first.file.representation(variant.to_sym),
-      only_path: true
-    )
+
+    if documents.first.has_file_variant_processed?(variant)
+      documents.first.fully_processed_url(variant)
+    elsif fallback.nil?
+      documents.first.redirect_to_processed_path(variant)
+    else
+      fallback
+    end
   end
 
   private

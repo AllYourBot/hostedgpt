@@ -41,6 +41,19 @@ class Document < ApplicationRecord
     !!r
   end
 
+  def fully_processed_url(variant)
+    file.attached? && variant.present? && file.representation(variant.to_sym).processed.url
+  end
+
+  def redirect_to_processed_path(variant)
+    return nil unless file.attached? && variant.present?
+
+    Rails.application.routes.url_helpers.rails_representation_url(
+      file.representation(variant.to_sym),
+      only_path: true
+    )
+  end
+
   private
 
   def file_present
@@ -64,6 +77,6 @@ class Document < ApplicationRecord
   end
 
   def wait_for_file_variant_to_process!(variant)
-    file.variant(variant.to_sym).processed # this blocks until processing is done
+    file && file.attached? && file.variant(variant.to_sym).processed # this blocks until processing is done
   end
 end

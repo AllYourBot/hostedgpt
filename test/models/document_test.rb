@@ -54,6 +54,18 @@ class DocumentTest < ActiveSupport::TestCase
     refute documents(:cat_photo).has_file_variant_processed?(:small)
   end
 
+  test "fully_processed_url" do
+    assert documents(:cat_photo).fully_processed_url(:small).starts_with?('http')
+    assert documents(:cat_photo).fully_processed_url(:small).include?('rails/active_storage/postgresql')
+    assert documents(:cat_photo).fully_processed_url(:small).exclude?('/redirect')
+  end
+
+  test "redirect_to_processed_path" do
+    assert documents(:cat_photo).redirect_to_processed_path(:small).starts_with?('/rails')
+    assert documents(:cat_photo).redirect_to_processed_path(:small).include?('representations/redirect')
+    assert documents(:cat_photo).redirect_to_processed_path(:small).exclude?('rails/active_storage/postgresql')
+  end
+
   test "associations are deleted upon destroy" do
     assert_nothing_raised do
       documents(:cat_photo).destroy!

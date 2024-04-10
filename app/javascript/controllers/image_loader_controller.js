@@ -23,7 +23,7 @@ export default class extends Controller {
 
   connect() {
     this.retryCount = 0
-    this.maxRetries = 6
+    this.maxRetries = 10
     this.retryAfterMs = 500
 
     this.imageTarget.src = this.urlValue
@@ -43,9 +43,8 @@ export default class extends Controller {
       setTimeout(() => window.dispatchEvent(new CustomEvent('main-column-changed')), 200)
 
       setTimeout(() => {
-        let srcBase = this.imageTarget.src.split("?")[0]
-        let separator = this.imageTarget.src.includes("?") ? "&" : "?"
-        this.imageTarget.src = `${srcBase}${separator}disposition=-${this.retryCount}`
+        let srcBase = this.urlValue.split("?")[0]
+        this.imageTarget.src = `${srcBase}?disposition=-${this.retryCount}`
       }, this.retryAfterMs)
     }
   }

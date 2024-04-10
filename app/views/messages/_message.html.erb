@@ -62,7 +62,7 @@
                   role: "image-preview",
                 } do
           %>
-            <%= image_tag message.has_document_image?(:small) ? message.document_image_path(:small) : "",
+            <%= image_tag message.document_image_path(:small, fallback: ""),
                   data: {
                     image_loader_target: "image",
                     action: %|
@@ -163,7 +163,7 @@
                 data-turbo-permanent
                 class="flex flex-col md:flex-row justify-center"
               >
-                <%= image_tag "",
+                <%= image_tag message.document_image_path(:large, fallback: ""),
                   data: {
                     image_loader_target: "image",
                     action: %|

@@ -115,7 +115,7 @@ class GetNextAIMessageJob < ApplicationJob
     url = service == 'OpenAI' ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
 
     @message.content_text = "(Received a quota error. Your API key is probably valid but you may need to adding billing details. You are using " +
-      "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan."
+      "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
   end
 
   def wrap_up_the_message

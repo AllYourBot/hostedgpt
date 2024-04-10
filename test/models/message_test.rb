@@ -185,9 +185,12 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   test "document_image_path" do
-    assert messages(:identify_photo).document_image_path(:small)
     assert messages(:identify_photo).document_image_path(:small).is_a?(String)
     assert messages(:identify_photo).document_image_path(:small).starts_with?("/rails/active_storage/representations/redirect")
+  end
+
+  test "document_image_path with fallback" do
+    assert_equal "", messages(:identify_photo).document_image_path(:small, fallback: "")
   end
 
   private
