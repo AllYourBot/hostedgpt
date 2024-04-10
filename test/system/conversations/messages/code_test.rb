@@ -18,7 +18,7 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
   test "clicking copy on code block changes icon and copies to clipboard" do
     assert_nil clipboard
 
-    node("code-clipboard", within: @code_msg).click
+    @code_msg.find_role("code-clipboard").click
     assert_equal "SELECT * FROM users", clipboard
 
     assert_includes @code_msg.text, "Copied", "Copied should be in the header"
@@ -29,7 +29,7 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
     assert_nil clipboard
 
     @code_msg.hover
-    copy = node("clipboard", within: @code_msg)
+    copy = @code_msg.find_role("clipboard")
     copy.click
 
     assert_equal messages(:im_a_bot).content_text.strip, clipboard

@@ -86,7 +86,7 @@ class AIBackends::Anthropic
             source: {
               type: "base64",
               media_type: document.file.blob.content_type,
-              data: document.file_base64,
+              data: document.file_base64(:large),
             }
           }
         end

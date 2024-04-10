@@ -18,18 +18,40 @@ class Document < ApplicationRecord
   before_validation :set_default_filename, on: :create
   before_validation :set_default_bytes, on: :create
 
-  def file_data_url
+  def file_data_url(variant = :large)
     return nil if !file.attached?
 
-    "data:#{file.blob.content_type};base64,#{file_base64}"
+    "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
   end
 
-  def file_base64
+  def file_base64(variant = :large)
     return nil if !file.attached?
+    wait_for_file_variant_to_process!(variant.to_sym)
 
-    base64 = file.blob.open do |file|
-      Base64.strict_encode64(file.read)
-    end
+    file_contents = file.variant(variant.to_sym).processed.download
+    base64 = Base64.strict_encode64(file_contents)
+  end
+
+  def has_file_variant_processed?(variant)
+    r = file.attached? &&
+      variant.present? &&
+      (key = file.variant(variant.to_sym).key) &&
+      ActiveStorage::Blob.service.exist?(key)
+
+    !!r
+  end
+
+  def fully_processed_url(variant)
+    file.attached? && variant.present? && file.representation(variant.to_sym).processed.url
+  end
+
+  def redirect_to_processed_path(variant)
+    return nil unless file.attached? && variant.present?
+
+    Rails.application.routes.url_helpers.rails_representation_url(
+      file.representation(variant.to_sym),
+      only_path: true
+    )
   end
 
   private
@@ -52,5 +74,9 @@ class Document < ApplicationRecord
 
   def set_default_bytes
     self.bytes ||= file.byte_size
+  end
+
+  def wait_for_file_variant_to_process!(variant)
+    file && file.attached? && file.variant(variant.to_sym).processed # this blocks until processing is done
   end
 end

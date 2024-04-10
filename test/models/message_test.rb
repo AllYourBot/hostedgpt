@@ -181,12 +181,16 @@ class MessageTest < ActiveSupport::TestCase
 
   test "has_document_image?" do
     assert messages(:identify_photo).has_document_image?
+    refute messages(:identify_photo).has_document_image?(:small)
   end
 
-  test "document_image_url" do
-    assert messages(:identify_photo).document_image_url(:small)
-    assert messages(:identify_photo).document_image_url(:small).is_a?(String)
-    assert messages(:identify_photo).document_image_url(:small).starts_with?("https://")
+  test "document_image_path" do
+    assert messages(:identify_photo).document_image_path(:small).is_a?(String)
+    assert messages(:identify_photo).document_image_path(:small).starts_with?("/rails/active_storage/representations/redirect")
+  end
+
+  test "document_image_path with fallback" do
+    assert_equal "", messages(:identify_photo).document_image_path(:small, fallback: "")
   end
 
   private
