@@ -18,17 +18,17 @@ class Document < ApplicationRecord
   before_validation :set_default_filename, on: :create
   before_validation :set_default_bytes, on: :create
 
-  def file_data_url
+  def file_data_url(variant = :large)
     return nil if !file.attached?
 
-    "data:#{file.blob.content_type};base64,#{file_base64}"
+    "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
   end
 
-  def file_base64
+  def file_base64(variant = :large)
     return nil if !file.attached?
-    wait_for_file_variant_to_process!(:large)
+    wait_for_file_variant_to_process!(variant.to_sym)
 
-    file_contents = file.variant(:large).processed.download
+    file_contents = file.variant(variant.to_sym).processed.download
     base64 = Base64.strict_encode64(file_contents)
   end
 
