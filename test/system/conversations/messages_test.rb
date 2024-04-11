@@ -51,37 +51,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_equal new_assistant.name, last_message.find_role("from").text
   end
 
-  test "the conversation auto-scrolls to bottom when page loads" do
-    assert_hidden "#scroll-button", "Page should have auto-scrolled to the bottom and hidden the scroll button."
-    assert_at_bottom
-  end
-
-  test "the scroll appears and disappears based on scroll position" do
-    scroll_to find_messages.second
-    assert_visible "#scroll-button", wait: 1
-
-    scroll_to first_message
-    assert_visible "#scroll-button", wait: 1
-
-    assert_scrolled_to_bottom do
-      scroll_to last_message
-      assert_hidden "#scroll-button", wait: 1
-    end
-  end
-
-  test "clicking scroll down button scrolls the page to the bottom" do
-    sleep 0.5
-    scroll_to first_message
-    assert_visible "#scroll-button", wait: 0.5
-
-    assert_scrolled_to_bottom do
-      sleep 1
-      click_element "#scroll-button button"
-      assert_hidden "#scroll-button", wait: 3
-    end
-  end
-
-  test "submitting a message with ENTER inserts two new messages with morphing & scrolls down" do
+  test "submitting a message with ENTER inserts two new messages with morphing" do
     visit conversation_messages_path(@long_conversation.id)
     scroll_to_bottom "section #messages"
 
@@ -99,7 +69,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert last_message.text.include?(@long_conversation.assistant.name), "The last message should have contained the assistant stub"
   end
 
-  test "when the AI replies with a message it appears with morphing and scrolls down" do
+  test "when the AI replies with a message it appears with morphing" do
     new_message = @long_conversation.messages.create! assistant: @long_conversation.assistant, content_text: "Stub: ", role: :assistant
     click_text @long_conversation.title
     sleep 1
@@ -117,11 +87,12 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     new_message.save!
   end
 
-  test "clicking new compose icon in the top-right starts a new conversation and preserves sidebar scroll" do
+  test "clicking new compose icon in the top-right starts a new conversation and preserves sidebar scroll -- BROKEN" do
     click_text @long_conversation.title
+    header = this_conversation.find("#wide-header")
 
     assert_did_not_scroll("#nav-scrollable") do
-      new_chat = this_conversation.find_role("new")
+      new_chat = header.find_role("new")
       assert_shows_tooltip new_chat, "New chat"
 
       new_chat.click

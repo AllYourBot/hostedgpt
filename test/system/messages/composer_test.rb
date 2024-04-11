@@ -163,46 +163,18 @@ class MessagesComposerTest < ApplicationSystemTestCase
   end
 
   test "when large block of text is pasted, textarea grows in height and auto-scrolls to stay at the bottom" do
-    text = <<~END
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-    END
-
     click_text @long_conversation.title
-    sleep 0.4
+    wait_for_images_to_load
 
     height = input.native.property('clientHeight')
     assert_stays_at_bottom do
-      send_keys text.gsub(/\n/, ' ')
+      send_keys long_input_text
       sleep 0.4
     end
     assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
 
   test "when large block of text is pasted, textarea grows in height and DOES NOT auto-scroll so what scrolled to stays visible" do
-    text = <<~END
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-    END
-
     click_text @long_conversation.title
     sleep 0.2
     scroll_to find_messages.second
@@ -210,7 +182,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
     height = input.native.property('clientHeight')
     assert_did_not_scroll do
-      send_keys text.gsub(/\n/, ' ')
+      send_keys long_input_text
       sleep 0.5
     end
     assert input.native.property('clientHeight') > height, "Input should have grown taller"
@@ -260,5 +232,22 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
   def input
     find(@input_selector)
+  end
+
+  def long_input_text
+    text = <<~END
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+    END
+    text.gsub(/\n/, ' ')
   end
 end

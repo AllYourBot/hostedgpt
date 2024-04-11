@@ -38,25 +38,20 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_equal element, page.active_element, error_msg || "Expected element to be the active element, but it is not"
   end
 
-  def assert_visible(selector, error_msg = nil, wait: 0)
-    element = first(selector, visible: false, wait: wait) rescue nil
+  def assert_visible(selector, error_msg = nil, wait: Capybara.default_max_wait_time)
+    element = first(selector, visible: :all, wait: wait) rescue nil
     assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
 
     element = first(selector, visible: true, wait: wait) rescue nil
-
-    unless element&.visible?
-      sleep wait
-      element = find(selector, visible: true, wait: wait) rescue nil
-    end
-
     assert element&.visible?, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
   end
 
-  def assert_hidden(selector, error_msg = nil, wait: nil)
-    element = find(selector, visible: false, wait: wait) rescue nil
+  def assert_hidden(selector, error_msg = nil, wait: Capybara.default_max_wait_time)
+    element = find(selector, visible: :all, wait: wait) rescue nil
     assert element, "Expected to find hidden css #{selector}, but the element was not found. #{error_msg}"
-    sleep wait  if wait.present?  # we can wait until an element is visible, but if we want to be sure it's disappearing we need to sleep
-    refute element.visible?, "Expected to find hidden css #{selector}. It was found but it is visible. #{error_msg}"
+    assert_false "Expected to find hidden css #{selector}. It was found but it is visible. #{error_msg}" do
+      element.visible?
+    end
   end
 
   def assert_shows_tooltip(selector_or_element, text, error_msg = nil, wait: nil)
@@ -124,11 +119,17 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def assert_did_not_scroll(selector = "section #messages-container")
     raise "No block given" unless block_given?
 
-    scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
+    scroll_position_first_element_relative_viewport = nil
+
+    assert_true "The #{selector} should have stopped scrolling before it could begin" do
+      scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
+      sleep 0.5
+      scroll_position_first_element_relative_viewport == page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
+    end
 
     yield
 
-    assert_true "The #{selector} should not have scrolled", wait: 10 do
+    assert_true "The #{selector} should not have scrolled" do
       new_scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
 
       scroll_position_first_element_relative_viewport == new_scroll_position_first_element_relative_viewport
@@ -142,9 +143,11 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     yield
 
-    assert_true "The #{selector} should have scrolled up", wait: 10 do
+    assert_true "The #{selector} should have scrolled up" do
       get_scroll_position(selector) > scroll_position
     end
+
+    assert_stopped_scrolling(selector)
   end
 
   def assert_scrolled_down(selector = "section #messages")
@@ -154,17 +157,28 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     yield
 
-    assert_true "The #{selector} should have scrolled down", wait: 10 do
+    assert_true "The #{selector} should have scrolled down" do
       get_scroll_position(selector) > scroll_position
+    end
+
+    assert_stopped_scrolling(selector)
+  end
+
+  def assert_stopped_scrolling(selector = "section #messages")
+    assert_true "The #{selector} should have stopped scrolling" do
+      prev_scroll_position = get_scroll_position(selector)
+      sleep 0.5
+      get_scroll_position(selector) == prev_scroll_position
     end
   end
 
   def assert_at_bottom(selector = "section #messages")
-    sleep Capybara.default_max_wait_time
-    new_scroll_position = get_scroll_position(selector)
+    assert_stopped_scrolling(selector)
+    initial_scroll_position = get_scroll_position(selector)
     scroll_to_bottom(selector)
-    sleep Capybara.default_max_wait_time
-    assert_equal new_scroll_position, get_scroll_position(selector), "The #{selector} was able to move down so it was not at the bottom"
+    assert_stopped_scrolling(selector)
+    new_scroll_position = get_scroll_position(selector)
+    assert_equal initial_scroll_position, new_scroll_position, "The #{selector} was able to move down so it was not at the bottom"
   end
 
   def assert_scrolled_to_bottom(selector = "section #messages")
@@ -182,7 +196,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     assert_at_bottom(selector)
     yield
-    sleep Capybara.default_max_wait_time
+    assert_stopped_scrolling(selector)
     assert_at_bottom(selector)
   end
 
@@ -210,27 +224,41 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     timeout = opts[:wait] || Capybara.default_max_wait_time
 
     Timeout.timeout(timeout) do
-      sleep 0.25 until block.call
+      until block.call
+        sleep 0.25
+        puts "### the block is still false when we want it to be true"
+      end
     end
   rescue Timeout::Error
+    puts "### timed out"
     assert false, msg || "Expected block to return true, but it did not"
   end
 
   def assert_false(msg = nil, opts = {}, &block)
     timeout = opts[:wait] || Capybara.default_max_wait_time
 
+    puts "### starting assert_false"
     Timeout.timeout(timeout) do
-      sleep 0.1 until !block.call
+      until !block.call
+        sleep 0.25
+        puts "### the block is still true when we want it to be false"
+      end
     end
   rescue Timeout::Error
+    puts "### timed out"
+    #binding.pry
     refute true, msg || "Expected block to return false, but it did not"
+  end
+
+  def wait_for_images_to_load
+    assert_false "all the image loaders should have disappeared" do
+      all("[data-role='image-loader']", visible: :all).map(&:visible?).include?(true)
+    end
   end
 end
 
 class Capybara::Node::Element
   def find_role(label)
-    elem = find("[data-role='#{label}']", visible: false) rescue nil
-    elem = find("[data-role='#{label}']") if elem.nil?
-    elem
+    find("[data-role='#{label}']", visible: :all)
   end
 end

@@ -58,11 +58,11 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       visit conversation_messages_path(@conversation)
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
-      loader          = image_container.find_role("loader")
-      img             = image_container.find("img", visible: false)
+      loader          = image_container.find_role("image-loader")
+      img             = image_container.find("img", visible: :all)
       modal_container = image_msg.find_role("image-modal")
-      modal_loader    = modal_container.find_role("loader")
-      modal_img       = modal_container.find("img", visible: false)
+      modal_loader    = modal_container.find_role("image-loader")
+      modal_img       = modal_container.find("img", visible: :all)
 
       sleep 0.5
       assert loader.visible?
@@ -93,9 +93,8 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       visit conversation_messages_path(@conversation)
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
-      img             = image_container.find("img", visible: false)
+      img             = image_container.find("img", visible: :all)
 
-      sleep 0.5
       assert_at_bottom
 
       Timeout.timeout(5) do
@@ -103,7 +102,6 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       end
 
       assert img.visible?
-      sleep 1
       assert_at_bottom
     end
   end
@@ -150,7 +148,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   def simulate_not_preprocessed
     ->() do
-      return nil if params[:retry_count].to_i < 3
+      return nil if params[:retry_count].to_i < 5
       ActiveStorage.verifier.verified(params[:encoded_key], purpose: :blob_key)&.symbolize_keys
     end
   end

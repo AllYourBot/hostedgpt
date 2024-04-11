@@ -1,6 +1,7 @@
 <head>
   <title>HostedGPT</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" %>
