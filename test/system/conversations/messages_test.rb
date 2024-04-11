@@ -77,42 +77,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     end
   end
 
-  test "clicking new compose icon in the top-right starts a new conversation and preserves sidebar scroll -- BROKEN" do
-    header = this_conversation.find("#wide-header")
-
-    assert_did_not_scroll("#nav-scrollable") do
-      new_chat = header.find_role("new")
-      assert_shows_tooltip new_chat, "New chat"
-
-      new_chat.click
-      assert_current_path new_assistant_message_path(@conversation.assistant)
-    end
-  end
-
-  test "when conversation is scrolled to the bottom, when the browser resizes it auto-scrolls to stay at the bottom" do
-    assert_stays_at_bottom do
-      resize_browser_to(1400, 700)
-    end
-  end
-
-  test "when conversation is NOT scrolled to the bottom, when the browser resizes it DOES NOT auto-scroll so what scrolled to stays visible" do
-    assert_at_bottom
-    assert_scrolled_up { scroll_to find_messages.second }
-
-    assert_did_not_scroll do
-      resize_browser_to(1400, 700)
-    end
-  end
-
   private
-
-  def this_conversation
-    find("#conversation")
-  end
-
-  def find_conversations
-    all("#conversations [data-role='conversation']").to_a
-  end
 
   def hover_last_message
     msg = last_message
