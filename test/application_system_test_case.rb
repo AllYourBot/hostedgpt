@@ -210,7 +210,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     timeout = opts[:wait] || Capybara.default_max_wait_time
 
     Timeout.timeout(timeout) do
-      sleep 0.1 until block.call
+      sleep 0.25 until block.call
     end
   rescue Timeout::Error
     assert false, msg || "Expected block to return true, but it did not"

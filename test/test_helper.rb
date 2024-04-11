@@ -17,6 +17,8 @@ end
 class ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers
 
+  Capybara.default_max_wait_time = 4
+
   def login_as(user_or_person)
     user = if user_or_person.is_a?(Person)
       user_or_person.user
