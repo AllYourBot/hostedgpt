@@ -19,7 +19,7 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
 
   test "the scroll appears and disappears based on scroll position" do
     scroll_to find_messages.second
-    assert_visible "#scroll-button", "time = #{Time.new.to_i - @time_start} seconds"
+    assert_visible "#scroll-button", @time_start
 
     scroll_to first_message
     assert_visible "#scroll-button"
@@ -33,7 +33,7 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
 
   test "clicking scroll down button scrolls the page to the bottom" do
     scroll_to first_message
-    assert_visible "#scroll-button", "time = #{Time.new.to_i - @time_start} seconds"
+    assert_visible "#scroll-button", @time_start
 
     assert_scrolled_to_bottom do
       click_element "#scroll-button button"

@@ -107,7 +107,7 @@ class ConversationsTest < ApplicationSystemTestCase
   private
 
   def hover_conversation(c)
-    assert_visible "#conversation-#{c.id} a"
+    assert_visible "#conversation-#{c.id} a[data-role='title']"
     convo_node = find("#conversation-#{c.id}")
     convo_node.hover
     convo_node

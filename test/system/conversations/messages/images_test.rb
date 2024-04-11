@@ -104,11 +104,13 @@ end
 
       assert_at_bottom
 
-      Timeout.timeout(5) do
-        sleep 0.25 until img.visible?
+      assert_false "all images should be visible" do
+        all("[data-role='image-preview'", visible: :all).map(&:visible?).include?(false)
       end
 
-      assert img.visible?
+      assert_true do
+        img.visible?
+      end
       assert_at_bottom
     end
   end

@@ -39,11 +39,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def assert_visible(selector, error_msg = nil, wait: Capybara.default_max_wait_time)
-    element = first(selector, visible: :all, wait: wait) rescue nil
+    elements = all(selector, visible: :all, wait: wait) rescue nil
+    assert elements.length == 1, "Ambiguous match, expected to find one visible css #{selector}, but found #{elements.length}. #{error_msg}"
+    element = elements.first
     assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
 
-    element = first(selector, wait: wait) rescue nil
-    assert element, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
+    element = find(selector, wait: wait) rescue nil
+    assert element, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg} and #{Time.now.to_i - error_msg.to_i} seconds"
   end
 
   def assert_hidden(selector, error_msg = nil, wait: Capybara.default_max_wait_time)
@@ -129,10 +131,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     yield
 
-    assert_true "The #{selector} should not have scrolled" do
-      new_scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
-
-      scroll_position_first_element_relative_viewport == new_scroll_position_first_element_relative_viewport
+    new_scroll = nil
+    assert_true "The #{selector} should not have scrolled but position is #{new_scroll} rather than #{scroll_position_first_element_relative_viewport}" do
+      new_scroll = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
+      scroll_position_first_element_relative_viewport == new_scroll
     end
   end
 
@@ -144,7 +146,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     yield
 
     assert_true "The #{selector} should have scrolled up" do
-      get_scroll_position(selector) > scroll_position
+      get_scroll_position(selector) < scroll_position
     end
 
     assert_stopped_scrolling(selector)

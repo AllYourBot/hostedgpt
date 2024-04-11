@@ -169,24 +169,30 @@ class MessagesComposerTest < ApplicationSystemTestCase
     height = input.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys long_input_text
-      sleep 0.4
+
+      assert_true "Input should have grown taller" do
+        input.native.property('clientHeight') > height
+      end
     end
-    assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
 
   test "when large block of text is pasted, textarea grows in height and DOES NOT auto-scroll so what scrolled to stays visible" do
     click_text @long_conversation.title
     wait_for_images_to_load
 
-    scroll_to find_messages.second
-    sleep 0.5
+    assert_at_bottom
+    assert_scrolled_up do
+      scroll_to find_messages.second
+    end
 
     height = input.native.property('clientHeight')
     assert_did_not_scroll do
       send_keys long_input_text
-      sleep 0.5
+
+      assert_true "Input should have grown taller" do
+        input.native.property('clientHeight') > height
+      end
     end
-    assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
 
   test "submitting a couple messages to an existing conversation with ENTER works" do
