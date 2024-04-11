@@ -13,8 +13,8 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
   end
 
   test "the conversation auto-scrolls to bottom when page loads" do
-    assert_hidden "#scroll-button", "Page should have auto-scrolled to the bottom and hidden the scroll button."
     assert_at_bottom
+    assert_hidden "#scroll-button", "Page should have auto-scrolled to the bottom and hidden the scroll button."
   end
 
   test "the scroll appears and disappears based on scroll position" do
