@@ -45,7 +45,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
 
     element = find(selector, wait: wait) rescue nil
-    assert element, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg} and #{Time.now.to_i - error_msg.to_i} seconds"
+    assert element, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
   end
 
   def assert_hidden(selector, error_msg = nil, wait: Capybara.default_max_wait_time)

@@ -98,9 +98,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   test "when conversation is NOT scrolled to the bottom, when the browser resizes it DOES NOT auto-scroll so what scrolled to stays visible" do
     assert_at_bottom
-    assert_scrolled_up do
-      scroll_to find_messages.second
-    end
+    assert_scrolled_up { scroll_to find_messages.second }
 
     assert_did_not_scroll do
       resize_browser_to(1400, 700)

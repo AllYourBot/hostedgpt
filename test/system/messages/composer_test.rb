@@ -181,9 +181,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     wait_for_images_to_load
 
     assert_at_bottom
-    assert_scrolled_up do
-      scroll_to find_messages.second
-    end
+    assert_scrolled_up { scroll_to find_messages.second }
 
     height = input.native.property('clientHeight')
     assert_did_not_scroll do

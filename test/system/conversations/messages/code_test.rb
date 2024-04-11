@@ -49,6 +49,6 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
 
     assert_nil clipboard
     send_keys "meta+shift+c"
-    assert_equal conversation.messages.ordered.last.content_text.strip, clipboard
+    assert_true { conversation.messages.ordered.last.content_text.strip == clipboard }
   end
 end
