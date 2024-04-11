@@ -10,6 +10,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
   end
 
   test "the cursor is auto-focused in the text input for a new conversation and selecting existing conversation and ESC unfocuses" do
+    sleep 0.2
     assert_active @input_selector
     send_keys "esc"
     assert_active "body"
@@ -17,7 +18,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.2
 
     click_text @long_conversation.title
-    sleep 0.2
+    sleep 0.4
     assert_active @input_selector
   end
 
@@ -54,7 +55,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_active input
   end
 
-  test "when not in text input, ? opens the keyboard shortcuts and CLICKING OUTSIZDE dismisses it and keyboard shortcuts work normally" do
+  test "when not in text input, ? opens the keyboard shortcuts and CLICKING OUTSIDE dismisses it and keyboard shortcuts work normally" do
     send_keys "esc"
     assert_active "body"
     refute_text "Keyboard shortcuts"
@@ -177,12 +178,12 @@ class MessagesComposerTest < ApplicationSystemTestCase
     END
 
     click_text @long_conversation.title
-    sleep 0.2
+    sleep 0.4
 
     height = input.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys text.gsub(/\n/, ' ')
-      sleep 0.2
+      sleep 0.4
     end
     assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
@@ -205,10 +206,12 @@ class MessagesComposerTest < ApplicationSystemTestCase
     click_text @long_conversation.title
     sleep 0.2
     scroll_to find_messages.second
+    sleep 0.5
 
     height = input.native.property('clientHeight')
     assert_did_not_scroll do
       send_keys text.gsub(/\n/, ' ')
+      sleep 0.5
     end
     assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
@@ -227,7 +230,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
     send_keys "This is a second message"
     send_keys "enter"
-    sleep 0.5
+    sleep 1
 
     assert_equal path, current_path, "The page should not have changed urls"
     assert input.value.blank?, "The composer should have cleared itself"

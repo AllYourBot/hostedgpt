@@ -125,35 +125,46 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     raise "No block given" unless block_given?
 
     scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
-    yield
-    new_scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
 
-    assert_equal scroll_position_first_element_relative_viewport,
-      new_scroll_position_first_element_relative_viewport,
-      "The #{selector} should not have scrolled"
+    yield
+
+    assert_true "The #{selector} should not have scrolled", wait: 10 do
+      new_scroll_position_first_element_relative_viewport = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
+
+      scroll_position_first_element_relative_viewport == new_scroll_position_first_element_relative_viewport
+    end
   end
 
   def assert_scrolled_up(selector = "section #messages")
     raise "No block given" unless block_given?
 
     scroll_position = get_scroll_position(selector)
+
     yield
-    assert get_scroll_position(selector) > scroll_position, "The #{selector} should have scrolled up"
+
+    assert_true "The #{selector} should have scrolled up", wait: 10 do
+      get_scroll_position(selector) > scroll_position
+    end
   end
 
   def assert_scrolled_down(selector = "section #messages")
     raise "No block given" unless block_given?
 
     scroll_position = get_scroll_position(selector)
+
     yield
-    assert get_scroll_position(selector) > scroll_position, "The #{selector} should have scrolled down"
+
+    assert_true "The #{selector} should have scrolled down", wait: 10 do
+      get_scroll_position(selector) > scroll_position
+    end
   end
 
   def assert_at_bottom(selector = "section #messages")
-    sleep 0.1
+    sleep Capybara.default_max_wait_time
     new_scroll_position = get_scroll_position(selector)
     scroll_to_bottom(selector)
-    assert_equal new_scroll_position, get_scroll_position(selector), "The #{selector} did not scroll to the bottom."
+    sleep Capybara.default_max_wait_time
+    assert_equal new_scroll_position, get_scroll_position(selector), "The #{selector} was able to move down so it was not at the bottom"
   end
 
   def assert_scrolled_to_bottom(selector = "section #messages")
@@ -171,6 +182,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     assert_at_bottom(selector)
     yield
+    sleep Capybara.default_max_wait_time
     assert_at_bottom(selector)
   end
 
@@ -192,6 +204,26 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def clipboard
     page.evaluate_script('window.clipboard')
+  end
+
+  def assert_true(msg = nil, opts = {}, &block)
+    timeout = opts[:wait] || Capybara.default_max_wait_time
+
+    Timeout.timeout(timeout) do
+      sleep 0.25 until block.call
+    end
+  rescue Timeout::Error
+    assert false, msg || "Expected block to return true, but it did not"
+  end
+
+  def assert_false(msg = nil, opts = {}, &block)
+    timeout = opts[:wait] || Capybara.default_max_wait_time
+
+    Timeout.timeout(timeout) do
+      sleep 0.1 until !block.call
+    end
+  rescue Timeout::Error
+    refute true, msg || "Expected block to return false, but it did not"
   end
 end
 

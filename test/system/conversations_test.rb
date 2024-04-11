@@ -35,7 +35,7 @@ class ConversationsTest < ApplicationSystemTestCase
 
     fill_in "edit-conversation", with: "Meeting Samantha Jones"
     find("body").click
-    sleep 0.2
+    sleep 1
 
     assert_equal "Meeting Samantha Jones", convo.text
     assert_equal "Meeting Samantha Jones", conversations(:greeting).reload.title

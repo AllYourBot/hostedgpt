@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "input", "submit", "overlay" ]
+  static targets = [ "form", "input", "submit", "overlay", "cancel" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -10,7 +10,7 @@ export default class extends Controller {
   connect() {
     this.inputTarget.focus()
     this.cursorToEnd()
-    this.disableSubmitButton()
+    this.toggleSubmitButton()
   }
 
   cursorToEnd() {
@@ -20,18 +20,20 @@ export default class extends Controller {
   }
 
   // Disable the submit button if the input is empty.
-  disableSubmitButton() {
+  toggleSubmitButton() {
     if (this.cleanInputValue.length < 1) {
       this.submitTarget.disabled = true
+      if (this.hasCancelTarget) this.cancelTarget.classList.remove('hidden')
     } else {
       this.submitTarget.disabled = false
+      if (this.hasCancelTarget) this.cancelTarget.classList.add('hidden')
     }
   }
 
   submitForm() {
     if (this.cleanInputValue.length > 0) {
       this.disableComposerUntilSubmit()
-      this.element.requestSubmit()
+      this.formTarget.requestSubmit()
       window.dispatchEvent(new CustomEvent('main-column-changed'))
     }
   }
@@ -66,6 +68,6 @@ export default class extends Controller {
 
   boundEnableComposer = () => { this.enableComposer() }
   enableComposer() {
-    this.element.reset()
+    this.formTarget.reset()
   }
 }

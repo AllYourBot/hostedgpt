@@ -123,7 +123,7 @@
 
       <div  id="composer"
             class="flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
-            data-controller="image-upload"
+            data-controller="new-message image-upload"
       >
         <%= button_tag type: "button",
               id: "attach-button",
@@ -143,36 +143,65 @@
         <% end %>
 
         <div id="document-previews" class="absolute hidden space-x-3 left-9 top-3 show-previews:preview-container" data-image-upload-target="preview">
-            <div  class="flex flex-col items-stretch w-16 h-16 overflow-hidden border-2 border-gray-100 rounded-xl group"
-                  data-role="preview"
-            >
-              <%= button_tag type: "button",
-                  class: "rounded-full absolute -top-2 -right-2 border border-gray-300 bg-gray-200 hidden group-hover:block",
-                  data: {
-                    action: "image-upload#remove",
-                    role: "preview-remove"
-                  } do
+          <div class="
+              flex flex-col
+              items-stretch
+              w-16 h-16
+              overflow-hidden
+              border-2 border-gray-100
+              rounded-xl
+              group
+            "
+            data-role="preview"
+          >
+            <%= button_tag type: "button",
+              class: "rounded-full absolute -top-2 -right-2 border border-gray-300 bg-gray-200 hidden group-hover:block",
+              data: {
+                action: "image-upload#remove",
+                role: "preview-remove"
+              } do
+            %>
+              <%= icon "x-mark",
+                variant: :mini,
+                class: %|
+                  text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white
+                  cursor-pointer stroke-2
+                |,
+                title: 'Remove file',
+                tooltip: :top
               %>
-                <%= icon "x-mark",
-                      variant: :mini,
-                      class: %|
-                        text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white
-                        cursor-pointer stroke-2
-                      |,
-                      title: 'Remove file',
-                      tooltip: :top
-                %>
-              <% end %>
+            <% end %>
 
-              <%= button_tag type: "button",
-                    class: "w-full h-full flex-1 p-0" do
-              %>
+            <%= button_tag type: "button",
+              class: "w-full h-full flex-1 p-0" do
+            %>
               <%= image_tag "", class: "w-full h-full object-cover" %>
             <% end %>
           </div>
         </div>
 
-        <%= form_with(model: [@assistant, @new_message], data: { controller: "new-message", turbo_frame: "_top" }) do |form| %>
+        <% if @streaming_message %>
+          <%= form_with(
+            model: @streaming_message,
+            class: "absolute top-2 right-8 z-10",
+            data: {
+              new_message_target: "cancel",
+              turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+          }) do |form| %>
+            <%= form.hidden_field :cancelled_at, value: Time.current %>
+            <%= form.button id: "cancel", type: "submit", class: "relative" do %>
+              <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
+              <%= icon "stop-circle", variant: :outline, size: 39, title: 'Stop', tooltip: :top %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <%= form_with(
+          model: [@assistant, @new_message],
+          data: {
+            new_message_target: "form",
+            turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+        }) do |form| %>
           <%= form.hidden_field :conversation_id %>
           <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
             <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
@@ -185,7 +214,7 @@
               application_target: "newMessageField",
               controller: "textarea-autogrow",
               action: %|
-                new-message#disableSubmitButton
+                new-message#toggleSubmitButton
                 keydown.enter->new-message#submitForm:prevent
                 keydown.meta+enter->new-message#submitForm
                 keydown.ctrl+enter->new-message#submitForm
