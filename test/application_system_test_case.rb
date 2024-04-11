@@ -224,29 +224,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     timeout = opts[:wait] || Capybara.default_max_wait_time
 
     Timeout.timeout(timeout) do
-      until block.call
-        sleep 0.25
-        puts "### the block is still false when we want it to be true"
-      end
+      sleep 0.25 until block.call
     end
   rescue Timeout::Error
-    puts "### timed out"
     assert false, msg || "Expected block to return true, but it did not"
   end
 
   def assert_false(msg = nil, opts = {}, &block)
     timeout = opts[:wait] || Capybara.default_max_wait_time
 
-    puts "### starting assert_false"
     Timeout.timeout(timeout) do
-      until !block.call
-        sleep 0.25
-        puts "### the block is still true when we want it to be false"
-      end
+      sleep 0.25 until !block.call
     end
   rescue Timeout::Error
-    puts "### timed out"
-    #binding.pry
     refute true, msg || "Expected block to return false, but it did not"
   end
 
