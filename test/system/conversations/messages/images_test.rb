@@ -89,7 +89,7 @@ end
       image_container.click
 
       assert_true "modal image should be visible" do
-        assert modal_img.visible?
+        modal_img.visible?
       end
       refute modal_loader.visible?
     end
