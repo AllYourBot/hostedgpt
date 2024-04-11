@@ -63,6 +63,71 @@ alive_response:
   additional_instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
+your_name_response:
+  assistant: samantha
+  conversation: attachment
+  status: completed
+  required_action:
+  last_error:
+  started_at: 2023-12-25 15:03:41
+  completed_at: 2023-12-25 15:04:41
+  expired_at: 2023-12-25 15:05:41
+  cancelled_at:
+  failed_at:
+  model: gpt-4
+  instructions: You are a helpful assistant
+  additional_instructions:
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+
+examine_this_response:
+  assistant: samantha
+  conversation: attachment
+  status: completed
+  required_action:
+  last_error:
+  started_at: 2023-12-25 15:06:41
+  completed_at: 2023-12-25 15:07:41
+  expired_at: 2023-12-25 15:08:41
+  cancelled_at:
+  failed_at:
+  model: gpt-4
+  instructions: You are a helpful assistant
+  additional_instructions:
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+  file_ids: ["file-abc123"]
+
+what_month_response:
+  assistant: samantha
+  conversation: attachment
+  status: completed
+  required_action:
+  last_error:
+  started_at: 2023-12-25 15:06:41
+  completed_at: 2023-12-25 15:07:41
+  expired_at: 2023-12-25 15:08:41
+  cancelled_at:
+  failed_at:
+  model: gpt-4
+  instructions: You are a helpful assistant
+  additional_instructions:
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+
+human_response:
+  assistant: samantha
+  conversation: attachment
+  status: completed
+  required_action:
+  last_error:
+  started_at: 2023-12-25 15:06:41
+  completed_at: 2023-12-25 15:07:41
+  expired_at: 2023-12-25 15:08:41
+  cancelled_at:
+  failed_at:
+  model: gpt-4
+  instructions: You are a helpful assistant
+  additional_instructions:
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+
 can_you_hear_response:
   assistant: samantha
   conversation: attachments

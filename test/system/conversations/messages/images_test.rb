@@ -11,7 +11,6 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   test "images render in messages WHEN pre-processed, clicking opens modal" do
     visit conversation_messages_path(@conversation)
-    sleep 0.3
     image_msg = find_messages.third
 
     image = image_msg.find_role("image-preview")
@@ -21,13 +20,15 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
     refute modal.visible?
 
     image.click
-    sleep 0.7
-    assert modal.visible?
+    assert_true "modal image should have been visible", wait: 0.6 do
+      modal.visible?
+    end
 
     send_keys "esc"
-    sleep 0.4
-    refute modal.visible?
-  end
+    assert_false "modal image should have closed/hidden itself", wait: 0.6 do
+      modal.visible?
+    end
+end
 
   test "images render in messages WHEN NOT pre-processed, clicking opens modal" do
     stimulate_image_variant_processing do
@@ -44,12 +45,14 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       refute modal.visible?
 
       image.click
-      sleep 0.7
-      assert modal.visible?
+      assert_true "modal image should have been visible" do
+        modal.visible?
+      end
 
       send_keys "esc"
-      sleep 0.4
-      refute modal.visible?
+      assert_false "modal image should have closed/hidden itself" do
+        modal.visible?
+      end
     end
   end
 
@@ -58,33 +61,37 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       visit conversation_messages_path(@conversation)
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
-      loader          = image_container.find_role("loader")
-      img             = image_container.find("img", visible: false)
+      loader          = image_container.find_role("image-loader")
+      img             = image_container.find("img", visible: :all)
       modal_container = image_msg.find_role("image-modal")
-      modal_loader    = modal_container.find_role("loader")
-      modal_img       = modal_container.find("img", visible: false)
+      modal_loader    = modal_container.find_role("image-loader")
+      modal_img       = modal_container.find("img", visible: :all)
 
-      sleep 0.5
-      assert loader.visible?
+      assert_true "image loader should be visible", wait: 0.6 do
+        loader.visible?
+      end
       refute img.visible?
 
       image_container.click
-      sleep 0.2
 
-      assert modal_loader.visible?
+      assert_true "modal image loader should be visible", wait: 0.6 do
+        modal_loader.visible?
+      end
       refute modal_img.visible?
 
       send_keys "esc"
-      sleep 3
 
-      refute loader.visible?
+      assert_false "image loader should have eventually disappeared", wait: 10 do
+        loader.visible?
+      end
       assert img.visible?
 
       image_container.click
-      sleep 0.2
 
+      assert_true "modal image should be visible" do
+        modal_img.visible?
+      end
       refute modal_loader.visible?
-      assert modal_img.visible?
     end
   end
 
@@ -93,17 +100,17 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       visit conversation_messages_path(@conversation)
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
-      img             = image_container.find("img", visible: false)
+      img             = image_container.find("img", visible: :all)
 
-      sleep 0.5
       assert_at_bottom
 
-      Timeout.timeout(5) do
-        sleep 0.25 until img.visible?
+      assert_false "all images should be visible" do
+        all("[data-role='image-preview'", visible: :all).map(&:visible?).include?(false)
       end
 
-      assert img.visible?
-      sleep 1
+      assert_true do
+        img.visible?
+      end
       assert_at_bottom
     end
   end
@@ -150,7 +157,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   def simulate_not_preprocessed
     ->() do
-      return nil if params[:retry_count].to_i < 3
+      return nil if params[:retry_count].to_i < 5
       ActiveStorage.verifier.verified(params[:encoded_key], purpose: :blob_key)&.symbolize_keys
     end
   end

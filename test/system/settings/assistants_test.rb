@@ -14,7 +14,6 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     fill_in "Instructions", with: @assistant.instructions
 
     click_text "Save"
-    sleep 0.3
     assert_text "Saved"
   end
 
@@ -34,12 +33,10 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     visit edit_settings_assistant_url(@assistant)
     click_text "Save"
     assert_text "Saved"
-    sleep 3.5
     refute_text "Saved"
 
     click_text "Save"
     assert_text "Saved"
-    sleep 3.5
     refute_text "Saved"
   end
 
@@ -48,7 +45,6 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     accept_confirm do
       click_text "Delete", match: :first
     end
-    sleep 0.5
     assert_text "Deleted"
 
     refute Assistant.exists?(id: @assistant.id)
