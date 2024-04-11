@@ -10,7 +10,6 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     @new_message = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
 
     visit conversation_messages_path(@conversation.id)
-    wait_for_images_to_load
   end
 
   test "clipboard icon shows tooltip" do

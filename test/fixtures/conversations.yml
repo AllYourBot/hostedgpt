@@ -3,6 +3,11 @@ greeting:
   assistant: samantha
   title: Meeting Samantha
 
+attachment:
+  user: keith
+  assistant: samantha
+  title: Testing one attachment
+
 attachments:
   user: keith
   assistant: samantha

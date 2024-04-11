@@ -4,7 +4,7 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
   setup do
     @user = users(:keith)
     login_as @user
-    @conversation = conversations(:greeting)
+    @conversation = conversations(:attachment)
     @new_message = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
 
     @time_start = Time.new.to_i

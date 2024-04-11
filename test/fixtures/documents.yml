@@ -9,7 +9,7 @@ background:
 cat_photo:
   user: keith
   assistant:
-  message: identify_photo
+  message: examine_this
   filename: cat.png
   purpose: assistants
   bytes: 51452
