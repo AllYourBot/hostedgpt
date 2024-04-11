@@ -63,11 +63,11 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       find(selector_or_element, wait: wait)
     end
 
-    unless element.matches_css?(".tooltip") # sometimes we're checking the tooltip on a link but within the link is an icon, check that instead
+    unless element.matches_css?(".tooltip", wait: 0) # sometimes we're checking the tooltip on a link but within the link is an icon, check that instead
       element = element.find(:xpath, './*', match: :first, wait: wait)
     end
 
-    assert element.matches_css?(".tooltip")
+    assert element.matches_css?(".tooltip", wait: 0)
     assert_equal text, element[:'data-tip'], "Expected element to have tooltip #{text}. #{error_msg}"
   end
 
