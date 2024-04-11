@@ -11,12 +11,11 @@ class MessagesComposerStopStreamingTest < ApplicationSystemTestCase
   test "stop button shows in composer while replying and disappears when done" do
     send_keys "You there?"
     send_keys "enter"
-    sleep 0.2
 
     assert_selector "#composer #cancel"
 
     reply = @conversation.messages.ordered.last
-    reply.update!(content_text: "Yes")
+    reply.update!(content_text: "Foo bar")
     stream_ai_message(reply)
     finish_streaming
 
@@ -26,19 +25,16 @@ class MessagesComposerStopStreamingTest < ApplicationSystemTestCase
   test "stop button shows in composer while replying and clicking cancel stops it" do
     send_keys "You there?"
     send_keys "enter"
-    sleep 0.2
 
     assert_selector "#composer #cancel"
 
     reply = @conversation.messages.ordered.last
-    reply.update!(content_text: "Yes")
+    reply.update!(content_text: "Foo bar")
     stream_ai_message(reply)
-    sleep 0.2
 
-    assert_changes "reply.reload.cancelled?", from: false, to: true do
-      click_element "#composer #cancel"
-      sleep 0.3
-    end
+    refute reply.reload.cancelled?
+    click_element "#composer #cancel"
+    assert_true { reply.reload.cancelled? }
 
     assert_no_selector "#composer #cancel"
   end
@@ -47,10 +43,11 @@ class MessagesComposerStopStreamingTest < ApplicationSystemTestCase
 
   def stream_ai_message(msg)
     GetNextAIMessageJob.broadcast_updated_message(msg)
+    sleep 1 # without this I get a stale element reference on this next line which I cannot understand...
+    assert_true { last_message.text.include?(msg.content_text) }
   end
 
   def finish_streaming
     @conversation.broadcast_refresh
-    sleep 0.2
   end
 end

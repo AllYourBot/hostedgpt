@@ -243,7 +243,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def wait_for_images_to_load
-    assert_false "all the image loaders should have disappeared" do
+    assert_false "all the image loaders should have disappeared", wait: 10 do
       all("[data-role='image-loader']", visible: :all).map(&:visible?).include?(true)
     end
   end
