@@ -7,6 +7,7 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
     @conversation = conversations(:greeting)
     @new_message = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
 
+    @time_start = Time.new.to_i
     visit conversation_messages_path(@conversation)
     wait_for_images_to_load
   end
@@ -18,8 +19,7 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
 
   test "the scroll appears and disappears based on scroll position" do
     scroll_to find_messages.second
-    assert_stopped_scrolling
-    assert_visible "#scroll-button"
+    assert_visible "#scroll-button", "time = #{Time.new.to_i - @time_start} seconds"
 
     scroll_to first_message
     assert_visible "#scroll-button"
@@ -33,7 +33,7 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
 
   test "clicking scroll down button scrolls the page to the bottom" do
     scroll_to first_message
-    assert_visible "#scroll-button"
+    assert_visible "#scroll-button", "time = #{Time.new.to_i - @time_start} seconds"
 
     assert_scrolled_to_bottom do
       click_element "#scroll-button button"

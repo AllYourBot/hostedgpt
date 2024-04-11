@@ -17,19 +17,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assistant = user.assistants.ordered.first
 
     visit logout_path
-    assert_current_path login_path, wait: 2
+    assert_current_path login_path
     fill_in "email", with: user.person.email
     fill_in "password", with: password
     click_text "Log In"
-    assert_current_path new_assistant_message_path(assistant), wait: 3
+    assert_current_path new_assistant_message_path(assistant)
   end
 
   def logout
     visit logout_path
-    assert_current_path login_path, wait: 2
+    assert_current_path login_path
   end
 
-  def assert_active(selector_or_element, error_msg = nil, wait: nil)
+  def assert_active(selector_or_element, error_msg = nil, wait: Capybara.default_max_wait_time)
     element = if selector_or_element.is_a?(Capybara::Node::Element)
       selector_or_element
     else
@@ -42,8 +42,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     element = first(selector, visible: :all, wait: wait) rescue nil
     assert element, "Expected to find visible css #{selector}, but the element was not found. #{error_msg}"
 
-    element = first(selector, visible: true, wait: wait) rescue nil
-    assert element&.visible?, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
+    element = first(selector, wait: wait) rescue nil
+    assert element, "Expected to find visible css #{selector}. It was found but it is hidden. #{error_msg}"
   end
 
   def assert_hidden(selector, error_msg = nil, wait: Capybara.default_max_wait_time)
@@ -54,7 +54,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
   end
 
-  def assert_shows_tooltip(selector_or_element, text, error_msg = nil, wait: nil)
+  def assert_shows_tooltip(selector_or_element, text, error_msg = nil, wait: Capybara.default_max_wait_time)
     element = if selector_or_element.is_a?(Capybara::Node::Element)
       selector_or_element
     else
@@ -98,7 +98,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     click_on text, **params
   end
 
-  def click_element(selector_or_element, wait: nil)
+  def click_element(selector_or_element, wait: Capybara.default_max_wait_time)
     element = if selector_or_element.is_a?(Capybara::Node::Element)
       selector_or_element
     else

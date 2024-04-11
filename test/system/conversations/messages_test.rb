@@ -71,7 +71,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
       @new_message.content_text = "The quick brown fox jumped over the lazy dog and this line needs to wrap to scroll." +
                                   "But it was not long enough so I'm adding more text on this second line to ensure it."
       GetNextAIMessageJob.broadcast_updated_message(@new_message)
-      assert_true "The last message should have contained the submitted text" do
+      assert_true "The last message should have contained the submitted text but it contains '#{last_message.text}'" do
         last_message.text.include?("The quick brown")
       end
       @new_message.save!
@@ -98,7 +98,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   test "when conversation is NOT scrolled to the bottom, when the browser resizes it DOES NOT auto-scroll so what scrolled to stays visible" do
     scroll_to find_messages.second
-    sleep 0.1
+    assert_stopped_scrolling
 
     assert_did_not_scroll do
       resize_browser_to(1400, 700)

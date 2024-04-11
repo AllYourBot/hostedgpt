@@ -18,7 +18,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.2
 
     click_text @long_conversation.title
-    sleep 0.4
+    wait_for_images_to_load
     assert_active @input_selector
   end
 
@@ -121,7 +121,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
   test "textarea grows in height as newlines are added and shrinks in height when they are removed" do
     click_text @long_conversation.title
-    sleep 1
+    wait_for_images_to_load
 
     send_keys "1"
 
@@ -176,7 +176,8 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
   test "when large block of text is pasted, textarea grows in height and DOES NOT auto-scroll so what scrolled to stays visible" do
     click_text @long_conversation.title
-    sleep 0.2
+    wait_for_images_to_load
+
     scroll_to find_messages.second
     sleep 0.5
 
@@ -190,7 +191,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
   test "submitting a couple messages to an existing conversation with ENTER works" do
     click_text @long_conversation.title
-    sleep 0.3
+    wait_for_images_to_load
     path = current_path
 
     send_keys "This is a message"
@@ -210,7 +211,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
   test "submitting a couple messages to an existing conversation with CLICKING works" do
     click_text @long_conversation.title
-    sleep 1
+    wait_for_images_to_load
     path = current_path
 
     send_keys "This is a message"
