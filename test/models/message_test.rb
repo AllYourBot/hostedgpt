@@ -14,11 +14,11 @@ class MessageTest < ActiveSupport::TestCase
   # and https://platform.openai.com/docs/guides/vision
   #
   # test "has associated content_document" do
-  #   assert_instance_of Document, messages(:identify_photo).content_document
+  #   assert_instance_of Document, messages(:examine_this).content_document
   # end
 
   test "has associated documents" do
-    assert_instance_of Document, messages(:identify_photo).documents.first
+    assert_instance_of Document, messages(:examine_this).documents.first
   end
 
   test "has an associated run" do
@@ -49,7 +49,7 @@ class MessageTest < ActiveSupport::TestCase
 
   test "documents are deleted upon destroy" do
     assert_difference "Document.count", -1 do
-      messages(:identify_photo).destroy
+      messages(:examine_this).destroy
     end
   end
 
@@ -180,17 +180,17 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   test "has_document_image?" do
-    assert messages(:identify_photo).has_document_image?
-    refute messages(:identify_photo).has_document_image?(:small)
+    assert messages(:examine_this).has_document_image?
+    refute messages(:examine_this).has_document_image?(:small)
   end
 
   test "document_image_path" do
-    assert messages(:identify_photo).document_image_path(:small).is_a?(String)
-    assert messages(:identify_photo).document_image_path(:small).starts_with?("/rails/active_storage/representations/redirect")
+    assert messages(:examine_this).document_image_path(:small).is_a?(String)
+    assert messages(:examine_this).document_image_path(:small).starts_with?("/rails/active_storage/representations/redirect")
   end
 
   test "document_image_path with fallback" do
-    assert_equal "", messages(:identify_photo).document_image_path(:small, fallback: "")
+    assert_equal "", messages(:examine_this).document_image_path(:small, fallback: "")
   end
 
   private
