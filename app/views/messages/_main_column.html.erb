@@ -216,16 +216,22 @@
               controller: "textarea-autogrow",
               action: %|
                 new-message#toggleSubmitButton
+
                 keydown.enter->new-message#submitForm:prevent
                 keydown.meta+enter->new-message#submitForm
                 keydown.ctrl+enter->new-message#submitForm
+
                 keydown.shift+esc@document->new-message#focusKeydown
                 keydown.slash@document->new-message#focusKeydown
+
                 keydown.esc->new-message#unfocusKeydown
+
                 keydown.meta+shift+o->new-message#unfocusKeydown
                 keydown.ctrl+shift+o->new-message#unfocusKeydown
                 keydown.meta+j->new-message#unfocusKeydown
                 keydown.ctrl+j->new-message#unfocusKeydown
+
+                paste->new-message#smartPaste
               |
             },
             rows: 1,
