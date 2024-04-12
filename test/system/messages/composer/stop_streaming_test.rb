@@ -26,6 +26,7 @@ class MessagesComposerStopStreamingTest < ApplicationSystemTestCase
     send_keys "You there?"
     send_keys "enter"
 
+    assert_composer_blank
     assert_selector "#composer #cancel"
 
     reply = @conversation.messages.ordered.last

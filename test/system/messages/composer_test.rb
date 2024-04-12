@@ -84,7 +84,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.5
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
-    assert input.value.blank?
+    assert_composer_blank
   end
 
   test "enter works to submit but only when text has been entered" do
@@ -100,7 +100,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.3
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
-    assert input.value.blank?
+    assert_composer_blank
   end
 
   test "shift+enter inserts a newline and then enter submits" do
@@ -116,7 +116,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.5
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
-    assert input.value.blank?
+    assert_composer_blank
   end
 
   test "textarea grows in height as newlines are added and shrinks in height when they are removed" do
@@ -203,14 +203,14 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.5
 
     assert_equal path, current_path, "The page should not have changed urls"
-    assert input.value.blank?, "The composer should have cleared itself"
+    assert_composer_blank
 
     send_keys "This is a second message"
     send_keys "enter"
     sleep 1
 
     assert_equal path, current_path, "The page should not have changed urls"
-    assert input.value.blank?, "The composer should have cleared itself"
+    assert_composer_blank
   end
 
   test "submitting a couple messages to an existing conversation with CLICKING works" do
@@ -223,14 +223,14 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 1
 
     assert_equal path, current_path, "The page should not have changed urls"
-    assert input.value.blank?, "The composer should have cleared itself"
+    assert_composer_blank
 
     send_keys "This is a second message"
     click_element @submit
     sleep 0.3
 
     assert_equal path, current_path, "The page should not have changed urls"
-    assert input.value.blank?, "The composer should have cleared itself"
+    assert_composer_blank
   end
 
   private

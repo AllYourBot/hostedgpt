@@ -247,6 +247,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       all("[data-role='image-loader']", visible: :all).map(&:visible?).include?(true)
     end
   end
+
+  def assert_composer_blank(msg = nil)
+    msg ||= "Composer input did not clear"
+    assert_true msg do
+      find("#composer textarea").value.blank?
+    end
+  end
 end
 
 class Capybara::Node::Element
