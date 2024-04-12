@@ -44,7 +44,9 @@ class MessagesComposerStopStreamingTest < ApplicationSystemTestCase
   def stream_ai_message(msg)
     GetNextAIMessageJob.broadcast_updated_message(msg)
     sleep 1 # without this I get a stale element reference on this next line which I cannot understand...
-    assert_true { last_message.text.include?(msg.content_text) }
+    assert_true(wait: 10) do
+      last_message.text.include?(msg.content_text)
+    end
   end
 
   def finish_streaming

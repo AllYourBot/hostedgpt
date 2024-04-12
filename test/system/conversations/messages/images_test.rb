@@ -38,8 +38,8 @@ end
       modal = image_msg.find_role("image-modal")
       img = image.find("img", visible: false)
 
-      Timeout.timeout(5) do
-        sleep 0.25 until img.visible?
+      assert_true wait: 5 do
+        img.visible?
       end
       assert img.visible?
       refute modal.visible?
@@ -115,26 +115,28 @@ end
     end
   end
 
-  test "images render in message and remain after submitting a new message which morphs the page" do
+  test "images in previous messages remain after submitting a new message, they should not display a new spinner" do
     image_msg = img = nil
     stimulate_image_variant_processing do
       visit conversation_messages_path(@conversation)
       image_msg = find_messages.third
       img = image_msg.find_role("image-preview").find("img", visible: false)
 
-      Timeout.timeout(5) do
-        sleep 0.25 until img.visible?
+      assert_true wait: 5 do
+        img.visible?
       end
     end
 
     send_keys "hello?"
     send_keys "enter"
 
-    img.visible?
+    assert_true { find("#composer textarea").value.blank? }
+    assert img.visible?
 
     send_keys "hello?"
     send_keys "enter"
 
+    assert_true { find("#composer textarea").value.blank? }
     assert img.visible?
   end
 
