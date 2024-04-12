@@ -24,8 +24,8 @@ class GetNextAIMessageJob < ApplicationJob
     raise WaitForPrevious if @prev_message && @prev_message.content_text.blank? && @prev_message.processed?
 
     last_sent_at = Time.current
-    @message.processed!
-    @message.content_text ||= ""
+    @message.update!(processed_at: Time.current, content_text: "")
+    GetNextAIMessageJob.broadcast_updated_message(@message, thinking: true) # signal to user that we're waiting on API
 
     response = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
       .get_next_chat_message do |content_chunk|
