@@ -111,6 +111,8 @@ end
       assert_true do
         img.visible?
       end
+      sleep 2 # I cannot figure out how to avoid the race condition that assert_at_bottom
+              # runs in between images appearing but before scroll down has happened
       assert_at_bottom
     end
   end
