@@ -233,6 +233,8 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert input.value.blank?, "The composer should have cleared itself"
   end
 
+  # TODO: We do not have a test for the smart paste. I'm not sure how to programmatically paste from within capybara
+
   private
 
   def input

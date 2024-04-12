@@ -2,8 +2,10 @@ require "./lib/markdown_renderer"
 
 module MessagesHelper
   def format(text, append_inside_tag:)
+    escaped_text = html_escape(text)
+
     html = ::MarkdownRenderer.render(
-      text,
+      escaped_text,
       block_code: block_code
     )
 
