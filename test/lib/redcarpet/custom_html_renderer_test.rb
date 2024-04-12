@@ -80,4 +80,27 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
       end
     )
   end
+
+  test "newlines within paragraphs get converted into BRs" do
+    markdown = <<~MD
+      This is the first paragraph
+
+      This is a second paragraph
+      with a line break.
+
+      This is a third paragraph
+
+    MD
+
+    formatted = <<~HTML
+      <p>This is the first paragraph</p>
+
+      <p>This is a second paragraph<br>
+      with a line break.</p>
+
+      <p>This is a third paragraph</p>
+    HTML
+
+    assert_equal formatted.strip, @renderer.render(markdown).strip
+  end
 end
