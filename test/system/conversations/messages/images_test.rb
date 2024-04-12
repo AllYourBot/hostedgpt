@@ -130,13 +130,13 @@ end
     send_keys "hello?"
     send_keys "enter"
 
-    assert_true { find("#composer textarea").value.blank? }
+    assert_composer_blank
     assert img.visible?
 
     send_keys "hello?"
     send_keys "enter"
 
-    assert_true { find("#composer textarea").value.blank? }
+    assert_composer_blank
     assert img.visible?
   end
 
