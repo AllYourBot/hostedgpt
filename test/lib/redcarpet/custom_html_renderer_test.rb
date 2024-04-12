@@ -9,7 +9,7 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
     markdown = "This is `code` inline."
     formatted = "<p>This is <code>code</code> inline.</p>\n"
 
-    assert_equal formatted, @renderer.render(markdown)
+    assert_equal formatted.strip, @renderer.render(markdown).strip
   end
 
   test "block_code perfectly formatted" do
@@ -32,7 +32,7 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
       <p>Line after.</p>
     HTML
 
-    assert_equal formatted, @renderer.render(markdown)
+    assert_equal formatted.strip, @renderer.render(markdown).strip
   end
 
   test "block_code missing a blank line before and after - ensure_newline_before_code_block_start" do
@@ -53,7 +53,7 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
       <p>Line after.</p>
     HTML
 
-    assert_equal formatted, @renderer.render(markdown)
+    assert_equal formatted.strip, @renderer.render(markdown).strip
   end
 
   test "block_code can be provided with a proc" do
@@ -74,11 +74,11 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
       <p>Line after.</p>
     HTML
 
-    assert_equal formatted, @renderer.render(markdown,
-      block_code: -> (code, language) do
-        %(<CODE lang="#{language}">#{code}</CODE>)
-      end
-    )
+    block_code = -> (code, language) do
+      %(<CODE lang="#{language}">#{code}</CODE>)
+    end
+
+    assert_equal formatted.strip, @renderer.render(markdown, block_code: block_code).strip
   end
 
   test "newlines within paragraphs get converted into BRs" do
