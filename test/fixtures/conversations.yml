@@ -32,3 +32,18 @@ debugging:
   user: rob
   assistant: rob_gpt4
   title: Verifying Ruby syntax
+
+
+# 0.1
+# 1.1
+# 2.1 2.2
+# 3.1 3.2
+#     4.2  (4.3)
+#     5.2  (5.3)
+#    (6.2) (6.3)
+#
+# messages in in parens are not pre-created
+versioned:
+  user: keith
+  assistant: samantha
+  title: Versioned conversation
