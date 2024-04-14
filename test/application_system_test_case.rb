@@ -219,7 +219,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def clipboard
-    page.evaluate_script('window.clipboard')
+    page.evaluate_script('window.clipboardForSystemTestsToCheck')
   end
 
   def assert_true(msg = nil, opts = {}, &block)
