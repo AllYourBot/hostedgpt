@@ -7,6 +7,9 @@ on:
 jobs:
   docker-build:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref }}-test
+      cancel-in-progress: true
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
