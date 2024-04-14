@@ -18,7 +18,7 @@ class Message < ApplicationRecord
   validate  :validate_conversation,  if: -> { conversation.present? && Current.user }
   validate  :validate_assistant,     if: -> { assistant.present? && Current.user }
 
-  scope :ordered, -> { order(:created_at) }
+  scope :ordered, -> { latest_version_for_conversation }
 
   after_create :start_assistant_reply, if: -> { user? }
 
