@@ -128,7 +128,7 @@ class Message::VersionTest < ActiveSupport::TestCase
     assert_equal msg_versions, c.map(&:full_version)
   end
 
-  test "Take 3 of - creating a new messages for a SPECIFIC INDEX but WITHOUT VERSION autosets version properly - not creating a new version" do
+  test "Take 3 of - creating a new messages for a SPECIFIC INDEX but WITHOUT VERSION autosets version properly - at the end so don't create a new version" do
     # See comment block in conversations.yml for :versioned to visualize the messages
     Current.user = users(:keith)
     m = conversations(:versioned).messages.latest_version_for_conversation.last
@@ -164,8 +164,10 @@ class Message::VersionTest < ActiveSupport::TestCase
     assert_equal msg_versions, c.map(&:full_version)
   end
 
-  test "Take 4 of - creating a new messages for a SPECIFIC INDEX but WITHOUT VERSION autosets version properly - overwriting a previous version" do
+  test "Take 4 of - creating a new messages for a SPECIFIC INDEX but WITHOUT VERSION autosets version properly - when higher up in the chain" do
     # See comment block in conversations.yml for :versioned to visualize the messages
+
+    # We're about to edit message #1 and what should get created is version 3 even though there is no version 2
     Current.user = users(:keith)
     m = conversations(:versioned).messages.latest_version_for_conversation.last
 
@@ -175,17 +177,28 @@ class Message::VersionTest < ActiveSupport::TestCase
     m = conversations(:versioned).messages.create!(index: 1, assistant: assistants(:samantha), content_text: "What is your name?")
 
     assert_equal 1, m.index
-    assert_equal 2, m.version
+    assert_equal 3, m.version
 
     c = conversations(:versioned).messages.latest_version_for_conversation
     msg_versions = [
       0.1,
-           1.2,
-           2.2
+               1.3,
+               2.3
     ]
     assert_equal msg_versions, c.map(&:full_version)
 
+    c = conversations(:versioned).messages.for_conversation_version(3)
+    assert_equal msg_versions, c.map(&:full_version)
+
     c = conversations(:versioned).messages.for_conversation_version(2)
+    msg_versions = [
+      0.1,
+      1.1,
+           2.2,
+           3.2,
+           4.2,
+           5.2
+    ]
     assert_equal msg_versions, c.map(&:full_version)
   end
 

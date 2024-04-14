@@ -48,7 +48,10 @@ module Message::Version
       if index > 0 && !conversation.messages.exists?(index: index-1)
         errors.add(:index, "cannot skip a number")
       else # index is valid
-        v =   conversation.latest_version_for_message_index(index)
+        v = conversation.latest_version_for_message_index(index)
+        if v && conversation.latest_message && v < conversation.latest_message.version
+          v = conversation.latest_message&.version
+        end
         v ||= conversation.latest_message&.version&.-1
 
         if version.blank?
