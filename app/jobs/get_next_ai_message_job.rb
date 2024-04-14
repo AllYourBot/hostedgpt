@@ -15,9 +15,9 @@ class GetNextAIMessageJob < ApplicationJob
   def perform(message_id, assistant_id)
     puts "GetNextAIMessageJob.perform(#{message_id}, #{assistant_id})" if Rails.env.development?
 
-    @message = Message.find_by(id: message_id)
+    @message      = Message.find_by(id: message_id)
     @conversation = @message.conversation
-    @assistant = Assistant.find_by(id: assistant_id)
+    @assistant    = Assistant.find_by(id: assistant_id)
     @prev_message = @conversation.messages.assistant.ordered.id_is("< #{@message.id}").last
 
     return false          if generation_was_cancelled? || message_is_populated?

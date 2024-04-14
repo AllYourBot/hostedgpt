@@ -147,11 +147,9 @@
                   <%= button_to message_path(message),
                     form_class: "inline-block p-0",
                     class: "truncate w-full py-2 px-4 text-left",
-                    method: :patch,
+                    method: :post,
                     params: { message: {
-                      content_text: nil,
-                      rerequested_at: Time.current,
-                      cancelled_at: nil,
+                      index: message.index,
                       assistant_id: assistant.id
                     } } do
                   %>
