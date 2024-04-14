@@ -10,7 +10,7 @@ class MessagesController < ApplicationController
   before_action :set_conversation_starters, only: [:new]
 
   def index
-    @messages = @conversation.messages.ordered
+    @messages = @conversation.messages.latest_version_for_conversation
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
       content_text: nil,
@@ -68,7 +68,7 @@ class MessagesController < ApplicationController
 
   def set_assistant
     @assistant = Current.user.assistants.find_by(id: params[:assistant_id])
-    @assistant ||= @conversation.messages.ordered.last.assistant
+    @assistant ||= @conversation.messages.latest_version_for_conversation.last.assistant
   end
 
   def set_message
