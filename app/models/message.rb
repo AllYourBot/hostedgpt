@@ -1,5 +1,5 @@
 class Message < ApplicationRecord
-  include DocumentImage, Cancellable
+  include DocumentImage, Version, Cancellable
 
   belongs_to :assistant
   belongs_to :conversation

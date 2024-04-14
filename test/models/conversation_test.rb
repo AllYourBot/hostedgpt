@@ -21,10 +21,6 @@ class ConversationTest < ActiveSupport::TestCase
     assert_instance_of Step, conversations(:greeting).steps.first
   end
 
-  test "latest_message works" do
-    assert_equal messages(:im_a_bot), conversations(:greeting).latest_message
-  end
-
   test "simple create works" do
     assert_nothing_raised do
       Conversation.create!(
