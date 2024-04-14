@@ -34,24 +34,24 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
     assert_false "modal image should have closed/hidden itself", wait: 0.6 do
       modal.visible?
     end
-end
+  end
 
-  test "images render in messages WHEN NOT pre-processed, clicking opens modal" do
+  test "images eventually render in messages WHEN NOT pre-processed, clicking opens modal" do
     stimulate_image_variant_processing do
       visit conversation_messages_path(@conversation)
       image_msg = find_messages.third
       image_btn = image_msg.find_role("image-preview")
-      modal = image_msg.find_role("image-modal")
       img = image_btn.find("img", visible: false)
+      modal = image_msg.find_role("image-modal")
+      assert image_btn
+      assert img
 
       assert_true wait: 5 do
         img.visible?
       end
       assert img.visible?
 
-      assert image_btn
-      assert img
-      assert_true "img should have fully loaded", wait: 1 do
+      assert_true "img should have fully loaded" do
         img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
       end
 
@@ -122,15 +122,16 @@ end
 
       assert_at_bottom
 
-      assert_false "all images should be visible" do
-        all("[data-role='image-preview'", visible: :all).map(&:visible?).include?(false)
-      end
+      assert_scrolled_down do
 
-      assert_true do
-        img.visible?
+        assert_false "all images should be visible" do
+          all("[data-role='image-preview'", visible: :all).map(&:visible?).include?(false)
+        end
+
+        assert_true do
+          img.visible?
+        end
       end
-      sleep 2 # I cannot figure out how to avoid the race condition that assert_at_bottom
-              # runs in between images appearing but before scroll down has happened
       assert_at_bottom
     end
   end
