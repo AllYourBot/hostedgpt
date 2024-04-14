@@ -16,7 +16,7 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
   end
 
   test "clicking copy on code block changes icon and copies to clipboard" do
-    assert_nil clipboard
+    assert_true { clipboard == "" }
 
     @code_msg.find_role("code-clipboard").click
     assert_equal "SELECT * FROM users", clipboard
@@ -26,7 +26,7 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
   end
 
   test "clicking copy on the overall message that includes code copies everything to clipboard and adds in the backticks" do
-    assert_nil clipboard
+    assert_true { clipboard == "" }
 
     @code_msg.hover
     copy = @code_msg.find_role("clipboard")
@@ -37,17 +37,16 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
   end
 
   test "using the overall keyboard shortcut for copying copies the code block within the last message" do
-    assert_nil clipboard
+    assert_true { clipboard == "" }
     send_keys "meta+shift+c"
     assert_equal "SELECT * FROM users", clipboard
   end
 
   test "using the overall keyboard shortcut for copying copies the full last message where there is NO code block" do
     conversation = conversations(:javascript)
-    click_text conversation.title
-    sleep 0.2
+    visit conversation_messages_path(conversation)
 
-    assert_nil clipboard
+    assert_true { clipboard == "" }
     send_keys "meta+shift+c"
     assert_true { conversation.messages.ordered.last.content_text.strip == clipboard }
   end
