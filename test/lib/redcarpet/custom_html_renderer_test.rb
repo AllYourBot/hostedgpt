@@ -103,4 +103,23 @@ class CustomHtmlRendererTest < ActiveSupport::TestCase
 
     assert_equal formatted.strip, @renderer.render(markdown).strip
   end
+
+  test "code_sanitization removes_script_tags" do
+    markdown = "Here is dangerous input: `<script>alert('bad');</script>`"
+    # Expect script to be sanitized, but code to be properly marked up as such
+    formatted = "<p>Here is dangerous input: <code>&lt;script&gt;alert(&#39;bad&#39;);&lt;/script&gt;</code></p>\n"
+
+    assert_equal formatted.strip, @renderer.render(markdown).strip
+  end
+
+  test "html_inside_code_tags_is_correctly_sanitized" do
+    # Input markdown with HTML that should be sanitized
+    markdown = "Display HTML code `<div>Some content</div>` safely."
+
+    # Expected output ensures that HTML tags are escaped, and contents remain inside code tags
+    expected_output = "<p>Display HTML code <code>&lt;div&gt;Some content&lt;/div&gt;</code> safely.</p>\n"
+
+    # Render the markdown and ensure the output is as expected
+    assert_equal expected_output.strip, @renderer.render(markdown).strip
+  end
 end
