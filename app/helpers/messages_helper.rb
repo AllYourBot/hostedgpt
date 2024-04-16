@@ -56,8 +56,8 @@ module MessagesHelper
           end
         end +
         div_tag(class: "px-4 py-3") do
-          sanitized_code = sanitize(code)
-          content_tag(:code, sanitized_code, data: { clipboard_target: "text" })
+          sanitized = sanitize(code)
+          content_tag(:code, sanitized, data: { clipboard_target: "text" })
         end
       end
     end
