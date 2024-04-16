@@ -18,11 +18,12 @@ class Message < ApplicationRecord
   validate  :validate_conversation,  if: -> { conversation.present? && Current.user }
   validate  :validate_assistant,     if: -> { assistant.present? && Current.user }
 
-  scope :ordered, -> { latest_version_for_conversation }
 
-  after_create :start_assistant_reply, if: -> { user? }
-
+  after_create :start_assistant_reply, if: :user?
+  after_create :set_latest_assistant_message, if: :assistant?
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
+
+  scope :ordered, -> { latest_version_for_conversation }
 
   private
 
@@ -43,8 +44,17 @@ class Message < ApplicationRecord
   end
 
   def start_assistant_reply
-    m = conversation.messages.create! role: :assistant, content_text: nil, assistant: assistant
-    redis.set("conversation-#{conversation_id}-latest_message-id", m.id)
+    m = conversation.messages.create!(
+      assistant: assistant,
+      role: :assistant,
+      content_text: nil,
+      version: version,
+      index: index+1
+    )
+  end
+
+  def set_latest_assistant_message
+    redis.set("conversation-#{conversation_id}-latest_message-id", id)
   end
 
   def update_assistant_on_conversation

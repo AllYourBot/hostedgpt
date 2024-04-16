@@ -10,29 +10,29 @@ module Message::Version
     before_validation :set_next_conversation_index, on: :create
     before_validation :set_default_version,         on: :create
 
-    before_create     :clear_preexisting_version_of_conversation, if: :conversation
-
     scope :latest_version_for_conversation, -> { for_conversation_version(:latest) }
 
-    scope :for_conversation_version, ->(v) do
+    scope :for_conversation_version, ->(version) do
+      version ||= :latest
       c_id = all.where_clause.send(:predicates).find { |p| p.left.name == "conversation_id" }&.right&.value
       raise "latest_version_for_conversation needs to be used on a conversation's messages" if c_id.nil?
 
-      if v == :latest
+      if version == :latest
         # Find the message which is the highest index for the highest version
-        m = Message.select(:index, :version).where(conversation_id: c_id).
+        last_msg_for_version = Message.select(:index, :version).where(conversation_id: c_id).
           order(version: :desc).order(index: :desc).first
       else
-        m = Message.select(:index, :version).where(conversation_id: c_id).where("version <= ?", v).
+        last_msg_for_version = Message.select(:index, :version).where(conversation_id: c_id).where("version <= ?", version).
           order(version: :desc).order(index: :desc).first
       end
 
       select("DISTINCT ON (index) *").
+        select("MAX(index) OVER (PARTITION BY version) AS max_index_for_version").
         select("ROW_NUMBER() OVER (ORDER BY index ASC, version DESC) AS subq_position").
-        order(:index).order(version: :desc).
-        where("index <= ? AND version <= ?",
-          (m&.index || 0),
-          (m&.version || 1),
+        order(:index).order(max_index_for_version: :desc).order(version: :desc).
+        where("version <= ? AND index <= ?",
+          (last_msg_for_version&.version || 1),
+          (last_msg_for_version&.index || 0)
         )
     end
   end
@@ -45,18 +45,27 @@ module Message::Version
 
   def set_next_conversation_index
     if index.present?
-      if index > 0 && !conversation.messages.exists?(index: index-1)
-        errors.add(:index, "cannot skip a number")
-      else # index is valid
-        v = conversation.latest_version_for_message_index(index)
-        if v && conversation.latest_message && v < conversation.latest_message.version
-          v = conversation.latest_message&.version
-        end
-        v ||= conversation.latest_message&.version&.-1
+      versions = conversation.messages.where(index: index).pluck(:version).sort
+      latest_msg = conversation.latest_message
+      max_version = 1
+      if latest_msg && index <= latest_msg.index
+        max_version = [versions.last.to_i, latest_msg.version].max + 1
+      elsif latest_msg && index > latest_msg.index
+        max_version = conversation.latest_message&.version
+      end
 
-        if version.blank?
-          self.version = (v || 0) + 1
-        elsif version != (v || 0) + 1
+      self.version ||= max_version
+
+      if index < 0
+        errors.add(:index, "is invalid")
+      elsif index > 0 && !conversation.messages.exists?(index: index-1)
+        errors.add(:index, "cannot skip a number")
+      else # index is
+        if version < 0 || version > max_version
+          errors.add(:version, "is invalid for this index")
+        elsif conversation.messages.exists?(index: index, version: version)
+          errors.add(:version, "already exists for this index")
+        elsif versions.present? && version < versions.max && !conversation.messages.exists?(index: index-1, version: version)
           errors.add(:version, "is invalid for this index")
         end
       end
@@ -74,9 +83,5 @@ module Message::Version
 
   def set_default_version
     self.version ||= 1
-  end
-
-  def clear_preexisting_version_of_conversation
-    conversation.messages.where("version >= ?", version).where("index > ?", index).destroy_all
   end
 end

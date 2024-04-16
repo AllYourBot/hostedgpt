@@ -210,7 +210,7 @@ class Message::VersionTest < ActiveSupport::TestCase
     end
   end
 
-  test "creating a new messages for a SPECIFIC INDEX and SPECIFIC VERSION succeeds" do
+  test "creating a new messages for a SPECIFIC INDEX and SPECIFIC VERSION succeeds - the point it branches" do
     # See comment block in conversations.yml for :versioned to visualize the messages
     Current.user = users(:keith)
     m = conversations(:versioned).messages.latest_version_for_conversation.last
@@ -247,7 +247,7 @@ class Message::VersionTest < ActiveSupport::TestCase
     assert_equal msg_versions, c.map(&:full_version)
   end
 
-  test "Take 2 - creating a new messages for a SPECIFIC INDEX and SPECIFIC VERSION succeeds - its hanging at the end" do
+  test "Take 2 - creating a new messages for a SPECIFIC INDEX and SPECIFIC VERSION succeeds - at end of LATEST version branch" do
     # See comment block in conversations.yml for :versioned to visualize the messages
     Current.user = users(:keith)
     m = conversations(:versioned).messages.latest_version_for_conversation.last
@@ -283,7 +283,43 @@ class Message::VersionTest < ActiveSupport::TestCase
     assert_equal msg_versions, c.map(&:full_version)
   end
 
-  test "Take 3 - creating a new messages for a SPECIFIC INDEX and SPECIFIC VERSION succeeds - its the first one" do
+  test "Take 3 - creating a new messages for a SPECIFIC INDEX and SPECIFIC VERSION succeeds - at end of PREVIOUS version branch" do
+    # See comment block in conversations.yml for :versioned to visualize the messages
+    Current.user = users(:keith)
+    m = conversations(:versioned).messages.latest_version_for_conversation.last
+
+    assert_equal 5, m.index
+    assert_equal 2, m.version
+
+    m = conversations(:versioned).messages.create!(index: "4", version: "1", assistant: assistants(:samantha), content_text: "What is your name?")
+
+    assert_equal 4, m.index
+    assert_equal 1, m.version
+
+    c = conversations(:versioned).messages.latest_version_for_conversation
+    msg_versions = [
+      0.1,
+      1.1,
+           2.2,
+           3.2,
+           4.2,
+           5.2,
+    ]
+    assert_equal msg_versions, c.map(&:full_version)
+
+    c = conversations(:versioned).messages.for_conversation_version(1)
+    msg_versions = [
+      0.1,
+      1.1,
+      2.1,
+      3.1,
+      4.1,
+      5.1,
+    ]
+    assert_equal msg_versions, c.map(&:full_version)
+  end
+
+  test "Take 4 - creating a new messages for a SPECIFIC INDEX and SPECIFIC VERSION succeeds - its the first message in a conversation" do
     # See comment block in conversations.yml for :versioned to visualize the messages
     Current.user = users(:keith)
     c = Conversation.create!(user: users(:keith), assistant: assistants(:samantha))
@@ -308,7 +344,7 @@ class Message::VersionTest < ActiveSupport::TestCase
     Current.user = users(:keith)
 
     assert_raises ActiveRecord::RecordInvalid do
-      conversations(:versioned).messages.create!(index: 4, version: 1, assistant: assistants(:samantha), content_text: "What is your name?")
+      conversations(:versioned).messages.create!(index: 5, version: 1, assistant: assistants(:samantha), content_text: "What is your name?")
     end
   end
 
