@@ -43,6 +43,7 @@
 # Ignore files for development
 .byebug_history
 /.vscode
+/.ruby-version
 
 # Mac
 

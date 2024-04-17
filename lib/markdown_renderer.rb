@@ -8,10 +8,14 @@ class MarkdownRenderer
 
     block_code_proc = options.delete(:block_code)
     if block_code_proc
+
       render_class = Class.new(Redcarpet::CustomHtmlRenderer)
       render_class.instance_eval do
         define_method(:block_code) do |code, language|
-          block_code_proc.call(code, language)
+          unescaped_code = CGI.unescapeHTML(code)
+          custom_block_code = super(unescaped_code, language)
+          block_code_proc.call(custom_block_code, language)
+
         end
       end
     end
@@ -24,13 +28,12 @@ class MarkdownRenderer
       strikethrough: true,
       underline: true,
       no_intra_emphasis: true,
-
       fenced_code_blocks: true,
       disable_indented_code_blocks: true
     )
 
     markdown = ensure_newline_before_code_block_start(markdown)
-
+    formatted = formatter.render(markdown)
     formatter.render(markdown)
   end
 
