@@ -4,10 +4,8 @@ module MessagesHelper
   def format(text, append_inside_tag:)
     escaped_text = html_escape(text)
 
-
     html = ::MarkdownRenderer.render(
       escaped_text,
-      block_code: block_code
       block_code: block_code
     )
 
@@ -17,7 +15,6 @@ module MessagesHelper
 
   private
 
-  def block_code
   def block_code
     ->(code, language) do
       content_tag(:pre,
