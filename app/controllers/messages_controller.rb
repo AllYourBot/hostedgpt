@@ -37,7 +37,7 @@ class MessagesController < ApplicationController
         @message.conversation.latest_message_for_version(@message.version).id,
         @assistant.id
       )
-      redirect_to conversation_messages_path(@message.conversation
+      redirect_to conversation_messages_path(@message.conversation)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
       set_nav_conversations
