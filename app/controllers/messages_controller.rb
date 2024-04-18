@@ -11,14 +11,6 @@ class MessagesController < ApplicationController
   before_action :set_conversation_starters, only: [:new]
 
   def index
-    if @version.blank?
-      version = @conversation.messages.order(:created_at).last&.version
-      redirect_to conversation_messages_path(
-        params[:conversation_id],
-        version: version
-      ) if version
-    end
-
     @messages = @conversation.messages.for_conversation_version(@version)
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
