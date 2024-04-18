@@ -20,6 +20,7 @@ module Message::Version
 
     scope :for_conversation_version, ->(version) do
       version ||= :latest
+      raise "for_conversation_version(version) takes a numerical version or :latest" if version != :latest && version.to_s.to_i.to_s != version.to_s
       c_id = all.where_clause.send(:predicates).find { |p| p.left.name == "conversation_id" }&.right&.value
       raise "latest_version_for_conversation needs to be used on a conversation's messages" if c_id.nil?
 
