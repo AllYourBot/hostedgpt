@@ -3,7 +3,8 @@ require "test_helper"
 class Message::CancellableTest < ActiveSupport::TestCase
   setup do
     @conversation = conversations(:greeting)
-    @previous_id = @conversation.latest_message.id
+    @previous_id = @conversation.latest_message_for_version(:latest).id
+
     redis.set("conversation-#{@conversation.id}-latest-assistant_message-id", @previous_id)
   end
 
@@ -32,8 +33,8 @@ class Message::CancellableTest < ActiveSupport::TestCase
         )
       end
     end
-
-    assert_equal @conversation.latest_message.reload.id, redis.get("conversation-#{@conversation.id}-latest-assistant_message-id")&.to_i
+    id = @conversation.latest_message_for_version(:latest).reload.id
+    assert_equal id, redis.get("conversation-#{@conversation.id}-latest-assistant_message-id")&.to_i
   end
 
   private
