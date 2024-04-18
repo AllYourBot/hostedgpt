@@ -387,7 +387,7 @@ filter_map_example:
 
 # Next conversation
 
-message0:
+message0_v1:
   assistant: samantha
   conversation: versioned
   role: user
@@ -398,13 +398,13 @@ message0:
   index: 0
   version: 1
 
-message1:
+message1_v1:
   assistant: samantha
   conversation: versioned
   role: assistant
   content_text: My favorite color is blue.
   content_document:
-  run: message0_response
+  run: message0_v1_response
   created_at: 2023-1-1 1:01:00
   index: 1
   version: 1
@@ -419,6 +419,8 @@ message2_v1:
   created_at: 2023-1-1 1:02:00
   index: 2
   version: 1
+  branched: true
+  branched_from_version: 2
 
 message3_v1:
   assistant: samantha
@@ -441,6 +443,7 @@ message2_v2:
   created_at: 2023-1-1 1:04:00
   index: 2
   version: 2
+  branched: true
 
 message3_v2:
   assistant: samantha
@@ -474,3 +477,128 @@ message5_v2:
   created_at: 2023-1-1 1:07:00
   index: 5
   version: 2
+
+
+# Next conversation
+
+msg0_v1:
+  assistant: samantha
+  conversation: versioned2
+  role: user
+  content_text: What's your favorite color?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:00:00
+  index: 0
+  version: 1
+
+msg1_v1:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: My favorite color is blue.
+  content_document:
+  run: msg0_v1_response
+  created_at: 2023-1-1 1:01:00
+  index: 1
+  version: 1
+
+msg2_v1:
+  assistant: samantha
+  conversation: versioned2
+  role: user
+  content_text: What do you eat?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:02:00
+  index: 2
+  version: 1
+  branched: true
+
+msg2_v2:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: I was born in San Francisco.
+  content_document:
+  run: msg2_v1_response
+  created_at: 2023-1-1 1:05:00
+  index: 2
+  version: 2
+  branched: true
+  branched_from_version: 1
+
+msg3_v2:
+  assistant: samantha
+  conversation: versioned2
+  role: user
+  content_text: What do you think of the city?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:06:00
+  index: 3
+  version: 2
+
+msg4_v2:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: It is a beautiful city.
+  content_document:
+  run: msg3_v2_response
+  created_at: 2023-1-1 1:07:00
+  index: 4
+  version: 2
+  branched: true
+
+
+msg2_v3:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: It is a beautiful city.
+  content_document:
+  run: message4_v2_response
+  created_at: 2023-1-1 1:07:00
+  index: 2
+  version: 3
+  branched: true
+  branched_from_version: 2
+
+msg3_v3:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: It is a beautiful city.
+  content_document:
+  run: msg2_v3_response
+  created_at: 2023-1-1 1:07:00
+  index: 3
+  version: 3
+
+
+msg4_v4:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: It is a beautiful city.
+  content_document:
+  run: message4_v2_response
+  created_at: 2023-1-1 1:07:00
+  index: 4
+  version: 4
+  branched: true
+  branched_from_version: 2
+
+msg2_v5:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: I don't eat food.
+  content_document:
+  run: msg4_v4_response
+  created_at: 2023-1-1 1:03:00
+  index: 2
+  version: 5
+  branched: true
+  branched_from_version: 3
