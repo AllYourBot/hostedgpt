@@ -11,8 +11,4 @@ class Redcarpet::CustomHtmlRenderer < Redcarpet::Render::HTML
     "<code>#{code}</code>"
   end
 
-  def block_code(code, language)
-    code
-  end
-
 end
