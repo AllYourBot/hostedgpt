@@ -2,6 +2,7 @@ class MessagesController < ApplicationController
   include ActiveStorage::SetCurrent
   include HasConversationStarter
 
+  before_action :set_version, only: [:index, :update]
   before_action :set_conversation, only: [:index]
   before_action :set_assistant, only: [:index, :new, :create]
   before_action :set_message, only: [:show, :edit, :update, :destroy]
@@ -10,12 +11,20 @@ class MessagesController < ApplicationController
   before_action :set_conversation_starters, only: [:new]
 
   def index
-    @messages = @conversation.messages.latest_version_for_conversation
+    if @version.blank?
+      version = @conversation.messages.order(:created_at).last&.version
+      redirect_to conversation_messages_path(
+        params[:conversation_id],
+        version: version
+      ) if version
+    end
+
+    @messages = @conversation.messages.for_conversation_version(@version)
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
       content_text: nil,
       cancelled_at: nil
-    ).find_by(id: redis.get("conversation-#{@conversation.id}-latest_message-id"))
+    ).find_by(id: redis.get("conversation-#{@conversation.id}-latest-assistant_message-id"))
   end
 
   def show  # show & edit will be used when we make messages editable
@@ -31,9 +40,12 @@ class MessagesController < ApplicationController
   def create
     @message = @assistant.messages.new(message_params)
 
-    if @message.save
-      GetNextAIMessageJob.perform_later(@message.conversation.latest_message_for_version(:latest).id, @assistant.id)
-      redirect_to conversation_messages_path(@message.conversation)
+    if @message.save # remember, an extra assistant message is auto-created
+      GetNextAIMessageJob.perform_later(
+        @message.conversation.latest_message_for_version(@message.version).id,
+        @assistant.id
+      )
+      redirect_to conversation_messages_path(@message.conversation, version: @message.version)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
       set_nav_conversations
@@ -46,8 +58,8 @@ class MessagesController < ApplicationController
 
   def update
     if @message.update(message_params)
-      GetNextAIMessageJob.perform_later(@message.id, @message.assistant.id)
-      redirect_to conversation_messages_path(@message.conversation)
+      GetNextAIMessageJob.perform_later(@message.id, @message.assistant.id) if @message.previous_changes.any?
+      redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version)
     else
       render :edit, status: :unprocessable_entity
     end
@@ -59,8 +71,11 @@ class MessagesController < ApplicationController
     redirect_to conversation_messages_url(@conversation), notice: "Message was successfully destroyed.", status: :see_other
   end
 
-
   private
+
+  def set_version
+    @version = params[:version].presence&.to_i
+  end
 
   def set_conversation
     @conversation = Current.user.conversations.find(params[:conversation_id])
@@ -68,7 +83,7 @@ class MessagesController < ApplicationController
 
   def set_assistant
     @assistant = Current.user.assistants.find_by(id: params[:assistant_id])
-    @assistant ||= @conversation.messages.latest_version_for_conversation.last.assistant
+    @assistant ||= @conversation.messages.for_conversation_version(@version).last.assistant
   end
 
   def set_message
@@ -88,11 +103,15 @@ class MessagesController < ApplicationController
       :conversation_id,
       :content_text,
       :assistant_id,
+      :index,
+      :version,
+      :role,
       :cancelled_at,
-      :rerequested_at,
+      :branched,
+      :branched_from_version,
       documents_attributes: [:file]
     )
-    if modified_params[:content_text].blank? # when we rerequest the content_text: nil is mistakenly getting converted to ""
+    if modified_params.has_key?(:content_text) && modified_params[:content_text].blank? # when we rerequest the content_text: nil is mistakenly getting converted to ""
       modified_params[:content_text] = nil
     end
     modified_params
