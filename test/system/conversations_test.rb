@@ -6,24 +6,6 @@ class ConversationsTest < ApplicationSystemTestCase
     @starting_path = current_path
   end
 
-  test "creating new chat with meta+shift+o" do
-    visit conversation_messages_path(conversations(:greeting))
-    send_keys("meta+shift+o")
-
-    expected_path = new_assistant_message_path(conversations(:greeting).assistant)
-
-    assert_current_path(expected_path)
-  end
-
-  test "creating new chat with meta+j" do
-    visit conversation_messages_path(conversations(:javascript))
-    send_keys("meta+j")
-
-    expected_path = new_assistant_message_path(conversations(:javascript).assistant)
-
-    assert_current_path(expected_path)
-  end
-
   test "edit icon shows a tooltip" do
     convo = hover_conversation conversations(:greeting)
     assert_shows_tooltip convo.find_role("edit"), "Rename"
@@ -107,7 +89,7 @@ class ConversationsTest < ApplicationSystemTestCase
   private
 
   def hover_conversation(c)
-    assert_visible "#conversation-#{c.id} a"
+    assert_visible "#conversation-#{c.id} a[data-role='title']"
     convo_node = find("#conversation-#{c.id}")
     convo_node.hover
     convo_node

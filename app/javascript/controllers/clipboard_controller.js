@@ -3,9 +3,13 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [ "text" ]
 
+  initialize() {
+    window.clipboardForSystemTestsToCheck = ""
+  }
+
   copy() {
     navigator.clipboard.writeText(this.text)
-    window.clipboard = this.text // useful for automated system tests
+    window.clipboardForSystemTestsToCheck = this.text
   }
 
   get text() {

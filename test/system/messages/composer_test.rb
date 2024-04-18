@@ -18,7 +18,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.2
 
     click_text @long_conversation.title
-    sleep 0.4
+    wait_for_images_to_load
     assert_active @input_selector
   end
 
@@ -84,7 +84,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.5
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
-    assert input.value.blank?
+    assert_composer_blank
   end
 
   test "enter works to submit but only when text has been entered" do
@@ -100,7 +100,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.3
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
-    assert input.value.blank?
+    assert_composer_blank
   end
 
   test "shift+enter inserts a newline and then enter submits" do
@@ -116,12 +116,12 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.5
 
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
-    assert input.value.blank?
+    assert_composer_blank
   end
 
   test "textarea grows in height as newlines are added and shrinks in height when they are removed" do
     click_text @long_conversation.title
-    sleep 1
+    wait_for_images_to_load
 
     send_keys "1"
 
@@ -163,62 +163,39 @@ class MessagesComposerTest < ApplicationSystemTestCase
   end
 
   test "when large block of text is pasted, textarea grows in height and auto-scrolls to stay at the bottom" do
-    text = <<~END
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-    END
-
     click_text @long_conversation.title
-    sleep 0.4
+    wait_for_images_to_load
 
     height = input.native.property('clientHeight')
     assert_stays_at_bottom do
-      send_keys text.gsub(/\n/, ' ')
-      sleep 0.4
+      send_keys long_input_text
+
+      assert_true "Input should have grown taller" do
+        input.native.property('clientHeight') > height
+      end
     end
-    assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
 
   test "when large block of text is pasted, textarea grows in height and DOES NOT auto-scroll so what scrolled to stays visible" do
-    text = <<~END
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-      The quick brown fox jumped over the lazy dog.
-    END
-
     click_text @long_conversation.title
-    sleep 0.2
-    scroll_to find_messages.second
-    sleep 0.5
+    wait_for_images_to_load
+
+    assert_at_bottom
+    assert_scrolled_up { scroll_to find_messages.second }
 
     height = input.native.property('clientHeight')
     assert_did_not_scroll do
-      send_keys text.gsub(/\n/, ' ')
-      sleep 0.5
+      send_keys long_input_text
+
+      assert_true "Input should have grown taller" do
+        input.native.property('clientHeight') > height
+      end
     end
-    assert input.native.property('clientHeight') > height, "Input should have grown taller"
   end
 
   test "submitting a couple messages to an existing conversation with ENTER works" do
     click_text @long_conversation.title
-    sleep 0.3
+    wait_for_images_to_load
     path = current_path
 
     send_keys "This is a message"
@@ -226,19 +203,19 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 0.5
 
     assert_equal path, current_path, "The page should not have changed urls"
-    assert input.value.blank?, "The composer should have cleared itself"
+    assert_composer_blank
 
     send_keys "This is a second message"
     send_keys "enter"
     sleep 1
 
     assert_equal path, current_path, "The page should not have changed urls"
-    assert input.value.blank?, "The composer should have cleared itself"
+    assert_composer_blank
   end
 
   test "submitting a couple messages to an existing conversation with CLICKING works" do
     click_text @long_conversation.title
-    sleep 1
+    wait_for_images_to_load
     path = current_path
 
     send_keys "This is a message"
@@ -246,19 +223,38 @@ class MessagesComposerTest < ApplicationSystemTestCase
     sleep 1
 
     assert_equal path, current_path, "The page should not have changed urls"
-    assert input.value.blank?, "The composer should have cleared itself"
+    assert_composer_blank
 
     send_keys "This is a second message"
     click_element @submit
     sleep 0.3
 
     assert_equal path, current_path, "The page should not have changed urls"
-    assert input.value.blank?, "The composer should have cleared itself"
+    assert_composer_blank
   end
+
+  # TODO: We do not have a test for the smart paste. I'm not sure how to programmatically paste from within capybara
 
   private
 
   def input
     find(@input_selector)
+  end
+
+  def long_input_text
+    text = <<~END
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+      The quick brown fox jumped over the lazy dog.
+    END
+    text.gsub(/\n/, ' ')
   end
 end

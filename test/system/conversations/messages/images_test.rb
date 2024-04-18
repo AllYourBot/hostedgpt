@@ -11,45 +11,62 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   test "images render in messages WHEN pre-processed, clicking opens modal" do
     visit conversation_messages_path(@conversation)
-    sleep 0.3
     image_msg = find_messages.third
 
-    image = image_msg.find_role("image-preview")
+    image_btn = image_msg.find_role("image-preview")
+    img = image_btn.find("img")
     modal = image_msg.find_role("image-modal")
 
-    assert image
+    assert image_btn
+    assert img
+    assert_true "img should have fully loaded", wait: 1 do
+      img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
+    end
     refute modal.visible?
 
-    image.click
-    sleep 0.7
-    assert modal.visible?
+    image_btn.click
+
+    assert_true "modal image should have been visible", wait: 0.6 do
+      modal.visible?
+    end
 
     send_keys "esc"
-    sleep 0.4
-    refute modal.visible?
+    assert_false "modal image should have closed/hidden itself", wait: 0.6 do
+      modal.visible?
+    end
   end
 
-  test "images render in messages WHEN NOT pre-processed, clicking opens modal" do
+  test "images eventually render in messages WHEN NOT pre-processed, clicking opens modal" do
     stimulate_image_variant_processing do
       visit conversation_messages_path(@conversation)
       image_msg = find_messages.third
-      image = image_msg.find_role("image-preview")
+      image_btn = image_msg.find_role("image-preview")
+      img = image_btn.find("img", visible: false)
       modal = image_msg.find_role("image-modal")
-      img = image.find("img", visible: false)
+      assert image_btn
+      assert img
 
-      Timeout.timeout(5) do
-        sleep 0.25 until img.visible?
+      assert_true wait: 5 do
+        img.visible?
       end
       assert img.visible?
+
+      assert_true "img should have fully loaded" do
+        img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
+      end
+
       refute modal.visible?
 
-      image.click
-      sleep 0.7
-      assert modal.visible?
+      image_btn.click
+
+      assert_true "modal image should have been visible" do
+        modal.visible?
+      end
 
       send_keys "esc"
-      sleep 0.4
-      refute modal.visible?
+      assert_false "modal image should have closed/hidden itself" do
+        modal.visible?
+      end
     end
   end
 
@@ -58,33 +75,41 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       visit conversation_messages_path(@conversation)
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
-      loader          = image_container.find_role("loader")
-      img             = image_container.find("img", visible: false)
+      loader          = image_container.find_role("image-loader")
+      img             = image_container.find("img", visible: :all)
       modal_container = image_msg.find_role("image-modal")
-      modal_loader    = modal_container.find_role("loader")
-      modal_img       = modal_container.find("img", visible: false)
+      modal_loader    = modal_container.find_role("image-loader")
+      modal_img       = modal_container.find("img", visible: :all)
 
-      sleep 0.5
-      assert loader.visible?
+      assert_true "image loader should be visible", wait: 0.6 do
+        loader.visible?
+      end
       refute img.visible?
 
       image_container.click
-      sleep 0.2
 
-      assert modal_loader.visible?
+      assert_true "modal image loader should be visible", wait: 0.6 do
+        modal_loader.visible?
+      end
       refute modal_img.visible?
 
       send_keys "esc"
-      sleep 3
 
-      refute loader.visible?
+      assert_false "image loader should have eventually disappeared", wait: 10 do
+        loader.visible?
+      end
       assert img.visible?
 
-      image_container.click
-      sleep 0.2
+      assert_true "img should have fully loaded" do
+        modal_img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
+      end
 
+      image_container.click
+
+      assert_true "modal image should be visible" do
+        modal_img.visible?
+      end
       refute modal_loader.visible?
-      assert modal_img.visible?
     end
   end
 
@@ -93,41 +118,46 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       visit conversation_messages_path(@conversation)
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
-      img             = image_container.find("img", visible: false)
+      img             = image_container.find("img", visible: :all)
 
-      sleep 0.5
       assert_at_bottom
 
-      Timeout.timeout(5) do
-        sleep 0.25 until img.visible?
-      end
+      assert_scrolled_down do
 
-      assert img.visible?
-      sleep 1
+        assert_false "all images should be visible" do
+          all("[data-role='image-preview'", visible: :all).map(&:visible?).include?(false)
+        end
+
+        assert_true do
+          img.visible?
+        end
+      end
       assert_at_bottom
     end
   end
 
-  test "images render in message and remain after submitting a new message which morphs the page" do
+  test "images in previous messages remain after submitting a new message, they should not display a new spinner" do
     image_msg = img = nil
     stimulate_image_variant_processing do
       visit conversation_messages_path(@conversation)
       image_msg = find_messages.third
       img = image_msg.find_role("image-preview").find("img", visible: false)
 
-      Timeout.timeout(5) do
-        sleep 0.25 until img.visible?
+      assert_true wait: 5 do
+        img.visible?
       end
     end
 
     send_keys "hello?"
     send_keys "enter"
 
-    img.visible?
+    assert_composer_blank
+    assert img.visible?
 
     send_keys "hello?"
     send_keys "enter"
 
+    assert_composer_blank
     assert img.visible?
   end
 
@@ -150,7 +180,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   def simulate_not_preprocessed
     ->() do
-      return nil if params[:retry_count].to_i < 3
+      return nil if params[:retry_count].to_i < 5
       ActiveStorage.verifier.verified(params[:encoded_key], purpose: :blob_key)&.symbolize_keys
     end
   end

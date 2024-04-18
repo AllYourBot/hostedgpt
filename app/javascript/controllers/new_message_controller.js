@@ -30,14 +30,6 @@ export default class extends Controller {
     }
   }
 
-  submitForm() {
-    if (this.cleanInputValue.length > 0) {
-      this.disableComposerUntilSubmit()
-      this.formTarget.requestSubmit()
-      window.dispatchEvent(new CustomEvent('main-column-changed'))
-    }
-  }
-
   focusKeydown(event) {
     if (event.key == "/" && ["INPUT", "TEXTAREA"].includes(event.target.tagName)) return
 
@@ -48,6 +40,14 @@ export default class extends Controller {
   unfocusKeydown(event) {
     document.activeElement.blur()
     event.preventDefault()
+  }
+
+  submitForm() {
+    if (this.cleanInputValue.length > 0) {
+      this.disableComposerUntilSubmit()
+      this.formTarget.requestSubmit()
+      window.dispatchEvent(new CustomEvent('main-column-changed'))
+    }
   }
 
   disableComposerUntilSubmit() {
@@ -69,5 +69,25 @@ export default class extends Controller {
   boundEnableComposer = () => { this.enableComposer() }
   enableComposer() {
     this.formTarget.reset()
+  }
+
+  smartPaste(event) {
+    event.preventDefault()
+    const input = event.target
+    const startPos = input.selectionStart
+    const endPos = input.selectionEnd
+    const clipboardData = event.clipboardData || window.clipboardData
+    let pastedData = clipboardData.getData('Text')
+
+    const isAtLineStart = startPos === 0 || input.value.charAt(startPos - 1) === '\n'
+
+    if (isAtLineStart && (pastedData.match(/\n/g) || []).length >= 2) {
+      pastedData = '```\n' + pastedData + '\n```\n'
+    }
+
+    input.value = input.value.substring(0, startPos) + pastedData + input.value.substring(endPos)
+    input.selectionStart = input.selectionEnd = startPos + pastedData.length
+
+    input.dispatchEvent(new Event('input', { bubbles: true }))
   }
 }

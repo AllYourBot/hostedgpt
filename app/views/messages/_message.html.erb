@@ -6,8 +6,8 @@
 <% initial_page_load = last_message && !scroll_down %>
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking = if thinking.nil?
-                (last_message && message.content_text.blank? && message.not_cancelled?) ||
-                (message.rerequested? && message.content_text.blank? && message.not_cancelled?)
+                (last_message && message.content_text == "" && message.not_cancelled?) ||
+                (message.rerequested? && message.content_text == "" && message.not_cancelled?)
               else
                 thinking
               end
@@ -77,7 +77,7 @@
                     rounded-md
                   |
             %>
-            <div data-role="loader" class="mx-auto hidden" data-image-loader-target="loader">
+            <div data-role="image-loader" class="mx-auto hidden" data-image-loader-target="loader">
               <%= spinner size: 6, class: "text-black dark:text-white" %>
             </div>
           <% end %>
@@ -162,37 +162,37 @@
             </menu>
           </div>
         <% end %>
-
-        <% if message.has_document_image? %>
-          <dialog class="modal no-focus-outline" data-modal-target="dialog" data-role="image-modal">
-            <main class="modal-box max-w-5xl p-0 rounded-none">
-              <article
-                data-controller="image-loader"
-                data-image-loader-url-value="<%= message.document_image_path(:large) %>"
-                data-turbo-permanent
-                class="flex flex-col md:flex-row justify-center"
-              >
-                <%= image_tag message.document_image_path(:large, fallback: ""),
-                  data: {
-                    image_loader_target: "image",
-                    action: %|
-                      error->image-loader#retryAfterDelay
-                      load->image-loader#show
-                    |
-                  },
-                  class: "w-full h-auto"
-                %>
-                <div data-role="loader" class="hidden p-5" data-image-loader-target="loader">
-                  <%= spinner size: 6, class: "text-black dark:text-white" %>
-                </div>
-              </article>
-            </main>
-            <form method="dialog" class="modal-backdrop no-focus-outline">
-              <button id="modal-backdrop">close</button>
-            </form>
-          </dialog>
-        <% end %>
       </div>
+
+      <% if message.has_document_image? %>
+        <dialog class="modal no-focus-outline" data-modal-target="dialog" data-role="image-modal">
+          <main class="modal-box max-w-5xl p-0 rounded-none">
+            <article
+              data-controller="image-loader"
+              data-image-loader-url-value="<%= message.document_image_path(:large) %>"
+              data-turbo-permanent
+              class="flex flex-col md:flex-row justify-center"
+            >
+              <%= image_tag message.document_image_path(:large, fallback: ""),
+                data: {
+                  image_loader_target: "image",
+                  action: %|
+                    error->image-loader#retryAfterDelay
+                    load->image-loader#show
+                  |
+                },
+                class: "w-full h-auto"
+              %>
+              <div data-role="image-loader" class="hidden p-5" data-image-loader-target="loader">
+                <%= spinner size: 6, class: "text-black dark:text-white" %>
+              </div>
+            </article>
+          </main>
+          <form method="dialog" class="modal-backdrop no-focus-outline">
+            <button id="modal-backdrop">close</button>
+          </form>
+        </dialog>
+      <% end %>
     </div>
   </div>
 </div>

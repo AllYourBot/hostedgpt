@@ -1,15 +1,29 @@
 <%# locals: (assistant:, size:, classes: nil) -%>
-<% text_size = size > 6 ? "text-sm" : "text-xs" %>
+<% classes = %|
+    rounded-full
+    w-#{size} h-#{size}
+    #{size > 6 ? "text-sm" : "text-xs"}
+    #{classes}
+|%>
+<% logo = if assistant.name.starts_with?("GPT-")
+  "openai_logo.svg"
+elsif assistant.name.starts_with?("Claude")
+  "claude_logo.svg"
+end
+%>
 
-<picture
-  class="
-        rounded-full
-        w-<%= size %> h-<%= size %>
-        bg-blue-200 text-black
-        flex justify-center items-center
-        <%= text_size %>
-        <%= classes %>
-        "
->
-  <%= assistant.initials %>
-</picture>
+<% if logo %>
+  <picture class="<%= classes %> p-1 bg-white border border-gray-100">
+    <%= image_tag logo %>
+  </picture>
+<% else %>
+  <picture
+    class="
+          <%= classes %>
+          bg-blue-200 text-black
+          flex justify-center items-center
+          "
+  >
+    <%= assistant.initials %>
+  </picture>
+<% end %>

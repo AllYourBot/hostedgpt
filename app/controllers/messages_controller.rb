@@ -84,13 +84,18 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(
+    modified_params = params.require(:message).permit(
       :conversation_id,
       :content_text,
       :assistant_id,
       :cancelled_at,
       :rerequested_at,
-      documents_attributes: [:file])
+      documents_attributes: [:file]
+    )
+    if modified_params[:content_text].blank? # when we rerequest the content_text: nil is mistakenly getting converted to ""
+      modified_params[:content_text] = nil
+    end
+    modified_params
   end
 
   def redis
