@@ -306,7 +306,7 @@ msg0_v1_response:
   additional_instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
-msg2_v1_response
+msg2_v1_response:
   assistant: samantha
   conversation: versioned2
   status: completed
@@ -322,39 +322,7 @@ msg2_v1_response
   additional_instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
-msg3_v2_response
-  assistant: samantha
-  conversation: versioned2
-  status: completed
-  required_action:
-  last_error:
-  started_at: 2023-1-1 1:07:00
-  completed_at: 2023-1-1 1:07:00
-  expired_at: 2023-1-1 1:07:00
-  cancelled_at:
-  failed_at:
-  model: gpt-4
-  instructions: You are a helpful assistant
-  additional_instructions:
-  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-
-msg3_v3_response
-  assistant: samantha
-  conversation: versioned2
-  status: completed
-  required_action:
-  last_error:
-  started_at: 2023-1-1 1:07:00
-  completed_at: 2023-1-1 1:07:00
-  expired_at: 2023-1-1 1:07:00
-  cancelled_at:
-  failed_at:
-  model: gpt-4
-  instructions: You are a helpful assistant
-  additional_instructions:
-  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-
-msg4_v4_response
+msg3_v2_response:
   assistant: samantha
   conversation: versioned2
   status: completed

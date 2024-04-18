@@ -556,9 +556,9 @@ msg2_v3:
   assistant: samantha
   conversation: versioned2
   role: assistant
-  content_text: It is a beautiful city.
+  content_text: I was born in the city of San Francisco
   content_document:
-  run: message4_v2_response
+  run: msg2_v1_response
   created_at: 2023-1-1 1:07:00
   index: 2
   version: 3
@@ -568,10 +568,10 @@ msg2_v3:
 msg3_v3:
   assistant: samantha
   conversation: versioned2
-  role: assistant
-  content_text: It is a beautiful city.
+  role: user
+  content_text: Do you like it there?
   content_document:
-  run: msg2_v3_response
+  run:
   created_at: 2023-1-1 1:07:00
   index: 3
   version: 3
@@ -581,9 +581,9 @@ msg4_v4:
   assistant: samantha
   conversation: versioned2
   role: assistant
-  content_text: It is a beautiful city.
+  content_text: It is a nice city.
   content_document:
-  run: message4_v2_response
+  run: msg3_v2_response
   created_at: 2023-1-1 1:07:00
   index: 4
   version: 4
@@ -593,10 +593,10 @@ msg4_v4:
 msg2_v5:
   assistant: samantha
   conversation: versioned2
-  role: assistant
-  content_text: I don't eat food.
+  role: user
+  content_text: Do you like the food?
   content_document:
-  run: msg4_v4_response
+  run:
   created_at: 2023-1-1 1:03:00
   index: 2
   version: 5
