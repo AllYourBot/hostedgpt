@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_12_205836) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_18_162137) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -103,13 +103,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_205836) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
-    t.datetime "rerequested_at"
-    t.datetime "cancelled_at"
     t.datetime "processed_at", precision: nil
     t.integer "index", null: false
     t.integer "version", null: false
+    t.datetime "cancelled_at"
+    t.boolean "branched", default: false, null: false
+    t.integer "branched_from_version"
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
+    t.index ["conversation_id", "index", "version"], name: "index_messages_on_conversation_id_and_index_and_version", unique: true
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["index"], name: "index_messages_on_index"
     t.index ["run_id"], name: "index_messages_on_run_id"
