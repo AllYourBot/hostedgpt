@@ -50,7 +50,7 @@ class AIBackends::OpenAI
     begin
       response = @client.chat(parameters: {
         model: @assistant.model,
-        messages: system_message + existing_messages,
+        messages: system_message + preceding_messages,
         stream: response_handler,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
       })
@@ -82,8 +82,8 @@ class AIBackends::OpenAI
     }]
   end
 
-  def existing_messages
-    @conversation.messages.ordered.where("created_at < ?", @message.created_at).collect do |message|
+  def preceding_messages
+    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
       if @assistant.images && message.documents.present?
 
         content = [{ type: "text", text: message.content_text }]
