@@ -3,9 +3,10 @@ require "./lib/markdown_renderer"
 module MessagesHelper
   def format(text, append_inside_tag:)
     escaped_text = html_escape(text)
+
     html = ::MarkdownRenderer.render(
       escaped_text,
-      block_code: formatted_block_code,
+      block_code: block_code
     )
 
     html = append(html, append_inside_tag) if append_inside_tag
@@ -14,7 +15,7 @@ module MessagesHelper
 
   private
 
-  def formatted_block_code
+  def block_code
     ->(code, language) do
       content_tag(:pre,
         class: %|
@@ -55,7 +56,6 @@ module MessagesHelper
           end
         end +
         div_tag(class: "px-4 py-3") do
-
           content_tag(:code, code, data: { clipboard_target: "text" })
         end
       end
