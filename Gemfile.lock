@@ -287,6 +287,8 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    serviceworker-rails (0.6.0)
+      railties (>= 3.1)
     solid_queue (0.2.1)
       rails (~> 7.1)
     sorbet-runtime (0.5.11156)
@@ -379,6 +381,7 @@ DEPENDENCIES
   ruby-lsp
   ruby-openai (~> 6.3)
   selenium-webdriver
+  serviceworker-rails
   solid_queue (~> 0.2.1)
   sprockets-rails
   standard

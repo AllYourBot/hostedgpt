@@ -1,6 +1,9 @@
 <head>
-  <title>HostedGPT</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= charset_tag('utf-8') %>
+  <%= viewport_tag('width=device-width,initial-scale=1') %>
+
+  <title><%= yield(:title) %></title>
+
   <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
@@ -11,6 +14,18 @@
   <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   <%= javascript_importmap_tags %>
   <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
-  <%= favicon_link_tag asset_path("favicon.png") %>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <!-- ios-pwa-splash screen-->
+  <%= javascript_include_tag "https://unpkg.com/ios-pwa-splash@1.0.0/cdn.min.js" %>
+  <%= javascript_tag do %>
+    iosPWASplash('/apple-touch-icon.png', '#2f5ff2')
+  <% end %>
+  <!-- /ios-pwa-splash screen-->
+  <!-- /PWA -->
+
+  <%= render 'application/head/favicons' %>
+  <%= render 'application/head/meta_tags' %>
   <%= content_for :head %>
 </head>
