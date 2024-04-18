@@ -37,7 +37,7 @@ class MessagesController < ApplicationController
         @message.conversation.latest_message_for_version(@message.version).id,
         @assistant.id
       )
-      redirect_to conversation_messages_path(@message.conversation, version: @message.version)
+      redirect_to conversation_messages_path(@message.conversation
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
       set_nav_conversations
@@ -51,7 +51,7 @@ class MessagesController < ApplicationController
   def update
     if @message.update(message_params)
       GetNextAIMessageJob.perform_later(@message.id, @message.assistant.id) if @message.previous_changes.any?
-      redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version)
+      redirect_to conversation_messages_path(@message.conversation)
     else
       render :edit, status: :unprocessable_entity
     end
