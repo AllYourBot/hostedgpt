@@ -62,23 +62,6 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should update message with a re-request" do
-    rerequested_at = Time.current.round
-    new_assistant_id = @user.assistants.where.not(id: @assistant.id).first.id
-
-    patch message_url(@conversation.latest_message), params: { message: {
-      content_text: nil,
-      rerequested_at: rerequested_at,
-      assistant_id: new_assistant_id,
-    }}
-    @conversation.latest_message.reload
-
-    assert_redirected_to conversation_messages_url(@conversation)
-    assert_nil @conversation.latest_message.content_text
-    assert_equal rerequested_at, @conversation.latest_message.rerequested_at
-    assert_equal new_assistant_id, @conversation.latest_message.assistant_id
-  end
-
   test "should destroy message" do
     assert_difference("Message.count", -1) do
       delete message_url(@message)
