@@ -4,11 +4,11 @@ class Message::CancellableTest < ActiveSupport::TestCase
   setup do
     @conversation = conversations(:greeting)
     @previous_id = @conversation.latest_message.id
-    redis.set("conversation-#{@conversation.id}-latest_message-id", @previous_id)
+    redis.set("conversation-#{@conversation.id}-latest-assistant_message-id", @previous_id)
   end
 
   teardown do
-    redis.set("conversation-#{@conversation.id}-latest_message-id", @previous_id) # cleanup
+    redis.set("conversation-#{@conversation.id}-latest-assistant_message-id", @previous_id) # cleanup
   end
 
   test "when a message is cancelled the redis key gets set" do
@@ -24,7 +24,7 @@ class Message::CancellableTest < ActiveSupport::TestCase
   end
 
   test "creating a new message on a conversation updates the redis key for that conversation" do
-    assert_changes "redis.get('conversation-#{@conversation.id}-latest_message-id')&.to_i", from: @previous_id do
+    assert_changes "redis.get('conversation-#{@conversation.id}-latest-assistant_message-id')&.to_i", from: @previous_id do
       assert_difference "@conversation.messages.count", 2 do
         @conversation.messages.create!(
           assistant: @conversation.assistant,
@@ -33,7 +33,7 @@ class Message::CancellableTest < ActiveSupport::TestCase
       end
     end
 
-    assert_equal @conversation.latest_message.reload.id, redis.get("conversation-#{@conversation.id}-latest_message-id")&.to_i
+    assert_equal @conversation.latest_message.reload.id, redis.get("conversation-#{@conversation.id}-latest-assistant_message-id")&.to_i
   end
 
   private

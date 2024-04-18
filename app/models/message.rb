@@ -18,7 +18,6 @@ class Message < ApplicationRecord
   validate  :validate_conversation,  if: -> { conversation.present? && Current.user }
   validate  :validate_assistant,     if: -> { assistant.present? && Current.user }
 
-
   after_create :start_assistant_reply, if: :user?
   after_create :set_latest_assistant_message, if: :assistant?
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
@@ -54,7 +53,7 @@ class Message < ApplicationRecord
   end
 
   def set_latest_assistant_message
-    redis.set("conversation-#{conversation_id}-latest_message-id", id)
+    redis.set("conversation-#{conversation_id}-latest-assistant_message-id", id)
   end
 
   def update_assistant_on_conversation
