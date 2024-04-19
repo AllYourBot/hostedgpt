@@ -88,7 +88,8 @@ HostedGPT requires these services to be running:
 1. `cd` into your local repository clone
 2. `asdf install` to install the correct ruby version
 3. `bundle install` to install ruby gems
-4. `bin/rails credentials:edit` (see config/credentials.yml.sample for names)
+3. 'bin/rails db:encryption:init' to create random keys for database encryption
+4. `bin/rails credentials:edit` (add values from step 3)
 5. `bin/rails db:setup` < Optional:  This will load the sample fixture data into your database
 6. `bin/dev` < Starts up all the services
 7. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
