@@ -11,10 +11,10 @@ elsif assistant.name.starts_with?("Claude")
   "claude_logo.svg"
 end
 %>
-
+  
 <% if logo %>
-  <picture class="<%= classes %> p-1 bg-white border border-gray-100">
-    <%= image_tag logo %>
+  <picture class="<%= classes %> bg-white border border-gray-100 overflow-hidden">
+    <%= image_tag(logo, class: "w-full h-full") %>
   </picture>
 <% else %>
   <picture
