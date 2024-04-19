@@ -27,7 +27,7 @@ class MessagesController < ApplicationController
     ).find_by(id: redis.get("conversation-#{@conversation.id}-latest-assistant_message-id"))
   end
 
-  def show  # show & edit will be used when we make messages editable
+  def show  # can I remove this?
   end
 
   def new
