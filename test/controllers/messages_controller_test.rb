@@ -59,7 +59,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal @user, conversation.user
   end
 
-  test "after creating message it redirects to the version of the message" do
+  test "after creating message with index and version it saves those details and redirects to the version of the message" do
     post assistant_messages_url(@assistant), params: { message: {
       conversation_id: @message.conversation_id,
       content_text: @message.content_text,
@@ -70,6 +70,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     }}
 
     message = Message.last
+    assert_equal 1, message.index
     assert_equal 2, message.version
     assert_redirected_to conversation_messages_url(@conversation, version: 2)
   end
