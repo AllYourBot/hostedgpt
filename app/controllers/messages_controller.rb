@@ -100,8 +100,8 @@ class MessagesController < ApplicationController
       :branched_from_version,
       documents_attributes: [:file]
     )
-    if modified_params.has_key?(:content_text) && modified_params[:content_text].blank? # when we rerequest the content_text: nil is mistakenly getting converted to ""
-      modified_params[:content_text] = nil
+    if modified_params.has_key?(:content_text) && modified_params[:content_text].blank?
+      modified_params[:content_text] = nil # nil and "" have different meanings
     end
     modified_params
   end
