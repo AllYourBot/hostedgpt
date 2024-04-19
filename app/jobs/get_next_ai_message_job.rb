@@ -84,7 +84,6 @@ class GetNextAIMessageJob < ApplicationJob
       puts "\n###Finished GetNextAIMessageJob with ERROR: #{e.inspect}" unless Rails.env.test?
       puts e.backtrace
     end
-
     return false # there may be some exceptions we want to re-raise?
   end
 
