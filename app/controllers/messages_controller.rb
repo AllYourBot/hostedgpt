@@ -2,12 +2,12 @@ class MessagesController < ApplicationController
   include ActiveStorage::SetCurrent
   include HasConversationStarter
 
-  before_action :set_version, only: [:index, :update]
-  before_action :set_conversation, only: [:index]
-  before_action :set_assistant, only: [:index, :new, :create]
-  before_action :set_message, only: [:show, :edit, :update, :destroy]
-  before_action :set_nav_conversations, only: [:index, :new]
-  before_action :set_nav_assistants, only: [:index, :new]
+  before_action :set_version,               only: [:index, :update]
+  before_action :set_conversation,          only: [:index]
+  before_action :set_assistant,             only: [:index, :new, :create]
+  before_action :set_message,               only: [:show, :edit, :update, :destroy]
+  before_action :set_nav_conversations,     only: [:index, :new]
+  before_action :set_nav_assistants,        only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
 
   def index
@@ -32,11 +32,9 @@ class MessagesController < ApplicationController
   def create
     @message = @assistant.messages.new(message_params)
 
-    if @message.save # remember, an extra assistant message is auto-created
-      GetNextAIMessageJob.perform_later(
-        @message.conversation.latest_message_for_version(@message.version).id,
-        @assistant.id
-      )
+    if @message.save
+      auto_created_message_after = @message.conversation.latest_message_for_version(@message.version)
+      GetNextAIMessageJob.perform_later(auto_created_message_after.id, @assistant.id)
       redirect_to conversation_messages_path(@message.conversation)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
@@ -50,7 +48,6 @@ class MessagesController < ApplicationController
 
   def update
     if @message.update(message_params)
-      GetNextAIMessageJob.perform_later(@message.id, @message.assistant.id) if @message.previous_changes.any?
       redirect_to conversation_messages_path(@message.conversation)
     else
       render :edit, status: :unprocessable_entity
@@ -75,7 +72,7 @@ class MessagesController < ApplicationController
 
   def set_assistant
     @assistant = Current.user.assistants.find_by(id: params[:assistant_id])
-    @assistant ||= @conversation.messages.for_conversation_version(@version).last.assistant
+    @assistant ||= @conversation.latest_message_for_version(@version).assistant
   end
 
   def set_message
