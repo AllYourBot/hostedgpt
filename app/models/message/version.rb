@@ -41,7 +41,6 @@ module Message::Version
         select("DISTINCT ON (index) messages.*").
         select("CASE WHEN mB.version IS NOT NULL THEN mB.version ELSE messages.version END as max_branched_to").
         select("CASE WHEN messages.branched THEN STRING_AGG(mV.version::text, ',') OVER (PARTITION BY messages.index,messages.version ORDER BY mV.version ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) ELSE null END AS versions").
-        select("ROW_NUMBER() OVER (ORDER BY messages.index ASC, messages.version DESC) AS subq_position").
         order("messages.index").order(max_branched_to: :desc).order("messages.version DESC").
         where("messages.index <= ? AND messages.version <= ?", index, version)
     end
