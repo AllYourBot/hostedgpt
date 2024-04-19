@@ -33,6 +33,7 @@ class MarkdownRenderer
     )
 
     markdown = ensure_newline_before_code_block_start(markdown)
+
     formatter.render(markdown)
   end
 
