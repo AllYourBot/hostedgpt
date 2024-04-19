@@ -52,24 +52,6 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_current_path conversation_messages_path(@conversation, version: 2)
   end
 
-  test "previous icon shows tooltip and next is disabled" do
-    conversations(:versioned).messages.where(version: 2).where("index > 2").delete_all
-    visit conversation_messages_path(conversations(:versioned), version: 2)
-
-    msg = hover_last_message
-    assert_shows_tooltip msg.find_role("previous"), "Previous"
-    assert msg.find_role("next").disabled?
-  end
-
-  test "next icon shows tooltip" do
-    messages(:message3_v1).destroy
-    visit conversation_messages_path(conversations(:versioned), version: 1)
-
-    msg = hover_last_message
-    assert_shows_tooltip msg.find_role("next"), "Next"
-    assert msg.find_role("previous").disabled?
-  end
-
   test "submitting a message with ENTER inserts two new messages with morphing" do
     assert_page_morphed do
       send_keys "Watch me appear"
@@ -100,12 +82,6 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   end
 
   private
-
-  def hover_last_message
-    msg = last_message
-    msg.hover
-    msg
-  end
 
   def assert_page_morphed
     raise "No block given" unless block_given?

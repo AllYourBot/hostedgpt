@@ -160,14 +160,4 @@ class NavColumnTest < ApplicationSystemTestCase
     click_element pencil_on_second_assistant
     assert_current_path new_assistant_message_path(assistant2)
   end
-
-  private
-
-  def assert_selected_assistant(assistant)
-    assert_selector "#assistants .relationship", text: assistant.name
-  end
-
-  def assert_first_message(message)
-    assert_selector "#messages > :first-child [data-role='content-text']", text: message.content_text
-  end
 end

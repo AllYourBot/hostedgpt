@@ -255,6 +255,25 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       find("#composer textarea").value.blank?
     end
   end
+
+  def hover_last_message
+    msg = last_message
+    msg.hover
+    msg
+  end
+
+  def assert_selected_assistant(assistant)
+    assert_selector "#assistants .relationship", text: assistant.name
+  end
+
+  def assert_first_message(message)
+    assert_selector "#messages > :first-child [data-role='content-text']", text: message.content_text
+  end
+
+  def assert_last_message(message)
+    assert_selector "#messages > :last-child [data-role='content-text']", text: message.content_text
+  end
+
 end
 
 class Capybara::Node::Element
