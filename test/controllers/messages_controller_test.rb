@@ -60,18 +60,22 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "after creating message with index and version it saves those details and redirects to the version of the message" do
-    post assistant_messages_url(@assistant), params: { message: {
-      conversation_id: @message.conversation_id,
-      content_text: @message.content_text,
-      index: 1,
-      version: 2,
-      branched: true,
-      branched_from_version: 1,
-    }}
+    assert_difference "Message.count", 2 do
+      post assistant_messages_url(@assistant), params: { message: {
+        conversation_id: @message.conversation_id,
+        content_text: @message.content_text,
+        index: 1,
+        version: 2,
+        branched: true,
+        branched_from_version: 1,
+      }}
+    end
 
-    message = Message.last
-    assert_equal 1, message.index
-    assert_equal 2, message.version
+    message1, message2 = Message.last(2)
+    assert_equal 1, message1.index
+    assert_equal 2, message1.version
+    assert_equal 2, message2.index
+    assert_equal 2, message2.version
     assert_redirected_to conversation_messages_url(@conversation, version: 2)
   end
 
