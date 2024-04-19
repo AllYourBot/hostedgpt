@@ -2,7 +2,7 @@ module ExtendActiveRecord
   def last(*args)
     if to_sql.include?("DISTINCT ON")
       limit = args.first
-      result = unscoped.from("(#{to_sql}) AS subq").select("subq.*").order(subq_position: :desc).limit(limit)
+      result = unscoped.from("(#{to_sql}) AS subq").select("subq.*").order("subq.index DESC").limit(limit)
 
       limit ? result.reverse : result.first
     else

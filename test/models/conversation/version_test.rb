@@ -1,8 +1,9 @@
 require "test_helper"
 
 class Conversation::VersionTest < ActiveSupport::TestCase
-  test "latest_message works" do
-    assert_equal messages(:im_a_bot), conversations(:greeting).latest_message
+  test "latest_message_for_version" do
+    assert_equal messages(:message3_v1), conversations(:versioned).latest_message_for_version(1)
+    assert_equal messages(:message5_v2), conversations(:versioned).latest_message_for_version(2)
   end
 
   test "latest_version_for_message_index" do

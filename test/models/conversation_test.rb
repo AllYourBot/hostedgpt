@@ -62,7 +62,7 @@ class ConversationTest < ActiveSupport::TestCase
 
         conversation.messages.create!(assistant: conversation.assistant, role: :user, content_text: "Can you hear me?")
 
-        latest_message = conversation.latest_message
+        latest_message = conversation.latest_message_for_version(:latest)
         assert latest_message.assistant?
 
         GetNextAIMessageJob.perform_now(latest_message.id, assistants(:samantha).id)
