@@ -175,6 +175,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def assert_at_bottom(selector = "section #messages")
+    sleep 1 # there is a lot of flakiness related to it not yet scrolled down
     assert_stopped_scrolling(selector)
     initial_scroll_position = get_scroll_position(selector)
     scroll_to_bottom(selector)

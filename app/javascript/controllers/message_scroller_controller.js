@@ -59,5 +59,7 @@ export default class extends Controller {
       // down a bit further. This was hard to test so I'm not yet certain it solves the problem.
       window.addEventListener('load', this.throttledScrollDownIfScrolledToBottom, { once: true })
     }
+
+    window.scrolledDownForSystemTestsToCheck = true
   }
 }

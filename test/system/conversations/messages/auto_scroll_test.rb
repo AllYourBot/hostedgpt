@@ -10,6 +10,7 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
     @time_start = Time.new.to_i
     visit conversation_messages_path(@conversation)
     wait_for_images_to_load
+    assert_true { page.evaluate_script('window.scrolledDownForSystemTestsToCheck') }
   end
 
   test "the conversation auto-scrolls to bottom when page loads" do

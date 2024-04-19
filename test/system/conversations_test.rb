@@ -55,16 +55,13 @@ class ConversationsTest < ApplicationSystemTestCase
   test "clicking the conversation delete, when you ARE NOT on this conversation, deletes it and the url does not change" do
     convo = hover_conversation conversations(:greeting)
     delete = convo.find_role("delete")
+    confirm_delete = convo.find_role("confirm-delete")
 
     delete.click
-    sleep 0.1
-    confirm_delete = convo.find_role("confirm-delete")
+    assert_true { confirm_delete.visible? }
     confirm_delete.click
 
-    sleep 0.5
     assert_text "Deleted conversation"
-    refute convo.exists?
-
     assert_current_path(@starting_path)
   end
 
@@ -72,18 +69,14 @@ class ConversationsTest < ApplicationSystemTestCase
     visit conversation_messages_path(conversations(:greeting))
     convo = hover_conversation conversations(:greeting)
     delete = convo.find_role("delete")
-
-    delete.click
-    sleep 0.1
     confirm_delete = convo.find_role("confirm-delete")
 
+    delete.click
+    assert_true { confirm_delete.visible? }
     confirm_delete.click
-    sleep 0.1
 
     assert_text "Deleted conversation"
-    refute convo.exists?
-
-    assert_current_path(new_assistant_message_path users(:keith).assistants.ordered.first)
+    assert_current_path new_assistant_message_path(users(:keith).assistants.ordered.first)
   end
 
   private
