@@ -1,4 +1,4 @@
-<%= form_with(model: [:settings, person], class: "contents") do |form| %>
+<%= form_with(model: [:settings, person], class: "contents", data: { controller: "local-storage" }) do |form| %>
   <% if person.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
@@ -131,6 +131,20 @@
         class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black",
         placeholder: "Anthropic Key"
       %>
+    </div>
+    <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
+      <%= user_fields.label :color_theme, "Color Theme" %>
+      <div class="flex items-center justify-between shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black">
+        <%= user_fields.fields_for :preferences do |preferences_fields| %>
+          <% color_themes = { "dark" => "Dark", "light" => "Light", "" => "System" } %>
+          <% color_themes.each do |value, label| %>
+            <div class="form-group">
+              <%= preferences_fields.radio_button :color_theme, value, checked: Current.user.preferences[:color_theme] == value,  data: { action: "change->local-storage#saveToLocalStorage" } %>
+              <%= user_fields.label "color_theme_#{value}", label, class: "ml-2" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   <% end %>
 

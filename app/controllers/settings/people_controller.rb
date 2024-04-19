@@ -17,7 +17,7 @@ class Settings::PeopleController < Settings::ApplicationController
 
   def person_params
     params.require(:person).permit(:email, personable_attributes: [
-      :id, :first_name, :last_name, :password, :openai_key, :anthropic_key
+      :id, :first_name, :last_name, :password, :openai_key, :anthropic_key, preferences: [:color_theme]
     ])
   end
 
