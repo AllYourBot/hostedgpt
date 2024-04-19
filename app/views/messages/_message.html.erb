@@ -1,15 +1,19 @@
-<%# locals: (message:, scroll_down: false, only_scroll_down_if_was_bottom: false, request_id: nil, timestamp: nil, thinking: nil, message_counter: -1) -%>
+<%# locals: (message:, scroll_down: false, only_scroll_down_if_was_bottom: false, request_id: nil, timestamp: nil, thinking: nil, streamed: false, message_counter: -1) -%>
 <%# request_id is not used, but broadcasting turbo stream messages provides it as a local so it needs to be accepted %>
 
-<% max_index = message.conversation.messages.length - 1 %>
+<% conversation = message.conversation %>
+<% conversation_version = streamed ? message.version : @version %>
+<% max_index = conversation.messages.for_conversation_version(conversation_version).count - 1 %>
 <% last_message = message_counter == max_index %>
 <% initial_page_load = last_message && !scroll_down %>
 <% scroll_down = scroll_down || initial_page_load %>
-<% thinking = if thinking.nil?
-                last_message && message.content_text == "" && message.not_cancelled?
-              else
-                thinking
-              end
+<% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
+<% last_message_done = last_message && !thinking && message.content_text.present? %>
+<%
+if message.versions.present?
+  previous_version  = message.versions.push(nil)[ message.versions.index(message.version)-1 ]
+  next_version      = message.versions.push(nil)[ message.versions.index(message.version)+1 ]
+end
 %>
 
 <div
@@ -103,7 +107,51 @@
         %>
       </div>
 
-      <div class="flex justify-start invisible gap-2 text-gray-600 dark:text-gray-300 group-hover:visible">
+      <div class="
+        flex justify-start
+        gap-2
+        text-gray-600 dark:text-gray-300
+        <%= !last_message_done && 'invisible' %> group-hover:visible
+      ">
+        <% if message.versions.length > 1 %>
+          <%= button_to message_path(message, version: previous_version),
+            method: :patch,
+            params: { message: { id: message.id } },
+            class: "-ml-1 cursor-pointer hover:text-gray-900 dark:hover:text-white disabled:opacity-25",
+            disabled: previous_version.nil?,
+            form: {
+              class: "flex items-center",
+              data: {
+                turbo_frame: "_top",
+                turbo_action: "replace",
+              }
+            },
+            data: {
+              role: "previous",
+          } do %>
+            <%= icon "chevron-left", variant: :micro, title: previous_version.present? && "Previous", data: { } %>
+          <% end %>
+
+          v<%= message.version %>
+          <%= button_to message_path(message, version: next_version),
+            method: :patch,
+            params: { message: { id: message.id } },
+            class: "mr-2 cursor-pointer hover:text-gray-900 dark:hover:text-white disabled:opacity-25",
+            disabled: next_version.nil?,
+            form: {
+              class: "flex items-center",
+              data: {
+                turbo_frame: "_top",
+                turbo_action: "replace",
+              }
+            },
+            data: {
+              role: "next",
+          } do %>
+            <%= icon "chevron-right", variant: :micro, title: next_version.present? && "Next", data: { } %>
+          <% end %>
+        <% end %>
+
         <% if message.user? %>
           <%= button_tag type: "button",
                 data: {
@@ -130,7 +178,7 @@
             <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
           <% end %>
 
-          <div class="dropdown dropdown-top">
+          <div class="dropdown dropdown-top flex items-center">
             <%= icon "arrow-path",
               tabindex: 0,
               role: :button,
@@ -143,13 +191,21 @@
             <menu tabindex="0" class="dropdown-content -ml-6 z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
               <% ([message.assistant] + message.user.assistants.ordered.excluding(message.assistant)).each do |assistant| %>
                 <li class="overflow-hidden">
-                  <%= button_to message_path(message),
+                  <%= button_to assistant_messages_path(assistant),
                     form_class: "inline-block p-0",
                     class: "truncate w-full py-2 px-4 text-left",
                     method: :post,
+                    data: {
+                      turbo_frame: "_top",
+                      turbo_action: "replace",
+                    },
                     params: { message: {
+                      conversation_id: conversation.id,
+                      assistant_id: assistant.id,
+                      role: "assistant",
                       index: message.index,
-                      assistant_id: assistant.id
+                      branched: true,
+                      branched_from_version: message.version
                     } } do
                   %>
                     Using <%= assistant.name %>

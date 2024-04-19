@@ -11,6 +11,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get index" do
     get conversation_messages_url(@conversation)
+    follow_redirect!
     assert_response :success
   end
 
@@ -24,7 +25,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       post assistant_messages_url(@assistant), params: { message: { conversation_id: @message.conversation_id, content_text: @message.content_text } }
     end
 
-    assert_redirected_to conversation_messages_url(@conversation)
+    assert_redirected_to conversation_messages_url(@conversation, version: 1)
     assert_equal @conversation.id, Message.last.conversation_id
   end
 
@@ -37,7 +38,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     conversation = Message.last.conversation
     assert_instance_of Conversation, conversation
-    assert_redirected_to conversation_messages_url(conversation)
+    assert_redirected_to conversation_messages_url(conversation, version: 1)
     assert_equal @assistant, conversation.assistant
     assert_equal @user, conversation.user
   end

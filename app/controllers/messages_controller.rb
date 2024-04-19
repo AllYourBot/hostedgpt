@@ -11,6 +11,14 @@ class MessagesController < ApplicationController
   before_action :set_conversation_starters, only: [:new]
 
   def index
+    if @version.blank?
+      version = @conversation.messages.order(:created_at).last&.version
+      redirect_to conversation_messages_path(
+        params[:conversation_id],
+        version: version
+      ) if version
+    end
+
     @messages = @conversation.messages.for_conversation_version(@version)
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
@@ -35,7 +43,7 @@ class MessagesController < ApplicationController
     if @message.save
       auto_created_message_after = @message.conversation.latest_message_for_version(@message.version)
       GetNextAIMessageJob.perform_later(auto_created_message_after.id, @assistant.id)
-      redirect_to conversation_messages_path(@message.conversation)
+      redirect_to conversation_messages_path(@message.conversation, version: @message.version)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
       set_nav_conversations
@@ -48,7 +56,7 @@ class MessagesController < ApplicationController
 
   def update
     if @message.update(message_params)
-      redirect_to conversation_messages_path(@message.conversation)
+      redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version)
     else
       render :edit, status: :unprocessable_entity
     end

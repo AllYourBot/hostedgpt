@@ -84,13 +84,15 @@ class GetNextAIMessageJob < ApplicationJob
       puts "\n###Finished GetNextAIMessageJob with ERROR: #{e.inspect}" unless Rails.env.test?
       puts e.backtrace
     end
+
     return false # there may be some exceptions we want to re-raise?
   end
 
   def self.broadcast_updated_message(message, locals = {})
     message.broadcast_replace_to message.conversation, locals: {
       only_scroll_down_if_was_bottom: true,
-      timestamp: (Time.current.to_f*1000).to_i
+      timestamp: (Time.current.to_f*1000).to_i,
+      streamed: true,
   }.merge(locals)
   end
 
