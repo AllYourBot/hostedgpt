@@ -13,7 +13,7 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def perform(message_id, assistant_id)
-    puts "\n### GetNextAIMessageJob.perform(#{message_id}, #{assistant_id})"
+    puts "\n### GetNextAIMessageJob.perform(#{message_id}, #{assistant_id})" unless Rails.env.test?
 
     @message = Message.find_by(id: message_id)
     @conversation = @message.conversation
@@ -27,7 +27,7 @@ class GetNextAIMessageJob < ApplicationJob
     @message.update!(processed_at: Time.current, content_text: "")
     GetNextAIMessageJob.broadcast_updated_message(@message, thinking: true) # signal to user that we're waiting on API
 
-    puts "\n### Wait for reply"
+    puts "\n### Wait for reply" unless Rails.env.test?
 
     response = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
       .get_next_chat_message do |content_chunk|
@@ -53,7 +53,7 @@ class GetNextAIMessageJob < ApplicationJob
     return true
 
   rescue ResponseCancelled => e
-    puts "\n### Response cancelled in GetNextAIMessageJob(#{message_id})"
+    puts "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     wrap_up_the_message
     return true
   rescue OpenAI::ConfigurationError => e
@@ -77,11 +77,11 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_message
     return true
   rescue WaitForPrevious
-    puts "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})"
+    puts "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     raise WaitForPrevious
   rescue => e
     unless Rails.env.test?
-      puts "\n###Finished GetNextAIMessageJob with ERROR: #{e.inspect}"
+      puts "\n###Finished GetNextAIMessageJob with ERROR: #{e.inspect}" unless Rails.env.test?
       puts e.backtrace
     end
     return false # there may be some exceptions we want to re-raise?
@@ -125,7 +125,7 @@ class GetNextAIMessageJob < ApplicationJob
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
-    puts "\n### Finished GetNextAIMessageJob.perform(#{@message.id}, #{@message.assistant_id})"
+    puts "\n### Finished GetNextAIMessageJob.perform(#{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
   end
 
   def generation_was_cancelled?

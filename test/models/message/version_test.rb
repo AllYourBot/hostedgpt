@@ -10,9 +10,42 @@ class Message::VersionTest < ActiveSupport::TestCase
       conversations(:versioned).messages.for_conversation_version(2).map(&:full_version)
   end
 
+  test "count works on latest_version_for_conversation" do
+    assert_equal 4, conversations(:versioned).messages.for_conversation_version(1).count
+    assert_equal 6, conversations(:versioned).messages.for_conversation_version(2).count
+
+  end
+
+  test "last works on latest_version_for_conversation" do
+    assert_equal messages(:message3_v1), conversations(:versioned).messages.for_conversation_version(1).last
+    assert_equal messages(:message5_v2), conversations(:versioned).messages.for_conversation_version(2).last
+  end
+
   test "for_conversation_version" do
     assert_equal [0.1, 1.1, 2.1, 3.1], conversations(:versioned).messages.for_conversation_version(1).map(&:full_version)
     assert_equal [0.1, 1.1, 2.2, 3.2, 4.2, 5.2], conversations(:versioned).messages.for_conversation_version(2).map(&:full_version)
+  end
+
+  test "creating a message with an existing index & version fails if the conversation has it and succeeds if it does not" do
+    assert_raises ActiveRecord::RecordNotUnique do
+      conversations(:versioned).messages.new(
+        role: :user,
+        assistant: assistants(:samantha),
+        content_text: "What is your name?",
+        index: 5,
+        version: 2
+      ).save(validate: false)
+    end
+
+    assert_nothing_raised do # different conversation
+      conversations(:versioned2).messages.new(
+        role: :user,
+        assistant: assistants(:samantha),
+        content_text: "What is your name?",
+        index: 5,
+        version: 2
+      ).save(validate: false)
+    end
   end
 
   test "creating a message with branched true FAILS if branched_from_version is null" do
