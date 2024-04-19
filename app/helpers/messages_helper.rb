@@ -16,7 +16,6 @@ module MessagesHelper
   private
 
   def block_code
-  def block_code
     ->(code, language) do
       content_tag(:pre,
         class: %|
