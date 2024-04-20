@@ -49,6 +49,8 @@ end
         <%= message.user? ? 'You' : message.assistant.name %>
       </div>
 
+      <turbo-frame id="message-<%= message.id %>">
+
       <div class="hidden" data-clipboard-target="text"><%= message.content_text %></div>
       <div
         data-role="content-text"
@@ -153,12 +155,12 @@ end
         <% end %>
 
         <% if message.user? %>
-          <%= button_tag type: "button",
-                data: {
-                  role: "edit",
-                },
-                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white" do
-          %>
+          <%= link_to edit_message_path(message),
+            class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
+            data: {
+              role: "edit",
+              turbo_frame: "message-#{message.id}",
+            } do %>
             <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
           <% end %>
         <% else %>
@@ -217,6 +219,9 @@ end
           </div>
         <% end %>
       </div>
+
+      </turbo-frame>
+
 
       <% if message.has_document_image? %>
         <dialog class="modal no-focus-outline" data-modal-target="dialog" data-role="image-modal">
