@@ -249,6 +249,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
   end
 
+  def wait_for_initial_scroll_down
+    assert_true { page.evaluate_script('window.scrolledDownForSystemTestsToCheck') }
+  end
+
   def assert_composer_blank(msg = nil)
     msg ||= "Composer input did not clear"
     assert_true msg do
@@ -273,7 +277,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def assert_last_message(message)
     assert_selector "#messages > :last-child [data-role='content-text']", text: message.content_text
   end
-
 end
 
 class Capybara::Node::Element
