@@ -15,6 +15,7 @@
       <%= form.hidden_field :branched_from_version, value: @message.version %>
 
       <%= form.text_area :content_text,
+        id: "edit-message-#{@message.id}",
         value: @message.content_text,
         autofocus: true,
         class: %|
@@ -34,8 +35,18 @@
       %>
 
       <div class="flex justify-center items-center text-sm font-medium">
-        <%= form.submit "Save & Submit", class: "rounded-lg py-2 px-3 bg-gray-200 dark:bg-gray-900 border border-gray-400 inline-block cursor-pointer" %>
-        <%= link_to "Cancel", @message, class: "inline-block ml-5" %>
+        <%= form.submit "Save & Submit",
+          data: { role: "save" },
+          class: %|
+            inline-block cursor-pointer
+            rounded-lg py-2 px-3
+            bg-gray-200 dark:bg-gray-900
+            border border-gray-400
+        | %>
+        <%= link_to "Cancel", @message,
+          data: { role: "cancel" },
+          class: "inline-block ml-5"
+        %>
       </div>
     <% end %>
   </turbo-frame>

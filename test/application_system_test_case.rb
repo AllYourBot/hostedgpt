@@ -215,6 +215,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     find_messages.last
   end
 
+  def last_user_message
+    find_messages.last(2).first
+  end
+
   def first_message
     find_messages.first
   end
