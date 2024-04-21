@@ -9,6 +9,14 @@ module Scopes::Lib::Boolean
     boolean_columns.each do |column|
       auto_scope "#{column.name}", -> { where(column.name => true) }, column: column.name
       auto_scope "not_#{column.name}", -> { where(column.name => false) }, column: column.name
+
+      define_method "not_#{column.name}" do
+        !send("#{column.name}?")
+      end
+
+      define_method "not_#{column.name}?" do
+        !send("#{column.name}?")
+      end
     end
   end
 end
