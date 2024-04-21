@@ -32,7 +32,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get edit" do
-    get edit_message_url(@message)
+    get edit_message_url(@conversation, @message)
     assert_response :success
   end
 
@@ -111,13 +111,5 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     patch message_url(message, version: 2), params: { message: { id: message.id } }
     assert_redirected_to conversation_messages_url(message.conversation, version: 2)
-  end
-
-  test "should destroy message" do
-    assert_difference("Message.count", -1) do
-      delete message_url(@message)
-    end
-
-    assert_redirected_to conversation_messages_url(@conversation)
   end
 end

@@ -4,8 +4,8 @@ class MessagesController < ApplicationController
 
   before_action :set_version,               only: [:index, :update]
   before_action :set_conversation,          only: [:index]
-  before_action :set_assistant,             only: [:index, :new, :create]
-  before_action :set_message,               only: [:show, :edit, :update, :destroy]
+  before_action :set_assistant,             only: [:index, :new, :edit, :create]
+  before_action :set_message,               only: [:show, :edit, :update]
   before_action :set_nav_conversations,     only: [:index, :new]
   before_action :set_nav_assistants,        only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
@@ -27,7 +27,7 @@ class MessagesController < ApplicationController
     ).find_by(id: redis.get("conversation-#{@conversation.id}-latest-assistant_message-id"))
   end
 
-  def show  # can I remove this?
+  def show
   end
 
   def new
@@ -35,14 +35,15 @@ class MessagesController < ApplicationController
   end
 
   def edit
+    @new_message = @assistant.messages.new
   end
 
   def create
     @message = @assistant.messages.new(message_params)
 
     if @message.save
-      auto_created_message_after = @message.conversation.latest_message_for_version(@message.version)
-      GetNextAIMessageJob.perform_later(auto_created_message_after.id, @assistant.id)
+      after_create_assistant_reply = @message.conversation.latest_message_for_version(@message.version)
+      GetNextAIMessageJob.perform_later(after_create_assistant_reply.id, @assistant.id)
       redirect_to conversation_messages_path(@message.conversation, version: @message.version)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
@@ -55,17 +56,13 @@ class MessagesController < ApplicationController
   end
 
   def update
+    # Clicking edit beneath a message actually submits to create and not here. This action is only used for next/prev conversation.
+    # In order to force a morph we PATCH to here and redirect.
     if @message.update(message_params)
       redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version)
     else
       render :edit, status: :unprocessable_entity
     end
-  end
-
-  def destroy
-    @conversation = @message.conversation
-    @message.destroy!
-    redirect_to conversation_messages_url(@conversation), notice: "Message was successfully destroyed.", status: :see_other
   end
 
   private

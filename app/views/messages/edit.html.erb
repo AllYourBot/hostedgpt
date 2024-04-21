@@ -2,14 +2,27 @@
   <h1 class="font-bold text-4xl">Editing message</h1>
 
   <turbo-frame id="message-<%= @message.id %>">
-    <%= form_with(model: @message, data: { controller: "inline-edit" }, class: "content-text") do |form| %>
+    <%= form_with(
+      model: [@assistant, @new_message],
+      class: "content-text",
+      data: {
+        turbo_frame: "_top",
+        controller: "inline-edit"
+    }) do |form| %>
+      <%= form.hidden_field :conversation_id, value: @message.conversation_id %>
+      <%= form.hidden_field :index, value: @message.index %>
+      <%= form.hidden_field :branched, value: true %>
+      <%= form.hidden_field :branched_from_version, value: @message.version %>
 
       <%= form.text_area :content_text,
+        value: @message.content_text,
         autofocus: true,
         class: %|
           prose
           w-full p-0 m-0
           border-0 focus:ring-0
+          bg-transparent
+          text-black dark:text-gray-200
           leading-normal
           resize-none
         |,

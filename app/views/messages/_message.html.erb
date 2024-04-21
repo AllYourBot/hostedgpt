@@ -52,176 +52,174 @@ end
       <turbo-frame id="message-<%= message.id %>">
 
       <div class="hidden" data-clipboard-target="text"><%= message.content_text %></div>
-      <div
-        data-role="content-text"
-        class="prose break-words leading-normal"
-      >
-        <% if message.has_document_image? %>
-          <%= button_tag type: "button",
-                class: "w-full h-auto flex focus:outline-none",
-                data: {
-                  controller: "image-loader",
-                  image_loader_url_value: message.document_image_path(:small),
-                  action: "modal#open",
-                  role: "image-preview",
-                } do
-          %>
-            <%= image_tag message.document_image_path(:small, fallback: ""),
+        <div
+          data-role="content-text"
+          class="prose break-words leading-normal"
+        >
+          <% if message.has_document_image? %>
+            <%= button_tag type: "button",
+                  class: "w-full h-auto flex focus:outline-none",
                   data: {
-                    image_loader_target: "image",
-                    action: %|
-                      error->image-loader#retryAfterDelay
-                      load->image-loader#show
-                    |
-                  },
-                  class: %|
-                    my-0
-                    mx-auto
-                    max-w-full
-                    border-2 border-gray-100 dark:border-gray-400
-                    rounded-md
-                  |
+                    controller: "image-loader",
+                    image_loader_url_value: message.document_image_path(:small),
+                    action: "modal#open",
+                    role: "image-preview",
+                  } do
             %>
-            <div data-role="image-loader" class="mx-auto hidden" data-image-loader-target="loader">
-              <%= spinner size: 6, class: "text-black dark:text-white" %>
+              <%= image_tag message.document_image_path(:small, fallback: ""),
+                    data: {
+                      image_loader_target: "image",
+                      action: %|
+                        error->image-loader#retryAfterDelay
+                        load->image-loader#show
+                      |
+                    },
+                    class: %|
+                      my-0
+                      mx-auto
+                      max-w-full
+                      border-2 border-gray-100 dark:border-gray-400
+                      rounded-md
+                    |
+              %>
+              <div data-role="image-loader" class="mx-auto hidden" data-image-loader-target="loader">
+                <%= spinner size: 6, class: "text-black dark:text-white" %>
+              </div>
+            <% end %>
+          <% end %>
+          <%= formatted_text = format message.content_text,
+                append_inside_tag: span_tag("", class: %|
+                  animate-breathe
+                  w-3 h-3
+                  rounded-full
+                  bg-black dark:bg-white
+                  inline-block
+                  ml-1
+                  #{!thinking && 'hidden'}
+                |) +
+                span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && 'hidden') +
+                icon("stop",
+                  variant: :solid,
+                  size: 17,
+                  title: "Stopped",
+                  tooltip: :top,
+                  data: { role: "cancelled" },
+                  class: "inline-block pl-1 #{message.not_cancelled? && 'hidden'}"
+                )
+          %>
+        </div>
+
+        <div class="
+          flex justify-start
+          gap-2
+          text-gray-600 dark:text-gray-300
+          <%= !last_message_done && 'invisible' %> group-hover:visible
+        ">
+          <% if message.versions.length > 1 %>
+            <%= button_to message_path(message, version: previous_version),
+              method: :patch,
+              params: { message: { id: message.id } },
+              class: "-ml-1 cursor-pointer hover:text-gray-900 dark:hover:text-white disabled:opacity-25",
+              disabled: previous_version.nil?,
+              form: {
+                class: "flex items-center",
+                data: {
+                  turbo_frame: "_top",
+                  turbo_action: "replace",
+                }
+              },
+              data: {
+                role: "previous",
+            } do %>
+              <%= icon "chevron-left", variant: :micro, title: previous_version.present? && "Previous", data: { } %>
+            <% end %>
+
+            v<%= message.version %>
+            <%= button_to message_path(message, version: next_version),
+              method: :patch,
+              params: { message: { id: message.id } },
+              class: "mr-2 cursor-pointer hover:text-gray-900 dark:hover:text-white disabled:opacity-25",
+              disabled: next_version.nil?,
+              form: {
+                class: "flex items-center",
+                data: {
+                  turbo_frame: "_top",
+                  turbo_action: "replace",
+                }
+              },
+              data: {
+                role: "next",
+            } do %>
+              <%= icon "chevron-right", variant: :micro, title: next_version.present? && "Next", data: { } %>
+            <% end %>
+          <% end %>
+
+          <% if message.user? && !message.has_document_image? %>
+            <%= link_to edit_assistant_message_path(message.assistant, message),
+              class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+              data: {
+                role: "edit",
+                turbo_frame: "message-#{message.id}",
+              } do %>
+              <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
+            <% end %>
+          <% else %>
+            <%= button_tag type: "button",
+                  class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
+                  data: {
+                    role: "clipboard",
+                    action: %|
+                      clipboard#copy
+                      transition#toggleClassOn
+                      mouseleave->transition#toggleClassOff
+                    |,
+                    keyboard_target: formatted_text.present? && formatted_text.exclude?('keyboard-target') ? "keyboardable" : nil,
+                    # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
+            } do %>
+              <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
+              <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
+            <% end %>
+
+            <div class="dropdown dropdown-top flex items-center">
+              <%= icon "arrow-path",
+                tabindex: 0,
+                role: :button,
+                variant: :outline,
+                size: 18,
+                title: "Regenerate",
+                data: { role: "regenerate" }
+              %>
+
+              <menu tabindex="0" class="dropdown-content -ml-6 z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
+                <% message.user.assistants.ordered.excluding(message.assistant).to_a.push(message.assistant).each do |assistant| %>
+                  <% last = message.assistant == assistant %>
+                  <li class="overflow-hidden <%= 'border-t border-gray-200 dark:border-gray-500 pt-1 mt-1' if last %>">
+                    <%= button_to assistant_messages_path(assistant),
+                      form_class: "inline-block p-0",
+                      class: "truncate w-full py-2 px-4 text-left",
+                      method: :post,
+                      data: {
+                        turbo_frame: "_top",
+                        turbo_action: "replace",
+                      },
+                      params: { message: {
+                        conversation_id: conversation.id,
+                        assistant_id: assistant.id,
+                        role: "assistant",
+                        index: message.index,
+                        branched: true,
+                        branched_from_version: message.version
+                      } } do
+                    %>
+                      Using <%= assistant.name %>
+                    <% end %>
+                  </li>
+                <% end %>
+              </menu>
             </div>
           <% end %>
-        <% end %>
-        <%= formatted_text = format message.content_text,
-              append_inside_tag: span_tag("", class: %|
-                animate-breathe
-                w-3 h-3
-                rounded-full
-                bg-black dark:bg-white
-                inline-block
-                ml-1
-                #{!thinking && 'hidden'}
-              |) +
-              span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && 'hidden') +
-              icon("stop",
-                variant: :solid,
-                size: 17,
-                title: "Stopped",
-                tooltip: :top,
-                data: { role: "cancelled" },
-                class: "inline-block pl-1 #{message.not_cancelled? && 'hidden'}"
-              )
-        %>
-      </div>
-
-      <div class="
-        flex justify-start
-        gap-2
-        text-gray-600 dark:text-gray-300
-        <%= !last_message_done && 'invisible' %> group-hover:visible
-      ">
-        <% if message.versions.length > 1 %>
-          <%= button_to message_path(message, version: previous_version),
-            method: :patch,
-            params: { message: { id: message.id } },
-            class: "-ml-1 cursor-pointer hover:text-gray-900 dark:hover:text-white disabled:opacity-25",
-            disabled: previous_version.nil?,
-            form: {
-              class: "flex items-center",
-              data: {
-                turbo_frame: "_top",
-                turbo_action: "replace",
-              }
-            },
-            data: {
-              role: "previous",
-          } do %>
-            <%= icon "chevron-left", variant: :micro, title: previous_version.present? && "Previous", data: { } %>
-          <% end %>
-
-          v<%= message.version %>
-          <%= button_to message_path(message, version: next_version),
-            method: :patch,
-            params: { message: { id: message.id } },
-            class: "mr-2 cursor-pointer hover:text-gray-900 dark:hover:text-white disabled:opacity-25",
-            disabled: next_version.nil?,
-            form: {
-              class: "flex items-center",
-              data: {
-                turbo_frame: "_top",
-                turbo_action: "replace",
-              }
-            },
-            data: {
-              role: "next",
-          } do %>
-            <%= icon "chevron-right", variant: :micro, title: next_version.present? && "Next", data: { } %>
-          <% end %>
-        <% end %>
-
-        <% if message.user? %>
-          <%= link_to edit_message_path(message),
-            class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
-            data: {
-              role: "edit",
-              turbo_frame: "message-#{message.id}",
-            } do %>
-            <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
-          <% end %>
-        <% else %>
-          <%= button_tag type: "button",
-                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
-                data: {
-                  role: "clipboard",
-                  action: %|
-                    clipboard#copy
-                    transition#toggleClassOn
-                    mouseleave->transition#toggleClassOff
-                  |,
-                  keyboard_target: formatted_text.present? && formatted_text.exclude?('keyboard-target') ? "keyboardable" : nil,
-                  # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
-          } do %>
-            <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
-            <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
-          <% end %>
-
-          <div class="dropdown dropdown-top flex items-center">
-            <%= icon "arrow-path",
-              tabindex: 0,
-              role: :button,
-              variant: :outline,
-              size: 18,
-              title: "Regenerate",
-              data: { role: "regenerate" }
-            %>
-
-            <menu tabindex="0" class="dropdown-content -ml-6 z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
-              <% message.user.assistants.ordered.excluding(message.assistant).to_a.push(message.assistant).each do |assistant| %>
-                <% last = message.assistant == assistant %>
-                <li class="overflow-hidden <%= 'border-t border-gray-200 dark:border-gray-500 pt-1 mt-1' if last %>">
-                  <%= button_to assistant_messages_path(assistant),
-                    form_class: "inline-block p-0",
-                    class: "truncate w-full py-2 px-4 text-left",
-                    method: :post,
-                    data: {
-                      turbo_frame: "_top",
-                      turbo_action: "replace",
-                    },
-                    params: { message: {
-                      conversation_id: conversation.id,
-                      assistant_id: assistant.id,
-                      role: "assistant",
-                      index: message.index,
-                      branched: true,
-                      branched_from_version: message.version
-                    } } do
-                  %>
-                    Using <%= assistant.name %>
-                  <% end %>
-                </li>
-              <% end %>
-            </menu>
-          </div>
-        <% end %>
-      </div>
-
+        </div>
       </turbo-frame>
-
 
       <% if message.has_document_image? %>
         <dialog class="modal no-focus-outline" data-modal-target="dialog" data-role="image-modal">
