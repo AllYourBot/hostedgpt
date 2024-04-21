@@ -163,7 +163,7 @@ end
               } do %>
               <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
             <% end %>
-          <% else %>
+          <% elsif message.assistant? %>
             <%= button_tag type: "button",
                   class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
                   data: {
