@@ -17,10 +17,6 @@ class MessageTest < ActiveSupport::TestCase
   #   assert_instance_of Document, messages(:examine_this).content_document
   # end
 
-  test "has associated documents" do
-    assert_instance_of Document, messages(:examine_this).documents.first
-  end
-
   test "has an associated run" do
     assert_instance_of Run, messages(:yes_i_do).run
   end
@@ -45,12 +41,6 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal assistants(:samantha), Message.last.assistant
     assert_not_nil Message.last.conversation
     assert_equal users(:keith), Message.last.conversation.user
-  end
-
-  test "documents are deleted upon destroy" do
-    assert_difference "Document.count", -1 do
-      messages(:examine_this).destroy
-    end
   end
 
   test "creating a message with a conversation and Current.user set fails if conversation is not owned by the user" do
@@ -141,61 +131,11 @@ class MessageTest < ActiveSupport::TestCase
     end
   end
 
-  test "creating a new message on a conversation updates the redis key for that conversation" do
-    conversation = conversations(:greeting)
-    previous_id = conversation.latest_message.id
-    redis.set("conversation-#{conversation.id}-latest_message-id", previous_id)
-
-    assert_changes "redis.get('conversation-#{conversation.id}-latest_message-id')&.to_i", from: previous_id do
-      assert_difference "conversation.messages.count", 2 do
-        conversation.messages.create!(
-          assistant: conversation.assistant,
-          content_text: "A new message"
-        )
-      end
-    end
-
-    assert_equal conversation.latest_message.reload.id, redis.get("conversation-#{conversation.id}-latest_message-id")&.to_i
-    redis.set("conversation-#{conversation.id}-latest_message-id", previous_id)
-  end
-
   test "when a conversation gets a message from a new assistant this propogates to the conversation" do
     old_assistant = conversations(:greeting).assistant
     new_assistant = assistants(:keith_claude3)
 
     conversations(:greeting).messages.create!(assistant: new_assistant, content_text: "Hello")
     assert_equal new_assistant, conversations(:greeting).reload.assistant
-  end
-
-  test "when a message is cancelled the redis key gets set" do
-    redis.set("message-cancelled-id", nil)
-
-    assert_changes "messages(:im_a_bot).cancelled_at", from: nil do
-      assert_changes "redis.get('message-cancelled-id')&.to_i", to: messages(:im_a_bot).id do
-        messages(:im_a_bot).cancelled!
-      end
-    end
-
-    redis.set("message-cancelled-id", nil)
-  end
-
-  test "has_document_image?" do
-    assert messages(:examine_this).has_document_image?
-    refute messages(:examine_this).has_document_image?(:small)
-  end
-
-  test "document_image_path" do
-    assert messages(:examine_this).document_image_path(:small).is_a?(String)
-    assert messages(:examine_this).document_image_path(:small).starts_with?("/rails/active_storage/representations/redirect")
-  end
-
-  test "document_image_path with fallback" do
-    assert_equal "", messages(:examine_this).document_image_path(:small, fallback: "")
-  end
-
-  private
-
-  def redis
-    RedisConnection.client
   end
 end

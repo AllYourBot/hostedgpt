@@ -6,8 +6,7 @@
 <% initial_page_load = last_message && !scroll_down %>
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking = if thinking.nil?
-                (last_message && message.content_text == "" && message.not_cancelled?) ||
-                (message.rerequested? && message.content_text == "" && message.not_cancelled?)
+                last_message && message.content_text == "" && message.not_cancelled?
               else
                 thinking
               end

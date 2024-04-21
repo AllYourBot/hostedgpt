@@ -8,6 +8,8 @@ hear_me:
   content_document:
   run:
   created_at: 2023-12-30 1:00:00
+  index: 0
+  version: 1
 
 yes_i_do:
   assistant: samantha
@@ -17,6 +19,8 @@ yes_i_do:
   content_document:
   run: hear_me_response
   created_at: 2023-12-30 1:01:00
+  index: 1
+  version: 1
 
 identify_photo:
   assistant: samantha
@@ -31,6 +35,8 @@ identify_photo:
   content_document:
   run:
   created_at: 2023-12-30 1:02:00
+  index: 2
+  version: 1
 
 photo_identified:
   assistant: samantha
@@ -40,6 +46,8 @@ photo_identified:
   content_document:
   run: identify_photo_response
   created_at: 2023-12-30 1:03:00
+  index: 3
+  version: 1
 
 what_day:
   assistant: samantha
@@ -49,6 +57,8 @@ what_day:
   content_document:
   run:
   created_at: 2023-12-30 1:04:00
+  index: 4
+  version: 1
 
 dont_know_day:
   assistant: samantha
@@ -58,6 +68,8 @@ dont_know_day:
   content_document:
   run: what_day_response
   created_at: 2023-12-30 1:05:00
+  index: 5
+  version: 1
 
 alive:
   assistant: samantha
@@ -67,6 +79,8 @@ alive:
   content_document:
   run:
   created_at: 2023-12-30 1:06:00
+  index: 6
+  version: 1
 
 im_a_bot:
   assistant: samantha
@@ -83,6 +97,8 @@ im_a_bot:
   content_document:
   run: alive_response
   created_at: 2023-12-30 1:07:00
+  index: 7
+  version: 1
 
 
 # Next conversation
@@ -95,6 +111,8 @@ your_name:
   content_document:
   run:
   created_at: 2023-12-30 1:00:00
+  index: 0
+  version: 1
 
 listening:
   assistant: samantha
@@ -104,6 +122,8 @@ listening:
   content_document:
   run: your_name_response
   created_at: 2023-12-30 1:01:00
+  index: 1
+  version: 1
 
 examine_this:
   assistant: samantha
@@ -113,6 +133,8 @@ examine_this:
   content_document: # the cat photo is not attached in this field, currently it's attached at the document level. info: https://platform.openai.com/docs/assistants/tools/knowledge-retrieval and https://platform.openai.com/docs/guides/vision
   run:
   created_at: 2023-12-30 1:02:00
+  index: 2
+  version: 1
 
 photo_examined:
   assistant: samantha
@@ -122,6 +144,8 @@ photo_examined:
   content_document:
   run: examine_this_response
   created_at: 2023-12-30 1:03:00
+  index: 3
+  version: 1
 
 what_month:
   assistant: samantha
@@ -131,6 +155,8 @@ what_month:
   content_document:
   run:
   created_at: 2023-12-30 1:04:00
+  index: 4
+  version: 1
 
 dont_know_month:
   assistant: samantha
@@ -140,6 +166,8 @@ dont_know_month:
   content_document:
   run: what_month_response
   created_at: 2023-12-30 1:05:00
+  index: 5
+  version: 1
 
 human:
   assistant: samantha
@@ -149,6 +177,8 @@ human:
   content_document:
   run:
   created_at: 2023-12-30 1:06:00
+  index: 6
+  version: 1
 
 not_human:
   assistant: samantha
@@ -158,6 +188,8 @@ not_human:
   content_document:
   run: human_response
   created_at: 2023-12-30 1:07:00
+  index: 7
+  version: 1
 
 
 # Next conversation
@@ -170,6 +202,8 @@ can_you_hear:
   content_document:
   run:
   created_at: 2023-12-30 1:00:00
+  index: 0
+  version: 1
 
 yes_i_can:
   assistant: samantha
@@ -179,6 +213,8 @@ yes_i_can:
   content_document:
   run: can_you_hear_response
   created_at: 2023-12-30 1:01:00
+  index: 1
+  version: 1
 
 one_attachment:
   assistant: samantha
@@ -188,6 +224,8 @@ one_attachment:
   content_document:
   run:
   created_at: 2023-12-30 1:02:00
+  index: 2
+  version: 1
 
 its_a_cat:
   assistant: samantha
@@ -197,6 +235,8 @@ its_a_cat:
   content_document:
   run: one_attachment_response
   created_at: 2023-12-30 1:03:00
+  index: 3
+  version: 1
 
 two_attachments:
   assistant: samantha
@@ -206,6 +246,8 @@ two_attachments:
   content_document:
   run:
   created_at: 2023-12-30 1:04:00
+  index: 4
+  version: 1
 
 yes_cat_and_dog:
   assistant: samantha
@@ -215,6 +257,8 @@ yes_cat_and_dog:
   content_document:
   run: two_attachments_response
   created_at: 2023-12-30 1:05:00
+  index: 5
+  version: 1
 
 # Next conversation
 
@@ -226,6 +270,8 @@ popstate:
   content_document:
   run:
   created_at: 2023-12-30 1:00:00
+  index: 0
+  version: 1
 
 popstate_event:
   assistant: keith_gpt4
@@ -238,6 +284,8 @@ popstate_event:
   content_document:
   run: popstate_response
   created_at: 2023-12-30 1:01:00
+  index: 1
+  version: 1
 
 
 # Next conversation
@@ -250,6 +298,8 @@ ruby_version:
   content_document:
   run:
   created_at: 2023-12-30 1:00:00
+  index: 0
+  version: 1
 
 latest_ruby_version:
   assistant: samantha
@@ -259,6 +309,8 @@ latest_ruby_version:
   content_document:
   run: ruby_version_response
   created_at: 2023-12-30 1:01:00
+  index: 1
+  version: 1
 
 
 # Next conversation
@@ -271,6 +323,8 @@ hello_claude:
   content_document:
   run:
   created_at: 2023-12-30 1:00:00
+  index: 0
+  version: 1
 
 claude_replying:
   assistant: keith_claude3
@@ -280,6 +334,8 @@ claude_replying:
   content_document:
   run:
   created_at: 2023-12-30 1:01:00
+  index: 1
+  version: 1
 
 claude_age:
   assistant: keith_claude3
@@ -289,6 +345,8 @@ claude_age:
   content_document:
   run:
   created_at: 2023-12-30 1:02:00
+  index: 2
+  version: 1
 
 claude_age_replying:
   assistant: keith_claude3
@@ -298,6 +356,8 @@ claude_age_replying:
   content_document:
   run:
   created_at: 2023-12-30 1:03:00
+  index: 3
+  version: 1
 
 
 # Next conversation
@@ -310,6 +370,8 @@ filter_map:
   content_document:
   run:
   created_at: 2023-12-30 1:00:00
+  index: 0
+  version: 1
 
 filter_map_example:
   assistant: rob_gpt4
@@ -319,3 +381,224 @@ filter_map_example:
   content_document:
   run: filter_map_response
   created_at: 2023-12-30 1:01:00
+  index: 1
+  version: 1
+
+
+# Next conversation
+
+message0_v1:
+  assistant: samantha
+  conversation: versioned
+  role: user
+  content_text: What's your favorite color?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:00:00
+  index: 0
+  version: 1
+
+message1_v1:
+  assistant: samantha
+  conversation: versioned
+  role: assistant
+  content_text: My favorite color is blue.
+  content_document:
+  run: message0_v1_response
+  created_at: 2023-1-1 1:01:00
+  index: 1
+  version: 1
+
+message2_v1:
+  assistant: samantha
+  conversation: versioned
+  role: user
+  content_text: What do you eat?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:02:00
+  index: 2
+  version: 1
+  branched: true
+  branched_from_version: 2
+
+message3_v1:
+  assistant: samantha
+  conversation: versioned
+  role: assistant
+  content_text: I don't eat food.
+  content_document:
+  run: message2_v1_response
+  created_at: 2023-1-1 1:03:00
+  index: 3
+  version: 1
+
+message2_v2:
+  assistant: samantha
+  conversation: versioned
+  role: user
+  content_text: Where were you born?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:04:00
+  index: 2
+  version: 2
+  branched: true
+
+message3_v2:
+  assistant: samantha
+  conversation: versioned
+  role: assistant
+  content_text: I was born in San Francisco.
+  content_document:
+  run: message2_v2_response
+  created_at: 2023-1-1 1:05:00
+  index: 3
+  version: 2
+
+message4_v2:
+  assistant: samantha
+  conversation: versioned
+  role: user
+  content_text: What do you think of the city?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:06:00
+  index: 4
+  version: 2
+
+message5_v2:
+  assistant: samantha
+  conversation: versioned
+  role: assistant
+  content_text: It is a beautiful city.
+  content_document:
+  run: message4_v2_response
+  created_at: 2023-1-1 1:07:00
+  index: 5
+  version: 2
+
+
+# Next conversation
+
+msg0_v1:
+  assistant: samantha
+  conversation: versioned2
+  role: user
+  content_text: What's your favorite color?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:00:00
+  index: 0
+  version: 1
+
+msg1_v1:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: My favorite color is blue.
+  content_document:
+  run: msg0_v1_response
+  created_at: 2023-1-1 1:01:00
+  index: 1
+  version: 1
+
+msg2_v1:
+  assistant: samantha
+  conversation: versioned2
+  role: user
+  content_text: What do you eat?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:02:00
+  index: 2
+  version: 1
+  branched: true
+
+msg2_v2:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: I was born in San Francisco.
+  content_document:
+  run: msg2_v1_response
+  created_at: 2023-1-1 1:05:00
+  index: 2
+  version: 2
+  branched: true
+  branched_from_version: 1
+
+msg3_v2:
+  assistant: samantha
+  conversation: versioned2
+  role: user
+  content_text: What do you think of the city?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:06:00
+  index: 3
+  version: 2
+
+msg4_v2:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: It is a beautiful city.
+  content_document:
+  run: msg3_v2_response
+  created_at: 2023-1-1 1:07:00
+  index: 4
+  version: 2
+  branched: true
+
+
+msg2_v3:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: I was born in the city of San Francisco
+  content_document:
+  run: msg2_v1_response
+  created_at: 2023-1-1 1:07:00
+  index: 2
+  version: 3
+  branched: true
+  branched_from_version: 2
+
+msg3_v3:
+  assistant: samantha
+  conversation: versioned2
+  role: user
+  content_text: Do you like it there?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:07:00
+  index: 3
+  version: 3
+
+
+msg4_v4:
+  assistant: samantha
+  conversation: versioned2
+  role: assistant
+  content_text: It is a nice city.
+  content_document:
+  run: msg3_v2_response
+  created_at: 2023-1-1 1:07:00
+  index: 4
+  version: 4
+  branched: true
+  branched_from_version: 2
+
+msg2_v5:
+  assistant: samantha
+  conversation: versioned2
+  role: user
+  content_text: Do you like the food?
+  content_document:
+  run:
+  created_at: 2023-1-1 1:03:00
+  index: 2
+  version: 5
+  branched: true
+  branched_from_version: 3
