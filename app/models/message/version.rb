@@ -77,13 +77,15 @@ module Message::Version
         errors.add(:index, "is invalid")
       elsif index > 0 && !conversation.messages.exists?(index: index-1)
         errors.add(:index, "cannot skip a number")
-      else # index is
+      elsif index > 0 && !branched && !conversation.messages.exists?(index: index-1, version: version)
+        errors.add(:branched, "is false but index is not following an existing message")
+      else
         if version < 0 || version > max_version
-          errors.add(:version, "is invalid for this index")
+          errors.add(:version, "#{version} is invalid for this index")
         elsif conversation.messages.exists?(index: index, version: version)
-          errors.add(:version, "already exists for this index")
+          errors.add(:version, "#{version} already exists for this index")
         elsif versions.present? && version < versions.max && !conversation.messages.exists?(index: index-1, version: version)
-          errors.add(:version, "is invalid for this index")
+          errors.add(:version, "#{version} is invalid for this index")
         end
       end
     else

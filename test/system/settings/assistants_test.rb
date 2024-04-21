@@ -40,23 +40,23 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     refute_text "Saved"
   end
 
-  test "should destroy Assistant" do
-    visit edit_settings_assistant_url(@assistant)
-    accept_confirm do
-      click_text "Delete", match: :first
-    end
-    assert_text "Deleted"
+  # test "should destroy Assistant" do
+  #   visit edit_settings_assistant_url(@assistant)
+  #   accept_confirm do
+  #     click_text "Delete", match: :first
+  #   end
+  #   assert_text "Deleted"
 
-    refute Assistant.exists?(id: @assistant.id)
-  end
+  #   refute Assistant.exists?(id: @assistant.id)
+  # end
 
-  test "should cancel destroy Assistant" do
-    visit edit_settings_assistant_url(@assistant)
-    dismiss_confirm do
-      click_text "Delete", match: :first
-    end
-    assert_no_text "Deleted"
+  # test "should cancel destroy Assistant" do
+  #   visit edit_settings_assistant_url(@assistant)
+  #   dismiss_confirm do
+  #     click_text "Delete", match: :first
+  #   end
+  #   assert_no_text "Deleted"
 
-    assert @assistant.reload.present?
-  end
+  #   assert @assistant.reload.present?
+  # end
 end

@@ -9,6 +9,7 @@ module MessagesHelper
       block_code: block_code
     )
 
+    html = "<p></p>" if html.blank?
     html = append(html, append_inside_tag) if append_inside_tag
     return html.html_safe
   end

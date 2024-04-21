@@ -434,7 +434,7 @@ message3_v1:
   version: 1
 
 message2_v2:
-  assistant: samantha
+  assistant: keith_gpt4
   conversation: versioned
   role: user
   content_text: Where were you born?
@@ -446,7 +446,7 @@ message2_v2:
   branched: true
 
 message3_v2:
-  assistant: samantha
+  assistant: keith_gpt4
   conversation: versioned
   role: assistant
   content_text: I was born in San Francisco.
@@ -457,7 +457,7 @@ message3_v2:
   version: 2
 
 message4_v2:
-  assistant: samantha
+  assistant: keith_gpt4
   conversation: versioned
   role: user
   content_text: What do you think of the city?
@@ -468,7 +468,7 @@ message4_v2:
   version: 2
 
 message5_v2:
-  assistant: samantha
+  assistant: keith_gpt4
   conversation: versioned
   role: assistant
   content_text: It is a beautiful city.
