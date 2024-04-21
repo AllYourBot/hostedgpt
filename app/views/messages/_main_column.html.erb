@@ -190,7 +190,7 @@
               turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
           }) do |form| %>
             <%= form.hidden_field :cancelled_at, value: Time.current %>
-            <%= form.button id: "cancel", type: "submit", class: "relative" do %>
+            <%= form.button id: "cancel", type: "submit", class: "relative bg-white dark:bg-gray-800" do %>
               <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
               <%= icon "stop-circle", variant: :outline, size: 39, title: 'Stop', tooltip: :top %>
             <% end %>
@@ -204,6 +204,8 @@
             turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
         }) do |form| %>
           <%= form.hidden_field :conversation_id %>
+          <%= form.hidden_field :index, value: @messages&.length %>
+          <%= form.hidden_field :version, value: @version %>
           <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
             <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
           <% end %>

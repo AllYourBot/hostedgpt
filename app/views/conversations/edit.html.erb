@@ -1,7 +1,30 @@
 <div class="mx-auto md:w-2/3 w-full">
   <h1 class="font-bold text-4xl">Editing conversation</h1>
 
-  <%= render "form", conversation: @conversation %>
+  <turbo-frame id="conversation-<%= @conversation.id %>">
+    <%= form_with(model: @conversation, data: { controller: "inline-edit" }, class: "contents") do |form| %>
+      <%= form.text_field :title,
+        id: "edit-conversation",
+        autofocus: true,
+        class: %|
+          block shadow rounded-md outline-none
+          px-[7px] pt-[7px] pb-[7px]
+          w-full
+          text-sm
+          disabled:text-gray-300
+          dark:text-black
+        |,
+        data: {
+          inline_edit_target: "input",
+          action: %|
+            blur->inline-edit#submitForm
+            keydown.enter->inline-edit#submitForm:prevent
+            keydown.esc->inline-edit#abort
+          |
+        }
+      %>
+    <% end %>
+  </turbo-frame>
 
   <%= link_to "Show this conversation", @conversation, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
 </div>
