@@ -32,7 +32,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get edit" do
-    get edit_message_url(@conversation, @message)
+    get edit_assistant_message_url(@assistant, @message)
     assert_response :success
   end
 
