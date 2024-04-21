@@ -13,6 +13,18 @@ class ConversationMessagesEditTest < ApplicationSystemTestCase
     @msg.hover
   end
 
+  test "there is no edit icon beneath messages with images" do
+    visit conversation_messages_path(conversations(:attachment))
+    third = find_messages.third
+    assert_equal messages(:examine_this).content_text, third.find_role("content-text").text
+
+    third.hover
+    assert_no_selector "##{third[:id]} [data-role='edit']"
+
+    first_message.hover
+    assert_selector "##{first_message[:id]} [data-role='edit']"
+  end
+
   test "edit icon shows a tooltip" do
     @btn.hover
     assert_shows_tooltip @btn, "Edit"
