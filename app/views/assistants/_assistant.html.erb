@@ -2,7 +2,7 @@
 <% selected = assistant == @assistant %>
 <% first = assistant_counter == 0 %>
 
-<div class="<%= first && 'absolute top-[17px] left-0 pl-3 w-full z-10' %>">
+<div class="bg-gray-50 dark:bg-gray-900 <%= first && 'absolute top-[17px] left-0 pl-3 w-full z-10' %>">
   <%# This extra div ^ is needed because of the absolute positioning. It doesn't lay out properly if added to the div below. %>
   <div class="
               flex justify-between items-center

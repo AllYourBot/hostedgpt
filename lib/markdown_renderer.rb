@@ -4,19 +4,23 @@ class MarkdownRenderer
 
   def self.render(markdown, options = {})
     markdown ||= ""
+
     render_class = Redcarpet::CustomHtmlRenderer
 
     block_code_proc = options.delete(:block_code)
+
     if block_code_proc
+
       render_class = Class.new(Redcarpet::CustomHtmlRenderer)
       render_class.instance_eval do
         define_method(:block_code) do |code, language|
-          block_code_proc.call(code, language)
+          block_code_proc.call(code.html_safe, language)
         end
       end
     end
 
     renderer = render_class.new(safe_links_only: true)
+
     formatter = Redcarpet::Markdown.new(renderer,
       autolink: true,
       tables: true,
@@ -24,7 +28,6 @@ class MarkdownRenderer
       strikethrough: true,
       underline: true,
       no_intra_emphasis: true,
-
       fenced_code_blocks: true,
       disable_indented_code_blocks: true
     )
