@@ -15,7 +15,7 @@ class GetNextAIMessageJob < ApplicationJob
   def perform(message_id, assistant_id)
     puts "\n### GetNextAIMessageJob.perform(#{message_id}, #{assistant_id})" unless Rails.env.test?
 
-    @message = Message.find_by(id: message_id)
+    @message      = Message.find_by(id: message_id)
     @conversation = @message.conversation
     @assistant    = Assistant.find_by(id: assistant_id)
     @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index-1)
@@ -90,7 +90,8 @@ class GetNextAIMessageJob < ApplicationJob
   def self.broadcast_updated_message(message, locals = {})
     message.broadcast_replace_to message.conversation, locals: {
       only_scroll_down_if_was_bottom: true,
-      timestamp: (Time.current.to_f*1000).to_i
+      timestamp: (Time.current.to_f*1000).to_i,
+      streamed: true,
   }.merge(locals)
   end
 

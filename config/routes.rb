@@ -7,14 +7,14 @@ Rails.application.routes.draw do
   root to: "assistants#index"
 
   resources :assistants do
-    resources :messages, only: [:new, :create]
+    resources :messages, only: [:new, :create, :edit]
   end
 
   resources :conversations, only: [:show, :edit, :update, :destroy] do
-    resources :messages, only: :index
+    resources :messages, only: [:index]
   end
 
-  resources :messages, except: [:new, :create, :index]
+  resources :messages, only: [:show, :update]
   resources :documents
   resources :users, only: [:new, :create, :update]
 

@@ -175,6 +175,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def assert_at_bottom(selector = "section #messages")
+    sleep 1 # there is a lot of flakiness related to it not yet scrolled down
     assert_stopped_scrolling(selector)
     initial_scroll_position = get_scroll_position(selector)
     scroll_to_bottom(selector)
@@ -214,6 +215,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     find_messages.last
   end
 
+  def last_user_message
+    find_messages.last(2).first
+  end
+
   def first_message
     find_messages.first
   end
@@ -248,11 +253,33 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
   end
 
+  def wait_for_initial_scroll_down
+    assert_true { page.evaluate_script('window.scrolledDownForSystemTestsToCheck') }
+  end
+
   def assert_composer_blank(msg = nil)
     msg ||= "Composer input did not clear"
     assert_true msg do
       find("#composer textarea").value.blank?
     end
+  end
+
+  def hover_last_message
+    msg = last_message
+    msg.hover
+    msg
+  end
+
+  def assert_selected_assistant(assistant)
+    assert_selector "#assistants .relationship", text: assistant.name
+  end
+
+  def assert_first_message(message)
+    assert_selector "#messages > :first-child [data-role='content-text']", text: message.content_text
+  end
+
+  def assert_last_message(message)
+    assert_selector "#messages > :last-child [data-role='content-text']", text: message.content_text
   end
 end
 

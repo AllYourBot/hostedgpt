@@ -81,10 +81,9 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "Entered text so we can now submit"
     refute @submit.disabled?
     click_element @submit
-    sleep 0.5
 
-    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert_composer_blank
+    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
   end
 
   test "enter works to submit but only when text has been entered" do
@@ -97,10 +96,9 @@ class MessagesComposerTest < ApplicationSystemTestCase
     send_keys "Entered text so we can now submit"
     refute @submit.disabled?
     send_keys "enter"
-    sleep 0.3
 
-    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert_composer_blank
+    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
   end
 
   test "shift+enter inserts a newline and then enter submits" do
@@ -113,10 +111,9 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
     send_keys "enter"
-    sleep 0.5
 
-    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
     assert_composer_blank
+    assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
   end
 
   test "textarea grows in height as newlines are added and shrinks in height when they are removed" do
@@ -196,41 +193,38 @@ class MessagesComposerTest < ApplicationSystemTestCase
   test "submitting a couple messages to an existing conversation with ENTER works" do
     click_text @long_conversation.title
     wait_for_images_to_load
-    path = current_path
+    starting_path = current_path
 
     send_keys "This is a message"
     send_keys "enter"
-    sleep 0.5
 
-    assert_equal path, current_path, "The page should not have changed urls"
     assert_composer_blank
+    assert_equal starting_path, current_path, "The page should not have changed urls"
+
 
     send_keys "This is a second message"
     send_keys "enter"
-    sleep 1
 
-    assert_equal path, current_path, "The page should not have changed urls"
     assert_composer_blank
+    assert_equal starting_path, current_path, "The page should not have changed urls"
   end
 
   test "submitting a couple messages to an existing conversation with CLICKING works" do
     click_text @long_conversation.title
     wait_for_images_to_load
-    path = current_path
+    starting_path = current_path
 
     send_keys "This is a message"
     click_element @submit
-    sleep 1
 
-    assert_equal path, current_path, "The page should not have changed urls"
     assert_composer_blank
+    assert_equal starting_path, current_path, "The page should not have changed urls"
 
     send_keys "This is a second message"
     click_element @submit
-    sleep 0.3
 
-    assert_equal path, current_path, "The page should not have changed urls"
     assert_composer_blank
+    assert_equal starting_path, current_path, "The page should not have changed urls"
   end
 
   # TODO: We do not have a test for the smart paste. I'm not sure how to programmatically paste from within capybara

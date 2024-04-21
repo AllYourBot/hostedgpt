@@ -1,42 +1,55 @@
-<!-- saving this scaffold view just because we'll implement editing messages soon -->
-
 <div class="mx-auto md:w-2/3 w-full">
   <h1 class="font-bold text-4xl">Editing message</h1>
 
-  <%= form_with(model: @message, class: "contents") do |form| %>
-  <% if @message.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(@message.errors.count, "error") %> prohibited this message from being saved:</h2>
+  <turbo-frame id="message-<%= @message.id %>">
+    <%= form_with(
+      model: [@assistant, @new_message],
+      class: "content-text",
+      data: {
+        turbo_frame: "_top",
+        controller: "inline-edit"
+    }) do |form| %>
+      <%= form.hidden_field :conversation_id, value: @message.conversation_id %>
+      <%= form.hidden_field :index, value: @message.index %>
+      <%= form.hidden_field :branched, value: true %>
+      <%= form.hidden_field :branched_from_version, value: @message.version %>
 
-      <ul>
-        <% @message.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+      <%= form.text_area :content_text,
+        id: "edit-message-#{@message.id}",
+        value: @message.content_text,
+        autofocus: true,
+        class: %|
+          prose
+          w-full p-0 m-0
+          border-0 focus:ring-0
+          bg-transparent
+          text-black dark:text-gray-200
+          leading-normal
+          resize-none
+        |,
+        rows: 1,
+        data: {
+          inline_edit_target: "input",
+          controller: "textarea-autogrow",
+        }
+      %>
 
-  <div class="my-5">
-    <%= form.label :conversation_id, "Conversation ID" %>
-    <%= form.text_field :conversation_id, value: Conversation.first.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :role %>
-    <%= form.text_field :role, value: "user", class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :content_text, "Text" %>
-    <%= form.text_field :content_text, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
-  </div>
-<% end %>
-
+      <div class="flex justify-center items-center text-sm font-medium">
+        <%= form.submit "Save & Submit",
+          data: { role: "save" },
+          class: %|
+            inline-block cursor-pointer
+            rounded-lg py-2 px-3
+            bg-gray-200 dark:bg-gray-900
+            border border-gray-400
+        | %>
+        <%= link_to "Cancel", @message,
+          data: { role: "cancel" },
+          class: "inline-block ml-5"
+        %>
+      </div>
+    <% end %>
+  </turbo-frame>
 
   <%= link_to "Show this message", @message, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-  <%= link_to "Back to messages", conversation_messages_path(@message.conversation), class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
 </div>
