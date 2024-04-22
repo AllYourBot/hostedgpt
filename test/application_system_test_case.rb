@@ -281,6 +281,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def assert_last_message(message)
     assert_selector "#messages > :last-child [data-role='content-text']", text: message.content_text
   end
+
+  def assert_toast(text)
+    toast = nil
+    assert_true "the toast element could not be found" do
+      toast = find("#toasts .alert span", visible: :all, wait: 0) rescue nil
+    end
+    assert_equal text, toast[:innerText]
+  end
 end
 
 class Capybara::Node::Element
