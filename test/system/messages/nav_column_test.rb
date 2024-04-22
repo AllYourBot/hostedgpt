@@ -24,17 +24,17 @@ class NavColumnTest < ApplicationSystemTestCase
     assert_selected_assistant assistant
 
     click_text conversations(:greeting).title
-    assert_current_path conversation_messages_path(conversations(:greeting))
+    assert_current_path conversation_messages_path(conversations(:greeting), version: 1)
     assert_selected_assistant conversations(:greeting).assistant
     assert_first_message conversations(:greeting).messages.ordered.first
 
     click_text conversations(:javascript).title
-    assert_current_path conversation_messages_path(conversations(:javascript))
+    assert_current_path conversation_messages_path(conversations(:javascript), version: 1)
     assert_selected_assistant conversations(:javascript).assistant
     assert_first_message conversations(:javascript).messages.ordered.first
 
     click_text conversations(:ruby_version).title
-    assert_current_path conversation_messages_path(conversations(:ruby_version))
+    assert_current_path conversation_messages_path(conversations(:ruby_version), version: 1)
     assert_selected_assistant conversations(:ruby_version).assistant
     assert_first_message conversations(:ruby_version).messages.ordered.first
 
@@ -144,7 +144,7 @@ class NavColumnTest < ApplicationSystemTestCase
   end
 
   test "clicking the assistant name in the nav column starts a new conversation" do
-    conversation_path = conversation_messages_path(conversations(:greeting))
+    conversation_path = conversation_messages_path(conversations(:greeting), version: 1)
     visit conversation_path
     assert_current_path conversation_path
 
@@ -159,15 +159,5 @@ class NavColumnTest < ApplicationSystemTestCase
     assert_shows_tooltip pencil_on_second_assistant, "New"
     click_element pencil_on_second_assistant
     assert_current_path new_assistant_message_path(assistant2)
-  end
-
-  private
-
-  def assert_selected_assistant(assistant)
-    assert_selector "#assistants .relationship", text: assistant.name
-  end
-
-  def assert_first_message(message)
-    assert_selector "#messages > :first-child [data-role='content-text']", text: message.content_text
   end
 end

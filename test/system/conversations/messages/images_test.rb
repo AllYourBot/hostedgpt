@@ -121,17 +121,17 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       img             = image_container.find("img", visible: :all)
 
       assert_at_bottom
-
       assert_scrolled_down do
 
         assert_false "all images should be visible" do
-          all("[data-role='image-preview'", visible: :all).map(&:visible?).include?(false)
+          all("[data-role='image-preview']", visible: :all).map(&:visible?).include?(false)
         end
 
         assert_true do
           img.visible?
         end
       end
+      sleep 5 # TODO: if flappy tests still persist then there is an actual bug with image_loader scroll down
       assert_at_bottom
     end
   end
