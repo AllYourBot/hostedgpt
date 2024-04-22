@@ -4,7 +4,7 @@ export default class extends Controller {
   static targets = ['document'];
   static values = { userPreference: String };
 
-  initialize() {
+  connect() {
     this.setDarkMode(this.userPreferenceValue);
     this.addDarkModeListener();
   }
