@@ -42,7 +42,7 @@ module.exports = {
       },
     },
   },
-  darkMode: ['selector', '[data-theme="dark"]'],
+  darkMode: ['selector'],
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/aspect-ratio'),

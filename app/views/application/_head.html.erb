@@ -31,11 +31,13 @@
     };
 
     const addDarkModeListener = () => {
-     if (!userPreferenceValue) {
-        prefersDarkScheme.addListener((e) => {
+      documentDataSet.darkModeUserPreferenceValue = 'system';
+      prefersDarkScheme.addEventListener(
+        'change',
+        (e) => {
           toggleDarkMode(e.matches);
-        });
-      }
+        }
+      );
     };
 
     if (userPreferenceValue === 'system'|| !userPreferenceValue) {
