@@ -47,7 +47,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(preferences: [:nav_closed, :color_theme])
+    params.require(:user).permit(preferences: [:nav_closed, :dark_mode])
   end
 
   def ensure_registration
