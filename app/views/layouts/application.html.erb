@@ -1,7 +1,14 @@
 <% mobile = false %>
 <!DOCTYPE html>
-<html>
+<html 
+    data-controller="dark-mode" 
+    data-dark-mode-target="document"
+    data-dark-mode-user-preference-value=<%= Current.user.preferences[:dark_mode]%> 
+    class=<%= Current.user.preferences[:dark_mode] %>
+  >
+ 
   <%= render "head" %>
+
   <body
     class="
       h-screen
