@@ -10,13 +10,13 @@ class Document < ApplicationRecord
 
   enum purpose: %w[fine-tune fine-tune-results assistants assistants_output].index_by(&:to_sym)
 
+  attribute :user, default: -> { message.conversation.user }
+  attribute :purpose, default: :assistants
+  attribute :filename, default: -> { file.filename.to_s }
+  attribute :bytes, default: -> { file.byte_size }
+
   validates :purpose, :filename, :bytes, presence: true
   validate :file_present
-
-  before_validation :set_default_user, on: :create
-  before_validation :set_default_purpose, on: :create
-  before_validation :set_default_filename, on: :create
-  before_validation :set_default_bytes, on: :create
 
   def file_data_url(variant = :large)
     return nil if !file.attached?
@@ -58,22 +58,6 @@ class Document < ApplicationRecord
 
   def file_present
     errors.add(:file, "must be attached") unless file.attached?
-  end
-
-  def set_default_user
-    self.user ||= message.conversation.user # this won't work when multiple people are in a conversation
-  end
-
-  def set_default_purpose
-    self.purpose ||= :assistants
-  end
-
-  def set_default_filename
-    self.filename ||= file.filename.to_s
-  end
-
-  def set_default_bytes
-    self.bytes ||= file.byte_size
   end
 
   def wait_for_file_variant_to_process!(variant)

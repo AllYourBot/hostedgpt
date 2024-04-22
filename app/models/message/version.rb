@@ -8,9 +8,9 @@ module Message::Version
   # See conversations.yml :versioned for a visual
   included do
     attribute :versions, :string, default: ""
+    attribute :version, default: 1
 
     before_validation :set_next_conversation_index_and_version, on: :create
-    before_validation :set_default_version,                     on: :create
 
     validate :branched_and_version_both_set,      if: -> { branched? || branched_from_version.present? }, on: :create
 
@@ -98,10 +98,6 @@ module Message::Version
         self.version  =  latest_msg&.version || 1
       end
     end
-  end
-
-  def set_default_version
-    self.version ||= 1
   end
 
   def branched_and_version_both_set
