@@ -42,12 +42,18 @@ module.exports = {
       },
     },
   },
-  darkMode: ['selector'],
+  darkMode: [
+    'variant',
+    [
+      '@media (prefers-color-scheme: dark) { &:is(.system *) }',
+      '&:is(.dark *)',
+    ],
+  ],
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/typography'),
     require('@tailwindcss/container-queries'),
   ],
-};
+}
 
