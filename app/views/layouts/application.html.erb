@@ -1,8 +1,7 @@
 <% mobile = false %>
 <!DOCTYPE html>
 <html 
-    data-controller="dark-mode" 
-    data-dark-mode-target="document"
+    data-controller="dark-mode"
     data-dark-mode-user-preference-value=<%= Current.user.preferences[:dark_mode]%> 
     class=<%= Current.user.preferences[:dark_mode] %>
   >
