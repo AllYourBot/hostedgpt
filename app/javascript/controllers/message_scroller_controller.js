@@ -38,7 +38,8 @@ export default class extends Controller {
       this.scrollDownIfScrolledToBottom()
   }
 
-  throttledScrollDownIfScrolledToBottom = throttle((event) => this.scrollDownIfScrolledToBottom(event), 50, (event) => { if (window.imageLoadingForSystemTestsToCheck[event?.detail]) window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' })
+  throttledScrollDownIfScrolledToBottom = throttle((event) => this.scrollDownIfScrolledToBottom(event), 50, this.discardScrollDown)
+  discardScrollDown = (event) => { if (window.imageLoadingForSystemTestsToCheck[event?.detail]) window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' }
   scrollDownIfScrolledToBottom(event) {
     if (window.wasScrolledToBottom)
       this.throttledScrollDown(event)

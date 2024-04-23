@@ -42,7 +42,7 @@ export default class extends Controller {
     if (this.retryCount <= this.maxRetries) {
       this.imageTarget.classList.add("hidden")
       this.loaderTarget.classList.remove("hidden")
-      setTimeout(() => window.dispatchEvent(new CustomEvent('main-column-changed')), 0)
+      window.dispatchEvent(new CustomEvent('main-column-changed'))
 
       setTimeout(() => {
         let srcBase = this.urlValue.split("?")[0]
