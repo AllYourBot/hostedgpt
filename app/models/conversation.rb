@@ -1,4 +1,6 @@
 class Conversation < ApplicationRecord
+  include Version
+
   belongs_to :user
   belongs_to :assistant
 
@@ -11,10 +13,6 @@ class Conversation < ApplicationRecord
   scope :ordered, -> { order(updated_at: :desc) }
 
   broadcasts_refreshes
-
-  def latest_message
-    messages.ordered.last
-  end
 
   # Builds a hash of date interval keys and queries which fetch the records for that internal.
   #
@@ -57,7 +55,6 @@ class Conversation < ApplicationRecord
       .to_h
       .delete_if { |_, v| v.empty? }
   end
-
 
   private
 

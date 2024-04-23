@@ -39,12 +39,14 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   test "images eventually render in messages WHEN NOT pre-processed, clicking opens modal" do
     stimulate_image_variant_processing do
       visit conversation_messages_path(@conversation)
+      sleep 2 # TODO sometimes it's getting to img.visible? but then it disappears so I think it's running too quickly
       image_msg = find_messages.third
       image_btn = image_msg.find_role("image-preview")
       img = image_btn.find("img", visible: false)
       modal = image_msg.find_role("image-modal")
       assert image_btn
       assert img
+      assert modal
 
       assert_true wait: 5 do
         img.visible?
@@ -59,7 +61,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
       image_btn.click
 
-      assert_true "modal image should have been visible" do
+      assert_true "modal image should have been visible but it was #{modal.visible?} and #{modal}" do
         modal.visible?
       end
 
@@ -121,17 +123,17 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       img             = image_container.find("img", visible: :all)
 
       assert_at_bottom
-
       assert_scrolled_down do
 
         assert_false "all images should be visible" do
-          all("[data-role='image-preview'", visible: :all).map(&:visible?).include?(false)
+          all("[data-role='image-preview']", visible: :all).map(&:visible?).include?(false)
         end
 
         assert_true do
           img.visible?
         end
       end
+      sleep 5 # TODO: if flappy tests still persist then there is an actual bug with image_loader scroll down
       assert_at_bottom
     end
   end

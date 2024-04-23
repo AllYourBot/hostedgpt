@@ -51,7 +51,7 @@ class AIBackends::Anthropic
       response = @client.messages(
         model: @assistant.model,
         system: @assistant.instructions,
-        messages: existing_messages,
+        messages: preceding_messages,
         parameters: {
           max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
           stream: response_handler,
@@ -76,8 +76,8 @@ class AIBackends::Anthropic
 
   private
 
-  def existing_messages
-    @conversation.messages.ordered.where("created_at < ?", @message.created_at).collect do |message|
+  def preceding_messages
+    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
       if @assistant.images && message.documents.present?
 
         content = [{ type: "text", text: message.content_text }]

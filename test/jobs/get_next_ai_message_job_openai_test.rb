@@ -4,7 +4,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   setup do
     @conversation = conversations(:greeting)
     @conversation.messages.create! role: :user, content_text: "Still there?", assistant: @conversation.assistant
-    @message = @conversation.latest_message
+    @message = @conversation.latest_message_for_version(:latest)
     @test_client = TestClients::OpenAI.new(access_token: 'abc')
   end
 
@@ -14,31 +14,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     end
 
     message_text = @test_client.chat
-    assert_equal message_text, @conversation.latest_message.content_text
-  end
-
-  test "re-populates an earlier message from the assistant if it was provided and marked as re-requested" do
-    messages(:yes_i_do).update!(rerequested_at: Time.current, content_text: nil)
-
-    assert_no_difference "@conversation.messages.reload.length" do
-      assert GetNextAIMessageJob.perform_now(messages(:yes_i_do).id, @conversation.assistant.id)
-    end
-
-    message_text = @test_client.chat
-    assert_equal message_text, messages(:yes_i_do).reload.content_text
-    assert_not_equal message_text, @conversation.latest_message.content_text
-  end
-
-  test "returns early if attempting to re-populate an earlier message from the assistant was provided but it was NOT marked as re-requested" do
-    messages(:yes_i_do).update!(content_text: nil)
-
-    assert_no_difference "@conversation.messages.reload.length" do
-      refute GetNextAIMessageJob.perform_now(messages(:yes_i_do).id, @conversation.assistant.id)
-    end
-
-    message_text = @test_client.chat
-    assert_not_equal message_text, messages(:yes_i_do).reload.content_text
-    assert_not_equal message_text, @conversation.latest_message.content_text
+    assert_equal message_text, @conversation.latest_message_for_version(:latest).content_text
   end
 
   test "returns early if the message id was invalid" do
@@ -64,13 +40,13 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     user.update!(openai_key: "")
 
     assert GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
-    assert_includes @conversation.latest_message.content_text, "need to enter a valid API key for OpenAI"
+    assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for OpenAI"
   end
 
   test "when API response key is, a nice error message is displayed" do
     TestClients::OpenAI.stub :text, "" do
       assert GetNextAIMessageJob.perform_now(@message.id, @conversation.assistant.id)
-      assert_includes @conversation.latest_message.content_text, "a blank response"
+      assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
     end
   end
 end

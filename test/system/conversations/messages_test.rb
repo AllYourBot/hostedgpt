@@ -7,9 +7,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     @user = users(:keith)
     login_as @user
     @conversation = conversations(:greeting)
-    @new_message = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
-
-    visit conversation_messages_path(@conversation.id)
+    visit conversation_messages_path(@conversation)
   end
 
   test "clipboard icon shows tooltip" do
@@ -47,8 +45,11 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_equal existing_assistant.name, last_message.find_role("from").text
 
     click_text "Using #{new_assistant.name}"
-    sleep 1
-    assert_equal new_assistant.name, last_message.find_role("from").text
+
+    assert_true do
+      last_message.find_role("from").text == new_assistant.name
+    end
+    assert_current_path conversation_messages_path(@conversation, version: 2)
   end
 
   test "submitting a message with ENTER inserts two new messages with morphing" do
@@ -64,6 +65,9 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   end
 
   test "when the AI replies with a message it appears with morphing" do
+    @new_message = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
+    visit conversation_messages_path(@conversation.id)
+
     assert last_message.text.include?("Stub:"), "The last message should have contained the submitted text"
 
     assert_page_morphed do
@@ -78,12 +82,6 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   end
 
   private
-
-  def hover_last_message
-    msg = last_message
-    msg.hover
-    msg
-  end
 
   def assert_page_morphed
     raise "No block given" unless block_given?
