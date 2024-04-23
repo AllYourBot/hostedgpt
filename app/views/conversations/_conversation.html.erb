@@ -3,10 +3,12 @@
 
 <div
   class="
-    rounded-lg mr-5 cursor-pointer group
-    hover:bg-gray-100 dark:hover:bg-gray-700
-    relationship:bg-gray-200 dark:relationship:bg-gray-700 
-    <%= selected && 'relationship dark:text-black dark:hover:text-gray-100' %>"
+          rounded-lg mr-5 cursor-pointer group
+          hover:bg-gray-100 dark:hover:bg-gray-500
+          relationship:bg-gray-200
+          dark:relationship:bg-gray-700
+          <%= selected && 'relationship' %>
+        "
   data-role="conversation"
   data-radio-behavior-target="radio"
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
