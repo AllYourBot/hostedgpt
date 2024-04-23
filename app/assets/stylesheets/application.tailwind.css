@@ -57,10 +57,12 @@
   @apply bg-gray-200
 }
 
-.relationship .dark\:relationship\:bg-gray-700,
+.dark {
+  .relationship .dark\:relationship\:bg-gray-700,
   .relationship.dark\:relationship\:bg-gray-700 {
     @apply bg-gray-700
   }
+}
 
 .relationship .relationship\:hidden,
 .relationship.relationship\:hidden {

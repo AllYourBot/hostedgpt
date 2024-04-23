@@ -29,6 +29,7 @@ module.exports = {
         brand: {
           blue: '#2f5ff2',
         },
+        'base-100': '#ffffff', //this can be avodied by installing, requiring and configuring the daisyui plugin
       },
       scale: {
         96: '0.96',
@@ -56,4 +57,6 @@ module.exports = {
     require('@tailwindcss/container-queries'),
   ],
 }
+
+
 
