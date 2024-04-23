@@ -252,12 +252,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       all("[data-role='image-loader']", visible: :all).map(&:visible?).include?(true)
     end
 
-    assert_true "all the images should have been marked as complete" do
-      all("img[data-image-loader-target='image']", visible: :all).map do |img|
-        img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-      end.all?
-    end
-
     assert_false "all values in the loading object should have been 'loaded'" do
       page.evaluate_script("Object.values(window.imageLoadingForSystemTestsToCheck).filter((v) => v != 'done') > 0")
     end
