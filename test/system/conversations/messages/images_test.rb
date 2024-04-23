@@ -14,23 +14,28 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
     image_msg = find_messages.third
 
     image_btn = image_msg.find_role("image-preview")
-    img = image_btn.find("img")
+    loader = image_btn.find_role("image-loader")
+    img = image_btn.find("img", visible: :all)
+
     modal = image_msg.find_role("image-modal")
+
+    wait_for_initial_scroll_down
 
     assert image_btn
     assert img
+    refute loader.visible?, "loader should NEVER be visible in this test"
     wait_for_images_to_load
 
     refute modal.visible?
 
     image_btn.click
 
-    assert_true "modal image should have been visible", wait: 0.6 do
+    assert_true "modal image should have been visible" do
       modal.visible?
     end
 
     send_keys "esc"
-    assert_false "modal image should have closed/hidden itself", wait: 0.6 do
+    assert_false "modal image should have closed/hidden itself" do
       modal.visible?
     end
   end
