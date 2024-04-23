@@ -12,6 +12,7 @@ export default class extends Controller {
   toggleDarkMode = (darkMode) => {
     this.element.classList.toggle('dark', darkMode)
     this.element.classList.toggle('light', !darkMode)
+    this.element.classList.toggle('system', false)
   }
 
   addDarkModeListener() {
