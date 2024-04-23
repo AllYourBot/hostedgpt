@@ -19,9 +19,8 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
     assert image_btn
     assert img
-    assert_true "img should have fully loaded", wait: 1 do
-      img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-    end
+    wait_for_images_to_load
+
     refute modal.visible?
 
     image_btn.click
@@ -53,9 +52,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       end
       assert img.visible?
 
-      assert_true "img should have fully loaded" do
-        img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-      end
+      wait_for_images_to_load
 
       refute modal.visible?
 
@@ -101,10 +98,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
         loader.visible?
       end
       assert img.visible?
-
-      assert_true "img should have fully loaded" do
-        modal_img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-      end
+      wait_for_images_to_load
 
       image_container.click
 
