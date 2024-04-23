@@ -38,19 +38,24 @@ export default class extends Controller {
       this.scrollDownIfScrolledToBottom()
   }
 
-  throttledScrollDownIfScrolledToBottom = throttle(() => this.scrollDownIfScrolledToBottom(), 50)
-  scrollDownIfScrolledToBottom() {
-    if (window.wasScrolledToBottom) this.throttledScrollDown()
+  throttledScrollDownIfScrolledToBottom = throttle((event) => this.scrollDownIfScrolledToBottom(event), 50, (event) => { if (window.imageLoadingForSystemTestsToCheck[event?.detail]) window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' })
+  scrollDownIfScrolledToBottom(event) {
+    if (window.wasScrolledToBottom)
+      this.throttledScrollDown(event)
+    else if (window.imageLoadingForSystemTestsToCheck[event?.detail])
+      window.imageLoadingForSystemTestsToCheck[event.detail] = 'loaded'
   }
 
-  throttledScrollDown = throttle(() => this.scrollDown(), 50)
-  scrollDown() {
+  throttledScrollDown = throttle((event) => this.scrollDown(event), 50)
+  scrollDown(event) {
     window.wasScrolledToBottom = true // even if we don't get the full way, it was the intention
 
     this.scrollableTarget.scrollTo({
       top: this.scrollableTarget.scrollHeight,
       behavior: this.instantlyValue ? "auto" : "smooth"
     })
+
+    if (event?.detail) setTimeout(() => { window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' }, 1000)
 
     if (this.instantlyValue) {
       // This occurs immediately after page load; we jump to the bottom as fast as we can. However,

@@ -22,3 +22,5 @@ document.addEventListener('turbo:before-stream-render', (event) => {
   console.log(`stream render (${stream.getAttribute('action')} event) ${newTimestamp <= oldTimestamp ? 'REORDER!' : ''}`, stream)
   oldTimestamp = newTimestamp
 })
+
+window.imageLoadingForSystemTestsToCheck = {}
