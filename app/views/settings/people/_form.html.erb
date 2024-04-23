@@ -136,11 +136,10 @@
       <%= user_fields.label :dark_mode, "Color Theme" %>
       <div class="flex items-center justify-between shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black">
         <%= user_fields.fields_for :preferences do |preferences_fields| %>
-          <% color_themes = { "dark" => "Dark", "light" => "Light", "system" => "System" } %>
-          <% color_themes.each do |value, label| %>
+          <% %w(dark light system).each do |value| %>
             <div class="form-group">
               <%= preferences_fields.radio_button :dark_mode, value, checked: Current.user.preferences[:dark_mode] == value %>
-              <%= user_fields.label :dark_mode, label, class: "ml-2 dark:text-gray-100" %>
+              <%= user_fields.label :dark_mode, value.capitalize, class: "ml-2 dark:text-gray-100" %>
             </div>
           <% end %>
         <% end %>
