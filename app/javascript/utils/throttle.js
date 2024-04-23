@@ -9,20 +9,29 @@
 //
 // See debounce.js
 
-export default function(func, wait) {
-  let timeout, lastExecution = Date.now() - wait
+export default function(func, wait, onDiscard) {
+  let timeout, timeoutOnDiscard,  lastExecution = Date.now() - wait
 
   return function() {
     var context = this
     var elapsed = Date.now() - lastExecution // always positive but could be 0
 
-    clearTimeout(timeout)
+    if (timeout !== null) {
+      if (timeoutOnDiscard) {
+        timeoutOnDiscard()
+        timeoutOnDiscard = null
+      }
+      clearTimeout(timeout)
+      timeout = null
+    }
 
     if (elapsed >= wait) {
       func.apply(context, arguments)
       lastExecution = Date.now()
     } else {
+      if (onDiscard) timeoutOnDiscard = (() => { onDiscard.apply(context, arguments); }).bind(this, ...arguments)
       timeout = setTimeout(() => {
+        timeout = null
         func.apply(context, arguments)
         lastExecution = Date.now()
       }, wait - elapsed)

@@ -14,24 +14,28 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
     image_msg = find_messages.third
 
     image_btn = image_msg.find_role("image-preview")
-    img = image_btn.find("img")
+    loader = image_btn.find_role("image-loader")
+    img = image_btn.find("img", visible: :all)
+
     modal = image_msg.find_role("image-modal")
+
+    wait_for_initial_scroll_down
 
     assert image_btn
     assert img
-    assert_true "img should have fully loaded", wait: 1 do
-      img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-    end
+    refute loader.visible?, "loader should NEVER be visible in this test"
+    wait_for_images_to_load
+
     refute modal.visible?
 
     image_btn.click
 
-    assert_true "modal image should have been visible", wait: 0.6 do
+    assert_true "modal image should have been visible" do
       modal.visible?
     end
 
     send_keys "esc"
-    assert_false "modal image should have closed/hidden itself", wait: 0.6 do
+    assert_false "modal image should have closed/hidden itself" do
       modal.visible?
     end
   end
@@ -53,9 +57,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       end
       assert img.visible?
 
-      assert_true "img should have fully loaded" do
-        img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-      end
+      wait_for_images_to_load
 
       refute modal.visible?
 
@@ -101,10 +103,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
         loader.visible?
       end
       assert img.visible?
-
-      assert_true "img should have fully loaded" do
-        modal_img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-      end
+      wait_for_images_to_load
 
       image_container.click
 
