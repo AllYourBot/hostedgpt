@@ -10,7 +10,6 @@ module Message::Version
     attribute :versions, :string, default: ""
 
     before_validation :set_next_conversation_index_and_version, on: :create
-    before_validation :set_default_version,                     on: :create
 
     validate :branched_and_version_both_set,      if: -> { branched? || branched_from_version.present? }, on: :create
 
@@ -88,20 +87,15 @@ module Message::Version
           errors.add(:version, "#{version} is invalid for this index")
         end
       end
-    else
-      if index.blank? && version.present?
+    elsif index.blank?
+      if version.present?
         errors.add(:version, "cannot be set without also setting index")
-      end
-      if index.blank? && version.blank?
+      elsif version.blank?
         latest_msg = self.conversation.latest_message_for_version(:latest)
         self.index    = (latest_msg&.index   || -1) + 1
         self.version  =  latest_msg&.version || 1
       end
     end
-  end
-
-  def set_default_version
-    self.version ||= 1
   end
 
   def branched_and_version_both_set
