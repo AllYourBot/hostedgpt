@@ -129,6 +129,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
           img.visible?
         end
       end
+      sleep 5 # TODO: cannot reliably get this condition to pass. Is it a bug with tests or with actual image scroll down?
       assert_at_bottom
     end
   end

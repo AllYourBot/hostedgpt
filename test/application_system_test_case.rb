@@ -120,6 +120,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     page.execute_script("document.querySelector('#{selector}').scrollTop = document.querySelector('#{selector}').scrollHeight")
   end
 
+  def scroll_to_position(selector, position)
+    page.execute_script("document.querySelector('#{selector}').scrollTop = #{position}")
+  end
+
   def assert_did_not_scroll(selector = "section #messages-container")
     raise "No block given" unless block_given?
 
@@ -183,6 +187,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     scroll_to_bottom(selector)
     assert_stopped_scrolling(selector)
     new_scroll_position = get_scroll_position(selector)
+    scroll_to_position(selector, initial_scroll_position) # scroll back so that if the next line fails the screenshot we take will capture the "wrong" position
     assert_equal initial_scroll_position, new_scroll_position, "The #{selector} was able to move down so it was not at the bottom"
   end
 
