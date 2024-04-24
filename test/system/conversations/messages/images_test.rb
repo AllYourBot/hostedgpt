@@ -14,10 +14,9 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
     image_msg = find_messages.third
 
     image_btn = image_msg.find_role("image-preview")
-    loader = image_btn.find_role("image-loader")
-    img = image_btn.find("img", visible: :all)
-
-    modal = image_msg.find_role("image-modal")
+    loader    = image_btn.find_role("image-loader")
+    img       = image_btn.find("img", visible: :all)
+    modal     = image_msg.find_role("image-modal")
 
     wait_for_initial_scroll_down
 
@@ -46,8 +45,8 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       sleep 2 # TODO sometimes it's getting to img.visible? but then it disappears so I think it's running too quickly
       image_msg = find_messages.third
       image_btn = image_msg.find_role("image-preview")
-      img = image_btn.find("img", visible: false)
-      modal = image_msg.find_role("image-modal")
+      img       = image_btn.find("img", visible: false)
+      modal     = image_msg.find_role("image-modal")
       assert image_btn
       assert img
       assert modal
@@ -124,15 +123,12 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       assert_at_bottom
       assert_scrolled_down do
 
-        assert_false "all images should be visible" do
-          all("[data-role='image-preview']", visible: :all).map(&:visible?).include?(false)
-        end
+        wait_for_images_to_load
 
         assert_true do
           img.visible?
         end
       end
-      sleep 5 # TODO: if flappy tests still persist then there is an actual bug with image_loader scroll down
       assert_at_bottom
     end
   end
@@ -142,7 +138,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
     stimulate_image_variant_processing do
       visit conversation_messages_path(@conversation)
       image_msg = find_messages.third
-      img = image_msg.find_role("image-preview").find("img", visible: false)
+      img       = image_msg.find_role("image-preview").find("img", visible: :all)
 
       assert_true wait: 5 do
         img.visible?

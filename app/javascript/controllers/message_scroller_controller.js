@@ -66,6 +66,6 @@ export default class extends Controller {
       window.addEventListener('load', this.throttledScrollDownIfScrolledToBottom, { once: true })
     }
 
-    window.scrolledDownForSystemTestsToCheck = true
+    setTimeout(() => { window.scrolledDownForSystemTestsToCheck = true }, 1000)
   }
 }

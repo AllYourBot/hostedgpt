@@ -6,6 +6,7 @@ class MessagesComposerStopStreamingTest < ApplicationSystemTestCase
     login_as @user
     @conversation = conversations(:greeting)
     visit conversation_messages_path(@conversation)
+    wait_for_initial_scroll_down
   end
 
   test "stop button shows in composer while replying and disappears when done" do

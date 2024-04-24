@@ -71,9 +71,10 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert last_message.text.include?("Stub:"), "The last message should have contained the submitted text"
 
     assert_page_morphed do
-      @new_message.content_text = "The quick brown fox jumped over the lazy dog and this line needs to wrap to scroll." +
+      @new_message.content_text = "The quick brown fox jumped over the lazy dog and this line needs to wrap to scroll. " +
                                   "But it was not long enough so I'm adding more text on this second line to ensure it."
       GetNextAIMessageJob.broadcast_updated_message(@new_message)
+      sleep 5 # TODO: cannot solve a "stale element reference" bug so trying this
       assert_true "The last message should have contained the submitted text but it contains '#{last_message.text}'", wait: 10 do
         last_message.text.include?("The quick brown")
       end
