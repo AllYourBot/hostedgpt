@@ -29,7 +29,7 @@ Rails.application.config.to_prepare do
       end
 
       if response&.status != 200
-        raise ::Faraday::ParsingError
+        raise StandardError.new("Anthropic #{response&.status} Error")
       else
         to_json(response&.body)
       end
