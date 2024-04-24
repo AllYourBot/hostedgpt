@@ -10,10 +10,11 @@ class Document < ApplicationRecord
 
   enum purpose: %w[fine-tune fine-tune-results assistants assistants_output].index_by(&:to_sym)
 
-  attribute :user, default: -> { message.conversation.user }
   attribute :purpose, default: :assistants
-  attribute :filename, default: -> { file.filename.to_s }
-  attribute :bytes, default: -> { file.byte_size }
+
+  before_validation :set_default_user, on: :create
+  before_validation :set_default_filename, on: :create
+  before_validation :set_default_bytes, on: :create
 
   validates :purpose, :filename, :bytes, presence: true
   validate :file_present
@@ -55,6 +56,18 @@ class Document < ApplicationRecord
   end
 
   private
+
+  def set_default_user
+    self.user ||= message.conversation.user
+  end
+
+  def set_default_filename
+    self.filename ||= file.filename.to_s
+  end
+
+  def set_default_bytes
+    self.bytes ||= file.byte_size
+  end
 
   def file_present
     errors.add(:file, "must be attached") unless file.attached?
