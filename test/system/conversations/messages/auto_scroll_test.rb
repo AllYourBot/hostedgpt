@@ -4,12 +4,11 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
   setup do
     @user = users(:keith)
     login_as @user
-    @conversation = conversations(:attachment)
+    @conversation = conversations(:greeting)
     @new_message = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
 
     @time_start = Time.new.to_i
     visit conversation_messages_path(@conversation)
-    wait_for_images_to_load
     wait_for_initial_scroll_down
   end
 
