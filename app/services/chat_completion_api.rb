@@ -14,7 +14,7 @@ class ChatCompletionAPI
     }]
 
     chat_messages.each_with_index do |msg, i|
-      role = (i % 2 == 0) ? 'user' : 'assistant'
+      role = (i % 2).zero? ? 'user' : 'assistant'
 
       message_payload << {
         role: role,

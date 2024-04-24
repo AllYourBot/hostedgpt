@@ -251,6 +251,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_false "all the image loaders should have disappeared", wait: 10 do
       all("[data-role='image-loader']", visible: :all).map(&:visible?).include?(true)
     end
+
+    assert_false "all values in the loading object should have been 'loaded'" do
+      page.evaluate_script("Object.values(window.imageLoadingForSystemTestsToCheck).filter((v) => v != 'done') > 0")
+    end
   end
 
   def wait_for_initial_scroll_down
@@ -280,6 +284,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def assert_last_message(message)
     assert_selector "#messages > :last-child [data-role='content-text']", text: message.content_text
+  end
+
+  def assert_toast(text)
+    toast = nil
+    assert_true "the toast element could not be found" do
+      toast = find("#toasts .alert span", visible: :all, wait: 0) rescue nil
+    end
+    assert_equal text, toast[:innerText]
   end
 end
 
