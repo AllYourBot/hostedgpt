@@ -10,15 +10,13 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   end
 
   test "images render in messages WHEN pre-processed, clicking opens modal" do
-    visit conversation_messages_path(@conversation)
-    image_msg = find_messages.third
+    visit_and_scroll_wait conversation_messages_path(@conversation)
 
+    image_msg = find_messages.third
     image_btn = image_msg.find_role("image-preview")
     loader    = image_btn.find_role("image-loader")
     img       = image_btn.find("img", visible: :all)
     modal     = image_msg.find_role("image-modal")
-
-    wait_for_initial_scroll_down
 
     assert image_btn
     assert img
@@ -41,8 +39,8 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   test "images eventually render in messages WHEN NOT pre-processed, clicking opens modal" do
     stimulate_image_variant_processing do
-      visit conversation_messages_path(@conversation)
-      sleep 2 # TODO sometimes it's getting to img.visible? but then it disappears so I think it's running too quickly
+      visit_and_scroll_wait conversation_messages_path(@conversation)
+
       image_msg = find_messages.third
       image_btn = image_msg.find_role("image-preview")
       img       = image_btn.find("img", visible: false)
@@ -75,7 +73,8 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   test "ensure images display a spinner initially if they get a 404 and then eventually get replaced with the image" do
     stimulate_image_variant_processing do
-      visit conversation_messages_path(@conversation)
+      visit_and_scroll_wait conversation_messages_path(@conversation)
+
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
       loader          = image_container.find_role("image-loader")
@@ -115,7 +114,8 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   test "ensure page scrolls back down to the bottom after an image pops in late" do
     stimulate_image_variant_processing do
-      visit conversation_messages_path(@conversation)
+      visit_and_scroll_wait conversation_messages_path(@conversation)
+
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
       img             = image_container.find("img", visible: :all)
@@ -129,7 +129,6 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
           img.visible?
         end
       end
-      sleep 5 # TODO: cannot reliably get this condition to pass. Is it a bug with tests or with actual image scroll down?
       assert_at_bottom
     end
   end
@@ -137,7 +136,8 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   test "images in previous messages remain after submitting a new message, they should not display a new spinner" do
     image_msg = img = nil
     stimulate_image_variant_processing do
-      visit conversation_messages_path(@conversation)
+      visit_and_scroll_wait conversation_messages_path(@conversation)
+
       image_msg = find_messages.third
       img       = image_msg.find_role("image-preview").find("img", visible: :all)
 
@@ -178,7 +178,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   def simulate_not_preprocessed
     ->() do
-      return nil if params[:retry_count].to_i < 5
+      return nil if params[:retry_count].to_i < 8
       ActiveStorage.verifier.verified(params[:encoded_key], purpose: :blob_key)&.symbolize_keys
     end
   end

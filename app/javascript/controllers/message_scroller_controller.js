@@ -13,6 +13,9 @@ export default class extends Controller {
     onlyScrollDownIfScrolledToBottom: { type: Boolean, default: false }
   }
 
+  get bottom() { return this.scrollableTarget.scrollHeight }
+  get scrollPosition() { return this.scrollableTarget.scrollTop + this.scrollableTarget.clientHeight }
+
   connect() {
     if (window.lastMessageControllerInstance) window.lastMessageControllerInstance.disconnect()
     window.lastMessageControllerInstance = this
@@ -38,25 +41,34 @@ export default class extends Controller {
       this.scrollDownIfScrolledToBottom()
   }
 
+  discardScrollDown = (event) => { if (window.imageLoadingForSystemTestsToCheck[event?.detail]) { console.log(`discarding ${event.detail}`); window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' } }
   throttledScrollDownIfScrolledToBottom = throttle((event) => this.scrollDownIfScrolledToBottom(event), 50, this.discardScrollDown)
-  discardScrollDown = (event) => { if (window.imageLoadingForSystemTestsToCheck[event?.detail]) window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' }
   scrollDownIfScrolledToBottom(event) {
     if (window.wasScrolledToBottom)
       this.throttledScrollDown(event)
     else if (window.imageLoadingForSystemTestsToCheck[event?.detail])
-      window.imageLoadingForSystemTestsToCheck[event.detail] = 'loaded'
+      window.imageLoadingForSystemTestsToCheck[event.detail] = 'done'
   }
 
   throttledScrollDown = throttle((event) => this.scrollDown(event), 50)
   scrollDown(event) {
+    this.scrollDownRetry(event?.detail, 0)
+  }
+
+  scrollDownRetry(key, attempt) {
+    if (attempt < 5 && this.bottom == this.scrollPosition) {
+      setTimeout(() => { this.scrollDownRetry(key, attempt + 1) }, 100)
+      return
+    } // will delay up to 500ms if unable to scroll down
+
     window.wasScrolledToBottom = true // even if we don't get the full way, it was the intention
 
     this.scrollableTarget.scrollTo({
-      top: this.scrollableTarget.scrollHeight,
+      top: this.bottom,
       behavior: this.instantlyValue ? "auto" : "smooth"
     })
 
-    if (event?.detail) setTimeout(() => { window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' }, 1000)
+    if (key) setTimeout(() => { window.imageLoadingForSystemTestsToCheck[key] = 'done' }, 500)
 
     if (this.instantlyValue) {
       // This occurs immediately after page load; we jump to the bottom as fast as we can. However,
@@ -66,6 +78,6 @@ export default class extends Controller {
       window.addEventListener('load', this.throttledScrollDownIfScrolledToBottom, { once: true })
     }
 
-    setTimeout(() => { window.scrolledDownForSystemTestsToCheck = true }, 1000)
+    setTimeout(() => { window.scrolledDownForSystemTestsToCheck = true }, 500)
   }
 }

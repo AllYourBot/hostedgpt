@@ -5,7 +5,7 @@ class ConversationMessagesNewConversationTest < ApplicationSystemTestCase
     @user = users(:keith)
     login_as @user
     @conversation = conversations(:greeting)
-    visit conversation_messages_path(@conversation)
+    visit_and_scroll_wait conversation_messages_path(@conversation)
   end
 
   test "clicking new compose icon in the top-right starts a new conversation and preserves sidebar scroll" do

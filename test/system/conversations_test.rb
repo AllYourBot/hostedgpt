@@ -66,7 +66,7 @@ class ConversationsTest < ApplicationSystemTestCase
   end
 
   test "clicking the conversation delete, when you ARE not on this conversation, deletes it and redirects you to a new conversation" do
-    visit conversation_messages_path(conversations(:greeting))
+    visit_and_scroll_wait conversation_messages_path(conversations(:greeting))
     convo = hover_conversation conversations(:greeting)
     delete = convo.find_role("delete")
     confirm_delete = convo.find_role("confirm-delete")

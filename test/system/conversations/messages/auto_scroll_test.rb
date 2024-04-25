@@ -8,8 +8,7 @@ class ConversationMessagesAutoScrollTest < ApplicationSystemTestCase
     @new_message = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
 
     @time_start = Time.new.to_i
-    visit conversation_messages_path(@conversation)
-    wait_for_initial_scroll_down
+    visit_and_scroll_wait conversation_messages_path(@conversation)
   end
 
   test "the conversation auto-scrolls to bottom when page loads" do
