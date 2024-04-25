@@ -6,7 +6,7 @@ class ConversationMessagesEditTest < ApplicationSystemTestCase
     login_as @user
 
     @conversation = conversations(:greeting)
-    visit conversation_messages_path(@conversation)
+    visit_and_scroll_wait conversation_messages_path(@conversation)
     @message = messages(:alive)
     @msg = last_user_message
     @btn = @msg.find_role("edit")
@@ -14,7 +14,9 @@ class ConversationMessagesEditTest < ApplicationSystemTestCase
   end
 
   test "there is no edit icon beneath messages with images" do
-    visit conversation_messages_path(conversations(:attachment))
+    visit_and_scroll_wait conversation_messages_path(conversations(:attachment))
+    wait_for_images_to_load
+
     third = find_messages.third
     assert_equal messages(:examine_this).content_text, third.find_role("content-text").text
 
