@@ -1,0 +1,1495 @@
+:root {
+  --in: 0.7206 0.191 231.6;
+  --su: 64.8% 0.15 160;
+  --wa: 0.8471 0.199 83.87;
+  --er: 0.7176 0.221 22.18;
+  --pc: 0.89824 0.06192 275.75;
+  --ac: 0.15352 0.0368 183.61;
+  --inc: 0 0 0;
+  --suc: 0 0 0;
+  --wac: 0 0 0;
+  --erc: 0 0 0;
+  --rounded-box: 1rem;
+  --rounded-btn: 0.5rem;
+  --rounded-badge: 1.9rem;
+  --animation-btn: 0.25s;
+  --animation-input: 0.2s;
+  --btn-focus-scale: 0.95;
+  --border-btn: 1px;
+  --tab-border: 1px;
+  --tab-radius: 0.5rem;
+  --p: 0.4912 0.3096 275.75;
+  --s: 0.6971 0.329 342.55;
+  --sc: 0.9871 0.0106 342.55;
+  --a: 0.7676 0.184 183.61;
+  --n: 0.321785 0.02476 255.701624;
+  --nc: 0.894994 0.011585 252.096176;
+  --b1: 1 0 0;
+  --b2: 0.961151 0 0;
+  --b3: 0.924169 0.00108 197.137559;
+  --bc: 0.278078 0.029596 256.847952;
+}
+@supports not (color: oklch(0 0 0)) {
+  :root {
+    /* color-scheme: light; */
+    --fallback-p: #491eff;
+    --fallback-pc: #d4dbff;
+    --fallback-s: #ff41c7;
+    --fallback-sc: #fff9fc;
+    --fallback-a: #00cfbd;
+    --fallback-ac: #00100d;
+    --fallback-n: #2b3440;
+    --fallback-nc: #d7dde4;
+    --fallback-b1: #ffffff;
+    --fallback-b2: #e5e6e6;
+    --fallback-b3: #e5e6e6;
+    --fallback-bc: #1f2937;
+    --fallback-in: #00b3f0;
+    --fallback-inc: #000000;
+    --fallback-su: #00ca92;
+    --fallback-suc: #000000;
+    --fallback-wa: #ffc22d;
+    --fallback-wac: #000000;
+    --fallback-er: #ff6f70;
+    --fallback-erc: #000000;
+  }
+}
+.bg-base-100 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.bg-base-100\/0 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0));
+}
+.bg-base-100\/10 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.1));
+}
+.bg-base-100\/100 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.bg-base-100\/20 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.2));
+}
+.bg-base-100\/25 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.25));
+}
+.bg-base-100\/30 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.3));
+}
+.bg-base-100\/40 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.4));
+}
+.bg-base-100\/5 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.05));
+}
+.bg-base-100\/50 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.5));
+}
+.bg-base-100\/60 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.6));
+}
+.bg-base-100\/70 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.7));
+}
+.bg-base-100\/75 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.75));
+}
+.bg-base-100\/80 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.8));
+}
+.bg-base-100\/90 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.9));
+}
+.bg-base-100\/95 {
+  background-color: var(--fallback-b1, oklch(var(--b1) / 0.95));
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  --tooltip-offset: calc(100% + 1px + var(--tooltip-tail, 0px));
+}
+.tooltip:before {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  content: var(--tw-content);
+  --tw-content: attr(data-tip);
+}
+.tooltip-top:before,
+.tooltip:before {
+  transform: translateX(-50%);
+  top: auto;
+  left: 50%;
+  right: auto;
+  bottom: var(--tooltip-offset);
+}
+.tooltip-bottom:before {
+  transform: translateX(-50%);
+  top: var(--tooltip-offset);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+}
+.tooltip-left:before {
+  transform: translateY(-50%);
+  top: 50%;
+  left: auto;
+  right: var(--tooltip-offset);
+  bottom: auto;
+}
+.tooltip-right:before {
+  transform: translateY(-50%);
+  top: 50%;
+  left: var(--tooltip-offset);
+  right: auto;
+  bottom: auto;
+}
+.tooltip:after,
+.tooltip:before {
+  opacity: 0;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-delay: 0.1s;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tooltip:after {
+  position: absolute;
+  content: '';
+  border-style: solid;
+  border-width: var(--tooltip-tail, 0);
+  width: 0;
+  height: 0;
+  display: block;
+}
+.tooltip:before {
+  max-width: 20rem;
+  border-radius: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background-color: var(--tooltip-color);
+  color: var(--tooltip-text-color);
+  width: max-content;
+}
+
+.tooltip.tooltip-open:before {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+.tooltip.tooltip-open:after {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+.tooltip:hover:before {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+.tooltip:hover:after {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+.tooltip:has(:focus-visible):after,
+.tooltip:has(:focus-visible):before {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+.tooltip:not([data-tip]):hover:after,
+.tooltip:not([data-tip]):hover:before {
+  visibility: hidden;
+  opacity: 0;
+}
+.tooltip-top:after,
+.tooltip:after {
+  transform: translateX(-50%);
+  border-color: var(--tooltip-color) transparent transparent transparent;
+  top: auto;
+  left: 50%;
+  right: auto;
+  bottom: var(--tooltip-tail-offset);
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  --tooltip-tail: 0.1875rem;
+  --tooltip-color: var(--fallback-n, oklch(var(--n) / 1));
+  --tooltip-text-color: var(--fallback-nc, oklch(var(--nc) / 1));
+  --tooltip-tail-offset: calc(100% + 0.0625rem - var(--tooltip-tail));
+}
+
+.tooltip-bottom:after {
+  transform: translateX(-50%);
+  border-color: transparent transparent var(--tooltip-color) transparent;
+  top: var(--tooltip-tail-offset);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+}
+.tooltip-left:after {
+  transform: translateY(-50%);
+  border-color: transparent transparent transparent var(--tooltip-color);
+  top: 50%;
+  left: auto;
+  right: calc(var(--tooltip-tail-offset) + 0.0625rem);
+  bottom: auto;
+}
+.tooltip-right:after {
+  transform: translateY(-50%);
+  border-color: transparent var(--tooltip-color) transparent transparent;
+  top: 50%;
+  left: calc(var(--tooltip-tail-offset) + 0.0625rem);
+  right: auto;
+  bottom: auto;
+}
+.tooltip-primary {
+  --tooltip-color: var(--fallback-p, oklch(var(--p) / 1));
+  --tooltip-text-color: var(--fallback-pc, oklch(var(--pc) / 1));
+}
+.tooltip-secondary {
+  --tooltip-color: var(--fallback-s, oklch(var(--s) / 1));
+  --tooltip-text-color: var(--fallback-sc, oklch(var(--sc) / 1));
+}
+.tooltip-accent {
+  --tooltip-color: var(--fallback-a, oklch(var(--a) / 1));
+  --tooltip-text-color: var(--fallback-ac, oklch(var(--ac) / 1));
+}
+.tooltip-info {
+  --tooltip-color: var(--fallback-in, oklch(var(--in) / 1));
+  --tooltip-text-color: var(--fallback-inc, oklch(var(--inc) / 1));
+}
+.tooltip-success {
+  --tooltip-color: var(--fallback-su, oklch(var(--su) / 1));
+  --tooltip-text-color: var(--fallback-suc, oklch(var(--suc) / 1));
+}
+.tooltip-warning {
+  --tooltip-color: var(--fallback-wa, oklch(var(--wa) / 1));
+  --tooltip-text-color: var(--fallback-wac, oklch(var(--wac) / 1));
+}
+.tooltip-error {
+  --tooltip-color: var(--fallback-er, oklch(var(--er) / 1));
+  --tooltip-text-color: var(--fallback-erc, oklch(var(--erc) / 1));
+}
+@supports not (color: oklch(0 0 0)) {
+  .btn {
+    background-color: var(--btn-color, var(--fallback-b2));
+    border-color: var(--btn-color, var(--fallback-b2));
+  }
+  .btn-primary {
+    --btn-color: var(--fallback-p);
+  }
+  .btn-secondary {
+    --btn-color: var(--fallback-s);
+  }
+  .btn-accent {
+    --btn-color: var(--fallback-a);
+  }
+  .btn-neutral {
+    --btn-color: var(--fallback-n);
+  }
+  .btn-info {
+    --btn-color: var(--fallback-in);
+  }
+  .btn-success {
+    --btn-color: var(--fallback-su);
+  }
+  .btn-warning {
+    --btn-color: var(--fallback-wa);
+  }
+  .btn-error {
+    --btn-color: var(--fallback-er);
+  }
+  .prose :where(code):not(:where([class~='not-prose']*, pre*)) {
+    background-color: var(--fallback-b3, oklch(var(--b3) / 1));
+  }
+}
+:root .prose {
+  --tw-prose-body: var(--fallback-bc, oklch(var(--bc) / 0.8));
+  --tw-prose-headings: var(--fallback-bc, oklch(var(--bc) / 1));
+  --tw-prose-lead: var(--fallback-bc, oklch(var(--bc) / 1));
+  --tw-prose-links: var(--fallback-bc, oklch(var(--bc) / 1));
+  --tw-prose-bold: var(--fallback-bc, oklch(var(--bc) / 1));
+  --tw-prose-counters: var(--fallback-bc, oklch(var(--bc) / 1));
+  --tw-prose-bullets: var(--fallback-bc, oklch(var(--bc) / 0.5));
+  --tw-prose-hr: var(--fallback-bc, oklch(var(--bc) / 0.2));
+  --tw-prose-quotes: var(--fallback-bc, oklch(var(--bc) / 1));
+  --tw-prose-quote-borders: var(--fallback-bc, oklch(var(--bc) / 0.2));
+  --tw-prose-captions: var(--fallback-bc, oklch(var(--bc) / 0.5));
+  --tw-prose-code: var(--fallback-bc, oklch(var(--bc) / 1));
+  --tw-prose-pre-code: var(--fallback-nc, oklch(var(--nc) / 1));
+  --tw-prose-pre-bg: var(--fallback-n, oklch(var(--n) / 1));
+  --tw-prose-th-borders: var(--fallback-bc, oklch(var(--bc) / 0.5));
+  --tw-prose-td-borders: var(--fallback-bc, oklch(var(--bc) / 0.2));
+}
+.prose :where(code):not(:where([class~='not-prose']*, pre*)) {
+  padding: 1px 8px;
+  border-radius: var(--rounded-badge);
+  font-weight: initial;
+  background-color: var(--fallback-bc, oklch(var(--bc) / 0.1));
+}
+.prose :where(code):not(:where([class~='not-prose'], [class~='not-prose']*))::after,
+.prose :where(code):not(:where([class~='not-prose'], [class~='not-prose']*))::before {
+  display: none;
+}
+.prose pre code {
+  border-radius: 0;
+  padding: 0;
+}
+.prose :where(tbodytr, thead):not(:where([class~='not-prose']*)) {
+  border-bottom-color: var(--fallback-bc, oklch(var(--bc) / 0.2));
+}
+:where(.toast) {
+  bottom: 0;
+  inset-inline-end: 0;
+  inset-inline-start: auto;
+  top: auto;
+  --tw-translate-x: 0px;
+  --tw-translate-y: 0px;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.toast:where(.toast-start) {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+  --tw-translate-x: 0px;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.toast:where(.toast-center) {
+  inset-inline-end: 50%;
+  inset-inline-start: 50%;
+  --tw-translate-x: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+:is([dir='rtl'].toast:where(.toast-center)) {
+  --tw-translate-x: 50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.toast:where(.toast-end) {
+  inset-inline-end: 0;
+  inset-inline-start: auto;
+  --tw-translate-x: 0px;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.toast:where(.toast-bottom) {
+  bottom: 0;
+  top: auto;
+  --tw-translate-y: 0px;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.toast:where(.toast-middle) {
+  bottom: auto;
+  top: 50%;
+  --tw-translate-y: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.toast:where(.toast-top) {
+  bottom: auto;
+  top: 0;
+  --tw-translate-y: 0px;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+/* //check this */
+dialog {
+  padding: 0;
+}
+.modal::backdrop,
+.modal:not(dialog:not(.modal-open)) {
+  background-color: #0006;
+  animation: modal-pop 0.2s ease-out;
+}
+.alert {
+  display: grid;
+  width: 100%;
+  grid-auto-flow: row;
+  align-content: flex-start;
+  align-items: center;
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+  border-radius: var(--rounded-box, 1rem);
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-b2, oklch(var(--b2) / var(--tw-border-opacity)));
+  padding: 1rem;
+  --tw-text-opacity: 1;
+  color: var(--fallback-bc, oklch(var(--bc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-b2, oklch(var(--b2) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+  background-color: var(--alert-bg);
+}
+@media (min-width: 640px) {
+  .alert {
+    grid-auto-flow: column;
+    grid-template-columns: auto minmax(auto, 1fr);
+    justify-items: start;
+    text-align: start;
+  }
+}
+.alert-info {
+  border-color: var(--fallback-in, oklch(var(--in) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-inc, oklch(var(--inc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-in, oklch(var(--in) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.alert-success {
+  border-color: var(--fallback-su, oklch(var(--su) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-suc, oklch(var(--suc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-su, oklch(var(--su) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.alert-warning {
+  border-color: var(--fallback-wa, oklch(var(--wa) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-wac, oklch(var(--wac) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-wa, oklch(var(--wa) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.alert-error {
+  border-color: var(--fallback-er, oklch(var(--er) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-erc, oklch(var(--erc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-er, oklch(var(--er) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.hover\:alert-info:hover {
+  border-color: var(--fallback-in, oklch(var(--in) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-inc, oklch(var(--inc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-in, oklch(var(--in) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.hover\:alert-success:hover {
+  border-color: var(--fallback-su, oklch(var(--su) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-suc, oklch(var(--suc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-su, oklch(var(--su) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.hover\:alert-warning:hover {
+  border-color: var(--fallback-wa, oklch(var(--wa) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-wac, oklch(var(--wac) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-wa, oklch(var(--wa) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.hover\:alert-error:hover {
+  border-color: var(--fallback-er, oklch(var(--er) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-erc, oklch(var(--erc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-er, oklch(var(--er) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.focus\:alert-info:focus {
+  border-color: var(--fallback-in, oklch(var(--in) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-inc, oklch(var(--inc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-in, oklch(var(--in) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.focus\:alert-success:focus {
+  border-color: var(--fallback-su, oklch(var(--su) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-suc, oklch(var(--suc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-su, oklch(var(--su) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.focus\:alert-warning:focus {
+  border-color: var(--fallback-wa, oklch(var(--wa) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-wac, oklch(var(--wac) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-wa, oklch(var(--wa) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.focus\:alert-error:focus {
+  border-color: var(--fallback-er, oklch(var(--er) / 0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-erc, oklch(var(--erc) / var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-er, oklch(var(--er) / 1));
+  --alert-bg-mix: var(--fallback-b1, oklch(var(--b1) / 1));
+}
+.input {
+  flex-shrink: 1;
+  appearance: none;
+  height: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 1rem;
+  line-height: 2;
+  line-height: 1.5rem;
+  border-radius: var(--rounded-btn, 0.5rem);
+  border-width: 1px;
+  border-color: transparent;
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-b1, oklch(var(--b1) / var(--tw-bg-opacity)));
+}
+
+.input:focus,
+.input:focus-within {
+  box-shadow: none;
+  border-color: var(--fallback-bc, oklch(var(--bc) / 0.2));
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: 2px;
+  outline-color: var(--fallback-bc, oklch(var(--bc) / 0.2));
+}
+.input-ghost {
+  --tw-bg-opacity: 0.05;
+}
+.input-ghost:focus,
+.input-ghost:focus-within {
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  color: var(--fallback-bc, oklch(var(--bc) / var(--tw-text-opacity)));
+  box-shadow: none;
+}
+.input-primary {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-p, oklch(var(--p) / var(--tw-border-opacity)));
+}
+.input-primary:focus,
+.input-primary:focus-within {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-p, oklch(var(--p) / var(--tw-border-opacity)));
+  outline-color: var(--fallback-p, oklch(var(--p) / 1));
+}
+.input-secondary {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-s, oklch(var(--s) / var(--tw-border-opacity)));
+}
+.input-secondary:focus,
+.input-secondary:focus-within {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-s, oklch(var(--s) / var(--tw-border-opacity)));
+  outline-color: var(--fallback-s, oklch(var(--s) / 1));
+}
+.input-accent {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity)));
+}
+.input-accent:focus,
+.input-accent:focus-within {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity)));
+  outline-color: var(--fallback-a, oklch(var(--a) / 1));
+}
+.input-info {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-in, oklch(var(--in) / var(--tw-border-opacity)));
+}
+.input-info:focus,
+.input-info:focus-within {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-in, oklch(var(--in) / var(--tw-border-opacity)));
+  outline-color: var(--fallback-in, oklch(var(--in) / 1));
+}
+.input-success {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-su, oklch(var(--su) / var(--tw-border-opacity)));
+}
+.input input:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.input[list]::-webkit-calendar-picker-indicator {
+  line-height: 1em;
+}
+.input-bordered {
+  border-color: var(--fallback-bc, oklch(var(--bc) / 0.2));
+}
+
+.input-success:focus,
+.input-success:focus-within {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-su, oklch(var(--su) / var(--tw-border-opacity)));
+  outline-color: var(--fallback-su, oklch(var(--su) / 1));
+}
+.input-warning {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-wa, oklch(var(--wa) / var(--tw-border-opacity)));
+}
+.input-warning:focus,
+.input-warning:focus-within {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-wa, oklch(var(--wa) / var(--tw-border-opacity)));
+  outline-color: var(--fallback-wa, oklch(var(--wa) / 1));
+}
+.input-error {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-er, oklch(var(--er) / var(--tw-border-opacity)));
+}
+.input-error:focus,
+.input-error:focus-within {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-er, oklch(var(--er) / var(--tw-border-opacity)));
+  outline-color: var(--fallback-er, oklch(var(--er) / 1));
+}
+.input-disabled,
+.input:disabled,
+.input[disabled] {
+  cursor: not-allowed;
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-b2, oklch(var(--b2) / var(--tw-border-opacity)));
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-b2, oklch(var(--b2) / var(--tw-bg-opacity)));
+  color: var(--fallback-bc, oklch(var(--bc) / 0.4));
+}
+.input-disabled::placeholder,
+.input:disabled::placeholder,
+.input[disabled]::placeholder {
+  color: var(--fallback-bc, oklch(var(--bc) / var(--tw-placeholder-opacity)));
+  --tw-placeholder-opacity: 0.2;
+}
+.input::-webkit-date-and-time-value {
+  text-align: inherit;
+}
+.input-xs {
+  height: 1.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  line-height: 1.625;
+}
+.input-md {
+  height: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  line-height: 2;
+}
+.input-lg {
+  height: 4rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  line-height: 2;
+}
+.input-sm {
+  height: 2rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 2rem;
+}
+.hover\:tooltip-info:hover {
+  --tooltip-color: var(--fallback-in, oklch(var(--in) / 1));
+  --tooltip-text-color: var(--fallback-inc, oklch(var(--inc) / 1));
+}
+.hover\:tooltip-success:hover {
+  --tooltip-color: var(--fallback-su, oklch(var(--su) / 1));
+  --tooltip-text-color: var(--fallback-suc, oklch(var(--suc) / 1));
+}
+.hover\:tooltip-warning:hover {
+  --tooltip-color: var(--fallback-wa, oklch(var(--wa) / 1));
+  --tooltip-text-color: var(--fallback-wac, oklch(var(--wac) / 1));
+}
+.hover\:tooltip-error:hover {
+  --tooltip-color: var(--fallback-er, oklch(var(--er) / 1));
+  --tooltip-text-color: var(--fallback-erc, oklch(var(--erc) / 1));
+}
+.focus\:tooltip-info:focus {
+  --tooltip-color: var(--fallback-in, oklch(var(--in) / 1));
+  --tooltip-text-color: var(--fallback-inc, oklch(var(--inc) / 1));
+}
+.focus\:tooltip-success:focus {
+  --tooltip-color: var(--fallback-su, oklch(var(--su) / 1));
+  --tooltip-text-color: var(--fallback-suc, oklch(var(--suc) / 1));
+}
+.focus\:tooltip-warning:focus {
+  --tooltip-color: var(--fallback-wa, oklch(var(--wa) / 1));
+  --tooltip-text-color: var(--fallback-wac, oklch(var(--wac) / 1));
+}
+.focus\:tooltip-error:focus {
+  --tooltip-color: var(--fallback-er, oklch(var(--er) / 1));
+  --tooltip-text-color: var(--fallback-erc, oklch(var(--erc) / 1));
+}
+.toast {
+  position: fixed;
+  display: flex;
+  min-width: fit-content;
+  flex-direction: column;
+  white-space: nowrap;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+.toast > * {
+  animation: toast-pop 0.25s ease-out;
+}
+@keyframes toast-pop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown > :not(summary):focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.dropdown .dropdown-content {
+  position: absolute;
+}
+.dropdown:is(:not(details)) .dropdown-content {
+  visibility: hidden;
+  opacity: 0;
+  transform-origin: top;
+  --tw-scale-x: 0.95;
+  --tw-scale-y: 0.95;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-duration: 0.2s;
+}
+.dropdown-end .dropdown-content {
+  inset-inline-end: 0;
+}
+.dropdown-left .dropdown-content {
+  bottom: auto;
+  inset-inline-end: 100%;
+  top: 0;
+  transform-origin: right;
+}
+.dropdown-right .dropdown-content {
+  bottom: auto;
+  inset-inline-start: 100%;
+  top: 0;
+  transform-origin: left;
+}
+.dropdown-bottom .dropdown-content {
+  bottom: auto;
+  top: 100%;
+  transform-origin: top;
+}
+.dropdown-top .dropdown-content {
+  bottom: 100%;
+  top: auto;
+  transform-origin: bottom;
+}
+.dropdown-end.dropdown-right .dropdown-content {
+  bottom: 0;
+  top: auto;
+}
+.dropdown-end.dropdown-left .dropdown-content {
+  bottom: 0;
+  top: auto;
+}
+.dropdown.dropdown-open .dropdown-content,
+.dropdown:focus-within .dropdown-content,
+.dropdown:not(.dropdown-hover):focus .dropdown-content {
+  visibility: visible;
+  opacity: 1;
+}
+@media (hover: hover) {
+  .dropdown.dropdown-hover:hover .dropdown-content {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+.dropdown.dropdown-hover:hover .dropdown-content {
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.dropdown:is(details) summary::-webkit-details-marker {
+  display: none;
+}
+.join .dropdown .join-item:first-child:not(:last-child),
+.join :first-child:not(:last-child) .dropdown .join-item {
+  border-start-end-radius: inherit;
+  border-end-end-radius: inherit;
+}
+.menu :where(li > .menu-dropdown:not(.menu-dropdown-show)) {
+  display: none;
+}
+.dropdown.dropdown-open .dropdown-content,
+.dropdown:focus .dropdown-content,
+.dropdown:focus-within .dropdown-content {
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.menu :where(li > .menu-dropdown-toggle):after,
+.menu :where(li > details > summary):after {
+  justify-self: end;
+  display: block;
+  margin-top: -0.5rem;
+  height: 0.5rem;
+  width: 0.5rem;
+  transform: rotate(45deg);
+  transition-property: transform, margin-top;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  content: '';
+  transform-origin: 75% 75%;
+  box-shadow: 2px 2px;
+  pointer-events: none;
+}
+
+.menu :where(li > .menu-dropdown-toggle.menu-dropdown-show):after,
+.menu :where(li > details[open] > summary):after {
+  transform: rotate(225deg);
+  margin-top: 0;
+}
+
+@media (min-width: 640px) {
+  .sm\:dropdown-end .dropdown-content {
+    inset-inline-end: 0;
+  }
+  .sm\:dropdown-left .dropdown-content {
+    bottom: auto;
+    inset-inline-end: 100%;
+    top: 0;
+    transform-origin: right;
+  }
+  .sm\:dropdown-right .dropdown-content {
+    bottom: auto;
+    inset-inline-start: 100%;
+    top: 0;
+    transform-origin: left;
+  }
+  .sm\:dropdown-bottom .dropdown-content {
+    bottom: auto;
+    top: 100%;
+    transform-origin: top;
+  }
+  .sm\:dropdown-top .dropdown-content {
+    bottom: 100%;
+    top: auto;
+    transform-origin: bottom;
+  }
+  .sm\:dropdown-end.dropdown-right .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .sm\:dropdown-right.dropdown-end .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .sm\:dropdown-end.dropdown-left .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .sm\:dropdown-left.dropdown-end .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .sm\:loading-sm {
+    width: 1.25rem;
+  }
+  .sm\:loading-md {
+    width: 1.5rem;
+  }
+  .sm\:loading-lg {
+    width: 2.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .md\:dropdown-end .dropdown-content {
+    inset-inline-end: 0;
+  }
+  .md\:dropdown-left .dropdown-content {
+    bottom: auto;
+    inset-inline-end: 100%;
+    top: 0;
+    transform-origin: right;
+  }
+  .md\:dropdown-right .dropdown-content {
+    bottom: auto;
+    inset-inline-start: 100%;
+    top: 0;
+    transform-origin: left;
+  }
+  .md\:dropdown-bottom .dropdown-content {
+    bottom: auto;
+    top: 100%;
+    transform-origin: top;
+  }
+  .md\:dropdown-top .dropdown-content {
+    bottom: 100%;
+    top: auto;
+    transform-origin: bottom;
+  }
+  .md\:dropdown-end.dropdown-right .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .md\:dropdown-right.dropdown-end .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .md\:dropdown-end.dropdown-left .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .md\:dropdown-left.dropdown-end .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .md\:loading-sm {
+    width: 1.25rem;
+  }
+  .md\:loading-md {
+    width: 1.5rem;
+  }
+  .md\:loading-lg {
+    width: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:dropdown-end .dropdown-content {
+    inset-inline-end: 0;
+  }
+  .lg\:dropdown-left .dropdown-content {
+    bottom: auto;
+    inset-inline-end: 100%;
+    top: 0;
+    transform-origin: right;
+  }
+  .lg\:dropdown-right .dropdown-content {
+    bottom: auto;
+    inset-inline-start: 100%;
+    top: 0;
+    transform-origin: left;
+  }
+  .lg\:dropdown-bottom .dropdown-content {
+    bottom: auto;
+    top: 100%;
+    transform-origin: top;
+  }
+  .lg\:dropdown-top .dropdown-content {
+    bottom: 100%;
+    top: auto;
+    transform-origin: bottom;
+  }
+  .lg\:dropdown-end.dropdown-right .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .lg\:dropdown-right.dropdown-end .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .lg\:dropdown-end.dropdown-left .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .lg\:dropdown-left.dropdown-end .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .lg\:loading-sm {
+    width: 1.25rem;
+  }
+  .lg\:loading-md {
+    width: 1.5rem;
+  }
+  .lg\:loading-lg {
+    width: 2.5rem;
+  }
+}
+@media (min-width: 1280px) {
+  .xl\:dropdown-end .dropdown-content {
+    inset-inline-end: 0;
+  }
+  .xl\:dropdown-left .dropdown-content {
+    bottom: auto;
+    inset-inline-end: 100%;
+    top: 0;
+    transform-origin: right;
+  }
+  .xl\:dropdown-right .dropdown-content {
+    bottom: auto;
+    inset-inline-start: 100%;
+    top: 0;
+    transform-origin: left;
+  }
+  .xl\:dropdown-bottom .dropdown-content {
+    bottom: auto;
+    top: 100%;
+    transform-origin: top;
+  }
+  .xl\:dropdown-top .dropdown-content {
+    bottom: 100%;
+    top: auto;
+    transform-origin: bottom;
+  }
+  .xl\:dropdown-end.dropdown-right .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .xl\:dropdown-right.dropdown-end .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .xl\:dropdown-end.dropdown-left .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .xl\:dropdown-left.dropdown-end .dropdown-content {
+    bottom: 0;
+    top: auto;
+  }
+  .xl\:loading-sm {
+    width: 1.25rem;
+  }
+  .xl\:loading-md {
+    width: 1.5rem;
+  }
+  .xl\:loading-lg {
+    width: 2.5rem;
+  }
+}
+
+.menu-horizontal {
+  display: inline-flex;
+  flex-direction: row;
+}
+.menu-horizontal > li:not(.menu-title) > details > ul {
+  position: absolute;
+}
+.menu-vertical {
+  display: flex;
+  flex-direction: column;
+}
+.menu-vertical > li:not(.menu-title) > details > ul {
+  position: relative;
+}
+
+.menu-vertical > li:not(.menu-title) > details > ul {
+  margin-inline-start: 1rem;
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-inline-end: 0;
+}
+.menu-xs :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.menu-xs :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.sm\:menu-sm :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.sm\:menu-sm :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.sm\:menu-sm .menu-title {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.sm\:menu-md :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.sm\:menu-md :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.sm\:menu-md .menu-title {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.sm\:menu-lg :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.sm\:menu-lg :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.sm\:menu-lg .menu-title {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.menu-xs .menu-title {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.menu-sm :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.menu-sm :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.menu-sm .menu-title {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.menu-md :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.menu-md :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.menu-md .menu-title {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.menu-lg :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.menu-lg :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.menu-lg .menu-title {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.md\:menu-sm :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.md\:menu-sm :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.md\:menu-sm .menu-title {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.md\:menu-md :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.md\:menu-md :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.md\:menu-md .menu-title {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.md\:menu-lg :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.md\:menu-lg :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.md\:menu-lg .menu-title {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.lg\:menu-sm :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.lg\:menu-sm :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.lg\:menu-sm .menu-title {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.lg\:menu-md :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.lg\:menu-md :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.lg\:menu-md .menu-title {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.lg\:menu-lg :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.lg\:menu-lg :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.lg\:menu-lg .menu-title {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.xl\:menu-sm :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.xl\:menu-sm :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.xl\:menu-sm .menu-title {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.xl\:menu-md :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.xl\:menu-md :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.xl\:menu-md .menu-title {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.xl\:menu-lg :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.xl\:menu-lg :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.xl\:menu-lg .menu-title {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.menu li > :not(ul):not(.menu-title):not(details).active,
+.menu li > :not(ul):not(.menu-title):not(details):active,
+.menu li > details > summary:active {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-n, oklch(var(--n) / var(--tw-bg-opacity)));
+  --tw-text-opacity: 1;
+  color: var(--fallback-nc, oklch(var(--nc) / var(--tw-text-opacity)));
+}
+:where(.menuli:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
+:where(.menuli:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
+  cursor: pointer;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+@supports (color: oklch(0 0 0)) {
+  :where(.menuli:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
+  :where(.menuli:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
+    background-color: var(--fallback-bc, oklch(var(--bc) / 0.1));
+  }
+}
+.menu {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding: 0.5rem;
+}
+.menu :where(liul) {
+  position: relative;
+  white-space: nowrap;
+  margin-inline-start: 1rem;
+  padding-inline-start: 0.5rem;
+}
+.menu :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.menu :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  display: grid;
+  grid-auto-flow: column;
+  align-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  grid-auto-columns: minmax(auto, max-content) auto max-content;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.menu li.disabled {
+  cursor: not-allowed;
+  -webkit-user-select: none;
+  user-select: none;
+  color: var(--fallback-bc, oklch(var(--bc) / 0.3));
+}
+
+:where(.menuli) {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+:where(.menuli) .badge {
+  justify-self: end;
+}
+:where(.menuli:empty) {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-bc, oklch(var(--bc) / var(--tw-bg-opacity)));
+  opacity: 0.1;
+  margin: 0.5rem 1rem;
+  height: 1px;
+}
+.menu :where(liul):before {
+  position: absolute;
+  bottom: 0.75rem;
+  inset-inline-start: 0;
+  top: 0.75rem;
+  width: 1px;
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-bc, oklch(var(--bc) / var(--tw-bg-opacity)));
+  opacity: 0.1;
+  content: '';
+}
+.menu :where(li:not(.menu-title) > :not(ul):not(details):not(.menu-title)),
+.menu :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+  border-radius: var(--rounded-btn, 0.5rem);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  text-align: start;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  text-wrap: balance;
+}
+:where(.menuli:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):is(summary):not(.active):focus-visible,
+:where(.menuli:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(summary):not(.active).focus,
+:where(.menuli:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(summary):not(.active):focus,
+:where(.menuli:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):is(summary):not(.active):focus-visible,
+:where(.menuli:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(summary):not(.active).focus,
+:where(.menuli:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(summary):not(.active):focus {
+  cursor: pointer;
+  background-color: var(--fallback-bc, oklch(var(--bc) / 0.1));
+  --tw-text-opacity: 1;
+  color: var(--fallback-bc, oklch(var(--bc) / var(--tw-text-opacity)));
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.menu li > :not(ul):not(.menu-title):not(details).active,
+.menu li > :not(ul):not(.menu-title):not(details):active,
+.menu li > details > summary:active {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-n, oklch(var(--n) / var(--tw-bg-opacity)));
+  --tw-text-opacity: 1;
+  color: var(--fallback-nc, oklch(var(--nc) / var(--tw-text-opacity)));
+}
+.menu :where(li > details > summary)::-webkit-details-marker {
+  display: none;
+}
+.rounded-box {
+  border-radius: var(--rounded-box, 1rem);
+}
+
+.menu-title {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 700;
+  color: var(--fallback-bc, oklch(var(--bc) / 0.4));
+}
+.menu-horizontal > li:not(.menu-title) > details > ul {
+  margin-inline-start: 0;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-inline-end: 0.5rem;
+}
+.menu-horizontal > li > details > ul:before {
+  content: none;
+}
+:where(.menu-horizontal > li:not(.menu-title) > details > ul) {
+  border-radius: var(--rounded-box, 1rem);
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-b1, oklch(var(--b1) / var(--tw-bg-opacity)));
+  --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
