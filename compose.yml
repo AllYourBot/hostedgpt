@@ -3,20 +3,20 @@ version: '3.1'
 services:
   redis:
     image: redis
-    ports: ['6379:6379']
+    # ports: ['6379:6379']
     healthcheck:
       test: ["CMD", "redis-cli","ping"]
 
   postgres:
     image: postgres:16
-    ports: ['5432:5432']
+    # ports: ['5432:5432']
     restart: always
     environment:
       POSTGRES_USER: app
       POSTGRES_DB: app_development
       POSTGRES_PASSWORD: secret
     volumes:
-    - pgdata:/var/lib/postgresql/data
+    - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "app", "-d", "app_development"]
       interval: 1s
@@ -45,4 +45,4 @@ services:
     command: bin/rails solid_queue:start
 
 volumes:
-  pgdata:
+  hostedgpt_pgdata:
