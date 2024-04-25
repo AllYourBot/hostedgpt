@@ -29,9 +29,9 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
     2.times do
       sleep 0.1
-      sleep 0.5 if !modal_loader.visible?
+      sleep 0.5 if !modal.visible?
       sleep 0.1
-      image_btn.click if !modal_loader.visible?
+      image_btn.click if !modal.visible?
     end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
 
     assert_true "modal image should have been visible" do
@@ -69,9 +69,9 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
       2.times do
         sleep 0.1
-        sleep 0.5 if !modal_loader.visible?
+        sleep 0.5 if !modal.visible?
         sleep 0.1
-        image_btn.click if !modal_loader.visible?
+        image_btn.click if !modal.visible?
       end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
 
       assert_true "modal image should have been visible", wait: 0.6 do
