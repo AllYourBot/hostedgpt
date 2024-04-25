@@ -195,3 +195,12 @@ dialog button:focus-visible {
     --tw-prose-body: rgb(236, 236, 236);
   }
 }
+
+
+/* show only on touch devices */
+@media (hover: none), (hover: on-demand), (-moz-touch-enabled: 1), (pointer:coarse) {
+  .tooltip:hover:after,.tooltip:hover:active:before,.tooltip:hover:active:after,.tooltip:hover:before {
+    display: none;
+    
+  }
+}
