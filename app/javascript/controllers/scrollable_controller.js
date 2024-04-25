@@ -13,26 +13,30 @@ export default class extends Controller {
     const isAtBottom = Math.abs(scrollOffset - target.clientHeight) <= 40 // occasionally these differ by a few pixels
 
     if (isAtTop && !isAtBottom) {
-      window.wasScrolledToBottom = false
+      if (this.notRecalculating()) window.wasScrolledToBottom = false
       if (this.hasTopClass)       this.widgetTarget.classList.add(this.topClass)
       if (this.hasNotTopClass)    this.widgetTarget.classList.remove(this.notTopClass)
       if (this.hasBottomClass)    this.widgetTarget.classList.remove(this.bottomClass)
       if (this.hasNotBottomClass) this.widgetTarget.classList.add(this.notBottomClass)
 
     } else if (isAtBottom) { // it might ALSO be at the top, if the page is short, but we count that as bottom
-      window.wasScrolledToBottom = true
+      if (this.notRecalculating()) window.wasScrolledToBottom = true
       if (this.hasTopClass)       this.widgetTarget.classList.remove(this.topClass)
       if (this.hasNotTopClass)    this.widgetTarget.classList.add(this.notTopClass)
       if (this.hasBottomClass)    this.widgetTarget.classList.add(this.bottomClass)
       if (this.hasNotBottomClass) this.widgetTarget.classList.remove(this.notBottomClass)
 
     } else {
-      window.wasScrolledToBottom = false
+      if (this.notRecalculating()) window.wasScrolledToBottom = false
       if (this.hasTopClass)       this.widgetTarget.classList.remove(this.topClass)
       if (this.hasNotTopClass)    this.widgetTarget.classList.add(this.notTopClass)
       if (this.hasBottomClass)    this.widgetTarget.classList.remove(this.bottomClass)
       if (this.hasNotBottomClass) this.widgetTarget.classList.add(this.notBottomClass)
     }
+  }
+
+  notRecalculating() {
+    return Object.values(window.imageLoadingForSystemTestsToCheck).filter(x => x == 'recalculating').length == 0
   }
 
   scrolled() {
