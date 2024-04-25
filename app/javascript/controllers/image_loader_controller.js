@@ -25,14 +25,16 @@ export default class extends Controller {
     this.retryCount = 0
     this.maxRetries = 10
     this.retryAfterMs = 500
+    this.imageKey = Math.round(Math.random()*100000000000)
+
+    window.imageLoadingForSystemTestsToCheck ||= {}
+
+    if (this.imageTarget.src == "")
+      window.imageLoadingForSystemTestsToCheck[this.imageKey] = 'loading'
+    else
+      window.imageLoadingForSystemTestsToCheck[this.imageKey] = 'done'
 
     this.imageTarget.src = this.urlValue
-  }
-
-  show() {
-    this.imageTarget.classList.remove("hidden")
-    this.loaderTarget.classList.add("hidden")
-    setTimeout(() => window.dispatchEvent(new CustomEvent('main-column-changed')), 50)
   }
 
   retryAfterDelay() {
@@ -40,12 +42,26 @@ export default class extends Controller {
     if (this.retryCount <= this.maxRetries) {
       this.imageTarget.classList.add("hidden")
       this.loaderTarget.classList.remove("hidden")
-      setTimeout(() => window.dispatchEvent(new CustomEvent('main-column-changed')), 50)
+      window.dispatchEvent(new CustomEvent('main-column-changed'))
 
       setTimeout(() => {
         let srcBase = this.urlValue.split("?")[0]
         this.imageTarget.src = `${srcBase}?disposition=-${this.retryCount}`
       }, this.retryAfterMs)
     }
+  }
+
+  show() {
+    this.imageTarget.classList.remove("hidden")
+    this.loaderTarget.classList.add("hidden")
+    window.imageLoadingForSystemTestsToCheck[this.imageKey] = 'loaded'
+    this.ensureImageLoaded()
+  }
+
+  ensureImageLoaded() {
+    if (this.imageTarget.parentElement.clientHeight > 25)
+      window.dispatchEvent(new CustomEvent('main-column-changed', { detail: this.imageKey}))
+    else
+      requestAnimationFrame(() => this.ensureImageLoaded())
   }
 }
