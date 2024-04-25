@@ -8,7 +8,7 @@ class ConversationMessagesVersionTest < ApplicationSystemTestCase
 
   test "previous icon shows tooltip and next is disabled" do
     conversations(:versioned).messages.where(version: 2).where("index > 2").delete_all
-    visit conversation_messages_path(conversations(:versioned), version: 2)
+    visit_and_scroll_wait conversation_messages_path(conversations(:versioned), version: 2)
 
     msg = hover_last_message
     assert_shows_tooltip msg.find_role("previous"), "Previous"
@@ -17,7 +17,7 @@ class ConversationMessagesVersionTest < ApplicationSystemTestCase
 
   test "next icon shows tooltip" do
     messages(:message3_v1).destroy
-    visit conversation_messages_path(conversations(:versioned), version: 1)
+    visit_and_scroll_wait conversation_messages_path(conversations(:versioned), version: 1)
 
     msg = hover_last_message
     assert_shows_tooltip msg.find_role("next"), "Next"
@@ -26,7 +26,7 @@ class ConversationMessagesVersionTest < ApplicationSystemTestCase
 
   test "changing conversation version morphs full page: messages change, nav does not scroll, active assistant changes" do
     messages(:message3_v1).destroy
-    visit conversation_messages_path(conversations(:versioned), version: 1)
+    visit_and_scroll_wait conversation_messages_path(conversations(:versioned), version: 1)
 
     last_msg_v1 = messages(:message2_v1)
 

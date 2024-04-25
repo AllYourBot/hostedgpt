@@ -31,5 +31,6 @@ services:
       - key: WEB_CONCURRENCY
         value: 2 # sensible default
   - type: redis
+    plan: free
     name: hostedgpt-redis
     ipAllowList: [] # no external connections

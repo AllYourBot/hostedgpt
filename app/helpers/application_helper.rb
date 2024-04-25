@@ -80,4 +80,17 @@ module ApplicationHelper
       content_tag(:div, content_or_options_with_block, options)
     end
   end
+
+  def meta_tag(name, content)
+    tag.meta(name: name, content: content)
+  end
+
+  def charset_tag(charset)
+    tag.meta(charset: charset)
+  end
+
+  def viewport_tag(content)
+    tag.meta(name: 'viewport', content: content)
+  end
+
 end

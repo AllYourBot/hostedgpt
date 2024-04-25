@@ -5,7 +5,7 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
     @user = users(:keith)
     login_as @user
     @conversation = conversations(:greeting)
-    visit conversation_messages_path(@conversation)
+    visit_and_scroll_wait conversation_messages_path(@conversation)
     @code_msg = last_message
   end
 
@@ -44,7 +44,7 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
 
   test "using the overall keyboard shortcut for copying copies the full last message where there is NO code block" do
     conversation = conversations(:javascript)
-    visit conversation_messages_path(conversation)
+    visit_and_scroll_wait conversation_messages_path(conversation)
 
     assert_true { clipboard == "" }
     send_keys "meta+shift+c"

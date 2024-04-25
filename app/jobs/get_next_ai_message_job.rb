@@ -2,7 +2,7 @@ class GetNextAIMessageJob < ApplicationJob
   class ResponseCancelled < StandardError; end
   class WaitForPrevious < StandardError; end
 
-  retry_on WaitForPrevious, wait: ->(run) { 2**run - 1 }, attempts: 3
+  retry_on WaitForPrevious, wait: ->(run) { (2**run - 1).seconds }, attempts: 3
 
   def ai_backend
     if @assistant.model.starts_with?('gpt-')
@@ -12,8 +12,8 @@ class GetNextAIMessageJob < ApplicationJob
     end
   end
 
-  def perform(message_id, assistant_id)
-    puts "\n### GetNextAIMessageJob.perform(#{message_id}, #{assistant_id})" unless Rails.env.test?
+  def perform(message_id, assistant_id, attempt = 1)
+    puts "\n### GetNextAIMessageJob.perform(#{message_id}, #{assistant_id}, #{attempt})" unless Rails.env.test?
 
     @message      = Message.find_by(id: message_id)
     @conversation = @message.conversation
@@ -80,11 +80,21 @@ class GetNextAIMessageJob < ApplicationJob
     puts "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     raise WaitForPrevious
   rescue => e
+    msg = e.inspect.gsub(/(sk-)[\w\-]{40}/, '\1' + '*' * 40)
+
     unless Rails.env.test?
-      puts "\n###Finished GetNextAIMessageJob with ERROR: #{e.inspect}" unless Rails.env.test?
-      puts e.backtrace
+      puts "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
+
+      if attempt < 3
+        @message.content_text = "(Error after #{attempt.ordinalize} try, retrying... #{msg})"
+        GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
+        GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(message_id, assistant_id, attempt+1)
+      else
+        set_unexpected_error(msg)
+        wrap_up_the_message
+      end
     end
-    return false # there may be some exceptions we want to re-raise?
+    return false
   end
 
   def self.broadcast_updated_message(message, locals = {})
@@ -111,6 +121,12 @@ class GetNextAIMessageJob < ApplicationJob
     @message.content_text = "(Received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
       "experiencing trouble. Try again or ensure your API key is valid. You can change your API key by clicking your Profile in the bottom " +
       "left and then settings.)"
+  end
+
+  def set_unexpected_error(msg)
+    @message.content_text = "(Received a unexpected response from the API after retrying 3 times. The AI servers may be experiencing trouble. " +
+      "Try again later or if you keep getting this error ensure your API key is valid and you haven't run out of funds with your AI service.\n\n" +
+      "#{msg}\n\nIt's also helpful if you report this to the app developers at: https://github.com/allyourbot/hostedgpt/discussions)"
   end
 
   def set_billing_error

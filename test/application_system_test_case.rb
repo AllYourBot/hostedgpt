@@ -111,11 +111,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def get_scroll_position(selector)
-    page.evaluate_script("document.querySelector('#{selector}').scrollTop")
+    page.evaluate_script("document.querySelector('#{selector}').scrollTop + document.querySelector('#{selector}').clientHeight")
+  end
+
+  def get_bottom_position(selector)
+    page.evaluate_script("document.querySelector('#{selector}').scrollHeight")
   end
 
   def scroll_to_bottom(selector)
     page.execute_script("document.querySelector('#{selector}').scrollTop = document.querySelector('#{selector}').scrollHeight")
+  end
+
+  def scroll_to_position(selector, position)
+    page.execute_script("document.querySelector('#{selector}').scrollTop = #{position}")
   end
 
   def assert_did_not_scroll(selector = "section #messages-container")
@@ -175,13 +183,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def assert_at_bottom(selector = "section #messages")
-    sleep 1 # there is a lot of flakiness related to it not yet scrolled down
     assert_stopped_scrolling(selector)
-    initial_scroll_position = get_scroll_position(selector)
-    scroll_to_bottom(selector)
-    assert_stopped_scrolling(selector)
-    new_scroll_position = get_scroll_position(selector)
-    assert_equal initial_scroll_position, new_scroll_position, "The #{selector} was able to move down so it was not at the bottom"
+    assert_equal get_bottom_position(selector), get_scroll_position(selector), "The #{selector} was able to move down so it was not at the bottom"
   end
 
   def assert_scrolled_to_bottom(selector = "section #messages")
@@ -251,10 +254,16 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_false "all the image loaders should have disappeared", wait: 10 do
       all("[data-role='image-loader']", visible: :all).map(&:visible?).include?(true)
     end
+
+    assert_false "all values in the loading object should have been 'loaded'" do
+      page.evaluate_script("Object.values(window.imageLoadingForSystemTestsToCheck).filter((v) => v != 'done').length > 0")
+    end
   end
 
   def wait_for_initial_scroll_down
-    assert_true { page.evaluate_script('window.scrolledDownForSystemTestsToCheck') }
+    assert_true "waiting for scroll down after initial page load" do
+      page.evaluate_script('window.scrolledDownForSystemTestsToCheck')
+    end
   end
 
   def assert_composer_blank(msg = nil)
@@ -280,6 +289,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def assert_last_message(message)
     assert_selector "#messages > :last-child [data-role='content-text']", text: message.content_text
+  end
+
+  def assert_toast(text)
+    toast = nil
+    assert_true "the toast element could not be found" do
+      toast = find("#toasts .alert span", visible: :all, wait: 0) rescue nil
+    end
+    assert_equal text, toast[:innerText]
+  end
+
+  def visit_and_scroll_wait(path)
+    visit path
+    wait_for_initial_scroll_down
   end
 end
 

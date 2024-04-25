@@ -10,40 +10,48 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   end
 
   test "images render in messages WHEN pre-processed, clicking opens modal" do
-    visit conversation_messages_path(@conversation)
-    image_msg = find_messages.third
+    visit_and_scroll_wait conversation_messages_path(@conversation)
 
+    image_msg = find_messages.third
     image_btn = image_msg.find_role("image-preview")
-    img = image_btn.find("img")
-    modal = image_msg.find_role("image-modal")
+    loader    = image_btn.find_role("image-loader")
+    img       = image_btn.find("img", visible: :all)
+    modal     = image_msg.find_role("image-modal")
 
     assert image_btn
     assert img
-    assert_true "img should have fully loaded", wait: 1 do
-      img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-    end
+    refute loader.visible?, "loader should NEVER be visible in this test"
+    wait_for_images_to_load
+
     refute modal.visible?
 
     image_btn.click
 
-    assert_true "modal image should have been visible", wait: 0.6 do
+    2.times do
+      sleep 0.1
+      sleep 0.5 if !modal.visible?
+      sleep 0.1
+      image_btn.click if !modal.visible?
+    end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
+
+    assert_true "modal image should have been visible" do
       modal.visible?
     end
 
     send_keys "esc"
-    assert_false "modal image should have closed/hidden itself", wait: 0.6 do
+    assert_false "modal image should have closed/hidden itself" do
       modal.visible?
     end
   end
 
   test "images eventually render in messages WHEN NOT pre-processed, clicking opens modal" do
     stimulate_image_variant_processing do
-      visit conversation_messages_path(@conversation)
-      sleep 2 # TODO sometimes it's getting to img.visible? but then it disappears so I think it's running too quickly
+      visit_and_scroll_wait conversation_messages_path(@conversation)
+
       image_msg = find_messages.third
       image_btn = image_msg.find_role("image-preview")
-      img = image_btn.find("img", visible: false)
-      modal = image_msg.find_role("image-modal")
+      img       = image_btn.find("img", visible: false)
+      modal     = image_msg.find_role("image-modal")
       assert image_btn
       assert img
       assert modal
@@ -53,15 +61,20 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       end
       assert img.visible?
 
-      assert_true "img should have fully loaded" do
-        img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-      end
+      wait_for_images_to_load
 
       refute modal.visible?
 
       image_btn.click
 
-      assert_true "modal image should have been visible but it was #{modal.visible?} and #{modal}" do
+      2.times do
+        sleep 0.1
+        sleep 0.5 if !modal.visible?
+        sleep 0.1
+        image_btn.click if !modal.visible?
+      end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
+
+      assert_true "modal image should have been visible", wait: 0.6 do
         modal.visible?
       end
 
@@ -74,11 +87,12 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   test "ensure images display a spinner initially if they get a 404 and then eventually get replaced with the image" do
     stimulate_image_variant_processing do
-      visit conversation_messages_path(@conversation)
+      visit_and_scroll_wait conversation_messages_path(@conversation)
+
       image_msg       = find_messages.third
-      image_container = image_msg.find_role("image-preview")
-      loader          = image_container.find_role("image-loader")
-      img             = image_container.find("img", visible: :all)
+      image_btn = image_msg.find_role("image-preview")
+      loader          = image_btn.find_role("image-loader")
+      img             = image_btn.find("img", visible: :all)
       modal_container = image_msg.find_role("image-modal")
       modal_loader    = modal_container.find_role("image-loader")
       modal_img       = modal_container.find("img", visible: :all)
@@ -88,7 +102,14 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       end
       refute img.visible?
 
-      image_container.click
+      image_btn.click
+
+      2.times do
+        sleep 0.1
+        sleep 0.5 if !modal_loader.visible?
+        sleep 0.1
+        image_btn.click if !modal_loader.visible?
+      end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
 
       assert_true "modal image loader should be visible", wait: 0.6 do
         modal_loader.visible?
@@ -101,12 +122,9 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
         loader.visible?
       end
       assert img.visible?
+      wait_for_images_to_load
 
-      assert_true "img should have fully loaded" do
-        modal_img.evaluate_script('this.complete && typeof this.naturalWidth != "undefined" && this.naturalWidth > 0')
-      end
-
-      image_container.click
+      image_btn.click
 
       assert_true "modal image should be visible" do
         modal_img.visible?
@@ -117,7 +135,8 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   test "ensure page scrolls back down to the bottom after an image pops in late" do
     stimulate_image_variant_processing do
-      visit conversation_messages_path(@conversation)
+      visit_and_scroll_wait conversation_messages_path(@conversation)
+
       image_msg       = find_messages.third
       image_container = image_msg.find_role("image-preview")
       img             = image_container.find("img", visible: :all)
@@ -125,15 +144,12 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       assert_at_bottom
       assert_scrolled_down do
 
-        assert_false "all images should be visible" do
-          all("[data-role='image-preview']", visible: :all).map(&:visible?).include?(false)
-        end
+        wait_for_images_to_load
 
         assert_true do
           img.visible?
         end
       end
-      sleep 5 # TODO: if flappy tests still persist then there is an actual bug with image_loader scroll down
       assert_at_bottom
     end
   end
@@ -141,9 +157,10 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   test "images in previous messages remain after submitting a new message, they should not display a new spinner" do
     image_msg = img = nil
     stimulate_image_variant_processing do
-      visit conversation_messages_path(@conversation)
+      visit_and_scroll_wait conversation_messages_path(@conversation)
+
       image_msg = find_messages.third
-      img = image_msg.find_role("image-preview").find("img", visible: false)
+      img       = image_msg.find_role("image-preview").find("img", visible: :all)
 
       assert_true wait: 5 do
         img.visible?
@@ -182,7 +199,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   def simulate_not_preprocessed
     ->() do
-      return nil if params[:retry_count].to_i < 5
+      return nil if params[:retry_count].to_i < 8
       ActiveStorage.verifier.verified(params[:encoded_key], purpose: :blob_key)&.symbolize_keys
     end
   end

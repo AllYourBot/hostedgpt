@@ -10,7 +10,8 @@ class Message < ApplicationRecord
 
   delegate :user, to: :conversation
 
-  before_validation :set_default_role, on: :create
+  attribute :role, default: :user
+
   before_validation :create_conversation, on: :create, if: -> { conversation.blank? }, prepend: true
 
   validates :role, presence: true
@@ -25,10 +26,6 @@ class Message < ApplicationRecord
   scope :ordered, -> { latest_version_for_conversation }
 
   private
-
-  def set_default_role
-    self.role ||= :user
-  end
 
   def create_conversation
     self.conversation = Conversation.create!(user: Current.user, assistant: assistant)

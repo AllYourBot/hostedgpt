@@ -61,12 +61,12 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_true { confirm_delete.visible? }
     confirm_delete.click
 
-    assert_text "Deleted conversation"
+    assert_toast "Deleted conversation"
     assert_current_path(@starting_path)
   end
 
   test "clicking the conversation delete, when you ARE not on this conversation, deletes it and redirects you to a new conversation" do
-    visit conversation_messages_path(conversations(:greeting))
+    visit_and_scroll_wait conversation_messages_path(conversations(:greeting))
     convo = hover_conversation conversations(:greeting)
     delete = convo.find_role("delete")
     confirm_delete = convo.find_role("confirm-delete")
@@ -75,7 +75,7 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_true { confirm_delete.visible? }
     confirm_delete.click
 
-    assert_text "Deleted conversation"
+    assert_toast "Deleted conversation"
     assert_current_path new_assistant_message_path(users(:keith).assistants.ordered.first)
   end
 

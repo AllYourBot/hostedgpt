@@ -1,6 +1,9 @@
 <head>
-  <title>HostedGPT</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= charset_tag('utf-8') %>
+  <%= viewport_tag('width=device-width,initial-scale=1') %>
+
+  <title><%= yield(:title) %></title>
+
   <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
@@ -9,10 +12,18 @@
   <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   <%= javascript_importmap_tags %>
   <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
-  <%= favicon_link_tag asset_path("favicon.png") %>
-  <% %w(76 120 152 167 180).each do |size| %>
-    <%= favicon_link_tag asset_path("apple_touch_icons/logo_apple-touch-icon-#{size}x#{size}.png"), rel: 'apple-touch-icon', type: 'image/png', sizes: "#{size}x#{size}" %>
-  <% end %>
 
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <!-- ios-pwa-splash screen: from https://github.com/avadhesh18/iosPWASplash -->
+  <%= javascript_include_tag "https://unpkg.com/ios-pwa-splash@1.0.0/cdn.min.js" %>
+  <%= javascript_tag do %>
+    iosPWASplash('/apple-touch-icon.png', '#ffffff')
+  <% end %>
+  <!-- /ios-pwa-splash screen-->
+  <!-- /PWA -->
+
+  <%= render 'application/head/favicons' %>
+  <%= render 'application/head/meta_tags' %>
   <%= content_for :head %>
 </head>
