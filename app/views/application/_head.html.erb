@@ -1,7 +1,4 @@
 <head>
-  <%= charset_tag('utf-8') %>
-  <%= viewport_tag('width=device-width,initial-scale=1') %>
-
   <title><%= yield(:title) %></title>
 
   <%= capybara_lockstep if defined?(Capybara::Lockstep) %>

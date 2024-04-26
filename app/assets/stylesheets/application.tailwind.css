@@ -161,7 +161,6 @@ input:focus {
     @apply h-full overscroll-none;
   }
   body {
-    /* @apply h-full font-sans text-gray-950 dark:text-gray-100 flex; */
     @apply h-full font-sans text-gray-950 dark:text-gray-100 flex overflow-y-auto;
     -webkit-overflow-scrolling: touch;
     min-height: -webkit-fill-available;
