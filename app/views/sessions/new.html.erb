@@ -24,6 +24,16 @@
       placeholder: "Password",
       class: "border border-gray-400 rounded p-3 dark:text-black"
     %>
-    <%= f.submit "Log In", class: 'text-white bg-brand-blue dark:bg-gray-900 border border-white dark:border-gray-400 rounded-lg font-medium p-4 text-center cursor-pointer hover:opacity-95' %>
+    <%= f.submit "Log In",
+        class: %|
+          text-white font-medium
+          bg-brand-blue dark:bg-gray-900
+          border border-white dark:border-gray-400
+          rounded-lg p-4 text-center
+          cursor-pointer
+          hover:opacity-95
+        |,
+        data: { turbo_submits_with: "Authenticating..." }
+    %>
   <% end %>
 </div>
