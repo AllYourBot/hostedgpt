@@ -36,7 +36,10 @@
 
       <div class="flex justify-center items-center text-sm font-medium">
         <%= form.submit "Save & Submit",
-          data: { role: "save" },
+          data: {
+            role: "save",
+            turbo_submits_with: "Saving..."
+          },
           class: %|
             inline-block cursor-pointer
             rounded-lg py-2 px-3
