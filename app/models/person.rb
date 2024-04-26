@@ -1,4 +1,6 @@
 class Person < ApplicationRecord
+  encrypts :email, deterministic: true
+
   delegated_type :personable, types: %w[User Tombstone]
   accepts_nested_attributes_for :personable
 
