@@ -20,7 +20,7 @@ This project is actively looking for contributors to help make it great. The goa
 
 ### Watch a demo of the app:
 
-[![](https://img.youtube.com/vi/TX2Er5Whl0E/0.jpg)](https://www.youtube.com/watch?v=TX2Er5Whl0E)
+[![](https://p425.p0.n0.cdn.zight.com/items/qGubwRKr/c4a119a9-254d-454a-b602-610b428ee769.jpg)](https://www.youtube.com/watch?v=m1UfKGWEhFs)
 
 
 # Table of Contents
