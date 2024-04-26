@@ -19,7 +19,7 @@ ChatGPT uses your private conversations history to train its models. [OpenAI dis
 
 ### Watch a short demo
 
-[![](https://p425.p0.n0.cdn.zight.com/items/qGubwRKr/c4a119a9-254d-454a-b602-610b428ee769.jpg)](https://www.youtube.com/watch?v=m1UfKGWEhFs)
+[![](https://p425.p0.n0.cdn.zight.com/items/qGubwRKr/c4a119a9-254d-454a-b602-610b428ee769.jpg)](https://www.youtube.com/watch?v=hXpNEz-slkU)
 
 
 # Table of Contents
