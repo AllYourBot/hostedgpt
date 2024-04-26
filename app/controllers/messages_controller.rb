@@ -22,7 +22,7 @@ class MessagesController < ApplicationController
     @messages = @conversation.messages.for_conversation_version(@version)
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
-      content_text: nil,
+      content_text: [nil, ""],
       cancelled_at: nil
     ).find_by(id: redis.get("conversation-#{@conversation.id}-latest-assistant_message-id"))
   end
