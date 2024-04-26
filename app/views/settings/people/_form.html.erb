@@ -136,7 +136,14 @@
 
   <div class="inline">
     <%= form.submit "Save",
-      class: "rounded-lg py-3 px-5 bg-gray-200 dark:bg-gray-900 border border-gray-400 inline-block font-medium cursor-pointer"
+      class: %|
+        inline-block font-medium
+        bg-gray-200 dark:bg-gray-900
+        border border-gray-400
+        rounded-lg py-3 px-5
+        cursor-pointer
+      |,
+      data: { turbo_submits_with: "Saving..." }
     %>
     <%= link_to "Cancel", root_path, class: "float-right inline-block ml-5 py-3" %>
   </div>

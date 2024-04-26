@@ -58,7 +58,7 @@
             data-transition-target="transitionable">
 
           <%= user_fields.label :name, class: "input input-bordered flex items-center justify-between" do %>
-            <span>Name <span class="">*</span></span>
+            <span>Full Name <span class="">*</span></span>
             <%= user_fields.text_field :name,
               placeholder: "First & Last name",
               class: "w-44 border-0 dark:text-black"
@@ -66,6 +66,16 @@
           <% end %>
         </div>
     <% end %>
-    <%= f.submit "Sign Up", class: 'text-white bg-brand-blue dark:bg-gray-900 border border-white dark:border-gray-400 rounded-lg font-medium p-4 text-center cursor-pointer hover:opacity-95' %>
+    <%= f.submit "Sign Up",
+      class: %|
+        text-white font-medium
+        bg-brand-blue dark:bg-gray-900
+        border border-white dark:border-gray-400
+        rounded-lg p-4 text-center
+        cursor-pointer
+        hover:opacity-95
+      |,
+      data: { turbo_submits_with: "Creating..." }
+    %>
   <% end %>
 </div>
