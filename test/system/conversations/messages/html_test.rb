@@ -5,7 +5,7 @@ class ConversationMessagesHtmlTest < ApplicationSystemTestCase
     @user = users(:keith)
     login_as @user
     @conversation = conversations(:greeting)
-    visit conversation_messages_path(@conversation)
+    visit_and_scroll_wait conversation_messages_path(@conversation)
   end
 
   test "html is escaped so that it renders to the user" do

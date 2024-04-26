@@ -23,7 +23,7 @@ export default class extends Controller {
 
   connect() {
     this.retryCount = 0
-    this.maxRetries = 10
+    this.maxRetries = 12
     this.retryAfterMs = 500
     this.imageKey = Math.round(Math.random()*100000000000)
 
@@ -52,15 +52,17 @@ export default class extends Controller {
   }
 
   show() {
+    this.imageTarget.removeAttribute("width")
+    this.imageTarget.removeAttribute("height")
     this.imageTarget.classList.remove("hidden")
     this.loaderTarget.classList.add("hidden")
-    window.imageLoadingForSystemTestsToCheck[this.imageKey] = 'loaded'
+    window.imageLoadingForSystemTestsToCheck[this.imageKey] = 'recalculating'
     this.ensureImageLoaded()
   }
 
   ensureImageLoaded() {
     if (this.imageTarget.parentElement.clientHeight > 25)
-      window.dispatchEvent(new CustomEvent('main-column-changed', { detail: this.imageKey}))
+      window.dispatchEvent(new CustomEvent('main-column-changed', { detail: this.imageKey }))
     else
       requestAnimationFrame(() => this.ensureImageLoaded())
   }

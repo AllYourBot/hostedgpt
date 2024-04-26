@@ -7,7 +7,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     @user = users(:keith)
     login_as @user
     @conversation = conversations(:greeting)
-    visit conversation_messages_path(@conversation)
+    visit_and_scroll_wait conversation_messages_path(@conversation)
   end
 
   test "clipboard icon shows tooltip" do
@@ -66,14 +66,15 @@ class ConversationMessagesTest < ApplicationSystemTestCase
 
   test "when the AI replies with a message it appears with morphing" do
     @new_message = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
-    visit conversation_messages_path(@conversation.id)
+    visit_and_scroll_wait conversation_messages_path(@conversation.id)
 
     assert last_message.text.include?("Stub:"), "The last message should have contained the submitted text"
 
     assert_page_morphed do
-      @new_message.content_text = "The quick brown fox jumped over the lazy dog and this line needs to wrap to scroll." +
+      @new_message.content_text = "The quick brown fox jumped over the lazy dog and this line needs to wrap to scroll. " +
                                   "But it was not long enough so I'm adding more text on this second line to ensure it."
       GetNextAIMessageJob.broadcast_updated_message(@new_message)
+      sleep 5 # TODO: cannot solve a "stale element reference" bug so trying this
       assert_true "The last message should have contained the submitted text but it contains '#{last_message.text}'", wait: 10 do
         last_message.text.include?("The quick brown")
       end
