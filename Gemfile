@@ -80,6 +80,9 @@ group :development do
 
   gem "pgreset"
   gem "htmlbeautifier"
+
+  # https://github.com/kirillplatonov/hotwire-livereload
+  gem "hotwire-livereload", "~> 1.3"
 end
 
 group :test do

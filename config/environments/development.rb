@@ -78,4 +78,5 @@ Rails.application.configure do
 
   config.hosts << /[a-z0-9\-]+\.ngrok-free\.app/
   config.hosts << /hostedgpt.*/
+  config.hotwire_livereload.reload_method = :turbo_stream
 end
