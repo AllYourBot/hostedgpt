@@ -1,6 +1,8 @@
 /* DaisyUI tooltip overrides */
 
-*, ::before, ::after {
+*,
+::before,
+::after {
   --tooltip-tail: 7px;
   --tooltip-tail-offset: calc(100% + 6px - var(--tooltip-tail));
   --tooltip-offset: calc(100% + 7px + var(--tooltip-tail, 0px));
@@ -11,7 +13,7 @@
 
 .tooltip-bottom:before {
   padding: 0.4rem 0.7rem;
-  box-shadow: 0px 0px 0px 1px #28282A;
+  box-shadow: 0px 0px 0px 1px #28282a;
   z-index: 8;
   pointer-events: none;
 }
@@ -35,7 +37,7 @@
 
 .tooltip-top:before {
   padding: 0.4rem 0.7rem;
-  box-shadow: 0px 0px 0px 1px #28282A;
+  box-shadow: 0px 0px 0px 1px #28282a;
   z-index: 8;
   pointer-events: none;
 }
@@ -59,7 +61,7 @@
 
 .tooltip-right:before {
   padding: 0.4rem 0.7rem;
-  box-shadow: 0px 0px 0px 1px #28282A;
+  box-shadow: 0px 0px 0px 1px #28282a;
   z-index: 8;
   pointer-events: none;
 }
@@ -83,7 +85,7 @@
 
 .tooltip-left:before {
   padding: 0.4rem 0.7rem;
-  box-shadow: 0px 0px 0px 1px #28282A;
+  box-shadow: 0px 0px 0px 1px #28282a;
   z-index: 8;
   pointer-events: none;
 }
@@ -124,20 +126,21 @@
 }
 
 @keyframes slide-in {
-  0%, 20% {
-      transform: translateX(100%);
-      opacity: 0;
+  0%,
+  20% {
+    transform: translateX(100%);
+    opacity: 0;
   }
   80% {
-      transform: translateX(-10%);
-      opacity: 1;
+    transform: translateX(-10%);
+    opacity: 1;
   }
   90% {
-      transform: translateX(8%);
+    transform: translateX(8%);
   }
   95% {
-      transform: translateX(-5%);
-      opacity: 1;
+    transform: translateX(-5%);
+    opacity: 1;
   }
   100% {
     transform: translateX(0);
@@ -173,14 +176,14 @@ dialog button:focus-visible {
 
 /* Code overrides — undoing */
 
-.prose :where(code):not(:where([class~=not-prose] *,pre *)) {
+.prose :where(code):not(:where([class~='not-prose'] *, pre *)) {
   padding: 0;
   border-radius: 0;
   background-color: transparent;
 }
 
-.prose :where(code):not(pre code):not(:where([class~=not-prose] *)):before,
-.prose :where(code):not(pre code):not(:where([class~=not-prose] *)):after {
+.prose :where(code):not(pre code):not(:where([class~='not-prose'] *)):before,
+.prose :where(code):not(pre code):not(:where([class~='not-prose'] *)):after {
   content: '`';
   display: inline-block;
 }
@@ -193,5 +196,15 @@ dialog button:focus-visible {
 @media (prefers-color-scheme: dark) {
   :root .prose {
     --tw-prose-body: rgb(236, 236, 236);
+  }
+}
+
+/* show only on touch devices */
+@media (hover: none), (hover: on-demand), (-moz-touch-enabled: 1), (pointer: coarse) {
+  .tooltip:hover:after,
+  .tooltip:hover:active:before,
+  .tooltip:hover:active:after,
+  .tooltip:hover:before {
+    display: none;
   }
 }
