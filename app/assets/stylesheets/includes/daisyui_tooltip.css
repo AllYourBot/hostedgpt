@@ -193,43 +193,29 @@ dialog button:focus-visible {
   --tw-prose-pre-code: #ffffff !important;
 }
 
+/* dark_mode overrides */
 @media (prefers-color-scheme: dark) {
   :root.light {
     color-scheme: light;
-    --in: 0.7206 0.191 231.6;
-    --su: 64.8% 0.150 160;
-    --wa: 0.8471 0.199 83.87;
-    --er: 0.7176 0.221 22.18;
-    --pc: 0.89824 0.06192 275.75;
-    --ac: 0.15352 0.0368 183.61;
-    --inc: 0 0 0;
-    --suc: 0 0 0;
-    --wac: 0 0 0;
-    --erc: 0 0 0;
-    --rounded-box: 1rem;
-    --rounded-btn: 0.5rem;
-    --rounded-badge: 1.9rem;
-    --animation-btn: 0.25s;
-    --animation-input: .2s;
-    --btn-focus-scale: 0.95;
-    --border-btn: 1px;
-    --tab-border: 1px;
-    --tab-radius: 0.5rem;
-    --p: 0.4912 0.3096 275.75;
-    --s: 0.6971 0.329 342.55;
-    --sc: 0.9871 0.0106 342.55;
-    --a: 0.7676 0.184 183.61;
-    --n: 0.321785 0.02476 255.701624;
-    --nc: 0.894994 0.011585 252.096176;
-    --b1: 1 0 0;
-    --b2: 0.961151 0 0;
-    --b3: 0.924169 0.00108 197.137559;
-    --bc: 0.278078 0.029596 256.847952;
+  }
+  :root .prose {
+    --tw-prose-body: rgb(236, 236, 236);
+  }
 }
+:root.dark {
+  :root .prose {
+    --tw-prose-body: rgb(236, 236, 236);
+  }
 }
 
+:root.dark {
+  :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
+  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
+    background-color: rgb(59 59 61);
+  }
+}
 
-/* show only on touch devices */
+/* hide tooltip on touch devices */
 @media (hover: none), (hover: on-demand), (-moz-touch-enabled: 1), (pointer: coarse) {
   .tooltip:hover:after,
   .tooltip:hover:active:before,
@@ -238,4 +224,3 @@ dialog button:focus-visible {
     display: none;
   }
 }
-
