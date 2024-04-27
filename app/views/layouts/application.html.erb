@@ -4,9 +4,6 @@
   <%= render "head" %>
   <body
     class="
-      h-screen
-      font-sans text-gray-950 dark:text-gray-100
-      flex
       nav-closed
     "
     data-controller="transition"
@@ -15,9 +12,9 @@
   >
     <nav
       class="
-        h-screen w-[260px]
+        w-[260px]
         bg-gray-50 dark:bg-gray-900
-
+        h-screen
         flex nav-closed:hidden <%= !Current.user.preferences[:nav_closed] && "md:!flex" %>
         z-30 md:z-auto nav-closed:z-auto
         absolute md:relative nav-closed:relative
@@ -25,7 +22,7 @@
         flex-col
       "
     >
-      <div id="nav-container" class="flex-1 flex flex-col h-screen">
+      <div id="nav-container" class="flex-1 flex flex-col h-full">
         <div id="nav-scrollable" class="flex-grow pl-3 overflow-y-auto overflow-x-clip scrollbar-hide overscroll-contain">
           <%= yield :nav_column %>
         </div>
@@ -57,7 +54,7 @@
       data-action="click->transition#toggleClass"
     ></div>
 
-    <main class="flex flex-1 h-screen bg-white dark:bg-gray-800">
+    <main class="flex flex-1 h-full w-full bg-white dark:bg-gray-800">
       <%= content_for?(:main) ? yield(:main) : yield %>
     </main>
 
