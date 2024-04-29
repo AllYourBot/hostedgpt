@@ -44,20 +44,23 @@
   @apply !text-white;
 }
 
-.relationship .relationship\:bg-gray-700,
-.relationship.relationship\:bg-gray-700 {
-  @apply bg-gray-700;
-}
-
-.relationship .relationship\:bg-gray-200,
-.relationship.relationship\:bg-gray-200 {
-  @apply bg-gray-200;
-}
-
-.dark {
-  .relationship .dark\:relationship\:bg-gray-700,
-  .relationship.dark\:relationship\:bg-gray-700 {
+:root:not(.dark) {
+  .relationship .relationship\:bg-gray-700,
+  .relationship.relationship\:bg-gray-700 {
     @apply bg-gray-700;
+  }
+  .relationship .relationship\:bg-gray-200,
+  .relationship.relationship\:bg-gray-200 {
+    @apply bg-gray-200;
+  }
+}
+
+:root.dark {
+  .dark\:relationship\:bg-gray-700.relationship {
+    @apply bg-gray-700;
+  }
+  .dark\:relationship\:bg-gray-900.relationship {
+    @apply bg-gray-900;
   }
 }
 

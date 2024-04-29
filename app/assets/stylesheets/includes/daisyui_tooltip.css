@@ -207,6 +207,19 @@ dialog button:focus-visible {
     --tw-prose-body: rgb(236, 236, 236);
   }
 }
+.dark {
+  :root .prose {
+    --tw-prose-body: rgb(236, 236, 236);
+  }
+}
+
+.dark {
+  :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
+  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
+    background-color: var(--fallback-bc, oklch(var(--bc) / 0.1)) !important;
+    color: inherit !important;
+  }
+}
 
 :root.dark {
   :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
