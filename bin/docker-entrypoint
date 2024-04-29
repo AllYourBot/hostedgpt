@@ -2,9 +2,13 @@
 
 # If running the rails server then create or migrate existing database
 if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+  rm -f ./tmp/pids/server.pid 2>/dev/null
+  echo "Running bundle"
+  bundle
   echo "Running db:prepare"
   ./bin/rails db:prepare
 else
+  echo "Skipping bundle"
   echo "Skipping db:prepare"
 fi
 
