@@ -159,6 +159,9 @@ input:focus {
 @layer base {
   html {
     @apply h-full overscroll-none;
+    font-size: 70%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   body {
     @apply h-full font-sans text-gray-950 dark:text-gray-100 flex overflow-y-auto;
