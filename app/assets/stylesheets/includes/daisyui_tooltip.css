@@ -228,6 +228,7 @@ dialog button:focus-visible {
 }
 
 /* hide tooltip on touch devices */
+
 @media (hover: none), (hover: on-demand), (-moz-touch-enabled: 1), (pointer: coarse) {
   .tooltip:hover:after,
   .tooltip:hover:active:before,
