@@ -134,12 +134,12 @@
     </div>
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :dark_mode, "Color Theme" %>
-      <div class="flex items-center justify-between shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black">
+      <div class="flex items-center justify-between shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black gap-1">
         <%= user_fields.fields_for :preferences do |preferences_fields| %>
           <% %w(dark light system).each do |value| %>
-            <div class="form-group">
+            <div class="flex items-center gap-2">
               <%= preferences_fields.radio_button :dark_mode, value, checked: Current.user.preferences[:dark_mode] == value %>
-              <%= user_fields.label :dark_mode, value.capitalize, class: "ml-2 dark:text-gray-100" %>
+              <%= user_fields.label :dark_mode, value.capitalize, class: "dark:text-gray-100", for: "person_personable_attributes_preferences_dark_mode_#{value}"%>
             </div>
           <% end %>
         <% end %>
