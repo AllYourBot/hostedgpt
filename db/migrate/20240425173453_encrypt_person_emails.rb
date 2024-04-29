@@ -5,7 +5,7 @@ class EncryptPersonEmails < ActiveRecord::Migration[7.1]
       person.encrypt
       if !person.save(validate: false)
         Rails.logger.warn "Could not update person #{person.id}: #{person.errors.full_messages.join(',')}"
-      else 
+      else
         Rails.logger.info "Successfully updated user #{person.id}"
       end
     end
