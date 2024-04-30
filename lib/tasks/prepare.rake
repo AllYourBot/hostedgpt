@@ -31,6 +31,8 @@ def add_secret_key_base(config)
 end
 
 def add_active_record_encryption(config)
+  raise active_record_key_exception if Rails.env.production?
+
   config[:active_record_encryption] = {
     primary_key: SecureRandom.alphanumeric(32),
     deterministic_key: SecureRandom.alphanumeric(32),
@@ -54,9 +56,43 @@ def encryption_init
 end
 
 def ensure_master_key
+  raise master_key_exception + active_record_key_exception if Rails.env.production?
+
   master_key_path = Rails.root.join('config', 'master.key')
   unless File.exist?(master_key_path)
     key = SecureRandom.hex(16)
     File.write(master_key_path, key)
   end
+end
+
+def master_key_exception
+  <<~END
+    ###############################################################################################################
+    ## ERROR: You are running in production but RAILS_MASTER_KEY is not set.
+    ## In rails console run SecureRandom.base64(32) and copy & paste that value into an ENV key.
+    ## On Render go to: Dashboard > (your web service) > Environment > Add Environment Variable
+    ##   Key: RAILS_MASTER_KEY
+    ##   Value: (the value you copied)
+    ###############################################################################################################
+  END
+end
+
+def active_record_key_exception
+  <<~END
+    ###############################################################################################################
+    ## ERROR: You are running in production but you are missing ActiveRecord encyrption ENV keys.
+    ## In rails console: SecureRandom.base64(32) three times (!) and copy & paste 3 unique values into ENV keys.
+    ## On Render go to: Dashboard > (your web service) > Environment > Add Environment Variable
+    ##   Key: CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV
+    ##   Value: true
+    ##
+    ## Then add the 3 unique values you generated:
+    ##   Key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+    ##   Value: (the 1st value you copied)
+    ##   Key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+    ##   Value: (the 2nd value you copied)
+    ##   Key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+    ##   Value: (the 3rd value you copied)
+    ###############################################################################################################
+  END
 end
