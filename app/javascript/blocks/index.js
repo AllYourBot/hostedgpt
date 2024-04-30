@@ -41,7 +41,11 @@ async function importDir(type) {
     const className = file.split('_').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('')
     console.log(`L: ${className} from ${modulePath}`)
     const module = await import(modulePath)
-    if (type != 'lib') window[className] = module.default
+    if (type != 'lib') {
+      window[className] = module.default
+      window[className].to_s = className
+      window[className].toString = () => className
+    }
   }
 }
 

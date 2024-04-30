@@ -33,6 +33,9 @@ function init() {
     } else {
       const opts = args.slice(1).select(e => e.startsWith('-'))
       const paths = args.slice(1).reject(e => e.startsWith('-'))
+      let path = paths[0]
+      let line = undefined
+      let options = []
 
       try {
         jestPath = execSync('which jest').toString().trim();
@@ -42,16 +45,32 @@ function init() {
 
       if (opts.include('-d') || opts.include('--debug')) {
         console.log(`Debugger: type 'c' then 'repl'\n`)
-        spawn('node', ['inspect', '--experimental-vm-modules', jestPath, '--runInBand', '--config=test/jest.config.js'].concat(paths), { stdio: 'inherit' })
-      } else {
-        spawn('node', ['--experimental-vm-modules', jestPath, '--config=test/jest.config.js'].concat(paths), { stdio: 'inherit' })
+        options = ['inspect', '--experimental-vm-modules', jestPath, '--runInBand', '--config=test/jest.config.js']
+      } else
+        options = ['--experimental-vm-modules', jestPath, '--config=test/jest.config.js']
 
-        // spawn('jest', ['--config=test/jest.config.js'].concat(paths), {
-        //   stdio: 'inherit',
-        //   shell: true,
-        //   env: { ...process.env, NODE_OPTIONS: '--experimental-vm-modules' } // this enables "await import()" within test_helper.js
-        // })
-      }
+      if (path.length > 0 && path.includes('.js:')) {
+        [path, line] = path.split(':')
+        const contents = fs.readFileSync(path, 'utf8')
+        const lines = contents.split('\n')
+
+        const matches = lines[line-1].match(/test\s*\(\s*['"`]([^'"`]+)/)
+        if (!matches) {
+          console.error(`Error: Line ${line} of ${path} is not the start of a test`)
+          return
+        }
+        const testName = matches[1]
+        options.push(`-t=${testName}`)
+      } else
+        options.push(`-t=.*`)
+
+      spawn('node', options.concat(path), { stdio: 'inherit' })
+
+      // spawn('jest', ['--config=test/jest.config.js'].concat(path), {
+      //   stdio: 'inherit',
+      //   shell: true,
+      //   env: { ...process.env, NODE_OPTIONS: '--experimental-vm-modules' } // this enables "await import()" within test_helper.js
+      // })
     }
   }
 }

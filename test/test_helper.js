@@ -81,6 +81,8 @@ async function importDir(name) {
         .map(part => part.charAt(0).toUpperCase() + part.slice(1))
         .join('')
       global[className] = moduleClass
+      global[className].to_s = className
+      global[className].toString() = () => className
     }
   }
 }

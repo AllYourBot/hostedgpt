@@ -50,7 +50,6 @@ function exit() {
 }
 
 function output(on) {
-  //console.log(`output(${on})`)
   if (on)
     r.output = process.stdout
   else
@@ -61,7 +60,7 @@ function output(on) {
 
 function init() {
   output(false)
-  const subdirs = subdirsExceptLib(blocksDir);
+  const subdirs = subdirsExceptLib(blocksDir); // semi needed
 
   (async () => {
     importFile(blocksDir, 'index.js')
@@ -75,11 +74,17 @@ function init() {
 async function importFile(dir, name) {
   const filepath = path.join(dir, name)
 
-  classname = name.split('.')[0].split('_').map(s => s.capitalize()).join('')
+  let className = name.split('.')[0].split('_').map(s => s.capitalize()).join('')
+
+  replInput.write(`const ${className}Module = await import('${filepath}')\n`)
+
   if (dir.endsWith('/lib') || dir.endsWith('blocks'))
     replInput.write(`.load ${filepath}\n`)
-  else
-    replInput.write(`const ${classname} = await import('${filepath}')\n`)
+  else {
+    replInput.write(`const ${className} = ${className}Module.default\n`)
+    replInput.write(`${className}.to_s = '${className}'\n`)
+    replInput.write(`${className}.toString = () => '${className}'\n`)
+  }
 }
 
 function importDir(dir) {

@@ -10,6 +10,7 @@ export default class {
     this.attributes = {}
     this.$ = this.attributes // Define '$' as a property of 'this'
     this._haveSetDefaultAttributes = false
+    this.$['class'] = this.constructor
 
     this._analyzeMethods()
     this._wrapMethods()
@@ -23,18 +24,18 @@ export default class {
 
     return new Proxy(this, {
       get(target, prop, receiver) {
-        const readerProps = self._declarationsFor('attrReader', 'attrAccessor', 'attr')
+        const readerProps = self._declarationsFor('attrReader', 'attrAccessor', 'attr').concat(['class'])
         if (readerProps.includes(prop))
           return self._setAttrDefaultValues() && receiver.$[prop]
         else
           return Reflect.get(...arguments)
       },
       set(target, prop, value, receiver) {
-        const writerProps = self._declarationsFor('attrWriter', 'attrAccessor')
+        const writerProps = self._declarationsFor('attrWriter', 'attrAccessor').concat(['class'])
         if (writerProps.includes(prop))
           return receiver.$[prop] = value
         else
-          return Reflect.get(...arguments)
+          return Reflect.set(...arguments)
       }
     })
   }
@@ -77,7 +78,10 @@ export default class {
   }
 
   _wrapGettersAndSetters() {
+    if (this._prototype._gettersAndSettersWrapped) return
+
     this._getterAndSetterMethods.forEach(func => {
+      // if the function dot wrapped is true then skip this iteraction of the foreach loop
 
       if (this._descriptors[func].get) {
         const methodBody = this._descriptors[func].get.toString().match(/{([\s\S]*)}/)[1].trim()
@@ -113,41 +117,8 @@ export default class {
 
       Object.defineProperty(this._prototype, func, this._descriptors[func])
     })
-  }
 
-  log(str, level = 'info') {
-    let logLevel
-    if (node.env.isTest)
-      logLevel = 'error'
-    else
-      logLevel = this._declarationsFor('log').first() || 'error'
-    if (this.logLevels[level] >= this.logLevels[logLevel]) console.log(`${this.constructor.name}: ${str}`);
-  }
-
-  _setAttrDefaultValues() {
-    // The default value of attr_* variables cannot be accessed inside the constructor. Most of the time,
-    // the setTimeout with 0 hack will get it to happen at the end of the constructor but more advanced
-    // class stuff can still end up skipping that. That's why we also call this within the getter as a backup.
-    if (this._haveSetDefaultAttributes) return true
-
-    const attrProps = this._declarationsFor('attr')
-    attrProps.forEach(prop => {
-      if (typeof this[`attr_${prop}`] != 'undefined') this.$[prop] = this[`attr_${prop}`]
-    })
-
-    this._haveSetDefaultAttributes = true
-    return true
-  }
-
-  _declarationsFor(...prefixes) {
-    return Object.keys(this)
-        .filter(prop => prefixes.some(prefix => prop.startsWith(prefix) && prop.includes('_')))
-        .map(prop => prop.split('_').splice(1))
-        .flat();
-  }
-
-  _declaration(declaration, name) {
-    return this[`${declaration}_${name}`]
+    this._prototype._gettersAndSettersWrapped = true
   }
 
   _methodLog(name, args, numArgs) {
@@ -180,6 +151,46 @@ export default class {
     }
 
     this.log(`${name}(${argSummary.join(',')})`, level)
+  }
+
+  log(str, level = 'info') {
+    let logLevel
+    // if (node.env.isTest)
+    //   logLevel = 'error'
+    // else
+      logLevel = this._declarationsFor('log').first() || 'error'
+    if (this.logLevels[level] >= this.logLevels[logLevel]) {
+      if (node.env.isTest)
+        process.stdout.write(`${this.$['class']?.to_s}: ${str}\n`)
+      else
+        console.log(`${this.$['class']?.to_s}: ${str}`)
+    }
+  }
+
+  _setAttrDefaultValues() {
+    // The default value of attr_* variables cannot be accessed inside the constructor. Most of the time,
+    // the setTimeout with 0 hack will get it to happen at the end of the constructor but more advanced
+    // class stuff can still end up skipping that. That's why we also call this within the getter as a backup.
+    if (this._haveSetDefaultAttributes) return true
+
+    const attrProps = this._declarationsFor('attr')
+    attrProps.forEach(prop => {
+      if (typeof this[`attr_${prop}`] != 'undefined' && this.$[prop] === undefined) this.$[prop] = this[`attr_${prop}`]
+    })
+
+    this._haveSetDefaultAttributes = true
+    return true
+  }
+
+  _declarationsFor(...prefixes) {
+    return Object.keys(this)
+        .filter(prop => prefixes.some(prefix => prop.startsWith(prefix) && prop.includes('_')))
+        .map(prop => prop.split('_').splice(1))
+        .flat()
+  }
+
+  _declaration(declaration, name) {
+    return this[`${declaration}_${name}`]
   }
 
 
@@ -276,6 +287,3 @@ export default class {
 // }
 // t = new Test
 // t.tester()
-
-
-
