@@ -1,7 +1,7 @@
 namespace :db do
   desc "Setup database encryption and update credentials"
   task setup_encryption: :environment do
-    ensure_master_key
+    ensure_master_key unless ENV['RAILS_MASTER_KEY'].present?
 
     old_config = Rails.application.credentials.config
     config = old_config.deep_dup
