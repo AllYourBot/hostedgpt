@@ -68,11 +68,14 @@ end
 def master_key_exception
   <<~END
     ###############################################################################################################
-    ## ERROR: You are running in production but RAILS_MASTER_KEY is not set.
-    ## In rails console run SecureRandom.base64(32) and copy & paste that value into an ENV key.
-    ## On Render go to: Dashboard > (your web service) > Environment > Add Environment Variable
+    ## ERROR: You are running in production but RAILS_MASTER_KEY is not set!
+    ## If you are on Render go to: Dashboard > (your web service) > Environment > Add Environment Variable
     ##   Key: RAILS_MASTER_KEY
-    ##   Value: (the value you copied)
+    ##   Value: (click 'Generate' on the right side of this field)
+    ## REMEMBER to Save Changes
+    ##
+    ## If not on Render, create the ENV key on server and for the value: open rails console, run
+    ## SecureRandom.base64(32) and copy & paste as the value for the key
     ###############################################################################################################
   END
 end
@@ -80,19 +83,21 @@ end
 def active_record_key_exception
   <<~END
     ###############################################################################################################
-    ## ERROR: You are running in production but you are missing ActiveRecord encyrption ENV keys.
-    ## In rails console: SecureRandom.base64(32) three times (!) and copy & paste 3 unique values into ENV keys.
-    ## On Render go to: Dashboard > (your web service) > Environment > Add Environment Variable
+    ## ERROR: You are running in production but you are missing ActiveRecord encyrption ENV keys!
+    ## If you are on Render go to: Dashboard > (your web service) > Environment > Add Environment Variable
     ##   Key: CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV
-    ##   Value: true
-    ##
-    ## Then add the 3 unique values you generated:
+    ##     Value: true
     ##   Key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
-    ##   Value: (the 1st value you copied)
+    ##     Value: (click 'Generate' on the right side of this field)
     ##   Key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
-    ##   Value: (the 2nd value you copied)
+    ##     Value: (click 'Generate' on the right side of this field)
     ##   Key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
-    ##   Value: (the 3rd value you copied)
+    ##     Value: (click 'Generate' on the right side of this field)
+    ##
+    ## REMEMBER to Save Changes
+    ##
+    ## If not on Render, create the ENV keys on server and for the 3 generated values: open rails console, run
+    ## SecureRandom.base64(32) three times (!) and copy & paste 3 unique values into your ENV keys.
     ###############################################################################################################
   END
 end
