@@ -1,0 +1,82 @@
+#!/usr/bin/env node
+
+const { spawn } = require('child_process')
+const path = require('path')
+const fs = require('fs')
+const { execSync } = require('child_process')
+
+requireLibThen(init)
+
+function init() {
+  const args = process.argv.slice(2)
+
+  if (args.length == 0 || args[0] == '-h' || args[0] == '--help') {
+    console.log("The most common blocks commands are:")
+    console.log("  console          Start the Blocks console")
+    console.log("  test             Runs the test suite (--help for options)")
+
+  } else if (args[0] == 'console' || args[0] == 'c') {
+    console.log('To quit type: .exit')
+    const initPath = path.join(__dirname, '..', 'vendor', 'javascript', 'blocks-console.js')
+    console.log(`For debugging, open chrome://inspect`)
+    spawn('node', ['--inspect', initPath], { stdio: 'inherit' })
+
+  } else if (args[0] == 'test' || args[0] == 't') {
+
+    if (args[1] == '-h' || args[1] == '--help') {
+      console.log("blocks test [OPTIONS]:")
+      console.log("")
+      console.log("options:")
+      console.log("  (path)         Run only this test or all tests in this directory")
+      console.log("  -d, --debug    Run tests in debugger mode")
+
+    } else {
+      const opts = args.slice(1).select(e => e.startsWith('-'))
+      const paths = args.slice(1).reject(e => e.startsWith('-'))
+
+      try {
+        jestPath = execSync('which jest').toString().trim();
+      } catch (error) {
+        console.error('Failed to find Jest path:', error);
+      }
+
+      if (opts.include('-d') || opts.include('--debug')) {
+        console.log(`Debugger: type 'c' then 'repl'\n`)
+        spawn('node', ['inspect', '--experimental-vm-modules', jestPath, '--runInBand', '--config=test/jest.config.js'].concat(paths), { stdio: 'inherit' })
+      } else {
+        spawn('node', ['--experimental-vm-modules', jestPath, '--config=test/jest.config.js'].concat(paths), { stdio: 'inherit' })
+
+        // spawn('jest', ['--config=test/jest.config.js'].concat(paths), {
+        //   stdio: 'inherit',
+        //   shell: true,
+        //   env: { ...process.env, NODE_OPTIONS: '--experimental-vm-modules' } // this enables "await import()" within test_helper.js
+        // })
+      }
+    }
+  }
+}
+
+function requireLibThen(init) {
+  const args = process.argv.slice(2)
+  if (args[0] == 'test' || args[0] == 't') // index.js needs this
+    process.env.NODE_ENV = 'test'
+  else if (args[0] == 'console' || args[0] == 'c')
+    process.env.NODE_ENV = 'console'
+
+  const blocksPath = path.join(__dirname, '..', 'app', 'javascript', 'blocks')
+  const libPath = path.join(blocksPath, 'lib')
+  const files = fs.readdirSync(libPath);
+
+  (async () => {
+    const indexPath = path.join(blocksPath, 'index.js')
+    console.log(`Loading blocks/index.js`)
+    await import(indexPath)
+
+    for (const file of files) {
+      const filePath = path.join(blocksPath, 'lib', file)
+      await import(filePath)
+    }
+
+    init()
+  })()
+}
