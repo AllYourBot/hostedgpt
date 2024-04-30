@@ -1,7 +1,6 @@
 <% content_for :title, "HostedGPT" %>
 <!DOCTYPE html>
 <html 
-    class=<%= Current.user.preferences[:dark_mode] %>
   >
  
   <%= render "head" %>
@@ -9,6 +8,8 @@
   <body
     class="
       nav-closed
+      <%= Current.user.preferences[:dark_mode]%>
+      
     "
     data-controller="transition"
     data-transition-toggle-class="nav-closed"
@@ -24,6 +25,7 @@
         absolute md:relative nav-closed:relative
         overflow-x-clip
         flex-col
+        text-gray-950 dark:text-gray-100
       "
     >
       <div id="nav-container" class="flex-1 flex flex-col h-full">
@@ -58,7 +60,7 @@
       data-action="click->transition#toggleClass"
     ></div>
 
-    <main class="flex flex-1 h-full w-full bg-white dark:bg-gray-800">
+    <main class="flex flex-1 h-full w-full bg-white dark:bg-gray-800 text-gray-950 dark:text-gray-100">
       <%= content_for?(:main) ? yield(:main) : yield %>
     </main>
 

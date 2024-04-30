@@ -44,24 +44,13 @@
   @apply !text-white;
 }
 
-:root:not(.dark) {
-  .relationship .relationship\:bg-gray-700,
-  .relationship.relationship\:bg-gray-700 {
-    @apply bg-gray-700;
-  }
-  .relationship .relationship\:bg-gray-200,
-  .relationship.relationship\:bg-gray-200 {
-    @apply bg-gray-200;
-  }
+#conversations .relationship {
+  @apply bg-gray-200 dark:bg-gray-700;
 }
 
-@media (prefers-color-scheme: dark), (root: dark) {
-  .dark\:relationship\:bg-gray-700.relationship {
-    @apply bg-gray-700 !important;
-  }
-  .dark\:relationship\:bg-gray-900.relationship {
-    @apply bg-gray-900;
-  }
+.relationship .relationship\:hidden,
+.relationship.relationship\:hidden {
+  @apply !hidden;
 }
 
 .relationship .relationship\:pl-4,
@@ -165,5 +154,18 @@ input:focus {
     -webkit-overflow-scrolling: touch;
     min-height: -webkit-fill-available;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+}
+
+@media not all and (prefers-color-scheme: dark) {
+  .dark :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
+  .dark :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
+    background-color: rgb(59 59 61);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose :where(a):not(:where([class~='not-prose'] *)) {
+    color: #374151;
   }
 }

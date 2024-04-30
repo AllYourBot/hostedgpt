@@ -194,36 +194,10 @@ dialog button:focus-visible {
 }
 
 /* dark_mode overrides */
+
 @media (prefers-color-scheme: dark) {
-  :root.light {
-    color-scheme: light;
-  }
-  :root .prose {
-    --tw-prose-body: rgb(236, 236, 236);
-  }
-}
-:root.dark {
-  :root .prose {
-    --tw-prose-body: rgb(236, 236, 236);
-  }
-}
-:root.dark {
-  :root .prose {
-    --tw-prose-body: rgb(236, 236, 236);
-  }
-}
-
-:root.dark {
-  :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
-  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
-    background-color: rgb(59 59 61);
-  }
-}
-
-:root.dark {
-  :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
-  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
-    background-color: rgb(59 59 61);
+  :root body:not(.dark) .prose {
+    --tw-prose-body: #374151 !important;
   }
 }
 
