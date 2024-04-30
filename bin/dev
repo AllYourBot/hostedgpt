@@ -9,5 +9,8 @@ else
     echo "Installing foreman..."
     gem install foreman
   fi
+
+  bundle install
+  bin/rails db:prepare
   exec foreman start -f Procfile.dev "$@"
 fi
