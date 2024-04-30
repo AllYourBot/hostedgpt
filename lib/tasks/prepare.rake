@@ -1,6 +1,8 @@
 namespace :db do
   desc "Setup database encryption and update credentials"
   task setup_encryption: :environment do
+    ensure_master_key
+
     old_config = Rails.application.credentials.config
     config = old_config.deep_dup
 
@@ -50,4 +52,12 @@ def encryption_init
     deterministic_key: output.match(/deterministic_key: (\S+)/)[1],
     key_derivation_salt: output.match(/key_derivation_salt: (\S+)/)[1],
   }
+end
+
+def ensure_master_key
+  master_key_path = Rails.root.join('config', 'master.key')
+  unless File.exist?(master_key_path)
+    key = SecureRandom.hex(16)
+    File.write(master_key_path, key)
+  end
 end
