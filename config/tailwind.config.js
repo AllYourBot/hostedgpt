@@ -5,7 +5,7 @@ module.exports = {
     './public/*.html',
     './app/helpers/**/*.rb',
     './app/javascript/**/*.js',
-    './app/views/**/*.{erb,haml,html,slim}'
+    './app/views/**/*.{erb,haml,html,slim}',
   ],
   theme: {
     extend: {
@@ -13,7 +13,7 @@ module.exports = {
         sans: ['Figtree', ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        'gray': {
+        gray: {
           50: '#f9f9f9',
           100: '#ececec',
           200: '#cdcdcd',
@@ -26,27 +26,37 @@ module.exports = {
           900: '#171717',
           950: '#0d0d0d',
         },
-        'brand': {
-          'blue': '#2f5ff2',
-        }
+        brand: {
+          blue: '#2f5ff2',
+        },
+        'base-100': '#ffffff', //this can be avodied by installing, requiring and configuring the daisyui plugin
       },
       scale: {
-        '96': '0.96',
-        '97': '0.97',
-        '98': '0.98',
-        '99': '0.99',
+        96: '0.96',
+        97: '0.97',
+        98: '0.98',
+        99: '0.99',
       },
       strokeWidth: {
-        '3': '3px',
-        '4': '4px',
+        3: '3px',
+        4: '4px',
       },
     },
   },
-
+  darkMode: [
+    'variant',
+    [
+      '@media (prefers-color-scheme: dark) { &:is(.system *) }',
+      '&:is(.dark *)',
+    ],
+  ],
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/typography'),
     require('@tailwindcss/container-queries'),
-  ]
+  ],
 }
+
+
+
