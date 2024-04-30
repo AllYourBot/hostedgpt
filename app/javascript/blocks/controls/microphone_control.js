@@ -1,7 +1,7 @@
 import Control from "./control.js"
 
 export default class extends Control {
-  log_info
+  logLevel_info
 
   SpeakInto(num)      { $.volume = num
                         $.msOfSilence = 0

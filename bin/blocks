@@ -33,7 +33,7 @@ function init() {
     } else {
       const opts = args.slice(1).select(e => e.startsWith('-'))
       const paths = args.slice(1).reject(e => e.startsWith('-'))
-      let path = paths[0]
+      let path = paths[0] ?? 'test/javascript/blocks'
       let line = undefined
       let options = []
 

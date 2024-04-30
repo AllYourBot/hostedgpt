@@ -82,7 +82,7 @@ async function importDir(name) {
         .join('')
       global[className] = moduleClass
       global[className].to_s = className
-      global[className].toString() = () => className
+      global[className].toString = () => className
     }
   }
 }

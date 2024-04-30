@@ -1,7 +1,7 @@
 ﻿import Service from "./service.js"
 
 export default class extends Service {
-  log_info
+  logLevel_info
   attrReader_volume
   attrAccessor_onVolumeChanged
 

@@ -78,8 +78,6 @@ export default class {
   }
 
   _wrapGettersAndSetters() {
-    if (this._prototype._gettersAndSettersWrapped) return
-
     this._getterAndSetterMethods.forEach(func => {
       // if the function dot wrapped is true then skip this iteraction of the foreach loop
 
@@ -95,7 +93,12 @@ export default class {
             ${methodBody}
           }
         `
-        this._descriptors[func].get = new Function(body).bind(this)
+        const newGetter = new Function(body).bind(this)
+        Object.defineProperty(this, func, {
+          get: newGetter,
+          configurable: true,
+          enumerable: true
+        })
       }
 
       if (this._descriptors[func].set) {
@@ -112,13 +115,14 @@ export default class {
             ${methodBody}
           }
         `
-        this._descriptors[func].set = new Function(arg, body).bind(this)
+        const newSetter = new Function(arg, body).bind(this)
+        Object.defineProperty(this, func, {
+          set: newSetter,
+          configurable: true,
+          enumerable: true
+        })
       }
-
-      Object.defineProperty(this._prototype, func, this._descriptors[func])
     })
-
-    this._prototype._gettersAndSettersWrapped = true
   }
 
   _methodLog(name, args, numArgs) {
@@ -158,7 +162,7 @@ export default class {
     // if (node.env.isTest)
     //   logLevel = 'error'
     // else
-      logLevel = this._declarationsFor('log').first() || 'error'
+      logLevel = this._declarationsFor('logLevel').first() || 'error'
     if (this.logLevels[level] >= this.logLevels[logLevel]) {
       if (node.env.isTest)
         process.stdout.write(`${this.$['class']?.to_s}: ${str}\n`)
@@ -192,98 +196,4 @@ export default class {
   _declaration(declaration, name) {
     return this[`${declaration}_${name}`]
   }
-
-
-  // _wrapGettersAndSetters() {
-  //   this._callableMethods.forEach(func => this[func] = this[func].bind(this))
-  //   this._getterMethods.forEach(func => this[func] = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), func).get)
-  //   this._setterMethods.forEach(func => this['set'+func.capitalize()] = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), func).set)
-
-  //   this._getterAndSetterMethods.forEach(func => {
-  //     const descriptor = Object.getOwnPropertyDescriptor(this._prototype, func)
-
-  //     if (descriptor.get) {
-  //       const originalGet = descriptor.get
-  //       descriptor.get = function() {
-  //         const $ = this.attributes
-  //         this._methodLog(func, [], 0)
-  //         return originalGet.call(this)
-  //       }
-  //     }
-
-  //     if (descriptor.set) {
-  //       const originalSet = descriptor.set
-  //       descriptor.set = function(value) {
-  //         debugger
-  //         const $ = this.attributes
-  //         this._methodLog(func, [value], 1)
-  //         originalSet.call(this, value)
-  //       }
-  //     }
-
-  //     Object.defineProperty(this._prototype, func, descriptor)
-  //   })
-  // }
 }
-
-
-// Test Code:
-
-// class Test extends ReadableModel {
-
-//   tester() {
-//     console.log(`in tester()`)
-
-//     console.log('1. one')
-//     on('on!')
-//     on()
-//     reallyDone()
-//   }
-
-//   set on(v) {
-//     $.onValue = v
-//     console.log(`2. set on() - ${$.onValue}`)
-//   }
-
-//   get on() {
-//     console.log(`3. get on() - ${$.onValue}`)
-//     off('off!')
-//     off()
-//     done()
-//   }
-
-//   set off(num) {
-//     $.offValue = num
-//     console.log(`4. set off() - ${$.offValue}`)
-//     firstName('keith')
-//     firstName()
-//     movingOn()
-//   }
-
-//   set firstName(n) {
-//     $.firstName = n
-//     console.log(`5. set firstName() - ${$.firstName}`)
-//   }
-
-//   get firstName() {
-//     console.log(`6. get firstName() - ${$.firstName}`)
-//   }
-
-//   movingOn() {
-//     console.log(`7. movingOn`)
-//   }
-
-//   get off() {
-//     console.log(`8. get off() - ${$.offValue}`)
-//   }
-
-//   done() {
-//     console.log(`9. done!`)
-//   }
-
-//   reallyDone() {
-//     console.log(`10. really done!`)
-//   }
-// }
-// t = new Test
-// t.tester()
