@@ -31,12 +31,11 @@ def add_secret_key_base(config)
 end
 
 def add_active_record_encryption(config)
-  encryption = encryption_init
-
-  config[:active_record_encryption] = {}
-  config[:active_record_encryption][:primary_key] = encryption[:primary_key]
-  config[:active_record_encryption][:deterministic_key] = encryption[:deterministic_key]
-  config[:active_record_encryption][:key_derivation_salt] = encryption[:key_derivation_salt]
+  config[:active_record_encryption] = {
+    primary_key: SecureRandom.alphanumeric(32),
+    deterministic_key: SecureRandom.alphanumeric(32),
+    key_derivation_salt: SecureRandom.alphanumeric(32),
+  }
   config
 end
 
