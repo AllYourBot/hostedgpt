@@ -1,25 +1,25 @@
-g().runAfter = (timeInMs, func) => {
+g().runAfter = (timeInSec, func) => {
   const timeout = new TimeoutService('setTimeout')
   const handler = setTimeout(() => {
     timeout.executed = true
     func()
-  }, timeInMs)
+  }, timeInSec*1000)
 
   timeout.handler = handler
   return timeout
 }
 
-g().runEvery = (timeInMs, func) => {
+g().runEvery = (timeInSec, func) => {
   const timeout = new TimeoutService('setInterval')
   const handler = setInterval(() => {
     timeout.executed = true
     func()
-  }, timeInMs)
+  }, timeInSec*1000)
 
   timeout.handler = handler
   return timeout
 }
 
-g().sleep = async(ms) => {
-  return await new Promise(r => setTimeout(r, ms))
+g().sleep = async(s) => {
+  return await new Promise(r => setTimeout(r, s*1000))
 }
