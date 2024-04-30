@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   include Personable, Registerable
+  encrypts :openai_key, :anthropic_key
 
   has_secure_password
   has_person_name

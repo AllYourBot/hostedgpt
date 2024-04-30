@@ -7,7 +7,17 @@ databases:
 envVarGroups:
 - name: hostedgpt-secrets
   envVars:
+    - key: RAILS_MASTER_KEY
+      generateValue: true
     - key: SECRET_KEY_BASE
+      generateValue: true
+    - key: CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV
+      value: true
+    - key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+      generateValue: true
+    - key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+      generateValue: true
+    - key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
       generateValue: true
 
 services:

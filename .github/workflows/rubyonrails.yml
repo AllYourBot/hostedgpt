@@ -37,7 +37,7 @@ jobs:
           bundler-cache: true
 
       - name: Set up database schema
-        run: bin/rails db:schema:load
+        run: bin/rails db:prepare
 
       - name: Build CSS
         run: bin/rails tailwindcss:build
@@ -85,7 +85,7 @@ jobs:
           bundler-cache: true
 
       - name: Set up database schema
-        run: bin/rails db:schema:load
+        run: bin/rails db:prepare
 
       - name: Build CSS
         run: bin/rails tailwindcss:build

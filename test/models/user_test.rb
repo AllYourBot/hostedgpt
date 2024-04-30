@@ -11,6 +11,26 @@ class UserTest < ActiveSupport::TestCase
     refute person.valid?
   end
 
+  test "encrypts openai_key" do
+    user = users(:keith)
+    old_openai_key = user.openai_key
+    old_cipher_text = user.ciphertext_for(:openai_key)
+    user.update!(openai_key: "new one")
+    assert user.reload
+    refute_equal old_cipher_text, user.ciphertext_for(:openai_key)
+    assert_equal "new one", user.openai_key
+  end
+
+  test "encrypts anthropic_key" do
+    user = users(:keith)
+    old_anthropic_key = user.anthropic_key
+    old_cipher_text = user.ciphertext_for(:anthropic_key)
+    user.update!(anthropic_key: "new one")
+    assert user.reload
+    refute_equal old_cipher_text, user.ciphertext_for(:anthropic_key)
+    assert_equal "new one", user.anthropic_key
+  end
+
   test "should validate a user with minimum information" do
     user = User.new(password: "password", password_confirmation: "password", first_name: "John", last_name: "Doe")
     person = Person.new(email: "example@gmail.com", personable: user)

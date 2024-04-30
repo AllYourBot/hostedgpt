@@ -68,30 +68,33 @@ We welcome contributors! After you get your developoment environment setup, revi
 
 The easiest way to get up and running is to use the provided docker compose workflow. The only things you need installed on your computer are Docker and Git.
 
-1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running.
+1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running
 2. Clone your fork `git clone [repository url]`
-3. `cd` into your clone.
-4. Run `docker compose up` to start the app.
-5. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
-6. Run tests: `docker compose run base rails test` The app has comprehensive test coverage.
+3. `cd` into your clone
+4. Run `docker compose up --build` to start the app
+5. Open [http://localhost:3000](http://localhost:3000) and register as a new user
+6. Run tests: `docker compose run base rails test` The app has comprehensive test coverage but note that system tests currently do not work in docker.
 7. Open the rails console: `docker compose run base rails console`
 8. Run a psql console: `docker compose run base psql`
 
-Alternatively, you can set up your development environment locally:
+Every time you pull new changes down, kill docker (if it's running) and re-run:
+`docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
+
+### Alternatively, you can set up your development environment locally:
 
 HostedGPT requires these services to be running:
 
 - Postgres ([installation instructions](https://www.postgresql.org/download/))
 - Redis ([installation instructions](https://redis.io/download))
-- asdf-vm ([installation instructions](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf))
+- rbenv or asdf-vm ([installation instructions](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf))
 
 1. `cd` into your local repository clone
-2. `asdf install` to install the correct ruby version
-3. `bundle install` to install ruby gems
-4. `bin/rails db:setup` < Note: This will load the sample fixture data into your database
-5. `bin/dev` < Starts up all the services
-6. Open [http://localhost:3000](http://localhost:3000) and register as a new user
-7. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
+2. `rbenv install` or `asdf install` to install the correct ruby version
+3. `bin/dev` starts up all the services, installs gems, and inits database (don't run **db:setup** as it will not configure encryption properly)
+4. Open [http://localhost:3000](http://localhost:3000) and register as a new user
+5. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
+
+Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
 
 # Changelog
 
@@ -119,3 +122,4 @@ v0.5 - Released on 2/14/2024
 * Conversations are automatically titled
 * Sidebar can be closed
 * AI responses stream in
+>>>>>>> upstream-main
