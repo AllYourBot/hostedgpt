@@ -2,7 +2,7 @@ window.lastMessageControllerInstance = null
 window.wasScrolledToBottom = false
 
 import { Controller } from "@hotwired/stimulus"
-import throttle from "utils/throttle"
+import throttle from "./utils/throttle"
 
 export default class extends Controller {
   scrollableTarget = null
