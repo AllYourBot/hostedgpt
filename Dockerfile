@@ -6,13 +6,13 @@ ENV BUNDLE_CACHE=/tmp/bundle \
   BUNDLE_JOBS=2 \
   PORT=3000
 
-WORKDIR /rails
+WORKDIR /app
 COPY Gemfile Gemfile.lock .tool-versions ./
 
 RUN --mount=type=cache,id=gems,target=/tmp/bundle \
   bundle install
 
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+ENTRYPOINT ["/app/bin/docker-entrypoint"]
 CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
 
 FROM base as development
@@ -40,6 +40,6 @@ RUN mkdir -p log tmp bin
 
 RUN adduser rails -D -h /rails -s /bin/sh && \
   chown -R rails:rails db log tmp bin && \
-  chmod 755 /rails/bin/docker-entrypoint
+  chmod 755 /app/bin/docker-entrypoint
 
 USER rails:rails
