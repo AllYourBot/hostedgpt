@@ -291,7 +291,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_01_215824) do
     t.string "last_name"
     t.string "openai_key"
     t.string "anthropic_key"
-    t.jsonb "preferences"
+    t.jsonb "preferences", default: {}
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
