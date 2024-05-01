@@ -25,6 +25,7 @@ services:
     name: hostedgpt
     runtime: docker
     plan: free
+    healthCheckPath: /up
     envVars:
       - key: DATABASE_URL
         fromDatabase:
