@@ -111,7 +111,7 @@ CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
 #### END of DEV ####
 
 #### START of RENDER ####
-# Render must be last because render.yml cannot specify a build target so it default so the last one
+# Render must be last because render.yml cannot specify a build target so it default to the last one
 # RUBY_VERSION is the only thing used from anything above
 FROM ruby:${RUBY_VERSION}-alpine AS render-production
 

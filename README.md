@@ -72,9 +72,9 @@ The hosting service Fly.io does not have one-click hosting like Render and it do
 
 1. You must first install the Fly command-line tool [view instructions](https://fly.io/docs/hands-on/install-flyctl/)
 3. Next run `fly launch` and say `Yes` to copy the existing fly.toml but note that it will generate the wrong settings
-4. **The settings it shows are incorrect correct** so tell it you want to make changes
-5. When it opens your browser change the Database to `Fly Postgres` and a name such as `hostedgpt-db` and you can set the configuration to `Development`
-6. Also in the browser change the Redis to `Upstash for Redis`
+4. **The settings it shows are INCORRECT** so tell it you want to make changes
+5. When it opens your browser, change the Database to `Fly Postgres` and a name such as `hostedgpt-db` and you can set the configuration to `Development`
+6. Also in the browser, change the Redis to `Upstash for Redis`
 7. Click `Confirm Settings` and close the browser.
 8. The app will do a bunch of build steps and attempt to deploy the app but **it will fail with an error message about "Missing `secret_key_base`"**. When you get back to the command prompt, first scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
 9. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly. (This can't be done until your app exists, which doesn't happen until you attempt your first deploy, that's why we intentionally hit that error.)
