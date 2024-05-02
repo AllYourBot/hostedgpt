@@ -32,8 +32,8 @@ services:
       - DATABASE_URL=postgres://app:secret@postgres/app_development
     ports: ["3000:3000"]
     volumes:
-      - .:/app
-      - /app/tmp
+      - .:/rails
+      - /rails/tmp
 
   worker:
     <<: *base
