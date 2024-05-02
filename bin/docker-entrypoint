@@ -1,7 +1,8 @@
 #!/bin/sh -e
 
-if [ "$RAILS_ENV" != "production" ]; then
-  if echo "${1}" | grep -q "rails$" && [ "${2}" == "server" ]; then
+if [ "$FLY_APP_NAME" != "" ] && [ "$RAILS_ENV" == "production" ]; then
+  echo "Running on Fly which runs a release command. Skipping docker-entrypoint."
+elif echo "${1}" | grep -q "rails$" && [ "${2}" == "server" ]; then
     rm -f ./tmp/pids/server.pid 2>/dev/null
     echo "Running db:prepare"
     ./bin/rails db:prepare
