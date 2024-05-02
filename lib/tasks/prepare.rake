@@ -1,6 +1,8 @@
 namespace :db do
   desc "Setup database encryption and update credentials"
-  task setup_encryption: :environment do
+  task :setup_encryption, [:send_to_fly] => :environment do |t, args|
+    args.with_defaults(send_to_fly: false)
+
     ensure_master_key unless ENV['RAILS_MASTER_KEY'].present?
 
     old_config = Rails.application.credentials.config
@@ -20,6 +22,18 @@ namespace :db do
       ActiveRecord::Encryption.config.deterministic_key = config[:active_record_encryption][:deterministic_key]
       ActiveRecord::Encryption.config.key_derivation_salt = config[:active_record_encryption][:key_derivation_salt]
     end
+
+    if args[:send_to_fly]
+      # Implement the logic to send to Fly here
+      puts "Sending configuration to Fly..."
+      system("fly secrets set RAILS_MASTER_KEY=#{File.read(master_key_path)}")
+      system("fly secrets set CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV=true")
+      system("fly secrets set ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=#{ActiveRecord::Encryption.config.primary_key}")
+      system("fly secrets set ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=#{ActiveRecord::Encryption.config.deterministic_key}")
+      system("fly secrets set ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=#{ActiveRecord::Encryption.config.key_derivation_salt}")
+    end
+
+    puts "Done ensuring encryption is setup"
   end
 end
 
@@ -58,11 +72,14 @@ end
 def ensure_master_key
   raise master_key_exception + active_record_key_exception if Rails.env.production?
 
-  master_key_path = Rails.root.join('config', 'master.key')
   unless File.exist?(master_key_path)
     key = SecureRandom.hex(16)
     File.write(master_key_path, key)
   end
+end
+
+def master_key_path
+  Rails.root.join('config', 'master.key')
 end
 
 def master_key_exception
@@ -83,7 +100,7 @@ end
 def active_record_key_exception
   <<~END
     ###############################################################################################################
-    ## ERROR: You are running in production but you are missing ActiveRecord encyrption ENV keys!
+    ## ERROR: You are running in production but you are missing ActiveRecord encryption ENV keys!
     ## If you are on Render go to: Dashboard > (your web service) > Environment > Add Environment Variable
     ##   Key: CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV
     ##     Value: true
