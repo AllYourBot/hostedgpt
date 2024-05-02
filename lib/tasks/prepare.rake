@@ -83,7 +83,7 @@ end
 def active_record_key_exception
   <<~END
     ###############################################################################################################
-    ## ERROR: You are running in production but you are missing ActiveRecord encyrption ENV keys!
+    ## ERROR: You are running in production but you are missing ActiveRecord encryption ENV keys!
     ## If you are on Render go to: Dashboard > (your web service) > Environment > Add Environment Variable
     ##   Key: CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV
     ##     Value: true
