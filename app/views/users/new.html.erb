@@ -1,6 +1,7 @@
-<div class='flex flex-col items-center justify-center w-full h-screen space-y-4'>
+<div class='flex flex-col items-center justify-center w-full h-screen space-y-4 dark:text-white'>
 
   <%= image_tag("logo.svg", height: "32", width: "32", class:"text-black dark:text-brand-blue") %>
+  <img src={<%= image_tag("logo.svg") =%>}/>
 
   <h2 class='text-3xl font-semibold'>Create your account</h2>
 
@@ -35,7 +36,7 @@
       <%= f.email_field :email,
         autofocus: true,
         placeholder: "Email",
-        class: "w-44 border-0 dark:text-black"
+        class: "w-44 border-0 dark:text-black rounded"
       %>
     <% end %>
 
@@ -44,7 +45,7 @@
           <span>Password <span class="">*</span></span>
           <%= user_fields.password_field :password,
             placeholder: "Password",
-            class: "w-44 border-0 dark:text-black",
+            class: "w-44 border-0 dark:text-black rounded",
             data: { action: "focus->transition#toggleClassOn" }
           %>
         <% end %>
@@ -61,7 +62,7 @@
             <span>Full Name <span class="">*</span></span>
             <%= user_fields.text_field :name,
               placeholder: "First & Last name",
-              class: "w-44 border-0 dark:text-black"
+              class: "w-44 border-0 dark:text-black rounded"
             %>
           <% end %>
         </div>
