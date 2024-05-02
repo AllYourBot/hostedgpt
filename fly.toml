@@ -1,25 +1,21 @@
+# fly.toml app configuration file generated for hostedgpt on 2024-05-02T12:36:21-05:00
+#
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "hostedgpt"
-primary_region = "dfw"
-console_command = "/app/bin/rails console"
-
-[experimental]
-  auto_rollback = true
+app = 'hostedgpt'
+primary_region = 'dfw'
+console_command = '/rails/bin/rails console'
 
 [build]
-
-[processes]
-web = "bin/rails server -p 3000"
-worker = "bin/rake solid_queue:start"
+  build-target = 'fly-production'
 
 [deploy]
-  release_command = "bin/rails db:prepare"
-  strategy = "rolling"
+  release_command = './bin/rails db:prepare'
 
-[env]
-  PORT = "3000"
-  RAILS_ENV = "production"
+[processes]
+  app = './bin/rails server'
+  solidq = 'bundle exec rake solid_queue:start'
 
 [http_service]
   internal_port = 3000
@@ -27,27 +23,28 @@ worker = "bin/rake solid_queue:start"
   auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["web"]
+  processes = ['app']
 
 [checks]
   [checks.status]
     port = 3000
-    type = "http"
-    interval = "10s"
-    timeout = "2s"
-    grace_period = "5s"
-    method = "GET"
-    path = "/up"
-    protocol = "http"
+    type = 'http'
+    interval = '10s'
+    timeout = '2s'
+    grace_period = '5s'
+    method = 'GET'
+    path = '/up'
+    protocol = 'http'
     tls_skip_verify = false
+
     [checks.status.headers]
-      X-Forwarded-Proto = "https"
+      X-Forwarded-Proto = 'https'
 
 [[vm]]
-  cpu_kind = "shared"
-  memory = "1gb"
+  memory = '1gb'
+  cpu_kind = 'shared'
   cpus = 1
 
 [[statics]]
-  guest_path = "/app/public"
-  url_prefix = "/"
+  guest_path = '/rails/public'
+  url_prefix = '/'
