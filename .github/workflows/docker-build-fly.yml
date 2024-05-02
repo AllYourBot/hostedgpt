@@ -1,4 +1,4 @@
-name: Docker Container Build
+name: Docker Fly Container Build
 on:
   push:
     branches: [ "main" ]
@@ -19,3 +19,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
+          target: fly-production
