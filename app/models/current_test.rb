@@ -20,4 +20,5 @@ class CurrentTest < ActiveSupport::TestCase
 
     assert_equal 'light', user.preferences[:dark_mode]
   end
+
 end
