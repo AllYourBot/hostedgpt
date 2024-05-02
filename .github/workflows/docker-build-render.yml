@@ -1,4 +1,4 @@
-name: Docker Render Container Build
+name: Docker Render Build
 on:
   push:
     branches: [ "main" ]

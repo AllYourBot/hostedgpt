@@ -1,4 +1,4 @@
-name: Docker Fly Container Build
+name: Docker Fly Build
 on:
   push:
     branches: [ "main" ]

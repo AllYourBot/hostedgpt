@@ -5,6 +5,7 @@
 
 # Ignore bundler config.
 /.bundle
+/.tool-versions
 /node_modules
 
 # Ignore all environment files (except templates).

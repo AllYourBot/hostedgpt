@@ -98,7 +98,7 @@ ENV BUNDLE_CACHE=/tmp/bundle \
   PORT=3000
 
 WORKDIR /rails
-COPY Gemfile Gemfile.lock .tool-versions ./
+COPY Gemfile Gemfile.lock .ruby-version ./
 
 RUN --mount=type=cache,id=gems,target=/tmp/bundle \
   bundle install
@@ -122,7 +122,7 @@ ENV BUNDLE_CACHE=/tmp/bundle \
   PORT=3000
 
 WORKDIR /rails
-COPY Gemfile Gemfile.lock .tool-versions ./
+COPY Gemfile Gemfile.lock .ruby-version ./
 
 RUN --mount=type=cache,id=gems,target=/tmp/bundle \
   bundle install
