@@ -126,7 +126,7 @@
             class="flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
             data-controller="new-message image-upload"
       >
-        <% if !(@assistant.name == "GPT-3.5")%>
+        <% if @assistant.images%>
           <%= button_tag type: "button",
                 id: "attach-button",
                 class: "absolute left-11 bottom-[26px] w-[23px] h-[23px] relationship:hidden",
