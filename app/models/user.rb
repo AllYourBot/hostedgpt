@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   include Personable, Registerable
+  encrypts :openai_key, :anthropic_key
 
   has_secure_password
   has_person_name
@@ -12,4 +13,13 @@ class User < ApplicationRecord
   has_many :conversations, dependent: :destroy
 
   serialize :preferences, coder: JsonSerializer
+
+  before_create :set_default_preferences
+
+  private
+
+  def set_default_preferences
+    self.preferences ||= {}
+    self.preferences[:dark_mode] ||= 'system'
+  end
 end

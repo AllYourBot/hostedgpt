@@ -44,26 +44,24 @@
   @apply !text-white;
 }
 
-.relationship .relationship\:bg-gray-700,
-.relationship.relationship\:bg-gray-700 {
-  @apply bg-gray-700;
-}
-
-.relationship .relationship\:bg-gray-200,
-.relationship.relationship\:bg-gray-200 {
-  @apply bg-gray-200;
-}
-
-@media (prefers-color-scheme: dark) {
-  .relationship .dark\:relationship\:bg-gray-700,
-  .relationship.dark\:relationship\:bg-gray-700 {
+:root:not(.dark) {
+  .relationship .relationship\:bg-gray-700,
+  .relationship.relationship\:bg-gray-700 {
     @apply bg-gray-700;
+  }
+  .relationship .relationship\:bg-gray-200,
+  .relationship.relationship\:bg-gray-200 {
+    @apply bg-gray-200;
   }
 }
 
-.relationship .relationship\:hidden,
-.relationship.relationship\:hidden {
-  @apply !hidden;
+@media (prefers-color-scheme: dark), (root: dark) {
+  .dark\:relationship\:bg-gray-700.relationship {
+    @apply bg-gray-700 !important;
+  }
+  .dark\:relationship\:bg-gray-900.relationship {
+    @apply bg-gray-900;
+  }
 }
 
 .relationship .relationship\:pl-4,

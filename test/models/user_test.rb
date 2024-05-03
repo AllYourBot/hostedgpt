@@ -11,6 +11,26 @@ class UserTest < ActiveSupport::TestCase
     refute person.valid?
   end
 
+  test "encrypts openai_key" do
+    user = users(:keith)
+    old_openai_key = user.openai_key
+    old_cipher_text = user.ciphertext_for(:openai_key)
+    user.update!(openai_key: "new one")
+    assert user.reload
+    refute_equal old_cipher_text, user.ciphertext_for(:openai_key)
+    assert_equal "new one", user.openai_key
+  end
+
+  test "encrypts anthropic_key" do
+    user = users(:keith)
+    old_anthropic_key = user.anthropic_key
+    old_cipher_text = user.ciphertext_for(:anthropic_key)
+    user.update!(anthropic_key: "new one")
+    assert user.reload
+    refute_equal old_cipher_text, user.ciphertext_for(:anthropic_key)
+    assert_equal "new one", user.anthropic_key
+  end
+
   test "should validate a user with minimum information" do
     user = User.new(password: "password", password_confirmation: "password", first_name: "John", last_name: "Doe")
     person = Person.new(email: "example@gmail.com", personable: user)
@@ -85,27 +105,44 @@ class UserTest < ActiveSupport::TestCase
 
   test "boolean values within preferences get converted back and forth properly" do
     assert_nil users(:keith).preferences[:nav_closed]
-    assert_nil users(:keith).preferences[:dark_mode]
     assert_nil users(:keith).preferences[:kids]
     assert_nil users(:keith).preferences[:city]
 
     users(:keith).update!(preferences: {
       nav_closed: true,
-      dark_mode: false,
       kids: 2,
       city: "Austin"
     })
     users(:keith).reload
+
     assert users(:keith).preferences[:nav_closed]
-    refute users(:keith).preferences[:dark_mode]
     assert_equal 2, users(:keith).preferences[:kids]
     assert_equal "Austin", users(:keith).preferences[:city]
 
     users(:keith).update!(preferences: {
       nav_closed: "false",
-      dark_mode: "true",
+
     })
+
     refute users(:keith).preferences[:nav_closed]
-    assert users(:keith).preferences[:dark_mode]
+
   end
+
+  test "dark_mode preference defaults to system and it can update user dark_mode preference" do
+    new_user = User.create!(password: 'password', first_name: 'First', last_name: 'Last')
+    assert_equal "system", new_user.preferences[:dark_mode]
+
+    new_user.update!(preferences: { dark_mode: "light" })
+    assert_equal "light", new_user.preferences[:dark_mode]
+
+    new_user.update!(preferences: { dark_mode: "dark" })
+
+    assert_equal "dark", new_user.preferences[:dark_mode]
+
+    new_user.update!(preferences: { dark_mode: "system" })
+
+    assert_equal "system", new_user.preferences[:dark_mode]
+
+  end
+
 end

@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-ruby File.readlines(File.join(__dir__ , '.tool-versions')).select{|l| l =~ /ruby/}.first.strip.split.last
+ruby file: ".ruby-version"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.3"
@@ -83,6 +83,8 @@ group :development do
 
   # https://github.com/kirillplatonov/hotwire-livereload
   gem "hotwire-livereload", "~> 1.3"
+
+  gem "dockerfile-rails", ">= 1.6"
 end
 
 group :test do

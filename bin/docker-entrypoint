@@ -1,14 +1,22 @@
 #!/bin/sh -e
 
-# If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  echo "Running db:prepare"
-  ./bin/rails db:prepare
+if [ "$FLY_APP_NAME" != "" ] && [ "$RAILS_ENV" = "production" ]; then
+  echo "Running on Fly which runs a release command. Skipping docker-entrypoint."
 else
-  echo "Skipping db:prepare"
+  if echo "${1}" | grep -q "rails$" && [ "${2}" = "server" ]; then
+    rm -f ./tmp/pids/server.pid 2>/dev/null
+    echo "Running db:prepare"
+    ./bin/rails db:prepare
+  elif echo "${1}" | grep -q "rails$" && [ "${2}" = "test" ]; then
+    export RAILS_ENV=test
+    echo "Running db:prepare"
+    ./bin/rails db:prepare
+  else
+    echo "Skipping db:prepare"
+  fi
 fi
 
-if [ "${1}" == "psql" ]; then
+if [ "${1}" = "psql" ]; then
   echo "Running psql to connect to development database"
   exec psql -d "$DATABASE_URL"
 fi
