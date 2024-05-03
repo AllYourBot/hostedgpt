@@ -15,7 +15,7 @@ console_command = '/rails/bin/rails console'
 
 [processes]
   app = './bin/rails server'
-  solidq = 'bundle exec rake solid_queue:start'
+  worker = 'bundle exec rake solid_queue:start'
 
 [http_service]
   internal_port = 3000
