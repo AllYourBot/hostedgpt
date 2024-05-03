@@ -79,4 +79,6 @@ Rails.application.configure do
   config.hosts << /[a-z0-9\-]+\.ngrok-free\.app/
 
   config.hotwire_livereload.reload_method = :turbo_stream
+
+  config.hosts << ENV['DEV_HOST']
 end
