@@ -7,6 +7,8 @@ class GetNextAIMessageJob < ApplicationJob
   def ai_backend
     if @assistant.model.starts_with?('gpt-')
       AIBackends::OpenAI
+    elsif @assistant.model.starts_with?('dall-')
+      AIBackends::OpenAI
     else
       AIBackends::Anthropic
     end
