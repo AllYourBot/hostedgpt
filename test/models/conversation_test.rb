@@ -65,7 +65,7 @@ class ConversationTest < ActiveSupport::TestCase
         latest_message = conversation.latest_message_for_version(:latest)
         assert latest_message.assistant?
 
-        GetNextAIMessageJob.perform_now(latest_message.id, assistants(:samantha).id)
+        GetNextAIMessageJob.perform_now(users(:keith).id, latest_message.id, assistants(:samantha).id)
 
         assert_equal "Hear me", conversation.reload.title
 

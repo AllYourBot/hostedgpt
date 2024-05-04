@@ -43,7 +43,7 @@ class MessagesController < ApplicationController
 
     if @message.save
       after_create_assistant_reply = @message.conversation.latest_message_for_version(@message.version)
-      GetNextAIMessageJob.perform_later(after_create_assistant_reply.id, @assistant.id)
+      GetNextAIMessageJob.perform_later(current_user.id, after_create_assistant_reply.id, @assistant.id)
       redirect_to conversation_messages_path(@message.conversation, version: @message.version)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
