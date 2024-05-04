@@ -1,6 +1,6 @@
 {
-  "name": "HostedGPT",
-  "short_name": "HostedGPT",
+  "name": "Notelessly",
+  "short_name": "Notelessly",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff",
