@@ -18,6 +18,7 @@ class AssistantsController < ApplicationController
 
   def create
     @assistant = Assistant.new(assistant_params)
+    @assistant.user_id = Current.user.id
 
     if @assistant.save
       redirect_to @assistant, notice: "Assistant was successfully created."

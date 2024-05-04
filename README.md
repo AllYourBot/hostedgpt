@@ -1,6 +1,6 @@
 ![](./public/logo_full_blue.jpg)
 
-# HostedGPT v0.6
+#clone from HostedGPT
 
 HostedGPT is a free, open-source alternative to ChatGPT. It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own OpenAI API key.
 

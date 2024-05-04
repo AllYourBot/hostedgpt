@@ -12,31 +12,38 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :user_id, "User ID" %>
-    <%= form.text_field :user_id, value: User.first.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+    <%= form.label :model, "Model" %>
+    <%= form.select :model, {
+      'Opus Claude 3 Opus' => 'claude-3-opus-20240229',
+      'Claude 3 Sonnet' => 'claude-3-sonnet-20240229',
+      'Claude 3 Haiku' => 'claude-3-haiku-20240307',
+      'GPT-4 Turbo with Vision' => 'gpt-4-turbo-2024-04-09',
+      'GPT-4 Vision Preview' => 'gpt-4-vision-preview',
+      'GPT-4 Base' => 'gpt-4',
+      'GPT-4 Turbo' => 'gpt-4-turbo',
+      'GPT-3.5' => 'gpt-3.5',
+      'GPT-3.5 Turbo' => 'gpt-3.5-turbo',
+      'Dall-E 3' => 'dall-e-3',
+      'Dall-E 2' => 'dall-e-2',
+    }, {}, { class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" } %>
   </div>
 
   <div class="my-5">
-    <%= form.label :model %>
-    <%= form.text_field :model, value: "gpt-4", class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :name %>
+    <%= form.label :name, "Name" %>
     <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :description %>
+    <%= form.label :description, "Description" %>
     <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :instructions %>
+    <%= form.label :instructions, "Instructions" %>
     <%= form.text_field :instructions, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="inline">
-    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+    <%= form.submit "Save", class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
   </div>
 <% end %>
