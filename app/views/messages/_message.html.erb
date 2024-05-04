@@ -54,7 +54,7 @@ end
       <div class="hidden" data-clipboard-target="text"><%= message.content_text %></div>
         <div
           data-role="content-text"
-          class="prose break-words leading-normal"
+          class="prose break-words leading-normal dark:[&_*]:text-gray-100 dark:marker:text-gray-100" 
         >
           <% if message.has_document_image? %>
             <%= button_tag type: "button",

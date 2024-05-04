@@ -7,6 +7,8 @@ databases:
 envVarGroups:
 - name: hostedgpt-secrets
   envVars:
+    - key: RAILS_MASTER_KEY
+      generateValue: true
     - key: SECRET_KEY_BASE
       generateValue: true
     - key: CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV
@@ -23,6 +25,7 @@ services:
     name: hostedgpt
     runtime: docker
     plan: free
+    healthCheckPath: /up
     envVars:
       - key: DATABASE_URL
         fromDatabase:

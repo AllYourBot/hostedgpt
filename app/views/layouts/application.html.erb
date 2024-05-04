@@ -1,7 +1,11 @@
 <% content_for :title, "HostedGPT" %>
 <!DOCTYPE html>
-<html>
+<html 
+    class=<%= Current.user.preferences[:dark_mode] %>
+  >
+ 
   <%= render "head" %>
+
   <body
     class="
       nav-closed
