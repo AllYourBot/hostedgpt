@@ -21,6 +21,12 @@ class ConversationTest < ActiveSupport::TestCase
     assert_instance_of Step, conversations(:greeting).steps.first
   end
 
+  test "has associated last_assistant_message but can also be nil" do
+    c = Conversation.create!(user: users(:keith), assistant: assistants(:samantha))
+    assert_nil c.last_assistant_message
+    assert_instance_of Message, conversations(:greeting).last_assistant_message
+  end
+
   test "simple create works" do
     assert_nothing_raised do
       Conversation.create!(

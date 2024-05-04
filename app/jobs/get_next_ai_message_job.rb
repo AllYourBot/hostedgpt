@@ -154,19 +154,15 @@ class GetNextAIMessageJob < ApplicationJob
 
   def message_cancelled?
     @message.cancelled? ||
-      (@cancel_counter > 1 && @message.id == redis.get("message-cancelled-id")&.to_i)
+      (@cancel_counter > 1 && @message.id == @user.reload.last_cancelled_message_id)
   end
 
   def newer_messages_in_conversation?
     @message != @conversation.latest_message_for_version(@message.version) ||
-      (@cancel_counter > 1 && @message.id != redis.get("conversation-#{@conversation.id}-latest-assistant_message-id")&.to_i)
+      (@cancel_counter > 1 && @message.id != @conversation.last_assistant_message_id)
   end
 
   def message_is_populated?
     @message.content_text.present?
-  end
-
-  def redis
-    RedisConnection.client
   end
 end

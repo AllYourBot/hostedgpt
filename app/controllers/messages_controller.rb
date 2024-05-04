@@ -24,7 +24,7 @@ class MessagesController < ApplicationController
     @streaming_message = Message.where(
       content_text: [nil, ""],
       cancelled_at: nil
-    ).find_by(id: redis.get("conversation-#{@conversation.id}-latest-assistant_message-id"))
+    ).find_by(id: @conversation.last_assistant_message_id)
   end
 
   def show
@@ -109,9 +109,5 @@ class MessagesController < ApplicationController
       modified_params[:content_text] = nil # nil and "" have different meanings
     end
     modified_params
-  end
-
-  def redis
-    RedisConnection.client
   end
 end
