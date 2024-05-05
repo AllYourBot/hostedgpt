@@ -26,9 +26,10 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   end
 
   test "if message_cancelled? starts returning true for any reason AFTER job starts, it cancels the message" do
-    # When the job first starts, it short circuits if the message is already cancelled so we are NOT going to set the message to be cancelled
-    # Instead, we are going to stub out the message_cancelled? checker so it returns true the first time it's used but false thereafter. This
-    # simulates message.cancelled! being toggled after the job has started.
+    # When the job first starts, it short circuits if the message is already cancelled so we are NOT going to
+    # set the message to be cancelled Instead, we are going to stub out the message_cancelled? checker so it
+    # returns true the first time it's used but false thereafter. This simulates message.cancelled! being
+    # toggled after the job has started.
     false_on_first_run = 0
     job = GetNextAIMessageJob.new
     job.stub(:message_cancelled?, -> { false_on_first_run += 1; false_on_first_run != 1 }) do
