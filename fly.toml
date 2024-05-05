@@ -15,7 +15,9 @@ console_command = '/rails/bin/rails console'
 
 [processes]
   app = './bin/rails server'
-  worker = 'bundle exec rake solid_queue:start'
+
+[env]
+  RUN_SOLID_QUEUE_IN_PUMA = 'true'
 
 [http_service]
   internal_port = 3000
