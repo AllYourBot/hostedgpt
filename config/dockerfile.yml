@@ -10,5 +10,4 @@ options:
     fly_launch_runtime: rails
   postgresql: true
   prepare: false
-  redis: true
   yjit: true

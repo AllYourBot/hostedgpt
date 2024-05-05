@@ -76,7 +76,7 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
 
-  config.hotwire_livereload.reload_method = :turbo_stream
+  config.web_console.permissions = "192.168.0.0/16"
 
-  config.hosts << ENV['DEV_HOST']
+  config.hosts << ENV['DEV_HOST'] if ENV['DEV_HOST'].present?
 end
