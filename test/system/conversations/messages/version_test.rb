@@ -7,7 +7,7 @@ class ConversationMessagesVersionTest < ApplicationSystemTestCase
   end
 
   test "previous icon shows tooltip and next is disabled" do
-    conversations(:versioned).messages.where(version: 2).where("index > 2").delete_all
+    conversations(:versioned).messages.where(version: 2).where("index > 2").destroy_all
     visit_and_scroll_wait conversation_messages_path(conversations(:versioned), version: 2)
 
     msg = hover_last_message
