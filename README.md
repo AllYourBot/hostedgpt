@@ -106,8 +106,7 @@ Every time you pull new changes down, kill docker (if it's running) and re-run:
 HostedGPT requires these services to be running:
 
 - Postgres ([installation instructions](https://www.postgresql.org/download/))
-- Redis ([installation instructions](https://redis.io/download))
-- rbenv or asdf-vm ([installation instructions](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf))
+- rbenv ([installation instructions](https://github.com/rbenv/rbenv))
 
 1. `cd` into your local repository clone
 2. `rbenv install` or `asdf install` to install the correct ruby version

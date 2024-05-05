@@ -10,7 +10,7 @@ class Message::CancellableTest < ActiveSupport::TestCase
     assert_equal users(:keith), messages(:dont_know_day).cancelled_by
   end
 
-  test "when a message is cancelled the redis key gets set" do
+  test "when a message is cancelled this user.last_cancelled_message gets set" do
     Current.user = users(:keith)
 
     assert_changes "messages(:im_a_bot).cancelled_at", from: nil do
@@ -20,7 +20,7 @@ class Message::CancellableTest < ActiveSupport::TestCase
     end
   end
 
-  test "creating a new message on a conversation updates the redis key for that conversation" do
+  test "creating a new message on a conversation updates the conversation.last_assistant_message" do
     assert_changes "@conversation.last_assistant_message_id", from: @previous_id do
       assert_difference "@conversation.messages.count", 2 do
         @conversation.messages.create!(
