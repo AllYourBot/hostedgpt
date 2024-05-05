@@ -12,12 +12,13 @@ class GetNextAIMessageJob < ApplicationJob
     end
   end
 
-  def perform(message_id, assistant_id, attempt = 1)
-    puts "\n### GetNextAIMessageJob.perform(#{message_id}, #{assistant_id}, #{attempt})" unless Rails.env.test?
+  def perform(user_id, message_id, assistant_id, attempt = 1)
+    puts "\n### GetNextAIMessageJob.perform(#{user_id}, #{message_id}, #{assistant_id}, #{attempt})" unless Rails.env.test?
 
-    @message      = Message.find_by(id: message_id)
+    @user         = User.find(user_id)
+    @message      = Message.find(message_id)
     @conversation = @message.conversation
-    @assistant    = Assistant.find_by(id: assistant_id)
+    @assistant    = Assistant.find(assistant_id)
     @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index-1)
 
     return false          if generation_was_cancelled? || message_is_populated?
@@ -153,19 +154,15 @@ class GetNextAIMessageJob < ApplicationJob
 
   def message_cancelled?
     @message.cancelled? ||
-      (@cancel_counter > 1 && @message.id == redis.get("message-cancelled-id")&.to_i)
+      (@cancel_counter > 1 && @message.id == @user.reload.last_cancelled_message_id)
   end
 
   def newer_messages_in_conversation?
     @message != @conversation.latest_message_for_version(@message.version) ||
-      (@cancel_counter > 1 && @message.id != redis.get("conversation-#{@conversation.id}-latest-assistant_message-id")&.to_i)
+      (@cancel_counter > 1 && @message.id != @conversation.reload.last_assistant_message_id)
   end
 
   def message_is_populated?
     @message.content_text.present?
-  end
-
-  def redis
-    RedisConnection.client
   end
 end

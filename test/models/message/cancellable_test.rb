@@ -4,28 +4,24 @@ class Message::CancellableTest < ActiveSupport::TestCase
   setup do
     @conversation = conversations(:greeting)
     @previous_id = @conversation.latest_message_for_version(:latest).id
-
-    redis.set("conversation-#{@conversation.id}-latest-assistant_message-id", @previous_id)
   end
 
-  teardown do
-    redis.set("conversation-#{@conversation.id}-latest-assistant_message-id", @previous_id) # cleanup
+  test "cancelled_by" do
+    assert_equal users(:keith), messages(:dont_know_day).cancelled_by
   end
 
   test "when a message is cancelled the redis key gets set" do
-    redis.set("message-cancelled-id", nil)
+    Current.user = users(:keith)
 
     assert_changes "messages(:im_a_bot).cancelled_at", from: nil do
-      assert_changes "redis.get('message-cancelled-id')&.to_i", to: messages(:im_a_bot).id do
+      assert_changes "users(:keith).last_cancelled_message", to: messages(:im_a_bot) do
         messages(:im_a_bot).cancelled!
       end
     end
-
-    redis.set("message-cancelled-id", nil)
   end
 
   test "creating a new message on a conversation updates the redis key for that conversation" do
-    assert_changes "redis.get('conversation-#{@conversation.id}-latest-assistant_message-id')&.to_i", from: @previous_id do
+    assert_changes "@conversation.last_assistant_message_id", from: @previous_id do
       assert_difference "@conversation.messages.count", 2 do
         @conversation.messages.create!(
           assistant: @conversation.assistant,
@@ -34,12 +30,6 @@ class Message::CancellableTest < ActiveSupport::TestCase
       end
     end
     id = @conversation.latest_message_for_version(:latest).reload.id
-    assert_equal id, redis.get("conversation-#{@conversation.id}-latest-assistant_message-id")&.to_i
-  end
-
-  private
-
-  def redis
-    RedisConnection.client
+    assert_equal id, @conversation.last_assistant_message_id
   end
 end
