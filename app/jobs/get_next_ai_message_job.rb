@@ -159,7 +159,7 @@ class GetNextAIMessageJob < ApplicationJob
 
   def newer_messages_in_conversation?
     @message != @conversation.latest_message_for_version(@message.version) ||
-      (@cancel_counter > 1 && @message.id != @conversation.last_assistant_message_id)
+      (@cancel_counter > 1 && @message.id != @conversation.reload.last_assistant_message_id)
   end
 
   def message_is_populated?
