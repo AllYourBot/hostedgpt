@@ -67,13 +67,6 @@ group :development do
   gem "rubocop-rails"
   gem "rubocop-capybara"
   gem "rubocop-minitest"
-
-  gem "pgreset"
-  gem "htmlbeautifier"
-
-  # https://github.com/kirillplatonov/hotwire-livereload
-  gem "hotwire-livereload", "~> 1.3"
-
   gem "dockerfile-rails", ">= 1.6"
 end
 
