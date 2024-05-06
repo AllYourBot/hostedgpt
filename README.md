@@ -68,17 +68,18 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 # Deploy the app on Fly
 
-The hosting service Fly.io does not have one-click hosting like Render and it does not have a free tier that HostedGPT can fit within, that's why Render is our default recommendation. But Fly is also great and we have created a configuration to make it easy for you to deploy there.
+Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free servie so Fly is actually less expensive over the long term.
 
-1. You must first install the Fly command-line tool [view instructions](https://fly.io/docs/hands-on/install-flyctl/)
-3. Next run `fly launch` and say `Yes` to copy the existing fly.toml but note that it will generate the wrong settings
+1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
+1. Install the Fly command-line tool [view instructions](https://fly.io/docs/hands-on/install-flyctl/)
+3. In the root directory of the repoistory you pulled down, run `fly launch --build-only` and say `Yes` to copy the existing fly.toml, but note that it will generate the wrong settings.
 4. **The settings it shows are INCORRECT** so tell it you want to make changes
-5. When it opens your browser, change the Database to `Fly Postgres` and a name such as `hostedgpt-db` and you can set the configuration to `Development`
-6. Also in the browser, change the Redis to `Upstash for Redis`
-7. Click `Confirm Settings` and close the browser.
-8. The app will do a bunch of build steps and attempt to deploy the app but **it will fail with an error message about "Missing `secret_key_base`"**. When you get back to the command prompt, first scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
-9. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly. (This can't be done until your app exists, which doesn't happen until you attempt your first deploy, that's why we intentionally hit that error.)
-10. Finally run `fly deploy`
+5. When it opens your browser, change the Database to `Fly Postgres` with a name such as `hostedgpt-db` and you can set the configuration to `Development`.
+7. Click `Confirm Settings` at the bottom of the page and close the browser.
+8. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
+9. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly.
+10. Run `fly deploy`
+11. It will automatically deploy 2 servers instead of just 1 so after it finishes deploy run `fly scale count app=1` to scale down to 1 machine.
 
 
 # Contribute as a developer
@@ -106,8 +107,7 @@ Every time you pull new changes down, kill docker (if it's running) and re-run:
 HostedGPT requires these services to be running:
 
 - Postgres ([installation instructions](https://www.postgresql.org/download/))
-- Redis ([installation instructions](https://redis.io/download))
-- rbenv or asdf-vm ([installation instructions](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf))
+- rbenv ([installation instructions](https://github.com/rbenv/rbenv))
 
 1. `cd` into your local repository clone
 2. `rbenv install` or `asdf install` to install the correct ruby version

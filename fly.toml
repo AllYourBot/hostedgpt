@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for hostedgpt on 2024-05-02T12:36:21-05:00
+# fly.toml app configuration file generated for hostedgpt on 2024-05-05T14:39:50-05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -13,16 +13,18 @@ console_command = '/rails/bin/rails console'
 [deploy]
   release_command = './bin/rails db:prepare'
 
+[env]
+  RUN_SOLID_QUEUE_IN_PUMA = 'true'
+
 [processes]
   app = './bin/rails server'
-  solidq = 'bundle exec rake solid_queue:start'
 
 [http_service]
   internal_port = 3000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = false
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
 [checks]
@@ -41,7 +43,7 @@ console_command = '/rails/bin/rails console'
       X-Forwarded-Proto = 'https'
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
 

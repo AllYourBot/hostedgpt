@@ -27,6 +27,7 @@ namespace :db do
       # Implement the logic to send to Fly here
       puts "Sending configuration to Fly..."
       system("fly secrets set RAILS_MASTER_KEY=#{File.read(master_key_path)}")
+      system("fly secrets set SECRET_KEY_BASE=#{config[:secret_key_base]}")
       system("fly secrets set CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV=true")
       system("fly secrets set ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=#{ActiveRecord::Encryption.config.primary_key}")
       system("fly secrets set ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=#{ActiveRecord::Encryption.config.deterministic_key}")
