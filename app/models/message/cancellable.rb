@@ -2,16 +2,14 @@ module Message::Cancellable
   extend ActiveSupport::Concern
 
   included do
-    after_save :save_cancelled_id_to_redis, if: :saved_change_to_cancelled_at?
+    has_one :cancelled_by, class_name: "User", foreign_key: :last_cancelled_message_id, dependent: :nullify
+
+    after_save :set_cancelled_by, if: :saved_change_to_cancelled_at?
   end
 
   private
 
-  def save_cancelled_id_to_redis
-    redis.set("message-cancelled-id", id)
-  end
-
-  def redis
-    RedisConnection.client
+  def set_cancelled_by
+    Current.user&.update!(last_cancelled_message: self)
   end
 end

@@ -25,6 +25,11 @@ class MessageTest < ActiveSupport::TestCase
     assert_instance_of User, messages(:yes_i_do).user
   end
 
+  test "has associated latest_assistant_message_for but can be nil" do
+    assert_nil messages(:dont_know_day).latest_assistant_message_for
+    assert_instance_of Conversation, messages(:im_a_bot).latest_assistant_message_for
+  end
+
   test "create without setting Current or conversation raises" do
     assert_raises ActiveRecord::RecordInvalid do
       Message.create!(content_text: "Hello")
@@ -137,5 +142,28 @@ class MessageTest < ActiveSupport::TestCase
 
     conversations(:greeting).messages.create!(assistant: new_assistant, content_text: "Hello")
     assert_equal new_assistant, conversations(:greeting).reload.assistant
+  end
+
+  test "messages are destroyed when a conversation is destroyed" do
+    msg1 = messages(:popstate)
+    msg2 = messages(:popstate_event)
+
+    assert_difference "Message.count", -2 do
+      msg1.conversation.destroy
+    end
+
+    assert_equal 0, Message.where(id: [msg1.id, msg2.id]).count
+  end
+
+  test "message which is referenced by conversation can be destroyed" do
+    assert_equal messages(:popstate_event), conversations(:javascript).last_assistant_message
+    messages(:popstate_event).destroy
+    assert_nil conversations(:javascript).reload.last_assistant_message
+  end
+
+  test "message which is referenced by user can be destroyed" do
+    assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
+    messages(:dont_know_day).destroy
+    assert_nil users(:keith).reload.last_cancelled_message
   end
 end
