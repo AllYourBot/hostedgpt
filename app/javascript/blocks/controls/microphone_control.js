@@ -4,13 +4,19 @@ export default class extends Control {
   logLevel_info
 
   SpeakInto(num)      { $.volume = num
+                        // $.volumeBuffer.push(num)
+                        // if ($.volumeBuffer.length > 6) $.volumeBuffer.shift()
                         $.msOfSilence = 0
+
                         if (!$.poller) $.poller = runEvery(0.2, () => { $.msOfSilence += 200 })
                       }
   Enable()            { $.status = 'on';  $.microphoneService.start() }
   Disable()           { $.status = 'off'; $.microphoneService.stop() }
 
   attr_volume         = 0
+  // attr_volumeBuffer   = []
+  // attr_noiseVolume    = 0
+  // attr_talkingVolume  = 0
   attr_status         = 'off'
   attr_msOfSilence    = 0
 
@@ -19,11 +25,11 @@ export default class extends Control {
 
   new() {
     $.microphoneService = new MicrophoneService
-    $.microphoneService.onVolumeChanged = (num) => { if (num > 2) SpeakInto(num) }
+    $.microphoneService.onVolumeChanged = (num) => { log(`noise (${num})`); if (num > 2) SpeakInto(num) }
     // SpeakInto.Microphone.at.volume(num) // .to  .at  .with
   }
 
   finalize() {
-    if ($.poller) $.poller.stop()
+    $.poller?.stop()
   }
 }

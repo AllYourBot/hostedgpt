@@ -1,6 +1,6 @@
 ((typeof window !== 'undefined' && window.mock === undefined) ? window : global).g = () => ((typeof window !== 'undefined' && window.mock === undefined) ? window : global)
 g().process = (typeof process === 'undefined') ? {} : process
-
+g().mode = (typeof window !== 'undefined' && window.mock === undefined) ? 'browser' : 'node'
 g().node = {
   env: (() => {
     const env = process?.env?.NODE_ENV ?? 'development'
@@ -29,6 +29,11 @@ g().node = {
 await importDir('lib')
 for (const subdir of subdirsExceptLib('lib'))
   await importDir(subdir)
+
+if (g().mode == 'browser') {
+  g().Microphone = new MicrophoneControl
+  g().Transcriber = new TranscriberControl
+}
 
 // Private
 
