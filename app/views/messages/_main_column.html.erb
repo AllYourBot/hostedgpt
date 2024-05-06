@@ -126,21 +126,23 @@
             class="flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
             data-controller="new-message image-upload"
       >
-        <%= button_tag type: "button",
-              id: "attach-button",
-              class: "absolute left-11 bottom-[26px] w-[23px] h-[23px] relationship:hidden",
-              data: { action: "image-upload#choose" } do
-        %>
-          <%= icon "paper-clip",
-                variant: :mini,
-                size: 23,
-                class: %|
-                  text-black dark:text-white
-                  cursor-pointer stroke-2
-                |,
-                title: 'Attach',
-                tooltip: :top
+        <% if @assistant.images%>
+          <%= button_tag type: "button",
+                id: "attach-button",
+                class: "absolute left-11 bottom-[26px] w-[23px] h-[23px] relationship:hidden",
+                data: { action: "image-upload#choose" } do
           %>
+            <%= icon "paper-clip",
+                  variant: :mini,
+                  size: 23,
+                  class: %|
+                    text-black dark:text-white
+                    cursor-pointer stroke-2
+                  |,
+                  title: 'Attach',
+                  tooltip: :top
+            %>
+          <% end %>
         <% end %>
 
         <div id="document-previews" class="absolute hidden space-x-3 left-9 top-3 show-previews:preview-container" data-image-upload-target="preview">
