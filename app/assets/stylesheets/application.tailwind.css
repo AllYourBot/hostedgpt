@@ -69,7 +69,8 @@
   @apply !pl-4;
 }
 
-.nav-closed .nav-closed\:hidden {
+.nav-closed .nav-closed\:hidden,
+.relationship .relationship\:hidden {
   @apply hidden;
 }
 
