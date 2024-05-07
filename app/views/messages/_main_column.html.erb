@@ -184,13 +184,15 @@
         <% if @streaming_message %>
           <%= form_with(
             model: @streaming_message,
-            class: "absolute top-2 right-8 z-10",
+            class: "absolute top-2 right-8 z-20",
             data: {
               new_message_target: "cancel",
               turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
           }) do |form| %>
             <%= form.hidden_field :cancelled_at, value: Time.current %>
-            <%= form.button id: "cancel", type: "submit", class: "relative bg-white dark:bg-gray-800" do %>
+            <%= form.button type: "submit",
+              id: "cancel",
+              class: "relative bg-white dark:bg-gray-800" do %>
               <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
               <%= icon "stop-circle", variant: :outline, size: 39, title: 'Stop', tooltip: :top %>
             <% end %>
@@ -217,7 +219,7 @@
               application_target: "newMessageField",
               controller: "textarea-autogrow",
               action: %|
-                new-message#toggleSubmitButton
+                new-message#determineSubmitButtonState
 
                 keydown.enter->new-message#submitForm:prevent
                 keydown.meta+enter->new-message#submitForm
@@ -237,7 +239,7 @@
               |
             },
             rows: 1,
-            placeholder: "Message #{@assistant.name} ...",
+            placeholder: "Enter to send",
             class: %|
               w-full pt-[14px] pb-[13px] min-h-14
               mb-2 block
@@ -252,14 +254,15 @@
             |
           %>
 
-          <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
+          <div
+            data-new-message-target="submit"
+            class="hidden absolute right-8 bottom-4 w-[39px] h-[39px]"
+          >
             <%= form.button type: "button",
               data: {
-                new_message_target: "submit",
                 action: "new-message#submitForm"
               },
               id: "send",
-              disabled: true,
               class: %w|
                 text-gray-100 dark:text-gray-600
                 enabled:text-black
@@ -271,9 +274,44 @@
           </div>
 
           <div
+            data-new-message-target="microphone"
+            class="absolute right-9 bottom-6 w-[26px] h-[26px] z-10"
+          >
+            <%= form.button type: "button",
+              data: {
+                new_message_target: "microphoneEnable",
+                action: "new-message#toggleMicrophone"
+              },
+              id: "microphone-enable",
+              class: %w|
+                text-gray-100 dark:text-gray-600
+                enabled:text-black
+                enabled:dark:text-white
+              | do
+            %>
+              <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
+            <% end %>
+
+            <%= form.button type: "button",
+              data: {
+                new_message_target: "microphoneDisable",
+                action: "new-message#toggleMicrophone"
+              },
+              id: "microphone-disable",
+              class: %w|
+                hidden
+                text-red-600 dark:text-gray-600
+              | do
+            %>
+              <%= icon "microphone", variant: :solid, size: 26, title: 'Stop', tooltip: :top %>
+            <% end %>
+          </div>
+
+          <div
             id="composer-overlay"
             data-new-message-target="overlay"
-            class="absolute inset-0 bg-white dark:bg-gray-800 !bg-opacity-65 hidden">
+            data-action="click->new-message#disableMicrophone"
+            class="absolute inset-0 bg-white dark:bg-red-800 !bg-opacity-65 hidden">
           </div>
 
         <% end %>

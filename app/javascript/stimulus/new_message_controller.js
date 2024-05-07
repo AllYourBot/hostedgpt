@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "form", "input", "submit", "overlay", "cancel" ]
+  static targets = [ "form", "input", "submit", "overlay", "cancel",
+    "microphone", "microphoneEnable", "microphoneDisable" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -10,7 +11,9 @@ export default class extends Controller {
   connect() {
     this.inputTarget.focus()
     this.cursorToEnd()
-    this.toggleSubmitButton()
+    this.determineSubmitButtonState()
+    this.microphoneEnabled = false
+    this.inputDefaultPlaceholder = this.inputTarget.placeholder
   }
 
   cursorToEnd() {
@@ -20,14 +23,43 @@ export default class extends Controller {
   }
 
   // Disable the submit button if the input is empty.
-  toggleSubmitButton() {
+  determineSubmitButtonState() {
+    console.log(`determining submit button state: ${this.cleanInputValue.length}`)
     if (this.cleanInputValue.length < 1) {
-      this.submitTarget.disabled = true
+      this.submitTarget.classList.add('hidden')
+      this.microphoneTarget.classList.remove('hidden')
       if (this.hasCancelTarget) this.cancelTarget.classList.remove('hidden')
     } else {
-      this.submitTarget.disabled = false
+      this.submitTarget.classList.remove('hidden')
+      this.microphoneTarget.classList.add('hidden')
       if (this.hasCancelTarget) this.cancelTarget.classList.add('hidden')
     }
+  }
+
+  toggleMicrophone() {
+    if (this.microphoneEnabled)
+      this.disableMicrophone()
+    else
+      this.enableMicrophone()
+  }
+
+  enableMicrophone() {
+    this.microphoneEnableTarget.classList.add('hidden')
+    this.microphoneDisableTarget.classList.remove('hidden')
+    this.disableComposer()
+    this.inputTarget.placeholder = "Speak aloud..."
+    this.microphoneEnabled = !this.microphoneEnabled
+  }
+
+  disableMicrophone() {
+    if (!this.microphoneEnabled) return
+
+    this.microphoneEnableTarget.classList.remove('hidden')
+    this.microphoneDisableTarget.classList.add('hidden')
+    this.enableComposer()
+    this.inputTarget.placeholder = this.inputDefaultPlaceholder
+    this.microphoneEnabled = !this.microphoneEnabled
+    this.determineSubmitButtonState()
   }
 
   focusKeydown(event) {
@@ -61,14 +93,25 @@ export default class extends Controller {
     // morphed back to being hidden. We listen for that morph and use that as a trigger to clear the text input.
     // This allows the composer to keep focus across multiple chat submits, but it also does not steal the focus
     // back if the user clicks elsewhere while waiting for a server submission to complete.
-    this.overlayTarget.addEventListener('turbo:before-morph-element', this.boundEnableComposer, { once: true })
-    this.overlayTarget.classList.remove('hidden')
+    this.overlayTarget.addEventListener('turbo:before-morph-element', this.boundResetForm, { once: true })
+    this.disableComposer()
     this.submitTarget.disabled = true
   }
 
-  boundEnableComposer = () => { this.enableComposer() }
+  disableComposer() {
+    this.overlayTarget.classList.remove('hidden')
+  }
+
   enableComposer() {
+    this.overlayTarget.classList.add('hidden')
+    this.inputTarget.focus()
+  }
+
+  boundResetForm = () => { this.resetForm() }
+  resetForm() {
+    console.log(`resetting`)
     this.formTarget.reset()
+    this.determineSubmitButtonState()
   }
 
   smartPaste(event) {
