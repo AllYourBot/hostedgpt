@@ -19,4 +19,8 @@ export default class extends Service {
     $.handler = null
     $.cleared = true
   }
+
+  valueOf() {
+    return !!$.handler
+  }
 }

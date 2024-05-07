@@ -14,43 +14,42 @@ import Control from "./control.js"
 export default class extends Control {
   logLevel_info
 
+    Flip(on)          { if (on && !$.active) {
+                          $.active = true
+                          $.transcriberService.start()
+                          Microphone.Flip(true)
+                          Listener.Invoke()
+                        } else if (!on && $.active) {
+                          $.active = false
+                          $.transcriberService.stop()
+                          Microphone.Flip(false)
+                          Listener.Dismiss()
+                        }
+                      }
+
   log_SpeakTo
-  SpeakTo(text)   { $.words += text+' '
-                    if (!$.poller) $.poller = runEvery(0.2, () => {
-                      if (Microphone.msOfSilence <= 1800) return // what if there is background noise?
+  SpeakTo(text)       { $.words += text+' '
+                        if (!$.poller?.handler) $.poller = runEvery(0.2, () => {
+                          log('enough silence...')
+                          if (Microphone.msOfSilence <= 1800) return // what if there is background noise?
 
-                      console.log(`## Consider ${$.words}`)
+                          Listener.Tell($.words)
+                          $.words = ''
+                          $.poller.stop()
+                        })
+                        else
+                          log('poller is already pending')
+                      }
 
-                      // what should paused state do?
 
+  attr_words          = ''
+	attr_active         = false
 
-                      // if (Bot.waiting)
-                      //   Tell.Bot.to($.words)
-                      // else
-                      //   Interrupt.Bot.with($.words)
-
-                      $.words = ''
-                      $.poller?.stop()
-                    })
-                  }
-  Start()	        { $.status = 'started'; $.transcriberService.start(); Microphone.Enable() }
-	Pause()	        { $.status = 'paused';  $.transcriberService.pause() } // TODO: implement this
-	End()		        { $.status = 'ended'
-                    $.poller?.stop()
-                    $.transcriberService.end()
-                    Microphone.Disable()
-                  }
-
-  attr_words      = ''
-	attr_status     = 'ended'
-
-	get paused() 	  { $.status == 'paused' }
-	get listening()	{ $.status == 'started' }
-	get ended()		  { $.status == 'ended' }
+	get on() 	          { $.active == 'paused' }
+	get off()	          { $.active == 'started' }
 
 	new() {
 		$.transcriberService = new TranscriberService
 		$.transcriberService.onTextReceived = (text) => SpeakTo(text)
-    // SpeakTo.Transcriber.with.words(text)
 	}
 }

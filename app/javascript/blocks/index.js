@@ -33,6 +33,7 @@ for (const subdir of subdirsExceptLib('lib'))
 if (g().mode == 'browser') {
   g().Microphone = new MicrophoneControl
   g().Transcriber = new TranscriberControl
+  g().Listener = new ListenerControl
 }
 
 // Private

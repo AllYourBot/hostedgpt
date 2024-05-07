@@ -25,10 +25,8 @@ export default class extends Service {
   }
 
 	start()         { $.intendedState = 'started';  _executeStart() }
-	pause()         { $.intendedState = 'paused';   _executePause() }
 	end()           { $.intendedState = 'ended';    _executeEnd() }
 
-  get paused() 	  { $.state == 'paused' }
 	get listening()	{ $.state == 'started' }
 	get ended()		  { $.state == 'ended' }
 
@@ -42,18 +40,12 @@ export default class extends Service {
 			_onStart()
 	}
 
-	_executePause() {
-		if ($.state != 'started') $.recognizer.start() // triggers no callback
-		_onPause()
-	}
-
 	_executeEnd() {
 		$.recognizer.abort()
 	}
 
 	_executeIntendedState() {
 		if ($.intendedState == 'started') _executeStart()
-		if ($.intendedState == 'paused')  _executePause()
 		if ($.intendedState == 'ended')   _executeEnd()
 	}
 
@@ -64,11 +56,6 @@ export default class extends Service {
     $.state = 'started' // we may not intend this but we're here
     if ($.intendedState != 'started') _executeIntendedState()
 	}
-
-  log_onPause
-	_onPause() { // this never automatically fires
-    $.state = 'paused'
-  }
 
   log_onEnd
 	_onEnd() {
