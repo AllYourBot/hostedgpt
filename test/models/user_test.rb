@@ -5,6 +5,11 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
+  test "has a last_cancelled_message but can be nil" do
+    assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
+    assert_nil users(:rob).last_cancelled_message
+  end
+
   test "should not validate a new user without password" do
     user = User.new
     person = Person.new(email: "example@gmail.com", personable: user)

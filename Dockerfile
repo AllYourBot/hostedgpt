@@ -117,17 +117,12 @@ FROM ruby:${RUBY_VERSION}-alpine AS render-production
 
 RUN apk add --no-cache git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
 
-ENV BUNDLE_CACHE=/tmp/bundle \
-  BUNDLE_JOBS=2 \
-  PORT=3000
-
 WORKDIR /rails
 COPY Gemfile Gemfile.lock .ruby-version ./
 
-RUN --mount=type=cache,id=gems,target=/tmp/bundle \
-  bundle install
-
-ENV BUNDLE_DEPLOYMENT=1 \
+ENV BUNDLE_CACHE=/tmp/bundle \
+  BUNDLE_JOBS=2 \
+  BUNDLE_DEPLOYMENT=1 \
   BUNDLE_WITHOUT=development \
   RAILS_ENV=production \
   PORT=8080

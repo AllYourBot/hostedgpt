@@ -69,6 +69,11 @@
   @apply !pl-4;
 }
 
+.relationship .relationship\:hidden,
+.relationship.relationship\:hidden {
+  @apply !hidden;
+}
+
 .nav-closed .nav-closed\:hidden {
   @apply hidden;
 }

@@ -5,6 +5,7 @@ class Message < ApplicationRecord
   belongs_to :conversation
   belongs_to :content_document, class_name: "Document", optional: true
   belongs_to :run, optional: true
+  has_one :latest_assistant_message_for, class_name: "Conversation", foreign_key: :last_assistant_message_id, dependent: :nullify
 
   enum role: %w[user assistant].index_by(&:to_sym)
 
@@ -20,7 +21,7 @@ class Message < ApplicationRecord
   validate  :validate_assistant,     if: -> { assistant.present? && Current.user }
 
   after_create :start_assistant_reply, if: :user?
-  after_create :set_latest_assistant_message, if: :assistant?
+  after_create :set_last_assistant_message, if: :assistant?
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
 
   scope :ordered, -> { latest_version_for_conversation }
@@ -49,8 +50,8 @@ class Message < ApplicationRecord
     )
   end
 
-  def set_latest_assistant_message
-    redis.set("conversation-#{conversation_id}-latest-assistant_message-id", id)
+  def set_last_assistant_message
+    conversation.update!(last_assistant_message: self)
   end
 
   def update_assistant_on_conversation

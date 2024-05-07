@@ -11,6 +11,7 @@ class User < ApplicationRecord
 
   has_many :assistants, dependent: :destroy
   has_many :conversations, dependent: :destroy
+  belongs_to :last_cancelled_message, class_name: "Message", optional: true
 
   serialize :preferences, coder: JsonSerializer
 
