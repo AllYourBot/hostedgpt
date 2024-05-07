@@ -38,6 +38,13 @@ class MarkdownRenderer
   end
 
   def self.ensure_newline_before_code_block_start(markdown)
-    markdown.gsub(/(?<!^[ \t]*\n\n)^[ \t]{0,3}```.*?```/m, "\n\\0")
+    markdown.gsub(/^[ \t]{0,3}```.*?```/m) do |match|
+      indentation = $&.scan(/^[ \t]*/).first.length
+      if indentation <= 3 && match !~ /\A\n/
+        "\n" + match
+      else
+        match
+      end
+    end
   end
 end
