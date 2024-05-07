@@ -17,13 +17,16 @@ export default class extends Control {
     Flip(on)          { if (on && !$.active) {
                           $.active = true
                           $.transcriberService.start()
-                          Microphone.Flip(true)
-                          Listener.Invoke()
+
+                          Flip.Microphone.on()
+                          Invoke.Listener()
+
                         } else if (!on && $.active) {
                           $.active = false
                           $.transcriberService.stop()
-                          Microphone.Flip(false)
-                          Listener.Dismiss()
+
+                          Flip.Microphone.off()
+                          Dismiss.Listener()
                         }
                       }
 
@@ -33,12 +36,10 @@ export default class extends Control {
                           log('enough silence...')
                           if (Microphone.msOfSilence <= 1800) return // what if there is background noise?
 
-                          Listener.Tell($.words)
+                          Tell.Listener.to.consider($.words)
                           $.words = ''
                           $.poller.stop()
                         })
-                        else
-                          log('poller is already pending')
                       }
 
 
@@ -50,6 +51,6 @@ export default class extends Control {
 
 	new() {
 		$.transcriberService = new TranscriberService
-		$.transcriberService.onTextReceived = (text) => SpeakTo(text)
+		$.transcriberService.onTextReceived = (text) => SpeakTo.Transcriber.with.words(text)
 	}
 }

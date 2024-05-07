@@ -5,10 +5,10 @@ export default class extends Control {
 
   log_Consider
   Tell(words)         { if (_intendedDismiss(words)) {
-                          Dismiss()
+                          Dismiss.Listener()
                           return
                         }
-                        if (_intendedInvoke(words)) Invoke()
+                        if (_intendedInvoke(words)) Invoke.Listener()
                         if (!$.processing) return // gave Invoke() a chance
 
                         $.consideration = words
@@ -17,13 +17,13 @@ export default class extends Control {
   log_Invoke
   Invoke()            { if (!$.processing) {
                           $.processing = true
-                          Transcriber.Flip(true)
+                          Flip.Transcriber.on()
                         }
                       }
   log_Dismiss
   Dismiss()           { if ($.processing) {
                           $.processing = false
-                          Transcriber.Flip(true) // so it can wait for "wake" words
+                          Flip.Transcriber.on() // so it can wait for "wake" words
                         }
                       }
 

@@ -49,7 +49,7 @@ export default class {
     this._getterMethods = this._allMethods.filter(prop => this._descriptors[prop].get)
     this._setterMethods = this._allMethods.filter(prop => this._descriptors[prop].set)
     this._getterAndSetterMethods = this._allMethods.filter(prop => this._descriptors[prop].get || this._descriptors[prop].set)
-    this._callableMethods = [...this._allMethodsExceptGetterAndSetter.excluding('new'), 'log']
+    this._callableMethodsExceptUppercase = [...this._allMethodsExceptGetterAndSetter.excluding('new').filter(prop => prop[0] && prop[0] === prop[0].toLowerCase()), 'log']
   }
 
   _wrapMethods() {
@@ -63,7 +63,7 @@ export default class {
       const body = `
         {
           const $ = this.attributes;
-          ${this._callableMethods.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
+          ${this._callableMethodsExceptUppercase.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
           ${this._getterMethods.map(func => 'const '+func+' = (v) => { return (typeof v == "undefined") ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").get() : Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").set(v); };').join("\n")}
           this._methodLog('${func}', arguments, this.${func}.length);
 
@@ -86,7 +86,7 @@ export default class {
         const body = `
           {
             const $ = this.attributes;
-            ${this._callableMethods.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
+            ${this._callableMethodsExceptUppercase.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
             ${this._getterMethods.map(func => 'const '+func+' = (v) => { return (typeof v == "undefined") ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").get() : Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").set(v); };').join("\n")}
             this._methodLog('${func}', [], 0)
 
@@ -108,7 +108,7 @@ export default class {
         const body = `
           {
             const $ = this.attributes;
-            ${this._callableMethods.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
+            ${this._callableMethodsExceptUppercase.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
             ${this._getterMethods.map(func => 'const '+func+' = (v) => { return (typeof v == "undefined") ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").get() : Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").set(v); };').join("\n")}
             this._methodLog('${func}', [${arg}], 1);
 

@@ -6,11 +6,11 @@ export default class extends Control {
   Flip(on)            { if (on && !$.active) {
                           $.active = true
                           $.microphoneService.start()
-                          Transcriber.Flip(true)
+                          Flip.Transcriber.on()
                         } else if (!on && $.active) {
                           $.active = false
                           $.microphoneService.stop()
-                          Transcriber.Flip(false)
+                          Flip.Transcriber.off()
                         }
                       }
 
@@ -32,7 +32,10 @@ export default class extends Control {
 
   new() {
     $.microphoneService = new MicrophoneService
-    $.microphoneService.onVolumeChanged = (num) => { if (num > 2) SpeakInto(num) }
+    $.microphoneService.onVolumeChanged = (num) => {
+      if (num > 2)
+      SpeakInto.Microphone.at.volume(num)
+    }
   }
 
   finalize() {
