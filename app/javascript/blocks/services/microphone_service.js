@@ -11,12 +11,11 @@ export default class extends Service {
 
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, echoCancellation: true, noiseSuppression: true })
-
+      $.stream = await navigator.mediaDevices.getUserMedia({ audio: true, echoCancellation: true, noiseSuppression: true })
       $.audioContext = new AudioContext()
-      $.audioListener = $.audioContext.createMediaStreamSource(stream)
+      $.audioSource = $.audioContext.createMediaStreamSource($.stream)
       $.audioProcessor = $.audioContext.createScriptProcessor(2048, 1, 1)
-      $.audioListener.connect($.audioProcessor)
+      $.audioSource.connect($.audioProcessor)
       $.audioProcessor.connect($.audioContext.destination)
 
       $.audioProcessor.onaudioprocess = (event) => processVolume(event)
@@ -27,11 +26,12 @@ export default class extends Service {
     }
   }
 
-  log_stop
-  stop() {
-    if ($.audioContext) $.audioContext.close()
-    if ($.audioListener) $.audioListener.disconnect()
+  log_end
+  end() {
     if ($.audioProcessor) $.audioProcessor.disconnect()
+    if ($.audioSource) $.audioSource.disconnect()
+    if ($.audioContext) $.audioContext.close()
+    if ($.stream) $.stream.getTracks().forEach(track => track.stop())
 
     $.active = false
     $.volume = null

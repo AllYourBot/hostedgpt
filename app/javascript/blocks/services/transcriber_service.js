@@ -18,7 +18,7 @@ export default class extends Service {
   }
 
   _initSpeechRecognizer() {
-		$.recognizer = ('webkitSpeechRecognition' in window) ? new webkitSpeechRecognition() : {}
+		$.recognizer = ('webkitSpeechRecognition' in window) ? new webkitSpeechRecognition() : new SpeechRecognition()
 		$.recognizer.continuous = true
     // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
     $.recognizer.lang = "" // blank uses system's default language

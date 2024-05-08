@@ -27,6 +27,10 @@ export default class extends Control {
                         }
                       }
 
+  End()               { $.processing = false
+                        Flip.Transcriber.off()
+                      }
+
   attr_consideration  = ''
 	attr_processing     = false
 

@@ -2,18 +2,30 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
-    "microphone", "microphoneEnable", "microphoneDisable" ]
+    "microphoneEnable", "microphoneDisable" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
   }
 
   connect() {
+    this.inputDefaultPlaceholder = this.inputTarget.placeholder
     this.inputTarget.focus()
     this.cursorToEnd()
-    this.determineSubmitButtonState()
-    this.microphoneEnabled = false
-    this.inputDefaultPlaceholder = this.inputTarget.placeholder
+    this.determineSubmitButton()
+
+    Listener.onConsiderationChanged = () => {
+      this.inputTarget.value = Listener.consideration
+      this.submitForm()
+    }
+
+    document.addEventListener('turbo:morph', this.boundDetermineMicButton)
+    document.addEventListener('turbo:frame-render', this.boundDetermineMicButton)
+  }
+
+  disconnect() {
+    document.removeEventListener('turbo:morph', this.boundDetermineMicButton)
+    document.removeEventListener('turbo:frame-render', this.boundDetermineMicButton)
   }
 
   cursorToEnd() {
@@ -22,25 +34,24 @@ export default class extends Controller {
         this.inputTarget.value.length
   }
 
-  // Disable the submit button if the input is empty.
-  determineSubmitButtonState() {
-    console.log(`determining submit button state: ${this.cleanInputValue.length}`)
+  determineSubmitButton() {
     if (this.cleanInputValue.length < 1) {
       this.submitTarget.classList.add('hidden')
-      this.microphoneTarget.classList.remove('hidden')
       if (this.hasCancelTarget) this.cancelTarget.classList.remove('hidden')
     } else {
       this.submitTarget.classList.remove('hidden')
-      this.microphoneTarget.classList.add('hidden')
       if (this.hasCancelTarget) this.cancelTarget.classList.add('hidden')
     }
   }
 
-  toggleMicrophone() {
-    if (this.microphoneEnabled)
-      this.disableMicrophone()
-    else
+  boundDetermineMicButton = () => { this.determineMicButton() }
+  determineMicButton() {
+    console.log('determineMicButton')
+    if (Microphone.on) {
       this.enableMicrophone()
+    } else {
+      this.disableMicrophone()
+    }
   }
 
   enableMicrophone() {
@@ -48,18 +59,18 @@ export default class extends Controller {
     this.microphoneDisableTarget.classList.remove('hidden')
     this.disableComposer()
     this.inputTarget.placeholder = "Speak aloud..."
-    this.microphoneEnabled = !this.microphoneEnabled
+    Flip.Microphone.on()
   }
 
   disableMicrophone() {
-    if (!this.microphoneEnabled) return
+    //if (Microphone.off) return
 
     this.microphoneEnableTarget.classList.remove('hidden')
     this.microphoneDisableTarget.classList.add('hidden')
     this.enableComposer()
     this.inputTarget.placeholder = this.inputDefaultPlaceholder
-    this.microphoneEnabled = !this.microphoneEnabled
-    this.determineSubmitButtonState()
+    Flip.Microphone.off()
+    this.determineSubmitButton()
   }
 
   focusKeydown(event) {
@@ -100,6 +111,7 @@ export default class extends Controller {
 
   disableComposer() {
     this.overlayTarget.classList.remove('hidden')
+    this.inputTarget.blur()
   }
 
   enableComposer() {
@@ -111,7 +123,7 @@ export default class extends Controller {
   resetForm() {
     console.log(`resetting`)
     this.formTarget.reset()
-    this.determineSubmitButtonState()
+    this.determineSubmitButton()
   }
 
   smartPaste(event) {

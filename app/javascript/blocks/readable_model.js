@@ -7,7 +7,7 @@ export default class {
   }
 
   constructor() {
-    this.attributes = {}
+    this.attributes = this._createAttributeProxy({})
     this.$ = this.attributes // Define '$' as a property of 'this'
     this._haveSetDefaultAttributes = false
     this.$['class'] = this.constructor
@@ -38,6 +38,22 @@ export default class {
           return Reflect.set(...arguments)
       }
     })
+  }
+
+  _createAttributeProxy(attr) {
+    const handler = {
+      set: (obj, prop, value) => {
+        if (obj[prop] !== value) {
+          obj[prop] = value
+          const changeHandler = `on${prop.capitalize()}Changed`
+          if (typeof this[changeHandler] === 'function') {
+            this[changeHandler](value)
+          }
+        }
+        return true // indicates success
+      }
+    }
+    return new Proxy(attr, handler)
   }
 
   _analyzeMethods() {

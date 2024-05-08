@@ -3,13 +3,13 @@ import Control from "./control.js"
 export default class extends Control {
   logLevel_info
 
-  Flip(on)            { if (on && !$.active) {
+  Flip(turnOn)          { if (turnOn && !$.active) {
                           $.active = true
-                          $.microphoneService.start()
+                          void $.microphoneService.start()
                           Flip.Transcriber.on()
-                        } else if (!on && $.active) {
+                        } else if (!turnOn && $.active) {
                           $.active = false
-                          $.microphoneService.stop()
+                          $.microphoneService.end()
                           Flip.Transcriber.off()
                         }
                       }
@@ -33,12 +33,11 @@ export default class extends Control {
   new() {
     $.microphoneService = new MicrophoneService
     $.microphoneService.onVolumeChanged = (num) => {
-      if (num > 2)
-      SpeakInto.Microphone.at.volume(num)
+      if (num > 2) SpeakInto.Microphone.at.volume(num)
     }
   }
 
   finalize() {
-    $.poller?.stop()
+    $.poller?.end()
   }
 }

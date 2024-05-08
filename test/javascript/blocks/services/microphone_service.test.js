@@ -15,14 +15,14 @@ describe('tests on an instance', () => {
     await microphone.start()
   })
 
-  test('stop() after start makes things inactive', async() => {
+  test('end() after start makes things inactive', async() => {
     expect(microphone.$.active).toStrictEqual(true)
-    microphone.stop()
+    microphone.end()
     expect(microphone.$.active).toStrictEqual(false)
   })
 
-  test('start() still works after a stop()', async() => {
-    microphone.stop()
+  test('start() still works after a end()', async() => {
+    microphone.end()
     expect(microphone.$.active).toStrictEqual(false)
     await microphone.start()
     expect(microphone.$.active).toStrictEqual(true)

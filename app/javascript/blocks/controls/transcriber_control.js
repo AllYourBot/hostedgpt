@@ -14,19 +14,19 @@ import Control from "./control.js"
 export default class extends Control {
   logLevel_info
 
-    Flip(on)          { if (on && !$.active) {
+  Flip(turnOn)        { if (turnOn && !$.active) {
                           $.active = true
                           $.transcriberService.start()
 
                           Flip.Microphone.on()
                           Invoke.Listener()
 
-                        } else if (!on && $.active) {
+                        } else if (!turnOn && $.active) {
                           $.active = false
-                          $.transcriberService.stop()
+                          $.transcriberService.end()
 
                           Flip.Microphone.off()
-                          Dismiss.Listener()
+                          End.Listener()
                         }
                       }
 
@@ -38,10 +38,9 @@ export default class extends Control {
 
                           Tell.Listener.to.consider($.words)
                           $.words = ''
-                          $.poller.stop()
+                          $.poller.end()
                         })
                       }
-
 
   attr_words          = ''
 	attr_active         = false

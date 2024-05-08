@@ -12,7 +12,7 @@ export default class extends Service {
     $.type = type
   }
 
-  stop() {
+  end() {
     if (! $.handler) return
     if ($.type == 'setTimeout') clearTimeout($.handler)
     if ($.type == 'setInterval') clearInterval($.handler)

@@ -43,6 +43,7 @@ function allMethodsCall(actionFunction) {
 }
 
 if (g().mode == 'browser') {
+  console.log(`initializing Blocks`)
   g().Microphone = new MicrophoneControl
   g().Transcriber = new TranscriberControl
   g().Listener = new ListenerControl
@@ -83,6 +84,10 @@ if (g().mode == 'browser') {
 
   g().Tell = {
     Listener: allMethodsCall((...args) => g().Listener.Tell(...args))
+  }
+
+  g().End = {
+    Listener: allMethodsCall((...args) => g().Listener.End(...args))
   }
 }
 

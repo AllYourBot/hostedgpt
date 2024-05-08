@@ -219,7 +219,7 @@
               application_target: "newMessageField",
               controller: "textarea-autogrow",
               action: %|
-                new-message#determineSubmitButtonState
+                new-message#determineSubmitButton
 
                 keydown.enter->new-message#submitForm:prevent
                 keydown.meta+enter->new-message#submitForm
@@ -254,58 +254,67 @@
             |
           %>
 
-          <div
-            data-new-message-target="submit"
-            class="hidden absolute right-8 bottom-4 w-[39px] h-[39px]"
-          >
-            <%= form.button type: "button",
-              data: {
-                action: "new-message#submitForm"
-              },
-              id: "send",
-              class: %w|
-                text-gray-100 dark:text-gray-600
-                enabled:text-black
-                enabled:dark:text-white
-              | do
-            %>
-              <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
-            <% end %>
-          </div>
+          <!-- options for the composer right button -->
 
-          <div
-            data-new-message-target="microphone"
-            class="absolute right-9 bottom-6 w-[26px] h-[26px] z-10"
-          >
-            <%= form.button type: "button",
-              data: {
-                new_message_target: "microphoneEnable",
-                action: "new-message#toggleMicrophone"
-              },
-              id: "microphone-enable",
-              class: %w|
-                text-gray-100 dark:text-gray-600
-                enabled:text-black
-                enabled:dark:text-white
-              | do
-            %>
-              <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
-            <% end %>
+          <%= form.button type: "button",
+            data: {
+              new_message_target: "microphoneDisable",
+              action: "new-message#disableMicrophone"
+            },
+            id: "microphone-disable",
+            class: %w|
+              hidden
+              z-40
+              absolute right-8 bottom-4
+              w-[40px] h-[40px]
+              flex items-center justify-center
+              text-red-600 dark:text-gray-600
+              bg-white dark:bg-gray-800
+            | do
+          %>
+            <%= icon "microphone", variant: :solid, size: 26, title: 'Stop', tooltip: :top %>
+          <% end %>
 
-            <%= form.button type: "button",
-              data: {
-                new_message_target: "microphoneDisable",
-                action: "new-message#toggleMicrophone"
-              },
-              id: "microphone-disable",
-              class: %w|
-                hidden
-                text-red-600 dark:text-gray-600
-              | do
-            %>
-              <%= icon "microphone", variant: :solid, size: 26, title: 'Stop', tooltip: :top %>
-            <% end %>
-          </div>
+          <%= form.button type: "button",
+            data: {
+              new_message_target: "submit",
+              action: "new-message#submitForm"
+            },
+            id: "send",
+            class: %w|
+              hidden
+              z-30
+              absolute right-8 bottom-4
+              w-[39px] h-[39px]
+              text-gray-100 dark:text-gray-600
+              enabled:text-black
+              enabled:dark:text-white
+              bg-white dark:bg-gray-800
+            | do
+          %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
+          <% end %>
+
+          <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
+
+          <%= form.button type: "button",
+            data: {
+              new_message_target: "microphoneEnable",
+              action: "new-message#enableMicrophone"
+            },
+            id: "microphone-enable",
+            class: %w|
+              z-10
+              absolute right-8 bottom-4
+              w-[40px] h-[40px]
+              flex items-center justify-center
+              text-gray-100 dark:text-gray-600
+              enabled:text-black
+              enabled:dark:text-white
+            | do
+          %>
+            <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
+          <% end %>
 
           <div
             id="composer-overlay"

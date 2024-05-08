@@ -7,7 +7,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  if (timeout) timeout.stop()
+  if (timeout) timeout.end()
 })
 
 test('runAfter can been declared, it returns a TimeoutService', async() => {
@@ -29,7 +29,7 @@ test('runAfter executed flag', async() => {
 test('runAfter cleared flag', async() => {
   timeout = runAfter(1, () => 'hello')
   expect(timeout.cleared).toStrictEqual(false)
-  timeout.stop()
+  timeout.end()
   expect(timeout.cleared).toStrictEqual(true)
 })
 
@@ -59,7 +59,7 @@ test('runEvery executed flag', async() => {
 test('runEvery cleared flag', async() => {
   timeout = runEvery(1, () => {})
   expect(timeout.cleared).toStrictEqual(false)
-  timeout.stop()
+  timeout.end()
   expect(timeout.cleared).toStrictEqual(true)
 })
 

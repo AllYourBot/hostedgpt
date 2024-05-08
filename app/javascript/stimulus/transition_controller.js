@@ -2,7 +2,11 @@ import { Controller } from '@hotwired/stimulus'
 
 // Example:
 //
-// <div data-controller="transition" data-transition-toggle-class="!hidden">
+// <div
+//   data-controller="transition"
+//   data-transition-toggle-class="!hidden"
+//   data-transition-after-timeout-value="3000"
+// >
 //   <div id="element-that-shows-and-hides" class="block" data-transition-target="transitionable"></div>
 //   <a href="#" data-action="transition#toggleClass">click to toggle</a>
 // </div>
