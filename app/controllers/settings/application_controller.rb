@@ -10,7 +10,7 @@ class Settings::ApplicationController < ApplicationController
       assistants: Current.user.assistants.ordered.map {
         |assistant| [ assistant, edit_settings_assistant_path(assistant) ]
       }.to_h.merge({
-        #'New Assistant': new_settings_assistant_path(assistant)
+        'New Assistant': new_settings_assistant_path
       }),
 
       people: {

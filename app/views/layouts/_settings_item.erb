@@ -1,6 +1,8 @@
 <% item, link = settings_item %>
 <% selected = (controller.to_s == controller_name.to_s) %>
-<% selected = selected && params[:id] == item.id.to_s  if params[:id] %>
+<% compare_id = item.respond_to?(:id) ? item.id.to_s : '' %>
+<% selected = selected && params[:id] == compare_id  if params[:id] %>
+<% selected = selected && request.fullpath == link if params[:id].blank? %>
 
 <div class="
             flex justify-between items-center
