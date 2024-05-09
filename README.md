@@ -129,6 +129,18 @@ The `render.yml` specifies details of the Render production environment. Note th
 The `fly.toml` specifies details of the Fly production environment. It references the `fly-production` build target. The Fly section of the Dockerfile was generated using the dockerfile-rails generator. This is Fly's recommendation and it produces a reasonable production-ready Dockerfile. Edits to this _top section_ of the file have been kept very minimal, on purpose, because it's intended to be updated using the generator. When it was originally generated it saved all the configuration parameters into `config/dockerfile.yml`. When you run `bin/rails generate dockerfile` it will read all these configurations and attempt to re-generate the Dockerfile. You can try this, it will warn you that it's going to overwrite, and press `d` to see the diff of what changes it will make. There should be no functional changes above the line `#### END of FLY ####`. Imagine you wanted to use this generator to change the app to use MySQL ((view all generator options)[https://github.com/fly-apps/dockerfile-rails]). You could run `bin/rails generate dockerfile --mysql` and it would update your Gemfile, automatically run bundle install to install any gem changes, and then it will attempt to update Dockerfile where you can again press `d`. Inspect the diff of any changes above the line `#### END of FLY ####` and manually apply those changes. Similarly, view the diff for dockerignore and docker-entrypoint, although none of those changes should be necessary. When you get to `fly.toml` you will want to view that diff closely and manually apply those changes. At the end it will update config/dockerfile.yml to record the new configuration of the Dockerfile. In this way, you can continue to use the generator to keep the Dockerfile updated (as recommended by Fly) while not breaking the dev or Render setup.
 
 
+# Instructions Running Tests locally
+Step by step instructions to run tests locally
+
+1. Create a local db by running  `bin/rails db:create`
+2. Then run the rails migrations by running  `bin/rails db:migrate`
+3. Finally run `bin/rails test` or `bin/rails test:system`
+
+
+** Troubleshooting **
+- Error: You must have ImageMagick or GraphicsMagick installed
+- Fix: Install GraphicsMagick or Imagemagick I have a Mac and I used `brew install graphicsmagick`
+
 # Changelog
 
 (Top features being developed for v0.7: voice support, Gemini Pro, pin conversations)
