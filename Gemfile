@@ -68,6 +68,7 @@ group :development do
   gem "rubocop-capybara"
   gem "rubocop-minitest"
   gem "dockerfile-rails", ">= 1.6"
+  gem "hotwire-livereload", "~> 1.4"
 end
 
 group :test do
