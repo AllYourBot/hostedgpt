@@ -1,5 +1,6 @@
 // Import and register all your controllers from the importmap under stimulus/*
 
+console.log('initializing stimulus')
 import { application } from "stimulus/application"
 
 // Eager load all controllers defined in the import map under stimulus/**/*_controller
