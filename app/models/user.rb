@@ -5,7 +5,7 @@ class User < ApplicationRecord
   has_secure_password
   has_person_name
 
-  validates :password, length: { minimum: 6 }, allow_nil: true
+  validates :password, length: { minimum: 6 }, allow_nil: !Feature.authenticate_with_password?
   validates :first_name, presence: true
   validates :last_name, presence: true, on: :create
 
