@@ -24,12 +24,34 @@ ChatGPT uses your private conversations history to train its models. [OpenAI dis
 
 # Table of Contents
 
+- [Configuration](#configuration)
 - [Deploy the app on Render](#deploy-the-app-on-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-fly)
 - [Contribute as a developer / Running locally](#contribute-as-a-developer)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
 
+# Configuration
+
+Following features can be configured with environment variables:
+
+- `REGISTRATON_FEATURE` - Set to `false` to disable registration.
+  Default is `true`.
+- `AUTHENTICATION_APPROACH` - Set to `google` to use Google OAuth for authentication, `http_header` to use HTTP header authentication, or `password` to use password authentication.
+  Default is `password`.
+- `AUTHENTICATION_HTTP_HEADER_EMAIL` - Name of the HTTP request header, which can be used to derive an email address of a new user.
+  Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
+  Default is `Tailscale-User-Login`.
+- `AUTHENTICATION_HTTP_HEADER_NAME` - Name of the HTTP request header, which can be used to derive the full name of a new user.
+  Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
+  Default is `Tailscale-User-Name`.
+- `AUTHENTICATION_HTTP_HEADER_UID` - Name of the HTTP request header, which will be used as unique identifier of the user.
+  Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
+  Default is `Tailscale-User-Login`.
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID.
+  Required if `AUTHENTICATION_APPROACH` is set to `google`.
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret.
+  Required if `AUTHENTICATION_APPROACH` is set to `google`.
 
 # Deploy the app on Render
 
@@ -84,7 +106,7 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 
 # Contribute as a developer
 
-We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.7. [View 0.7 Milestone](https://github.com/allyourbot/hostedgpt/milestone/6). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
+We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.7. [View 0.7 Milestone](https://github.com/allyourbot/hostedgpt/milestone/6). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
 ## Setting up development
 
