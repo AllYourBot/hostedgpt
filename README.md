@@ -108,6 +108,7 @@ HostedGPT requires these services to be running:
 
 - Postgres ([installation instructions](https://www.postgresql.org/download/))
 - rbenv ([installation instructions](https://github.com/rbenv/rbenv))
+- ImageMagick (`brew install imagemagick` should work on Mac )
 
 1. `cd` into your local repository clone
 2. `rbenv install` or `asdf install` to install the correct ruby version
@@ -116,6 +117,12 @@ HostedGPT requires these services to be running:
 5. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
 
 Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
+
+### Running tests
+
+If you're set up with Docker you run `docker compose run base rails test`. Note that the system tests, which use a headless browser, are not able to run in Docker. They will be run automatically for you if you create a Pull Request against the project.
+
+If you set up the app outside of Docker, then run the usual `bin/rails test` and `bin/rails test:system`.
 
 
 # Understanding the Docker configuration
@@ -155,4 +162,3 @@ v0.5 - Released on 2/14/2024
 * Conversations are automatically titled
 * Sidebar can be closed
 * AI responses stream in
->>>>>>> upstream-main
