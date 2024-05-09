@@ -3,6 +3,7 @@ class UsersController < ApplicationController
 
   layout "public"
 
+  before_action :authorize_password_login, only: [:new, :create]
   before_action :ensure_registration, only: [:new, :create]
   before_action :set_user, only: [:update]
 
@@ -35,6 +36,12 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def authorize_password_login
+    return if Feature.authenticate_with_password?
+
+    halt 403
+  end
 
   def set_user
     @user = Current.user if params[:id].to_i == Current.user.id

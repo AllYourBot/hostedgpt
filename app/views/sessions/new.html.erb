@@ -11,29 +11,49 @@
   </span>
 
   <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
-    <%= f.email_field :email,
-      value: params[:email],
-      id: "email",
-      autofocus: params[:email].present? ? false : true,
-      placeholder: "Email address",
-      class: "border border-gray-400 rounded p-3 dark:text-black"
-    %>
-    <%= f.password_field :password,
-      id: "password",
-      autofocus: params[:email].present? ? true : false,
-      placeholder: "Password",
-      class: "border border-gray-400 rounded p-3 dark:text-black"
-    %>
-    <%= f.submit "Log In",
-        class: %|
-          text-white font-medium
-          bg-brand-blue dark:bg-gray-900
-          border border-white dark:border-gray-400
-          rounded-lg p-4 text-center
-          cursor-pointer
-          hover:opacity-95
-        |,
-        data: { turbo_submits_with: "Authenticating..." }
-    %>
+    <% if Feature.authenticate_with_password? %>
+      <%= f.email_field :email,
+        value: params[:email],
+        id: "email",
+        autofocus: params[:email].present? ? false : true,
+        placeholder: "Email address",
+        class: "border border-gray-400 rounded p-3 dark:text-black"
+      %>
+      <%= f.password_field :password,
+        id: "password",
+        autofocus: params[:email].present? ? true : false,
+        placeholder: "Password",
+        class: "border border-gray-400 rounded p-3 dark:text-black"
+      %>
+      <%= f.submit "Log In",
+          class: %|
+            text-white font-medium
+            bg-brand-blue dark:bg-gray-900
+            border border-white dark:border-gray-400
+            rounded-lg p-4 text-center
+            cursor-pointer
+            hover:opacity-95
+          |,
+          data: { turbo_submits_with: "Authenticating..." }
+      %>
+    <% end %>
+    <% if Feature.authenticate_with_google? %>
+      <%=
+        button_to 'Log In with Google',
+                  '/auth/google',
+                  method: 'post',
+                  class: %|
+                    text-white font-medium
+                    bg-brand-blue dark:bg-gray-900
+                    border border-white dark:border-gray-400
+                    rounded-lg p-4 text-center
+                    cursor-pointer
+                    hover:opacity-95
+                  |,
+                  data: {
+                    turbo: false,
+                  }
+      %>
+    <% end %>
   <% end %>
 </div>
