@@ -4,12 +4,17 @@ export default class extends Control {
   logLevel_info
 
   log_Consider
-  Tell(words)         { if (_intendedDismiss(words)) {
+  async Tell(words)     { if (_intendedDismiss(words)) {
                           Dismiss.Listener()
                           return
                         }
                         if (_intendedInvoke(words)) Invoke.Listener()
                         if (!$.processing) return // gave Invoke() a chance
+
+                        if (_referencingTheScreen(words))
+                          $.attachment = await $.screenService.takeScreenshot()
+                        else
+                          $.attachment = null
 
                         $.consideration = words
                         log(`## Considering: ${words}`)
@@ -18,6 +23,7 @@ export default class extends Control {
   Invoke()            { if (!$.processing) {
                           $.processing = true
                           Flip.Transcriber.on()
+                          $.screenService.start()
                         }
                       }
   log_Dismiss
@@ -29,10 +35,16 @@ export default class extends Control {
 
   End()               { $.processing = false
                         Flip.Transcriber.off()
+                        $.screenService.end()
                       }
 
   attr_consideration  = ''
+  attr_attachment     = null
 	attr_processing     = false
+
+  new() {
+    $.screenService = new ScreenService
+  }
 
   _intendedDismiss(words) {
     return words.downcase().includeAny(["hold on", "hold up", "one sec", "one second", "stop", "on a call"]) &&
@@ -45,6 +57,6 @@ export default class extends Control {
   }
 
   _referencingTheScreen(words) {
-    return words.downcase().includeAny(["can you see", "you can see", "do you see", "look at", "this"])
+    return words.downcase().includeAny(["can you see", "you can see", "do you see", "look at", "this", "my screen", "the screen"])
   }
 }

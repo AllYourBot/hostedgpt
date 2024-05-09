@@ -36,7 +36,7 @@ export default class extends Control {
                           log('enough silence...')
                           if (Microphone.msOfSilence <= 1800) return // what if there is background noise?
 
-                          Tell.Listener.to.consider($.words)
+                          void Tell.Listener.to.consider($.words)
                           $.words = ''
                           $.poller.end()
                         })
