@@ -55,6 +55,7 @@ end
         class="hidden"
         data-clipboard-target="text"
         <%= message.assistant? && "data-speaker-target=text" %>
+        data-thinking="<%= thinking ? 'true' : 'false' %>"
       ><%= message.content_text %></div>
         <div
           data-role="content-text"

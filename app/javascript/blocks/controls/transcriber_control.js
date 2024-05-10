@@ -42,11 +42,14 @@ export default class extends Control {
                         })
                       }
 
+  log_Restart
+  Restart()           { $.transcriberService.restart() }
+
   attr_words          = ''
 	attr_active         = false
 
-	get on() 	          { $.active == 'paused' }
-	get off()	          { $.active == 'started' }
+	get on() 	          { return $.active }
+	get off()	          { return !$.active }
 
 	new() {
 		$.transcriberService = new TranscriberService

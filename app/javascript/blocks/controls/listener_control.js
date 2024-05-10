@@ -1,10 +1,16 @@
 import Control from "./control.js"
 
+// To clarify the verbs:
+// Invoke a Listener and it starts listening
+// Dismiss a Listener and you can re-invoke it with wake words, so it's listening just not paying attention
+// Mute a Listener and it completely ignores everything it hears, but the mic stays on
+
 export default class extends Control {
   logLevel_info
 
-  log_Consider
-  async Tell(words)     { if (_intendedDismiss(words)) {
+  log_Tell
+  async Tell(words)   { log(`muted = ${$.muted}`); if ($.muted) return
+                        if (_intendedDismiss(words)) {
                           Dismiss.Listener()
                           return
                         }
@@ -17,11 +23,11 @@ export default class extends Control {
                           $.attachment = null
 
                         $.consideration = words
-                        log(`## Considering: ${words}`)
                       }
   log_Invoke
   Invoke()            { if (!$.processing) {
                           $.processing = true
+                          $.muted = false
                           Flip.Transcriber.on()
                           $.screenService.start()
                         }
@@ -33,14 +39,14 @@ export default class extends Control {
                         }
                       }
 
-  End()               { $.processing = false
-                        Flip.Transcriber.off()
-                        $.screenService.end()
+  Mute()              { $.processing = false
+                        $.muted = true
                       }
 
   attr_consideration  = ''
   attr_attachment     = null
 	attr_processing     = false
+  attr_muted          = true
 
   new() {
     $.screenService = new ScreenService

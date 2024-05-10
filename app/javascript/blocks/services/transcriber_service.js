@@ -15,6 +15,11 @@ export default class extends Service {
 		$.recognizer.onend = () => _onEnd()
 		$.recognizer.onerror = () => _onError()
 		$.recognizer.onresult = (event) => _onResult(event)
+
+		$.recognizer.onsoundstart = () => log('## SOUND START')
+		$.recognizer.onspeechstart = () => log('## SPEECH START')
+		$.recognizer.onsoundend = () => log('## sound end')
+		$.recognizer.onspeechend = () => log('## speech end')
   }
 
   _initSpeechRecognizer() {
@@ -25,8 +30,8 @@ export default class extends Service {
   }
 
 	start()         { $.intendedState = 'started';  _executeStart() }
+  restart()       { $.intendedState = 'started';  _executeRestart() }
 	end()           { $.intendedState = 'ended';    _executeEnd() }
-
 	get listening()	{ $.state == 'started' }
 	get ended()		  { $.state == 'ended' }
 
@@ -38,6 +43,10 @@ export default class extends Service {
 			$.recognizer.start() // triggers _onStart() callback
 		else
 			_onStart()
+	}
+
+	_executeRestart() {
+		$.recognizer.abort() // it will automatically restart b/c of intendedState
 	}
 
 	_executeEnd() {

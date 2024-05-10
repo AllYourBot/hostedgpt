@@ -182,8 +182,15 @@ export default class {
     if (this.logLevels[level] >= this.logLevels[logLevel]) {
       if (node.env.isTest)
         process.stdout.write(`${this.$['class']?.to_s}: ${str}\n`)
-      else
-        console.log(`${this.$['class']?.to_s}: ${str}`)
+      else {
+        let c = this.$['class']?.to_s ?? ''
+        if (c.includes('Control') && str.includes('(')) {
+          c = c.replace('Control', '')
+          let pieces = str.split('(')
+          console.log(`${pieces[0]}.${c} (${pieces[1]}`)
+        } else
+          console.log(`${this.$['class']?.to_s}: ${str}`)
+      }
     }
   }
 

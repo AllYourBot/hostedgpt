@@ -3,7 +3,7 @@ import Service from "./service.js"
 export default class extends Service {
   logLevel_info
 
-  static async SpeechWithOpenAI(text) {
+  static async audioFromOpenAI(text) {
     const ttsAbortController = new AbortController()
     const openAITTSUrl = "https://api.openai.com/v1/audio/speech"
     let ttsResponse
@@ -46,4 +46,10 @@ export default class extends Service {
 
     return audioUrl
   }
+
+	static splitIntoThoughts(text) {
+		text = text.replace(". . .", "...")
+		const thoughts = text.split(/(?<=[^ ][\.,:!\?;…] |[\n，。．！？；：])/)
+		return thoughts.reject(t => t.strip().empty())
+	}
 }

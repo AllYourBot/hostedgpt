@@ -2,12 +2,13 @@ import Service from "./service.js"
 
 export default class extends Service {
   logLevel_info
-	attrReader_started
+	attr_started 	= false
+	attr_declined = false
 
 	log_start
 	async start() {
 		const canIRun = 'getDisplayMedia' in navigator.mediaDevices
-		if (!canIRun) return false
+		if (!canIRun || $.declined) return false
 
 		try {
 			$.media = await navigator.mediaDevices.getDisplayMedia({
@@ -17,6 +18,7 @@ export default class extends Service {
 		} catch (error) {
 			log(`Screenshare declined: ${error}`)
 			$.started = false
+			$.declined = true
 		}
 
 		return $.started

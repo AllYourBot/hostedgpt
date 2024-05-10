@@ -20,6 +20,15 @@ export default class extends Controller {
       this.submitForm()
     }
 
+    Listener.onProcessingChanged = async (processing) => {
+      console.log(`Listener.processing changed to ${processing}`)
+    }
+
+    Microphone.onActiveChanged = async (active) => {
+      console.log(`Microphone.active changed to ${active}`)
+      this.determineMicButton()
+    } // TODO: Do I need this? Controls never disable the mic.
+
     document.addEventListener('turbo:morph', this.boundDetermineMicButton)
     document.addEventListener('turbo:frame-render', this.boundDetermineMicButton)
   }
@@ -47,7 +56,6 @@ export default class extends Controller {
 
   boundDetermineMicButton = () => { this.determineMicButton() }
   determineMicButton() {
-    console.log('determineMicButton')
     if (Microphone.on) {
       this.enableMicrophone()
     } else {
@@ -122,7 +130,6 @@ export default class extends Controller {
 
   boundResetForm = () => { this.resetForm() }
   resetForm() {
-    console.log(`resetting`)
     this.formTarget.reset()
     this.determineSubmitButton()
   }

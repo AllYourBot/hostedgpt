@@ -3,7 +3,7 @@ import Control from "./control.js"
 export default class extends Control {
   logLevel_info
 
-  Flip(turnOn)          { if (turnOn && !$.active) {
+  Flip(turnOn)        { if (turnOn && !$.active) {
                           $.active = true
                           void $.microphoneService.start()
                           Flip.Transcriber.on()

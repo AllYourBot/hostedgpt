@@ -47,6 +47,7 @@ if (g().mode == 'browser') {
   g().Microphone = new MicrophoneControl
   g().Transcriber = new TranscriberControl
   g().Listener = new ListenerControl
+  g().Speaker = new SpeakerControl
 
   g().Flip = {}
   g().Invoke = {}
@@ -54,6 +55,11 @@ if (g().mode == 'browser') {
   g().SpeakInto = {}
   g().SpeakTo = {}
   g().Tell = {}
+  g().Mute = {}
+  g().Unmute = {}
+  g().Prompt = {}
+  g().Reset = {}
+  g().Restart = {}
 
   g().Flip = {
     Microphone: {
@@ -86,9 +92,26 @@ if (g().mode == 'browser') {
     Listener: allMethodsCall((...args) => g().Listener.Tell(...args))
   }
 
-  g().End = {
-    Listener: allMethodsCall((...args) => g().Listener.End(...args))
+  g().Mute = {
+    Listener: allMethodsCall((...args) => g().Listener.Mute(...args))
   }
+
+  g().Unmute = {
+    Listener: allMethodsCall((...args) => g().Listener.Unmute(...args))
+  }
+
+  g().Prompt = {
+    Speaker: allMethodsCall((...args) => g().Speaker.Prompt(...args))
+  }
+
+  g().Reset = {
+    Speaker: allMethodsCall((...args) => g().Speaker.Reset())
+  }
+
+  g().Restart = {
+    Transcriber: allMethodsCall((...args) => g().Transcriber.Restart())
+  }
+
 }
 
 // Private
