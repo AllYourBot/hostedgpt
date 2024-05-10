@@ -13,9 +13,10 @@ class Settings::ApplicationController < ApplicationController
       @hide_settings_assistants = settings_assistants[5, settings_assistants.length - 5]
 
       # If user is editing an "overflow assistant" don't collapse that section, keep it open from the start
-      @open_hide_settings_assistants  = params[:controller] =='settings/assistants' &&
-        params[:action] == 'edit' &&
-        @hide_settings_assistants.map(&:first).map(&:id).include?(params[:id].to_i)
+      if params[:controller] =='settings/assistants' && params[:action] == 'edit' && @hide_settings_assistants.map(&:first).map(&:id).include?(params[:id].to_i)
+        @settings_assistants.concat(@hide_settings_assistants)
+        @hide_settings_assistants = []
+      end
     end
   end
 end

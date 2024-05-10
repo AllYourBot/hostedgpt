@@ -19,12 +19,16 @@
     <div class="mb-5">
       <%= render partial: "layouts/settings_item", collection: @settings_assistants, locals: { controller: :assistants } %>
       <% if @hide_settings_assistants.present? %>
-          <div tabindex="0" class="collapse <%= @open_hide_settings_assistants ? "collapse-open" : "collapse-plus" %> bg-base-200">
-            <div class="collapse-title text-xl font-medium">More</div>
-            <div class="collapse-content"> 
-              <%= render partial: "layouts/settings_item", collection: @hide_settings_assistants, locals: { controller: :assistants } %>
-            </div>
-          </div>
+    	<div data-controller="transition" data-transition-toggle-class="hidden">
+          <%= button_tag type: "button",
+            class: "p-3",
+            data: {transition_target: "transitionable", action: "transition#toggleClass",
+        } do %>
+            Show Remaining (<%= @hide_settings_assistants.size %>) 
+        <% end %>
+        <div data-transition-target="transitionable" class="hidden">
+          <%= render partial: "layouts/settings_item", collection: @hide_settings_assistants, locals: { controller: :assistants } %>
+        </div>
       <% end %>
     </div>
 
