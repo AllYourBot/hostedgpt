@@ -14,9 +14,13 @@ module Authenticate
   end
 
   def current_user
-    Current.user ||= User.find_by(id: session[:current_user_id])
-    Current.person ||= Current.user&.person
-    Current.user = nil if Current.person.nil?
+    return Current.user unless Current.user.nil?
+
+    if Feature.authenticate_with_http_header?
+      find_current_user_based_on_http_header
+    else
+      find_current_user_based_on_session
+    end
 
     Current.user
   end
@@ -27,5 +31,25 @@ module Authenticate
 
   def authenticate_user!
     redirect_to login_path unless current_user
+  end
+
+  private
+
+  def find_current_user_based_on_session
+    Current.user = User.find_by(id: session[:current_user_id])
+    Current.person = Current.user&.person
+    Current.user = nil if Current.person.nil?
+  end
+
+  def find_current_user_based_on_http_header
+    if Feature.enabled?(:registration)
+      Current.user = User.find_or_create_by!(uid: request.headers[Feature.authentication_http_header_uid]) do |user|
+        user.create_person!(email: request.headers[Feature.authentication_http_header_email])
+        user.name = request.headers[Feature.authentication_http_header_name] || person.email
+      end
+    else
+      Current.user = User.find_by(uid: request.headers[Feature.authentication_http_header_uid])
+    end
+    Current.person = Current.user&.person
   end
 end
