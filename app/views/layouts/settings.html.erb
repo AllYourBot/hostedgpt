@@ -16,11 +16,30 @@
     Settings
   </header>
   <section id="menu" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship">
-    <% @settings_menu.each do |controller, settings_items| %>
-      <div class="mb-5">
-        <%= render partial: "layouts/settings_item", collection: settings_items, locals: { controller: controller } %>
-      </div>
-    <% end %>
+    <div class="mb-5">
+      <%= render partial: "layouts/settings_item", collection: @settings_assistants, locals: { controller: :assistants } %>
+      <% if @hide_settings_assistants.present? %>
+        <% unless @unhide_settings_assistants %>
+          <details tabindex="0" class="collapse collapse-plus bg-base-200">
+            <summary class="collapse-title text-xl font-medium">More</summary>
+              <div class="collapse-content"> 
+                <%= render partial: "layouts/settings_item", collection: @hide_settings_assistants, locals: { controller: :assistants } %>
+              </div>
+          </details>
+        <% else %>
+          <details tabindex="0" class="collapse bg-base-200">
+            <summary class="collapse-title text-xl font-medium">More</summary>
+          </details>
+          <div
+            <%= render partial: "layouts/settings_item", collection: @hide_settings_assistants, locals: { controller: :assistants } %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  
+    <div class="mb-5">
+      <%= render partial: "layouts/settings_item", locals: {settings_item: ['Account', edit_settings_person_path], controller: 'people' } %>
+    </div>
   </section>
 <% end %>
 
