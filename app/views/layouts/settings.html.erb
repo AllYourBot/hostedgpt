@@ -19,21 +19,12 @@
     <div class="mb-5">
       <%= render partial: "layouts/settings_item", collection: @settings_assistants, locals: { controller: :assistants } %>
       <% if @hide_settings_assistants.present? %>
-        <% unless @unhide_settings_assistants %>
-          <details tabindex="0" class="collapse collapse-plus bg-base-200">
-            <summary class="collapse-title text-xl font-medium">More</summary>
+          <div tabindex="0" class="collapse <%=  @open_hide_settings_assistants ? 'collapse-open' : 'collapse-plus' %> bg-base-200">
+            <div class="collapse-title text-xl font-medium">More</div>
               <div class="collapse-content"> 
                 <%= render partial: "layouts/settings_item", collection: @hide_settings_assistants, locals: { controller: :assistants } %>
               </div>
-          </details>
-        <% else %>
-          <details tabindex="0" class="collapse bg-base-200">
-            <summary class="collapse-title text-xl font-medium">More</summary>
-          </details>
-          <div
-            <%= render partial: "layouts/settings_item", collection: @hide_settings_assistants, locals: { controller: :assistants } %>
           </div>
-        <% end %>
       <% end %>
     </div>
   
