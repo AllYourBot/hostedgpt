@@ -1,6 +1,6 @@
-class CreateAIAPIModels < ActiveRecord::Migration[7.1]
+class CreateLlms < ActiveRecord::Migration[7.1]
   def change
-    create_table :ai_api_models do |t|
+    create_table :llms do |t|
       t.string :name
       t.text :description
 
@@ -18,7 +18,7 @@ class CreateAIAPIModels < ActiveRecord::Migration[7.1]
         'gpt-3.5-turbo-0125': 'ChatGPT 3.5 Turbo',
         'gpt-4-turbo-2024-04-09': 'ChatGPT 4 Turbo'
       }.each do |name, description|
-        AIAPIModel.create(name: name, description: description)
+        LLM.create(name: name, description: description)
       end
     end
   end

@@ -48,13 +48,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_07_165222) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "ai_api_models", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "assistants", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "model"
@@ -103,6 +96,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_07_165222) do
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
+  create_table "llms", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.string "role", null: false
@@ -112,10 +112,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_07_165222) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
+    t.datetime "cancelled_at"
     t.datetime "processed_at", precision: nil
     t.integer "index", null: false
     t.integer "version", null: false
-    t.datetime "cancelled_at"
     t.boolean "branched", default: false, null: false
     t.integer "branched_from_version"
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
