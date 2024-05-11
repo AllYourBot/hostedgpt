@@ -3,7 +3,7 @@ import viewport from "./utils/viewport"
 
 export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
-    "microphoneEnable", "microphoneDisable" ]
+    "microphoneEnable", "microphoneDisable", "microphoneShortcut" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -150,11 +150,13 @@ export default class extends Controller {
 
   disableComposer() {
     this.overlayTarget.classList.remove('hidden')
+    this.microphoneShortcutTarget.classList.add('!hidden')
     this.inputTarget.blur()
   }
 
   enableComposer() {
     this.overlayTarget.classList.add('hidden')
+    this.microphoneShortcutTarget.classList.remove('!hidden')
     this.focus()
   }
 

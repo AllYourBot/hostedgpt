@@ -216,6 +216,8 @@
           <% end %>
 
           <%= form.text_area :content_text,
+            id: "composer-input",
+            placeholder: "Enter to submit",
             data: {
               composer_target: "input",
               image_upload_target: "content",
@@ -230,6 +232,7 @@
 
                 keydown.shift+esc@document->composer#focusKeydown
                 keydown.slash@document->composer#focusKeydown
+                focus->composer#focus
 
                 keydown.esc->composer#unfocusKeydown
 
@@ -239,10 +242,12 @@
                 keydown.ctrl+j->composer#unfocusKeydown
 
                 paste->composer#smartPaste
+
+                keydown.ctrl+a@document->composer#toggleMicrophone
+                keydown.meta+a@document->composer#toggleMicrophone
               |
             },
             rows: 1,
-            placeholder: "Enter to send",
             class: %|
               w-full pt-[14px] pb-[13px] min-h-14
               mb-2 block
@@ -256,6 +261,10 @@
               resize-none
             |
           %>
+
+          <div class="absolute right-20 bottom-6 text-gray-500 hidden md:block" data-composer-target="microphoneShortcut">
+            Ctrl + A
+          </div>
 
           <!-- options for the composer right button -->
 
@@ -370,6 +379,15 @@
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">ESC</div>
+          </kbd>
+        </figure>
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Toggle audio mode
+          </figcaption>
+          <kbd class="w-50 text-right flex flex-row gap-1">
+            <div class="key">Ctrl or ⌘</div>
+            <div class="key">A</div>
           </kbd>
         </figure>
 
