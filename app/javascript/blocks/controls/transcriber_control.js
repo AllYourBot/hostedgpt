@@ -42,8 +42,10 @@ export default class extends Control {
                         })
                       }
 
-  log_Restart
-  Restart()           { $.transcriberService.restart() }
+  Cover()             { $.covered = true }
+  Uncover()           { $.transcriberService.restart()
+                        $.covered = false
+                      }
 
   attr_words          = ''
 	attr_active         = false
@@ -52,7 +54,11 @@ export default class extends Control {
 	get off()	          { return !$.active }
 
 	new() {
+    $.covered = false
 		$.transcriberService = new TranscriberService
-		$.transcriberService.onTextReceived = (text) => SpeakTo.Transcriber.with.words(text)
+		$.transcriberService.onTextReceived = (text) => {
+      if ($.covered) return
+      SpeakTo.Transcriber.with.words(text)
+    }
 	}
 }

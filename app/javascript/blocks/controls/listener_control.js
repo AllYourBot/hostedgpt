@@ -11,8 +11,7 @@ export default class extends Control {
   logLevel_info
 
   log_Tell
-  async Tell(words)   { log(`muted = ${$.muted}`); if ($.muted) return
-                        if (_intendedDismiss(words)) {
+  async Tell(words)   { if (_intendedDismiss(words)) {
                           Dismiss.Listener()
                           return
                         }
@@ -27,11 +26,10 @@ export default class extends Control {
                         $.consideration = words
                       }
   log_Invoke
-  Invoke()            { if (!$.processing) {
+  async Invoke()      { if (!$.processing) {
                           $.processing = true
-                          $.muted = false
                           Flip.Transcriber.on()
-                          $.screenService.start()
+                          await $.screenService.start()
                         }
                       }
   log_Dismiss
@@ -41,27 +39,19 @@ export default class extends Control {
                         }
                       }
 
-  Mute()              { $.processing = false
-                        $.muted = true
-                      }
-
-  Unmute()            { $.processing = true
-                        $.muted = false
-                        Restart.Transcriber() // clears listening buffer
-                      }
-
-  Disable()           { $.processing = false
-                        $.muted = true
+  Disable()           { $.processing = null
                         $.screenService.end()
                         Flip.Transcriber.off()
                       }
 
   attr_consideration  = ''
   attr_attachment     = null
-	attr_processing     = false
-  attr_muted          = true
+
+  get engaged()       { return $.processing === true  }
+  get dismissed()     { return $.processing === false }
 
   new() {
+    $.processing = null
     $.screenService = new ScreenService
   }
 

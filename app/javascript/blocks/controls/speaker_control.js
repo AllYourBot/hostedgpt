@@ -15,9 +15,9 @@ export default class extends Control {
 		$.audioService.onBusyChanged = (busy) => {
       console.log(`onbusyChanged(${busy})`)
       if (busy)
-        Mute.Listener()
+        Cover.Transcriber()
       else
-        Unmute.Listener()
+        Uncover.Transcriber()
     }
 	}
 }

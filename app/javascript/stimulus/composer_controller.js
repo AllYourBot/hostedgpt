@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import viewport from "./utils/viewport"
 
 export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
@@ -9,8 +10,7 @@ export default class extends Controller {
   }
 
   connect() {
-    this.inputDefaultPlaceholder = this.inputTarget.placeholder
-    this.inputTarget.focus()
+    this.focus()
     this.cursorToEnd()
     this.determineSubmitButton()
 
@@ -20,21 +20,21 @@ export default class extends Controller {
       this.submitForm()
     }
 
-    Listener.onProcessingChanged = async (processing) => {
-      console.log(`Listener.processing changed to ${processing}`)
-    }
+    Listener.onProcessingChanged = async (processing) => this.boundDetermineMicButton()
 
-    Microphone.onActiveChanged = async (active) => {
-      console.log(`Microphone.active changed to ${active}`)
-      this.determineMicButton()
-    } // TODO: Do I need this? Controls never disable the mic.
+    // Microphone.onActiveChanged = async (active) => {
+    //   console.log(`Microphone.active changed to ${active}`)
+    //   // this.determineMicButton()
+    // } // TODO: Do I need this? Controls never disable the mic.
 
     document.addEventListener('turbo:morph', this.boundDetermineMicButton)
+    document.addEventListener('turbo:visit', this.boundDetermineMicButton)
     document.addEventListener('turbo:frame-render', this.boundDetermineMicButton)
   }
 
   disconnect() {
     document.removeEventListener('turbo:morph', this.boundDetermineMicButton)
+    document.removeEventListener('turbo:visit', this.boundDetermineMicButton)
     document.removeEventListener('turbo:frame-render', this.boundDetermineMicButton)
   }
 
@@ -54,11 +54,26 @@ export default class extends Controller {
     }
   }
 
+  toggleMicrophone(event) {
+    event.preventDefault()
+
+    if (Listener.engaged) {
+      this.disableMicrophone()
+    } else if (Microphone.off){
+      this.enableMicrophone()
+    }
+  }
+
   boundDetermineMicButton = () => { this.determineMicButton() }
   determineMicButton() {
-    if (Microphone.on) {
+    if (Listener.engaged) {
+      console.log('## Listener.engaged')
       this.enableMicrophone()
-    } else {
+    } else if (Listener.dismissed) {
+      console.log('## Listener.dismissed')
+      this.blinkingMicrophone() // mic still on
+    } else if (Microphone.off) {
+      console.log('## Microphone Off')
       this.disableMicrophone()
     }
   }
@@ -66,30 +81,45 @@ export default class extends Controller {
   enableMicrophone() {
     this.microphoneEnableTarget.classList.add('hidden')
     this.microphoneDisableTarget.classList.remove('hidden')
+    this.microphoneDisableTarget.classList.remove('animate-blink')
     this.disableComposer()
     this.inputTarget.placeholder = "Speak aloud..."
     Flip.Microphone.on()
   }
 
-  disableMicrophone() {
-    //if (Microphone.off) return
+  blinkingMicrophone() {
+    this.enableMicrophone()
+    this.microphoneDisableTarget.classList.add('animate-blink')
+  }
 
+  disableMicrophone() {
     this.microphoneEnableTarget.classList.remove('hidden')
     this.microphoneDisableTarget.classList.add('hidden')
     this.enableComposer()
-    this.inputTarget.placeholder = this.inputDefaultPlaceholder
     Flip.Microphone.off()
     this.determineSubmitButton()
   }
 
   focusKeydown(event) {
     if (event.key == "/" && ["INPUT", "TEXTAREA"].includes(event.target.tagName)) return
+    this.focus()
+  }
 
+  async focus() {
+    if (viewport('md')) {
+      this.inputTarget.placeholder = 'Enter to submit'
+    } else {
+      this.inputTarget.placeholder = ''
+    }
     this.inputTarget.focus()
-    event.preventDefault()
   }
 
   unfocusKeydown(event) {
+    if (viewport('md')) {
+      this.inputTarget.placeholder = '/  to focus input'
+    } else {
+      this.inputTarget.placeholder = ''
+    }
     document.activeElement.blur()
     event.preventDefault()
   }
@@ -125,7 +155,7 @@ export default class extends Controller {
 
   enableComposer() {
     this.overlayTarget.classList.add('hidden')
-    this.inputTarget.focus()
+    this.focus()
   }
 
   boundResetForm = () => { this.resetForm() }

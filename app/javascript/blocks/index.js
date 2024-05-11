@@ -55,11 +55,10 @@ if (g().mode == 'browser') {
   g().SpeakInto = {}
   g().SpeakTo = {}
   g().Tell = {}
-  g().Mute = {}
-  g().Unmute = {}
   g().Prompt = {}
   g().Reset = {}
-  g().Restart = {}
+  g().Cover = {}
+  g().Uncover = {}
   g().Disable = {}
 
   g().Flip = {
@@ -93,14 +92,6 @@ if (g().mode == 'browser') {
     Listener: allMethodsCall((...args) => g().Listener.Tell(...args))
   }
 
-  g().Mute = {
-    Listener: allMethodsCall((...args) => g().Listener.Mute(...args))
-  }
-
-  g().Unmute = {
-    Listener: allMethodsCall((...args) => g().Listener.Unmute(...args))
-  }
-
   g().Prompt = {
     Speaker: allMethodsCall((...args) => g().Speaker.Prompt(...args))
   }
@@ -109,8 +100,12 @@ if (g().mode == 'browser') {
     Speaker: allMethodsCall((...args) => g().Speaker.Reset())
   }
 
-  g().Restart = {
-    Transcriber: allMethodsCall((...args) => g().Transcriber.Restart())
+  g().Cover = {
+    Transcriber: allMethodsCall((...args) => g().Transcriber.Cover())
+  }
+
+  g().Uncover = {
+    Transcriber: allMethodsCall((...args) => g().Transcriber.Uncover())
   }
 
   g().Disable = {

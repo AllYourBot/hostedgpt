@@ -184,7 +184,7 @@ export default class {
         process.stdout.write(`${this.$['class']?.to_s}: ${str}\n`)
       else {
         let c = this.$['class']?.to_s ?? ''
-        if (c.includes('Control') && str.includes('(')) {
+        if (c.includes('Control') && str.includes('(') && str[0] == str[0].upcase() && str[0] == '_') {
           c = c.replace('Control', '')
           let pieces = str.split('(')
           console.log(`${pieces[0]}.${c} (${pieces[1]}`)
