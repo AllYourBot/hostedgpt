@@ -4,6 +4,7 @@ import Control from "./control.js"
 // Invoke a Listener and it starts listening
 // Dismiss a Listener and you can re-invoke it with wake words, so it's listening just not paying attention
 // Mute a Listener and it completely ignores everything it hears, but the mic stays on
+// Unmute a Listener and it clears any buffered audio before it starts listening again
 
 export default class extends Control {
   logLevel_info
@@ -41,6 +42,11 @@ export default class extends Control {
 
   Mute()              { $.processing = false
                         $.muted = true
+                      }
+
+  Unmute()            { $.processing = true
+                        $.muted = false
+                        Restart.Transcriber() // clears listening buffer
                       }
 
   attr_consideration  = ''

@@ -17,7 +17,7 @@ export default class extends Control {
       if (busy)
         Mute.Listener()
       else
-        Invoke.Listener()
+        Unmute.Listener()
     }
 	}
 }

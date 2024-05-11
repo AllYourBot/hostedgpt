@@ -46,7 +46,10 @@ export default class extends Service {
 	}
 
 	_executeRestart() {
-		$.recognizer.abort() // it will automatically restart b/c of intendedState
+		if ($.state == 'started')
+			_executeEnd() // will eventually trigger _onStart() b/c of intendedState
+		else
+			_onStart()
 	}
 
 	_executeEnd() {
