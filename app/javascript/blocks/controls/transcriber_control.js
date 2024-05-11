@@ -26,7 +26,7 @@ export default class extends Control {
                           $.transcriberService.end()
 
                           Flip.Microphone.off()
-                          End.Listener()
+                          Disable.Listener()
                         }
                       }
 

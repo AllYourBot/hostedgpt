@@ -8,7 +8,7 @@ export default class extends Service {
 	log_start
 	async start() {
 		const canIRun = 'getDisplayMedia' in navigator.mediaDevices
-		if (!canIRun || $.declined) return false
+		if (!canIRun || $.declined) { console.log(`## skipping because ${canIRun} || ${$.declined}`); return false }
 
 		try {
 			$.media = await navigator.mediaDevices.getDisplayMedia({
@@ -29,8 +29,9 @@ export default class extends Service {
 			const tracks = $.media.getVideoTracks()
 			tracks.forEach(track => track.stop())
 			$.media = null
-			$.started = false
 		}
+		$.started = false
+		$.declined = false
 	}
 
 	async takeScreenshot() {

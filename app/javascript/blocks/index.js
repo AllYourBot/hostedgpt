@@ -60,6 +60,7 @@ if (g().mode == 'browser') {
   g().Prompt = {}
   g().Reset = {}
   g().Restart = {}
+  g().Disable = {}
 
   g().Flip = {
     Microphone: {
@@ -112,6 +113,9 @@ if (g().mode == 'browser') {
     Transcriber: allMethodsCall((...args) => g().Transcriber.Restart())
   }
 
+  g().Disable = {
+    Listener: allMethodsCall((...args) => g().Listener.Disable())
+  }
 }
 
 // Private
