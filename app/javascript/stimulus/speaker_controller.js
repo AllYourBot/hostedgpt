@@ -31,6 +31,8 @@ export default class extends Controller {
 
   boundParseWords = (event) => { this.parseWords(event) }
   parseWords(target) {
+    if (Microphone.off) return
+
     const thinking = target.getAttribute('data-thinking') === 'true'
     const thoughts = SpeechService.splitIntoThoughts(target.innerText)
 

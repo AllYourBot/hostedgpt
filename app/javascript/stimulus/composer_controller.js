@@ -64,8 +64,10 @@ export default class extends Controller {
     }
   }
 
-  boundDetermineMicButton = () => { this.determineMicButton() }
-  determineMicButton() {
+  boundDetermineMicButton = (event) => { this.determineMicButton(event) }
+  determineMicButton(event) {
+    if (event?.type == 'turbo:frame-render' && event?.id != 'conversation') return
+
     if (Listener.engaged) {
       console.log('## Listener.engaged')
       this.enableMicrophone()
@@ -102,6 +104,7 @@ export default class extends Controller {
 
   focusKeydown(event) {
     if (event.key == "/" && ["INPUT", "TEXTAREA"].includes(event.target.tagName)) return
+    event.preventDefault()
     this.focus()
   }
 

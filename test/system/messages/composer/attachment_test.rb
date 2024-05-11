@@ -4,18 +4,18 @@ class MessagesComposerAttachmentTest < ApplicationSystemTestCase
   setup do
     @user = users(:keith)
     login_as @user
-    @submit = find("#composer #send") # oddly, when I changed id="submit" on the button the form fails to submit
+    @submit = find("#composer #send", visible: :all) # oddly, when I changed id="submit" on the button the form fails to submit
     @input_selector = "#composer textarea"
     @input = find(@input_selector)
   end
 
-  test "attaching an image to the composer shows a preview, keeps submit disabled, and refocuses input" do
+  test "attaching an image to the composer shows a preview, keeps submit hidden, and refocuses input" do
     assert_hidden "#document-previews"
     attach_file "message_documents_attributes_0_file", Rails.root.join('test', 'assets', 'cat-image-for-attaching.png'), make_visible: true
 
     assert find_previews.first.visible?
     assert find("#document-previews img")[:src].starts_with?("data:image")
-    assert @submit.disabled?
+    refute @submit.visible?
     assert_active @input_selector
   end
 
@@ -31,7 +31,7 @@ class MessagesComposerAttachmentTest < ApplicationSystemTestCase
     x.click
 
     assert_hidden "#document-previews"
-    assert @submit.disabled?
+    refute @submit.visible?
     assert_active @input_selector
   end
 

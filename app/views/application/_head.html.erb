@@ -23,7 +23,7 @@
     iosPWASplash('/apple-touch-icon.png', '#ffffff')
   <% end %>
   <%= javascript_tag do %>
-  openAIKey = "<%= Current.user.openai_key %>"
+  openAIKey = "<%= Current.user&.openai_key %>"
   <% end %>
 
   <!-- /ios-pwa-splash screen-->

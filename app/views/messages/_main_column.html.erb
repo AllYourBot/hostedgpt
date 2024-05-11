@@ -243,8 +243,8 @@
 
                 paste->composer#smartPaste
 
-                keydown.ctrl+a@document->composer#toggleMicrophone
-                keydown.meta+a@document->composer#toggleMicrophone
+                keydown.ctrl+m@document->composer#toggleMicrophone
+                keydown.meta+m@document->composer#toggleMicrophone
               |
             },
             rows: 1,
@@ -263,7 +263,7 @@
           %>
 
           <div class="absolute right-20 bottom-6 text-gray-500 hidden md:block" data-composer-target="microphoneShortcut">
-            Ctrl + A
+            Ctrl + M
           </div>
 
           <!-- options for the composer right button -->
@@ -383,11 +383,11 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Toggle audio mode
+            Toggle microphone mode
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
-            <div class="key">A</div>
+            <div class="key">M</div>
           </kbd>
         </figure>
 
