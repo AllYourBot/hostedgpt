@@ -7,21 +7,32 @@ export default class extends Controller {
   connect() {
     this.connected = true
     this.textTargetsCount = this.textTargets.length
+    this.thoughtsSentCount = 0
+
+    this.textTargets.forEach((target) => target.addEventListener('turbo:before-morph', this.boundParseWords))
   }
 
   textTargetConnected(target) {
-    if (!this.connected || Listener.muted) return
-
-    const thinking = target.getAttribute('data-thinking') === 'true'
-    const thoughts = SpeechService.splitIntoThoughts(target.innerText)
-
-    console.log(`text target connected and ${this.textTargets.length} >? ${this.textTargetsCount} (${thinking}) with "${target.innerText}"`)
+    if (!this.connected) return
 
     if (this.textTargets.length > this.textTargetsCount) {
+      target.addEventListener('turbo:before-morph', this.boundParseWords)
       this.textTargetsCount += 1
       this.thoughtsSentCount = 0
       Reset.Speaker()
     }
+
+    this.parseWords(target)
+  }
+
+  disconnect() {
+    this.textTargets.forEach((target) => target.removeEventListener('turbo:before-morph', this.boundParseWords))
+  }
+
+  boundParseWords = (event) => { this.parseWords(event) }
+  parseWords(target) {
+    const thinking = target.getAttribute('data-thinking') === 'true'
+    const thoughts = SpeechService.splitIntoThoughts(target.innerText)
 
     for(this.thoughtsSentCount; this.thoughtsSentCount < thoughts.length-1; this.thoughtsSentCount ++)
       Prompt.Speaker.toSay(thoughts[this.thoughtsSentCount])
