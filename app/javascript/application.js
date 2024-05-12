@@ -24,6 +24,7 @@ let oldTimestamp
 // })
 
 window.imageLoadingForSystemTestsToCheck = {}
+window.logs = []
 // END debug code
 
 

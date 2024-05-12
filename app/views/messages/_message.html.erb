@@ -23,8 +23,8 @@ end
   data-timestamp="<%= timestamp %>"
   data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && 'message-scroller' %>"
   data-message-scroller-scroll-down-value="<%= scroll_down %>"
-  data-message-scroller-instantly-value="<%= initial_page_load %>"
   data-message-scroller-only-scroll-down-if-scrolled-to-bottom-value="<%= only_scroll_down_if_was_bottom %>"
+  data-message-scroller-instantly-value="<%= initial_page_load %>"
 >
   <div class="flex">
     <div class="flex flex-col items-center w-6 ml-1">
@@ -66,6 +66,7 @@ end
                   class: "w-full h-auto flex focus:outline-none",
                   data: {
                     controller: "image-loader",
+                    image_loader_message_scroller_outlet: "[data-role='message']",
                     image_loader_url_value: message.document_image_path(:small),
                     action: "modal#open",
                     role: "image-preview",
@@ -233,6 +234,7 @@ end
           <main class="modal-box max-w-5xl p-0 rounded-none">
             <article
               data-controller="image-loader"
+              data-image-loader-message-scroller-outlet="[data-role='message']"
               data-image-loader-url-value="<%= message.document_image_path(:large) %>"
               data-turbo-permanent
               class="flex flex-col md:flex-row justify-center"
