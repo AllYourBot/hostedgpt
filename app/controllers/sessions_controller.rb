@@ -35,7 +35,7 @@ class SessionsController < ApplicationController
   def find_user_for_password_authentication
     return if params[:email].blank? && params[:password].blank?
 
-    person = Person.find_by(email: params[:email].strip.downcase)
+    person = Person.find_by(email: params[:email])
 
     @user = person&.personable
   end
