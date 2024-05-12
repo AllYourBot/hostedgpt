@@ -13,7 +13,7 @@
 
   <div class="my-5">
     <%= form.label :model  %><br/>
-    <%= form.select :model, LLM.order(:description).all.pluck(:description, :name), class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+    <%= form.select :model, LanguageModel.order(:description).all.pluck(:description, :name), class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
   <div class="my-5">
     <%= form.label :name %>
