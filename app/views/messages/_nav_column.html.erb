@@ -1,5 +1,13 @@
-<div id="spacer-above-fixed-assistant" class="absolute top-0 z-10 w-full h-5 bg-gray-50 dark:bg-gray-900"></div>
 <section id="assistants" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship" class="pt-14">
+    <% if @hide_settings_assistants_overflow %>
+      <div data-controller="transition" data-transition-toggle-class="hidden">
+        <%= button_tag type: "button",
+          class: "p-1 text-sm",
+          data: {transition_target: "transitionable", action: "transition#toggleClass",
+          } do %>
+          Show Remaining
+     <% end %>
+   <% end %>
   <%= render @nav_assistants %>
 </section>
 

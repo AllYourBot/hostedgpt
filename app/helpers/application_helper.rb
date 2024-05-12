@@ -1,12 +1,12 @@
 module ApplicationHelper
 
-  def hide_settings_item_class(item, item_counter)
+  def hide_assistant_class(item, item_counter)
     return nil unless item.is_a?(Assistant)
     return 'hidden' if @hide_settings_assistants_overflow && item_counter >= Assistant::MAX_LIST_DISPLAY
     nil
   end
 
-  def settings_item_data_transition_target(item, item_counter)
+  def assitant_data_transaction_target(item, item_counter)
     return nil unless item.is_a?(Assistant)
     return 'data-transition-target="transitionable"'.html_safe if @hide_settings_assistants_overflow && item_counter >= Assistant::MAX_LIST_DISPLAY
   end

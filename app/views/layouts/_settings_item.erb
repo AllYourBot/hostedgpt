@@ -11,10 +11,10 @@
             group
             text-sm rounded-s-lg
             <%= selected ? "bg-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700 cursor-default" : "cursor-pointer" %>
-            <%= hide_settings_item_class(item, settings_item_counter) %>
+            <%= hide_assistant_class(item, settings_item_counter) %>
           "
     data-role="assistant"
-    <%= settings_item_data_transition_target(item, settings_item_counter) %>
+    <%= assitant_data_transaction_target(item, settings_item_counter) %>
 >
   <%= link_to link,
         class: %|
