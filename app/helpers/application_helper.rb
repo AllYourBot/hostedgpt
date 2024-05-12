@@ -1,4 +1,16 @@
 module ApplicationHelper
+
+  def hide_settings_item_class(item, item_counter)
+    return nil unless item.is_a?(Assistant)
+    return 'hidden' if @hide_settings_assistants_overflow && item_counter >= Assistant::MAX_LIST_DISPLAY
+    nil
+  end
+
+  def settings_item_data_transition_target(item, item_counter)
+    return nil unless item.is_a?(Assistant)
+    return 'data-transition-target="transitionable"'.html_safe if @hide_settings_assistants_overflow && item_counter >= Assistant::MAX_LIST_DISPLAY
+  end
+  
   def spinner(opts = {})
     html = <<~HTML
       <svg class="animate-spin -ml-1 mr-3 h-#{opts[:size]} w-#{opts[:size]} #{opts[:class]}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

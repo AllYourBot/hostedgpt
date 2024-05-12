@@ -9,6 +9,8 @@ class Assistant < ApplicationRecord
 
   validates :tools, presence: true, allow_blank: true
 
+  MAX_LIST_DISPLAY = 5
+
   scope :ordered, -> { order(:id) }
 
   def initials

@@ -11,8 +11,10 @@
             group
             text-sm rounded-s-lg
             <%= selected ? "bg-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700 cursor-default" : "cursor-pointer" %>
+            <%= hide_settings_item_class(item, settings_item_counter) %>
           "
     data-role="assistant"
+    <%= settings_item_data_transition_target(item, settings_item_counter) %>
 >
   <%= link_to link,
         class: %|
@@ -29,8 +31,6 @@
       <div id="profile" class="mr-2 w-7 h-7 bg-blue-200 rounded-full"></div>
     <% end %>
 
-    <span class="<%= !item.is_a?(Assistant) && "ml-1 text-base" %>">
-      <%= item.to_s %>
-    </span>
+    <%= content_tag :span, item.to_s, class: !item.is_a?(Assistant) && "ml-1 text-base" %>
   <% end %>
 </div>

@@ -16,29 +16,21 @@
     Settings
   </header>
   <section id="menu" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship">
-    <div class="mb-5">
-      <%= render partial: "layouts/settings_item", collection: @settings_assistants, locals: { controller: :assistants } %>
-      <% if @hide_settings_assistants.present? %>
-    	<div data-controller="transition" data-transition-toggle-class="hidden">
-          <%= button_tag type: "button",
-            class: "p-3",
-            data: {transition_target: "transitionable", action: "transition#toggleClass",
-        } do %>
-            Show Remaining (<%= @hide_settings_assistants.size %>) 
-        <% end %>
-        <div data-transition-target="transitionable" class="hidden">
-          <%= render partial: "layouts/settings_item", collection: @hide_settings_assistants, locals: { controller: :assistants } %>
-        </div>
-      <% end %>
-    </div>
+    <% if @hide_settings_assistants_overflow %>
+      <div data-controller="transition" data-transition-toggle-class="hidden">
+        <%= button_tag type: "button",
+          class: "p-1 text-sm",
+          data: {transition_target: "transitionable", action: "transition#toggleClass",
+          } do %>
+          Show Remaining
+     <% end %>
+   <% end %>
 
-    <div class="mb-5">
-      <%= render partial: "layouts/settings_item", locals: {settings_item: ['New Assistant', new_settings_assistant_path], controller: 'assistants' } %>
-    </div>
-  
-    <div class="mb-5">
-      <%= render partial: "layouts/settings_item", locals: {settings_item: ['Account', edit_settings_person_path], controller: 'people' } %>
-    </div>
+    <% @settings_menu.each do | controller, settings_items| %>
+      <div class="mb-5">
+        <%= render partial: "layouts/settings_item", collection: settings_items, locals: { controller: :assistants } %>
+      </div>
+    <% end %>
   </section>
 <% end %>
 
