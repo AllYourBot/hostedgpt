@@ -49,7 +49,7 @@ class AIBackends::Anthropic
 
     begin
       response = @client.messages(
-        model: @assistant.model.provider_id,
+        model: @assistant.language_model.provider_id,
         system: @assistant.instructions,
         messages: preceding_messages,
         parameters: {

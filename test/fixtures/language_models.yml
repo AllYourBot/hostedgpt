@@ -1,0 +1,8 @@
+gpt_4:
+    name: gpt-4
+    description: gpt-4 from fixtures
+
+claude_3:
+    name: claude-3-opus-20240229
+    description: claude-3 from fixtures
+
