@@ -1,4 +1,4 @@
-import Control from "./control.js"
+import Interface from "./interface.js"
 
 // To clarify the verbs:
 // Invoke a Listener and it starts listening
@@ -7,7 +7,7 @@ import Control from "./control.js"
 // Unmute a Listener and it clears any buffered audio before it starts listening again
 // Disable a Listener and it completely stops working and will be fully re-initialized if you Invoke again
 
-export default class extends Control {
+export default class extends Interface {
   logLevel_info
 
   log_Tell

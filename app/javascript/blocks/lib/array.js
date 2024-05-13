@@ -17,3 +17,5 @@ Array.prototype.exclude = function(...args) { return !this.includes(...args) }
 Array.prototype.sum = function() { return this.reduce((acc, val) => acc + val, 0) }
 Array.prototype.select = function(...args) { return this.filter(...args) }
 Array.prototype.reject = function(callback) { return this.filter(e => !callback(e)) }
+Array.prototype.uniq = function() { return [...new Set(this)] }
+Array.prototype.collect = function(...args) { return this.map(...args) }

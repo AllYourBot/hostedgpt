@@ -1,6 +1,6 @@
-import Control from "./control.js"
+import Interface from "./interface.js"
 
-export default class extends Control {
+export default class extends Interface {
   logLevel_info
 
   log_Prompt

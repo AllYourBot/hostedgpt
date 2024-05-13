@@ -1,4 +1,4 @@
-import Control from "./control.js"
+import Interface from "./interface.js"
 
 // the length of time we pause before reflecting on what was said should
 // take into account *what* was said. If the last word was clearly the end
@@ -11,7 +11,7 @@ import Control from "./control.js"
 // responsive? Also, maybe we start processing the response even before
 // this duration has elapsed but we delay responding?
 
-export default class extends Control {
+export default class extends Interface {
   logLevel_info
 
   Flip(turnOn)        { if (turnOn && !$.active) {

@@ -30,88 +30,9 @@ await importDir('lib')
 for (const subdir of subdirsExceptLib('lib'))
   await importDir(subdir)
 
-function allMethodsCall(actionFunction) {
-    const handler = {
-        get: function(target, prop, receiver) {
-            return new Proxy(actionFunction, handler);
-        },
-        apply: function(target, thisArg, args) {
-            return actionFunction(...args);
-        }
-    };
-    return new Proxy(actionFunction, handler);
-}
+console.log(`initializing Blocks`)
+initializeInterfaces()
 
-if (g().mode == 'browser') {
-  console.log(`initializing Blocks`)
-  g().Microphone = new MicrophoneControl
-  g().Transcriber = new TranscriberControl
-  g().Listener = new ListenerControl
-  g().Speaker = new SpeakerControl
-
-  g().Flip = {}
-  g().Invoke = {}
-  g().Dismiss = {}
-  g().SpeakInto = {}
-  g().SpeakTo = {}
-  g().Tell = {}
-  g().Prompt = {}
-  g().Reset = {}
-  g().Cover = {}
-  g().Uncover = {}
-  g().Disable = {}
-
-  g().Flip = {
-    Microphone: {
-      on: () => g().Microphone.Flip(true),
-      off: () => g().Microphone.Flip(false)
-    },
-    Transcriber: {
-      on: () => g().Transcriber.Flip(true),
-      off: () => g().Transcriber.Flip(false)
-    }
-  }
-
-  g().Invoke = {
-    Listener: allMethodsCall(() => g().Listener.Invoke())
-  }
-
-  g().Dismiss = {
-    Listener: allMethodsCall(() => g().Listener.Dismiss())
-  }
-
-  g().SpeakInto = {
-    Microphone: allMethodsCall((...args) => g().Microphone.SpeakInto(...args))
-  }
-
-  g().SpeakTo = {
-    Transcriber: allMethodsCall((...args) => g().Transcriber.SpeakTo(...args))
-  }
-
-  g().Tell = {
-    Listener: allMethodsCall((...args) => g().Listener.Tell(...args))
-  }
-
-  g().Prompt = {
-    Speaker: allMethodsCall((...args) => g().Speaker.Prompt(...args))
-  }
-
-  g().Reset = {
-    Speaker: allMethodsCall((...args) => g().Speaker.Reset())
-  }
-
-  g().Cover = {
-    Transcriber: allMethodsCall((...args) => g().Transcriber.Cover())
-  }
-
-  g().Uncover = {
-    Transcriber: allMethodsCall((...args) => g().Transcriber.Uncover())
-  }
-
-  g().Disable = {
-    Listener: allMethodsCall((...args) => g().Listener.Disable())
-  }
-}
 
 // Private
 
@@ -132,6 +53,39 @@ async function importDir(type) {
   }
 }
 
+async function initializeInterfaces() {
+  if (typeof window === 'undefined' || g() != window) return
+
+  let instances = []
+  for (const modulePath of allModules('interfaces')) {
+    const fileParts = modulePath.split('/')
+    const file = fileParts[fileParts.length-1]
+    if (file.excludes('_')) continue
+    const className = file.split('_').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('')
+    const instanceName = className.replace('Interface', '')
+
+    console.log(`instantiating: ${className}  ${instanceName}`)
+
+    window[instanceName] = new window[className]
+    instances.push(instanceName)
+  }
+
+  instances.forEach(instanceName => {
+    Object.getOwnPropertyNames(Object.getPrototypeOf(g()[instanceName])).filter((name) => {
+      return name[0].upcase() == name[0] && name[0] != '_'
+    }).forEach(verb => {
+      g()[verb] ||= {}
+      if (verb == 'Flip')
+        g()[verb][instanceName] = {
+          on: () => g()[instanceName].Flip(true),
+          off: () => g()[instanceName].Flip(false)
+        }
+      else
+        g()[verb][instanceName] = allMethodsCall((...args) => g()[instanceName][verb](...args))
+    })
+  })
+}
+
 function blocksModules() {
   return Object.keys(parseImportmapJson()).filter(path => path.match(new RegExp(`^blocks/.*$`)))
 }
@@ -149,4 +103,14 @@ function parseImportmapJson() {
   return JSON.parse(document.querySelector("script[type=importmap]").text).imports
 }
 
-true
+function allMethodsCall(actionFunction) {
+    const handler = {
+        get: function(target, prop, receiver) {
+            return new Proxy(actionFunction, handler);
+        },
+        apply: function(target, thisArg, args) {
+            return actionFunction(...args);
+        }
+    };
+    return new Proxy(actionFunction, handler);
+}
