@@ -22,11 +22,6 @@ export default class extends Controller {
 
     Listener.onProcessingChanged = async (processing) => this.boundDetermineMicButton()
 
-    // Microphone.onActiveChanged = async (active) => {
-    //   console.log(`Microphone.active changed to ${active}`)
-    //   // this.determineMicButton()
-    // } // TODO: Do I need this? Controls never disable the mic.
-
     document.addEventListener('turbo:morph', this.boundDetermineMicButton)
     document.addEventListener('turbo:visit', this.boundDetermineMicButton)
     document.addEventListener('turbo:frame-render', this.boundDetermineMicButton)
