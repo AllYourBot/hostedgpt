@@ -32,19 +32,19 @@ class Feature
 
     def authentication_http_header_name
       ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:authentication_http_header_name, 'Tailscale-User-Name')
+        configuration.fetch(:authentication_http_header_name, 'X-WEBAUTH-USER')
       )
     end
 
     def authentication_http_header_uid
       ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:authentication_http_header_uid, 'Tailscale-User-Login')
+        configuration.fetch(:authentication_http_header_uid, 'X-WEBAUTH-NAME')
       )
     end
 
     def authentication_http_header_email
       ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:authentication_http_header_email, 'Tailscale-User-Login')
+        configuration.fetch(:authentication_http_header_email, 'X-WEBAUTH-EMAIL')
       )
     end
 

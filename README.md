@@ -41,13 +41,13 @@ Following features can be configured with environment variables:
   Default is `password`.
 - `AUTHENTICATION_HTTP_HEADER_EMAIL` - Name of the HTTP request header, which can be used to derive an email address of a new user.
   Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
-  Default is `Tailscale-User-Login`.
+  Default is `X-WEBAUTH-EMAIL`.
 - `AUTHENTICATION_HTTP_HEADER_NAME` - Name of the HTTP request header, which can be used to derive the full name of a new user.
   Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
-  Default is `Tailscale-User-Name`.
+  Default is `X-WEBAUTH-NAME`.
 - `AUTHENTICATION_HTTP_HEADER_UID` - Name of the HTTP request header, which will be used as unique identifier of the user.
   Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
-  Default is `Tailscale-User-Login`.
+  Default is `X-WEBAUTH-USER`.
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID.
   Required if `AUTHENTICATION_APPROACH` is set to `google`.
 - `GOOGLE_CLIENT_SECRET` - Google OAuth client secret.

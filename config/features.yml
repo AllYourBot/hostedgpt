@@ -1,8 +1,8 @@
 shared:
   authentication_approach: <%= ENV.fetch("AUTHENTICATION_APPROACH", "password") %>
-  authentication_http_header_email: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_EMAIL", "Tailscale-User-Login") %>
-  authentication_http_header_name: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_NAME", "Tailscale-User-Name") %>
-  authentication_http_header_uid: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_UID", "Tailscale-User-Login") %>
+  authentication_http_header_email: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_EMAIL", "X-WEBAUTH-EMAIL") %>
+  authentication_http_header_name: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_NAME", "X-WEBAUTH-NAME") %>
+  authentication_http_header_uid: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_UID", "X-WEBAUTH-USER") %>
   google_client_id: <%= ENV.fetch("GOOGLE_CLIENT_ID", nil) %>
   google_client_secret: <%= ENV.fetch("GOOGLE_CLIENT_SECRET", nil) %>
   registration: <%= ENV.fetch("REGISTRATON_FEATURE", true) %>
