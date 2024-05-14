@@ -287,7 +287,7 @@ GEM
       language_server-protocol (~> 3.17.0)
       prism (>= 0.19.0, < 0.20)
       sorbet-runtime (>= 0.5.5685)
-    ruby-openai (6.3.1)
+    ruby-openai (7.0.1)
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
       faraday-multipart (>= 1)
@@ -390,7 +390,7 @@ DEPENDENCIES
   rubocop-minitest
   rubocop-rails
   ruby-lsp
-  ruby-openai (~> 6.3)
+  ruby-openai (~> 7.0.1)
   selenium-webdriver
   solid_queue (~> 0.2.1)
   sprockets-rails

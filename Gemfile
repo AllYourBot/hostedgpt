@@ -37,7 +37,7 @@ gem "redcarpet", "~> 3.6.0"
 gem "image_processing", "~> 1.2"
 
 gem "rails_heroicon", "~> 2.2.0"
-gem "ruby-openai", "~> 6.3"
+gem "ruby-openai", "~> 7.0.1"
 gem "anthropic", "~> 0.1.0"
 gem "tiktoken_ruby", "~> 0.0.6"
 gem "solid_queue", "~> 0.2.1"
