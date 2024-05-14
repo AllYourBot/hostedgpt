@@ -1,7 +1,7 @@
 let transcriber
 
 beforeEach(() => {
-  Transcriber = new TranscriberControl()
+  Transcriber = new TranscriberInterface()
 })
 
 test('dummy', () => {

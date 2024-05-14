@@ -75,7 +75,7 @@ function init() {
   }
 }
 
-function requireLibThen(init) {
+function requireLibThen(init) { // look in test_helper.js for test env version of this
   const args = process.argv.slice(2)
   if (args[0] == 'test' || args[0] == 't') // index.js needs this
     process.env.NODE_ENV = 'test'

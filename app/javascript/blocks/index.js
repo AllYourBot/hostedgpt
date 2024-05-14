@@ -1,7 +1,22 @@
-((typeof window !== 'undefined' && window.mock === undefined) ? window : global).g = () => ((typeof window !== 'undefined' && window.mock === undefined) ? window : global)
-g().process = (typeof process === 'undefined') ? {} : process
-g().mode = (typeof window !== 'undefined' && window.mock === undefined) ? 'browser' : 'node'
-g().node = {
+((typeof window !== 'undefined' && window.mock === undefined) ? window : global).g = new Proxy(() => ((typeof window !== 'undefined' && window.mock === undefined) ? window : global), {
+  apply: (target, thisArg, argumentsList) => target(),
+  get: (target, prop, receiver) => {
+    const context = target()
+    if (prop in context) {
+      return context[prop]
+    }
+    return undefined
+  },
+  set: (target, prop, value) => {
+    const context = target()
+    context[prop] = value
+    return true
+  }
+})
+
+g.process = (typeof process === 'undefined') ? {} : process
+g.mode = (typeof window !== 'undefined' && window.mock === undefined) ? 'browser' : 'node'
+g.node = {
   env: (() => {
     const env = process?.env?.NODE_ENV ?? 'development'
 
@@ -26,19 +41,30 @@ g().node = {
   })()
 }
 
-await importDir('lib')
-for (const subdir of subdirsExceptLib('lib'))
-  await importDir(subdir)
+g.allMethodsCall = (actionFunction) => {
+  const handler = {
+      get: function(target, prop, receiver) {
+          return new Proxy(actionFunction, handler)
+      },
+      apply: function(target, thisArg, args) {
+          return actionFunction(...args)
+      }
+  }
+  return new Proxy(actionFunction, handler)
+}
 
-console.log(`initializing Blocks`)
-initializeInterfaces()
+// Finish init
+if (g.mode == 'browser') {
+  await importDir('lib')
+  for (const subdir of subdirsExceptLib('lib'))
+    await importDir(subdir)
 
+  initializeInterfaces()
+}
 
-// Private
+// Helpers
 
 async function importDir(type) {
-  if (typeof window === 'undefined' || g() != window) return
-
   for (const modulePath of allModules(type)) {
     const fileParts = modulePath.split('/')
     const file = fileParts[fileParts.length-1]
@@ -53,9 +79,7 @@ async function importDir(type) {
   }
 }
 
-async function initializeInterfaces() {
-  if (typeof window === 'undefined' || g() != window) return
-
+function initializeInterfaces() {
   let instances = []
   for (const modulePath of allModules('interfaces')) {
     const fileParts = modulePath.split('/')
@@ -71,27 +95,27 @@ async function initializeInterfaces() {
   }
 
   instances.forEach(instanceName => {
-    Object.getOwnPropertyNames(Object.getPrototypeOf(g()[instanceName])).filter((name) => {
+    Object.getOwnPropertyNames(Object.getPrototypeOf(g[instanceName])).filter((name) => {
       return name[0].upcase() == name[0] && name[0] != '_'
     }).forEach(verb => {
-      g()[verb] ||= {}
+      g[verb] ||= {}
       if (verb == 'Flip')
-        g()[verb][instanceName] = {
-          on: () => g()[instanceName].Flip(true),
-          off: () => g()[instanceName].Flip(false)
+        g[verb][instanceName] = {
+          on: () => g[instanceName].Flip(true),
+          off: () => g[instanceName].Flip(false)
         }
       else
-        g()[verb][instanceName] = allMethodsCall((...args) => g()[instanceName][verb](...args))
+        g[verb][instanceName] = g.allMethodsCall((...args) => g[instanceName][verb](...args))
     })
   })
 }
 
-function blocksModules() {
-  return Object.keys(parseImportmapJson()).filter(path => path.match(new RegExp(`^blocks/.*$`)))
-}
-
 function allModules(type) {
   return blocksModules().filter(path => path.match(new RegExp(`^blocks/${type}/.*$`)))
+}
+
+function blocksModules() {
+  return Object.keys(parseImportmapJson()).filter(path => path.match(new RegExp(`^blocks/.*$`)))
 }
 
 function subdirsExceptLib() {
@@ -101,16 +125,4 @@ function subdirsExceptLib() {
 
 function parseImportmapJson() {
   return JSON.parse(document.querySelector("script[type=importmap]").text).imports
-}
-
-function allMethodsCall(actionFunction) {
-    const handler = {
-        get: function(target, prop, receiver) {
-            return new Proxy(actionFunction, handler);
-        },
-        apply: function(target, thisArg, args) {
-            return actionFunction(...args);
-        }
-    };
-    return new Proxy(actionFunction, handler);
 }

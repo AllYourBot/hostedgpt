@@ -8,7 +8,7 @@ export default class extends Service {
 	log_start
 	async start() {
 		const canIRun = 'getDisplayMedia' in navigator.mediaDevices
-		if (!canIRun || $.declined) { console.log(`## skipping because ${canIRun} || ${$.declined}`); return false }
+		if (!canIRun || $.declined) return false
 
 		try {
 			$.media = await navigator.mediaDevices.getDisplayMedia({

@@ -1,7 +1,7 @@
 let microphone
 
 beforeEach(() => {
-  Microphone = new MicrophoneControl()
+  initializeInterfaces()
 })
 
 afterEach(() => {
@@ -12,14 +12,18 @@ test('new creates a MicrophoneService', () => {
   expect(Microphone.$.microphoneService.class).toBe(MicrophoneService)
 })
 
-test('enable and disable changes status, on, and off', () => {
-  expect(Microphone.status).toBe('off')
-  Microphone.Enable()
-  expect(Microphone.status).toBe('on')
-  expect(Microphone.on).toBe(true)
-  Microphone.Disable()
-  expect(Microphone.status).toBe('off')
+test('enable and disable changes active, on, and off', () => {
+  expect(Microphone.active).toBe(false)
   expect(Microphone.on).toBe(false)
+  expect(Microphone.off).toBe(true)
+  Flip.Microphone.on()
+  expect(Microphone.active).toBe(true)
+  expect(Microphone.on).toBe(true)
+  expect(Microphone.off).toBe(false)
+  Flip.Microphone.off()
+  expect(Microphone.active).toBe(false)
+  expect(Microphone.on).toBe(false)
+  expect(Microphone.off).toBe(true)
 })
 
 test('when sound is heard, the volume changes and silence is recorded', async() => {
