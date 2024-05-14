@@ -20,7 +20,6 @@ g.node = {
   env: (() => {
     const env = process?.env?.NODE_ENV ?? 'development'
 
-    // Supports all this:       node.env.
     const envFunc =                     () => env
     envFunc.                            toString = () => env
     Object.defineProperties(envFunc, {
