@@ -7,8 +7,8 @@ export default class extends Interface {
   Prompt(words)       { $.audioService.sayNext(words) }
   Reset()             { $.audioService.stop() }
 
-  get speaking()	    { $.audioService.speaking }
-  get busy()	        { $.audioService.busy }
+  get speaking()      { $.audioService.speaking }
+  get busy()          { $.audioService.busy }
 
   new() {
     $.audioService = new AudioService

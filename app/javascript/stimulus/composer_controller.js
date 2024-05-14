@@ -193,22 +193,22 @@ export default class extends Controller {
     if (!Listener.attachment) return
 
     const data = Listener.attachment.split(';base64,').pop()
-		const byteCharacters = atob(data)
-		const byteNumbers = new Array(byteCharacters.length)
+    const byteCharacters = atob(data)
+    const byteNumbers = new Array(byteCharacters.length)
 
-		for (let i = 0; i < byteCharacters.length; i++) {
-			byteNumbers[i] = byteCharacters.charCodeAt(i)
-		}
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
 
-		const byteArray = new Uint8Array(byteNumbers)
-		const blob = new Blob([byteArray], {type: 'image/jpeg'})
+    const byteArray = new Uint8Array(byteNumbers)
+    const blob = new Blob([byteArray], {type: 'image/jpeg'})
 
-		const file = new File([blob], "filename.jpg", { type: "image/jpeg" })
-		const fileInput = document.querySelector('input[type="file"]')
+    const file = new File([blob], "filename.jpg", { type: "image/jpeg" })
+    const fileInput = document.querySelector('input[type="file"]')
 
-		const dataTransfer = new DataTransfer()
-		dataTransfer.items.add(file)
-		fileInput.files = dataTransfer.files
+    const dataTransfer = new DataTransfer()
+    dataTransfer.items.add(file)
+    fileInput.files = dataTransfer.files
 
     fileInput.dispatchEvent(new Event('change', { bubbles: true }))
   }

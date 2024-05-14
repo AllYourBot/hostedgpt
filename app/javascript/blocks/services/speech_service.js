@@ -30,7 +30,7 @@ export default class extends Service {
       throw new Error("Service is currently unavailable")
     }
 
-		apiTimeoutHandler.end()
+    apiTimeoutHandler.end()
 
     if (!ttsResponse.ok) {
       let errorMessage = "Failed to generate audio";
@@ -47,9 +47,9 @@ export default class extends Service {
     return audioUrl
   }
 
-	static splitIntoThoughts(text) {
-		text = text.replace(". . .", "...")
-		const thoughts = text.split(/(?<=[^ ][\.,:!\?;…] |[\n，。．！？；：])/)
-		return thoughts.reject(t => t.strip().empty())
-	}
+  static splitIntoThoughts(text) {
+    text = text.replace(". . .", "...")
+    const thoughts = text.split(/(?<=[^ ][\.,:!\?;…] |[\n，。．！？；：])/)
+    return thoughts.reject(t => t.strip().empty())
+  }
 }

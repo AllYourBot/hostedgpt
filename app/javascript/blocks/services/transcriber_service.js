@@ -11,83 +11,83 @@ export default class extends Service {
     $.recognizer = null
 
     this._initSpeechRecognizer()
-		$.recognizer.onstart = () => _onStart()
-		$.recognizer.onend = () => _onEnd()
-		$.recognizer.onerror = () => _onError()
-		$.recognizer.onresult = (event) => _onResult(event)
+    $.recognizer.onstart = () => _onStart()
+    $.recognizer.onend = () => _onEnd()
+    $.recognizer.onerror = () => _onError()
+    $.recognizer.onresult = (event) => _onResult(event)
 
-		$.recognizer.onsoundstart = () => log('## SOUND START')
-		$.recognizer.onspeechstart = () => log('## SPEECH START')
-		$.recognizer.onsoundend = () => log('## sound end')
-		$.recognizer.onspeechend = () => log('## speech end')
+    $.recognizer.onsoundstart = () => log('## SOUND START')
+    $.recognizer.onspeechstart = () => log('## SPEECH START')
+    $.recognizer.onsoundend = () => log('## sound end')
+    $.recognizer.onspeechend = () => log('## speech end')
   }
 
   _initSpeechRecognizer() {
-		$.recognizer = ('webkitSpeechRecognition' in window) ? new webkitSpeechRecognition() : new SpeechRecognition()
-		$.recognizer.continuous = true
+    $.recognizer = ('webkitSpeechRecognition' in window) ? new webkitSpeechRecognition() : new SpeechRecognition()
+    $.recognizer.continuous = true
     // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
     $.recognizer.lang = "" // blank uses system's default language
   }
 
-	start()         { $.intendedState = 'started';  _executeStart() }
+  start()         { $.intendedState = 'started';  _executeStart() }
   restart()       { $.intendedState = 'started';  _executeRestart() }
-	end()           { $.intendedState = 'ended';    _executeEnd() }
-	get listening()	{ $.state == 'started' }
-	get ended()		  { $.state == 'ended' }
+  end()           { $.intendedState = 'ended';    _executeEnd() }
+  get listening()  { $.state == 'started' }
+  get ended()      { $.state == 'ended' }
 
 
-	// Exeuctors
+  // Exeuctors
 
-	_executeStart() {
-		if ($.state != 'started')
-			$.recognizer.start() // triggers _onStart() callback
-		else
-			_onStart()
-	}
+  _executeStart() {
+    if ($.state != 'started')
+      $.recognizer.start() // triggers _onStart() callback
+    else
+      _onStart()
+  }
 
-	_executeRestart() {
-		if ($.state == 'started')
-			_executeEnd() // will eventually trigger _onStart() b/c of intendedState
-		else
-			_onStart()
-	}
+  _executeRestart() {
+    if ($.state == 'started')
+      _executeEnd() // will eventually trigger _onStart() b/c of intendedState
+    else
+      _onStart()
+  }
 
-	_executeEnd() {
-		$.recognizer.abort()
-	}
+  _executeEnd() {
+    $.recognizer.abort()
+  }
 
-	_executeIntendedState() {
-		if ($.intendedState == 'started') _executeStart()
-		if ($.intendedState == 'ended')   _executeEnd()
-	}
+  _executeIntendedState() {
+    if ($.intendedState == 'started') _executeStart()
+    if ($.intendedState == 'ended')   _executeEnd()
+  }
 
-	// After state change
+  // After state change
 
   log_onStart
-	_onStart() {
+  _onStart() {
     $.state = 'started' // we may not intend this but we're here
     if ($.intendedState != 'started') _executeIntendedState()
-	}
+  }
 
   log_onEnd
-	_onEnd() {
+  _onEnd() {
     $.state = 'ended' // we may not intend this but we're here, ensures recognizer will restart
-		if ($.intendedState != 'ended') _executeIntendedState()
-	}
+    if ($.intendedState != 'ended') _executeIntendedState()
+  }
 
   log_onError
-	_onError() {
-		_executeIntendedState()
-	}
+  _onError() {
+    _executeIntendedState()
+  }
 
   _onResult(event) {
     let transcript = ""
-		for (let i = event.resultIndex; i < event.results.length; ++i) {
-			if (event.results[i].isFinal) transcript += event.results[i][0].transcript
-		}
-		transcript = transcript.trim()
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) transcript += event.results[i][0].transcript
+    }
+    transcript = transcript.trim()
 
-		if (transcript.length <= 1) return
+    if (transcript.length <= 1) return
 
     $.onTextReceived(transcript)
   }

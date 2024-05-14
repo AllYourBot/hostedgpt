@@ -50,8 +50,8 @@ export default class extends Interface {
   attr_words          = ''
   attr_active         = false
 
-  get on() 	          { return $.active }
-  get off()	          { return !$.active }
+  get on()            { return $.active }
+  get off()           { return !$.active }
 
   new() {
     $.covered = false
