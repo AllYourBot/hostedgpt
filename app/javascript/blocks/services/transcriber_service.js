@@ -15,11 +15,6 @@ export default class extends Service {
     $.recognizer.onend = () => _onEnd()
     $.recognizer.onerror = () => _onError()
     $.recognizer.onresult = (event) => _onResult(event)
-
-    $.recognizer.onsoundstart = () => log('## SOUND START')
-    $.recognizer.onspeechstart = () => log('## SPEECH START')
-    $.recognizer.onsoundend = () => log('## sound end')
-    $.recognizer.onspeechend = () => log('## speech end')
   }
 
   _initSpeechRecognizer() {

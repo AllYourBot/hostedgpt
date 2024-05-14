@@ -262,29 +262,33 @@
             |
           %>
 
-          <div class="absolute right-20 bottom-6 text-gray-500 hidden md:block" data-composer-target="microphoneShortcut">
-            Ctrl + M
-          </div>
+          <% if Feature.enabled?(:voice) %>
+            <div class="absolute right-20 bottom-6 text-gray-500 hidden md:block" data-composer-target="microphoneShortcut">
+              Ctrl + M
+            </div>
+          <% end %>
 
           <!-- options for the composer right button -->
 
-          <%= form.button type: "button",
-            data: {
-              composer_target: "microphoneDisable",
-              action: "composer#disableMicrophone"
-            },
-            id: "microphone-disable",
-            class: %w|
-              hidden
-              z-40
-              absolute right-8 bottom-4
-              w-[40px] h-[40px]
-              flex items-center justify-center
-              text-red-600 dark:text-gray-600
-              bg-white dark:bg-gray-800
-            | do
-          %>
-            <%= icon "microphone", variant: :solid, size: 26, title: 'Stop', tooltip: :top %>
+          <% if Feature.enabled?(:voice) %>
+            <%= form.button type: "button",
+              data: {
+                composer_target: "microphoneDisable",
+                action: "composer#disableMicrophone"
+              },
+              id: "microphone-disable",
+              class: %w|
+                hidden
+                z-40
+                absolute right-8 bottom-4
+                w-[40px] h-[40px]
+                flex items-center justify-center
+                text-red-600 dark:text-gray-600
+                bg-white dark:bg-gray-800
+              | do
+            %>
+              <%= icon "microphone", variant: :solid, size: 26, title: 'Stop', tooltip: :top %>
+            <% end %>
           <% end %>
 
           <%= form.button type: "button",
@@ -309,23 +313,40 @@
 
           <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
 
-          <%= form.button type: "button",
-            data: {
-              composer_target: "microphoneEnable",
-              action: "composer#enableMicrophone"
-            },
-            id: "microphone-enable",
-            class: %w|
-              z-10
-              absolute right-8 bottom-4
-              w-[40px] h-[40px]
-              flex items-center justify-center
-              text-gray-100 dark:text-gray-600
-              enabled:text-black
-              enabled:dark:text-white
-            | do
-          %>
-            <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
+          <% if Feature.enabled?(:voice) %>
+            <%= form.button type: "button",
+              data: {
+                composer_target: "microphoneEnable",
+                action: "composer#enableMicrophone"
+              },
+              id: "microphone-enable",
+              class: %w|
+                z-10
+                absolute right-8 bottom-4
+                w-[40px] h-[40px]
+                flex items-center justify-center
+                text-gray-100 dark:text-gray-600
+                enabled:text-black
+                enabled:dark:text-white
+              | do
+            %>
+              <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
+            <% end %>
+          <% else %>
+            <%= form.button type: "button",
+              disabled: true,
+              class: %w|
+                z-10
+                absolute right-8 bottom-4
+                w-[40px] h-[40px]
+                flex items-center justify-center
+                text-gray-100 dark:text-gray-600
+                enabled:text-black
+                enabled:dark:text-white
+              | do
+            %>
+              <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
+            <% end %>
           <% end %>
 
           <div

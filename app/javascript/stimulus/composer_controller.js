@@ -50,6 +50,8 @@ export default class extends Controller {
   }
 
   toggleMicrophone(event) {
+    if (!this.hasMicrophoneShortcutTarget) return // TODO: remove when enabling feature
+
     event.preventDefault()
 
     if (Listener.engaged) {
@@ -61,18 +63,15 @@ export default class extends Controller {
 
   boundDetermineMicButton = (event) => { this.determineMicButton(event) }
   determineMicButton(event) {
+    if (!this.hasMicrophoneShortcutTarget) return // TODO: remove when enabling feature
     if (event?.type == 'turbo:frame-render' && event?.id != 'conversation') return
 
-    if (Listener.engaged) {
-      console.log('## Listener.engaged')
+    if (Listener.engaged)
       this.enableMicrophone()
-    } else if (Listener.dismissed) {
-      console.log('## Listener.dismissed')
+    else if (Listener.dismissed)
       this.blinkingMicrophone() // mic still on
-    } else if (Microphone.off) {
-      console.log('## Microphone Off')
+    else if (Microphone.off)
       this.disableMicrophone()
-    }
   }
 
   enableMicrophone() {
@@ -148,13 +147,13 @@ export default class extends Controller {
 
   disableComposer() {
     this.overlayTarget.classList.remove('hidden')
-    this.microphoneShortcutTarget.classList.add('!hidden')
+    if (this.hasMicrophoneShortcutTarget) this.microphoneShortcutTarget.classList.add('!hidden') // TODO: fix when enabling feature
     this.inputTarget.blur()
   }
 
   enableComposer() {
     this.overlayTarget.classList.add('hidden')
-    this.microphoneShortcutTarget.classList.remove('!hidden')
+    if (this.hasMicrophoneShortcutTarget) this.microphoneShortcutTarget.classList.remove('!hidden') // TODO: fix when enabling feature
     this.focus()
   }
 
