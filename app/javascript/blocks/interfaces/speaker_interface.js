@@ -6,7 +6,8 @@ export default class extends Interface {
   log_Prompt
   Prompt(words)       { $.audioService.sayNext(words) }
   Reset()             { $.audioService.stop() }
-  Play(sound)         { $.audioService.play(sound) }
+  Play(sound, onEnd)  { $.audioService.play(sound, onEnd) }
+  Loop(sec, sound)    { $.audioService.playEvery(sec, sound) }
 
   get speaking()      { $.audioService.speaking }
   get busy()          { $.audioService.busy }
