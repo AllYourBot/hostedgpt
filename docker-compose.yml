@@ -25,6 +25,8 @@ services:
     environment:
       - DATABASE_URL=postgres://app:secret@postgres/app_development
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
+      - SOOMO_OPENAI_KEY=${SOOMO_OPENAI_KEY}
+      - SOOMO_ANTHROPIC_KEY=${SOOMO_ANTHROPIC_KEY}
     ports: ["3000:3000"]
     volumes:
       - .:/rails
