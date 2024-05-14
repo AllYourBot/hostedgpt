@@ -3,7 +3,7 @@ import viewport from "stimulus/utils/viewport"
 
 export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
-    "microphoneEnable", "microphoneDisable", "microphoneShortcut" ]
+    "microphoneEnable", "microphoneDisable" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -42,15 +42,17 @@ export default class extends Controller {
   determineSubmitButton() {
     if (this.cleanInputValue.length < 1) {
       this.submitTarget.classList.add('hidden')
+      if (this.hasMicrophoneEnableTarget) this.microphoneEnableTarget.classList.remove('hidden') // TODO: remove when enabling feature
       if (this.hasCancelTarget) this.cancelTarget.classList.remove('hidden')
     } else {
       this.submitTarget.classList.remove('hidden')
+      if (this.hasMicrophoneEnableTarget) this.microphoneEnableTarget.classList.add('hidden') // TODO: remove when enabling feature
       if (this.hasCancelTarget) this.cancelTarget.classList.add('hidden')
     }
   }
 
   toggleMicrophone(event) {
-    if (!this.hasMicrophoneShortcutTarget) return // TODO: remove when enabling feature
+    if (!this.hasMicrophoneEnableTarget) return // TODO: remove when enabling feature
 
     event.preventDefault()
 
@@ -63,7 +65,7 @@ export default class extends Controller {
 
   boundDetermineMicButton = (event) => { this.determineMicButton(event) }
   determineMicButton(event) {
-    if (!this.hasMicrophoneShortcutTarget) return // TODO: remove when enabling feature
+    if (!this.hasMicrophoneEnableTarget) return // TODO: remove when enabling feature
     if (event?.type == 'turbo:frame-render' && event?.id != 'conversation') return
 
     if (Listener.engaged)
@@ -147,13 +149,11 @@ export default class extends Controller {
 
   disableComposer() {
     this.overlayTarget.classList.remove('hidden')
-    if (this.hasMicrophoneShortcutTarget) this.microphoneShortcutTarget.classList.add('!hidden') // TODO: fix when enabling feature
     this.inputTarget.blur()
   }
 
   enableComposer() {
     this.overlayTarget.classList.add('hidden')
-    if (this.hasMicrophoneShortcutTarget) this.microphoneShortcutTarget.classList.remove('!hidden') // TODO: fix when enabling feature
     this.focus()
   }
 
