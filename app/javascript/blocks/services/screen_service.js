@@ -2,11 +2,13 @@ import Service from "./service.js"
 
 export default class extends Service {
   logLevel_info
-  attr_started   = false
+  attr_started  = false
   attr_declined = false
 
   log_start
   async start() {
+    if ($.started) return
+
     const canIRun = 'getDisplayMedia' in navigator.mediaDevices
     if (!canIRun || $.declined) return false
 
