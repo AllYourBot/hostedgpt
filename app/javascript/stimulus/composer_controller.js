@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import viewport from "./utils/viewport"
+import viewport from "stimulus/utils/viewport"
 
 export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
