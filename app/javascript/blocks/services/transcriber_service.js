@@ -1,4 +1,4 @@
-import Service from "./service.js"
+import Service from "blocks/service"
 
 export default class extends Service {
   logLevel_info

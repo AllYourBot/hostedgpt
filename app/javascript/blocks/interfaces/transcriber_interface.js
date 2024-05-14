@@ -1,4 +1,4 @@
-import Interface from "./interface.js"
+import Interface from "blocks/interface"
 
 // the length of time we pause before reflecting on what was said should
 // take into account *what* was said. If the last word was clearly the end
