@@ -20,6 +20,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [ "image", "loader" ]
   static values = { url: String }
+  static outlets = [ "message-scroller" ]
 
   connect() {
     this.retryCount = 0
@@ -42,7 +43,7 @@ export default class extends Controller {
     if (this.retryCount <= this.maxRetries) {
       this.imageTarget.classList.add("hidden")
       this.loaderTarget.classList.remove("hidden")
-      window.dispatchEvent(new CustomEvent('main-column-changed'))
+      this.considerScrolling(false) // why are we scrolling here? Tests fail if we remove this
 
       setTimeout(() => {
         let srcBase = this.urlValue.split("?")[0]
@@ -62,8 +63,21 @@ export default class extends Controller {
 
   ensureImageLoaded() {
     if (this.imageTarget.parentElement.clientHeight > 25)
-      window.dispatchEvent(new CustomEvent('main-column-changed', { detail: this.imageKey }))
+      this.considerScrolling(true)
     else
-      requestAnimationFrame(() => this.ensureImageLoaded())
+      runAfter(0.5, () => this.ensureImageLoaded())
+  }
+
+  messageScrollerOutletConnected() {
+    if (this.redoConsiderScrolling != undefined) this.considerScrolling(this.redoConsiderScrolling)
+  }
+
+  considerScrolling(includeDetails) {
+    const event = includeDetails ? new CustomEvent('dummy', { detail: this.imageKey }) : new CustomEvent('dummy')
+
+    if (this.hasMessageScrollerOutlet && this.messageScrollerOutlets.length > 0)
+      this.messageScrollerOutlets.forEach((outlet) => outlet.throttledScrollDownIfScrolledToBottom(event))
+    else
+      this.redoConsiderScrolling = includeDetails
   }
 }

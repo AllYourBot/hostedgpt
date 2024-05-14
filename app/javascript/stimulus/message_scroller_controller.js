@@ -2,7 +2,7 @@ window.lastMessageControllerInstance = null
 window.wasScrolledToBottom = false
 
 import { Controller } from "@hotwired/stimulus"
-import throttle from "utils/throttle"
+import throttle from "./utils/throttle"
 
 export default class extends Controller {
   scrollableTarget = null
@@ -41,7 +41,7 @@ export default class extends Controller {
       this.scrollDownIfScrolledToBottom()
   }
 
-  discardScrollDown = (event) => { if (window.imageLoadingForSystemTestsToCheck[event?.detail]) { console.log(`discarding ${event.detail}`); window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' } }
+  discardScrollDown = (event) => { if (window.imageLoadingForSystemTestsToCheck[event?.detail]) { window.imageLoadingForSystemTestsToCheck[event.detail] = 'done' } }
   throttledScrollDownIfScrolledToBottom = throttle((event) => this.scrollDownIfScrolledToBottom(event), 50, this.discardScrollDown)
   scrollDownIfScrolledToBottom(event) {
     if (window.wasScrolledToBottom)
