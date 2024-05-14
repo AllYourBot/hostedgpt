@@ -28,8 +28,8 @@ export default class extends Interface {
   log_Invoke
   async Invoke()      { if (!$.processing) {
                           $.processing = true
-                          Flip.Transcriber.on()
                           await $.screenService.start()
+                          Flip.Transcriber.on()
                         }
                       }
   log_Dismiss
