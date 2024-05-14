@@ -5,6 +5,7 @@ keith:
   registered_at: 2023-12-19 08:40:05
   openai_key: abc123
   anthropic_key: def789
+  last_cancelled_message: dont_know_day
   preferences: {}
 
 rob:

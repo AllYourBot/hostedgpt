@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_25_173453) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_13_184146) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -75,7 +75,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_173453) do
     t.string "title"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "last_assistant_message_id"
     t.index ["assistant_id"], name: "index_conversations_on_assistant_id"
+    t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end
@@ -92,6 +94,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_173453) do
     t.index ["assistant_id"], name: "index_documents_on_assistant_id"
     t.index ["message_id"], name: "index_documents_on_message_id"
     t.index ["user_id"], name: "index_documents_on_user_id"
+  end
+
+  create_table "llms", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "messages", force: :cascade do |t|
@@ -292,6 +301,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_173453) do
     t.string "openai_key"
     t.string "anthropic_key"
     t.jsonb "preferences"
+    t.bigint "last_cancelled_message_id"
+    t.index ["last_cancelled_message_id"], name: "index_users_on_last_cancelled_message_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -299,6 +310,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_173453) do
   add_foreign_key "assistants", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "conversations", "assistants"
+  add_foreign_key "conversations", "messages", column: "last_assistant_message_id"
   add_foreign_key "conversations", "users"
   add_foreign_key "documents", "assistants"
   add_foreign_key "documents", "messages"
@@ -319,4 +331,5 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_173453) do
   add_foreign_key "steps", "assistants"
   add_foreign_key "steps", "conversations"
   add_foreign_key "steps", "runs"
+  add_foreign_key "users", "messages", column: "last_cancelled_message_id"
 end

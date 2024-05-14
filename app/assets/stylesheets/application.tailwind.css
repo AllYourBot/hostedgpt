@@ -44,31 +44,34 @@
   @apply !text-white;
 }
 
-.relationship .relationship\:bg-gray-700,
-.relationship.relationship\:bg-gray-700 {
-  @apply bg-gray-700;
-}
-
-.relationship .relationship\:bg-gray-200,
-.relationship.relationship\:bg-gray-200 {
-  @apply bg-gray-200;
-}
-
-@media (prefers-color-scheme: dark) {
-  .relationship .dark\:relationship\:bg-gray-700,
-  .relationship.dark\:relationship\:bg-gray-700 {
+:root:not(.dark) {
+  .relationship .relationship\:bg-gray-700,
+  .relationship.relationship\:bg-gray-700 {
     @apply bg-gray-700;
+  }
+  .relationship .relationship\:bg-gray-200,
+  .relationship.relationship\:bg-gray-200 {
+    @apply bg-gray-200;
   }
 }
 
-.relationship .relationship\:hidden,
-.relationship.relationship\:hidden {
-  @apply !hidden;
+@media (prefers-color-scheme: dark), (root: dark) {
+  .dark\:relationship\:bg-gray-700.relationship {
+    @apply bg-gray-700 !important;
+  }
+  .dark\:relationship\:bg-gray-900.relationship {
+    @apply bg-gray-900;
+  }
 }
 
 .relationship .relationship\:pl-4,
 .relationship.relationship\:pl-4 {
   @apply !pl-4;
+}
+
+.relationship .relationship\:hidden,
+.relationship.relationship\:hidden {
+  @apply !hidden;
 }
 
 .nav-closed .nav-closed\:hidden {
@@ -159,6 +162,8 @@ input:focus {
 @layer base {
   html {
     @apply h-full overscroll-none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   body {
     @apply h-full font-sans text-gray-950 dark:text-gray-100 flex overflow-y-auto;

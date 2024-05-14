@@ -7,10 +7,13 @@
   <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" %>
   <%# daisyui (^) is declared above application (v) so we can override classes from it %>
   <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
-  <%= stylesheet_link_tag "application", 'https://fonts.googleapis.com/css?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap', "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", 'https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap', "data-turbo-track": "reload" %>
   <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-  <%= javascript_importmap_tags %>
   <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+
+  <script async src="https://ga.jspm.io/npm:es-module-shims@1.8.2/dist/es-module-shims.js" data-turbo-track="reload"></script>
+  <%= javascript_importmap_tags %>
+  <%# shim explained ^ https://github.com/rails/importmap-rails#supporting-legacy-browsers-such-as-safari-on-ios-15 %>
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json">
@@ -19,11 +22,15 @@
   <%= javascript_tag do %>
     iosPWASplash('/apple-touch-icon.png', '#ffffff')
   <% end %>
+  <%= javascript_tag do %>
+  // NOTE: This is not safe for multi-user environments. Fix before we default-enable the voice Feature
+  openAIKey = "<%= Current.user&.openai_key %>"
+  <% end %>
+
   <!-- /ios-pwa-splash screen-->
   <!-- /PWA -->
 
   <%= render 'application/head/favicons' %>
   <%= render 'application/head/meta_tags' %>
   <%= content_for :head %>
-  <%= hotwire_livereload_tags if Rails.env.development? %> <!-- Hotwire LiveReload -->
 </head>

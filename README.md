@@ -24,13 +24,16 @@ ChatGPT uses your private conversations history to train its models. [OpenAI dis
 
 # Table of Contents
 
-- [Setup the app](#setup-the-app)
+- [Deploy the app on Render](#deploy-the-app-on-render)
+- [Deploy the app on Fly.io](#deploy-the-app-on-fly)
 - [Contribute as a developer](#contribute-as-a-developer)
+- [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
 
-# Setup the app
 
-You can deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working. You will need to upgrade to a paid version of the database which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
+# Deploy the app on Render
+
+For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working. You will need to upgrade to a paid version of the database which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
@@ -52,13 +55,32 @@ You can deploy a full version of HostedGPT to the hosting service, Render, for f
 
 ## Troubleshooting Render
 
-1. If you encountered an error while waiting for the services to be deployed on Render, click **Dashboard** at the top of the Render screen and click the Service that failed.
+If you encountered an error while waiting for the services to be deployed on Render:
+
+1. Login to your account on Render.com and click **Dashboard** at the top then click the Service that failed.
 2. It should take you to the Events section and the top event should explain the error. It will probably contain a link to click to the **deploy logs**
 3. Scroll back up through the logs and find any instances of errors. [Start a new discussion](https://github.com/allyourbot/hostedgpt/discussions/new?category=general) and share details.
 4. When you are ready to try Render again, it's best to do the following:
 5. First, ensure your repo is caught up. Open your fork in github, click the Sync Fork button so that any bug fixes are pulled in.
 6. Second, in Render navigate to the Dashboard, Bluebrint, and Env Groups and delete any details associated with **hostedgpt**
 7. Now you can go back to your repo and click **Deploy to Render**
+
+
+# Deploy the app on Fly
+
+Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free servie so Fly is actually less expensive over the long term.
+
+1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
+1. Install the Fly command-line tool [view instructions](https://fly.io/docs/hands-on/install-flyctl/)
+3. In the root directory of the repoistory you pulled down, run `fly launch --build-only` and say `Yes` to copy the existing fly.toml, but note that it will generate the wrong settings.
+4. **The settings it shows are INCORRECT** so tell it you want to make changes
+5. When it opens your browser, change the Database to `Fly Postgres` with a name such as `hostedgpt-db` and you can set the configuration to `Development`.
+7. Click `Confirm Settings` at the bottom of the page and close the browser.
+8. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
+9. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly.
+10. Run `fly deploy`
+11. It will automatically deploy 2 servers instead of just 1 so after it finishes deploy run `fly scale count app=1` to scale down to 1 machine.
+
 
 # Contribute as a developer
 
@@ -85,8 +107,8 @@ Every time you pull new changes down, kill docker (if it's running) and re-run:
 HostedGPT requires these services to be running:
 
 - Postgres ([installation instructions](https://www.postgresql.org/download/))
-- Redis ([installation instructions](https://redis.io/download))
-- rbenv or asdf-vm ([installation instructions](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf))
+- rbenv ([installation instructions](https://github.com/rbenv/rbenv))
+- ImageMagick (`brew install imagemagick` should work on Mac )
 
 1. `cd` into your local repository clone
 2. `rbenv install` or `asdf install` to install the correct ruby version
@@ -95,6 +117,24 @@ HostedGPT requires these services to be running:
 5. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
 
 Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
+
+### Running tests
+
+If you're set up with Docker you run `docker compose run base rails test`. Note that the system tests, which use a headless browser, are not able to run in Docker. They will be run automatically for you if you create a Pull Request against the project.
+
+If you set up the app outside of Docker, then run the usual `bin/rails test` and `bin/rails test:system`.
+
+
+# Understanding the Docker configuration
+
+The `Dockerfile` is set up to support three distinct situations: development, deploying to Render, and deploying to Fly. Each of these are completely separate targets which don't share any steps, they are simply in the same Dockerfile.
+
+The `docker-compose.yml` is solely for development. It references the `development` build target.
+
+The `render.yml` specifies details of the Render production environment. Note that Render does not support specifying a build target within this file, it simply defaults to the last target with the Dockerfile so the order of the sections within there matter.
+
+The `fly.toml` specifies details of the Fly production environment. It references the `fly-production` build target. The Fly section of the Dockerfile was generated using the dockerfile-rails generator. This is Fly's recommendation and it produces a reasonable production-ready Dockerfile. Edits to this _top section_ of the file have been kept very minimal, on purpose, because it's intended to be updated using the generator. When it was originally generated it saved all the configuration parameters into `config/dockerfile.yml`. When you run `bin/rails generate dockerfile` it will read all these configurations and attempt to re-generate the Dockerfile. You can try this, it will warn you that it's going to overwrite, and press `d` to see the diff of what changes it will make. There should be no functional changes above the line `#### END of FLY ####`. Imagine you wanted to use this generator to change the app to use MySQL ((view all generator options)[https://github.com/fly-apps/dockerfile-rails]). You could run `bin/rails generate dockerfile --mysql` and it would update your Gemfile, automatically run bundle install to install any gem changes, and then it will attempt to update Dockerfile where you can again press `d`. Inspect the diff of any changes above the line `#### END of FLY ####` and manually apply those changes. Similarly, view the diff for dockerignore and docker-entrypoint, although none of those changes should be necessary. When you get to `fly.toml` you will want to view that diff closely and manually apply those changes. At the end it will update config/dockerfile.yml to record the new configuration of the Dockerfile. In this way, you can continue to use the generator to keep the Dockerfile updated (as recommended by Fly) while not breaking the dev or Render setup.
+
 
 # Changelog
 
@@ -122,4 +162,3 @@ v0.5 - Released on 2/14/2024
 * Conversations are automatically titled
 * Sidebar can be closed
 * AI responses stream in
->>>>>>> upstream-main

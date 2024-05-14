@@ -24,7 +24,7 @@ class MessagesController < ApplicationController
     @streaming_message = Message.where(
       content_text: [nil, ""],
       cancelled_at: nil
-    ).find_by(id: redis.get("conversation-#{@conversation.id}-latest-assistant_message-id"))
+    ).find_by(id: @conversation.last_assistant_message_id)
   end
 
   def show
@@ -43,7 +43,7 @@ class MessagesController < ApplicationController
 
     if @message.save
       after_create_assistant_reply = @message.conversation.latest_message_for_version(@message.version)
-      GetNextAIMessageJob.perform_later(after_create_assistant_reply.id, @assistant.id)
+      GetNextAIMessageJob.perform_later(current_user.id, after_create_assistant_reply.id, @assistant.id)
       redirect_to conversation_messages_path(@message.conversation, version: @message.version)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
@@ -109,9 +109,5 @@ class MessagesController < ApplicationController
       modified_params[:content_text] = nil # nil and "" have different meanings
     end
     modified_params
-  end
-
-  def redis
-    RedisConnection.client
   end
 end
