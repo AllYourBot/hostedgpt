@@ -48,17 +48,17 @@ export default class extends Interface {
                       }
 
   attr_words          = ''
-	attr_active         = false
+  attr_active         = false
 
-	get on() 	          { return $.active }
-	get off()	          { return !$.active }
+  get on() 	          { return $.active }
+  get off()	          { return !$.active }
 
-	new() {
+  new() {
     $.covered = false
-		$.transcriberService = new TranscriberService
-		$.transcriberService.onTextReceived = (text) => {
+    $.transcriberService = new TranscriberService
+    $.transcriberService.onTextReceived = (text) => {
       if ($.covered) return
       SpeakTo.Transcriber.with.words(text)
     }
-	}
+  }
 }
