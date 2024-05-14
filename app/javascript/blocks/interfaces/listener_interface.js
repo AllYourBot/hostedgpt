@@ -30,6 +30,7 @@ export default class extends Interface {
                           $.processing = true
                           await $.screenService.start()
                           Flip.Transcriber.on()
+                          Play.Speaker.sound('pop')
                         }
                       }
   log_Dismiss
