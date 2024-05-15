@@ -101,8 +101,11 @@
   </header>
   <!-- end header possibilities -->
 
-  <section class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip scrollbar-hide" data-controller="scrollable" data-scrollable-not-bottom-class="!block">
-
+  <section
+    class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip scrollbar-hide"
+    data-controller="scrollable speaker"
+    data-scrollable-not-bottom-class="!block"
+  >
     <div id="messages" class="relative flex-grow overflow-y-auto overflow-x-clip scrollbar-hide overscroll-contain" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
       <div id="messages-container" class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
         <%= yield :messages %>
@@ -124,7 +127,7 @@
 
       <div  id="composer"
             class="flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
-            data-controller="new-message image-upload"
+            data-controller="composer image-upload"
       >
         <%= button_tag type: "button",
               id: "attach-button",
@@ -184,13 +187,15 @@
         <% if @streaming_message %>
           <%= form_with(
             model: @streaming_message,
-            class: "absolute top-2 right-8 z-10",
+            class: "absolute top-2 right-8 z-20",
             data: {
-              new_message_target: "cancel",
+              composer_target: "cancel",
               turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
           }) do |form| %>
             <%= form.hidden_field :cancelled_at, value: Time.current %>
-            <%= form.button id: "cancel", type: "submit", class: "relative bg-white dark:bg-gray-800" do %>
+            <%= form.button type: "submit",
+              id: "cancel",
+              class: "relative bg-white dark:bg-gray-800" do %>
               <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
               <%= icon "stop-circle", variant: :outline, size: 39, title: 'Stop', tooltip: :top %>
             <% end %>
@@ -200,7 +205,7 @@
         <%= form_with(
           model: [@assistant, @new_message],
           data: {
-            new_message_target: "form",
+            composer_target: "form",
             turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
         }) do |form| %>
           <%= form.hidden_field :conversation_id %>
@@ -211,33 +216,38 @@
           <% end %>
 
           <%= form.text_area :content_text,
+            id: "composer-input",
+            placeholder: "Enter to submit",
             data: {
-              new_message_target: "input",
+              composer_target: "input",
               image_upload_target: "content",
               application_target: "newMessageField",
               controller: "textarea-autogrow",
               action: %|
-                new-message#toggleSubmitButton
+                composer#determineSubmitButton
 
-                keydown.enter->new-message#submitForm:prevent
-                keydown.meta+enter->new-message#submitForm
-                keydown.ctrl+enter->new-message#submitForm
+                keydown.enter->composer#submitForm:prevent
+                keydown.meta+enter->composer#submitForm
+                keydown.ctrl+enter->composer#submitForm
 
-                keydown.shift+esc@document->new-message#focusKeydown
-                keydown.slash@document->new-message#focusKeydown
+                keydown.shift+esc@document->composer#focusKeydown
+                keydown.slash@document->composer#focusKeydown
+                focus->composer#focus
 
-                keydown.esc->new-message#unfocusKeydown
+                keydown.esc->composer#unfocusKeydown
 
-                keydown.meta+shift+o->new-message#unfocusKeydown
-                keydown.ctrl+shift+o->new-message#unfocusKeydown
-                keydown.meta+j->new-message#unfocusKeydown
-                keydown.ctrl+j->new-message#unfocusKeydown
+                keydown.meta+shift+o->composer#unfocusKeydown
+                keydown.ctrl+shift+o->composer#unfocusKeydown
+                keydown.meta+j->composer#unfocusKeydown
+                keydown.ctrl+j->composer#unfocusKeydown
 
-                paste->new-message#smartPaste
+                paste->composer#smartPaste
+
+                keydown.ctrl+m@document->composer#toggleMicrophone
+                keydown.meta+m@document->composer#toggleMicrophone
               |
             },
             rows: 1,
-            placeholder: "Message #{@assistant.name} ...",
             class: %|
               w-full pt-[14px] pb-[13px] min-h-14
               mb-2 block
@@ -252,15 +262,89 @@
             |
           %>
 
-          <div id="send-button" class="absolute right-8 bottom-4 w-[39px] h-[39px]">
+          <!-- options for the composer right button -->
+
+          <% if Feature.enabled?(:voice) %>
             <%= form.button type: "button",
               data: {
-                new_message_target: "submit",
-                action: "new-message#submitForm"
+                composer_target: "microphoneDisable",
+                action: "composer#disableMicrophone"
               },
-              id: "send",
+              id: "microphone-disable",
+              class: %w|
+                hidden
+                z-40
+                absolute right-8 bottom-4
+                w-[40px] h-[40px]
+                flex items-center justify-center
+                text-red-600 dark:text-red-400
+                bg-white dark:bg-gray-800
+              | do
+            %>
+              <%= icon "microphone", variant: :solid, size: 26, title: 'Stop', tooltip: :top %>
+            <% end %>
+          <% end %>
+
+          <%= form.button type: "button",
+            data: {
+              composer_target: "submit",
+              action: "composer#submitForm"
+            },
+            id: "send",
+            class: %w|
+              hidden
+              z-30
+              absolute right-8 bottom-4
+              w-[39px] h-[39px]
+              text-gray-100 dark:text-gray-600
+              enabled:text-black
+              enabled:dark:text-white
+              bg-white dark:bg-gray-800
+            | do
+          %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
+          <% end %>
+
+          <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
+
+          <% if Feature.enabled?(:voice) %>
+            <div
+              id="microphone-enable"
+              data-composer-target="microphoneEnable"
+              class="
+                z-10
+                absolute
+                right-8 bottom-4
+                h-[40px] w-[120px]
+                flex items-center justify-end
+            ">
+              <div class="text-gray-500 mr-1 hidden md:block">
+                Ctrl + M
+              </div>
+
+              <%= form.button type: "button",
+                data: {
+                  action: "composer#enableMicrophone"
+                },
+                class: %w|
+                  flex items-center justify-center
+                  w-[40px] h-[40px]
+                  text-gray-100 dark:text-gray-600
+                  enabled:text-black
+                  enabled:dark:text-white
+                | do
+              %>
+                <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
+              <% end %>
+            </div>
+          <% else %>
+            <%= form.button type: "button",
               disabled: true,
               class: %w|
+                z-10
+                absolute right-8 bottom-4
+                w-[40px] h-[40px]
+                flex items-center justify-center
                 text-gray-100 dark:text-gray-600
                 enabled:text-black
                 enabled:dark:text-white
@@ -268,11 +352,12 @@
             %>
               <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
             <% end %>
-          </div>
+          <% end %>
 
           <div
             id="composer-overlay"
-            data-new-message-target="overlay"
+            data-composer-target="overlay"
+            data-action="click->composer#disableMicrophone"
             class="absolute inset-0 bg-white dark:bg-gray-800 !bg-opacity-65 hidden">
           </div>
 
@@ -320,6 +405,15 @@
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">ESC</div>
+          </kbd>
+        </figure>
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Toggle microphone mode
+          </figcaption>
+          <kbd class="w-50 text-right flex flex-row gap-1">
+            <div class="key">Ctrl or ⌘</div>
+            <div class="key">M</div>
           </kbd>
         </figure>
 
