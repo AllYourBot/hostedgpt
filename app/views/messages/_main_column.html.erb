@@ -217,7 +217,7 @@
 
           <%= form.text_area :content_text,
             id: "composer-input",
-            placeholder: "Enter to submit",
+            placeholder: "ENTER  to submit",
             data: {
               composer_target: "input",
               image_upload_target: "content",
@@ -233,6 +233,7 @@
                 keydown.shift+esc@document->composer#focusKeydown
                 keydown.slash@document->composer#focusKeydown
                 focus->composer#focus
+                blur->composer#blur
 
                 keydown.esc->composer#unfocusKeydown
 

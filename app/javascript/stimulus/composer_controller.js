@@ -106,7 +106,7 @@ export default class extends Controller {
 
   async focus() {
     if (viewport('md')) {
-      this.inputTarget.placeholder = 'Enter to submit'
+      this.inputTarget.placeholder = 'ENTER  to submit'
     } else {
       this.inputTarget.placeholder = ''
     }
@@ -114,13 +114,17 @@ export default class extends Controller {
   }
 
   unfocusKeydown(event) {
+    this.blur()
+    event.preventDefault()
+  }
+
+  blur() {
     if (viewport('md')) {
       this.inputTarget.placeholder = '/  to focus input'
     } else {
       this.inputTarget.placeholder = ''
     }
-    document.activeElement.blur()
-    event.preventDefault()
+    this.inputTarget.blur()
   }
 
   submitForm() {
