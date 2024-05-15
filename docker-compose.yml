@@ -1,11 +1,6 @@
 version: '3.1'
 
 services:
-  redis:
-    image: redis
-    healthcheck:
-      test: ["CMD", "redis-cli","ping"]
-
   postgres:
     image: postgres:16
     restart: always
@@ -21,19 +16,18 @@ services:
       retries: 5
 
   base: &base
-    depends_on: ["redis", "postgres"]
+    depends_on: ["postgres"]
     restart: on-failure:3
     tty: true
     build:
       context: .
       target: development
     environment:
-      - REDIS_URL=redis://redis/0
       - DATABASE_URL=postgres://app:secret@postgres/app_development
+      - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
     ports: ["3000:3000"]
     volumes:
-      - .:/app
-      - /app/tmp
+      - .:/rails
 
   worker:
     <<: *base
