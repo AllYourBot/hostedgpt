@@ -50,7 +50,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_12_163300) do
 
   create_table "assistants", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "model"
     t.string "name"
     t.string "description"
     t.string "instructions"
@@ -58,6 +57,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_12_163300) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "images", default: false, null: false
+    t.bigint "language_model_id"
+    t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
     t.index ["user_id"], name: "index_assistants_on_user_id"
   end
 
@@ -119,10 +120,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_12_163300) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
-    t.datetime "cancelled_at"
     t.datetime "processed_at", precision: nil
     t.integer "index", null: false
     t.integer "version", null: false
+    t.datetime "cancelled_at"
     t.boolean "branched", default: false, null: false
     t.integer "branched_from_version"
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
@@ -314,6 +315,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_12_163300) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "assistants", "language_models"
   add_foreign_key "assistants", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "conversations", "assistants"
