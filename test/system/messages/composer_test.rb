@@ -4,7 +4,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
   setup do
     @user = users(:keith)
     login_as @user
-    @submit = find("#composer #send") # oddly, when I changed id="submit" on the button the form fails to submit
+    @submit = find("#composer #send", visible: :all) # oddly, when I changed id="submit" on the button the form fails to submit
     @input_selector = "#composer textarea"
     @long_conversation = conversations(:greeting)
   end
@@ -70,16 +70,12 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_active input
   end
 
-  test "submit button is disabled and cannot be clicked until text is entered" do
+  test "submit button is hidden and can only be clicked when text is entered" do
     path = current_path
 
-    assert @submit.disabled?
-    click_element @submit
-    assert_equal path, current_path, "Path should not have changed because form should not submit"
-
-    click_element input # focus is lost after the attempted click on submit so we need to refocus
+    refute @submit.visible?
     send_keys "Entered text so we can now submit"
-    refute @submit.disabled?
+    assert @submit.visible?
     click_element @submit
 
     assert_composer_blank
@@ -89,12 +85,12 @@ class MessagesComposerTest < ApplicationSystemTestCase
   test "enter works to submit but only when text has been entered" do
     path = current_path
 
-    assert @submit.disabled?
+    refute @submit.visible?
     send_keys "enter"
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
     send_keys "Entered text so we can now submit"
-    refute @submit.disabled?
+    assert @submit.visible?
     send_keys "enter"
 
     assert_composer_blank
