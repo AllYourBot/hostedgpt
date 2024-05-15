@@ -38,6 +38,6 @@ class MarkdownRenderer
   end
 
   def self.ensure_blank_line_before_code_block_start(markdown)
-    markdown.gsub(/(\n*)(```.*?```)/m, "\n\n\\2")
+    markdown.gsub(/(\n*)( *)(```.*?```)/m, "\n\\2\\3")
   end
 end

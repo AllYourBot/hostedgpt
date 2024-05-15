@@ -5,7 +5,7 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     @renderer = MarkdownRenderer
   end
 
-  test 'ensure_blank_line_before_code_block_start adds blank line before code block when zero newlines' do
+  test "ensure_blank_line_before_code_block_start adds blank line before code block when zero newlines" do
     markdown = "Text before code block```ruby\ncode block\n```"
     expected = "Text before code block\n\n```ruby\ncode block\n```"
     assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
@@ -19,7 +19,7 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
   end
 
-  test 'ensure_blank_line_before_code_block_start adds blank line before code block when one newline' do
+  test "ensure_blank_line_before_code_block_start adds blank line before code block when one newline" do
     markdown = "Text before code block\n```ruby\ncode block\n```"
     expected = "Text before code block\n\n```ruby\ncode block\n```"
     assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
@@ -33,7 +33,7 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
   end
 
-  test 'ensure_blank_line_before_code_block_start does not add blank line when one is already present' do
+  test "ensure_blank_line_before_code_block_start does not add blank line when one is already present" do
     markdown = "Text before code block\n\n```ruby\ncode block\n```"
     expected = "Text before code block\n\n```ruby\ncode block\n```"
     assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
@@ -44,6 +44,15 @@ class MarkdownRendererTest < ActiveSupport::TestCase
 
     markdown = "Text before code block\n\n```ruby\ncode block\n```Text before second\n\n```\ncode block\n```"
     expected = "Text before code block\n\n```ruby\ncode block\n```Text before second\n\n```\ncode block\n```"
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
+  end
+
+  test "ensure_blank_line_before_code_block_start keeps a block indented if it is indented" do
+    # TODO: Notably, if a block is indented right after a bullet such that it's intended to be included within the bullet,
+    # redcarpet is not including the block within the bullet: https://github.com/allyourbot/hostedgpt/issues/323
+
+    markdown = "Text before code block\n\n  ```  ruby\n  code block\n  ```"
+    expected = "Text before code block\n\n  ```  ruby\n  code block\n  ```"
     assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
   end
 
