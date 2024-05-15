@@ -24,24 +24,28 @@ export default class extends Interface {
                           $.attachment = null
 
                         $.consideration = words
+                        _startThinking()
                       }
   log_Invoke
   async Invoke()      { if (!$.processing) {
                           $.processing = true
-                          Flip.Transcriber.on()
                           await $.screenService.start()
+                          Flip.Transcriber.on()
+                          Play.Speaker.sound('pop')
                         }
                       }
   log_Dismiss
   Dismiss()           { if ($.processing) {
                           $.processing = false
                           Flip.Transcriber.on() // so it can wait for "wake" words
+                          Play.Speaker.sound('pip')
                         }
                       }
 
   Disable()           { $.processing = null
                         $.screenService.end()
                         Flip.Transcriber.off()
+                        Play.Speaker.sound('pip')
                       }
 
   attr_consideration  = ''
@@ -67,5 +71,11 @@ export default class extends Interface {
 
   _referencingTheScreen(words) {
     return words.downcase().includeAny(["can you see", "you can see", "do you see", "look at", "this", "my screen", "the screen"])
+  }
+
+  _startThinking() {
+    Play.Speaker.sound('jeep', () => {
+      Loop.Speaker.every(4, 'thinking')
+    })
   }
 }
