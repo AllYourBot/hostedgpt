@@ -19,6 +19,8 @@ class ApplicationController < ActionController::Base
     reset_session
     login_as person.user
 
-    render json: { assistantId: person.user.assistants.ordered.first.id }
+    render json: {
+      assistants: person.user.assistants.ordered
+    }
   end
 end
