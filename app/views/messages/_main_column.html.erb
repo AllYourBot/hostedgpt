@@ -187,15 +187,37 @@
         <% if @streaming_message %>
           <%= form_with(
             model: @streaming_message,
-            class: "absolute top-2 right-8 z-20",
+            class: %|
+              z-20
+              absolute
+              right-8 bottom-4
+              h-[40px] w-[100px]
+              flex items-center justify-end
+              bg-white dark:bg-gray-800
+            |,
             data: {
               composer_target: "cancel",
               turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
           }) do |form| %>
+            <div class="text-gray-300 dark:text-gray-500 mr-2 hidden md:block">
+              ⌘ ESC
+            </div>
             <%= form.hidden_field :cancelled_at, value: Time.current %>
             <%= form.button type: "submit",
               id: "cancel",
-              class: "relative bg-white dark:bg-gray-800" do %>
+              data: {
+                controller: "keyboard",
+                action: %|
+                  keydown.meta+esc@document->keyboard#click
+                  keydown.ctrl+esc@document->keyboard#click
+                |,
+              },
+              class: %|
+                relative
+                flex items-center justify-center
+                w-[40px] h-[40px]
+                bg-white dark:bg-gray-800
+            | do %>
               <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
               <%= icon "stop-circle", variant: :outline, size: 39, title: 'Stop', tooltip: :top %>
             <% end %>
@@ -420,6 +442,15 @@
 
       </section>
       <section class="flex-1 pl-0 md:pl-5">
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            <span>Stop streaming response</span>
+          </figcaption>
+          <kbd class="w-50 text-right flex flex-row gap-1">
+            <div class="key">Ctrl or ⌘</div>
+            <div class="key">ESC</div>
+          </kbd>
+        </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
             <span>Copy last response <span class="whitespace-nowrap">(or code)</span></span>
