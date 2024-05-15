@@ -7,5 +7,4 @@ class Redcarpet::CustomHtmlRenderer < Redcarpet::Render::HTML
   def codespan(code)
     "<code>#{code}</code>"
   end
-
 end

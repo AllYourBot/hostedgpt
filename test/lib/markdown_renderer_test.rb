@@ -1,27 +1,118 @@
 require 'test_helper'
 
 class MarkdownRendererTest < ActiveSupport::TestCase
-  test 'ensure_newline_before_code_block_start adds newline before code block' do
+  setup do
+    @renderer = MarkdownRenderer
+  end
+
+  test 'ensure_blank_line_before_code_block_start adds blank line before code block when zero newlines' do
+    markdown = "Text before code block```ruby\ncode block\n```"
+    expected = "Text before code block\n\n```ruby\ncode block\n```"
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
+
+    markdown = "```ruby\ncode block\n```"
+    expected = "\n\n```ruby\ncode block\n```"
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
+
+    markdown = "Text before code block```ruby\ncode block\n```Text before second```\ncode block\n```"
+    expected = "Text before code block\n\n```ruby\ncode block\n```Text before second\n\n```\ncode block\n```"
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
+  end
+
+  test 'ensure_blank_line_before_code_block_start adds blank line before code block when one newline' do
     markdown = "Text before code block\n```ruby\ncode block\n```"
     expected = "Text before code block\n\n```ruby\ncode block\n```"
-    assert_equal expected, MarkdownRenderer.ensure_newline_before_code_block_start(markdown)
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
+
+    markdown = "\n```ruby\ncode block\n```"
+    expected = "\n\n```ruby\ncode block\n```"
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
+
+    markdown = "Text before code block\n```ruby\ncode block\n```Text before second\n```\ncode block\n```"
+    expected = "Text before code block\n\n```ruby\ncode block\n```Text before second\n\n```\ncode block\n```"
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
   end
 
-  test 'ensure_newline_before_code_block_start does not add newline when one is already present' do
+  test 'ensure_blank_line_before_code_block_start does not add blank line when one is already present' do
     markdown = "Text before code block\n\n```ruby\ncode block\n```"
     expected = "Text before code block\n\n```ruby\ncode block\n```"
-    assert_equal expected, MarkdownRenderer.ensure_newline_before_code_block_start(markdown)
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
+
+    markdown = "\n\n```ruby\ncode block\n```"
+    expected = "\n\n```ruby\ncode block\n```"
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
+
+    markdown = "Text before code block\n\n```ruby\ncode block\n```Text before second\n\n```\ncode block\n```"
+    expected = "Text before code block\n\n```ruby\ncode block\n```Text before second\n\n```\ncode block\n```"
+    assert_equal expected, MarkdownRenderer.ensure_blank_line_before_code_block_start(markdown)
   end
 
-  test 'ensure_newline_before_code_block_start does not add newline inside code block' do
-    markdown = "```ruby\ncode\nblock\n```"
-    expected = "```ruby\ncode\nblock\n```"
-    assert_equal expected, MarkdownRenderer.ensure_newline_before_code_block_start(markdown)
+  test "block_code nicely formatted gets converted" do
+    markdown = <<~MD
+      This is sql:
+
+      ```sql
+      SELECT * FROM users;
+      ```
+
+      Line after.
+    MD
+
+    formatted = <<~HTML
+      <p>This is sql:</p>
+
+      <pre><code class="sql">SELECT * FROM users;
+      </code></pre>
+
+      <p>Line after.</p>
+    HTML
+
+    assert_equal formatted.strip, @renderer.render(markdown).strip
   end
 
-  test 'ensure_newline_before_code_block_start handles multiple code blocks' do
-    markdown = "Text\n```ruby\ncode block\n```\nMore text\n```ruby\nanother code block\n```"
-    expected = "Text\n\n```ruby\ncode block\n```\nMore text\n\n```ruby\nanother code block\n```"
-    assert_equal expected, MarkdownRenderer.ensure_newline_before_code_block_start(markdown)
+  test "block_code missing a blank line before and after gets gets nicely - ensure_blank_line_before_code_block_start" do
+    markdown = <<~MD
+      This is sql:
+      ```sql
+      SELECT * FROM users;
+      ```
+      Line after.
+    MD
+
+    formatted = <<~HTML
+      <p>This is sql:</p>
+
+      <pre><code class="sql">SELECT * FROM users;
+      </code></pre>
+
+      <p>Line after.</p>
+    HTML
+
+    assert_equal formatted.strip, @renderer.render(markdown).strip
+  end
+
+  test "block_code can be provided with a proc" do
+    markdown = <<~MD
+      This is sql:
+
+      ```sql
+      SELECT * FROM users;
+      ```
+
+      Line after.
+    MD
+
+    formatted = <<~HTML
+      <p>This is sql:</p>
+      <CODE lang="sql">SELECT * FROM users;
+      </CODE>
+      <p>Line after.</p>
+    HTML
+
+    block_code = -> (code, language) do
+      %(<CODE lang="#{language}">#{code}</CODE>)
+    end
+
+    assert_equal formatted.strip, @renderer.render(markdown, block_code: block_code).strip
   end
 end
