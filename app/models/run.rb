@@ -7,6 +7,6 @@ class Run < ApplicationRecord
 
   enum status: %w[queued in_progress requires_action cancelling cancelled failed completed expired].index_by(&:to_sym)
 
-  validates :status, :expired_at, :model, :instructions, presence: true
+  validates :status, :expired_at, :instructions, presence: true
   validates :tools, :file_ids, presence: true, allow_blank: true
 end

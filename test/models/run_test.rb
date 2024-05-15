@@ -22,7 +22,6 @@ class RunTest < ActiveSupport::TestCase
       Run.create!(
         assistant: assistants(:samantha),
         conversation: conversations(:greeting),
-        model: assistants(:samantha).model,
         instructions: assistants(:samantha).instructions,
         status: "queued",
         expired_at: 1.minute.from_now

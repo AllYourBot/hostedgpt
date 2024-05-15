@@ -174,7 +174,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_15_080700) do
     t.datetime "cancelled_at", precision: nil
     t.datetime "failed_at", precision: nil
     t.datetime "completed_at", precision: nil
-    t.string "model", null: false
     t.string "instructions"
     t.string "additional_instructions"
     t.jsonb "tools", default: [], null: false

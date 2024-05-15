@@ -9,31 +9,31 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
 
     # Currently supported models
     {
-      'gpt-best': 'Best OpenAI Model',
-      'claude-best': 'Best Anthropic Model',
+      1, 'gpt-best': 'Best OpenAI Model',
+      2, 'claude-best': 'Best Anthropic Model',
 
-      'gpt-4': 'ChatGPT 4',
-      'gpt-4-turbo': 'ChatGPT 4 Turbo with Vision (may update in future)',
-      'gpt-4-turbo-2024-04-09': 'ChatGPT-4 Turbo with Vision (2024-04-09)',
-      'gpt-4-turbo-preview': 'ChatGPT 4 Turbo Preview',
-      'gpt-4-0125-preview': 'ChatGPT 4 Turbo Preview (2024-01-25)',
-      'gpt-4-1106-preview': 'ChatGPT 4 Turbo Preview (2023-11-06)',
-      'gpt-4-vision-preview': 'ChatGPT 4 Turbo Model preview with the ability to understand images (2023-11-06)',
-      'gpt-4-1106-vision-preview': 'ChatGPT 4 Turbo preview with the ability to understand images (2023-11-06)',
-      'gpt-4-0613': 'ChatGPT 4 Snapshot improved function calling (2023-06-13)',
+      3, 'gpt-4': 'ChatGPT 4',
+      4, 'gpt-4-turbo': 'ChatGPT 4 Turbo with Vision (may update in future)',
+      5, 'gpt-4-turbo-2024-04-09': 'ChatGPT-4 Turbo with Vision (2024-04-09)',
+      6, 'gpt-4-turbo-preview': 'ChatGPT 4 Turbo Preview',
+      7, 'gpt-4-0125-preview': 'ChatGPT 4 Turbo Preview (2024-01-25)',
+      8, 'gpt-4-1106-preview': 'ChatGPT 4 Turbo Preview (2023-11-06)',
+      9, 'gpt-4-vision-preview': 'ChatGPT 4 Turbo Model preview with the ability to understand images (2023-11-06)',
+      10, 'gpt-4-1106-vision-preview': 'ChatGPT 4 Turbo preview with the ability to understand images (2023-11-06)',
+      11, 'gpt-4-0613': 'ChatGPT 4 Snapshot improved function calling (2023-06-13)',
 
-      'gpt-3.5-turbo': 'ChatGPT 3.5 Turbo',
-      'gpt-3.5-turbo-16k-0613': 'ChatGPT 3.5 Turbo (2022-06-13)',
-      'gpt-3.5-turbo-0125': 'ChatGPT 3.5 Turbo (2022-01-25)',
-      'gpt-3.5-turbo-1106': 'ChatGPT 3.5 Turbo (2022-11-06)',
-      'gpt-3.5-turbo-instruct': 'ChatGPT 3.5 Turbo Instruct',
+      12, 'gpt-3.5-turbo': 'ChatGPT 3.5 Turbo',
+      13, 'gpt-3.5-turbo-16k-0613': 'ChatGPT 3.5 Turbo (2022-06-13)',
+      14, 'gpt-3.5-turbo-0125': 'ChatGPT 3.5 Turbo (2022-01-25)',
+      15, 'gpt-3.5-turbo-1106': 'ChatGPT 3.5 Turbo (2022-11-06)',
+      16, 'gpt-3.5-turbo-instruct': 'ChatGPT 3.5 Turbo Instruct',
 
-      'claude-3-opus-20240229': 'Claude 3 Opus (2024-02-29)',
-      'claude-3-sonnet-20240229': 'Claude 3 Sonnet (2024-02-29)',
-      'claude-3-haiku-20240307': 'Claude 3 Haiku (2024-03-07)',
-      'claude-2.1': 'Claude 2.1',
-      'claude-2.0': 'Claude 2.0',
-      'claude-instant-1.2': 'Claude Instant 1.2'
+      17, 'claude-3-opus-20240229': 'Claude 3 Opus (2024-02-29)',
+      18, 'claude-3-sonnet-20240229': 'Claude 3 Sonnet (2024-02-29)',
+      19, 'claude-3-haiku-20240307': 'Claude 3 Haiku (2024-03-07)',
+      20, 'claude-2.1': 'Claude 2.1',
+      21, 'claude-2.0': 'Claude 2.0',
+      22, 'claude-instant-1.2': 'Claude Instant 1.2'
     }.each do |name, description|
       LanguageModel.create(name: name, description: description)
     end
@@ -56,5 +56,7 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
 
     remove_column :assistants, :language_model_id
     drop_table :language_models
+
+    remove_column :runs, :model
   end
 end

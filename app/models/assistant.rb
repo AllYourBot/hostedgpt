@@ -9,14 +9,6 @@ class Assistant < ApplicationRecord
 
   belongs_to :language_model, required: false
 
-  def model=(model_name)
-    self.language_model_id = LanguageModel.where(name: model_name).first.id
-  end
-
-  def model
-    self.language_model.name
-  end
-
   validates :tools, presence: true, allow_blank: true
 
   MAX_LIST_DISPLAY = 5
