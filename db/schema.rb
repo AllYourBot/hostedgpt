@@ -180,6 +180,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_15_080700) do
     t.jsonb "file_ids", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "model"
     t.index ["assistant_id"], name: "index_runs_on_assistant_id"
     t.index ["conversation_id"], name: "index_runs_on_conversation_id"
   end

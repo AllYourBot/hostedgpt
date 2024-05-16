@@ -31,12 +31,12 @@ class AssistantTest < ActiveSupport::TestCase
 
   test "simple create works" do
     assert_nothing_raised do
-      Assistant.create!(user: users(:keith))
+      Assistant.create!(user: users(:keith), language_model_id: 1)
     end
   end
 
   test "tools defaults to empty array on create" do
-    a = Assistant.create!(user: users(:keith))
+    a = Assistant.create!(user: users(:keith), language_model_id: 1)
     assert_equal [], a.tools
   end
 

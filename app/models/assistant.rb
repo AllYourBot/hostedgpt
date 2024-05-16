@@ -7,7 +7,7 @@ class Assistant < ApplicationRecord
   has_many :steps, dependent: :destroy
   has_many :messages # TODO: What should happen if an assistant is deleted?
 
-  belongs_to :language_model, required: false
+  belongs_to :language_model
 
   validates :tools, presence: true, allow_blank: true
 

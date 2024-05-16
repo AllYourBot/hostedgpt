@@ -12,7 +12,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create assistant" do
-    params = assistants(:samantha).slice(:name, :description, :instructions)
+    params = assistants(:samantha).slice(:name, :description, :instructions, :language_model_id)
 
     assert_difference("Assistant.count") do
       post settings_assistants_url, params: { assistant: params }
@@ -20,7 +20,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to edit_settings_assistant_url(Assistant.last)
     assert_nil flash[:error]
-    assert_equal params, Assistant.last.slice(:name, :description, :instructions)
+    assert_equal params, Assistant.last.slice(:name, :description, :instructions, :language_model_id)
   end
 
   test "should get edit" do
