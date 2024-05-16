@@ -46,6 +46,6 @@ class AssistantsController < ApplicationController
   end
 
   def assistant_params
-    params.require(:assistant).permit(:user_id, :model, :name, :description, :instructions, :tools)
+    params.require(:assistant).permit(:user_id, :language_model_id, :name, :description, :instructions, :tools)
   end
 end
