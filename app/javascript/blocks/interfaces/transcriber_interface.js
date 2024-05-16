@@ -56,6 +56,8 @@ export default class extends Interface {
   get on()            { return $.active }
   get off()           { return !$.active }
 
+  get supported()     { return Transcriber.$.transcriberService.$.recognizer != null }
+
   new() {
     $.covered = false
     $.transcriberService = new TranscriberService

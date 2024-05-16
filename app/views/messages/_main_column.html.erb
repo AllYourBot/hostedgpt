@@ -361,21 +361,25 @@
                 <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
               <% end %>
             </div>
-          <% else %>
-            <%= form.button type: "button",
-              disabled: true,
-              class: %w|
-                z-10
-                absolute right-8 bottom-4
-                w-[40px] h-[40px]
-                flex items-center justify-center
-                text-gray-100 dark:text-gray-600
-                enabled:text-black
-                enabled:dark:text-white
-              | do
-            %>
-              <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
-            <% end %>
+          <% end %>
+
+          <%= form.button type: "button",
+            disabled: true,
+            data: {
+              composer_target: "disabledSubmit",
+            },
+            class: %|
+              z-10
+              absolute right-8 bottom-4
+              w-[40px] h-[40px]
+              flex items-center justify-center
+              text-gray-100 dark:text-gray-600
+              enabled:text-black
+              enabled:dark:text-white
+              #{Feature.enabled?(:voice) && '!hidden'}
+            | do
+          %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
           <% end %>
 
           <div
