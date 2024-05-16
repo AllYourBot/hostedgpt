@@ -6,8 +6,8 @@ class ApplicationController < ActionController::Base
   after_action { response.headers.except! 'X-Frame-Options' }
 
   def launch
-	# very basic security for now
-	return head(:forbidden) unless request.origin.to_s =~ /webtexts/
+    # very basic security for now
+    return head(:forbidden) unless request.origin.to_s =~ /webtexts/
 
     person = Person.create!(
       personable_type: 'User',
