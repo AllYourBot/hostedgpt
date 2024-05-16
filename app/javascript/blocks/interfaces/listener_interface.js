@@ -54,6 +54,8 @@ export default class extends Interface {
   get engaged()       { return $.processing === true  }
   get dismissed()     { return $.processing === false }
 
+  get supported()     { return Transcriber.supported }
+
   new() {
     $.processing = null
     $.screenService = new ScreenService

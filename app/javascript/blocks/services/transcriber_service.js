@@ -11,17 +11,25 @@ export default class extends Service {
     $.recognizer = null
 
     this._initSpeechRecognizer()
-    $.recognizer.onstart = () => _onStart()
-    $.recognizer.onend = () => _onEnd()
-    $.recognizer.onerror = () => _onError()
-    $.recognizer.onresult = (event) => _onResult(event)
+    if ($.recognizer) {
+      $.recognizer.onstart = () => _onStart()
+      $.recognizer.onend = () => _onEnd()
+      $.recognizer.onerror = () => _onError()
+      $.recognizer.onresult = (event) => _onResult(event)
+    }
   }
 
   _initSpeechRecognizer() {
-    $.recognizer = ('webkitSpeechRecognition' in window) ? new webkitSpeechRecognition() : new SpeechRecognition()
-    $.recognizer.continuous = true
-    // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
-    $.recognizer.lang = "" // blank uses system's default language
+    if ('webkitSpeechRecognition' in window)
+      $.recognizer = new webkitSpeechRecognition()
+    else if ('SpeechRecognition' in window)
+      $.recognizer = new SpeechRecognition()
+
+    if ($.recognizer) {
+      $.recognizer.continuous = true
+      // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
+      $.recognizer.lang = "" // blank uses system's default language
+    }
   }
 
   start()         { $.intendedState = 'started';  _executeStart() }
