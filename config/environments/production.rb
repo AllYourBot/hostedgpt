@@ -96,4 +96,21 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  config.hosts << ENV['DEV_HOST'] if ENV['DEV_HOST'].present?
+
+  config.action_cable.allowed_request_origins = [/webtexts/]
+
+  config.middleware.insert_before 0, Rack::Cors do
+    allow do
+      origins /webtexts/
+
+      resource "*",
+      headers: :any,
+      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      credentials: true,
+      max_age: 86400
+    end
+  end
+
 end
