@@ -1,10 +1,15 @@
 # We don't care about large or not
 class LanguageModel < ApplicationRecord
-  def readonly?() = !new_record?
-  def before_destroy() = raise ActiveRecord::ReadOnlyRecord
+  def readonly?
+    !new_record?
+  end
+
+  def before_destroy
+    raise ActiveRecord::ReadOnlyRecord
+  end
 
   PROVIDER_ID_MAP = {'gpt-best': 'gpt-4-turbo',
-     'claude-best': 'claude-3-opus-20240229'}             
+     'claude-best': 'claude-3-opus-20240229'}
 
   GPT_BEST_ID        = 1
   CLAUDE_BEST_ID     = 2
