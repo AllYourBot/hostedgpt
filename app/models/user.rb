@@ -9,7 +9,8 @@ class User < ApplicationRecord
   validates :first_name, presence: true
   validates :last_name, presence: true, on: :create
 
-  has_many :assistants, dependent: :destroy
+  has_many :assistants, -> { not_deleted }, dependent: :destroy
+  has_many :assistants_including_deleted, class_name: "Assistant"
   has_many :conversations, dependent: :destroy
   belongs_to :last_cancelled_message, class_name: "Message", optional: true
 

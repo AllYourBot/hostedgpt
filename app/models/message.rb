@@ -26,6 +26,7 @@ class Message < ApplicationRecord
 
   scope :ordered, -> { latest_version_for_conversation }
 
+  attr_accessor :allow_deleted_assistant
   private
 
   def create_conversation
@@ -38,6 +39,7 @@ class Message < ApplicationRecord
 
   def validate_assistant
     errors.add(:assistant, 'is invalid') unless assistant.user == Current.user
+    errors.add(:assistant, 'has been deleted') if assistant.deleted? && !allow_deleted_assistant
   end
 
   def start_assistant_reply

@@ -34,23 +34,25 @@
         }
       %>
 
-      <div class="flex justify-center items-center text-sm font-medium">
-        <%= form.submit "Save & Submit",
-          data: {
-            role: "save",
-            turbo_submits_with: "Saving..."
-          },
-          class: %|
-            inline-block cursor-pointer
-            rounded-lg py-2 px-3
-            bg-gray-200 dark:bg-gray-900
-            border border-gray-400
-        | %>
-        <%= link_to "Cancel", @message,
-          data: { role: "cancel" },
-          class: "inline-block ml-5"
-        %>
-      </div>
+      <% unless @message.assistant.deleted? %>
+        <div class="flex justify-center items-center text-sm font-medium">
+          <%= form.submit "Save & Submit",
+            data: {
+              role: "save",
+              turbo_submits_with: "Saving..."
+            },
+            class: %|
+              inline-block cursor-pointer
+              rounded-lg py-2 px-3
+              bg-gray-200 dark:bg-gray-900
+              border border-gray-400
+          | %>
+          <%= link_to "Cancel", @message,
+            data: { role: "cancel" },
+            class: "inline-block ml-5"
+          %>
+        </div>
+      <% end %>
     <% end %>
   </turbo-frame>
 

@@ -125,10 +125,15 @@
         <% end %>
       </div>
 
-      <div  id="composer"
+      <div id="composer"
             class="flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
             data-controller="composer image-upload"
       >
+        <% if @assistant.deleted? %>
+          <div class="text-center">
+            <p>This assistant has been deleted, and cannot assist any longer.</p>
+          </div>
+        <% else %>
         <%= button_tag type: "button",
               id: "attach-button",
               class: "absolute left-11 bottom-[26px] w-[23px] h-[23px] relationship:hidden",
@@ -362,6 +367,7 @@
           </div>
 
         <% end %>
+      <% end %>
       </div>
 
       <div class="w-full mb-2 text-xs text-center text-gray-400 dark:text-gray-300">

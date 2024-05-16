@@ -162,7 +162,7 @@ end
             <% end %>
           <% end %>
 
-          <% if message.user? && !message.has_document_image? %>
+          <% if message.user? && !message.has_document_image? && !message.assistant.deleted? %>
             <%= link_to edit_assistant_message_path(message.assistant, message),
               class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
               data: {
@@ -171,7 +171,7 @@ end
               } do %>
               <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
             <% end %>
-          <% elsif message.assistant? %>
+          <% elsif message.assistant? && !message.assistant.deleted? %>
             <%= button_tag type: "button",
                   class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
                   data: {
