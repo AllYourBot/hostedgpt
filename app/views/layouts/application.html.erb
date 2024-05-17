@@ -1,15 +1,13 @@
 <% content_for :title, "HostedGPT" %>
 <!DOCTYPE html>
-<html 
-  >
- 
+<html>
+
   <%= render "head" %>
 
   <body
     class="
       nav-closed
-      <%= Current.user.preferences[:dark_mode]%>
-      
+      <%= Current.user.preferences[:dark_mode] %>
     "
     data-controller="transition"
     data-transition-toggle-class="nav-closed"
