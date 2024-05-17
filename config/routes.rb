@@ -4,6 +4,9 @@ Rails.application.routes.draw do
     resource :person, only: [:edit, :update]
   end
 
+  get "/auth/:provider/callback" => "google_oauth#create"
+  get "/auth/failure" => "google_oauth#destroy"
+
   root to: "assistants#index"
 
   resources :assistants do
