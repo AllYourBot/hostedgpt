@@ -13,7 +13,7 @@ export default class extends Controller {
     this.autogrow()
 
     this.element.addEventListener('input', this.throttledAutogrow)
-    window.addEventListener('turbo:morph', () => this.throttledAutogrow)
+    window.addEventListener('turbo:morph', this.throttledAutogrow)
     window.addEventListener('resize', this.throttledAutogrow)
     window.addEventListener('main-column-changed', this.throttledAutogrow)
   }
@@ -33,5 +33,9 @@ export default class extends Controller {
     this.element.style.height = newHeight
 
     if (prevHeight != newHeight) window.dispatchEvent(new CustomEvent('main-column-changed'))
+  }
+
+  submitForm() {
+    this.element.closest('form').requestSubmit()
   }
 }
