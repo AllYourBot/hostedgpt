@@ -2,13 +2,13 @@
 
 class Feature
   class << self
-    def configuration
-      Rails.configuration.features
+    def features
+      Rails.application.config.options.features
     end
 
     def enabled?(feature)
       ActiveModel::Type::Boolean.new.cast(
-        configuration.fetch(feature&.to_sym, false)
+        features.fetch(feature&.to_sym, false)
       )
     end
   end
