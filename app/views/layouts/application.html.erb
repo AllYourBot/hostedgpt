@@ -43,7 +43,19 @@
               </div>
 
               <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
-                <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
+                <li>
+                  <%= link_to edit_settings_person_path,
+                    data: {
+                      controller: "keyboard",
+                      action: %|
+                        keydown.ctrl+s@document->keyboard#click
+                        keydown.meta+s@document->keyboard#click
+                      |
+                    } do %>
+                    <%= icon "cog-6-tooth", variant: :outline, size: 18 %>
+                    Settings
+                  <% end %>
+                </li>
                 <li><%= link_to logout_path, data: { turbo: false } do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
               </menu>
             </div>
