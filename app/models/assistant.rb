@@ -1,4 +1,6 @@
 class Assistant < ApplicationRecord
+  MAX_LIST_DISPLAY = 5
+
   belongs_to :user
 
   has_many :conversations, dependent: :destroy
@@ -12,11 +14,7 @@ class Assistant < ApplicationRecord
   validates :tools, presence: true, allow_blank: true
   validates :name, presence: true
 
-  MAX_LIST_DISPLAY = 5
-
   scope :ordered, -> { order(:id) }
-
-  scope :not_deleted, -> { where(deleted_at: nil) }
 
   def initials
     return nil if name.blank?
@@ -28,12 +26,8 @@ class Assistant < ApplicationRecord
   end
 
   def destroy
-    raise "Can't delete user's last assistant" if user.assistants.count < 2
+    raise "Can't delete user's last assistant" if user.assistants.count <=
     update!(deleted_at: Time.now)
-  end
-
-  def deleted?
-    deleted_at.present?
   end
 
   def to_s
