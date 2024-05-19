@@ -10,7 +10,7 @@ export default class extends Service {
     $.state = 'ended'
     $.recognizer = null
 
-    this._initSpeechRecognizer()
+    _initSpeechRecognizer()
     if ($.recognizer) {
       $.recognizer.onstart = () => _onStart()
       $.recognizer.onend = () => _onEnd()

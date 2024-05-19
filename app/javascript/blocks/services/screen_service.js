@@ -46,10 +46,10 @@ export default class extends Service {
     }
 
     try {
-      return await this._getFirstFrameAsImage()
+      return await _getFirstFrameAsImage()
     } catch(error) {
       log('Error taking screenshot, trying another approach', error)
-      return await this._getImageOfVideo()
+      return await _getImageOfVideo()
     }
   }
 
