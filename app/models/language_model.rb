@@ -1,5 +1,7 @@
 # We don't care about large or not
 class LanguageModel < ApplicationRecord
+  scope :ordered, -> { order(:position) }
+
   def readonly?
     !new_record?
   end
