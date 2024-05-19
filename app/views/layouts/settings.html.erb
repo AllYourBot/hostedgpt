@@ -16,19 +16,9 @@
     Settings
   </header>
   <section id="menu" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship">
-    <% if @hide_settings_assistants_overflow %>
-      <div data-controller="transition" data-transition-toggle-class="hidden">
-        <%= button_tag type: "button",
-          class: "p-1 text-sm",
-          data: {transition_target: "transitionable", action: "transition#toggleClass",
-          } do %>
-          Show Remaining
-     <% end %>
-   <% end %>
-
-    <% @settings_menu.each do | controller, settings_items| %>
+    <% @settings_menu.each do |controller, settings_items| %>
       <div class="mb-5">
-        <%= render partial: "layouts/settings_item", collection: settings_items, locals: { controller: :assistants } %>
+        <%= render partial: "layouts/settings_item", collection: settings_items, locals: { controller: controller } %>
       </div>
     <% end %>
   </section>
