@@ -42,6 +42,8 @@ export default class extends Service {
   // Exeuctors
 
   _executeStart() {
+    if (!$.recognizer) return
+
     if ($.state != 'started')
       $.recognizer.start() // triggers _onStart() callback
     else
@@ -49,6 +51,8 @@ export default class extends Service {
   }
 
   _executeRestart() {
+    if (!$.recognizer) return
+
     if ($.state == 'started')
       _executeEnd() // will eventually trigger _onStart() b/c of intendedState
     else
@@ -56,6 +60,7 @@ export default class extends Service {
   }
 
   _executeEnd() {
+    if (!$.recognizer) return
     $.recognizer.abort()
   }
 
