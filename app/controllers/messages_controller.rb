@@ -91,7 +91,8 @@ class MessagesController < ApplicationController
 
   def set_nav_assistants
     @nav_assistants = Current.user.assistants.ordered
-    @hide_settings_assistants_overflow = @nav_assistants.length > Assistant::MAX_LIST_DISPLAY
+    @hide_settings_assistants_overflow = @nav_assistants.length > Assistant::MAX_LIST_DISPLAY &&
+      @nav_assistants.index(@assistant) <= Assistant::MAX_LIST_DISPLAY-1
   end
 
   def message_params
@@ -117,4 +118,3 @@ class MessagesController < ApplicationController
     params.require(:message).permit(:conversation_id, :version)
   end
 end
-

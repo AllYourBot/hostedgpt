@@ -2,12 +2,10 @@
   <%= render 'nav_column' %>
 <% end %>
 
-
-
 <%= content_for :messages do %>
 
 <% if @message&.errors&.any? %>
-  <h2>The following errors prevented your message to reach the AI:</h2>
+  <h2>Errors communicating with assistant:</h2>
   <% @message.errors.full_messages.each do |msg| %>
     <%= msg %>
   <% end %>

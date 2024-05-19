@@ -1,14 +1,29 @@
-<section id="assistants" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship" class="pt-14">
-    <% if @hide_settings_assistants_overflow %>
-      <div data-controller="transition" data-transition-toggle-class="hidden">
-        <%= button_tag type: "button",
-          class: "p-1 text-sm",
-          data: {transition_target: "transitionable", action: "transition#toggleClass",
-          } do %>
-          Show Remaining
-     <% end %>
-   <% end %>
+<section
+  id="assistants"
+  data-controller="radio-behavior transition"
+  data-radio-behavior-selected-class="relationship"
+  data-transition-toggle-class="hidden"
+  class="pt-14 flex flex-col"
+>
   <%= render @nav_assistants %>
+
+  <% if @hide_settings_assistants_overflow %>
+    <%= button_tag type: "button",
+      class: %|
+        flex
+        text-sm
+        rounded-lg
+        mb-1 p-1 pl-2 pr-2 mr-5
+        hover:bg-gray-100 dark:hover:bg-gray-700
+        pointer
+      |,
+      data: {
+        transition_target: "transitionable",
+        action: "transition#toggleClass",
+      } do %>
+      <%= icon "chevron-down", variant: :mini, class: 'text-gray-500 ml-[2px] mr-[14px]' %> Show All
+    <% end %>
+  <% end %>
 </section>
 
 <section class="text-gray-950 dark:text-gray-100 select-none">
