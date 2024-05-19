@@ -1,6 +1,6 @@
 samantha:
   user: keith
-  language_model_id: 3
+  language_model: gpt_4
   name: Samantha
   description: My personal assistant
   instructions: You are a helpful assistant
@@ -9,7 +9,7 @@ samantha:
 
 keith_gpt4:
   user: keith
-  language_model_id: 3
+  language_model: gpt_4
   name: GPT-4
   description: OpenAI's GPT-4
   instructions:
@@ -18,7 +18,7 @@ keith_gpt4:
 
 keith_claude3:
   user: keith
-  language_model_id: 17
+  language_model: claude_3_opus
   name: Claude 3 Opus
   description: Claude 3, Opus version
   instructions:
@@ -27,7 +27,7 @@ keith_claude3:
 
 rob_gpt4:
   user: rob
-  language_model_id: 3
+  language_model: gpt_4
   name: GPT-4
   description: OpenAI's GPT-4
   instructions:

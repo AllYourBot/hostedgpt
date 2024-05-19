@@ -1,29 +1,29 @@
 gpt_best:
-    id: 1
+    position: 1
     name: gpt-best
     description: gpt-best from fixtures
 
 claude_best:
-    id: 2
+    position: 2
     name: best-claude
     description: claude-best from fixtures
 
 claude_3_sonnet:
-    id: 18
+    position: 18
     name: claude-3-sonnet-20240229
     description: claude-3-sonnet-20240229 from fixtures
 
 claude_3_opus:
-    id: 17
+    position: 17
     name: claude-3-opus-20240229
     description: claude-3-opus-20240229 from fixtures
 
 gpt_4:
-    id: 3
+    position: 3
     name: gpt-4
     description: gpt-4 from fixtures
 
 gpt_3_5_turbo_0125:
-    id: 12
+    position: 12
     name: gpt-3.5-turbo
     description: gpt-3.5-turbo from fixtures

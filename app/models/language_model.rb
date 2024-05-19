@@ -2,6 +2,8 @@
 class LanguageModel < ApplicationRecord
   scope :ordered, -> { order(:position) }
 
+  has_many :assistants
+
   def readonly?
     !new_record?
   end
