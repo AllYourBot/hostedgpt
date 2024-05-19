@@ -13,6 +13,7 @@ String.prototype.capitalize = function() {
 
 
 // Configure REPL
+
 process.stdin.setRawMode(true)
 process.stdin.resume()
 process.stdin.setEncoding('utf8')
