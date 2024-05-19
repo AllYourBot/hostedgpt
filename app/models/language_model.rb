@@ -1,5 +1,10 @@
 # We don't care about large or not
 class LanguageModel < ApplicationRecord
+  BEST_MODELS = {
+    'gpt-best' => 'gpt-4o-2024-05-13',
+    'claude-best' => 'claude-3-opus-20240229'
+  }
+
   scope :ordered, -> { order(:position) }
 
   has_many :assistants
@@ -12,11 +17,8 @@ class LanguageModel < ApplicationRecord
     raise ActiveRecord::ReadOnlyRecord
   end
 
-  PROVIDER_ID_MAP = {'gpt-best': 'gpt-4-turbo',
-     'claude-best': 'claude-3-opus-20240229'}
-
-  def provider_id
-    PROVIDER_ID_MAP[self.name.to_sym] || self.name unless self.name =~ /^best/
+  def provider_name
+    BEST_MODELS[name] || name
   end
 
   def ai_backend

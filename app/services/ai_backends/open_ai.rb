@@ -49,7 +49,7 @@ class AIBackends::OpenAI
 
     begin
       response = @client.chat(parameters: {
-        model: @assistant.language_model.provider_id,
+        model: @assistant.language_model.provider_name,
         messages: system_message + preceding_messages,
         stream: response_handler,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
