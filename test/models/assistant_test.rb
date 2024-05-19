@@ -31,27 +31,21 @@ class AssistantTest < ActiveSupport::TestCase
 
   test "simple create works" do
     assert_nothing_raised do
-      Assistant.create!(user: users(:keith), language_model_id: 1, name: 'abc')
+      Assistant.create!(user: users(:keith), language_model: language_models(:gpt_4), name: 'abc')
     end
   end
 
   test "tools defaults to empty array on create" do
-    a = Assistant.create!(user: users(:keith), language_model_id: 1, name: 'abc')
+    a = Assistant.create!(user: users(:keith), language_model: language_models(:gpt_4), name: 'abc')
     assert_equal [], a.tools
   end
 
   test "associations are not deleted upon destroy" do
-    assistant = assistants(:samantha)
-    conversation_count = assistant.conversations.count * -1
-    document_count = (assistant.documents.count+assistant.conversations.sum { |c| c.messages.sum { |m| m.documents.count }}) * -1
-    run_count = assistant.runs.count * -1
-    step_count = assistant.steps.count * -1
-
-    assert_difference "Conversation.count", 0 do
-      assert_difference "Document.count", 0 do
-        assert_difference "Run.count", 0 do
-          assert_difference "Step.count", 0 do
-            assistant.destroy
+    assert_no_difference "Conversation.count" do
+      assert_no_difference "Document.count" do
+        assert_no_difference "Run.count" do
+          assert_no_difference "Step.count" do
+            assistants(:samantha).destroy
           end
         end
       end

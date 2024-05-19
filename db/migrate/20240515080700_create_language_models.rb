@@ -27,7 +27,7 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
       [12, 'gpt-4', 'GPT-4 (latest)'],
       [13, 'gpt-4-0613', 'GPT-4 Snapshot improved function calling (2023-06-13)'],
 
-      [14, 'gpt-3.5-turbo', 'GPT-3.5 Turbo'],
+      [14, 'gpt-3.5-turbo', 'GPT-3.5 Turbo (latest)'],
       [15, 'gpt-3.5-turbo-16k-0613', 'GPT-3.5 Turbo (2022-06-13)'],
       [16, 'gpt-3.5-turbo-0125', 'GPT-3.5 Turbo (2022-01-25)'],
       [17, 'gpt-3.5-turbo-1106', 'GPT-3.5 Turbo (2022-11-06)'],

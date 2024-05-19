@@ -15,11 +15,6 @@ class LanguageModel < ApplicationRecord
   PROVIDER_ID_MAP = {'gpt-best': 'gpt-4-turbo',
      'claude-best': 'claude-3-opus-20240229'}
 
-  GPT_BEST_ID        = 1
-  CLAUDE_BEST_ID     = 2
-  GPT_3_5_ID         = 12
-  CLAUDE_3_SONNET_ID = 18
-
   def provider_id
     PROVIDER_ID_MAP[self.name.to_sym] || self.name unless self.name =~ /^best/
   end
