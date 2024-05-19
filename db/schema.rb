@@ -58,6 +58,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "images", default: false, null: false
+    t.string "model"
     t.index ["user_id"], name: "index_assistants_on_user_id"
   end
 
