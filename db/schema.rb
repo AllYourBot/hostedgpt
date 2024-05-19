@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_16_144314) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -50,7 +50,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
 
   create_table "assistants", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "model"
     t.string "name"
     t.string "description"
     t.string "instructions"
@@ -58,6 +57,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "images", default: false, null: false
+    t.bigint "language_model_id"
+    t.datetime "deleted_at", precision: nil
+    t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
+    t.index ["user_id", "deleted_at"], name: "index_assistants_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_assistants_on_user_id"
   end
 
@@ -94,6 +97,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
     t.index ["assistant_id"], name: "index_documents_on_assistant_id"
     t.index ["message_id"], name: "index_documents_on_message_id"
     t.index ["user_id"], name: "index_documents_on_user_id"
+  end
+
+  create_table "language_models", force: :cascade do |t|
+    t.integer "position"
+    t.string "name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "messages", force: :cascade do |t|
@@ -300,6 +311,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "assistants", "language_models"
   add_foreign_key "assistants", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "conversations", "assistants"

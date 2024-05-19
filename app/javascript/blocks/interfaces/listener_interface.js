@@ -1,4 +1,4 @@
-import Interface from "blocks/interface"
+import Interface from "../interface.js"
 
 // To clarify the verbs:
 // Invoke a Listener and it starts listening

@@ -91,6 +91,7 @@ function requireLibThen(init) { // look in test_helper.js for test env version o
     console.log(`Loading blocks/index.js`)
     await import(indexPath)
 
+    // load lib files
     for (const file of files) {
       const filePath = path.join(blocksPath, 'lib', file)
       await import(filePath)
