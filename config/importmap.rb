@@ -23,7 +23,7 @@ end.each do |file|
     # Interface and Service models are imported as normal importmap names:
     #   "blocks/interfaces/listener_interface"
     # These are autoimported within blocks/index.js by string parsing the importmap
-   pin file.remove('.js'), to: file, preload: true
+    pin file.remove('.js'), to: file, preload: true
   else
     # The other JS files within blocks (e.g. readable_model.js) need special importmap names.
     # These files are referenced with explicit 'import' directives at the top of blocks models.
