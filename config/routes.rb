@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   get "/auth/:provider/callback" => "google_oauth#create"
   get "/auth/failure" => "google_oauth#destroy"
 
+  post "whatsapp/create" => "whatsapp#create"
+
   root to: "assistants#index"
 
   resources :assistants do

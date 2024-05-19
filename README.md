@@ -162,3 +162,19 @@ v0.5 - Released on 2/14/2024
 * Conversations are automatically titled
 * Sidebar can be closed
 * AI responses stream in
+
+
+1. Go to console.cloud.google.com
+2. Create a new organization or select an existing organization
+3. Go to the Google API Library and select the services you want to support: https://console.cloud.google.com/apis/library and select your organization
+3. Go to Credentials / API
+4. Create a new Oauth credential
+5. Fill out the oAuth consent screen
+6. In a new tab go to the Google API li
+7. On the next screen, Scopes, add a bunch of permissions
+8. Add your test users
+9. Go back to API & Services > Credentials (https://console.cloud.google.com/apis/credentials?project=hosted-423518)
+10. Click to Create Credentials > OAuth client ID
+
+# be sure to add the different email addresses you want to test
+# be sure to get the callback URL correctly
