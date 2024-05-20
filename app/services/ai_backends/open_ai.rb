@@ -27,15 +27,26 @@ class AIBackends::OpenAI
   end
 
   def get_next_chat_message(&chunk_received_handler)
+    puts "starting get_next"
+
     stream_response_text = ""
+    tool_calling_response = []
 
     response_handler = proc do |intermediate_response, bytesize|
-      chunk = intermediate_response.dig("choices", 0, "delta", "content")
-      print chunk if Rails.env.development?
-      if chunk
-        stream_response_text += chunk
-        yield chunk
+      content_chunk = intermediate_response.dig("choices", 0, "delta", "content")
+      tool_calls = intermediate_response.dig("choices", 0, "delta", "tool_calls")
+
+      print content_chunk if Rails.env.development?
+      if content_chunk
+        stream_response_text += content_chunk
+        yield content_chunk
+      elsif tool_calls && tool_calls.is_a?(Array)
+        tool_calls.each_with_index do |tool_call, i|
+          tool_calling_response[i] ||= {}
+          tool_calling_response[i] = deep_streaming_merge(tool_calling_response[i], tool_call)
+        end
       end
+
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue ::Faraday::UnauthorizedError => e
@@ -51,6 +62,7 @@ class AIBackends::OpenAI
       response = @client.chat(parameters: {
         model: @assistant.model,
         messages: system_message + preceding_messages,
+        tools: OpenWeather.tools,
         stream: response_handler,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
       })
@@ -64,7 +76,12 @@ class AIBackends::OpenAI
       response
     end
 
-    if response_text.blank? && stream_response_text.blank?
+    if tool_calling_response.present?
+      tool_calling_response = deep_json_parse(tool_calling_response)
+      tool_calling_response.each do |tool_call|
+        # TODO: call tool and add onto the messages.
+      end
+    elsif response_text.blank? && stream_response_text.blank?
       raise ::Faraday::ParsingError
     else
       response_text
@@ -101,6 +118,40 @@ class AIBackends::OpenAI
           content: message.content_text || ""
         }
       end
+    end
+  end
+
+  def deep_streaming_merge(hash1, hash2)
+    merged_hash = hash1.dup
+    hash2.each do |key, value|
+      if merged_hash.has_key?(key) && merged_hash[key].is_a?(Hash) && value.is_a?(Hash)
+        merged_hash[key] = deep_streaming_merge(merged_hash[key], value)
+      elsif merged_hash.has_key?(key)
+        merged_hash[key] += value
+      else
+        merged_hash[key] = value
+      end
+    end
+    merged_hash
+  end
+
+  def deep_json_parse(obj)
+    if obj.is_a?(Array)
+      obj.map { |item| deep_json_parse(item) }
+    else
+      converted_hash = {}
+      obj.each do |key, value|
+        if value.is_a?(Hash)
+          converted_hash[key] = deep_json_parse(value)
+        else
+          converted_hash[key] = begin
+            JSON.parse(value)
+          rescue => e
+            value
+          end
+        end
+      end
+      converted_hash
     end
   end
 end
