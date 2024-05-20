@@ -19,6 +19,9 @@ class ApplicationController < ActionController::Base
       },
       email: "#{@password}@hostedgpt.soomo"
     )
+	person.user.assistants.each do |assistant|
+		assistant.update!(instructions: 'You are a helpful assistant')
+	end
     reset_session
     login_as person.user
 
