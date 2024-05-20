@@ -44,10 +44,14 @@ class SessionsController < ApplicationController
     auth = request.env['omniauth.auth']
     return if auth.blank?
 
-    @user = User.find_or_create_by!(uid: auth[:uid]) do |user|
-      user.first_name = auth[:info][:first_name],
-      user.last_name = auth[:info][:last_name]
-      user.create_person!(email: auth[:info][:email])
+    if Feature.enabled?(:registration)
+      @user = User.find_or_create_by!(uid: auth[:uid]) do |user|
+        user.first_name = auth[:info][:first_name],
+        user.last_name = auth[:info][:last_name]
+        user.create_person!(email: auth[:info][:email])
+      end
+    else
+      @user = User.find_by!(uid: auth[:uid])
     end
   end
 end
