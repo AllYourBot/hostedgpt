@@ -3,7 +3,6 @@ OmniAuth.config.on_failure = Proc.new do |env|
 end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
-  puts "loaded with: #{Setting.google_client_id} and #{Setting.google_client_secret}"
   provider :google_oauth2, Setting.google_client_id, Setting.google_client_secret, {
     name: 'google'
   }
