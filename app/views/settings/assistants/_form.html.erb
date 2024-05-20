@@ -40,15 +40,14 @@
   <div class="my-5">
     <%= form.label :instructions, "Custom Instructions" %>
     <%= form.text_area :instructions,
-      class: %|
-        block
-        border border-gray-200 outline-none
-        shadow rounded-md
-        px-3 py-2 mt-2
-        w-full
-        dark:text-black
-      |,
-      data: { controller: "textarea-autogrow" }
+      class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black h-18",
+      data: {
+        controller: "textarea-autogrow",
+        action: %|
+          keydown.meta+enter->textarea-autogrow#submitForm
+          keydown.ctrl+enter->textarea-autogrow#submitForm
+        |
+      }
     %>
   </div>
 

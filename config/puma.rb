@@ -8,7 +8,7 @@
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum; this matches the default thread size of Active Record.
 max_threads_count = ENV.fetch("RAILS_MAX_THREADS") {
-  ENV.fetch("RAILS_ENV", "development") == "development" ? 2 : 5
+  ENV.fetch("RAILS_ENV", "development") == "development" ? 1 : 5
 }
 min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
 threads min_threads_count, max_threads_count
@@ -18,6 +18,8 @@ if ENV["RAILS_ENV"] == "production"
   require "concurrent-ruby"
   worker_count = Integer(ENV.fetch("WEB_CONCURRENCY") { Concurrent.physical_processor_count })
   workers worker_count if worker_count > 1
+else
+  workers 0
 end
 
 # Specifies the `worker_timeout` threshold that Puma will use to wait before
@@ -39,5 +41,3 @@ plugin :tmp_restart
 if ENV.fetch("RUN_SOLID_QUEUE_IN_PUMA") { false }
   plugin :solid_queue
 end
-
-plugin :tailwindcss if ENV.fetch("RAILS_ENV", "development") == "development"

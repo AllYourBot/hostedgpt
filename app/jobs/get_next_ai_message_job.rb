@@ -83,7 +83,7 @@ class GetNextAIMessageJob < ApplicationJob
       puts "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
 
       if attempt < 3
-        @message.content_text = "(Error after #{attempt.ordinalize} try, retrying... #{msg})"
+        @message.content_text = "(Error after #{attempt.ordinalize} try, retrying... #{msg&.slice(0..3000)})"
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
         GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(message_id, assistant_id, attempt+1)
       else

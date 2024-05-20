@@ -1,4 +1,4 @@
-import ReadableModel from "blocks/readable_model"
+import ReadableModel from "./readable_model.js"
 
 export default class extends ReadableModel {
 

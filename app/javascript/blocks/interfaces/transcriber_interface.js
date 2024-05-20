@@ -1,4 +1,4 @@
-import Interface from "blocks/interface"
+import Interface from "../interface.js"
 
 // the length of time we pause before reflecting on what was said should
 // take into account *what* was said. If the last word was clearly the end
@@ -55,6 +55,8 @@ export default class extends Interface {
 
   get on()            { return $.active }
   get off()           { return !$.active }
+
+  get supported()     { return Transcriber.$.transcriberService.$.recognizer != null }
 
   new() {
     $.covered = false

@@ -26,7 +26,14 @@
 
 <% content_for :main do %>
   <header class="absolute right-0 ml-2 mt-2 mb-3 h-10 text-lg">
-    <%= link_to root_path, class: "block cursor-pointer inline-flex mr-3 px-2 py-2 group" do %>
+    <%= link_to root_path,
+      data: {
+        controller: "keyboard",
+        action: "keydown.esc@document->keyboard#click"
+      },
+      class: %|
+        block cursor-pointer inline-flex mr-3 px-2 py-2 group
+      | do %>
       <%= icon "x-mark",
             variant: :outline,
             size: 22,
