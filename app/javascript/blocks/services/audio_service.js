@@ -1,4 +1,4 @@
-import Service from "blocks/service"
+import Service from "../service.js"
 
 export default class extends Service {
   logLevel_info
@@ -118,18 +118,18 @@ export default class extends Service {
   }
 
   _playThenLoop(index, words, audioUrl) {
-    // if (this._plabackSoundTimeoutHandler) clearTimeout(this._plabackSoundTimeoutHandler)
+    // if (_plabackSoundTimeoutHandler) clearTimeout(_plabackSoundTimeoutHandler)
 
-    // this._plabackSoundTimeoutHandler = setTimeout(() => {
+    // _plabackSoundTimeoutHandler = setTimeout(() => {
     //   $.playing = false
     //   log(`  speaking now ${$.playing}`)
     //   log(`  play timed out for #${index}, looping anyway.`)
     //   _speakingLoop('timer')
-    // }, 8000) // figure out how to cancel this timeout as soon as speaking starts. Add a callback from background to indicate this.
+    // }, 8000) // figure out how to cancel this timeout as soon as speaking starts. Add a callback from background to indicate this
 
     log(`Playing: ${words}`)
     play(audioUrl, () => {
-      // f (this._plabackSoundTimeoutHandler) clearTimeout(this._plabackSoundTimeoutHandler)
+      // f (_plabackSoundTimeoutHandler) clearTimeout(_plabackSoundTimeoutHandler)
       // log(`  done #${index} - ${words.slice(0,10)}...`)
       _speakingLoop('playback')
     }, words)

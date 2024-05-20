@@ -1,4 +1,4 @@
-import Interface from "blocks/interface"
+import Interface from "../interface.js"
 
 export default class extends Interface {
   logLevel_info

@@ -1,4 +1,4 @@
-import Service from "blocks/service"
+import Service from "../service.js"
 
 export default class extends Service {
   attrAccessor_handler

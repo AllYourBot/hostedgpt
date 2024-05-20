@@ -1,4 +1,4 @@
-import Interface from "blocks/interface"
+import Interface from "../interface.js"
 
 // To clarify the verbs:
 // Invoke a Listener and it starts listening
@@ -53,6 +53,8 @@ export default class extends Interface {
 
   get engaged()       { return $.processing === true  }
   get dismissed()     { return $.processing === false }
+
+  get supported()     { return Transcriber.supported }
 
   new() {
     $.processing = null

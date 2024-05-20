@@ -1,4 +1,4 @@
-import Service from "blocks/service"
+import Service from "../service.js"
 
 export default class extends Service {
   logLevel_info
@@ -10,18 +10,26 @@ export default class extends Service {
     $.state = 'ended'
     $.recognizer = null
 
-    this._initSpeechRecognizer()
-    $.recognizer.onstart = () => _onStart()
-    $.recognizer.onend = () => _onEnd()
-    $.recognizer.onerror = () => _onError()
-    $.recognizer.onresult = (event) => _onResult(event)
+    _initSpeechRecognizer()
+    if ($.recognizer) {
+      $.recognizer.onstart = () => _onStart()
+      $.recognizer.onend = () => _onEnd()
+      $.recognizer.onerror = () => _onError()
+      $.recognizer.onresult = (event) => _onResult(event)
+    }
   }
 
   _initSpeechRecognizer() {
-    $.recognizer = ('webkitSpeechRecognition' in window) ? new webkitSpeechRecognition() : new SpeechRecognition()
-    $.recognizer.continuous = true
-    // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
-    $.recognizer.lang = "" // blank uses system's default language
+    if ('webkitSpeechRecognition' in window)
+      $.recognizer = new webkitSpeechRecognition()
+    else if ('SpeechRecognition' in window)
+      $.recognizer = new SpeechRecognition()
+
+    if ($.recognizer) {
+      $.recognizer.continuous = true
+      // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
+      $.recognizer.lang = "" // blank uses system's default language
+    }
   }
 
   start()         { $.intendedState = 'started';  _executeStart() }
@@ -34,6 +42,8 @@ export default class extends Service {
   // Exeuctors
 
   _executeStart() {
+    if (!$.recognizer) return
+
     if ($.state != 'started')
       $.recognizer.start() // triggers _onStart() callback
     else
@@ -41,6 +51,8 @@ export default class extends Service {
   }
 
   _executeRestart() {
+    if (!$.recognizer) return
+
     if ($.state == 'started')
       _executeEnd() // will eventually trigger _onStart() b/c of intendedState
     else
@@ -48,6 +60,7 @@ export default class extends Service {
   }
 
   _executeEnd() {
+    if (!$.recognizer) return
     $.recognizer.abort()
   }
 

@@ -130,7 +130,6 @@ class UserTest < ActiveSupport::TestCase
     })
 
     refute users(:keith).preferences[:nav_closed]
-
   end
 
   test "dark_mode preference defaults to system and it can update user dark_mode preference" do
@@ -141,13 +140,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "light", new_user.preferences[:dark_mode]
 
     new_user.update!(preferences: { dark_mode: "dark" })
-
     assert_equal "dark", new_user.preferences[:dark_mode]
 
     new_user.update!(preferences: { dark_mode: "system" })
-
     assert_equal "system", new_user.preferences[:dark_mode]
-
   end
-
 end

@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [ "keyboardable" ]
 
-  click() {
+  click(event) {
     let element
 
     if (this.hasKeyboardableTarget)
@@ -12,6 +12,7 @@ export default class extends Controller {
       element = this.element
 
     element.click()
+    event.preventDefault()
   }
 
   get lastOfTheTargets() {

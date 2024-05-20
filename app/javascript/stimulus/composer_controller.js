@@ -3,7 +3,7 @@ import viewport from "stimulus/utils/viewport"
 
 export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
-    "microphoneEnable", "microphoneDisable" ]
+    "disabledSubmit", "microphoneEnable", "microphoneDisable" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -25,6 +25,8 @@ export default class extends Controller {
     document.addEventListener('turbo:morph', this.boundDetermineMicButton)
     document.addEventListener('turbo:visit', this.boundDetermineMicButton)
     document.addEventListener('turbo:frame-render', this.boundDetermineMicButton)
+
+    this.determineMicButton()
   }
 
   disconnect() {
@@ -42,17 +44,17 @@ export default class extends Controller {
   determineSubmitButton() {
     if (this.cleanInputValue.length < 1) {
       this.submitTarget.classList.add('hidden')
-      if (this.hasMicrophoneEnableTarget) this.microphoneEnableTarget.classList.remove('hidden') // TODO: remove when enabling feature
+      if (this.hasMicrophoneEnableTarget && Listener.supported) this.microphoneEnableTarget.classList.remove('hidden') // TODO: remove when enabling feature
       if (this.hasCancelTarget) this.cancelTarget.classList.remove('hidden')
     } else {
       this.submitTarget.classList.remove('hidden')
-      if (this.hasMicrophoneEnableTarget) this.microphoneEnableTarget.classList.add('hidden') // TODO: remove when enabling feature
+      if (this.hasMicrophoneEnableTarget && Listener.supported) this.microphoneEnableTarget.classList.add('hidden') // TODO: remove when enabling feature
       if (this.hasCancelTarget) this.cancelTarget.classList.add('hidden')
     }
   }
 
   toggleMicrophone(event) {
-    if (!this.hasMicrophoneEnableTarget) return // TODO: remove when enabling feature
+    if (!this.hasMicrophoneEnableTarget || !Listener.supported) return // TODO: remove when enabling feature
 
     event.preventDefault()
 
@@ -68,7 +70,11 @@ export default class extends Controller {
     if (!this.hasMicrophoneEnableTarget) return // TODO: remove when enabling feature
     if (event?.type == 'turbo:frame-render' && event?.id != 'conversation') return
 
-    if (Listener.engaged)
+    if (!Listener.supported) {
+      if (this.hasMicrophoneEnableTarget) this.microphoneEnableTarget.classList.add('!hidden')
+      if (this.hasMicrophoneDisableTarget) this.microphoneDisableTarget.classList.add('!hidden')
+      if (this.hasDisabledSubmitTarget) this.disabledSubmitTarget.classList.remove('!hidden')
+    } else if (Listener.engaged)
       this.enableMicrophone()
     else if (Listener.dismissed)
       this.blinkingMicrophone() // mic still on
@@ -106,7 +112,7 @@ export default class extends Controller {
 
   async focus() {
     if (viewport('md')) {
-      this.inputTarget.placeholder = 'Enter to submit'
+      this.inputTarget.placeholder = 'ENTER  to submit'
     } else {
       this.inputTarget.placeholder = ''
     }
@@ -114,13 +120,17 @@ export default class extends Controller {
   }
 
   unfocusKeydown(event) {
+    this.blur()
+    event.preventDefault()
+  }
+
+  blur() {
     if (viewport('md')) {
       this.inputTarget.placeholder = '/  to focus input'
     } else {
       this.inputTarget.placeholder = ''
     }
-    document.activeElement.blur()
-    event.preventDefault()
+    this.inputTarget.blur()
   }
 
   submitForm() {
@@ -160,6 +170,7 @@ export default class extends Controller {
   boundResetForm = () => { this.resetForm() }
   resetForm() {
     this.formTarget.reset()
+    this.focus()
     this.determineSubmitButton()
   }
 
