@@ -24,26 +24,66 @@ class AIBackends::OpenAI
     @assistant = assistant
     @conversation = conversation
     @message = message
+
+    @stream_response_text = ""
+    @tool_calls = []
   end
 
-  def get_next_chat_message(&chunk_received_handler)
-    puts "starting get_next"
+  def get_next_chat_message(&chunk_handler)
+    tool_messages = [] # should these be persisted to the DB?
+    response_handler = block_given? ? stream_handler(&chunk_handler) : nil
 
-    stream_response_text = ""
-    tool_calling_response = []
+    loop do
+      begin
+        response = @client.chat(parameters: {
+          model: @assistant.model,
+          messages: system_message + preceding_messages + tool_messages,
+          tools: OpenWeather.tools,
+          stream: response_handler,
+          max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
+        })
+      rescue ::Faraday::UnauthorizedError => e
+        raise OpenAI::ConfigurationError
+      end
 
-    response_handler = proc do |intermediate_response, bytesize|
+      response_text = if response.is_a?(Hash) && response.dig("choices")
+        response.dig("choices", 0, "message", "content")
+      else
+        response
+      end
+
+      if @tool_calls.present?
+        tool_messages << {
+          role: "assistant",
+          tool_calls: @tool_calls
+        }
+        tool_messages += generate_tool_messages(@tool_calls)
+      elsif response_text.blank? && @stream_response_text.blank?
+        raise ::Faraday::ParsingError
+      else
+        return response_text
+      end
+
+      @stream_response_text = ""
+      @tool_calls = []
+    end # loops until it returns or raises
+  end
+
+  private
+
+  def stream_handler(&chunk_received_handler)
+    proc do |intermediate_response, bytesize|
       content_chunk = intermediate_response.dig("choices", 0, "delta", "content")
-      tool_calls = intermediate_response.dig("choices", 0, "delta", "tool_calls")
+      tool_calls_chunk = intermediate_response.dig("choices", 0, "delta", "tool_calls")
 
       print content_chunk if Rails.env.development?
       if content_chunk
-        stream_response_text += content_chunk
+        @stream_response_text += content_chunk
         yield content_chunk
-      elsif tool_calls && tool_calls.is_a?(Array)
-        tool_calls.each_with_index do |tool_call, i|
-          tool_calling_response[i] ||= {}
-          tool_calling_response[i] = deep_streaming_merge(tool_calling_response[i], tool_call)
+      elsif tool_calls_chunk && tool_calls_chunk.is_a?(Array)
+        tool_calls_chunk.each_with_index do |tool_call, i|
+          @tool_calls[i] ||= {}
+          @tool_calls[i] = deep_streaming_merge(@tool_calls[i], tool_call)
         end
       end
 
@@ -53,42 +93,9 @@ class AIBackends::OpenAI
       raise OpenAI::ConfigurationError
     rescue => e
       puts "\nUnhandled error in AIBackends::OpenAI response handler: #{e.message}"
-      puts e.backtrace
-    end
-
-    response_handler = nil unless block_given?
-
-    begin
-      response = @client.chat(parameters: {
-        model: @assistant.model,
-        messages: system_message + preceding_messages,
-        tools: OpenWeather.tools,
-        stream: response_handler,
-        max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
-      })
-    rescue ::Faraday::UnauthorizedError => e
-      raise OpenAI::ConfigurationError
-    end
-
-    response_text = if response.is_a?(Hash) && response.dig("choices")
-      response.dig("choices", 0, "message", "content")
-    else
-      response
-    end
-
-    if tool_calling_response.present?
-      tool_calling_response = deep_json_parse(tool_calling_response)
-      tool_calling_response.each do |tool_call|
-        # TODO: call tool and add onto the messages.
-      end
-    elsif response_text.blank? && stream_response_text.blank?
-      raise ::Faraday::ParsingError
-    else
-      response_text
+      puts e.backtrace.join("\n")
     end
   end
-
-  private
 
   def system_message
     return [] if @assistant.instructions.blank?
@@ -119,6 +126,28 @@ class AIBackends::OpenAI
         }
       end
     end
+  end
+
+  def generate_tool_messages(tool_calls)
+    # We could parallelize function calling using ruby threads
+    tool_calls.map do |tool_call|
+      tool_call = deep_json_parse(tool_call)
+      id = tool_call.dig("id")
+      function_name = tool_call.dig("function", "name")
+      function_arguments = tool_call.dig("function", "arguments")
+      raise "Unexpected tool call: #{id}, #{function_name}, and #{function_arguments}" if function_name.blank? || function_arguments.blank?
+      function_response = Toolbox.call(function_name, function_arguments)
+
+      {
+        role: "tool",
+        content: function_response.to_json,
+        tool_call_id: id,
+      }
+    end
+  rescue => e
+    puts "## Error calling tools: #{e.message}"
+    puts e.backtrace.join("\n")
+    raise ::Faraday::ParsingError
   end
 
   def deep_streaming_merge(hash1, hash2)
