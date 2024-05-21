@@ -27,7 +27,7 @@
     },
     "CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV": {
       "description": "hostedgpt specific",
-      "value": true
+      "value": "true"
     },
     "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY": {
       "description": "hostedgpt specific",
@@ -43,7 +43,7 @@
     },
     "RUN_SOLID_QUEUE_IN_PUMA": {
       "description": "Runs the worker process within web dynos",
-      "value": true
+      "value": "true"
     }
   },
   "formation": {
