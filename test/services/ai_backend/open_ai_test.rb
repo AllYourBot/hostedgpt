@@ -1,6 +1,6 @@
 require "test_helper"
 
-module AIBackends
+module AIBackend
   class OpenAITest < ActiveSupport::TestCase
     setup do
       @conversation = conversations(:attachments)

@@ -26,7 +26,7 @@ ChatGPT uses your private conversations history to train its models. [OpenAI dis
 
 - [Deploy the app on Render](#deploy-the-app-on-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-fly)
-- [Contribute as a developer / Running locally](#contribute-as-a-developer)
+- [Contribute as a developer](#contribute-as-a-developer)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
 
@@ -111,7 +111,7 @@ HostedGPT requires these services to be running:
 - ImageMagick (`brew install imagemagick` should work on Mac )
 
 1. `cd` into your local repository clone
-2. `rbenv install` to install the correct ruby version (it reads the .ruby-version in the repo)
+2. `rbenv install` or `asdf install` to install the correct ruby version
 3. `bin/dev` starts up all the services, installs gems, and inits database (don't run **db:setup** as it will not configure encryption properly)
 4. Open [http://localhost:3000](http://localhost:3000) and register as a new user
 5. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
@@ -162,3 +162,18 @@ v0.5 - Released on 2/14/2024
 * Conversations are automatically titled
 * Sidebar can be closed
 * AI responses stream in
+
+1. Go to console.cloud.google.com
+2. Create a new organization or select an existing organization
+3. Go to the Google API Library and select the services you want to support: https://console.cloud.google.com/apis/library and sel$
+3. Go to Credentials / API
+4. Create a new Oauth credential
+5. Fill out the oAuth consent screen
+6. In a new tab go to the Google API li
+7. On the next screen, Scopes, add a bunch of permissions
+8. Add your test users
+9. Go back to API & Services > Credentials (https://console.cloud.google.com/apis/credentials?project=hosted-423518)
+10. Click to Create Credentials > OAuth client ID
+
+# be sure to add the different email addresses you want to test
+# be sure to get the callback URL correctly

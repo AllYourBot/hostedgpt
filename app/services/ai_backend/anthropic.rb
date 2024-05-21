@@ -1,6 +1,4 @@
-class AIBackends::Anthropic
-  attr :client
-
+class AIBackend::Anthropic < AIBackend
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
   #
@@ -8,9 +6,9 @@ class AIBackends::Anthropic
   # what you want instead.
   def self.client
     if Rails.env.test?
-      TestClients::Anthropic
+      ::TestClients::Anthropic
     else
-      Anthropic::Client
+      ::Anthropic::Client
     end
   end
 
@@ -41,7 +39,7 @@ class AIBackends::Anthropic
     rescue ::Faraday::UnauthorizedError => e
       raise Anthropic::ConfigurationError
     rescue => e
-      puts "\nUnhandled error in AIBackends::Anthropic response handler: #{e.message}"
+      puts "\nUnhandled error in AIBackend::Anthropic response handler: #{e.message}"
       puts e.backtrace
     end
 

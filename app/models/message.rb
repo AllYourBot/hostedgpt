@@ -7,7 +7,9 @@ class Message < ApplicationRecord
   belongs_to :run, optional: true
   has_one :latest_assistant_message_for, class_name: "Conversation", foreign_key: :last_assistant_message_id, dependent: :nullify
 
-  enum role: %w[user assistant].index_by(&:to_sym)
+  serialize :content_tool_calls, coder: JsonSerializer
+
+  enum role: %w[user assistant tool].index_by(&:to_sym)
 
   delegate :user, to: :conversation
 
@@ -25,6 +27,22 @@ class Message < ApplicationRecord
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
 
   scope :ordered, -> { latest_version_for_conversation }
+
+  def name
+    case role
+    when "user" then user.first_name[/\A[a-zA-Z0-9_-]+/]
+    when "assistant" then assistant.name[/\A[a-zA-Z0-9_-]+/]
+    end
+  end
+
+  def finished?
+    processed? &&
+      (content_text.present? || content_tool_calls.present?)
+  end
+
+  def not_finished?
+    !finished?
+  end
 
   private
 
