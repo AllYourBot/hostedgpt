@@ -2,6 +2,7 @@
   "name": "hostedgpt",
   "description": "An open version of ChatGPT you can host anywhere or run locally.",
   "repository": "https://github.com/allyourbot/hostedgpt",
+  "logo": "https://github.com/allyourbot/hostedgpt/blob/main/app/assets/images/logo.svg",
   "buildpacks": [
     {
       "url": "heroku/ruby"
