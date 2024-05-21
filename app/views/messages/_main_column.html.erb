@@ -197,7 +197,7 @@
             |,
             data: {
               composer_target: "cancel",
-              turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+              turbo_frame: "_top" # this causes the page to morph, without this it does a frame substitution
           }) do |form| %>
             <div class="text-gray-300 dark:text-gray-500 mr-2 hidden md:block">
               ⌘ ESC
@@ -228,7 +228,8 @@
           model: [@assistant, @new_message],
           data: {
             composer_target: "form",
-            turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+            turbo_frame: "_top", # this causes the page to morph, without this it does a frame substitution
+            turbo_action: "replace",
         }) do |form| %>
           <%= form.hidden_field :conversation_id %>
           <%= form.hidden_field :index, value: @messages&.length %>
