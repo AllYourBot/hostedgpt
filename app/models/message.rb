@@ -1,3 +1,42 @@
+# == Schema Information
+#
+# Table name: messages
+#
+#  id                    :bigint           not null, primary key
+#  branched              :boolean          default(FALSE), not null
+#  branched_from_version :integer
+#  cancelled_at          :datetime
+#  content_text          :string
+#  index                 :integer          not null
+#  processed_at          :datetime
+#  role                  :string           not null
+#  version               :integer          not null
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  assistant_id          :bigint           not null
+#  content_document_id   :bigint
+#  conversation_id       :bigint           not null
+#  run_id                :bigint
+#
+# Indexes
+#
+#  index_messages_on_assistant_id                           (assistant_id)
+#  index_messages_on_content_document_id                    (content_document_id)
+#  index_messages_on_conversation_id                        (conversation_id)
+#  index_messages_on_conversation_id_and_index_and_version  (conversation_id,index,version) UNIQUE
+#  index_messages_on_index                                  (index)
+#  index_messages_on_run_id                                 (run_id)
+#  index_messages_on_updated_at                             (updated_at)
+#  index_messages_on_version                                (version)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (assistant_id => assistants.id)
+#  fk_rails_...  (content_document_id => documents.id)
+#  fk_rails_...  (conversation_id => conversations.id)
+#  fk_rails_...  (run_id => runs.id)
+#
+
 class Message < ApplicationRecord
   include DocumentImage, Version, Cancellable
 
