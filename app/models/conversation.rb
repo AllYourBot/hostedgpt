@@ -14,6 +14,7 @@
 # Indexes
 #
 #  index_conversations_on_assistant_id               (assistant_id)
+#  index_conversations_on_external_id                (external_id) UNIQUE
 #  index_conversations_on_last_assistant_message_id  (last_assistant_message_id)
 #  index_conversations_on_updated_at                 (updated_at)
 #  index_conversations_on_user_id                    (user_id)
@@ -23,6 +24,7 @@
 #  fk_rails_...  (assistant_id => assistants.id)
 #  fk_rails_...  (last_assistant_message_id => messages.id)
 #  fk_rails_...  (user_id => users.id)
+#
 
 class Conversation < ApplicationRecord
   include Version

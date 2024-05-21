@@ -21,6 +21,10 @@ class ConversationTest < ActiveSupport::TestCase
     assert_instance_of Step, conversations(:greeting).steps.first
   end
 
+  test "has external id" do
+    assert_instance_of String, conversations(:openai_thread).external_id
+  end
+
   test "has associated last_assistant_message but can also be nil" do
     c = Conversation.create!(user: users(:keith), assistant: assistants(:samantha))
     assert_nil c.last_assistant_message
@@ -32,6 +36,22 @@ class ConversationTest < ActiveSupport::TestCase
       Conversation.create!(
         user: users(:keith),
         assistant: assistants(:samantha)
+      )
+    end
+  end
+
+  test "Conversation should not be created with duplicate external ids" do
+    assert_raise do
+      Conversation.create!(
+        user: users(:keith),
+        assistant: assistants(:samantha),
+        external_id: "dup1"
+      )
+
+      Conversation.create!(
+        user: users(:keith),
+        assistant: assistants(:mandela_gpt4),
+        external_id: "dup1"
       )
     end
   end

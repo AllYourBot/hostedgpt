@@ -59,6 +59,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_20_195516) do
     t.datetime "updated_at", null: false
     t.boolean "images", default: false, null: false
     t.text "external_id", comment: "The Backend AI's (e.g OpenAI) assistant id"
+    t.index ["external_id"], name: "index_assistants_on_external_id", unique: true
     t.index ["user_id"], name: "index_assistants_on_user_id"
   end
 
@@ -79,6 +80,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_20_195516) do
     t.bigint "last_assistant_message_id"
     t.text "external_id", comment: "The Backend AI system (e.g OpenAI) Thread Id"
     t.index ["assistant_id"], name: "index_conversations_on_assistant_id"
+    t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
     t.index ["user_id"], name: "index_conversations_on_user_id"
@@ -107,10 +109,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_20_195516) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
+    t.datetime "cancelled_at"
     t.datetime "processed_at", precision: nil
     t.integer "index", null: false
     t.integer "version", null: false
-    t.datetime "cancelled_at"
     t.boolean "branched", default: false, null: false
     t.integer "branched_from_version"
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"

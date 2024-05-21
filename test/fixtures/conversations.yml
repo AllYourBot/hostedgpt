@@ -69,3 +69,10 @@ versioned2:
   assistant: samantha
   title: Versioned v2 conversation
   last_assistant_message: msg2_v5
+
+openai_thread:
+  user: keith
+  assistant: samantha
+  title: Meeting Samantha
+  last_assistant_message: im_a_bot
+  external_id: openai-threadid-1
