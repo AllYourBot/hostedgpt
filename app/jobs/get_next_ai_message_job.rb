@@ -6,9 +6,9 @@ class GetNextAIMessageJob < ApplicationJob
 
   def ai_backend
     if @assistant.model.starts_with?('gpt-')
-      AIBackends::OpenAI
+      AIBackend::OpenAI
     else
-      AIBackends::Anthropic
+      AIBackend::Anthropic
     end
   end
 
@@ -57,11 +57,11 @@ class GetNextAIMessageJob < ApplicationJob
     puts "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     wrap_up_the_message
     return true
-  rescue OpenAI::ConfigurationError => e
+  rescue ::OpenAI::ConfigurationError => e
     set_openai_error
     wrap_up_the_message
     return true
-  rescue Anthropic::ConfigurationError => e
+  rescue ::Anthropic::ConfigurationError => e
     set_anthropic_error
     wrap_up_the_message
     return true

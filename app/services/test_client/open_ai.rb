@@ -1,4 +1,4 @@
-class TestClients::OpenAI
+class TestClient::OpenAI
   def initialize(access_token:)
   end
 
