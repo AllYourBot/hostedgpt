@@ -18,7 +18,7 @@ setInterval(() => {
       if (elem) {
         elem.classList.remove('bg-red-400')
         elem.classList.remove('text-white')
-        elem.classList.add('text-red-500')
+        elem.classList.add('text-gray-200')
       }
     }
   }
