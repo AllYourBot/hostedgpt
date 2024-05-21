@@ -31,7 +31,6 @@ end.each do |file|
     # To ensure this import directive works both in browser (where importmaps are used) and in
     # node (which does not support importmaps), we name the importmap the relative path
     #   pin file, to: "./readable_model.js"
-    prefix = Dir.exist?("app/javascript/blocks/" + name.remove(".js").pluralize) ? "../" : "./"
-    pin "#{prefix}#{name}", to: file, preload: true
+    pin "/assets/blocks/#{name}", to: file, preload: true
   end
 end

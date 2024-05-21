@@ -75,7 +75,7 @@ export default class extends Service {
 
     for (let i = 1; i <= 3; i++) {
       try {
-        log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`)
+        // log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`)
         audioUrl = await SpeechService.audioFromOpenAI(text)
       } catch(error) {
         log(`  error fetching job ${index} attempt ${i}${i == 3 ? ' - giving up' : ''}`)
@@ -94,10 +94,10 @@ export default class extends Service {
 
   async _speakingLoop(trigger) {
     const jobsToPlay = $.queue.filter((job) => !job.spoken)
-    if (trigger) {
-      log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`)
-      jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`))
-    }
+    // if (trigger) {
+    //   log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`)
+    //   jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`))
+    // }
 
     if (jobsToPlay.length > 0) {
       const job = jobsToPlay[0]

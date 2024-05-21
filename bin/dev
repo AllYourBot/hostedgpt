@@ -3,6 +3,8 @@
 export PORT="${PORT:-3000}"
 
 if command -v overmind > /dev/null 2>&1; then
+  bundle install
+  bin/rails db:prepare
   exec overmind start -f Procfile.dev "$@"
 else
   if ! gem list foreman -i --silent; then
