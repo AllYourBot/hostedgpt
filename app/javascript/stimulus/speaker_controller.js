@@ -18,7 +18,7 @@ export default class extends Controller {
   }
 
   disconnect() {
-    document.addEventListener('turbo:before-stream-render', this.parseReplaceWords)
+    document.removeEventListener('turbo:before-stream-render', this.parseReplaceWords)
     if (this.hasAssistantTextTarget) this.assistantTextTargets.forEach((target) => target.removeEventListener('turbo:morph-element', this.boundParseWords))
     document.removeEventListener('turbo:visit', this.firstParseWords)
   }
@@ -35,12 +35,11 @@ export default class extends Controller {
     this.parseWords(target, 'targetConnected')
   }
 
-  parseReplaceWords = (event) => { console.log('replace', event.target.getAttribute('action')); if (event.target.getAttribute('action') == 'replace') this.parseWords(event.detail.newStream.querySelector('template').content?.firstChild?.nextSibling?.querySelector('[data-speaker-target="text assistantText"]'), 'replace') }
+  parseReplaceWords = (event) => { if (event.target.getAttribute('action') == 'replace') this.parseWords(event.detail.newStream.querySelector('template').content?.firstChild?.nextSibling?.querySelector('[data-speaker-target="text assistantText"]'), 'replace') }
   firstParseWords = () => { if (this.assistantTextTargets.length == 1) this.parseWords(this.assistantTextTargets.first(), 'visit replace or first morph') }
   boundParseWords = (event) => { this.parseWords(event.target, 'morph') }
   parseWords(target, source) {
     if (!target) return
-    console.log(`parseWords (${source})`, target)
     if (source == 'morph' &&
        (target != this.assistantTextTargets.last() || target != this.textTargets.last())) {
       console.log(`morphed but not last`, target, this.assistantTextTargets.last(), this.textTargets.last())
