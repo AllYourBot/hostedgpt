@@ -22,18 +22,23 @@
       "generator": "secret"
     },
     "RAILS_MASTER_KEY": {
+      "description": "Rails encryption key",
       "generator": "secret"
     },
     "CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV": {
+      "description": "hostedgpt specific",
       "value": true
     },
     "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY": {
+      "description": "hostedgpt specific",
       "generator": "secret"
     },
     "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY": {
+      "description": "hostedgpt specific",
       "generator": "secret"
     },
     "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT": {
+      "description": "hostedgpt specific",
       "generator": "secret"
     },
     "RUN_SOLID_QUEUE_IN_PUMA": {
