@@ -26,7 +26,7 @@ class Assistant < ApplicationRecord
   end
 
   def destroy
-    raise "Can't delete user's last assistant" if user.assistants.count <=
+    raise "Can't delete user's last assistant" if user.assistants.count <= 1
     update!(deleted_at: Time.now)
   end
 

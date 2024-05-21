@@ -6,7 +6,7 @@ module ApplicationHelper
     nil
   end
 
-  def assitant_data_transaction_target(item, item_counter)
+  def assistant_data_transaction_target(item, item_counter)
     return nil unless item.is_a?(Assistant)
     return 'data-transition-target="transitionable"'.html_safe if @hide_settings_assistants_overflow && item_counter >= Assistant::MAX_LIST_DISPLAY
   end

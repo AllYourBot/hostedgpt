@@ -13,10 +13,6 @@ class LanguageModel < ApplicationRecord
     !new_record?
   end
 
-  def before_destroy
-    raise ActiveRecord::ReadOnlyRecord
-  end
-
   def provider_name
     BEST_MODELS[name] || name
   end
