@@ -52,9 +52,10 @@ end
       <turbo-frame id="message-<%= message.id %>">
 
       <div
+        id="message-text-<%= message.id %>"
         class="hidden"
         data-clipboard-target="text"
-        <%= message.assistant? && "data-speaker-target=text" %>
+        data-speaker-target="text <%= message.assistant? && 'assistantText' %>"
         data-thinking="<%= thinking ? 'true' : 'false' %>"
       ><%= message.content_text %></div>
         <div

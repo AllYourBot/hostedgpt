@@ -22,7 +22,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_active @input_selector
   end
 
-  test "when cursor is not focused in the text input, / focuses it and then / works as a key press" do
+  test "when cursor is not focused in the text input, / focuses it and then an accidental second / does not appear" do
     send_keys "esc"
     assert_active "body"
 
@@ -31,7 +31,7 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_equal "", input.value
 
     send_keys "/"
-    assert_equal "/", input.value
+    assert_equal "", input.value
   end
 
   test "when cursor is focused in the text input, ? works as a key press" do
