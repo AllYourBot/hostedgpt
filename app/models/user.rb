@@ -19,4 +19,17 @@ class User < ApplicationRecord
   def preferences
     attributes["preferences"].with_defaults(dark_mode: "system")
   end
+
+  def destroy_in_progress?
+    @destroy_in_progress
+  end
+
+  def destroy
+    @destroy_in_progress = true
+    begin
+      super
+    ensure
+      @destroy_in_progress = false
+    end
+  end
 end

@@ -37,11 +37,12 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_equal params, @assistant.reload.slice(:name, :description, :instructions)
   end
 
-  test "should destroy assistant" do
-    assert_difference("Assistant.count", -1) do
+  test "destroy should soft-delete assistant" do
+    assert_difference("Assistant.count", 0) do
       delete settings_assistant_url(@assistant)
     end
 
+    assert @assistant.reload.deleted?
     assert_redirected_to new_settings_assistant_url
   end
 end
