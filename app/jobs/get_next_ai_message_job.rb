@@ -85,11 +85,12 @@ class GetNextAIMessageJob < ApplicationJob
 
     unless Rails.env.test?
       puts "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
+      puts e.backtrace.join("\n") if Rails.env.development?
 
       if attempt < 3
         @message.content_text = "(Error after #{attempt.ordinalize} try, retrying... #{msg&.slice(0..3000)})"
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
-        GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(message_id, assistant_id, attempt+1)
+        GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(user_id, message_id, assistant_id, attempt+1)
       else
         set_unexpected_error(msg)
         wrap_up_the_message
@@ -103,7 +104,7 @@ class GetNextAIMessageJob < ApplicationJob
       only_scroll_down_if_was_bottom: true,
       timestamp: (Time.current.to_f*1000).to_i,
       streamed: true,
-  }.merge(locals)
+    }.merge(locals)
   end
 
   private
@@ -143,7 +144,7 @@ class GetNextAIMessageJob < ApplicationJob
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
-    puts "\n### Finished GetNextAIMessageJob.perform(#{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
+    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
   end
 
   def generation_was_cancelled?
