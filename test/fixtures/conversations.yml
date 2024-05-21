@@ -73,6 +73,6 @@ versioned2:
 openai_thread:
   user: keith
   assistant: samantha
-  title: Meeting Samantha
-  last_assistant_message: im_a_bot
+  title: Hello!
+  last_assistant_message: what_day
   external_id: openai-threadid-1
