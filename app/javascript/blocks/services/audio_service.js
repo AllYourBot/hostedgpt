@@ -75,7 +75,7 @@ export default class extends Service {
 
     for (let i = 1; i <= 3; i++) {
       try {
-        log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`)
+        // log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`)
         audioUrl = await SpeechService.audioFromOpenAI(text)
       } catch(error) {
         log(`  error fetching job ${index} attempt ${i}${i == 3 ? ' - giving up' : ''}`)
