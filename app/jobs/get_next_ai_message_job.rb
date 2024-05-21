@@ -104,7 +104,7 @@ class GetNextAIMessageJob < ApplicationJob
       only_scroll_down_if_was_bottom: true,
       timestamp: (Time.current.to_f*1000).to_i,
       streamed: true,
-  }.merge(locals)
+    }.merge(locals)
   end
 
   private

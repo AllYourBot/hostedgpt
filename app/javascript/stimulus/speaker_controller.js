@@ -1,41 +1,54 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "text" ]
+  static targets = [ "text", "assistantText" ]
   static values = { initialMessageCount: Number }
 
   connect() {
     this.connected = true
-    this.textTargetsCount = this.textTargets.length
+    this.assistantTextTargetsCount = this.assistantTextTargets.length
     this.thoughtsSentCount = 0
 
-    this.textTargets.forEach((target) => target.addEventListener('turbo:before-morph-element', this.boundParseWords))
-    document.addEventListener('turbo:visit', this.lastParseWords)
+    console.log(`## connected with ${this.textTargets.length} text and ${this.assistantTextTargetsCount} assistantText`)
+
+    document.addEventListener('turbo:before-stream-render', this.parseReplaceWords) // the streaming response triggers this
+    if (this.hasAssistantTextTarget) this.assistantTextTargets.last().addEventListener('turbo:morph-element', this.firstParseWords) // in the 1st response an empty reply message can be there
+    document.addEventListener('turbo:visit', this.firstParseWords) // in the 1st response, the reply can already be there upon load
+    this.firstParseWords() // sometimes the controller is slow to connect
   }
 
   disconnect() {
-    this.textTargets.forEach((target) => target.removeEventListener('turbo:before-morph-element', this.boundParseWords))
-    document.removeEventListener('turbo:visit', this.lastParseWords)
+    document.addEventListener('turbo:before-stream-render', this.parseReplaceWords)
+    if (this.hasAssistantTextTarget) this.assistantTextTargets.forEach((target) => target.removeEventListener('turbo:morph-element', this.boundParseWords))
+    document.removeEventListener('turbo:visit', this.firstParseWords)
   }
 
-  textTargetConnected(target) {
+  assistantTextTargetConnected(target) {
     if (!this.connected) return
+    if (this.assistantTextTargets.length <= this.assistantTextTargetsCount) return
 
-    if (this.textTargets.length > this.textTargetsCount) {
-      target.addEventListener('turbo:before-morph', this.boundParseWords)
-      this.textTargetsCount += 1
-      this.thoughtsSentCount = 0
-      Reset.Speaker()
-    }
+    target.addEventListener('turbo:morph-element', this.boundParseWords) // sometimes a streams is missed so then morph updates things
+    this.assistantTextTargetsCount += 1
+    this.thoughtsSentCount = 0
+    Reset.Speaker()
 
-    this.parseWords(target)
+    this.parseWords(target, 'targetConnected')
   }
 
-  lastParseWords = () => { this.parseWords(this.textTargets.last(), 'visit replace') }
-  boundParseWords = (event) => { this.parseWords(event.target, 'morph-element') }
-  parseWords(target, source = 'targetConnected') {
+  parseReplaceWords = (event) => { console.log('replace', event.target.getAttribute('action')); if (event.target.getAttribute('action') == 'replace') this.parseWords(event.detail.newStream.querySelector('template').content?.firstChild?.nextSibling?.querySelector('[data-speaker-target="text assistantText"]'), 'replace') }
+  firstParseWords = () => { if (this.assistantTextTargets.length == 1) this.parseWords(this.assistantTextTargets.first(), 'visit replace or first morph') }
+  boundParseWords = (event) => { this.parseWords(event.target, 'morph') }
+  parseWords(target, source) {
     if (!target) return
+    console.log(`parseWords (${source})`, target)
+    if (source == 'morph' &&
+       (target != this.assistantTextTargets.last() || target != this.textTargets.last())) {
+      console.log(`morphed but not last`, target, this.assistantTextTargets.last(), this.textTargets.last())
+      return
+    }
     if (Microphone.off) return
+
+    console.log(`## parsingWords (${source})`, target)
 
     const thinking = target.getAttribute('data-thinking') === 'true'
     const thoughts = SpeechService.splitIntoThoughts(target.innerText)
