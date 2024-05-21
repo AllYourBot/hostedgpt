@@ -42,6 +42,8 @@ export default class extends Controller {
   }
 
   determineSubmitButton() {
+    this.preventAccidentalSlashTyping()
+
     if (this.cleanInputValue.length < 1) {
       this.submitTarget.classList.add('hidden')
       if (this.hasMicrophoneEnableTarget && Listener.supported) this.microphoneEnableTarget.classList.remove('hidden') // TODO: remove when enabling feature
@@ -172,6 +174,12 @@ export default class extends Controller {
     this.formTarget.reset()
     this.focus()
     this.determineSubmitButton()
+  }
+
+  preventAccidentalSlashTyping() {
+    if (this.inputTarget.value.length == 1 && this.inputTarget.value[0] == '/') {
+      this.inputTarget.value = ''
+    }
   }
 
   smartPaste(event) {
