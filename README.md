@@ -37,21 +37,82 @@ Following features can be configured with environment variables:
 
 - `REGISTRATON_FEATURE` - Set to `false` to disable registration.
   Default is `true`.
-- `AUTHENTICATION_APPROACH` - Set to `google` to use Google OAuth for authentication, `http_header` to use HTTP header authentication, or `password` to use password authentication.
-  Default is `password`.
+- `VOICE_FEATURE` - Set to `true` to enable voice chat.
+  Default is `false`.
+
+## Authentication
+
+HostedGPT supports multiple authentication methods:
+
+<!-- no toc -->
+- [Password-based authentication](#password-based-authentication)
+- [Google OAuth authentication](#google-oauth-authentication)
+- [HTTP header authentication](#http-header-authentication)
+
+### Password-based authentication
+
+Password authentication is enabled by default.
+You can disable it by setting `PASSWORD_AUTHENTICATION_FEATURE` to `false`.
+
+### Google OAuth authentication
+
+Google OAuth authentication is disabled by default.
+You can enable it by setting `GOOGLE_AUTHENTICATION_FEATURE` to `true`.
+
+To enable Google OAuth authentication, you need to set the following environment variables:
+
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID.
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret.
+
+**Steps to set up Google OAuth authentication:**
+
+1. **Go to the Google Cloud Console and Create a New Project:**
+   - Open your web browser and navigate to [Google Cloud Console](https://console.cloud.google.com/).
+   - Click on the project drop-down menu at the top of the page.
+   - Select "New Project"
+   - Enter a name for your project and click "Create"
+
+2. **Create OAuth Consent Screen:**
+   - In the navigation menu, go to "APIs & Services" > "OAuth consent screen"
+   - Select "Internal" and click "Create"
+   - Fill out the required fields (App name, User support email, etc.).
+   - Add your domain (if applicable) and authorized domains.
+   - Click "Save and Continue"
+
+3. **Create OAuth Credentials:**
+   - In the navigation menu, go to "APIs & Services" > "Credentials"
+   - Click on "Create Credentials" and select "OAuth client ID"
+   - Choose "Web application" as the application type.
+   - Fill out the required fields:
+     - **Name:** A descriptive name for your client ID, e.g. "HostedGPT"
+     - **Authorized JavaScript origins:** Your application's base URL, e.g., `https://hostedgpt.example.com`.
+     - **Authorized redirect URIs:** `https://hostedgpt.example.com/auth/google/callback`
+   - Click "Create"
+
+4. **Set Environment Variables:**
+   - After creating the credentials, you will see a dialog with your Client ID and Client Secret.
+   - Set the Client ID and Client Secret as environment variables in your application:
+     - `GOOGLE_CLIENT_ID`: Your Client ID
+     - `GOOGLE_CLIENT_SECRET`: Your Client Secret
+
+### HTTP header authentication
+
+HTTP header authentication is an alternative method to authenticate users based on custom HTTP request headers.
+This method is useful when you have an existing authentication system that sets custom headers for authenticated users, e.g. a Reverse Proxy (e.g., [Traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/), [Caddy](https://caddyserver.com/docs/caddyfile/directives/forward_auth)) or a Zero Trust Network (e.g., [Tailscale](https://tailscale.com/kb/1312/serve#identity-headers)).
+
+HTTP header authentication is disabled by default.
+You can enable it by setting `HTTP_HEADER_AUTHENTICATION_FEATURE` to `true`.
+When this feature is enabled, password authentication and Google OAuth authentication will be disabled automatically.
+
+Beware that enabling HTTP header authentication will allow anyone with direct access to the application to impersonate any user by setting the custom headers, if not properly secured.
+You must ensure that the custom headers are set by a trusted source and are not easily spoofed.
+
 - `AUTHENTICATION_HTTP_HEADER_EMAIL` - Name of the HTTP request header, which can be used to derive an email address of a new user.
-  Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
   Default is `X-WEBAUTH-EMAIL`.
 - `AUTHENTICATION_HTTP_HEADER_NAME` - Name of the HTTP request header, which can be used to derive the full name of a new user.
-  Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
   Default is `X-WEBAUTH-NAME`.
 - `AUTHENTICATION_HTTP_HEADER_UID` - Name of the HTTP request header, which will be used as unique identifier of the user.
-  Required if `AUTHENTICATION_APPROACH` is set to `http_header`.
   Default is `X-WEBAUTH-USER`.
-- `GOOGLE_CLIENT_ID` - Google OAuth client ID.
-  Required if `AUTHENTICATION_APPROACH` is set to `google`.
-- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret.
-  Required if `AUTHENTICATION_APPROACH` is set to `google`.
 
 # Deploy the app on Render
 

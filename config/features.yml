@@ -1,5 +1,7 @@
 shared:
-  authentication_approach: <%= ENV.fetch("AUTHENTICATION_APPROACH", "password") %>
+  password_authentication: <%= ENV.fetch("PASSWORD_AUTHENTICATION_FEATURE", true) %>
+  google_authentication: <%= ENV.fetch("GOOGLE_AUTHENTICATION_FEATURE", false) %>
+  http_header_authentication: <%= ENV.fetch("HTTP_HEADER_AUTHENTICATION_FEATURE", false) %>
   authentication_http_header_email: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_EMAIL", "X-WEBAUTH-EMAIL") %>
   authentication_http_header_name: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_NAME", "X-WEBAUTH-NAME") %>
   authentication_http_header_uid: <%= ENV.fetch("AUTHENTICATION_HTTP_HEADER_UID", "X-WEBAUTH-USER") %>

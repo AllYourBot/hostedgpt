@@ -13,21 +13,19 @@ class Feature
     end
 
     def authenticate_with_password?
-      !(authenticate_with_google? || authenticate_with_http_header?)
+      return false if authenticate_with_http_header?
+
+      enabled?(:password_authentication)
     end
 
     def authenticate_with_google?
-      authentication_approach == 'google'
+      return false if authenticate_with_http_header?
+
+      enabled?(:google_authentication)
     end
 
     def authenticate_with_http_header?
-      authentication_approach == 'http_header'
-    end
-
-    def authentication_approach
-      ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:authentication_approach, 'password')
-      )
+      enabled?(:http_header_authentication)
     end
 
     def authentication_http_header_name
