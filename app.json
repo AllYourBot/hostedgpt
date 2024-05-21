@@ -48,8 +48,7 @@
   },
   "formation": {
     "web": {
-      "quantity": 1,
-      "size": "eco"
+      "quantity": 1
     }
   },
   "addons": ["heroku-postgresql:essential-0"],
