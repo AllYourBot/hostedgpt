@@ -84,6 +84,14 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 
 # Deploy the app on Heroku
 
+Heroku is a one-click option that will cost $10/monnth for the compute (dyno) and database. By default, apps use Eco dynos ($5) if you are subscribed to Eco. Otherwise, it defaults to Basic dynos ($7). The Eco dynos plan is shared across all Eco dynos in your account and is recommended if you plan on deploying many small apps to Heroku. Eco dynos "sleep" after 30 minutes of inactivity and take a few seconds to wake up. Basic dynos do not sleep.
+
+Eligible students can apply for Heroku platform credits through [Heroku for GitHub Students program](https://blog.heroku.com/github-student-developer-program).
+
+1. Sign up for a free Heroku account at [heroku.com](https://signup.heroku.com/)
+2. If you wish to Eco dynos, you will need to subscribe to the $5 Eco dyno plan at [the billing page](https://dashboard.heroku.com/account/billing).
+3. Press the button below to deploy the app to Heroku!
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/allyourbot/hostedgpt)
 
 # Contribute as a developer
