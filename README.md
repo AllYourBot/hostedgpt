@@ -26,6 +26,7 @@ ChatGPT uses your private conversations history to train its models. [OpenAI dis
 
 - [Deploy the app on Render](#deploy-the-app-on-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-fly)
+- [Deploy the app on Heroku](#deploy-the-app-on-heroku)
 - [Contribute as a developer](#contribute-as-a-developer)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
@@ -81,6 +82,9 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 10. Run `fly deploy`
 11. It will automatically deploy 2 servers instead of just 1 so after it finishes deploy run `fly scale count app=1` to scale down to 1 machine.
 
+# Deploy the app on Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/allyourbot/hostedgpt)
 
 # Contribute as a developer
 

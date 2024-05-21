@@ -1,0 +1,54 @@
+{
+  "name": "hostedgpt",
+  "description": "An open version of ChatGPT you can host anywhere or run locally.",
+  "repository": "https://github.com/allyourbot/hostedgpt",
+  "buildpacks": [
+    {
+      "url": "heroku/ruby"
+    }
+  ],
+  "env": {
+    "RAILS_ENV": {
+      "description": "Rails environment",
+      "value": "production"
+    },
+    "RAILS_LOG_TO_STDOUT": {
+      "description": "Rails log to stdout",
+      "value": "enabled"
+    },
+    "SECRET_KEY_BASE": {
+      "description": "Secret key base for verifying signed cookies",
+      "generator": "secret"
+    },
+    "RAILS_MASTER_KEY": {
+      "generator": "secret"
+    },
+    "CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV": {
+      "value": true
+    },
+    "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY": {
+      "value": true
+    },
+    "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY": {
+      "value": true
+    },
+    "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT": {
+      "value": true
+    },
+    "RUN_SOLID_QUEUE_IN_PUMA": {
+      "description": "Runs the worker process within web dynos",
+      "value": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "addons": ["heroku-postgresql:essential-0"],
+  "scripts": {
+    "postdeploy": "bundle exec rails db:prepare"
+  },
+  "stack": "heroku-22"
+}
