@@ -27,13 +27,13 @@
       "value": true
     },
     "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY": {
-      "value": true
+      "generator": "secret"
     },
     "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY": {
-      "value": true
+      "generator": "secret"
     },
     "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT": {
-      "value": true
+      "generator": "secret"
     },
     "RUN_SOLID_QUEUE_IN_PUMA": {
       "description": "Runs the worker process within web dynos",
