@@ -113,8 +113,30 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to conversation_messages_url(message.conversation, version: 2)
   end
 
+  test "when assistant is deleted still see all the conversations messages" do
+    assert @assistant.destroy
+    get conversation_messages_url(@conversation, version: 1)
+    assert @conversation.messages.count > 0
+    assert_select 'div[data-role="message"]', count: @conversation.messages.count
+  end
+
+  test "when assistant is not deleted deleted-blurb is hidden but the composer is not" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select "footer div.hidden p.text-center", "Samantha has been deleted and cannot assist any longer."
+    assert_select "div#composer"
+    assert_select "div#composer.hidden", false
+  end
+
+  test "when assistant is deleted deleted-blurb is shown and the composer is hidden" do
+    @assistant.destroy
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select "footer p.text-center", "Samantha has been deleted and cannot assist any longer."
+    assert_select "footer div.hidden p.text-center", false
+    assert_select "div#composer.hidden"
+  end
+
   test "even when assistant is deleted update succeeds for a new version in the URL" do
-    assert assistants(:samantha).destroy
+    @assistant.destroy
     message = messages(:message2_v1)
 
     patch message_url(message, version: 2), params: { message: { id: message.id } }
