@@ -36,8 +36,13 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update assistant" do
-    patch assistant_url(@assistant), params: {assistant: {description: @assistant.description, instructions: @assistant.instructions, language_model_id: @assistant.language_model_id, name: @assistant.name, tools: @assistant.tools, user_id: @assistant.user_id}}
+    patch assistant_url(@assistant), params: {assistant: {description: "new description", instructions: "new instructions", language_model_id: language_models(:claude_3_opus).id, name: 'new name', tools: @assistant.tools, user_id: @assistant.user_id}}
     assert_redirected_to assistant_url(@assistant)
+    @assistant.reload
+    assert_equal "new description", @assistant.description
+    assert_equal "new instructions", @assistant.instructions
+    assert_equal "claude-3-opus-20240229", @assistant.language_model.name
+    assert_equal "new name", @assistant.name
   end
 
   # TODO: Messages are connected to assistants. When an assistant is deleted,

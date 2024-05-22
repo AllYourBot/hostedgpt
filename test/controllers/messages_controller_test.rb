@@ -112,4 +112,33 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     patch message_url(message, version: 2), params: { message: { id: message.id } }
     assert_redirected_to conversation_messages_url(message.conversation, version: 2)
   end
+
+  test "even when assistant is deleted update succeeds for a new version in the URL" do
+    assert assistants(:samantha).destroy
+    message = messages(:message2_v1)
+
+    patch message_url(message, version: 2), params: { message: { id: message.id } }
+    assert_redirected_to conversation_messages_url(message.conversation, version: 2)
+
+    get conversation_messages_url(message.conversation, version: 2)
+    assert_match /Where were you born/, response.body
+  end
+
+  test "when there are many assistants only a few are shown in the nav bar" do
+    5.times do |x|
+      @user.assistants.create! name: "New assistant #{x+1}", language_model: LanguageModel.find_by(name: 'gpt-3.5-turbo')
+    end
+    get conversation_messages_url(@conversation, version: 1)
+    @user.assistants.each do |assistant|
+      assert_select %{div[data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
+    end
+    @user.assistants.each_with_index do |assistant, index|
+      if index>5
+        assert_select %{div.hidden[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
+      else
+        assert_select %{div[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
+        assert_select %{div.hiden[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}, false
+      end
+    end
+  end
 end

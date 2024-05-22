@@ -78,4 +78,27 @@ class AssistantTest < ActiveSupport::TestCase
   test "initials will split on - and return two characters" do
     assert_equal "G4", assistants(:keith_gpt4).initials
   end
+
+  test "language model validated" do
+    record = Assistant.new
+    refute record.valid?
+    assert record.errors[:language_model].present?
+  end
+
+  test "name validated" do
+    record = Assistant.new
+    refute record.valid?
+    assert record.errors[:name].present?
+  end
+
+  test "cannot destroy last assistant of a user" do
+    assert_raise do
+      users(:rob).assistants.first.destroy
+    end
+  end
+  test "can destroy assistant of a user if they have more than one" do
+    assert_nothing_raised do
+      users(:keith).assistants.first.destroy
+    end
+  end
 end

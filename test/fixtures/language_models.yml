@@ -16,7 +16,7 @@ gpt_4o:
     supports_images: true 
     description: gpt-4ot from fixtures
 
-gpt_3.5_turbo:
+gpt_3_5_turbo:
     position: 4
     name: gpt-3.5-turbo
     description: gpt-3.5-turbo from fixtures
