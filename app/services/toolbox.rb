@@ -1,11 +1,14 @@
 class Toolbox < SDK
   def self.descendants
-    [OpenMeteo]
+    [
+      Toolbox::HelloWorld,
+      Toolbox::OpenMeteo,
+    ]
   end
 
   def self.call(name, args)
     kname, method = name.split("_", 2)
-    klass = Toolbox.descendants.find { |k| k.to_s.downcase == kname }
+    klass = Toolbox.descendants.find { |k| k.to_s.downcase == "toolbox::#{kname}" }
     raise "'#{kname}' does not match a class which is a descendant of SDK" if klass.nil?
     raise "'#{method} does not exist on this class" if klass.method(method).nil?
 

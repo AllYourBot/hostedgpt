@@ -1,4 +1,4 @@
-class OpenMeteo < Toolbox
+class Toolbox::OpenMeteo < Toolbox
   # Followed this guide: https://open-meteo.com/en/docs
 
   describe :get_current_and_todays_weather, <<~S
