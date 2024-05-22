@@ -45,6 +45,10 @@ class Message < ApplicationRecord
     !finished?
   end
 
+  def tool_call?
+    tool? || content_tool_calls.present?
+  end
+
   private
 
   def create_conversation
