@@ -74,7 +74,7 @@ class Toolbox::OpenMeteo < Toolbox
     private
 
     def get_location(city_s, state_province_or_region_s, country_s = nil)
-        locations = get("https://geocoding-api.open-meteo.com/v1/search").params(
+      locations = get("https://geocoding-api.open-meteo.com/v1/search").params(
         name: city_s,
         count: 5,
         language: "en",
@@ -86,10 +86,10 @@ class Toolbox::OpenMeteo < Toolbox
     end
 
     def filter_by_country(country_s, locations:)
-        countries = locations.map(&:country)
-        country = countries[ pick_best_index(input: country_s, options: countries) ]
+      countries = locations.map(&:country)
+      country = countries[ pick_best_index(input: country_s, options: countries) ]
 
-        locations.select { |l| l.country == country }
+      locations.select { |l| l.country == country }
     end
 
     def pick_by_region(region_s, locations:)
