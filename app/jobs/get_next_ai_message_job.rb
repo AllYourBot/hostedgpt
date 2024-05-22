@@ -22,7 +22,7 @@ class GetNextAIMessageJob < ApplicationJob
     @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index-1)
 
     return false          if generation_was_cancelled? || message_is_populated?
-    raise WaitForPrevious if @prev_message && @prev_message.content_text.blank? && @prev_message.processed?
+    raise WaitForPrevious if @prev_message&.not_finished?
 
     last_sent_at = Time.current
     @message.update!(processed_at: Time.current, content_text: "")
@@ -30,7 +30,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     puts "\n### Wait for reply" unless Rails.env.test?
 
-    response = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
+    @message.content_tool_calls = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
       .get_next_chat_message do |content_chunk|
         @message.content_text += content_chunk
 
@@ -45,10 +45,7 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
 
-    if @message.content_text.blank? # this shouldn't happen b/c the += above will build up the response, but it's a final effort if things are blank
-      @message.content_text = response if response.is_a?(String)
-      raise Faraday::ParsingError if @message.content_text.blank?
-    end
+    raise Faraday::ParsingError if @message.not_finished?
 
     wrap_up_the_message
     return true
@@ -143,6 +140,33 @@ class GetNextAIMessageJob < ApplicationJob
     GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
+
+    if @message.content_tool_calls.present?
+      puts "\n### Calling tools" unless Rails.env.test?
+
+      msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
+      index = @message.index
+      msgs.each do |tool_message|
+        @conversation.messages.create!(
+          assistant: @assistant,
+          role: tool_message[:role],
+          content_text: tool_message[:content],
+          tool_call_id: tool_message[:tool_call_id],
+          version: @message.version,
+          index: index += 1
+        )
+      end
+
+      assistant_reply = @conversation.messages.create!(
+        assistant: @assistant,
+        role: :assistant,
+        content_text: nil,
+        version: @message.version,
+        index: index += 1
+      )
+
+      GetNextAIMessageJob.perform_later(@user.id, assistant_reply.id, @assistant.id)
+    end
 
     puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
   end

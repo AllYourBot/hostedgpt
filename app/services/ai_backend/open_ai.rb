@@ -12,8 +12,9 @@ class AIBackend::OpenAI < AIBackend
     end
   end
 
-  def self.get_tool_messages_by_calling(content_tool_calls)
-    tool_calls = content_tool_calls.deep_symbolize_keys.dig(:choices, 0, :tool_calls)
+  def self.get_tool_messages_by_calling(tool_calls_response)
+    tool_calls = deep_json_parse(tool_calls_response)
+
     # We could parallelize function calling using ruby threads
     tool_calls.map do |tool_call|
       id = tool_call.dig(:id)
@@ -78,7 +79,7 @@ class AIBackend::OpenAI < AIBackend
     end
 
     if @stream_response_tool_calls.present?
-      return { "choices" => [ { "tool_calls" => deep_json_parse(@stream_response_tool_calls) } ] }
+      return @stream_response_tool_calls
     elsif @stream_response_text.blank?
       raise ::Faraday::ParsingError
     end

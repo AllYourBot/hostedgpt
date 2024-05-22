@@ -2,11 +2,9 @@ class Toolbox::OpenMeteo < Toolbox
   # Followed this guide: https://open-meteo.com/en/docs
 
   describe :get_current_and_todays_weather, <<~S
-    Retrieves the current weather and todays forecast for a given location. The location must be specified with a valid city
-    and a valid state_province_or_region, but the country will be inferred if it is not provided. The city and
-    state_province_or_region should never be guessed. If you have not been explicitly instructed with the user's city, do not
-    guess. If you have been instructed with the city but not the state_province_or_region, do not guess. Instead, you should
-    explicitly ask so that you are certain of the city and state_province_or_region.
+    Retrieves the current weather and today's forecast for a given location. The location must be specified with a valid city
+    and a valid state_province_or_region. The city and state_province_or_region SHOULD NEVER BE INFERRED; meaning, you should
+    ask the user to clarify their city or clarify their state_province_or_region if you have not been instructed with those.
   S
 
   def self.get_current_and_todays_weather(city_s:, state_province_or_region_s:, country_s: nil)

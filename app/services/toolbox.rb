@@ -29,7 +29,7 @@ class Toolbox < SDK
     end
 
     def describe(method_name, description)
-      (@method_descriptions ||= {})[method_name] = description.remove("\n")
+      (@method_descriptions ||= {})[method_name] = description.gsub("\n", " ")
     end
 
     def description(method_name)
@@ -57,7 +57,7 @@ class Toolbox < SDK
       {
         type: "function",
         function: {
-          name: "#{self.to_s.downcase}_#{name}",
+          name: "#{self.to_s.downcase.remove('toolbox::')}_#{name}",
           description: description(name),
           parameters: {
             type: "object",

@@ -27,8 +27,8 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
   test "get_tool_messages_by_calling gracefully handles a failure within a function call" do
     tool_calls = messages(:weather_tool_call).content_tool_calls
-    tool_calls[:choices][0][:tool_calls][0][:function][:name] = "helloworld_bad"
-    tool_calls[:choices][0][:tool_calls][0][:function][:arguments].delete(:name)
+    tool_calls[0][:function][:name] = "helloworld_bad"
+    tool_calls[0][:function][:arguments].delete(:name)
 
     msg = AIBackend::OpenAI.get_tool_messages_by_calling(tool_calls).first
     assert_equal "tool", msg[:role]
@@ -38,8 +38,8 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
   test "get_tool_messages_by_calling gracefully handles calling an invalid function" do
     tool_calls = messages(:weather_tool_call).content_tool_calls
-    tool_calls[:choices][0][:tool_calls][0][:function][:name] = "helloworld_nonexistent"
-    tool_calls[:choices][0][:tool_calls][0][:function][:arguments].delete(:name)
+    tool_calls[0][:function][:name] = "helloworld_nonexistent"
+    tool_calls[0][:function][:arguments].delete(:name)
 
     msg = AIBackend::OpenAI.get_tool_messages_by_calling(tool_calls).first
     assert_equal "tool", msg[:role]
@@ -65,7 +65,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     TestClient::OpenAI.stub :function, function do
       TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_function_response do
         function_call = @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal function, function_call.dig("choices", 0, "tool_calls", 0, "function", "name")
+        assert_equal function, function_call.dig(0, "function", "name")
       end
     end
   end
@@ -114,7 +114,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     messages = @openai.send(:preceding_messages)
 
     m1 = {:role=>"user", :name=>"Keith", :content=>"What is the weather in Austin?"}
-    m2 = {:role=>"assistant", :name=>"Samantha", :tool_calls=>{:choices=>[{:tool_calls=>[{:id=>"abc123", :type=>"function", :index=>0, :function=>{:name=>"helloworld_hi", :arguments=>{:name=>"World"}}}]}]}}
+    m2 = {:role=>"assistant", :name=>"Samantha", :tool_calls=>[{:id=>"abc123", :type=>"function", :index=>0, :function=>{:name=>"helloworld_hi", :arguments=>{:name=>"World"}}}]}
     m3 = {:role=>"tool", :content=>"weather is", :tool_call_id=>"abc123"}
 
     assert_equal m1, messages.first

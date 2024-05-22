@@ -44,7 +44,7 @@ class MessageTest < ActiveSupport::TestCase
 
   test "finished? returns true if processed and missing either content_text or content_tool_calls" do
     assert messages(:weather_tool_call).finished?
-    messages(:weather_tool_call).content_tool_calls = {}
+    messages(:weather_tool_call).content_tool_calls = []
     refute messages(:weather_tool_call).finished?
 
     assert messages(:weather_explained).finished?
