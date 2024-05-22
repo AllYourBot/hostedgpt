@@ -25,7 +25,7 @@ export default class extends Controller {
     window.removeEventListener('main-column-changed', this.throttledAutogrow)
   }
 
-  throttledAutogrow = throttle((event) => { if (event.detail?.fromAutogrow) this.autogrow(event) }, 50)
+  throttledAutogrow = throttle((event) => { if (!event.detail?.fromAutogrow) this.autogrow(event) }, 50)
   autogrow() {
     const prevHeight = getComputedStyle(this.element).height
     this.element.style.height = 'auto'
