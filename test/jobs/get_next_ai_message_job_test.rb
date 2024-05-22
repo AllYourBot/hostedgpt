@@ -33,10 +33,14 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     false_on_first_run = 0
     job = GetNextAIMessageJob.new
     job.stub(:message_cancelled?, -> { false_on_first_run += 1; false_on_first_run != 1 }) do
+      TestClient::OpenAI.stub :text, "Hello" do
+        TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_text_response do
 
-      assert_changes "@message.content_text", from: nil, to: @test_client.chat do
-        assert_changes "@message.reload.cancelled_at", from: nil do
-          assert job.perform(@user.id, @message.id, @conversation.assistant.id)
+          assert_changes "@message.content_text", from: nil, to: "Hello" do
+            assert_changes "@message.reload.cancelled_at", from: nil do
+              assert job.perform(@user.id, @message.id, @conversation.assistant.id)
+            end
+          end
         end
       end
     end

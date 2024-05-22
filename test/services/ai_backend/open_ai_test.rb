@@ -50,8 +50,8 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
   test "get_next_chat_message works to stream text" do
     text = "Hello! How can I assist you today?"
 
-    TestClient::OpenAI.stub(:text, -> { text }) do
-      TestClient::OpenAI.stub(:api_response, -> { TestClient::OpenAI.api_text_response }) do
+    TestClient::OpenAI.stub :text, text do
+      TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_text_response do
         streamed_text = ""
         @openai.get_next_chat_message { |chunk| streamed_text += chunk }
         assert_equal text, streamed_text
@@ -62,8 +62,8 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
   test "get_next_chat_message works to get a function call" do
     function = "openmeteo_get_current_and_todays_weather"
 
-    TestClient::OpenAI.stub(:function, -> { function }) do
-      TestClient::OpenAI.stub(:api_response, -> { TestClient::OpenAI.api_function_response }) do
+    TestClient::OpenAI.stub :function, function do
+      TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_function_response do
         function_call = @openai.get_next_chat_message { |chunk| streamed_text += chunk }
         assert_equal function, function_call.dig("choices", 0, "tool_calls", 0, "function", "name")
       end

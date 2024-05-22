@@ -1,6 +1,6 @@
 require "test_helper"
 
-class OpenMeteoTest < ActiveSupport::TestCase
+class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
   setup do
     @locations = [
       { name: "Paris", country: "France", admin1: "Ile-de-France" },
@@ -12,19 +12,19 @@ class OpenMeteoTest < ActiveSupport::TestCase
   end
 
   test "filter_by_country filters locations by country with a fuzzy match" do
-    filtered_locations = OpenMeteo.send(:filter_by_country, "US", locations: @locations)
+    filtered_locations = Toolbox::OpenMeteo.send(:filter_by_country, "US", locations: @locations)
 
     @locations.delete_at(0)
     assert_equal @locations, filtered_locations
   end
 
   test "pick_by_region selects best with a fuzzy match" do
-    location = OpenMeteo.send(:pick_by_region, "TX", locations: @locations)
+    location = Toolbox::OpenMeteo.send(:pick_by_region, "TX", locations: @locations)
     assert_equal @locations[1], location
   end
 
   test "get_current_and_todays_weather hits the API and doesn't fail" do
-    result = OpenMeteo.get_current_and_todays_weather(city_s: 'Austin', state_province_or_region_s: 'Texas')
+    result = Toolbox::OpenMeteo.get_current_and_todays_weather(city_s: 'Austin', state_province_or_region_s: 'Texas')
     assert result.values.all? { |value| value.present? }
   end
 end

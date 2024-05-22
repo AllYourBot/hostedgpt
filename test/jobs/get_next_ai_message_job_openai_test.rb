@@ -11,11 +11,14 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
 
   test "populates the latest message from the assistant" do
     assert_no_difference "@conversation.messages.reload.length" do
-      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
+      TestClient::OpenAI.stub :text, "Hello" do
+        TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_text_response do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
+        end
+      end
     end
 
-    message_text = @test_client.chat
-    assert_equal message_text, @conversation.latest_message_for_version(:latest).content_text
+    assert_equal "Hello", @conversation.latest_message_for_version(:latest).content_text
   end
 
   test "returns early if the message id was invalid" do
@@ -44,10 +47,12 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for OpenAI"
   end
 
-  test "when API response key is, a nice error message is displayed" do
+  test "when API response key is missing, a nice error message is displayed" do
     TestClient::OpenAI.stub :text, "" do
-      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
-      assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
+      TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_text_response do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
+        assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
+      end
     end
   end
 end
