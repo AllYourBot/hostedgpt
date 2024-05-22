@@ -34,7 +34,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     job = GetNextAIMessageJob.new
     job.stub(:message_cancelled?, -> { false_on_first_run += 1; false_on_first_run != 1 }) do
 
-      assert_changes "@message.content_text", from: nil, to: @test_client.chat do
+      assert_changes "@message.content_text", from: nil, to: @test_client.chat(parameters: {model: "gpt-4", messages: [{role: "system", content: "You are a helpful assistant"}]}) do
         assert_changes "@message.reload.cancelled_at", from: nil do
           assert job.perform(@user.id, @message.id, @conversation.assistant.id)
         end

@@ -14,7 +14,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
       assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
     end
 
-    message_text = @test_client.chat
+    message_text = @test_client.chat(parameters: {model: "gpt-4", messages: [{role: "system", content: "You are a helpful assistant"}]})
     assert_equal message_text, @conversation.latest_message_for_version(:latest).content_text
   end
 

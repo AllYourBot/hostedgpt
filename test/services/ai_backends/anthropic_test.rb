@@ -17,7 +17,7 @@ module AIBackends
     end
 
     test "get_next_chat_message works" do
-      assert_equal @test_client.messages, @anthropic.get_next_chat_message
+      assert_equal @test_client.messages(model: "gpt-4", system: "You are a helpful assistant"), @anthropic.get_next_chat_message
     end
 
     test "preceding_messages constructs a proper response and pivots on images" do

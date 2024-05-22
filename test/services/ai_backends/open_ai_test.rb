@@ -13,12 +13,22 @@ module AIBackends
       @test_client = TestClients::OpenAI.new(access_token: 'abc')
     end
 
+    test "uses model from assistant" do
+      openai = OpenAI.new(
+        users(:keith),
+        assistants(:keith_claude3),
+        @conversation,
+        @conversation.latest_message_for_version(:latest)
+      )
+      assert_equal "Hello this is model claude-3-opus-20240229 with instruction nil! How can I assist you today?", openai.get_next_chat_message
+    end
+
     test "initializing client works" do
       assert @openai.client.present?
     end
 
     test "get_next_chat_message works" do
-      assert_equal @test_client.chat, @openai.get_next_chat_message
+      assert_equal "Hello this is model gpt-4 with instruction \"You are a helpful assistant\"! How can I assist you today?", @openai.get_next_chat_message
     end
 
     test "preceding_messages constructs a proper response and pivots on images" do

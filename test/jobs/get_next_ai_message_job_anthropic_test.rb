@@ -14,7 +14,7 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
       assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
     end
 
-    message_text = @test_client.messages
+    message_text = @test_client.messages(model: "claude-3-opus-20240229")
     assert_equal message_text, @conversation.latest_message_for_version(:latest).content_text
   end
 
