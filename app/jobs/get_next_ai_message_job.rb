@@ -137,38 +137,41 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def wrap_up_the_message
+    call_tools_before_wrapping_up if @message.content_tool_calls.present?
+
     GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
-    if @message.content_tool_calls.present?
-      puts "\n### Calling tools" unless Rails.env.test?
+    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
+  end
 
-      msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
-      index = @message.index
-      msgs.each do |tool_message|
-        @conversation.messages.create!(
-          assistant: @assistant,
-          role: tool_message[:role],
-          content_text: tool_message[:content],
-          tool_call_id: tool_message[:tool_call_id],
-          version: @message.version,
-          index: index += 1
-        )
-      end
+  def call_tools_before_wrapping_up
+    puts "\n### Calling tools" unless Rails.env.test?
 
-      assistant_reply = @conversation.messages.create!(
+    msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
+    index = @message.index
+    msgs.each do |tool_message|
+      @conversation.messages.create!(
         assistant: @assistant,
-        role: :assistant,
-        content_text: nil,
+        role: tool_message[:role],
+        content_text: tool_message[:content],
+        tool_call_id: tool_message[:tool_call_id],
         version: @message.version,
-        index: index += 1
+        index: index += 1,
+        processed_at: Time.current,
       )
-
-      GetNextAIMessageJob.perform_later(@user.id, assistant_reply.id, @assistant.id)
     end
 
-    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
+    assistant_reply = @conversation.messages.create!(
+      assistant: @assistant,
+      role: :assistant,
+      content_text: nil,
+      version: @message.version,
+      index: index += 1
+    )
+
+    GetNextAIMessageJob.perform_later(@user.id, assistant_reply.id, @assistant.id)
   end
 
   def generation_was_cancelled?

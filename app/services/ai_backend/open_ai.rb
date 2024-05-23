@@ -29,7 +29,7 @@ class AIBackend::OpenAI < AIBackend
         puts "## Handled error calling tools: #{e.message}" unless Rails.env.test?
         puts e.backtrace.join("\n") unless Rails.env.test?
 
-        <<~STR.remove("\n")
+        <<~STR.gsub("\n", " ")
           An unexpected error occurred. You were requesting this information to help you answer a users question. Because this information
           is not available at this time, DO NOT MAKE ANY GUESSES as you attempt to answer the users questions. Instead, you can let the
           user know you attempted to retrieve some information in order to answer their question but you had some difficulties accessing

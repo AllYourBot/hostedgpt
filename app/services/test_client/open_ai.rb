@@ -36,6 +36,10 @@ class TestClient::OpenAI
     raise "When using the OpenAI test client for api_function_response you need to stub the .function method"
   end
 
+  def self.arguments
+    {:city=>"Austin", :state=>"TX", :country=>"US"}
+  end
+
   def self.api_function_response
     {
       "choices" => [
@@ -48,7 +52,7 @@ class TestClient::OpenAI
                 "type"=>"function",
                 "function"=>{
                   "name"=> function,
-                  "arguments"=>{:city=>"Austin", :state=>"TX", :country=>"US"}
+                  "arguments"=>arguments
                 }
               }
             ]
