@@ -13,6 +13,13 @@ class FeatureTest < ActiveSupport::TestCase
     end
   end
 
+  test "disabled? returns the opposite" do
+    stub_features(my_feature: false) do
+      refute Feature.enabled?(:my_feature)
+      assert Feature.disabled?(:my_feature)
+    end
+  end
+
   test "should default to false when feature not found" do
     refute Feature.enabled?(:fake)
     refute Feature.fake?

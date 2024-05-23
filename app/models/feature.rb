@@ -32,6 +32,10 @@ class Feature
       )
     end
 
+    def disabled?(feature)
+      !enabled?(feature)
+    end
+
     def method_missing(method_name, *arguments, &block)
       if method_name.to_s.end_with?('?')
         enabled?(method_name.to_s.chomp('?'))
