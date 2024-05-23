@@ -1,14 +1,13 @@
 <% content_for :title, "HostedGPT" %>
 <!DOCTYPE html>
-<html 
-    class=<%= Current.user.preferences[:dark_mode] %>
-  >
- 
+<html>
+
   <%= render "head" %>
 
   <body
     class="
       nav-closed
+      <%= Current.user.preferences[:dark_mode] %>
     "
     data-controller="transition"
     data-transition-toggle-class="nav-closed"
@@ -16,7 +15,7 @@
   >
     <nav
       class="
-        w-[260px]
+        min-w-[260px]
         bg-gray-50 dark:bg-gray-900
         h-screen
         flex nav-closed:hidden <%= !Current.user.preferences[:nav_closed] && "md:!flex" %>
@@ -24,6 +23,7 @@
         absolute md:relative nav-closed:relative
         overflow-x-clip
         flex-col
+        text-gray-950 dark:text-gray-100
       "
     >
       <div id="nav-container" class="flex-1 flex flex-col h-full">
@@ -43,7 +43,19 @@
               </div>
 
               <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
-                <li><%= link_to edit_settings_person_path do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
+                <li>
+                  <%= link_to edit_settings_person_path,
+                    data: {
+                      controller: "keyboard",
+                      action: %|
+                        keydown.ctrl+s@document->keyboard#click
+                        keydown.meta+s@document->keyboard#click
+                      |
+                    } do %>
+                    <%= icon "cog-6-tooth", variant: :outline, size: 18 %>
+                    Settings
+                  <% end %>
+                </li>
                 <li><%= link_to logout_path, data: { turbo: false } do %><%= icon "arrow-right-start-on-rectangle", variant: :outline, size: 18 %>Logout<% end %></li>
               </menu>
             </div>
@@ -58,7 +70,7 @@
       data-action="click->transition#toggleClass"
     ></div>
 
-    <main class="flex flex-1 h-full w-full bg-white dark:bg-gray-800">
+    <main class="flex flex-1 h-full w-full bg-white dark:bg-gray-800 text-gray-950 dark:text-gray-100">
       <%= content_for?(:main) ? yield(:main) : yield %>
     </main>
 

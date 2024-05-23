@@ -187,15 +187,37 @@
         <% if @streaming_message %>
           <%= form_with(
             model: @streaming_message,
-            class: "absolute top-2 right-8 z-20",
+            class: %|
+              z-20
+              absolute
+              right-8 bottom-4
+              h-[40px] w-[100px]
+              flex items-center justify-end
+              bg-white dark:bg-gray-800
+            |,
             data: {
               composer_target: "cancel",
-              turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+              turbo_frame: "_top" # this causes the page to morph, without this it does a frame substitution
           }) do |form| %>
+            <div class="text-gray-300 dark:text-gray-500 mr-2 hidden md:block">
+              ⌘ ESC
+            </div>
             <%= form.hidden_field :cancelled_at, value: Time.current %>
             <%= form.button type: "submit",
               id: "cancel",
-              class: "relative bg-white dark:bg-gray-800" do %>
+              data: {
+                controller: "keyboard",
+                action: %|
+                  keydown.meta+esc@document->keyboard#click
+                  keydown.ctrl+esc@document->keyboard#click
+                |,
+              },
+              class: %|
+                relative
+                flex items-center justify-center
+                w-[40px] h-[40px]
+                bg-white dark:bg-gray-800
+            | do %>
               <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
               <%= icon "stop-circle", variant: :outline, size: 39, title: 'Stop', tooltip: :top %>
             <% end %>
@@ -206,7 +228,8 @@
           model: [@assistant, @new_message],
           data: {
             composer_target: "form",
-            turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+            turbo_frame: "_top", # this causes the page to morph, without this it does a frame substitution
+            turbo_action: "replace",
         }) do |form| %>
           <%= form.hidden_field :conversation_id %>
           <%= form.hidden_field :index, value: @messages&.length %>
@@ -217,7 +240,7 @@
 
           <%= form.text_area :content_text,
             id: "composer-input",
-            placeholder: "Enter to submit",
+            placeholder: "ENTER  to submit",
             data: {
               composer_target: "input",
               image_upload_target: "content",
@@ -233,6 +256,7 @@
                 keydown.shift+esc@document->composer#focusKeydown
                 keydown.slash@document->composer#focusKeydown
                 focus->composer#focus
+                blur->composer#blur
 
                 keydown.esc->composer#unfocusKeydown
 
@@ -262,12 +286,6 @@
             |
           %>
 
-          <% if Feature.enabled?(:voice) %>
-            <div class="absolute right-20 bottom-6 text-gray-500 hidden md:block" data-composer-target="microphoneShortcut">
-              Ctrl + M
-            </div>
-          <% end %>
-
           <!-- options for the composer right button -->
 
           <% if Feature.enabled?(:voice) %>
@@ -283,7 +301,7 @@
                 absolute right-8 bottom-4
                 w-[40px] h-[40px]
                 flex items-center justify-center
-                text-red-600 dark:text-gray-600
+                text-red-600 dark:text-red-400
                 bg-white dark:bg-gray-800
               | do
             %>
@@ -314,53 +332,70 @@
           <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
 
           <% if Feature.enabled?(:voice) %>
-            <%= form.button type: "button",
-              data: {
-                composer_target: "microphoneEnable",
-                action: "composer#enableMicrophone"
-              },
-              id: "microphone-enable",
-              class: %w|
+            <div
+              id="microphone-enable"
+              data-composer-target="microphoneEnable"
+              class="
                 z-10
-                absolute right-8 bottom-4
-                w-[40px] h-[40px]
-                flex items-center justify-center
-                text-gray-100 dark:text-gray-600
-                enabled:text-black
-                enabled:dark:text-white
-              | do
-            %>
-              <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
-            <% end %>
-          <% else %>
-            <%= form.button type: "button",
-              disabled: true,
-              class: %w|
-                z-10
-                absolute right-8 bottom-4
-                w-[40px] h-[40px]
-                flex items-center justify-center
-                text-gray-100 dark:text-gray-600
-                enabled:text-black
-                enabled:dark:text-white
-              | do
-            %>
-              <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
-            <% end %>
+                absolute
+                right-8 bottom-4
+                h-[40px] w-[100px]
+                flex items-center justify-end
+                bg-white dark:bg-gray-800
+            ">
+              <div class="text-gray-300 dark:text-gray-500 mr-1 hidden md:block">
+                ⌘ M
+              </div>
+
+              <%= form.button type: "button",
+                data: {
+                  action: "composer#enableMicrophone"
+                },
+                class: %w|
+                  flex items-center justify-center
+                  w-[40px] h-[40px]
+                  text-gray-100 dark:text-gray-600
+                  enabled:text-black
+                  enabled:dark:text-white
+                | do
+              %>
+                <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
+              <% end %>
+            </div>
+          <% end %>
+
+          <%= form.button type: "button",
+            disabled: true,
+            data: {
+              composer_target: "disabledSubmit",
+            },
+            class: %|
+              z-10
+              absolute right-8 bottom-4
+              w-[40px] h-[40px]
+              flex items-center justify-center
+              text-gray-100 dark:text-gray-600
+              enabled:text-black
+              enabled:dark:text-white
+              #{Feature.enabled?(:voice) && '!hidden'}
+            | do
+          %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
           <% end %>
 
           <div
             id="composer-overlay"
             data-composer-target="overlay"
             data-action="click->composer#disableMicrophone"
-            class="absolute inset-0 bg-white dark:bg-red-800 !bg-opacity-65 hidden">
+            class="absolute inset-0 bg-white dark:bg-gray-800 !bg-opacity-65 hidden">
           </div>
 
         <% end %>
       </div>
 
       <div class="w-full mb-2 text-xs text-center text-gray-400 dark:text-gray-300">
-        HostedGPT can make mistakes. Double check information.
+        <span id="connection-status" class="" data-turbo-permanent>HostedGPT can make mistakes. Double check information.</span>
+        <span>&nbsp;</span> <!-- the data-turbo-permanent causes height of page to be calculated incorrectly, adding this span fixes it -->
       </div>
   </footer>
 </turbo-frame>
@@ -371,7 +406,7 @@
   data-controller="modal"
   data-action="keydown@document->modal#keydownQuestionOpen"
 >
-  <main class="modal-box max-w-5xl">
+  <main class="modal-box max-w-5xl dark:bg-black">
     <header class="font-bold text-lg mb-5">
       Keyboard shortcuts
     </header>
@@ -414,6 +449,15 @@
 
       </section>
       <section class="flex-1 pl-0 md:pl-5">
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            <span>Stop streaming response</span>
+          </figcaption>
+          <kbd class="w-50 text-right flex flex-row gap-1">
+            <div class="key">Ctrl or ⌘</div>
+            <div class="key">ESC</div>
+          </kbd>
+        </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
             <span>Copy last response <span class="whitespace-nowrap">(or code)</span></span>

@@ -159,6 +159,7 @@
 .alert-error {
   --er: 0% 0 0;
   --erc: 100% 0 0;
+  border: 1px solid white;
 }
 
 /* Form overrides */
@@ -193,38 +194,77 @@ dialog button:focus-visible {
   --tw-prose-pre-code: #ffffff !important;
 }
 
-/* dark_mode overrides */
+/* dark_mode overrides where daisy would otherwise override based upon prefers-color-scheme: dark*/
+
 @media (prefers-color-scheme: dark) {
-  :root.light {
-    color-scheme: light;
-  }
-  :root .prose {
-    --tw-prose-body: rgb(236, 236, 236);
+  :root body:not(.dark) .prose {
+    --tw-prose-body: initial;
+    --tw-prose-headings: initial;
+    --tw-prose-lead: initial;
+    --tw-prose-links: initial;
+    --tw-prose-bold: initial;
+    --tw-prose-counters: initial;
+    --tw-prose-bullets: initial;
+    --tw-prose-hr: initial;
+    --tw-prose-quotes: initial;
+    --tw-prose-quote-borders: initial;
+    --tw-prose-captions: initial;
+    --tw-prose-code: initial;
+    /* --tw-prose-pre-code: initial; */
+    /* --tw-prose-pre-bg: initial; */
+    --tw-prose-th-borders: initial;
+    --tw-prose-td-borders: initial;
+    --tw-prose-invert-body: initial;
+    --tw-prose-invert-headings: initial;
+    --tw-prose-invert-lead: initial;
+    --tw-prose-invert-links: initial;
+    --tw-prose-invert-bold: initial;
+    --tw-prose-invert-counters: initial;
+    --tw-prose-invert-bullets: initial;
+    --tw-prose-invert-hr: initial;
+    --tw-prose-invert-quotes: initial;
+    --tw-prose-invert-quote-borders: initial;
+    --tw-prose-invert-captions: initial;
+    --tw-prose-invert-code: initial;
+    --tw-prose-invert-pre-code: initial;
+    --tw-prose-invert-pre-bg: initial;
+    --tw-prose-invert-th-borders: initial;
+    --tw-prose-invert-td-borders: initial;
   }
 }
-:root.dark {
-  :root .prose {
-    --tw-prose-body: rgb(236, 236, 236);
-  }
-}
-:root.dark {
-  :root .prose {
-    --tw-prose-body: rgb(236, 236, 236);
-  }
-}
-
-:root.dark {
-  :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
-  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
-    background-color: rgb(59 59 61);
-  }
-}
-
-:root.dark {
-  :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
-  :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
-    background-color: rgb(59 59 61);
-  }
+:root body.dark .prose {
+  --tw-prose-body: initial;
+  --tw-prose-headings: initial;
+  --tw-prose-lead: initial;
+  --tw-prose-links: initial;
+  --tw-prose-bold: initial;
+  --tw-prose-counters: initial;
+  --tw-prose-bullets: initial;
+  --tw-prose-hr: initial;
+  --tw-prose-quotes: initial;
+  --tw-prose-quote-borders: initial;
+  --tw-prose-captions: initial;
+  --tw-prose-code: initial;
+  /* --tw-prose-pre-code: initial; */
+  /* --tw-prose-pre-bg: initial; */
+  --tw-prose-th-borders: initial;
+  --tw-prose-td-borders: initial;
+  --tw-prose-invert-body: initial;
+  --tw-prose-invert-headings: initial;
+  --tw-prose-invert-lead: initial;
+  --tw-prose-invert-links: initial;
+  --tw-prose-invert-bold: initial;
+  --tw-prose-invert-counters: initial;
+  --tw-prose-invert-bullets: initial;
+  --tw-prose-invert-hr: initial;
+  --tw-prose-invert-quotes: initial;
+  --tw-prose-invert-quote-borders: initial;
+  --tw-prose-invert-captions: initial;
+  --tw-prose-invert-code: initial;
+  --tw-prose-invert-pre-code: initial;
+  --tw-prose-invert-pre-bg: initial;
+  --tw-prose-invert-th-borders: initial;
+  --tw-prose-invert-td-borders: initial;
 }
 
 /* hide tooltip on touch devices */

@@ -1,4 +1,4 @@
-import Service from "blocks/service"
+import Service from "../service.js"
 
 export default class extends Service {
   logLevel_info
@@ -48,6 +48,7 @@ export default class extends Service {
   }
 
   static splitIntoThoughts(text) {
+    if (!text) return []
     text = text.replace(". . .", "...")
     const thoughts = text.split(/(?<=[^ ][\.,:!\?;…] |[\n，。．！？；：])/)
     return thoughts.reject(t => t.strip().empty())

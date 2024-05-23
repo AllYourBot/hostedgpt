@@ -32,12 +32,12 @@ class MarkdownRenderer
       disable_indented_code_blocks: true
     )
 
-    markdown = ensure_newline_before_code_block_start(markdown)
+    markdown = ensure_blank_line_before_code_block_start(markdown)
 
     formatter.render(markdown)
   end
 
-  def self.ensure_newline_before_code_block_start(markdown)
-    markdown.gsub(/(?<!\n\n)```.*?```/m, "\n\\0")
+  def self.ensure_blank_line_before_code_block_start(markdown)
+    markdown.gsub(/(\n*)( *)(```.*?```)/m, "\n\n\\2\\3")
   end
 end
