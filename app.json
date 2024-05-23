@@ -1,7 +1,6 @@
 {
   "name": "hostedgpt",
   "description": "An open version of ChatGPT you can host anywhere or run locally.",
-  "repository": "https://github.com/mgomes/hostedgpt",
   "logo": "https://raw.githubusercontent.com/allyourbot/hostedgpt/main/app/assets/images/logo.svg",
   "buildpacks": [
     {
