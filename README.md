@@ -88,11 +88,12 @@ Heroku is a one-click option that will cost $10/monnth for the compute (dyno) an
 
 Eligible students can apply for Heroku platform credits through [Heroku for GitHub Students program](https://blog.heroku.com/github-student-developer-program).
 
+1. Click Fork > Create New Fork at the top of this repository
 1. Sign up for a free Heroku account at [heroku.com](https://signup.heroku.com/)
-2. If you wish to Eco dynos, you will need to subscribe to the $5 Eco dyno plan at [the billing page](https://dashboard.heroku.com/account/billing).
-3. Press the button below to deploy the app to Heroku!
+1. If you wish to Eco dynos, you will need to subscribe to the $5 Eco dyno plan at [the billing page](https://dashboard.heroku.com/account/billing).
+1. Press the button below to deploy the app to Heroku!
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/allyourbot/hostedgpt)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 # Contribute as a developer
 
