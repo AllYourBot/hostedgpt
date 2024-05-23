@@ -1,3 +1,0 @@
-shared:
-  registration: <%= ENV.fetch("REGISTRATON_FEATURE", true) %>
-  voice: <%= ENV.fetch("VOICE_FEATURE", false) %>

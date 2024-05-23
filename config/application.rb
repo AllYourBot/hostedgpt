@@ -27,6 +27,6 @@ module HostedGPT
     # config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("lib")
 
-    config.features = config_for(:features)
+    config.options = config_for(:options)
   end
 end
