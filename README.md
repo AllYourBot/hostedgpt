@@ -10,17 +10,15 @@ This project is led by an experienced rails developer, but I'm actively looking 
 
 ### Top features of HostedGPT
 
-* **Your private conversations are not being used for training!**
-ChatGPT uses your private conversations history to train its models. [OpenAI disclosed this in this article](https://help.openai.com/en/articles/7730893-data-controls-faq), and if you disable it then you lose all your conversation history!
-* **Use GPT-4 and Claude 3 without two $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. HostedGPT costs nothing so you just pay for your GPT-4 and Claude 3 API usage.
-* **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
-* **You will never hit the '*You've reached the current usage cap*' errors**.
-
+- **Your private conversations are not being used for training!**
+  ChatGPT uses your private conversations history to train its models. [OpenAI disclosed this in this article](https://help.openai.com/en/articles/7730893-data-controls-faq), and if you disable it then you lose all your conversation history!
+- **Use GPT-4 and Claude 3 without two $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. HostedGPT costs nothing so you just pay for your GPT-4 and Claude 3 API usage.
+- **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
+- **You will never hit the '_You've reached the current usage cap_' errors**.
 
 ### Watch a short demo
 
 [![](https://p425.p0.n0.cdn.zight.com/items/qGubwRKr/c4a119a9-254d-454a-b602-610b428ee769.jpg)](https://www.youtube.com/watch?v=hXpNEz-slkU)
-
 
 # Table of Contents
 
@@ -30,7 +28,6 @@ ChatGPT uses your private conversations history to train its models. [OpenAI dis
 - [Contribute as a developer / Running locally](#contribute-as-a-developer)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
-
 
 # Deploy the app on Render
 
@@ -66,21 +63,20 @@ If you encountered an error while waiting for the services to be deployed on Ren
 6. Second, in Render navigate to the Dashboard, Bluebrint, and Env Groups and delete any details associated with **hostedgpt**
 7. Now you can go back to your repo and click **Deploy to Render**
 
-
 # Deploy the app on Fly
 
 Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free servie so Fly is actually less expensive over the long term.
 
 1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
 1. Install the Fly command-line tool [view instructions](https://fly.io/docs/hands-on/install-flyctl/)
-3. In the root directory of the repoistory you pulled down, run `fly launch --build-only` and say `Yes` to copy the existing fly.toml, but note that it will generate the wrong settings.
-4. **The settings it shows are INCORRECT** so tell it you want to make changes
-5. When it opens your browser, change the Database to `Fly Postgres` with a name such as `hostedgpt-db` and you can set the configuration to `Development`.
-7. Click `Confirm Settings` at the bottom of the page and close the browser.
-8. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
-9. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly.
-10. Run `fly deploy`
-11. It will automatically deploy 2 servers instead of just 1 so after it finishes deploy run `fly scale count app=1` to scale down to 1 machine.
+1. In the root directory of the repoistory you pulled down, run `fly launch --build-only` and say `Yes` to copy the existing fly.toml, but note that it will generate the wrong settings.
+1. **The settings it shows are INCORRECT** so tell it you want to make changes
+1. When it opens your browser, change the Database to `Fly Postgres` with a name such as `hostedgpt-db` and you can set the configuration to `Development`.
+1. Click `Confirm Settings` at the bottom of the page and close the browser.
+1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
+1. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly.
+1. Run `fly deploy`
+1. It will automatically deploy 2 servers instead of just 1 so after it finishes deploy run `fly scale count app=1` to scale down to 1 machine.
 
 # Deploy the app on Heroku
 
@@ -93,7 +89,7 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
 1. If you wish to Eco dynos, you will need to subscribe to the $5 Eco dyno plan at [the billing page](https://dashboard.heroku.com/account/billing).
 1. Press the button below to deploy the app to Heroku!
 
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy)
 
 # Contribute as a developer
 
@@ -137,7 +133,6 @@ If you're set up with Docker you run `docker compose run base rails test`. Note 
 
 If you set up the app outside of Docker, then run the usual `bin/rails test` and `bin/rails test:system`.
 
-
 # Understanding the Docker configuration
 
 The `Dockerfile` is set up to support three distinct situations: development, deploying to Render, and deploying to Fly. Each of these are completely separate targets which don't share any steps, they are simply in the same Dockerfile.
@@ -148,30 +143,29 @@ The `render.yml` specifies details of the Render production environment. Note th
 
 The `fly.toml` specifies details of the Fly production environment. It references the `fly-production` build target. The Fly section of the Dockerfile was generated using the dockerfile-rails generator. This is Fly's recommendation and it produces a reasonable production-ready Dockerfile. Edits to this _top section_ of the file have been kept very minimal, on purpose, because it's intended to be updated using the generator. When it was originally generated it saved all the configuration parameters into `config/dockerfile.yml`. When you run `bin/rails generate dockerfile` it will read all these configurations and attempt to re-generate the Dockerfile. You can try this, it will warn you that it's going to overwrite, and press `d` to see the diff of what changes it will make. There should be no functional changes above the line `#### END of FLY ####`. Imagine you wanted to use this generator to change the app to use MySQL ([view all generator options](https://github.com/fly-apps/dockerfile-rails)). You could run `bin/rails generate dockerfile --mysql` and it would update your Gemfile, automatically run bundle install to install any gem changes, and then it will attempt to update Dockerfile where you can again press `d`. Inspect the diff of any changes above the line `#### END of FLY ####` and manually apply those changes. Similarly, view the diff for dockerignore and docker-entrypoint, although none of those changes should be necessary. When you get to `fly.toml` you will want to view that diff closely and manually apply those changes. At the end it will update config/dockerfile.yml to record the new configuration of the Dockerfile. In this way, you can continue to use the generator to keep the Dockerfile updated (as recommended by Fly) while not breaking the dev or Render setup.
 
-
 # Changelog
 
 (Top features being developed for v0.7: voice support, Gemini Pro, pin conversations)
 
 v0.6 - Released on 4/26/2024
 
-* Abort a long AI reply by clicking stop or simply "interrupting" it with a new question
-* Edit your messages and view previous versions with the left & right arrows
-* Support PWA (progressive web app) install for mobile phones (open in Safari, tap share then "Add to Home")
-* Show a helpful error messages when the API responds with an error
-* Re-generate an AI responses and even switch to a different assistant
-* Copy-to-clipboard button (and keyboard shortcut) for messages and markdown sections
-* Markdown is properly rendered in AI responses (and your own chats)
-* Include images in your messages (click icon, drag & drop, or copy & paste into message)
+- Abort a long AI reply by clicking stop or simply "interrupting" it with a new question
+- Edit your messages and view previous versions with the left & right arrows
+- Support PWA (progressive web app) install for mobile phones (open in Safari, tap share then "Add to Home")
+- Show a helpful error messages when the API responds with an error
+- Re-generate an AI responses and even switch to a different assistant
+- Copy-to-clipboard button (and keyboard shortcut) for messages and markdown sections
+- Markdown is properly rendered in AI responses (and your own chats)
+- Include images in your messages (click icon, drag & drop, or copy & paste into message)
 
 v0.5 - Released on 2/14/2024
 
-* Anthropic's Claude 3 models can be used alongside GPT-4 and GPT-3
-* Dark mode theme is now supported (it switches automatically with your OS)
-* Full keyboard shortcuts have been added (press ? to see them)
-* AI assistants can be given custom instructions (under Profile > Settings)
-* Delete conversations
-* Ability to edit conversation title
-* Conversations are automatically titled
-* Sidebar can be closed
-* AI responses stream in
+- Anthropic's Claude 3 models can be used alongside GPT-4 and GPT-3
+- Dark mode theme is now supported (it switches automatically with your OS)
+- Full keyboard shortcuts have been added (press ? to see them)
+- AI assistants can be given custom instructions (under Profile > Settings)
+- Delete conversations
+- Ability to edit conversation title
+- Conversations are automatically titled
+- Sidebar can be closed
+- AI responses stream in
