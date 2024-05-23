@@ -93,7 +93,7 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
 1. If you wish to Eco dynos, you will need to subscribe to the $5 Eco dyno plan at [the billing page](https://dashboard.heroku.com/account/billing).
 1. Press the button below to deploy the app to Heroku!
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 # Contribute as a developer
 
