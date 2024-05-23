@@ -69,3 +69,9 @@ versioned2:
   assistant: samantha
   title: Versioned v2 conversation
   last_assistant_message: msg2_v5
+
+weather:
+  user: keith
+  assistant: samantha
+  title: Weather
+  last_assistant_message: weather_explained
