@@ -81,5 +81,6 @@ class FeatureTest < ActiveSupport::TestCase
     Feature.stub :raw_features, hash do
       yield
     end
+    Feature.features_hash = nil
   end
 end
