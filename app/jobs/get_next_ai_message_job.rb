@@ -30,7 +30,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     puts "\n### Wait for reply" unless Rails.env.test?
 
-    @message.content_tool_calls = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
+    response = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
       .get_next_chat_message do |content_chunk|
         @message.content_text += content_chunk
 
@@ -45,6 +45,12 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
 
+    @message.content_tool_calls = response # This Typically, get_next_chat_message will simply return nil because it executes
+                                           # the content_chunk block to return it's response incrementally. However, tool_call
+                                           # responses don't make sense to stream because they can't be executed incrementally
+                                           # so we just return the full tool response message at once. The only time we return
+                                           # like this is for tool_calls so we know we can simply assign it here.
+
     raise Faraday::ParsingError if @message.not_finished?
 
     wrap_up_the_message
@@ -54,11 +60,11 @@ class GetNextAIMessageJob < ApplicationJob
     puts "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     wrap_up_the_message
     return true
-  rescue ::OpenAI::ConfigurationError => e
+  rescue OpenAI::ConfigurationError => e
     set_openai_error
     wrap_up_the_message
     return true
-  rescue ::Anthropic::ConfigurationError => e
+  rescue Anthropic::ConfigurationError => e
     set_anthropic_error
     wrap_up_the_message
     return true
@@ -150,8 +156,9 @@ class GetNextAIMessageJob < ApplicationJob
     puts "\n### Calling tools" unless Rails.env.test?
 
     msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
+
     index = @message.index
-    msgs.each do |tool_message|
+    msgs.each do |tool_message| # one message for each tool executed
       @conversation.messages.create!(
         assistant: @assistant,
         role: tool_message[:role],
@@ -171,7 +178,11 @@ class GetNextAIMessageJob < ApplicationJob
       index: index += 1
     )
 
-    GetNextAIMessageJob.perform_later(@user.id, assistant_reply.id, @assistant.id)
+    GetNextAIMessageJob.perform_later(
+      @user.id,
+      assistant_reply.id,
+      @assistant.id
+    ) # now AI decides what to say based on the tool responses. It may also execute more tools
   end
 
   def generation_was_cancelled?
