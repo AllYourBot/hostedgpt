@@ -28,11 +28,11 @@ export default class extends Controller {
   boundRemoveParentClickable = (event) => { this.removeParentClickable(event) }
   removeParentClickable(event) {
     this.parent = event.currentTarget.parentNode.closest('.cursor-pointer')
-    this.parent.classList.remove('cursor-pointer')
+    this.parent?.classList?.remove('cursor-pointer')
   }
 
   boundAddParentClickable = () => { this.addParentClickable() }
   addParentClickable() {
-    this.parent.classList.add('cursor-pointer')
+    this.parent?.classList?.add('cursor-pointer')
   }
 }
