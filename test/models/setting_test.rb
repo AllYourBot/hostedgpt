@@ -1,6 +1,6 @@
 require "test_helper"
 
-class FeatureTest < ActiveSupport::TestCase
+class SettingTest < ActiveSupport::TestCase
   test "should return value of feature" do
     Setting.stub :settings, { special_key: "abc123" } do
       assert_equal "abc123", Setting.special_key
