@@ -35,7 +35,7 @@ For the easiest way to get started, deploy a full version of HostedGPT to the ho
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
-3. View your newly created fork within github.com and click the button below:
+3. View your newly created fork within github.com and click the button below (be sure you're viewing your fork of this repo before clicking):
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
@@ -87,7 +87,7 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
 1. Click Fork > Create New Fork at the top of this repository
 1. Sign up for a free Heroku account at [heroku.com](https://signup.heroku.com/)
 1. If you wish to Eco dynos, you will need to subscribe to the $5 Eco dyno plan at [the billing page](https://dashboard.heroku.com/account/billing).
-1. Press the button below to deploy the app to Heroku!
+1. View your newly created fork within github.com and click the button below (be sure you're viewing your fork of this repo before clicking):
 
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy)
 
@@ -145,7 +145,7 @@ The `fly.toml` specifies details of the Fly production environment. It reference
 
 # Changelog
 
-(Top features being developed for v0.7: voice support, Gemini Pro, pin conversations)
+(Notable features being developed for v0.7: Heroku deploy, voice support, skills for the AI, Gemini Pro, pin conversations)
 
 v0.6 - Released on 4/26/2024
 
