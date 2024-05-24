@@ -41,8 +41,10 @@ class AssistantTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted when user is being destroyed" do
+    conversations_count = assistants(:samantha).conversations.count
+
     User.stub_any_instance(:destroy_in_progress?, true) do
-      assert_difference "Conversation.count", -6 do
+      assert_difference "Conversation.count", -1*conversations_count do
         assert_difference "Document.count", -5 do
           assert_difference "Run.count", -19 do
             assert_difference "Step.count", -3 do
