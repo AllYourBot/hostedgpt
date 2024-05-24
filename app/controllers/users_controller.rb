@@ -9,6 +9,8 @@ class UsersController < ApplicationController
   def new
     @person = Person.new
     @person.personable = User.new
+
+    flash[:errors]&.each { |error| @person.errors.add(:base, error) }
   end
 
   def create
