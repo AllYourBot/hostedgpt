@@ -66,6 +66,12 @@ class FeatureTest < ActiveSupport::TestCase
     end
   end
 
+  test "referencing a feature that does not exist raises an exception" do
+    assert_raises do
+      Feature.foobar?
+    end
+  end
+
   private
 
   def stub_features(hash, &block)

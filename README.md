@@ -172,8 +172,8 @@ Google OAuth authentication is disabled by default. You can enable it by setting
 
 To enable Google OAuth authentication, you need to set up Google OAuth in the Google Cloud Console. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
 
-- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID.
-- `GOOGLE_AUTHCLIENT_SECRET` - Google OAuth client secret.
+- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID (alternatively, you can add `google_auth_client_id` to your Rails credentials file)
+- `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret (alternatively, you can add `google_auth_client_secret` to your Rails credentials file)
 
 **Steps to set up:**
 

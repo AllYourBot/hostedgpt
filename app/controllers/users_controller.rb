@@ -38,7 +38,7 @@ class UsersController < ApplicationController
   private
 
   def authorize_password_login
-    return if Feature.authenticate_with_password?
+    return if Feature.password_authentication?
 
     halt 403
   end

@@ -6,13 +6,13 @@
 
   <h2 class='text-3xl font-semibold'>Welcome back</h2>
 
-  <% if Feature.authenticate_with_password? %>
+  <% if Feature.password_authentication? %>
     <span class='text-sm text-center'>
       Don't have an account? <%= link_to "Sign up", register_path, class: "underline" %>
     </span>
   <% end %>
 
-  <% if Feature.authenticate_with_password? %>
+  <% if Feature.password_authentication? %>
     <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
       <%= f.email_field :email,
         value: params[:email],
@@ -40,7 +40,7 @@
       %>
     <% end %>
   <% end %>
-  <% if Feature.authenticate_with_google? %>
+  <% if Feature.google_authentication? %>
     <%=
       button_to 'Log In with Google',
                 '/auth/google',

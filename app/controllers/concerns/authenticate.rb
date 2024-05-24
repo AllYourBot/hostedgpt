@@ -8,7 +8,7 @@ module Authenticate
   end
 
   def login_as(user)
-    return if Feature.authenticate_with_http_header?
+    return if Feature.http_header_authentication?
 
     session[:current_user_id] = user.id
   end
@@ -16,7 +16,7 @@ module Authenticate
   def current_user
     return Current.user unless Current.user.nil?
 
-    if Feature.authenticate_with_http_header?
+    if Feature.http_header_authentication?
       find_current_user_based_on_http_header
     else
       find_current_user_based_on_session
@@ -42,13 +42,13 @@ module Authenticate
   end
 
   def find_current_user_based_on_http_header
-    if Feature.enabled?(:registration)
-      Current.user = User.find_or_create_by!(uid: request.headers[Feature.authentication_http_header_uid]) do |user|
-        user.create_person!(email: request.headers[Feature.authentication_http_header_email])
-        user.name = request.headers[Feature.authentication_http_header_name] || person.email
+    if Feature.registration?
+      Current.user = User.find_or_create_by!(uid: request.headers[Setting.http_header_auth_uid]) do |user|
+        user.create_person!(email: request.headers[Setting.http_header_auth_email])
+        user.name = request.headers[Setting.authentication_http_header_name] || person.email
       end
     else
-      Current.user = User.find_by(uid: request.headers[Feature.authentication_http_header_uid])
+      Current.user = User.find_by(uid: request.headers[Setting.http_header_auth_uid])
     end
     Current.person = Current.user&.person
   end

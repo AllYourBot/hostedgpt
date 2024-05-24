@@ -1,8 +1,8 @@
 class SessionsController < ApplicationController
   include Accessible
 
-  before_action :find_user_for_password_authentication, only: :create, if: -> { Feature.authenticate_with_password? && !omniauth_authenticaton_ongoing?}
-  before_action :find_user_for_google_authentication, only: :create, if: -> { Feature.authenticate_with_google? && omniauth_authenticaton_ongoing? }
+  before_action :find_user_for_password_authentication, only: :create, if: -> { Feature.password_authentication? && !omniauth_authenticaton_ongoing?}
+  before_action :find_user_for_google_authentication, only: :create, if: -> { Feature.google_authentication? && omniauth_authenticaton_ongoing? }
 
   layout "public"
 
@@ -44,7 +44,7 @@ class SessionsController < ApplicationController
     auth = request.env['omniauth.auth']
     return if auth.blank?
 
-    if Feature.enabled?(:registration)
+    if Feature.registration?
       @user = User.find_or_create_by!(uid: auth[:uid]) do |user|
         user.first_name = auth[:info][:first_name],
         user.last_name = auth[:info][:last_name]
