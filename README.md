@@ -148,7 +148,7 @@ If you set up the app outside of Docker, then run the usual `bin/rails test` and
 
 # Configure optional features
 
-The file options.yml contains a number of things you can configure. Simple flags are:
+The file `options.yml` contains a number of things you can configure. Simple flags are:
 
 - `REGISTRATON_FEATURE` is `true` by default but you can set to `false` to prevent any new people from creating an account.
 - `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It defaults to `false` but you may choose to enable this.
@@ -158,26 +158,24 @@ The file options.yml contains a number of things you can configure. Simple flags
 HostedGPT supports multiple authentication methods:
 
 <!-- no toc -->
-- [Password-based authentication](#password-based-authentication)
+- [Password authentication](#password-authentication)
 - [Google OAuth authentication](#google-oauth-authentication)
 - [HTTP header authentication](#http-header-authentication)
 
-### Password-based authentication
+### Password authentication
 
-Password authentication is enabled by default.
-You can disable it by setting `PASSWORD_AUTHENTICATION_FEATURE` to `false`.
+Password authentication is enabled by default. You can disable it by setting `PASSWORD_AUTHENTICATION_FEATURE` to `false`.
 
 ### Google OAuth authentication
 
-Google OAuth authentication is disabled by default.
-You can enable it by setting `GOOGLE_AUTHENTICATION_FEATURE` to `true`.
+Google OAuth authentication is disabled by default. You can enable it by setting `GOOGLE_AUTHENTICATION_FEATURE` to `true`.
 
-To enable Google OAuth authentication, you need to set the following environment variables:
+To enable Google OAuth authentication, you need to set up Google OAuth in the Google Cloud Console. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
 
-- `GOOGLE_CLIENT_ID` - Google OAuth client ID.
-- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret.
+- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID.
+- `GOOGLE_AUTHCLIENT_SECRET` - Google OAuth client secret.
 
-**Steps to set up Google OAuth authentication:**
+**Steps to set up:**
 
 1. **Go to the Google Cloud Console and Create a New Project:**
    - Open your web browser and navigate to [Google Cloud Console](https://console.cloud.google.com/).
@@ -199,33 +197,33 @@ To enable Google OAuth authentication, you need to set the following environment
    - Fill out the required fields:
      - **Name:** A descriptive name for your client ID, e.g. "HostedGPT"
      - **Authorized JavaScript origins:** Your application's base URL, e.g., `https://hostedgpt.example.com`.
-     - **Authorized redirect URIs:** `https://hostedgpt.example.com/auth/google/callback`
+     - **Authorized redirect URIs:** Use your base URL followed by a specific path, e.g. `https://hostedgpt.example.com/auth/google/callback`
    - Click "Create"
 
 4. **Set Environment Variables:**
    - After creating the credentials, you will see a dialog with your Client ID and Client Secret.
    - Set the Client ID and Client Secret as environment variables in your application:
-     - `GOOGLE_CLIENT_ID`: Your Client ID
-     - `GOOGLE_CLIENT_SECRET`: Your Client Secret
+     - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID
+     - `GOOGLE_AUTHCLIENT_SECRET`: Your Client Secret
 
 ### HTTP header authentication
 
-HTTP header authentication is an alternative method to authenticate users based on custom HTTP request headers.
-This method is useful when you have an existing authentication system that sets custom headers for authenticated users, e.g. a Reverse Proxy (e.g., [Traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/), [Caddy](https://caddyserver.com/docs/caddyfile/directives/forward_auth)) or a Zero Trust Network (e.g., [Tailscale](https://tailscale.com/kb/1312/serve#identity-headers)).
+HTTP header authentication is an alternative method to authenticate users based on custom HTTP request headers. This method is useful when you have an existing authentication system, and you want to direct them to HostedGPT and have them skip all authentication steps. They'll be taken right into the app and a HostedGPT user account will be created on the fly. This works by having your existing system set custom headers for authenticated users, e.g. a Reverse Proxy (e.g., [Traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/), [Caddy](https://caddyserver.com/docs/caddyfile/directives/forward_auth)) or a Zero Trust Network (e.g., [Tailscale](https://tailscale.com/kb/1312/serve#identity-headers)).
 
-HTTP header authentication is disabled by default.
-You can enable it by setting `HTTP_HEADER_AUTHENTICATION_FEATURE` to `true`.
-When this feature is enabled, password authentication and Google OAuth authentication will be disabled automatically.
+**Steps to set up:**
 
-Beware that enabling HTTP header authentication will allow anyone with direct access to the application to impersonate any user by setting the custom headers, if not properly secured.
-You must ensure that the custom headers are set by a trusted source and are not easily spoofed.
+1. **Enable the feature:**
+   - Since HTTP header authentication is disabled by default set the environment variable `HTTP_HEADER_AUTHENTICATION_FEATURE` to `true`. This will automatically disable password and Google OAuth authentication methods.
 
-- `AUTHENTICATION_HTTP_HEADER_EMAIL` - Name of the HTTP request header, which can be used to derive an email address of a new user.
-  Default is `X-WEBAUTH-EMAIL`.
-- `AUTHENTICATION_HTTP_HEADER_NAME` - Name of the HTTP request header, which can be used to derive the full name of a new user.
-  Default is `X-WEBAUTH-NAME`.
-- `AUTHENTICATION_HTTP_HEADER_UID` - Name of the HTTP request header, which will be used as unique identifier of the user.
-  Default is `X-WEBAUTH-USER`.
+2. **Configure the request headers:**
+   - Beware: enabling HTTP header authentication will allow anyone with direct access to the application to impersonate any user by setting the custom headers, if not properly secured. You must ensure that the custom headers are set by a trusted source and are not easily spoofed.
+   - Configure your authentication system to set the following request headers when directing users to the HostedGPT app:
+   - `AUTHENTICATION_HTTP_HEADER_EMAIL` - Set this environment variable to the name of the HTTP request header which will contain the user's email address. This defaults to a check for a request header of `X-WEBAUTH-EMAIL` to find the user's email.
+   - `AUTHENTICATION_HTTP_HEADER_NAME` - Set this environment variable to the name of the HTTP request header which will contain the user's full name (first and last). This defaults to a check for a request header of `X-WEBAUTH-NAME` to find the user's full name.
+   - `AUTHENTICATION_HTTP_HEADER_UID` - Set this environment variable to the name of the HTTP request header which will contain the user's identifier (any unique alphanumeric string). This defaults to a check for a request header of `X-WEBAUTH-UID` to find the user's unique ID.
+
+3. **Test the connection:**
+   - After you complete the configuration changes above and restart your server, however you direct users to the HostedGPT app you need to be sure that the request headers are present in that initial visit. This will do a find_or_create on the user: so it will register them if they've never been seen and log them in as that user if the information is already present.
 
 
 # Understanding the Docker configuration
