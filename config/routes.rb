@@ -22,8 +22,6 @@ Rails.application.routes.draw do
 
   # routes to still be cleaned up:
 
-  resources :chats, only: [:index, :show, :create]
-
   get "/login", to: "sessions#new"
   post "/login", to: "sessions#create"
   get "/register", to: "users#new"

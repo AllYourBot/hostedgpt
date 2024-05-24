@@ -10,7 +10,7 @@ samantha:
 keith_gpt4:
   user: keith
   language_model: gpt_4
-  name: GPT-4
+  name: OpenAI's GPT-4
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]

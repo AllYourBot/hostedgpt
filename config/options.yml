@@ -1,0 +1,13 @@
+shared:
+  features:
+    voice: <%= ENV.fetch("VOICE_FEATURE", false) %>
+    registration: <%= ENV.fetch("REGISTRATION_FEATURE", true) %>
+    password_authentication: <%= ENV.fetch("PASSWORD_AUTHENTICATION_FEATURE", true) %>
+    google_authentication: <%= ENV.fetch("GOOGLE_AUTHENTICATION_FEATURE", false) %>
+    http_header_authentication: <%= ENV.fetch("HTTP_HEADER_AUTHENTICATION_FEATURE", false) %>
+  settings:
+    google_auth_client_id: <%= ENV["GOOGLE_AUTH_CLIENT_ID"] || Rails.application.credentials[:google_client_id] %>
+    google_auth_client_secret: <%= ENV["GOOGLE_AUTH_CLIENT_SECRET"] || Rails.application.credentials[:google_client_secret] %>
+    http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
+    http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
+    http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>

@@ -18,7 +18,7 @@ end
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.tool_call? && 'hidden' %>"
   data-role="message"
   data-timestamp="<%= timestamp %>"
   data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && 'message-scroller' %>"
@@ -46,15 +46,21 @@ end
       class="flex-1 min-w-0 ml-3 mr-8 text-base text-gray-950 dark:text-gray-100">
 
       <div class="mt-[6px] mb-1 font-semibold" data-role="from">
-        <%= message.user? ? 'You' : message.assistant.name %>
+        <%= case message.role
+          when "user" then "You"
+          when "assistant" then message.assistant.name
+          when "tool" then "Tool"
+          end
+        %>
       </div>
 
       <turbo-frame id="message-<%= message.id %>">
 
       <div
+        id="message-text-<%= message.id %>"
         class="hidden"
         data-clipboard-target="text"
-        <%= message.assistant? && "data-speaker-target=text" %>
+        data-speaker-target="text <%= message.assistant? && 'assistantText' %>"
         data-thinking="<%= thinking ? 'true' : 'false' %>"
       ><%= message.content_text %></div>
         <div

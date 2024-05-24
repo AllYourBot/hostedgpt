@@ -201,7 +201,7 @@
             |,
             data: {
               composer_target: "cancel",
-              turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+              turbo_frame: "_top" # this causes the page to morph, without this it does a frame substitution
           }) do |form| %>
             <div class="text-gray-300 dark:text-gray-500 mr-2 hidden md:block">
               ⌘ ESC
@@ -232,7 +232,8 @@
           model: [@assistant, @new_message],
           data: {
             composer_target: "form",
-            turbo_frame: "_top" # this causes the page to morph, without this it does a frame replace
+            turbo_frame: "_top", # this causes the page to morph, without this it does a frame substitution
+            turbo_action: "replace",
         }) do |form| %>
           <%= form.hidden_field :conversation_id %>
           <%= form.hidden_field :index, value: @messages&.length %>
@@ -280,7 +281,8 @@
               mb-2 block
               pl-14 pr-12 relationship:pl-4 show-previews:pt-24
               bg-transparent
-              text-black placeholder-gray-500 dark:text-gray-200
+              text-black dark:text-gray-200
+              placeholder-gray-300 dark:placeholder-gray-500
               text-md
               rounded-2xl border-gray-300
               focus:ring-0 focus:border-gray-400 focus:shadow
@@ -291,7 +293,7 @@
 
           <!-- options for the composer right button -->
 
-          <% if Feature.enabled?(:voice) %>
+          <% if Feature.voice? %>
             <%= form.button type: "button",
               data: {
                 composer_target: "microphoneDisable",
@@ -334,7 +336,7 @@
 
           <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
 
-          <% if Feature.enabled?(:voice) %>
+          <% if Feature.voice? %>
             <div
               id="microphone-enable"
               data-composer-target="microphoneEnable"
@@ -380,7 +382,7 @@
               text-gray-100 dark:text-gray-600
               enabled:text-black
               enabled:dark:text-white
-              #{Feature.enabled?(:voice) && '!hidden'}
+              #{Feature.voice? && '!hidden'}
             | do
           %>
             <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
@@ -397,7 +399,8 @@
       </div>
 
       <div class="w-full mb-2 text-xs text-center text-gray-400 dark:text-gray-300">
-        HostedGPT can make mistakes. Double check information.
+        <span id="connection-status" class="" data-turbo-permanent>HostedGPT can make mistakes. Double check information.</span>
+        <span>&nbsp;</span> <!-- the data-turbo-permanent causes height of page to be calculated incorrectly, adding this span fixes it -->
       </div>
   </footer>
 </turbo-frame>

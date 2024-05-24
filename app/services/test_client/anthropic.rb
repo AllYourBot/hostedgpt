@@ -1,4 +1,4 @@
-class TestClients::Anthropic
+class TestClient::Anthropic
   def initialize(access_token:)
   end
 
