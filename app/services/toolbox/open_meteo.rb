@@ -100,7 +100,6 @@ class Toolbox::OpenMeteo < Toolbox
     def pick_best_index(input:, options: [])
       input = Amatch::JaroWinkler.new(input)
       options_hash = options.each_with_index.to_h { |value, index| [index, value] }
-      binding.pry
       options_hash.each do |index, option|
         options_hash[index] = input.match(option)
       end
