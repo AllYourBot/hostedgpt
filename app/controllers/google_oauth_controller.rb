@@ -1,17 +1,19 @@
 class GoogleOauthController < ApplicationController
   def create
-    if auth[:provider] == "google"
-      auth[:uid]
-      auth[:credentials]
+    if auth[:provider].in? %w[ gmail google_tasks google_calendar ]
+      # auth[:uid]
+      # auth[:credentials]
+      # auth[:credentials][:scope].split
 
-      auth[:credentials][:scope].split
+      redirect_to edit_settings_person_path, notice: "Saved"
     end
-
-    redirect_to edit_settings_person_path, notice: "Saved"
   end
 
   def destroy
-    redirect_to edit_settings_person_path, alert: "Cancelled"
+    binding.pry
+    if auth[:provider].in? %w[ gmail google_tasks google_calendar ]
+      redirect_to edit_settings_person_path, alert: "Cancelled"
+    end
   end
 
     # {
@@ -64,6 +66,6 @@ class GoogleOauthController < ApplicationController
   private
 
   def auth
-    request.env['omniauth.auth'].deep_symbolize_keys
+    request.env['omniauth.auth']&.deep_symbolize_keys
   end
 end
