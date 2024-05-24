@@ -12,7 +12,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   test "populates the latest message from the assistant" do
     assert_no_difference "@conversation.messages.reload.length" do
       TestClient::OpenAI.stub :text, "Hello" do
-        TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_text_response do
+        TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response }do
           assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
         end
       end
@@ -84,7 +84,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
 
   test "when API response key is missing, a nice error message is displayed" do
     TestClient::OpenAI.stub :text, "" do
-      TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_text_response do
+      TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response }do
         assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
         assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
       end

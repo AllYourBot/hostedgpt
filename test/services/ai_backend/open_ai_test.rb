@@ -3,9 +3,10 @@ require "test_helper"
 class AIBackend::OpenAITest < ActiveSupport::TestCase
   setup do
     @conversation = conversations(:attachments)
+    @assistant = assistants(:keith_claude3)
     @openai = AIBackend::OpenAI.new(
       users(:keith),
-      assistants(:samantha),
+      @assistant,
       @conversation,
       @conversation.latest_message_for_version(:latest)
     )
@@ -14,6 +15,19 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
   test "initializing client works" do
     assert @openai.client.present?
+  end
+
+  test "get_next_chat_message works to stream text and uses model from assistant" do
+    assert_not_equal @assistant, @conversation.assistant,
+      "We want to force this next message to use a different assistant so these should not match"
+
+    TestClient::OpenAI.stub :text, nil do # this forces it to fall back to default text
+      TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response }do
+        streamed_text = ""
+        @openai.get_next_chat_message { |chunk| streamed_text += chunk }
+        assert_equal "Hello this is model claude-3-opus-20240229 with instruction nil! How can I assist you today?", streamed_text
+      end
+    end
   end
 
   test "get_tool_messages_by_calling properly executes tools" do
@@ -45,18 +59,6 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     assert_equal "tool", msg[:role]
     assert_equal "abc123", msg[:tool_call_id]
     assert msg[:content].starts_with?('"An unexpected error occurred. You')
-  end
-
-  test "get_next_chat_message works to stream text" do
-    text = "Hello! How can I assist you today?"
-
-    TestClient::OpenAI.stub :text, text do
-      TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_text_response do
-        streamed_text = ""
-        @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal text, streamed_text
-      end
-    end
   end
 
   test "get_next_chat_message works to get a function call" do
