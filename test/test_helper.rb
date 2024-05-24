@@ -4,6 +4,8 @@ require "rails/test_help"
 require "minitest/autorun"
 require "pry"
 
+require_relative 'support/feature_helpers'
+
 class Capybara::Node::Element
   def obsolete?
     inspect.include?('Obsolete')

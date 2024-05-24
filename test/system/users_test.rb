@@ -1,6 +1,8 @@
 require "application_system_test_case"
 
 class UsersTest < ApplicationSystemTestCase
+  include FeatureHelpers
+
   setup do
     @user = users(:keith)
     visit root_url
@@ -35,6 +37,13 @@ class UsersTest < ApplicationSystemTestCase
     click_text "Sign Up"
 
     assert_text "can't be blank"
+  end
+
+  test "should hide the Sign Up link if the registration feature is disabled" do
+    stub_features(registration: false) do
+      visit root_url
+      assert_no_text 'Sign up'
+    end
   end
 
   test "should create a new user" do
