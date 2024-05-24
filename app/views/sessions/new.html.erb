@@ -6,7 +6,7 @@
 
   <h2 class='text-3xl font-semibold'>Welcome back</h2>
 
-  <% unless Feature.registration? %>
+  <% if Feature.registration? %>
     <span class='text-sm text-center'>
       Don't have an account? <%= link_to "Sign up", register_path, class: "underline" %>
     </span>
