@@ -11,7 +11,7 @@ class TestClient::OpenAI
   end
 
   def self.default_text
-    "Hello this is model claude-3-opus-20240229 with instruction nil! How can I assist you today?"
+    "Hello this is model #{@@model} with instruction nil! How can I assist you today?"
   end
 
   def self.api_text_response
