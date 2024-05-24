@@ -1,6 +1,8 @@
 require "test_helper"
 
 class FeatureTest < ActiveSupport::TestCase
+  include FeatureHelpers
+
   test "should return value of feature" do
     stub_features(my_feature: true) do
       assert Feature.enabled?(:my_feature)
@@ -64,23 +66,5 @@ class FeatureTest < ActiveSupport::TestCase
       refute Feature.enabled?(:google_authentication)
       refute Feature.google_authentication?
     end
-  end
-
-  private
-
-  def stub_features(hash, &block)
-    Feature.features_hash = nil
-    Feature.stub :features, hash do
-      yield
-    end
-    Feature.features_hash = nil
-  end
-
-  def stub_raw_features(hash, &block)
-    Feature.features_hash = nil
-    Feature.stub :raw_features, hash do
-      yield
-    end
-    Feature.features_hash = nil
   end
 end
