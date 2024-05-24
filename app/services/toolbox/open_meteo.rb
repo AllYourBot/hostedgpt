@@ -93,14 +93,14 @@ class Toolbox::OpenMeteo < Toolbox
     end
 
     def pick_by_region(region_s, locations:)
-      best_index = pick_best_index(input: region_s, options: locations.map(&:admin1))
+      best_index = pick_best_index(input: region_s, options: locations.map(&:admin1).map(&:to_s))
       locations[best_index]
     end
 
     def pick_best_index(input:, options: [])
       input = Amatch::JaroWinkler.new(input)
       options_hash = options.each_with_index.to_h { |value, index| [index, value] }
-
+      binding.pry
       options_hash.each do |index, option|
         options_hash[index] = input.match(option)
       end
