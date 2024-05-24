@@ -289,7 +289,7 @@
 
           <!-- options for the composer right button -->
 
-          <% if Feature.enabled?(:voice) %>
+          <% if Feature.voice? %>
             <%= form.button type: "button",
               data: {
                 composer_target: "microphoneDisable",
@@ -332,7 +332,7 @@
 
           <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
 
-          <% if Feature.enabled?(:voice) %>
+          <% if Feature.voice? %>
             <div
               id="microphone-enable"
               data-composer-target="microphoneEnable"
@@ -378,7 +378,7 @@
               text-gray-100 dark:text-gray-600
               enabled:text-black
               enabled:dark:text-white
-              #{Feature.enabled?(:voice) && '!hidden'}
+              #{Feature.voice? && '!hidden'}
             | do
           %>
             <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
