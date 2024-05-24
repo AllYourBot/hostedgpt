@@ -3,11 +3,11 @@ OmniAuth.config.on_failure = Proc.new do |env|
 end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
-  provider :google_oauth2, Setting.google_client_id, Setting.google_client_secret, {
+  provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
     name: 'google'
   }
 
-  provider :google_oauth2, Setting.google_client_id, Setting.google_client_secret, {
+  provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
     name: 'google_tasks',
     scope: %|
       email,
@@ -16,7 +16,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     include_granted_scopes: true
   }
 
-  provider :google_oauth2, Setting.google_client_id, Setting.google_client_secret, {
+  provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
     name: 'gmail',
     scope: %|
       email,
@@ -31,7 +31,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     include_granted_scopes: true
   }
 
-  provider :google_oauth2, Setting.google_client_id, Setting.google_client_secret, {
+  provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
     name: 'google_calendar',
     scope: %|
       email,

@@ -31,6 +31,14 @@ class ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
   end
+
+  def assert_logged_in(user = nil)
+    if user.nil?
+      assert session.fetch(:current_user_id)
+    else
+      assert_equal session[:current_user_id], user.id
+    end
+  end
 end
 
 module ActiveSupport
