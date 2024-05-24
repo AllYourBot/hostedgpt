@@ -35,7 +35,7 @@ gem "redcarpet", "~> 3.6.0"
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
-
+gem "amatch", "~> 0.4.1" # enables fuzzy comparison of strings, a tool uses this
 gem "rails_heroicon", "~> 2.2.0"
 gem "ruby-openai", "~> 7.0.1"
 gem "anthropic", "~> 0.1.0"

@@ -68,6 +68,6 @@ class AssistantTest < ActiveSupport::TestCase
   end
 
   test "initials will split on - and return two characters" do
-    assert_equal "G4", assistants(:keith_gpt4).initials
+    assert_equal "G4", assistants(:rob_gpt4).initials
   end
 end
