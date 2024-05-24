@@ -2,60 +2,46 @@
 
 class Feature
   class << self
-    def configuration
-      Rails.configuration.features
+    def raw_features
+      Rails.application.config.options.features
+    end
+
+    def features_hash
+      defined?(@@features_hash) && !@@features_hash.nil? ? @@features_hash : nil
+    end
+
+    def features_hash=(features)
+      @@features_hash = features
+    end
+
+    def features
+      return features_hash if features_hash
+      @@features_hash = raw_features
+
+      if @@features_hash[:http_header_authentication]
+        @@features_hash[:password_authentication] = false
+        @@features_hash[:google_authentication] = false
+      end
+
+      @@features_hash
     end
 
     def enabled?(feature)
       ActiveModel::Type::Boolean.new.cast(
-        configuration.fetch(feature&.to_sym, false)
+        features.fetch(feature&.to_sym, false)
       )
     end
 
-    def authenticate_with_password?
-      return false if authenticate_with_http_header?
-
-      enabled?(:password_authentication)
+    def disabled?(feature)
+      !enabled?(feature)
     end
 
-    def authenticate_with_google?
-      return false if authenticate_with_http_header?
-
-      enabled?(:google_authentication)
-    end
-
-    def authenticate_with_http_header?
-      enabled?(:http_header_authentication)
-    end
-
-    def authentication_http_header_name
-      ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:authentication_http_header_name, 'X-WEBAUTH-USER')
-      )
-    end
-
-    def authentication_http_header_uid
-      ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:authentication_http_header_uid, 'X-WEBAUTH-NAME')
-      )
-    end
-
-    def authentication_http_header_email
-      ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:authentication_http_header_email, 'X-WEBAUTH-EMAIL')
-      )
-    end
-
-    def google_client_id
-      ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:google_client_id, nil)
-      )
-    end
-
-    def google_client_secret
-      ActiveRecord::Type::ImmutableString.new.cast(
-        configuration.fetch(:google_client_secret, nil)
-      )
+    def method_missing(method_name, *arguments, &block)
+      if method_name.to_s.end_with?('?')
+        enabled?(method_name.to_s.chomp('?'))
+      else
+        super
+      end
     end
   end
 end

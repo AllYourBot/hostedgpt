@@ -58,6 +58,6 @@ class UsersController < ApplicationController
   end
 
   def ensure_registration
-    redirect_to root_path unless Feature.enabled?(:registration)
+    redirect_to root_path unless Feature.registration?
   end
 end

@@ -6,9 +6,9 @@ class GetNextAIMessageJob < ApplicationJob
 
   def ai_backend
     if @assistant.model.starts_with?('gpt-')
-      AIBackends::OpenAI
+      AIBackend::OpenAI
     else
-      AIBackends::Anthropic
+      AIBackend::Anthropic
     end
   end
 
@@ -22,7 +22,7 @@ class GetNextAIMessageJob < ApplicationJob
     @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index-1)
 
     return false          if generation_was_cancelled? || message_is_populated?
-    raise WaitForPrevious if @prev_message && @prev_message.content_text.blank? && @prev_message.processed?
+    raise WaitForPrevious if @prev_message&.not_finished?
 
     last_sent_at = Time.current
     @message.update!(processed_at: Time.current, content_text: "")
@@ -45,10 +45,13 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
 
-    if @message.content_text.blank? # this shouldn't happen b/c the += above will build up the response, but it's a final effort if things are blank
-      @message.content_text = response if response.is_a?(String)
-      raise Faraday::ParsingError if @message.content_text.blank?
-    end
+    @message.content_tool_calls = response # This Typically, get_next_chat_message will simply return nil because it executes
+                                           # the content_chunk block to return it's response incrementally. However, tool_call
+                                           # responses don't make sense to stream because they can't be executed incrementally
+                                           # so we just return the full tool response message at once. The only time we return
+                                           # like this is for tool_calls so we know we can simply assign it here.
+
+    raise Faraday::ParsingError if @message.not_finished?
 
     wrap_up_the_message
     return true
@@ -88,11 +91,10 @@ class GetNextAIMessageJob < ApplicationJob
       puts e.backtrace.join("\n") if Rails.env.development?
 
       if attempt < 3
-        @message.content_text = "(Error after #{attempt.ordinalize} try, retrying... #{msg&.slice(0..3000)})"
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
         GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(user_id, message_id, assistant_id, attempt+1)
       else
-        set_unexpected_error(msg)
+        set_unexpected_error(msg&.slice(0...2000))
         wrap_up_the_message
       end
     end
@@ -140,11 +142,46 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def wrap_up_the_message
+    call_tools_before_wrapping_up if @message.content_tool_calls.present?
+
     GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
     puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
+  end
+
+  def call_tools_before_wrapping_up
+    puts "\n### Calling tools" unless Rails.env.test?
+
+    msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
+
+    index = @message.index
+    msgs.each do |tool_message| # one message for each tool executed
+      @conversation.messages.create!(
+        assistant: @assistant,
+        role: tool_message[:role],
+        content_text: tool_message[:content],
+        tool_call_id: tool_message[:tool_call_id],
+        version: @message.version,
+        index: index += 1,
+        processed_at: Time.current,
+      )
+    end
+
+    assistant_reply = @conversation.messages.create!(
+      assistant: @assistant,
+      role: :assistant,
+      content_text: nil,
+      version: @message.version,
+      index: index += 1
+    )
+
+    GetNextAIMessageJob.perform_later(
+      @user.id,
+      assistant_reply.id,
+      @assistant.id
+    ) # now AI decides what to say based on the tool responses. It may also execute more tools
   end
 
   def generation_was_cancelled?
