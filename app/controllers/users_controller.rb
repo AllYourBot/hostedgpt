@@ -15,9 +15,7 @@ class UsersController < ApplicationController
     @person = Person.new(person_params)
 
     if @person.save
-      reset_session
       login_as @person.user
-
       redirect_to root_path
     else
       @person.errors.delete :personable
