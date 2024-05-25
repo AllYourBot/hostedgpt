@@ -29,8 +29,6 @@ Rails.application.routes.draw do
   get "/register", to: "users#new"
   get "/logout", to: "sessions#destroy"
 
-  get "/auth/google/callback", to: "sessions#create"
-
   get "/rails/active_storage/postgresql/:encoded_key/*filename" => "active_storage/postgresql#show", as: :rails_postgresql_service
   put "/rails/active_storage/postgresql/:encoded_token" => "active_storage/postgresql#update", as: :update_rails_postgresql_service
 end
