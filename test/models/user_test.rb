@@ -10,10 +10,22 @@ class UserTest < ActiveSupport::TestCase
     assert_nil users(:rob).last_cancelled_message
   end
 
-  test "should not validate a new user without password" do
-    user = User.new
-    person = Person.new(email: "example@gmail.com", personable: user)
-    refute person.valid?
+  test "user needs to have a password unless they have auth_uid" do
+    minimum_user = User.new(first_name: 'John', last_name: 'Doe', password: 'abc123')
+    assert minimum_user.valid?, "We were unable to verify the minimum user"
+
+    minimum_user.password = nil
+    refute minimum_user.valid?, "The password should be required"
+
+    minimum_user.auth_uid = "abc123"
+    assert minimum_user.valid?, "The password should be allowed to be blank when auth_uid is set"
+  end
+
+  test "user can change something like their first name w/o having to reenter their password" do
+    user = users(:keith)
+    assert_nothing_raised do
+      user.update!(first_name: "New")
+    end
   end
 
   test "encrypts openai_key" do
@@ -55,20 +67,12 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "it can update a user with a password" do
+  test "it can update a user with a new password" do
     user = users(:keith)
     old_password_hash = user.password_digest
     user.update(password: "password")
     assert user.valid?
     refute_equal old_password_hash, user.password_digest
-  end
-
-  test "it can update a user without a password" do
-    user = users(:keith)
-    old_password_hash = user.password_digest
-    user.update(first_name: "New Name")
-    assert user.valid?
-    assert_equal old_password_hash, user.password_digest
   end
 
   test "passwords must be 6 characters or longer" do
@@ -92,7 +96,7 @@ class UserTest < ActiveSupport::TestCase
     assert user.authenticate("secret")
   end
 
-  test "it destroys assistantes on destroy" do
+  test "it destroys assistants on destroy" do
     assistant = assistants(:samantha)
     assistant.user.destroy
     assert_raises ActiveRecord::RecordNotFound do

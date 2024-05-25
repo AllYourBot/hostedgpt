@@ -6,9 +6,30 @@
 
   <h2 class='text-3xl font-semibold'>Welcome back</h2>
 
-  <% if Feature.password_authentication? %>
-    <span class='text-sm text-center'>
+  <% if Feature.registration? %>
+    <span class="text-sm text-center">
       Don't have an account? <%= link_to "Sign up", register_path, class: "underline" %>
+    </span>
+  <% end %>
+
+  <% if Feature.google_authentication? %>
+    <%= button_to "Log In with Google", "/auth/google",
+      method: "post",
+      class: %|
+        text-white font-medium
+        bg-brand-blue dark:bg-gray-900
+        border border-white dark:border-gray-400
+        rounded-lg p-4 text-center
+        cursor-pointer
+        hover:opacity-95
+      |,
+      form_class: "flex flex-col space-y-4 w-80",
+      data: {
+        turbo: false,
+      }
+    %>
+    <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && 'hidden' %>">
+      - Or -
     </span>
   <% end %>
 
@@ -39,24 +60,5 @@
           data: { turbo_submits_with: "Authenticating..." }
       %>
     <% end %>
-  <% end %>
-  <% if Feature.google_authentication? %>
-    <%=
-      button_to 'Log In with Google',
-                '/auth/google',
-                method: 'post',
-                class: %|
-                  text-white font-medium
-                  bg-brand-blue dark:bg-gray-900
-                  border border-white dark:border-gray-400
-                  rounded-lg p-4 text-center
-                  cursor-pointer
-                  hover:opacity-95
-                |,
-                form_class: 'flex flex-col space-y-4 w-80',
-                data: {
-                  turbo: false,
-                }
-    %>
   <% end %>
 </div>

@@ -10,6 +10,7 @@ module Authenticate
   def login_as(user)
     return if Feature.http_header_authentication?
 
+    reset_session
     session[:current_user_id] = user.id
   end
 

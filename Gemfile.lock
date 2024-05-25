@@ -336,6 +336,9 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     sexp_processor (4.17.1)
+    snaky_hash (2.0.1)
+      hashie
+      version_gem (~> 1.1, >= 1.1.1)
     solid_queue (0.2.1)
       rails (~> 7.1)
     sorbet-runtime (0.5.11156)
@@ -426,7 +429,7 @@ DEPENDENCIES
   name_of_person
   omniauth (~> 2.1)
   omniauth-google-oauth2 (~> 1.1)
-  omniauth-rails_csrf_protection (~> 1.0)
+  omniauth-rails_csrf_protection (~> 1.0.2)
   pg (~> 1.1)
   pry-rails
   puma (>= 5.0)
