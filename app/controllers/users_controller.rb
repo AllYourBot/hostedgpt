@@ -3,13 +3,10 @@ class UsersController < ApplicationController
 
   layout "public"
 
-  before_action :authorize_password_login, only: [:new, :create]
-  before_action :ensure_registration, only: [:new, :create]
+  before_action :ensure_registration_and_authentication_allowed, only: [:new, :create]
   before_action :set_user, only: [:update]
 
   def new
-    redirect_to root_url if Feature.disabled?(:registration)
-
     @person = Person.new
     @person.personable = User.new
 
@@ -39,10 +36,12 @@ class UsersController < ApplicationController
 
   private
 
-  def authorize_password_login
-    return if Feature.password_authentication?
+  def ensure_registration
+    if Feature.disabled?(:registration) ||
+      (Feature.disabled?(:password_authentication) && Feature.disabled?(:google_authentication))
 
-    halt 403
+      redirect_to root_path
+    end
   end
 
   def set_user
@@ -57,9 +56,5 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(preferences: [:nav_closed, :dark_mode])
-  end
-
-  def ensure_registration
-    redirect_to root_path unless Feature.registration?
   end
 end
