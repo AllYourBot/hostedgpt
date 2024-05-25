@@ -6,9 +6,11 @@
 
   <h2 class='text-3xl font-semibold'>Welcome back</h2>
 
-  <span class='text-sm text-center'>
-    Don't have an account? <%= link_to "Sign up", register_path, class: "underline" %>
-  </span>
+  <% if Feature.registration? %>
+    <span class='text-sm text-center'>
+      Don't have an account? <%= link_to "Sign up", register_path, class: "underline" %>
+    </span>
+  <% end %>
 
   <% if Feature.google_authentication? %>
     <%= button_to 'Log In with Google',
