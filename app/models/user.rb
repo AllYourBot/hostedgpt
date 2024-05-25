@@ -9,7 +9,7 @@ class User < ApplicationRecord
   validates :password, length: { minimum: 6 }, if: -> { password.present? }
   validates :first_name, presence: true
   validates :last_name, presence: true, on: :create
-  validates :uid, uniqueness: true, allow_nil: true
+  validates :auth_uid, uniqueness: true, allow_nil: true
 
   has_many :assistants, dependent: :destroy
   has_many :conversations, dependent: :destroy
