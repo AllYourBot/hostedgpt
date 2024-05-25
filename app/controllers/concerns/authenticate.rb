@@ -44,12 +44,12 @@ module Authenticate
 
   def find_current_user_based_on_http_header
     if Feature.registration?
-      Current.user = User.find_or_create_by!(uid: request.headers[Setting.http_header_auth_uid]) do |user|
+      Current.user = User.find_or_create_by!(auth_uid: request.headers[Setting.http_header_auth_uid]) do |user|
         user.create_person!(email: request.headers[Setting.http_header_auth_email])
         user.name = request.headers[Setting.authentication_http_header_name] || person.email
       end
     else
-      Current.user = User.find_by(uid: request.headers[Setting.http_header_auth_uid])
+      Current.user = User.find_by(auth_uid: request.headers[Setting.http_header_auth_uid])
     end
     Current.person = Current.user&.person
   end
