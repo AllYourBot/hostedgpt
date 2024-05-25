@@ -22,9 +22,9 @@ class Toolbox::OpenMeteo < Toolbox
       wind_speed_unit: "mph",
       precipitation_unit: "inch",
 
-      current: "temperature_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover",
-      hourly:  "temperature_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,cloud_cover",
-      daily:   "temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_probability_max",
+      current: "weather_code,temperature_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover",
+      #hourly:  "weather_code,temperature_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,cloud_cover",
+      daily:   "weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_probability_max",
     )
 
     degrees = response.current_units.temperature_2m
@@ -40,11 +40,48 @@ class Toolbox::OpenMeteo < Toolbox
     tl = response.daily.temperature_2m_min[1]
     tlf = response.daily.apparent_temperature_min[1]
 
+    curr = response.current.temperature_2m
+    curr_feel = response.current.apparent_temperature
+
+    near_high = (curr - th).abs <= 2
+    near_low = (curr - tl).abs <= 2
+
+    if near_high
+      phrase = "at today's high of "
+      near_low = false
+    elsif near_low
+      phrase = "at today's low of "
+    else
+      phrase = ""
+    end
+
+    summary = "Currently in #{location.name} it's #{phrase}#{curr.round} degrees with "
+    summary += weather_code_to_description(response.current.weather_code) # "scattered showers"
+
+    if response.current.apparent_temperature - curr >= 5
+      summary += ", but it feels like #{curr_feel.round} degrees. "
+    else
+      summary += ". "
+    end
+
+    summary += "Today there's a forecasted "
+    summary += "low of #{tl.round} degrees" if (!near_low)
+    summary += " and a " if (!near_high && !near_low)
+    summary += "high of #{th.round} degrees" if (!near_high)
+
+    summary += " with " + weather_code_to_description(response.daily.weather_code[1])
+
+    if thf - th >= 5
+      summary += ", but it will feel like #{thf.round} degrees."
+    else
+      summary += "."
+    end
+
     {
       in: "#{location.name}, #{location.admin1}, #{location.country}",
 
-      right_now: "#{response.current.temperature_2m.round}#{degrees}",
-      right_now_feels_like: "#{response.current.apparent_temperature.round}#{degrees}",
+      right_now: "#{curr.round}#{degrees}",
+      right_now_feels_like: "#{curr_feel.round}#{degrees}",
 
       right_now_precipitation: "#{response.current.precipitation.round} #{quantity}",
       right_now_rain: "#{response.current.rain.round} #{quantity}",
@@ -67,6 +104,10 @@ class Toolbox::OpenMeteo < Toolbox
       today_now_rain: "#{response.daily.rain_sum[1]} #{quantity}",
       today_now_showers: "#{response.daily.showers_sum[1]} #{quantity}",
       today_now_snowfall: "#{response.daily.snowfall_sum[1]} #{quantity}",
+
+      good_summary: summary,
+      # right_now_weather_code: response.current.weather_code,
+      # today_weather_code: response.daily.weather_code[1],
     }
   end
 
@@ -109,6 +150,40 @@ class Toolbox::OpenMeteo < Toolbox
       end
 
       highest_match_sort_with_lowest_index_tiebreaker.first.first # returns the index
+    end
+
+    def weather_code_to_description(code)
+      # it's 85 degrees with
+      case code
+      when 0 then "clear skies"
+      when 1 then "mostly clear skies"
+      when 2 then "scattered clouds" # "and partly cloudy"
+      when 3 then "overcast skies"
+      when 45 then "fog" # "and foggy"
+      when 48 then "freezing fog"
+      when 51 then "light drizzle"
+      when 53 then "drizzle" #"and drizzling"
+      when 55 then "heavy drizzle"
+      when 56 then "light freezing drizzle"
+      when 57 then "freezing drizzle"
+      when 61 then "light rain"
+      when 63 then "rain" # "and raining"
+      when 65 then "heavy rain" # "and raining heavily"
+      when 66 then "light freezing rain"
+      when 67 then "freezing rain"
+      when 71 then "light snow"
+      when 73 then "snow" # "and snowing"
+      when 75 then "heavy snow" # "and snowing heavily"
+      when 77 then "snow drizzle"
+      when 80 then "light scattered showers"
+      when 81 then "scattered showers"
+      when 82 then "heavy scattered showers"
+      when 85 then "light scattered snow"
+      when 86 then "scattered snow"
+      when 95 then "thunderstorms"
+      when 96 then "thunderstorms and some hail"
+      when 99 then "thunderstorms and heavy hail"
+      end
     end
   end
 end
