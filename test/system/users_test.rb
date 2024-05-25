@@ -1,7 +1,6 @@
 require "application_system_test_case"
 
 class UsersTest < ApplicationSystemTestCase
-  include FeatureHelpers
 
   setup do
     @user = users(:keith)
@@ -43,6 +42,20 @@ class UsersTest < ApplicationSystemTestCase
     stub_features(registration: false) do
       visit root_url
       assert_no_text 'Sign up'
+    end
+  end
+
+  test "should NOT display a Google button when the feature is DISABLED" do
+    stub_features(google_authentication: false) do
+      visit register_url
+      assert_no_text "Sign Up with Google"
+    end
+  end
+
+  test "should SHOW the Google button when the feature is ENABLED" do
+    stub_features(google_authentication: true) do
+      visit register_url
+      assert_text "Sign Up with Google"
     end
   end
 

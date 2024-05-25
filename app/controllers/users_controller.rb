@@ -9,15 +9,15 @@ class UsersController < ApplicationController
   def new
     @person = Person.new
     @person.personable = User.new
+
+    flash[:errors]&.each { |error| @person.errors.add(:base, error) }
   end
 
   def create
     @person = Person.new(person_params)
 
     if @person.save
-      reset_session
       login_as @person.user
-
       redirect_to root_path
     else
       @person.errors.delete :personable

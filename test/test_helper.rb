@@ -3,8 +3,7 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "minitest/autorun"
 require "pry"
-
-require_relative 'support/feature_helpers'
+Dir[Rails.root.join('test/support/**/*.rb')].sort.each { |file| require file }
 
 class Capybara::Node::Element
   def obsolete?
@@ -33,30 +32,24 @@ class ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
   end
+
+  def assert_logged_in(user = nil)
+    if user.nil?
+      assert session.fetch(:current_user_id)
+    else
+      assert_equal session[:current_user_id], user.id
+    end
+  end
 end
 
 module ActiveSupport
   class TestCase
     include Turbo::Broadcastable::TestHelper
     include ActiveJob::TestHelper
+    include FeatureHelpers
+    include PostgresqlHelper
 
-    # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
-
-    # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
-
-    # Added this ActiveStorage configuration when implementing postgres-file storage
-    setup do
-      if ActiveStorage::Current.respond_to?(:url_options)
-        ActiveStorage::Current.url_options = { host: 'example.com', protocol: 'https' }
-      else
-        ActiveStorage::Current.host = "https://example.com"
-      end
-    end
-
-    teardown do
-      ActiveStorage::Current.reset
-    end
   end
 end

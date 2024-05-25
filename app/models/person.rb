@@ -22,7 +22,7 @@ class Person < ApplicationRecord
   end
 
   def proper_personable_id
-    if personable.id.blank?
+    if personable_id.present? && personable.id.blank?
       errors.add(:personable_id, 'must be provided on update')
     end
   end
