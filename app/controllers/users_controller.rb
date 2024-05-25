@@ -8,6 +8,8 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:update]
 
   def new
+    redirect_to root_url if Feature.disabled?(:registration)
+
     @person = Person.new
     @person.personable = User.new
 
