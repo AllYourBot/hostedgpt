@@ -56,9 +56,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_21_175839) do
     t.jsonb "tools", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "images", default: false, null: false
-    t.bigint "language_model_id"
     t.datetime "deleted_at", precision: nil
+    t.bigint "language_model_id"
     t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
     t.index ["user_id", "deleted_at"], name: "index_assistants_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_assistants_on_user_id"
@@ -100,10 +99,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_21_175839) do
   end
 
   create_table "language_models", force: :cascade do |t|
-    t.integer "position"
-    t.string "name"
-    t.text "description"
-    t.boolean "supports_images"
+    t.integer "position", null: false
+    t.string "name", null: false
+    t.text "description", null: false
+    t.boolean "supports_images", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -5,7 +5,6 @@ samantha:
   description: My personal assistant
   instructions: You are a helpful assistant
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-  images: true
 
 keith_gpt4:
   user: keith
@@ -14,7 +13,6 @@ keith_gpt4:
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-  images: true
 
 keith_claude3:
   user: keith
@@ -23,7 +21,6 @@ keith_claude3:
   description: Claude 3, Opus version
   instructions:
   tools: []
-  images: true
 
 rob_gpt4:
   user: rob
@@ -32,4 +29,11 @@ rob_gpt4:
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-  images: true
+
+zen:
+  user: keith
+  language_model: gpt_3_5_turbo
+  name: Zen
+  description: OpenAI's GPT-3 but with Zen
+  instructions: Include a Zen perspective when possilbe
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]

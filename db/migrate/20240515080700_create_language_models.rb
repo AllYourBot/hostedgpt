@@ -1,10 +1,10 @@
 class CreateLanguageModels < ActiveRecord::Migration[7.1]
   def up
     create_table :language_models do |t|
-      t.integer :position
-      t.string :name
-      t.text :description
-      t.boolean :supports_images
+      t.integer :position, null: false
+      t.string :name, null: false
+      t.text :description, null: false
+      t.boolean :supports_images, null: false
 
       t.timestamps
     end
@@ -48,8 +48,8 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
 
     # Respect some users who may have added their own model values in the assistants table
     (Assistant.all.pluck(:model).uniq - LanguageModel.all.pluck(:name)).each do |model_name|
-      Rails.logger.info "Create language_models record from assistants column value: #{model_name.inspect}"
-      LanguageModel.create!(name: model_name, description: model_name, position: max_position += 1)
+      Rails.logger.info "Create language_models record from assistants column value: #{model_name.inspect}. Setting supports_images to false, update manually if it has support"
+      LanguageModel.create!(name: model_name, description: model_name, position: max_position += 1, supports_images: false)
     end
 
     add_reference :assistants, :language_model, null: true, foreign_key: { to_table: :language_models}
@@ -60,10 +60,14 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
     ActiveRecord::Base.connection.execute "update assistants a set language_model_id = (select id from language_models lm where lm.name = a.model)"
 
     remove_column :assistants, :model
+    remove_column :assistants, :images
   end
 
   def down
+    add_column  :assistants, :images, :boolean
     add_column :assistants, :model, :string
+
+    ActiveRecord::Base.connection.execute "update assistants a set images = (select supports_images from language_models lm where lm.id=a.language_model_id)"
     ActiveRecord::Base.connection.execute "update assistants a set model = (select name from language_models lm where lm.id=a.language_model_id)"
 
     remove_column :assistants, :language_model_id

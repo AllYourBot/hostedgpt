@@ -19,6 +19,7 @@ gpt_4o:
 gpt_3_5_turbo:
     position: 4
     name: gpt-3.5-turbo
+    supports_images: false
     description: gpt-3.5-turbo from fixtures
 
 claude_3_sonnet:
@@ -43,3 +44,4 @@ gpt_3_5_turbo_0125:
     position: 12
     name: gpt-3.5-turbo
     description: gpt-3.5-turbo from fixtures
+    supports_images: false

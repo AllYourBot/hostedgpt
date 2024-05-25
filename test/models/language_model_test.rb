@@ -6,6 +6,11 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert language_models(:claude_3_sonnet).readonly?
   end
 
+  test "supports_images?" do
+    assert language_models(:gpt_best).supports_images?
+    refute language_models(:gpt_3_5_turbo).supports_images?
+  end
+
   test "ai_backend for best models" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
     assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend

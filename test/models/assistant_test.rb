@@ -13,6 +13,11 @@ class AssistantTest < ActiveSupport::TestCase
     assert_instance_of Message, assistants(:samantha).messages.first
   end
 
+  test "has supports_images?" do
+    assert assistants(:samantha).supports_images?
+    refute assistants(:zen).supports_images?
+  end
+
   test "has associated documents" do
     assert_instance_of Document, assistants(:samantha).documents.first
   end
@@ -98,6 +103,7 @@ class AssistantTest < ActiveSupport::TestCase
       users(:rob).assistants.first.destroy
     end
   end
+
   test "can destroy assistant of a user if they have more than one" do
     assert_nothing_raised do
       users(:keith).assistants.first.destroy

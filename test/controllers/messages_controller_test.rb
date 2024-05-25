@@ -127,6 +127,17 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "div#composer.hidden", false
   end
 
+  test "when assistant supports images the image upload function is available" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select "div#composer"
+    assert_select "div#composer.relationship", false
+  end
+
+  test "when assistant doesnt support images the image upload function is not available" do
+    get conversation_messages_url(conversations(:trees), version: 1)
+    assert_select "div#composer.relationship"
+  end
+
   test "when assistant is deleted deleted-blurb is shown and the composer is hidden" do
     @assistant.destroy
     get conversation_messages_url(@conversation, version: 1)

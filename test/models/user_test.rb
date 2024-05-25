@@ -147,15 +147,15 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "has assistants" do
-    assert_equal 3, users(:keith).assistants.length
+    assert_equal 4, users(:keith).assistants.length
     assert_equal 1, users(:rob).assistants.length
   end
 
   test "has assistants including deleted" do
-    assert_equal 3, users(:keith).assistants_including_deleted.length
+    assert_equal 4, users(:keith).assistants_including_deleted.length
     users(:keith).assistants.first.destroy
     users(:keith).reload
-    assert_equal 3, users(:keith).assistants_including_deleted.length
-    assert_equal 2, users(:keith).assistants.length
+    assert_equal 4, users(:keith).assistants_including_deleted.length # no difference
+    assert_equal 3, users(:keith).assistants.length
   end
 end
