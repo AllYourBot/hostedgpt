@@ -1,6 +1,8 @@
 require "test_helper"
 
 class MessageTest < ActiveSupport::TestCase
+  include ActionDispatch::TestProcess::FixtureFile
+
   test "has an associated assistant (it's through conversation)" do
     assert_instance_of Assistant, messages(:hear_me).assistant
   end
@@ -16,6 +18,16 @@ class MessageTest < ActiveSupport::TestCase
   # test "has associated content_document" do
   #   assert_instance_of Document, messages(:examine_this).content_document
   # end
+
+  test "handles documents_attributes" do
+    Current.user = users(:keith)
+    test_file = fixture_file_upload("cat.png", "image/png")
+    message = Message.create(assistant: assistants(:samantha), documents_attributes: {"0": {file: test_file}}, content_text: "Nice file")
+    assert_equal 1, message.documents.length
+    document = message.documents.first
+    assert_equal 'cat.png', document.filename
+    assert_equal assistants(:samantha), document.assistant
+  end
 
   test "has an associated run" do
     assert_instance_of Run, messages(:yes_i_do).run

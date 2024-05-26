@@ -1,6 +1,8 @@
 require "test_helper"
 
 class MessagesControllerTest < ActionDispatch::IntegrationTest
+  include ActionDispatch::TestProcess::FixtureFile
+
   setup do
     @message = messages(:hear_me)
     @conversation = @message.conversation
@@ -77,6 +79,23 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, message2.index
     assert_equal 2, message2.version
     assert_redirected_to conversation_messages_url(@conversation, version: 2)
+  end
+
+        #post assistant_messages_url(@assistant), params: { message: { content_text: @message.content_text } }
+
+  test "should create message with image attachment" do
+    test_file = fixture_file_upload("cat.png", "image/png")
+    assert_difference "Conversation.count", 1 do
+      assert_difference "Document.count", 1 do
+        assert_difference "Message.count", 2 do
+          post assistant_messages_url(@assistant), params: { message: { documents_attributes: {"0": {file: test_file}}, content_text: @message.content_text } }
+        end
+      end
+    end
+    
+    conversation = Conversation.last
+    document = Document.last
+    assert_equal @assistant, document.assistant
   end
 
   test "should fail to create message when there is no content_text" do
