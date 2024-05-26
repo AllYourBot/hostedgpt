@@ -8,6 +8,7 @@ module Authenticate
   end
 
   def login_as(user)
+    reset_session
     session[:current_user_id] = user.id
   end
 

@@ -2,10 +2,11 @@ class User < ApplicationRecord
   include Personable, Registerable
   encrypts :openai_key, :anthropic_key
 
-  has_secure_password
+  has_secure_password validations: false
   has_person_name
 
-  validates :password, length: { minimum: 6 }, allow_nil: true
+  validates :password, presence: true, on: :create, if: -> { auth_uid.blank? }
+  validates :password, length: { minimum: 6 }, if: -> { password.present? }
   validates :first_name, presence: true
   validates :last_name, presence: true, on: :create
 

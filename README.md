@@ -26,6 +26,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
 - [Deploy the app on Fly.io](#deploy-the-app-on-fly)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
 - [Contribute as a developer / Running locally](#contribute-as-a-developer)
+- [Configure optional features](#configure-optional-features)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
 
@@ -132,6 +133,72 @@ Every time you pull new changes down, kill `bin/dev` and then re-run it. This wi
 If you're set up with Docker you run `docker compose run base rails test`. Note that the system tests, which use a headless browser, are not able to run in Docker. They will be run automatically for you if you create a Pull Request against the project.
 
 If you set up the app outside of Docker, then run the usual `bin/rails test` and `bin/rails test:system`.
+
+
+# Configure optional features
+
+The file `options.yml` contains a number of things you can configure. Simple flags are:
+
+- `REGISTRATON_FEATURE` is `true` by default but you can set to `false` to prevent any new people from creating an account.
+- `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It defaults to `false` but you may choose to enable this.
+
+
+## Authentication
+
+HostedGPT supports multiple authentication methods:
+
+<!-- no toc -->
+- [Password authentication](#password-authentication)
+- [Google OAuth authentication](#google-oauth-authentication)
+
+### Password authentication
+
+Password authentication is enabled by default. You can disable it by setting `PASSWORD_AUTHENTICATION_FEATURE` to `false`.
+
+### Google OAuth authentication
+
+Google OAuth authentication is disabled by default. You can enable it by setting `GOOGLE_AUTHENTICATION_FEATURE` to `true`.
+
+To enable Google OAuth authentication, you need to set up Google OAuth in the Google Cloud Console. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
+
+- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID (alternatively, you can add `google_auth_client_id` to your Rails credentials file)
+- `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret (alternatively, you can add `google_auth_client_secret` to your Rails credentials file)
+
+**Steps to set up:**
+
+1. **Go to the Google Cloud Console and Create a New Project:**
+   - Open your web browser and navigate to [Google Cloud Console](https://console.cloud.google.com/).
+   - Click on the project drop-down menu at the top of the page.
+   - Select "New Project"
+   - Enter a name for your project and click "Create"
+
+2. **Create OAuth Consent Screen:**
+   - In the navigation menu, go to "APIs & Services" > "OAuth consent screen"
+   - Select "Internal" and click "Create"
+   - Fill out the required fields (App name, User support email, etc.).
+   - Add your domain (if applicable) and authorized domains.
+   - Click "Save and Continue"
+
+3. **Create OAuth Credentials:**
+   - In the navigation menu, go to "APIs & Services" > "Credentials"
+   - Click on "Create Credentials" and select "OAuth client ID"
+   - Choose "Web application" as the application type.
+   - Fill out the required fields:
+     - **Name:** A descriptive name for your client ID, e.g. "HostedGPT"
+     - **Authorized JavaScript origins:** Your application's base URL, e.g., `https://hostedgpt.example.com`
+     - **Authorized Redirect URIs:** Add these paths but replace the base URL with yours:
+       - `https://hostedgpt.example.com/auth/google/callback`
+       - `https://hostedgpt.example.com/auth/gmail/callback`
+       - `https://hostedgpt.example.com/auth/google_tasks/callback`
+       - `https://hostedgpt.example.com/auth/google_calendar/callback`
+   - Click "Create"
+
+4. **Set Environment Variables:**
+   - After creating the credentials, you will see a dialog with your Client ID and Client Secret.
+   - Set the Client ID and Client Secret as environment variables in your application:
+     - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID ENV or `google_auth_client_id` in your Rails credentials file
+     - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret ENV or `google_auth_client_secret` in your Rails credentials file
+
 
 # Understanding the Docker configuration
 

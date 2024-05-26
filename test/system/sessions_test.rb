@@ -29,4 +29,18 @@ class SessionsTest < ApplicationSystemTestCase
     assert_active "#password"
     assert_current_path previous_path
   end
+
+  test "should NOT display a Google button when the feature is DISABLED" do
+    stub_features(google_authentication: false) do
+      visit root_url
+      assert_no_text "Log In with Google"
+    end
+  end
+
+  test "should SHOW the Google button when the feature is ENABLED" do
+    stub_features(google_authentication: true) do
+      visit root_url
+      assert_text "Log In with Google"
+    end
+  end
 end
