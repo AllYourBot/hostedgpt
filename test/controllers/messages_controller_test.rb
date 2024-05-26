@@ -81,8 +81,6 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to conversation_messages_url(@conversation, version: 2)
   end
 
-        #post assistant_messages_url(@assistant), params: { message: { content_text: @message.content_text } }
-
   test "should create message with image attachment" do
     test_file = fixture_file_upload("cat.png", "image/png")
     assert_difference "Conversation.count", 1 do
@@ -92,7 +90,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
         end
       end
     end
-    
+
     conversation = Conversation.last
     document = Document.last
     assert_equal @assistant, document.assistant
