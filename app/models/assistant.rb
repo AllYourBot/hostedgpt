@@ -3,11 +3,11 @@ class Assistant < ApplicationRecord
 
   belongs_to :user
 
-  has_many :conversations, dependent: :destroy
-  has_many :documents, dependent: :destroy
-  has_many :runs, dependent: :destroy
-  has_many :steps, dependent: :destroy
-  has_many :messages # TODO: What should happen if an assistant is deleted?
+  has_many :conversations
+  has_many :documents
+  has_many :runs
+  has_many :steps
+  has_many :messages
 
   delegate :supports_images?, to: :language_model
 

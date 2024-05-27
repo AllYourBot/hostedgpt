@@ -56,10 +56,7 @@ class MessagesController < ApplicationController
   end
 
   def update
-    # Clicking edit beneath a message actually submits to create and not here. This action is only used for next/prev conversation.
-    # In order to force a morph we PATCH to here and redirect.
-    @message.allow_deleted_assistant = true # disable that validation
-    if @message.update(version_navigate_message_params)
+    if @message.update(message_params)
       redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version)
     else
       render :edit, status: :unprocessable_entity
@@ -112,9 +109,5 @@ class MessagesController < ApplicationController
       modified_params[:content_text] = nil # nil and "" have different meanings
     end
     modified_params
-  end
-
-  def version_navigate_message_params
-    params.require(:message).permit(:conversation_id, :version)
   end
 end

@@ -8,7 +8,7 @@ background:
 
 cat_photo:
   user: keith
-  assistant: samantha
+  assistant:
   message: examine_this
   filename: cat.png
   purpose: assistants
@@ -16,7 +16,7 @@ cat_photo:
 
 cute_cat_photo:
   user: keith
-  assistant: samantha
+  assistant:
   message: one_attachment
   filename: cute_cat_photo.png
   purpose: assistants
@@ -32,7 +32,7 @@ single_cat_photo:
 
 single_dog_photo:
   user: keith
-  assistant: samantha
+  assistant:
   message: two_attachments
   filename: single_dog_photo.png
   purpose: assistants

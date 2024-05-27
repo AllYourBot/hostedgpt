@@ -9,13 +9,9 @@ class AssistantTest < ActiveSupport::TestCase
     assert_instance_of Conversation, assistants(:samantha).conversations.first
   end
 
-  test "has associated messages (through conversations)" do
-    assert_instance_of Message, assistants(:samantha).messages.first
-  end
-
   test "has supports_images?" do
     assert assistants(:samantha).supports_images?
-    refute assistants(:zen).supports_images?
+    refute assistants(:keith_gpt3).supports_images?
   end
 
   test "has associated documents" do
@@ -30,18 +26,27 @@ class AssistantTest < ActiveSupport::TestCase
     assert_instance_of Step, assistants(:samantha).steps.first
   end
 
+  test "has associated messages (through conversations)" do
+    assert_instance_of Message, assistants(:samantha).messages.first
+  end
+
+  test "has associated language_model" do
+    assert_instance_of LanguageModel, assistants(:samantha).language_model
+  end
+
   test "tools is an array of objects" do
     assert_instance_of Array, assistants(:samantha).tools
   end
 
-  test "simple create works" do
+  test "simple create works and tool defaults to empty array" do
+    a = nil
     assert_nothing_raised do
-      Assistant.create!(user: users(:keith), language_model: language_models(:gpt_4), name: 'abc')
+      a = Assistant.create!(
+        user: users(:keith),
+        language_model: language_models(:gpt_4),
+        name: 'abc'
+      )
     end
-  end
-
-  test "tools defaults to empty array on create" do
-    a = Assistant.create!(user: users(:keith), language_model: language_models(:gpt_4), name: 'abc')
     assert_equal [], a.tools
   end
 

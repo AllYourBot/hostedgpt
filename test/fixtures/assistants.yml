@@ -22,18 +22,18 @@ keith_claude3:
   instructions:
   tools: []
 
+keith_gpt3:
+  user: keith
+  language_model: gpt_3_5_turbo
+  name: GPT 3.5
+  description: OpenAI's GPT-3 but with Zen
+  instructions: Include a Zen perspective when possilbe
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+
 rob_gpt4:
   user: rob
   language_model: gpt_4
   name: GPT-4
   description: OpenAI's GPT-4
   instructions:
-  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-
-zen:
-  user: keith
-  language_model: gpt_3_5_turbo
-  name: Zen
-  description: OpenAI's GPT-3 but with Zen
-  instructions: Include a Zen perspective when possilbe
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]

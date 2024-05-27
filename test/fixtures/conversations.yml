@@ -78,6 +78,6 @@ weather:
 
 trees:
   user: keith
-  assistant: zen
+  assistant: keith_gpt3
   title: Trees
   last_assistant_message: trees_explained

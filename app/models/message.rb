@@ -9,7 +9,6 @@ class Message < ApplicationRecord
 
   serialize :content_tool_calls, coder: JsonSerializer
 
-
   enum role: %w[user assistant tool].index_by(&:to_sym)
 
   delegate :user, to: :conversation
@@ -17,7 +16,6 @@ class Message < ApplicationRecord
   attribute :role, default: :user
 
   before_validation :create_conversation, on: :create, if: -> { conversation.blank? }, prepend: true
-  before_create :copy_assistant_id_to_documents_if_empty
 
   validates :role, presence: true
   validates :content_text, presence: true, unless: :assistant?
@@ -59,20 +57,12 @@ class Message < ApplicationRecord
     self.conversation = Conversation.create!(user: Current.user, assistant: assistant)
   end
 
-  def copy_assistant_id_to_documents_if_empty
-    return if assistant.blank?
-    documents.each do |document|
-      document.assistant_id ||= assistant.id
-    end
-  end
-
   def validate_conversation
     errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
   end
 
   def validate_assistant
     errors.add(:assistant, 'is invalid') unless assistant.user == Current.user
-    errors.add(:assistant, 'has been deleted') if assistant.deleted? && !allow_deleted_assistant
   end
 
   def start_assistant_reply

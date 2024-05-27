@@ -91,9 +91,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    conversation = Conversation.last
-    document = Document.last
-    assert_equal @assistant, document.assistant
+    (user_msg, asst_msg) = Message.last(2)
+    assert_equal Document.last, user_msg.documents.first
   end
 
   test "should fail to create message when there is no content_text" do
@@ -137,7 +136,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'div[data-role="message"]', count: @conversation.messages.count
   end
 
-  test "when assistant is not deleted deleted-blurb is hidden but the composer is not" do
+  test "when assistant is not deleted the deleted-blurb is hidden but the composer is visible" do
     get conversation_messages_url(@conversation, version: 1)
     assert_select "footer div.hidden p.text-center", "Samantha has been deleted and cannot assist any longer."
     assert_select "div#composer"
@@ -155,7 +154,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "div#composer.relationship"
   end
 
-  test "when assistant is deleted deleted-blurb is shown and the composer is hidden" do
+  test "when assistant is deleted the deleted-blurb is shown and the composer is hidden" do
     @assistant.destroy
     get conversation_messages_url(@conversation, version: 1)
     assert_select "footer p.text-center", "Samantha has been deleted and cannot assist any longer."
@@ -163,7 +162,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "div#composer.hidden"
   end
 
-  test "even when assistant is deleted update succeeds for a new version in the URL" do
+  test "when assistant is deleted an update succeeds for a new version in the URL" do
     @assistant.destroy
     message = messages(:message2_v1)
 

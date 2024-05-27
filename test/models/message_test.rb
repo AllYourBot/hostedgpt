@@ -26,7 +26,6 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal 1, message.documents.length
     document = message.documents.first
     assert_equal 'cat.png', document.filename
-    assert_equal assistants(:samantha), document.assistant
   end
 
   test "has an associated run" do

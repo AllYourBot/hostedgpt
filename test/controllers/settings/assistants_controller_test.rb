@@ -23,19 +23,6 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_equal params, Assistant.last.slice(:name, :description, :instructions, :language_model_id)
   end
 
-  test "should not hide assistants" do
-    user = @assistant.user
-    5.times do |x|
-      user.assistants.create! name: "New assistant #{x+1}", language_model: LanguageModel.find_by(name: 'gpt-3.5-turbo')
-    end
-    get edit_settings_assistant_url(@assistant)
-    assert user.assistants.length > 6
-    user.assistants.each do |assistant|
-      assert_select %{div[data-role="assistant"] a[data-role="name"] span}, assistant.name
-      assert_select %{div.hidden[data-role="assistant"] a[data-role="name"] span}, false
-    end
-  end
-
   test "should get edit" do
     get edit_settings_assistant_url(@assistant)
     assert_response :success

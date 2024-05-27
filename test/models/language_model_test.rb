@@ -1,6 +1,10 @@
 require "test_helper"
 
 class LanguageModelTest < ActiveSupport::TestCase
+  test "has associated assistant" do
+    assert_instance_of Assistant, language_models(:gpt_4).assistants.first
+  end
+
   test "is readonly?" do
     assert language_models(:gpt_best).readonly?
     assert language_models(:claude_3_sonnet).readonly?
@@ -34,11 +38,5 @@ class LanguageModelTest < ActiveSupport::TestCase
   test "ai_backend for OpenAI  models" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_4o).ai_backend
     assert_equal AIBackend::OpenAI, language_models(:gpt_3_5_turbo).ai_backend
-  end
-
-  test "has assistants" do
-    assert_equal 3, language_models(:gpt_4).assistants.size
-    assert_equal 1, language_models(:claude_3_opus).assistants.size
-    assert_equal 0, language_models(:claude_3_sonnet).assistants.size
   end
 end

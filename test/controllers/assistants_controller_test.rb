@@ -12,6 +12,8 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_assistant_message_path(@assistant)
   end
 
+  # TODO: Delete this duplicate functionality since it's been moved to settings.
+
   test "should get new" do
     get new_assistant_url
     assert_response :success
@@ -45,14 +47,4 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "new name", @assistant.name
   end
 
-  # TODO: Messages are connected to assistants. When an assistant is deleted,
-  # what should happen to the messages?
-  #
-  # test "should destroy assistant" do
-  #   assert_difference("Assistant.count", -1) do
-  #     delete assistant_url(@assistant)
-  #   end
-
-  #   assert_redirected_to assistants_url
-  # end
 end
