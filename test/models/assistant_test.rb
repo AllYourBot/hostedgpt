@@ -50,15 +50,20 @@ class AssistantTest < ActiveSupport::TestCase
     assert_equal [], a.tools
   end
 
-  test "associations are deleted when user is being destroyed" do
-    conversations_count = assistants(:samantha).conversations.count
+  test "associations are deleted upon destroy" do
+    assistant = assistants(:samantha)
+    conversation_count = assistant.conversations.count * -1
+    message_count = assistant.conversations.map { |c| c.messages.length }.sum * -1
+    document_count = (assistant.documents.count+assistant.conversations.sum { |c| c.messages.sum { |m| m.documents.count }}) * -1
+    run_count = assistant.runs.count * -1
+    step_count = assistant.steps.count * -1
 
-    User.stub_any_instance(:destroy_in_progress?, true) do
-      assert_difference "Conversation.count", -1*conversations_count do
-        assert_difference "Document.count", -5 do
-          assert_difference "Run.count", -19 do
-            assert_difference "Step.count", -3 do
-              assistants(:samantha).destroy
+    assert_difference "Message.count", message_count do
+      assert_difference "Conversation.count", conversation_count do
+        assert_difference "Document.count", document_count do
+          assert_difference "Run.count", run_count do
+            assert_difference "Step.count", step_count do
+              assistant.destroy
             end
           end
         end
@@ -66,12 +71,14 @@ class AssistantTest < ActiveSupport::TestCase
     end
   end
 
-  test "associations are not deleted upon destroy" do
-    assert_no_difference "Conversation.count" do
-      assert_no_difference "Document.count" do
-        assert_no_difference "Run.count" do
-          assert_no_difference "Step.count" do
-            assistants(:samantha).destroy
+  test "associations are not deleted upon soft delete" do
+    assert_no_difference "Message.count" do
+      assert_no_difference "Conversation.count" do
+        assert_no_difference "Document.count" do
+          assert_no_difference "Run.count" do
+            assert_no_difference "Step.count" do
+              assistants(:samantha).soft_delete
+            end
           end
         end
       end
@@ -103,13 +110,13 @@ class AssistantTest < ActiveSupport::TestCase
     assert record.errors[:name].present?
   end
 
-  test "cannot destroy last assistant of a user" do
+  test "cannot soft_delete last assistant of a user" do
     assert_raise do
-      users(:rob).assistants.first.destroy
+      users(:rob).assistants.first.soft_delete!
     end
   end
 
-  test "can destroy assistant of a user if they have more than one" do
+  test "can soft_delete assistant of a user if they have more than one" do
     assert_nothing_raised do
       users(:keith).assistants.first.destroy
     end

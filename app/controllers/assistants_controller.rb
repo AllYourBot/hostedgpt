@@ -35,7 +35,7 @@ class AssistantsController < ApplicationController
   end
 
   def destroy
-    @assistant.destroy!
+    @assistant.soft_delete
     redirect_to assistants_url, notice: "Assistant was successfully destroyed.", status: :see_other
   end
 

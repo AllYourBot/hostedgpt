@@ -27,8 +27,11 @@ class Settings::AssistantsController < Settings::ApplicationController
   end
 
   def destroy
-    @assistant.destroy!
-    redirect_to new_settings_assistant_url, notice: "Deleted", status: :see_other
+    if @assistant.soft_delete
+      redirect_to new_settings_assistant_url, notice: "Deleted", status: :see_other
+    else
+      redirect_to new_settings_assistant_url, alert: "Cannot delete your last assistant", status: :see_other
+    end
   end
 
   private

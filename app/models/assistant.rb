@@ -3,11 +3,11 @@ class Assistant < ApplicationRecord
 
   belongs_to :user
 
-  has_many :conversations
-  has_many :documents
-  has_many :runs
-  has_many :steps
-  has_many :messages
+  has_many :conversations, dependent: :destroy
+  has_many :documents, dependent: :destroy
+  has_many :runs, dependent: :destroy
+  has_many :steps, dependent: :destroy
+  has_many :messages, dependent: :destroy
 
   delegate :supports_images?, to: :language_model
 
@@ -27,13 +27,14 @@ class Assistant < ApplicationRecord
       parts[1]&.try(:[], 0)&.capitalize.to_s
   end
 
-  def destroy
-    if user.destroy_in_progress?
-      super
-    else
-      raise "Can't delete user's last assistant" if user.assistants.count <= 1
-      update!(deleted_at: Time.now)
-    end
+  def soft_delete
+    return false if user.assistants.count <= 1
+    update!(deleted_at: Time.now)
+    return true
+  end
+
+  def soft_delete!
+    raise "Can't delete user's last assistant" if !soft_delete
   end
 
   def to_s

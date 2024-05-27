@@ -129,8 +129,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to conversation_messages_url(message.conversation, version: 2)
   end
 
-  test "when assistant is deleted still see all the conversations messages" do
-    assert @assistant.destroy
+  test "messages can still be viewed when attached to a soft-deleted assistant" do
+    assert @assistant.soft_delete
     get conversation_messages_url(@conversation, version: 1)
     assert @conversation.messages.count > 0
     assert_select 'div[data-role="message"]', count: @conversation.messages.count
@@ -149,21 +149,21 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "div#composer.relationship", false
   end
 
-  test "when assistant doesnt support images the image upload function is not available" do
+  test "when assistant doesn't support images the image upload function is not available" do
     get conversation_messages_url(conversations(:trees), version: 1)
     assert_select "div#composer.relationship"
   end
 
-  test "when assistant is deleted the deleted-blurb is shown and the composer is hidden" do
-    @assistant.destroy
+  test "the composer is hidden when viewing a list of messages attached to an assistant that has been soft-deleted" do
+    @assistant.soft_delete
     get conversation_messages_url(@conversation, version: 1)
     assert_select "footer p.text-center", "Samantha has been deleted and cannot assist any longer."
     assert_select "footer div.hidden p.text-center", false
     assert_select "div#composer.hidden"
   end
 
-  test "when assistant is deleted an update succeeds for a new version in the URL" do
-    @assistant.destroy
+  test "viewing messages in a conversation which has history but the assistant has been soft deleted, the conversation history can still be viewed" do
+    @assistant.soft_delete
     message = messages(:message2_v1)
 
     patch message_url(message, version: 2), params: { message: { id: message.id } }
