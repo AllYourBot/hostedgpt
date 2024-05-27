@@ -48,6 +48,7 @@ module ActiveSupport
     include ActiveJob::TestHelper
     include FeatureHelpers
     include PostgresqlHelper
+    include ViewHelpers
 
     parallelize(workers: :number_of_processors)
     fixtures :all

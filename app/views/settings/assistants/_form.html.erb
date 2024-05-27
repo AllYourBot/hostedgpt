@@ -12,6 +12,19 @@
   <% end %>
 
   <div class="my-5">
+    <%= form.label :name %>
+    <%= form.text_field :name,
+      autofocus: assistant.new_record?,
+      class: %|
+        block w-full
+        border border-gray-200 outline-none
+        shadow rounded-md
+        px-3 py-2 mt-2
+        dark:text-black
+      | %>
+  </div>
+
+  <div class="my-5">
     <%= form.label :language_model_id  %><br/>
     <%= form.select :language_model_id,
       LanguageModel.ordered.pluck(:description, :id),
@@ -28,11 +41,6 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :name %>
-    <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
-  </div>
-
-  <div class="my-5">
     <%= form.label :description %>
     <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
@@ -40,7 +48,15 @@
   <div class="my-5">
     <%= form.label :instructions, "Custom Instructions" %>
     <%= form.text_area :instructions,
-      class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black h-18",
+      autofocus: assistant.persisted?,
+      class: %|
+        block w-full
+        border border-gray-200 outline-none
+        shadow rounded-md
+        px-3 py-2 mt-2
+        dark:text-black
+        h-18
+      |,
       data: {
         controller: "textarea-autogrow",
         action: %|

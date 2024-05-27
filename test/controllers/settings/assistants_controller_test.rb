@@ -3,7 +3,8 @@ require "test_helper"
 class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @assistant = assistants(:samantha)
-    login_as @assistant.user
+    @user = @assistant.user
+    login_as @user
   end
 
   test "should get new" do
@@ -26,8 +27,23 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
   test "should get edit" do
     get edit_settings_assistant_url(@assistant)
     assert_response :success
-    assert_select 'section#menu a[href="/settings/person/edit"] span', "Your Account"
-    assert_select 'section#menu a[href="/settings/assistants/new"] span', "New Assistant"
+    assert_contains_text "div#nav-container", "Your Account"
+    assert_contains_text "div#nav-container", "New Assistant"
+  end
+
+  test "form should display a DELETE button if this is not your last assistant" do
+    assert @user.assistants.length > 1, "User needs to have more than one assistant"
+    get edit_settings_assistant_url(@assistant)
+    assert_response :success
+    assert_contains_text "main", "Delete"
+  end
+
+  test "form should NOT display a DELETE button if this is your last assistant" do
+    @user.assistants.where.not(id: @assistant.id).map(&:destroy)
+    assert @user.assistants.length == 1, "User needs to have more than one assistant"
+    get edit_settings_assistant_url(@user.assistants.first)
+    assert_response :success
+    assert_contains_text "main", "Delete"
   end
 
   test "should allow language_model selection" do

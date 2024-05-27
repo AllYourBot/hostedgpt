@@ -1,5 +1,6 @@
 class Settings::AssistantsController < Settings::ApplicationController
   before_action :set_assistant, only: [:edit, :update, :destroy]
+  before_action :set_last_assistant, except: [:destroy]
 
   def new
     @assistant = Assistant.new
@@ -41,6 +42,10 @@ class Settings::AssistantsController < Settings::ApplicationController
     if @assistant.nil?
       redirect_to new_settings_assistant_url, notice: "The assistant was deleted", status: :see_other
     end
+  end
+
+  def set_last_assistant
+    @last_assistant = Current.user.assistants.count <= 1
   end
 
   def assistant_params
