@@ -29,8 +29,6 @@ class Message < ApplicationRecord
 
   scope :ordered, -> { latest_version_for_conversation }
 
-  attr_accessor :allow_deleted_assistant
-
   def name
     case role
     when "user" then user.first_name[/\A[a-zA-Z0-9_-]+/]
