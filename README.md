@@ -66,7 +66,7 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 # Deploy the app on Fly
 
-Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free serve so Fly is actually less expensive over the long term.
+Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free service so Fly is actually less expensive over the long term.
 
 1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
 1. Install the Fly command-line tool [view instructions](https://fly.io/docs/hands-on/install-flyctl/)
