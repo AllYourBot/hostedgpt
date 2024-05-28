@@ -47,7 +47,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     msg = AIBackend::OpenAI.get_tool_messages_by_calling(tool_calls).first
     assert_equal "tool", msg[:role]
     assert_equal "abc123", msg[:tool_call_id]
-    assert msg[:content].starts_with?('"An unexpected error occurred. You')
+    assert msg[:content].starts_with?('"An unexpected error occurred')
   end
 
   test "get_tool_messages_by_calling gracefully handles calling an invalid function" do
@@ -58,7 +58,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     msg = AIBackend::OpenAI.get_tool_messages_by_calling(tool_calls).first
     assert_equal "tool", msg[:role]
     assert_equal "abc123", msg[:tool_call_id]
-    assert msg[:content].starts_with?('"An unexpected error occurred. You')
+    assert msg[:content].starts_with?('"An unexpected error occurred')
   end
 
   test "get_next_chat_message works to get a function call" do
@@ -68,6 +68,40 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_function_response do
         function_call = @openai.get_next_chat_message { |chunk| streamed_text += chunk }
         assert_equal function, function_call.dig(0, "function", "name")
+      end
+    end
+  end
+
+  test "get_next_chat_message works to get a parallel function call CORRECTLY formatted" do
+    function = "openmeteo_get_current_and_todays_weather"
+
+    TestClient::OpenAI.stub :function, function do
+      TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_function_response(2) do
+        function_calls = @openai.get_next_chat_message { |chunk| streamed_text += chunk }
+
+        assert_equal 2, function_calls.length
+        assert_equal [0,1], function_calls.map { |f| f['index'] }
+        assert_equal [function, function], function_calls.map { |f| f['function']['name'] }
+      end
+    end
+  end
+
+  test "get_next_chat_message works to get a parallel function call INCORRECTLY formatted" do
+    function = "openmeteo_get_current_and_todays_weather"
+    arguments = {:city=>"Austin", :state=>"TX", :country=>"US"}.to_json
+
+    TestClient::OpenAI.stub :function, function+function do
+      TestClient::OpenAI.stub :arguments, arguments+arguments do
+        TestClient::OpenAI.stub :id, "call_abccall_def" do
+          TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_function_response do
+            function_calls = @openai.get_next_chat_message { |chunk| streamed_text += chunk }
+
+            assert_equal 2, function_calls.length
+            assert_equal [0,1], function_calls.map { |f| f[:index] }
+            assert_equal ['call_abc', 'call_def'], function_calls.map { |f| f[:id] }
+            assert_equal [function, function], function_calls.map { |f| f[:function][:name] }
+          end
+        end
       end
     end
   end

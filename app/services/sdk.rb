@@ -6,4 +6,8 @@ class SDK
   def self.get(url)
     SDK::Get.new(url)
   end
+
+  def self.post(url, bearer_token_proc = ->{ nil })
+    SDK::Post.new(url, bearer_token_proc)
+  end
 end

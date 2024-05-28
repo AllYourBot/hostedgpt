@@ -36,30 +36,34 @@ class TestClient::OpenAI
     }
   end
 
+  def self.id
+    "call_BlAN9iRiAD6aCzmBWCjzYxjj"
+  end
+
   def self.function
     raise "When using the OpenAI test client for api_function_response you need to stub the .function method"
   end
 
   def self.arguments
-    {:city=>"Austin", :state=>"TX", :country=>"US"}
+    {:city=>"Austin", :state=>"TX", :country=>"US"}.to_json
   end
 
-  def self.api_function_response
+  def self.api_function_response(count = 1)
     {
       "choices" => [
         {
           "delta"=>{
-            "tool_calls" => [
+            "tool_calls" => Array.new(count) {
               {
                 "index"=>0,
-                "id"=>"call_BlAN9iRiAD6aCzmBWCjzYxjj",
+                "id"=>id,
                 "type"=>"function",
                 "function"=>{
                   "name"=> function,
                   "arguments"=>arguments
                 }
               }
-            ]
+            }.map.with_index.map { |h, i| h['index'] = i; h }
           }
         }
       ]

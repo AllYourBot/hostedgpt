@@ -30,10 +30,9 @@ class AIBackend::OpenAI < AIBackend
         puts e.backtrace.join("\n") unless Rails.env.test?
 
         <<~STR.gsub("\n", " ")
-          An unexpected error occurred. You were requesting this information to help you answer a users question. Because this information
-          is not available at this time, DO NOT MAKE ANY GUESSES as you attempt to answer the users questions. Instead, you can let the
-          user know you attempted to retrieve some information in order to answer their question but you had some difficulties accessing
-          the website at this time.
+          An unexpected error occurred (#{e.message}). You were querying information to help you answer a users question. Because this information
+          is not available at this time, DO NOT MAKE ANY GUESSES as you attempt to answer the users questions. Instead, consider attempting a
+          different query OR let the user know you attempted to retrieve some information but the website is having difficulties at this time.
         STR
       end
 
@@ -79,7 +78,7 @@ class AIBackend::OpenAI < AIBackend
     end
 
     if @stream_response_tool_calls.present?
-      return @stream_response_tool_calls
+      format_parallel_tool_calls(@stream_response_tool_calls)
     elsif @stream_response_text.blank?
       raise ::Faraday::ParsingError
     end
@@ -146,5 +145,37 @@ class AIBackend::OpenAI < AIBackend
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
       end
     end
+  end
+
+  def format_parallel_tool_calls(content_tool_calls)
+    if content_tool_calls.length > 1 || (calls = content_tool_calls.dig(0, "id"))&.scan("call_").length == 1
+      return content_tool_calls
+    end
+
+    names = find_repeats_and_split(content_tool_calls.dig(0, "function", "name"))
+    args = content_tool_calls.dig(0, "function", "arguments").split(/(?<=})(?={)/)
+
+    calls.split(/(?=call_)/).map.with_index do |id, i|
+      {
+        index: i,
+        type: "function",
+        id: id[0...40],
+        function: {
+          name: names.fetch(i),
+          arguments: args.fetch(i),
+        }
+      }
+    end
+  rescue
+    {}
+  end
+
+  def find_repeats_and_split(str)
+    (1..str.length).each do |len|
+      substring = str[0, len]
+      repeated = substring * (str.length / len)
+      return [substring] * (str.length / len) if repeated == str
+    end
+    [str]
   end
 end

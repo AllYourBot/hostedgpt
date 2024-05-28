@@ -23,6 +23,8 @@ class Message < ApplicationRecord
   validate  :validate_conversation,  if: -> { conversation.present? && Current.user }
   validate  :validate_assistant,     if: -> { assistant.present? && Current.user }
 
+  normalizes :tool_call_id, with: -> tool_call_id { tool_call_id[0...40] }
+
   after_create :start_assistant_reply, if: :user?
   after_create :set_last_assistant_message, if: :assistant?
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
