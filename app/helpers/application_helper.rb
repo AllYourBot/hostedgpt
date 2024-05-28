@@ -1,5 +1,4 @@
 module ApplicationHelper
-
   def spinner(opts = {})
     html = <<~HTML
       <svg class="animate-spin -ml-1 mr-3 h-#{opts[:size]} w-#{opts[:size]} #{opts[:class]}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
