@@ -1,7 +1,7 @@
 class SDK::Verb
-  def initialize(url, bearer_token_proc = ->{ nil })
+  def initialize(url, bearer_token = nil)
     @url = url
-    @bearer_token_proc = bearer_token_proc
+    @bearer_token = bearer_token
   end
 
   def no_params

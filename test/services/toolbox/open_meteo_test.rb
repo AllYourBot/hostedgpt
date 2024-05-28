@@ -9,22 +9,29 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
       { name: "Paris", country: "United States", admin1: "Kentucky" },
       { name: "Paris", country: "United States", admin1: "Illinois" },
     ].map(&OpenStruct.method(:new))
+
+    @open_meteo = Toolbox::OpenMeteo.new
   end
 
   test "filter_by_country filters locations by country with a fuzzy match" do
-    filtered_locations = Toolbox::OpenMeteo.send(:filter_by_country, "US", locations: @locations)
+    filtered_locations = @open_meteo.send(:filter_by_country, "US", locations: @locations)
 
     @locations.delete_at(0)
     assert_equal @locations, filtered_locations
   end
 
   test "pick_by_region selects best with a fuzzy match" do
-    location = Toolbox::OpenMeteo.send(:pick_by_region, "TX", locations: @locations)
+    location = @open_meteo.send(:pick_by_region, "TX", locations: @locations)
     assert_equal @locations[1], location
   end
 
   test "get_current_and_todays_weather hits the API and doesn't fail" do
-    result = Toolbox::OpenMeteo.get_current_and_todays_weather(city_s: 'Austin', state_province_or_region_s: 'Texas')
+    result = @open_meteo.get_current_and_todays_weather(city_s: 'Austin', state_province_or_region_s: 'Texas')
+    assert result.values.all? { |value| value.present? }
+  end
+
+  test "get_current_and_todays_weather works as a tool call" do
+    result = Toolbox.call("openmeteo_get_current_and_todays_weather", city: 'Austin', state_province_or_region: 'Texas')
     assert result.values.all? { |value| value.present? }
   end
 end

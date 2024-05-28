@@ -1,13 +1,17 @@
 class SDK
-  def self.key
+  def key
     raise "self.key is undefined. You need to override this method."
   end
 
-  def self.get(url)
-    SDK::Get.new(url)
+  def bearer_token
+    nil
   end
 
-  def self.post(url, bearer_token_proc = ->{ nil })
-    SDK::Post.new(url, bearer_token_proc)
+  def get(url, token = nil)
+    SDK::Get.new(url, token || bearer_token)
+  end
+
+  def post(url, token = nil)
+    SDK::Post.new(url, token || bearer_token)
   end
 end

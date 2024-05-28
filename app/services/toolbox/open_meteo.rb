@@ -7,7 +7,7 @@ class Toolbox::OpenMeteo < Toolbox
     ask the user to clarify their city or clarify their state_province_or_region if you have not been instructed with those.
   S
 
-  def self.get_current_and_todays_weather(city_s:, state_province_or_region_s:, country_s: nil)
+  def get_current_and_todays_weather(city_s:, state_province_or_region_s:, country_s: nil)
     location = get_location(city_s, state_province_or_region_s, country_s)
 
     response = get("https://api.open-meteo.com/v1/forecast").params(
@@ -113,7 +113,7 @@ class Toolbox::OpenMeteo < Toolbox
     query data spanning a longer period, do multiple queries for the SPECIFIC narrow ranges you want to consider.
   S
 
-  def self.get_historical_weather(city_s:, state_province_or_region_s:, country_s:  nil, date_span_begin_s:, date_span_end_s:)
+  def get_historical_weather(city_s:, state_province_or_region_s:, country_s:  nil, date_span_begin_s:, date_span_end_s:)
     location = get_location(city_s, state_province_or_region_s, country_s)
 
     date_begin = Date.parse(date_span_begin_s).beginning_of_day
@@ -175,135 +175,133 @@ class Toolbox::OpenMeteo < Toolbox
     end
   end
 
-  class << self
-    private
+  private
 
-    def get_location(city_s, state_province_or_region_s, country_s = nil)
-      locations = get("https://geocoding-api.open-meteo.com/v1/search").params(
-        name: city_s,
-        count: 5,
-        language: "en",
-        format: "json",
-      ).results
+  def get_location(city_s, state_province_or_region_s, country_s = nil)
+    locations = get("https://geocoding-api.open-meteo.com/v1/search").params(
+      name: city_s,
+      count: 5,
+      language: "en",
+      format: "json",
+    ).results
 
-      locations = filter_by_country(country_s, locations: locations) if country_s.present?
-      pick_by_region(state_province_or_region_s, locations: locations)
+    locations = filter_by_country(country_s, locations: locations) if country_s.present?
+    pick_by_region(state_province_or_region_s, locations: locations)
+  end
+
+  def filter_by_country(country_s, locations:)
+    countries = locations.map(&:country)
+    country = countries[ pick_best_index(input: country_s, options: countries) ]
+
+    locations.select { |l| l.country == country }
+  end
+
+  def pick_by_region(region_s, locations:)
+    best_index = pick_best_index(input: region_s, options: locations.map(&:admin1).map(&:to_s))
+    locations[best_index]
+  end
+
+  def pick_best_index(input:, options: [])
+    input = Amatch::JaroWinkler.new(input)
+    options_hash = options.each_with_index.to_h { |value, index| [index, value] }
+    options_hash.each do |index, option|
+      options_hash[index] = input.match(option)
     end
 
-    def filter_by_country(country_s, locations:)
-      countries = locations.map(&:country)
-      country = countries[ pick_best_index(input: country_s, options: countries) ]
-
-      locations.select { |l| l.country == country }
+    highest_match_sort_with_lowest_index_tiebreaker = options_hash.sort do |a,b|
+      [b.second, a.first] <=> [a.second, b.first]
     end
 
-    def pick_by_region(region_s, locations:)
-      best_index = pick_best_index(input: region_s, options: locations.map(&:admin1).map(&:to_s))
-      locations[best_index]
+    highest_match_sort_with_lowest_index_tiebreaker.first.first # returns the index
+  end
+
+  def extract_data_from(response)
+    OpenStruct.new({
+      degrees_unit: unit(response.current_units.temperature_2m),
+      qty_unit: unit(response.current_units.precipitation),
+      yest_high: response.daily.temperature_2m_max[0],
+      yest_high_feel: response.daily.apparent_temperature_max[0],
+      yest_low: response.daily.temperature_2m_min[0],
+      yest_low_feel: response.daily.apparent_temperature_min[0],
+
+      today_high: response.daily.temperature_2m_max[1],
+      today_high_feel: response.daily.apparent_temperature_max[1],
+      today_low: response.daily.temperature_2m_min[1],
+      today_low_feel: response.daily.apparent_temperature_min[1],
+
+      curr: response.current.temperature_2m,
+      curr_feel: response.current.apparent_temperature,
+
+      curr_precip: response.current.precipitation,
+      curr_rain: response.current.rain,
+      curr_showers: response.current.showers,
+      curr_snowfall: response.current.snowfall,
+
+      curr_cloud_cover: response.current.cloud_cover,
+
+      today_precip: response.daily.precipitation_sum[1],
+      today_precip_prob: response.daily.precipitation_probability_max[1],
+
+      today_rain: response.daily.rain_sum[1],
+      today_showers: response.daily.showers_sum[1],
+      today_snowfall: response.daily.snowfall_sum[1],
+
+      curr_code: response.current.weather_code,
+      today_code: response.daily.weather_code[1],
+    })
+  end
+
+  def unit(u)
+    u.gsub('°', 'degrees ').gsub('F', 'fahrenheit').gsub('C', 'celcius')
+  end
+
+  def weather_code_to_description(code)
+    # it's 85 degrees with
+    case code
+    when 0 then ["are", "clear skies"]
+    when 1 then ["are", "mostly clear skies"]
+    when 2 then ["are", "scattered clouds"]
+    when 3 then ["are", "overcast skies"]
+    when 45 then ["is", "fog"]
+    when 48 then ["is", "freezing fog"]
+    when 51 then ["is", "light drizzle"]
+    when 53 then ["is", "drizzle"]
+    when 55 then ["is", "heavy drizzle"]
+    when 56 then ["is", "light freezing drizzle"]
+    when 57 then ["is", "freezing drizzle"]
+    when 61 then ["is", "light rain"]
+    when 63 then ["is", "rain"]
+    when 65 then ["is", "heavy rain"]
+    when 66 then ["is", "light freezing rain"]
+    when 67 then ["is", "freezing rain"]
+    when 71 then ["is", "light snow"]
+    when 73 then ["is", "snow"]
+    when 75 then ["is", "heavy snow"]
+    when 77 then ["is", "snow drizzle"]
+    when 80 then ["are", "light scattered showers"]
+    when 81 then ["are", "scattered showers"]
+    when 82 then ["are", "heavy scattered showers"]
+    when 85 then ["are", "light scattered snow"]
+    when 86 then ["are", "scattered snow"]
+    when 95 then ["are", "some thunderstorms"]
+    when 96 then ["are", "thunderstorms and some hail"]
+    when 99 then ["are", "thunderstorms and heavy hail"]
     end
+  end
 
-    def pick_best_index(input:, options: [])
-      input = Amatch::JaroWinkler.new(input)
-      options_hash = options.each_with_index.to_h { |value, index| [index, value] }
-      options_hash.each do |index, option|
-        options_hash[index] = input.match(option)
-      end
-
-      highest_match_sort_with_lowest_index_tiebreaker = options_hash.sort do |a,b|
-        [b.second, a.first] <=> [a.second, b.first]
-      end
-
-      highest_match_sort_with_lowest_index_tiebreaker.first.first # returns the index
-    end
-
-    def extract_data_from(response)
-      OpenStruct.new({
-        degrees_unit: unit(response.current_units.temperature_2m),
-        qty_unit: unit(response.current_units.precipitation),
-        yest_high: response.daily.temperature_2m_max[0],
-        yest_high_feel: response.daily.apparent_temperature_max[0],
-        yest_low: response.daily.temperature_2m_min[0],
-        yest_low_feel: response.daily.apparent_temperature_min[0],
-
-        today_high: response.daily.temperature_2m_max[1],
-        today_high_feel: response.daily.apparent_temperature_max[1],
-        today_low: response.daily.temperature_2m_min[1],
-        today_low_feel: response.daily.apparent_temperature_min[1],
-
-        curr: response.current.temperature_2m,
-        curr_feel: response.current.apparent_temperature,
-
-        curr_precip: response.current.precipitation,
-        curr_rain: response.current.rain,
-        curr_showers: response.current.showers,
-        curr_snowfall: response.current.snowfall,
-
-        curr_cloud_cover: response.current.cloud_cover,
-
-        today_precip: response.daily.precipitation_sum[1],
-        today_precip_prob: response.daily.precipitation_probability_max[1],
-
-        today_rain: response.daily.rain_sum[1],
-        today_showers: response.daily.showers_sum[1],
-        today_snowfall: response.daily.snowfall_sum[1],
-
-        curr_code: response.current.weather_code,
-        today_code: response.daily.weather_code[1],
-      })
-    end
-
-    def unit(u)
-      u.gsub('°', 'degrees ').gsub('F', 'fahrenheit').gsub('C', 'celcius')
-    end
-
-    def weather_code_to_description(code)
-      # it's 85 degrees with
-      case code
-      when 0 then ["are", "clear skies"]
-      when 1 then ["are", "mostly clear skies"]
-      when 2 then ["are", "scattered clouds"]
-      when 3 then ["are", "overcast skies"]
-      when 45 then ["is", "fog"]
-      when 48 then ["is", "freezing fog"]
-      when 51 then ["is", "light drizzle"]
-      when 53 then ["is", "drizzle"]
-      when 55 then ["is", "heavy drizzle"]
-      when 56 then ["is", "light freezing drizzle"]
-      when 57 then ["is", "freezing drizzle"]
-      when 61 then ["is", "light rain"]
-      when 63 then ["is", "rain"]
-      when 65 then ["is", "heavy rain"]
-      when 66 then ["is", "light freezing rain"]
-      when 67 then ["is", "freezing rain"]
-      when 71 then ["is", "light snow"]
-      when 73 then ["is", "snow"]
-      when 75 then ["is", "heavy snow"]
-      when 77 then ["is", "snow drizzle"]
-      when 80 then ["are", "light scattered showers"]
-      when 81 then ["are", "scattered showers"]
-      when 82 then ["are", "heavy scattered showers"]
-      when 85 then ["are", "light scattered snow"]
-      when 86 then ["are", "scattered snow"]
-      when 95 then ["are", "some thunderstorms"]
-      when 96 then ["are", "thunderstorms and some hail"]
-      when 99 then ["are", "thunderstorms and heavy hail"]
-      end
-    end
-
-    def format(num, unit)
-      if unit.include?('celcius')
-        (num * 2).round / 2.0
-      elsif unit.include?('fahrenheit')
-        num.round
-      elsif unit.include?('in')
-        (num.round * 4).round / 4.0
-      elsif unit.include?('cm')
-        num.round
-      elsif unit.include?('%')
-        num
-      else
-        num.round
-      end.to_s + " " + unit
-    end
+  def format(num, unit)
+    if unit.include?('celcius')
+      (num * 2).round / 2.0
+    elsif unit.include?('fahrenheit')
+      num.round
+    elsif unit.include?('in')
+      (num.round * 4).round / 4.0
+    elsif unit.include?('cm')
+      num.round
+    elsif unit.include?('%')
+      num
+    else
+      num.round
+    end.to_s + " " + unit
   end
 end
