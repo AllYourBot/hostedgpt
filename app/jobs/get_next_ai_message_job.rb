@@ -41,7 +41,7 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
 
-    @message.content_tool_calls = response # This Typically, get_next_chat_message will simply return nil because it executes
+    @message.content_tool_calls = response # Typically, get_next_chat_message will simply return nil because it executes
                                            # the content_chunk block to return it's response incrementally. However, tool_call
                                            # responses don't make sense to stream because they can't be executed incrementally
                                            # so we just return the full tool response message at once. The only time we return
