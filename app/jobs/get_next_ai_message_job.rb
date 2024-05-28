@@ -138,7 +138,7 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def wrap_up_the_message
-    call_tools_before_wrapping_up if @message.content_tool_calls.present?
+    call_tools_before_wrapping_up if @message.content_tool_calls.present? && @message.valid?
 
     GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
     @message.save!
