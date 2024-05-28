@@ -10,18 +10,22 @@ class TestClient::OpenAI
     raise "When using the OpenAI test client for api_text_response you need to stub the .text method"
   end
 
+  def self.default_text
+    "Hello this is model #{@@model} with instruction nil! How can I assist you today?"
+  end
+
   def self.api_text_response
     {
       "id"=> "chatcmpl-abc123abc123abc123abc123abc12",
       "object"=>"chat.completion",
       "created"=>1707429030,
-      "model"=>"gpt-3.5-turbo-0613",
+      "model"=> @@model,
       "choices"=> [
         {
           "index"=>0,
           "delta"=>{
             "role"=>"assistant",
-            "content"=> text
+            "content"=> text || default_text
           },
           "logprobs"=>nil,
           "finish_reason"=>"stop"
@@ -63,6 +67,8 @@ class TestClient::OpenAI
   end
 
   def chat(**args)
+    @@model = args.dig(:parameters, :model) || "no model"
+
     proc = args.dig(:parameters, :stream)
     raise "No stream proc provided. When calling get_next_chat_message in tests be sure to include a block" if proc.nil?
     proc.call(self.class.api_response)

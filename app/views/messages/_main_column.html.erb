@@ -125,8 +125,12 @@
         <% end %>
       </div>
 
-      <div  id="composer"
-            class="flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
+      <div class="<%= @assistant.not_deleted? && 'hidden' %> flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
+        <p class="text-center"><%= @assistant.name %> has been deleted and cannot assist any longer.</p>
+      </div>
+
+      <div id="composer"
+            class="<%= @assistant.deleted? && 'hidden' %> flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= !@assistant.supports_images? && 'relationship' %>"
             data-controller="composer image-upload"
       >
         <%= button_tag type: "button",
@@ -407,7 +411,7 @@
   data-controller="modal"
   data-action="keydown@document->modal#keydownQuestionOpen"
 >
-  <main class="modal-box max-w-5xl dark:bg-black">
+  <div class="modal-box max-w-5xl dark:bg-black">
     <header class="font-bold text-lg mb-5">
       Keyboard shortcuts
     </header>
@@ -488,7 +492,7 @@
         </figure>
       </section>
     </article>
-  </main>
+  </div>
   <form method="dialog" class="modal-backdrop no-focus-outline">
     <button id="modal-backdrop">close</button>
   </form>

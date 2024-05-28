@@ -17,8 +17,8 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :model %>
-    <%= form.text_field :model, value: "gpt-4", class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+    <%= form.label :language_model_id  %><br/>
+    <%= form.select :language_model_id, LanguageModel.order(:description).all.pluck(:description, :id), class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <div class="my-5">

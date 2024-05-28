@@ -63,7 +63,7 @@ class ConversationTest < ActiveSupport::TestCase
     perform_enqueued_jobs do
       ChatCompletionAPI.stub :get_next_response, {"topic" => "Hear me"} do
         TestClient::OpenAI.stub :text, "Hello" do
-          TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_text_response do
+          TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response } do
 
             conversation = users(:keith).conversations.create!(assistant: assistants(:samantha))
             assert_nil conversation.title
