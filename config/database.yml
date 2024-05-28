@@ -9,20 +9,11 @@ default: &default
 
 development:
   <<: *default
-  database: hostedgpt_development
-    # To customize set:
-    # DATABASE_URL="postgres://username:password@localhost:5432/custom_database_name"
-    # Or since local often has no credentials and default port it can be (note the three slashes)
-    # DATABASE_URL="postgres:///custom_database_name"
-
-    # Locally you probably want to put that in your bash profile and then when running tests
-    # you could have a bash alias which executes:
-    # DATABASE_URL="postgres:///custom_database_name" bin/rails test
-
+  database: <%= ENV['HOSTEDGPT_DEV_DB'] || "hostedgpt_development" %>
 
 test:
   <<: *default
-  database: hostedgpt_test
+  database: <%= ENV['HOSTEDGPT_TEST_DB'] || "hostedgpt_test" %>
 
 production:
   <<: *default
