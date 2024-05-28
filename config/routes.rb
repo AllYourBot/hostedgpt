@@ -4,13 +4,12 @@ Rails.application.routes.draw do
     resource :person, only: [:edit, :update]
   end
 
-  get "/auth/:provider/callback" => "google_oauth#create"
-  get "/auth/failure" => "google_oauth#destroy"
+  get "/auth/:provider/callback" => "sessions/google_oauth#create"
+  get "/auth/failure" => "sessions/google_oauth#destroy"
 
   post "whatsapp/create" => "whatsapp#create"
 
   root to: "assistants#index"
-
   resources :assistants do
     resources :messages, only: [:new, :create, :edit]
   end

@@ -19,8 +19,11 @@ class Message < ApplicationRecord
 
   validates :role, presence: true
   validates :content_text, presence: true, unless: :assistant?
+  validates :tool_call_id, presence: true, if: :tool?
   validate  :validate_conversation,  if: -> { conversation.present? && Current.user }
   validate  :validate_assistant,     if: -> { assistant.present? && Current.user }
+
+  normalizes :tool_call_id, with: -> tool_call_id { tool_call_id[0...40] }
 
   after_create :start_assistant_reply, if: :user?
   after_create :set_last_assistant_message, if: :assistant?
@@ -42,6 +45,10 @@ class Message < ApplicationRecord
 
   def not_finished?
     !finished?
+  end
+
+  def tool_call?
+    tool? || content_tool_calls.present?
   end
 
   private

@@ -18,7 +18,7 @@ end
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.tool? && 'hidden' %>"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.tool_call? && 'hidden' %>"
   data-role="message"
   data-timestamp="<%= timestamp %>"
   data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && 'message-scroller' %>"
@@ -168,7 +168,7 @@ end
             <% end %>
           <% end %>
 
-          <% if message.user? && !message.has_document_image? %>
+          <% if message.user? && message.assistant.not_deleted? && !message.has_document_image? %>
             <%= link_to edit_assistant_message_path(message.assistant, message),
               class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
               data: {
@@ -177,7 +177,7 @@ end
               } do %>
               <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
             <% end %>
-          <% elsif message.assistant? %>
+          <% elsif message.assistant? && message.assistant.not_deleted? %>
             <%= button_tag type: "button",
                   class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
                   data: {

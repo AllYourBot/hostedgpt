@@ -22,12 +22,22 @@ class RunTest < ActiveSupport::TestCase
       Run.create!(
         assistant: assistants(:samantha),
         conversation: conversations(:greeting),
-        model: assistants(:samantha).model,
         instructions: assistants(:samantha).instructions,
         status: "queued",
         expired_at: 1.minute.from_now
       )
     end
+  end
+
+  test "model populated from assistant" do
+      r = Run.create!(
+        assistant: assistants(:keith_claude3),
+        conversation: conversations(:greeting),
+        instructions: "Some instructions",
+        status: "queued",
+        expired_at: 1.minute.from_now
+      )
+      assert_equal 'claude-3-opus-20240229', r.model
   end
 
   test "associations are deleted upon destroy" do

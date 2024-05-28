@@ -15,7 +15,7 @@ class AIBackend
     merged_hash
   end
 
-  def deep_json_parse(obj)
+  def self.deep_json_parse(obj)
     if obj.is_a?(Array)
       obj.map { |item| deep_json_parse(item) }
     else

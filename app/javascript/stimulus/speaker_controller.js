@@ -52,6 +52,8 @@ export default class extends Controller {
     const thinking = target.getAttribute('data-thinking') === 'true'
     const thoughts = SpeechService.splitIntoThoughts(target.innerText)
 
+    if (thoughts.includes('::ServerError')) return  // client is displaying a server error
+
     for(this.thoughtsSentCount; this.thoughtsSentCount < thoughts.length-1; this.thoughtsSentCount ++)
       Prompt.Speaker.toSay(thoughts[this.thoughtsSentCount])
 
