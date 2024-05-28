@@ -8,11 +8,11 @@ class Fly < SDK
   end
 
   def get(url)
-    SDK::Get.new(url, ->{ key }, ->{ bearer_token })
+    SDK::Get.new(url, ->{ bearer_token })
   end
 
   def post(url)
-    SDK::Post.new(url, ->{ key }, ->{ bearer_token })
+    SDK::Post.new(url, ->{ bearer_token })
   end
 
   def patch(url)

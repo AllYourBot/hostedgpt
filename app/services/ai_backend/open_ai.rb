@@ -30,10 +30,9 @@ class AIBackend::OpenAI < AIBackend
         puts e.backtrace.join("\n") unless Rails.env.test?
 
         <<~STR.gsub("\n", " ")
-          An unexpected error occurred. You were requesting this information to help you answer a users question. Because this information
-          is not available at this time, DO NOT MAKE ANY GUESSES as you attempt to answer the users questions. Instead, you can let the
-          user know you attempted to retrieve some information in order to answer their question but you had some difficulties accessing
-          the website at this time.
+          An unexpected error occurred (#{e.message}). You were querying information to help you answer a users question. Because this information
+          is not available at this time, DO NOT MAKE ANY GUESSES as you attempt to answer the users questions. Instead, consider attempting a
+          different query OR let the user know you attempted to retrieve some information but the website is having difficulties at this time.
         STR
       end
 
