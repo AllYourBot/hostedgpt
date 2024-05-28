@@ -72,30 +72,30 @@ class Toolbox::OpenMeteo < Toolbox
       date: Date.current.strftime("%Y-%m-%d"),
       in: "#{location.name}, #{location.admin1}, #{location.country}",
 
-      right_now: "#{d.curr.round} #{d.degrees_unit}",
-      right_now_feels_like: "#{d.curr_feel.round} #{d.degrees_unit}",
+      right_now: format(d.curr.round, d.degrees_unit),
+      right_now_feels_like: format(d.curr_feel, d.degrees_unit),
 
-      right_now_precipitation: "#{response.current.precipitation.round} #{d.qty_unit}",
-      right_now_rain: "#{response.current.rain.round} #{d.qty_unit}",
-      right_now_showers: "#{response.current.showers.round} #{d.qty_unit}",
-      right_now_snowfall: "#{response.current.snowfall.round} #{d.qty_unit}",
-      right_now_cloud_cover: "#{response.current.cloud_cover.round}%",
+      right_now_precipitation: format(d.curr_precip, d.qty_unit),
+      right_now_rain: format(d.curr_rain, d.qty_unit),
+      right_now_showers: format(d.curr_showers, d.qty_unit),
+      right_now_snowfall: format(d.curr_snowfall, d.qty_unit),
+      right_now_cloud_cover: format(d.curr_cloud_cover, '%'),
 
-      today_high: "#{d.today_high.round} #{d.degrees_unit}",
-      today_high_feels_like: "#{d.today_high_feel.round} #{d.degrees_unit}",
-      today_low: "#{d.today_low.round} #{d.degrees_unit}",
-      today_low_feels_like: "#{d.today_low_feel.round} #{d.degrees_unit}",
+      today_high: format(d.today_high.round, d.degrees_unit),
+      today_high_feels_like: format(d.today_high_feel.round, d.degrees_unit),
+      today_low: format(d.today_low.round, d.degrees_unit),
+      today_low_feels_like: format(d.today_low_feel.round, d.degrees_unit),
 
-      today_high_change_from_yesterday: "#{d.today_high > d.yest_high ? "+" :''}#{(d.today_high - d.yest_high).round} #{d.degrees_unit}",
-      today_high_feels_like_change_from_yesterday: "#{d.today_high_feel > d.yest_high_feel ? "+" :''}#{(d.today_high_feel - d.yest_high_feel).round} #{d.degrees_unit}",
-      today_low_change_from_yesterday: "#{d.today_low > d.yest_low ? "+" :''}#{(d.today_low - d.yest_low).round} #{d.degrees_unit}",
-      today_low_feels_like_change_from_yesterday: "#{d.today_low_feel > d.yest_low_feel ? "+" :''}#{(d.today_low_feel - d.yest_low_feel).round} #{d.degrees_unit}",
+      today_high_change_from_yesterday: "#{d.today_high > d.yest_high ? "+" :''}#{(d.today_high - d.yest_high).round(1)} #{d.degrees_unit}",
+      today_high_feels_like_change_from_yesterday: "#{d.today_high_feel > d.yest_high_feel ? "+" :''}#{(d.today_high_feel - d.yest_high_feel).round(1)} #{d.degrees_unit}",
+      today_low_change_from_yesterday: "#{d.today_low > d.yest_low ? "+" :''}#{(d.today_low - d.yest_low).round(1)} #{d.degrees_unit}",
+      today_low_feels_like_change_from_yesterday: "#{d.today_low_feel > d.yest_low_feel ? "+" :''}#{(d.today_low_feel - d.yest_low_feel).round(1)} #{d.degrees_unit}",
 
-      today_precipitation: "#{d.today_precip} #{d.qty_unit}",
-      today_precipitation_probability: "#{d.today_precip_prob}%",
-      today_rain: "#{d.today_rain} #{d.qty_unit}",
-      today_showers: "#{d.today_showers} #{d.qty_unit}",
-      today_snowfall: "#{d.today_snowfall} #{d.qty_unit}",
+      today_precipitation: format(d.today_precip, d.qty_unit),
+      today_precipitation_probability: format(d.today_precip_prob, '%'),
+      today_rain: format(d.today_rain, d.qty_unit),
+      today_showers: format(d.today_showers, d.qty_unit),
+      today_snowfall: format(d.today_snowfall, d.qty_unit),
 
       good_summary: summary,
       right_now_weather_code: d.curr_code,
@@ -142,10 +142,14 @@ class Toolbox::OpenMeteo < Toolbox
       precipitation_unit: "inch",
 
       daily: "weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,rain_sum,snowfall_sum",
-    ).daily
+    )
 
-    data[:time].map.with_index do |date, i|
-      day = data.to_h.transform_values { |v| v[i] }
+    degrees_unit = unit(data.daily_units.temperature_2m_max)
+    qty_unit = unit(data.daily_units.precipitation_sum)
+    dailies = data.daily
+
+    dailies.time.map.with_index do |date, i|
+      day = dailies.to_h.transform_values { |v| v[i] }
       {
         date: day[:time],
         in: "#{location.name}, #{location.admin1}, #{location.country}",
@@ -155,9 +159,18 @@ class Toolbox::OpenMeteo < Toolbox
         temp_low: day[:temperature_2m_max],
         temp_low_feels_like: day[:apparent_temperature_min],
 
+        temp_high_formatted: format(day[:temperature_2m_max], degrees_unit),
+        temp_high_feels_like_formatted: format(day[:apparent_temperature_max], degrees_unit),
+        temp_low_formatted: format(day[:temperature_2m_max], degrees_unit),
+        temp_low_feels_like_formatted: format(day[:apparent_temperature_min], degrees_unit),
+
         precipitation: day[:precipitation_sum],
         rain: day[:rain_sum],
         snowfall: day[:snowfall_sum],
+
+        precipitation_formatted: format(day[:precipitation_sum], qty_unit),
+        rain_formatted: format(day[:rain_sum], qty_unit),
+        snowfall_formatted: format(day[:snowfall_sum], qty_unit),
       }
     end
   end
@@ -205,8 +218,8 @@ class Toolbox::OpenMeteo < Toolbox
 
     def extract_data_from(response)
       OpenStruct.new({
-        degrees_unit: response.current_units.temperature_2m.gsub('°', 'degrees ').gsub('F', 'fahrenheit').gsub('C', 'celcius'),
-        qty_unit: response.current_units.precipitation,
+        degrees_unit: unit(response.current_units.temperature_2m),
+        qty_unit: unit(response.current_units.precipitation),
         yest_high: response.daily.temperature_2m_max[0],
         yest_high_feel: response.daily.apparent_temperature_max[0],
         yest_low: response.daily.temperature_2m_min[0],
@@ -220,6 +233,13 @@ class Toolbox::OpenMeteo < Toolbox
         curr: response.current.temperature_2m,
         curr_feel: response.current.apparent_temperature,
 
+        curr_precip: response.current.precipitation,
+        curr_rain: response.current.rain,
+        curr_showers: response.current.showers,
+        curr_snowfall: response.current.snowfall,
+
+        curr_cloud_cover: response.current.cloud_cover,
+
         today_precip: response.daily.precipitation_sum[1],
         today_precip_prob: response.daily.precipitation_probability_max[1],
 
@@ -230,6 +250,10 @@ class Toolbox::OpenMeteo < Toolbox
         curr_code: response.current.weather_code,
         today_code: response.daily.weather_code[1],
       })
+    end
+
+    def unit(u)
+      u.gsub('°', 'degrees ').gsub('F', 'fahrenheit').gsub('C', 'celcius')
     end
 
     def weather_code_to_description(code)
@@ -264,6 +288,22 @@ class Toolbox::OpenMeteo < Toolbox
       when 96 then ["are", "thunderstorms and some hail"]
       when 99 then ["are", "thunderstorms and heavy hail"]
       end
+    end
+
+    def format(num, unit)
+      if unit.include?('celcius')
+        (num * 2).round / 2.0
+      elsif unit.include?('fahrenheit')
+        num.round
+      elsif unit.include?('in')
+        (num.round * 4).round / 4.0
+      elsif unit.include?('cm')
+        num.round
+      elsif unit.include?('%')
+        num
+      else
+        num.round
+      end.to_s + " " + unit
     end
   end
 end
