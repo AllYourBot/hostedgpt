@@ -138,7 +138,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "when assistant is not deleted the deleted-blurb is hidden but the composer is visible" do
     get conversation_messages_url(@conversation, version: 1)
-    assert_select "footer div.hidden p.text-center", "Samantha has been deleted and cannot assist any longer."
+    assert_response :success
+    assert_contains_text "main footer", "Samantha has been deleted and cannot assist any longer."
     assert_select "div#composer"
     assert_select "div#composer.hidden", false
   end
@@ -157,7 +158,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   test "the composer is hidden when viewing a list of messages attached to an assistant that has been soft-deleted" do
     @assistant.soft_delete
     get conversation_messages_url(@conversation, version: 1)
-    assert_select "footer p.text-center", "Samantha has been deleted and cannot assist any longer."
+    assert_response :success
+    assert_contains_text "main footer", "Samantha has been deleted and cannot assist any longer."
     assert_select "footer div.hidden p.text-center", false
     assert_select "div#composer.hidden"
   end
@@ -170,7 +172,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to conversation_messages_url(message.conversation, version: 2)
 
     get conversation_messages_url(message.conversation, version: 2)
-    assert_match /Where were you born/, response.body
+    assert_response :success
+    assert_contains_text "main", "Where were you born"
   end
 
   test "when there are many assistants only a few are shown in the nav bar" do
