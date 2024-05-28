@@ -35,7 +35,7 @@ class AssistantsController < ApplicationController
   end
 
   def destroy
-    @assistant.destroy!
+    @assistant.soft_delete
     redirect_to assistants_url, notice: "Assistant was successfully destroyed.", status: :see_other
   end
 
@@ -46,6 +46,6 @@ class AssistantsController < ApplicationController
   end
 
   def assistant_params
-    params.require(:assistant).permit(:user_id, :model, :name, :description, :instructions, :tools)
+    params.require(:assistant).permit(:user_id, :language_model_id, :name, :description, :instructions, :tools)
   end
 end

@@ -1,35 +1,39 @@
 samantha:
   user: keith
-  model: gpt-4
+  language_model: gpt_4
   name: Samantha
   description: My personal assistant
   instructions: You are a helpful assistant
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-  images: true
 
 keith_gpt4:
   user: keith
-  model: gpt-4
+  language_model: gpt_4
   name: OpenAI's GPT-4
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-  images: true
 
 keith_claude3:
   user: keith
-  model: claude-3-opus-20240229
+  language_model: claude_3_opus
   name: Claude 3 Opus
   description: Claude 3, Opus version
   instructions:
   tools: []
-  images: true
+
+keith_gpt3:
+  user: keith
+  language_model: gpt_3_5_turbo
+  name: GPT 3.5
+  description: OpenAI's GPT-3 but with Zen
+  instructions: Include a Zen perspective when possilbe
+  tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
 rob_gpt4:
   user: rob
-  model: gpt-4
+  language_model: gpt_4
   name: GPT-4
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-  images: true

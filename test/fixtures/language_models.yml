@@ -1,0 +1,47 @@
+gpt_best:
+    position: 1
+    supports_images: true 
+    name: gpt-best
+    description: gpt-best from fixtures
+
+claude_best:
+    position: 2
+    name: best-claude
+    supports_images: true 
+    description: claude-best from fixtures
+
+gpt_4o:
+    position: 3
+    name: gpt-4o
+    supports_images: true 
+    description: gpt-4ot from fixtures
+
+gpt_3_5_turbo:
+    position: 4
+    name: gpt-3.5-turbo
+    supports_images: false
+    description: gpt-3.5-turbo from fixtures
+
+claude_3_sonnet:
+    position: 18
+    name: claude-3-sonnet-20240229
+    supports_images: true 
+    description: claude-3-sonnet-20240229 from fixtures
+
+claude_3_opus:
+    position: 17
+    supports_images: true 
+    name: claude-3-opus-20240229
+    description: claude-3-opus-20240229 from fixtures
+
+gpt_4:
+    position: 3
+    supports_images: true 
+    name: gpt-4
+    description: gpt-4 from fixtures
+
+gpt_3_5_turbo_0125:
+    position: 12
+    name: gpt-3.5-turbo
+    description: gpt-3.5-turbo from fixtures
+    supports_images: false

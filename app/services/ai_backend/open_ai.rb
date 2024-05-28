@@ -67,7 +67,7 @@ class AIBackend::OpenAI < AIBackend
 
     begin
       response = @client.chat(parameters: {
-        model: @assistant.model,
+        model: @assistant.language_model.provider_name,
         messages: system_message + preceding_messages,
         tools: Toolbox.tools,
         stream: response_handler,
@@ -123,7 +123,7 @@ class AIBackend::OpenAI < AIBackend
 
   def preceding_messages
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
-      if @assistant.images && message.documents.present?
+      if @assistant.supports_images? && message.documents.present?
 
         content_with_images = [{ type: "text", text: message.content_text }]
         content_with_images += message.documents.collect do |document|
