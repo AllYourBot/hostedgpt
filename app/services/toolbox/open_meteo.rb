@@ -72,8 +72,8 @@ class Toolbox::OpenMeteo < Toolbox
       date: Date.current.strftime("%Y-%m-%d"),
       in: "#{location.name}, #{location.admin1}, #{location.country}",
 
-      right_now: "#{d.curr.round}#{d.degrees_unit}",
-      right_now_feels_like: "#{d.curr_feel.round}#{d.degrees_unit}",
+      right_now: "#{d.curr.round} #{d.degrees_unit}",
+      right_now_feels_like: "#{d.curr_feel.round} #{d.degrees_unit}",
 
       right_now_precipitation: "#{response.current.precipitation.round} #{d.qty_unit}",
       right_now_rain: "#{response.current.rain.round} #{d.qty_unit}",
@@ -81,15 +81,15 @@ class Toolbox::OpenMeteo < Toolbox
       right_now_snowfall: "#{response.current.snowfall.round} #{d.qty_unit}",
       right_now_cloud_cover: "#{response.current.cloud_cover.round}%",
 
-      today_high: "#{d.today_high.round}#{d.degrees_unit}",
-      today_high_feels_like: "#{d.today_high_feel.round}#{d.degrees_unit}",
-      today_low: "#{d.today_low.round}#{d.degrees_unit}",
-      today_low_feels_like: "#{d.today_low_feel.round}#{d.degrees_unit}",
+      today_high: "#{d.today_high.round} #{d.degrees_unit}",
+      today_high_feels_like: "#{d.today_high_feel.round} #{d.degrees_unit}",
+      today_low: "#{d.today_low.round} #{d.degrees_unit}",
+      today_low_feels_like: "#{d.today_low_feel.round} #{d.degrees_unit}",
 
-      today_high_change_from_yesterday: "#{d.today_high > d.yest_high ? "+" :''}#{(d.today_high - d.yest_high).round}#{d.degrees_unit}",
-      today_high_feels_like_change_from_yesterday: "#{d.today_high_feel > d.yest_high_feel ? "+" :''}#{(d.today_high_feel - d.yest_high_feel).round}#{d.degrees_unit}",
-      today_low_change_from_yesterday: "#{d.today_low > d.yest_low ? "+" :''}#{(d.today_low - d.yest_low).round}#{d.degrees_unit}",
-      today_low_feels_like_change_from_yesterday: "#{d.today_low_feel > d.yest_low_feel ? "+" :''}#{(d.today_low_feel - d.yest_low_feel).round}#{d.degrees_unit}",
+      today_high_change_from_yesterday: "#{d.today_high > d.yest_high ? "+" :''}#{(d.today_high - d.yest_high).round} #{d.degrees_unit}",
+      today_high_feels_like_change_from_yesterday: "#{d.today_high_feel > d.yest_high_feel ? "+" :''}#{(d.today_high_feel - d.yest_high_feel).round} #{d.degrees_unit}",
+      today_low_change_from_yesterday: "#{d.today_low > d.yest_low ? "+" :''}#{(d.today_low - d.yest_low).round} #{d.degrees_unit}",
+      today_low_feels_like_change_from_yesterday: "#{d.today_low_feel > d.yest_low_feel ? "+" :''}#{(d.today_low_feel - d.yest_low_feel).round} #{d.degrees_unit}",
 
       today_precipitation: "#{d.today_precip} #{d.qty_unit}",
       today_precipitation_probability: "#{d.today_precip_prob}%",
@@ -205,7 +205,7 @@ class Toolbox::OpenMeteo < Toolbox
 
     def extract_data_from(response)
       OpenStruct.new({
-        degrees_unit: response.current_units.temperature_2m,
+        degrees_unit: response.current_units.temperature_2m.gsub('°', 'degrees ').gsub('F', 'fahrenheit').gsub('C', 'celcius'),
         qty_unit: response.current_units.precipitation,
         yest_high: response.daily.temperature_2m_max[0],
         yest_high_feel: response.daily.apparent_temperature_max[0],
