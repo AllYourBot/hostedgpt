@@ -78,7 +78,7 @@ class AIBackend::OpenAI < AIBackend
     end
 
     if @stream_response_tool_calls.present?
-      return @stream_response_tool_calls
+      format_parallel_tool_calls(@stream_response_tool_calls)
     elsif @stream_response_text.blank?
       raise ::Faraday::ParsingError
     end
@@ -145,5 +145,36 @@ class AIBackend::OpenAI < AIBackend
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
       end
     end
+  end
+
+  def format_parallel_tool_calls(content_tool_calls)
+    if content_tool_calls.length > 1 || (calls = content_tool_calls.dig(0, :id))&.count("call_") == 1
+      return content_tool_calls
+    end
+
+    names = find_repeats_and_split(content_tool_calls.dig(0, :function, :name))
+    args = content_tool_calls.dig(0, :function, :arguments).split(/(?<=})(?={)/)
+
+    calls.split(/(?=call_)/).map.with_index do |id, i|
+      {
+        index: i,
+        type: "function",
+        id: id,
+        function: {
+          name: names.fetch(i),
+          arguments: args.fetch(i),
+        }
+      }
+  rescue
+    {}
+  end
+
+  def find_repeats_and_split(str)
+    (1..str.length).each do |len|
+      substring = str[0, len]
+      repeated = substring * (str.length / len)
+      return [substring] * (str.length / len) if repeated == str
+    end
+    [str]
   end
 end
