@@ -148,7 +148,7 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def format_parallel_tool_calls(content_tool_calls)
-    if content_tool_calls.length > 1 || (calls = content_tool_calls.dig(0, "id"))&.count("call_") == 1
+    if content_tool_calls.length > 1 || (calls = content_tool_calls.dig(0, "id"))&.scan("call_").length == 1
       return content_tool_calls
     end
 
