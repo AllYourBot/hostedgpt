@@ -159,7 +159,7 @@ class AIBackend::OpenAI < AIBackend
       {
         index: i,
         type: "function",
-        id: id,
+        id: id[0...40],
         function: {
           name: names.fetch(i),
           arguments: args.fetch(i),
