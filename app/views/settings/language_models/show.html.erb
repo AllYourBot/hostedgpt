@@ -1,0 +1,32 @@
+<h1 class="font-bold text-4xl">
+  Language Model <%= @language_model.name %>
+</h1>
+
+<div class="mt-16">
+  <table>
+    <tbody>
+      <tr>
+        <td class="py-2">Description</td>
+        <td class="px-4 py-2"><%= n_a_if_blank(@language_model.description) %></td>
+      </tr>
+      <tr>
+        <td class="py-2">Images Supported?</td>
+        <td class="px-4 py-2"><%= display_boolean(@language_model.supports_images?) %></td>
+      </tr>
+      <tr>
+        <td class="py-2">API URL</td>
+        <td class="px-4 py-2"><%= n_a_if_blank(@language_model.api_url) %></td>
+      </tr>
+      <tr>
+        <td class="py-2">Access Token</td>
+        <td class="px-4 py-2"><%= @language_model.access_token.present? ? '[Hidden]' : 'Empty' %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-16">
+  <p>
+    <%= link_to "Back to language models list", settings_language_models_path, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium text-indigo-600 hover:text-indigo-900" %>
+  </p>
+</div>

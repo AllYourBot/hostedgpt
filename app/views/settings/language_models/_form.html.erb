@@ -1,0 +1,51 @@
+<%= form_with(model: [:settings, language_model], class: "contents") do |form| %>
+  <% if language_model.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(language_model.errors.count, "error") %> prohibited this language_model from being saved:</h2>
+
+      <ul>
+        <% language_model.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :name %>
+    <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :description %>
+    <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.check_box :supports_images %>
+    <%= form.label :supports_images, "Supports Images?" %>
+  </div>
+
+  <h2 class="text-2xl">Advanced</h2>
+
+  <div class="my-5">
+    <%= form.label :api_url %>
+    <%= form.text_field :api_url, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :access_token %>
+    <%= form.password_field :access_token, autocomplete: :off, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+  </div>
+
+  <%= form.submit "Save",
+    class: %|
+      inline-block font-bold
+      bg-gray-200 dark:bg-gray-900
+      border border-gray-400
+      rounded-lg py-3 px-5
+      cursor-pointer
+    |,
+    data: { turbo_submits_with: "Saving..." }
+  %>
+<% end %>

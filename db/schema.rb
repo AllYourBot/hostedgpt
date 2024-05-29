@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_26_164833) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_26_195302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -56,8 +56,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_26_164833) do
     t.jsonb "tools", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at", precision: nil
     t.bigint "language_model_id"
+    t.datetime "deleted_at", precision: nil
     t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
     t.index ["user_id", "deleted_at"], name: "index_assistants_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_assistants_on_user_id"
@@ -105,6 +105,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_26_164833) do
     t.boolean "supports_images", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.string "api_url"
+    t.string "access_token"
+    t.datetime "deleted_at", precision: nil
+    t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
   end
 
   create_table "messages", force: :cascade do |t|
