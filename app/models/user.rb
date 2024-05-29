@@ -13,6 +13,12 @@ class User < ApplicationRecord
   has_many :assistants, -> { not_deleted }
   has_many :assistants_including_deleted, class_name: "Assistant", dependent: :destroy
   has_many :conversations, dependent: :destroy
+  has_many :credentials, dependent: :destroy
+  has_many :authentications, dependent: :destroy
+
+  has_one :email_credential, -> { type_is("EmailCredential") }, class_name: "Credential"
+  has_one :gmail_credential, -> { type_is("GmailCredential") }, class_name: "Credential"
+
   belongs_to :last_cancelled_message, class_name: "Message", optional: true
 
   serialize :preferences, coder: JsonSerializer

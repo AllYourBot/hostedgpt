@@ -5,6 +5,26 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
+  test "has associated conversations" do
+    assert_instance_of Conversation, users(:keith).conversations.first
+  end
+
+  test "has associated credentials" do
+    assert_instance_of EmailCredential, users(:keith).credentials.type_is('EmailCredential').first
+  end
+
+  test "has associated authentications" do
+    assert_instance_of Authentication, users(:keith).authentications.first
+  end
+
+  test "has an associated email_credential" do
+    assert_instance_of EmailCredential, users(:keith).email_credential
+  end
+
+  test "has an associated gmail_credential" do
+    assert_instance_of GmailCredential, users(:keith).gmail_credential
+  end
+
   test "has a last_cancelled_message but can be nil" do
     assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
     assert_nil users(:rob).last_cancelled_message
