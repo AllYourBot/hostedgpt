@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
-
+ActiveRecord::Schema[7.1].define(version: 2024_05_24_144314) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -51,14 +50,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
 
   create_table "assistants", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "model"
     t.string "name"
     t.string "description"
     t.string "instructions"
     t.jsonb "tools", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "images", default: false, null: false
+    t.datetime "deleted_at", precision: nil
+    t.bigint "language_model_id"
+    t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
+    t.index ["user_id", "deleted_at"], name: "index_assistants_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_assistants_on_user_id"
   end
 
@@ -97,6 +98,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
+  create_table "language_models", force: :cascade do |t|
+    t.integer "position", null: false
+    t.string "name", null: false
+    t.text "description", null: false
+    t.boolean "supports_images", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.string "role", null: false
@@ -106,12 +116,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
+    t.datetime "cancelled_at"
     t.datetime "processed_at", precision: nil
     t.integer "index", null: false
     t.integer "version", null: false
-    t.datetime "cancelled_at"
     t.boolean "branched", default: false, null: false
     t.integer "branched_from_version"
+    t.jsonb "content_tool_calls"
+    t.string "tool_call_id"
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
     t.index ["conversation_id", "index", "version"], name: "index_messages_on_conversation_id_and_index_and_version", unique: true
@@ -296,11 +308,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_14_184146) do
     t.string "anthropic_key"
     t.jsonb "preferences"
     t.bigint "last_cancelled_message_id"
+    t.string "auth_uid"
+    t.index ["auth_uid"], name: "index_users_on_auth_uid", unique: true
     t.index ["last_cancelled_message_id"], name: "index_users_on_last_cancelled_message_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "assistants", "language_models"
   add_foreign_key "assistants", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "conversations", "assistants"

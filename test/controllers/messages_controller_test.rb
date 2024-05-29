@@ -1,6 +1,8 @@
 require "test_helper"
 
 class MessagesControllerTest < ActionDispatch::IntegrationTest
+  include ActionDispatch::TestProcess::FixtureFile
+
   setup do
     @message = messages(:hear_me)
     @conversation = @message.conversation
@@ -79,6 +81,20 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to conversation_messages_url(@conversation, version: 2)
   end
 
+  test "should create message with image attachment" do
+    test_file = fixture_file_upload("cat.png", "image/png")
+    assert_difference "Conversation.count", 1 do
+      assert_difference "Document.count", 1 do
+        assert_difference "Message.count", 2 do
+          post assistant_messages_url(@assistant), params: { message: { documents_attributes: {"0": {file: test_file}}, content_text: @message.content_text } }
+        end
+      end
+    end
+
+    (user_msg, asst_msg) = Message.last(2)
+    assert_equal Document.last, user_msg.documents.first
+  end
+
   test "should fail to create message when there is no content_text" do
     post assistant_messages_url(@assistant), params: { message: { content_text: nil } }
     assert_response :unprocessable_entity
@@ -111,5 +127,70 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     patch message_url(message, version: 2), params: { message: { id: message.id } }
     assert_redirected_to conversation_messages_url(message.conversation, version: 2)
+  end
+
+  test "messages can still be viewed when attached to a soft-deleted assistant" do
+    assert @assistant.soft_delete
+    get conversation_messages_url(@conversation, version: 1)
+    assert @conversation.messages.count > 0
+    assert_select 'div[data-role="message"]', count: @conversation.messages.count
+  end
+
+  test "when assistant is not deleted the deleted-blurb is hidden but the composer is visible" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_response :success
+    assert_contains_text "main footer", "Samantha has been deleted and cannot assist any longer."
+    assert_select "div#composer"
+    assert_select "div#composer.hidden", false
+  end
+
+  test "when assistant supports images the image upload function is available" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select "div#composer"
+    assert_select "div#composer.relationship", false
+  end
+
+  test "when assistant doesn't support images the image upload function is not available" do
+    get conversation_messages_url(conversations(:trees), version: 1)
+    assert_select "div#composer.relationship"
+  end
+
+  test "the composer is hidden when viewing a list of messages attached to an assistant that has been soft-deleted" do
+    @assistant.soft_delete
+    get conversation_messages_url(@conversation, version: 1)
+    assert_response :success
+    assert_contains_text "main footer", "Samantha has been deleted and cannot assist any longer."
+    assert_select "footer div.hidden p.text-center", false
+    assert_select "div#composer.hidden"
+  end
+
+  test "viewing messages in a conversation which has history but the assistant has been soft deleted, the conversation history can still be viewed" do
+    @assistant.soft_delete
+    message = messages(:message2_v1)
+
+    patch message_url(message, version: 2), params: { message: { id: message.id } }
+    assert_redirected_to conversation_messages_url(message.conversation, version: 2)
+
+    get conversation_messages_url(message.conversation, version: 2)
+    assert_response :success
+    assert_contains_text "main", "Where were you born"
+  end
+
+  test "when there are many assistants only a few are shown in the nav bar" do
+    5.times do |x|
+      @user.assistants.create! name: "New assistant #{x+1}", language_model: LanguageModel.find_by(name: 'gpt-3.5-turbo')
+    end
+    get conversation_messages_url(@conversation, version: 1)
+    @user.assistants.each do |assistant|
+      assert_select %{div[data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
+    end
+    @user.assistants.each_with_index do |assistant, index|
+      if index>5
+        assert_select %{div.hidden[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
+      else
+        assert_select %{div[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
+        assert_select %{div.hiden[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}, false
+      end
+    end
   end
 end

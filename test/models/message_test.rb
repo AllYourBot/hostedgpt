@@ -1,6 +1,8 @@
 require "test_helper"
 
 class MessageTest < ActiveSupport::TestCase
+  include ActionDispatch::TestProcess::FixtureFile
+
   test "has an associated assistant (it's through conversation)" do
     assert_instance_of Assistant, messages(:hear_me).assistant
   end
@@ -17,6 +19,15 @@ class MessageTest < ActiveSupport::TestCase
   #   assert_instance_of Document, messages(:examine_this).content_document
   # end
 
+  test "handles documents_attributes" do
+    Current.user = users(:keith)
+    test_file = fixture_file_upload("cat.png", "image/png")
+    message = Message.create(assistant: assistants(:samantha), documents_attributes: {"0": {file: test_file}}, content_text: "Nice file")
+    assert_equal 1, message.documents.length
+    document = message.documents.first
+    assert_equal 'cat.png', document.filename
+  end
+
   test "has an associated run" do
     assert_instance_of Run, messages(:yes_i_do).run
   end
@@ -28,6 +39,28 @@ class MessageTest < ActiveSupport::TestCase
   test "has associated latest_assistant_message_for but can be nil" do
     assert_nil messages(:dont_know_day).latest_assistant_message_for
     assert_instance_of Conversation, messages(:im_a_bot).latest_assistant_message_for
+  end
+
+  test "content_tool_calls starts as empty hash" do
+    h = {}
+    assert_equal h, Message.new.content_tool_calls
+  end
+
+  test "name returns a properly formatted string" do
+    assert_equal users(:keith).first_name, messages(:hear_me).name
+    assert_equal "Samantha", messages(:yes_i_do).name
+    assert_equal "OpenAI", messages(:popstate_event).name # strips off non-alphanumeric
+    assert_nil messages(:weather_tool_result).name
+  end
+
+  test "finished? returns true if processed and missing either content_text or content_tool_calls" do
+    assert messages(:weather_tool_call).finished?
+    messages(:weather_tool_call).content_tool_calls = []
+    refute messages(:weather_tool_call).finished?
+
+    assert messages(:weather_explained).finished?
+    messages(:weather_explained).content_text = nil
+    refute messages(:weather_explained).finished?
   end
 
   test "create without setting Current or conversation raises" do
@@ -46,6 +79,37 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal assistants(:samantha), Message.last.assistant
     assert_not_nil Message.last.conversation
     assert_equal users(:keith), Message.last.conversation.user
+  end
+
+  test "creating a tool message fails without a tool_call_id" do
+    assert_raises ActiveRecord::RecordInvalid do
+      conversations(:weather).messages.create!(
+        assistant: assistants(:samantha),
+        role: :tool,
+        content_text: "tool response",
+      )
+    end
+  end
+
+  test "creating a tool message fails without a content_text" do
+    assert_raises ActiveRecord::RecordInvalid do
+      conversations(:weather).messages.create!(
+        assistant: assistants(:samantha),
+        role: :tool,
+        tool_call_id: "tool_1234",
+      )
+    end
+  end
+
+  test "creating a tool message succeeds with both tool_call_id and content_text" do
+    assert_nothing_raised do
+      conversations(:weather).messages.create!(
+        assistant: assistants(:samantha),
+        role: :tool,
+        content_text: "tool response",
+        tool_call_id: "tool_1234",
+      )
+    end
   end
 
   test "creating a message with a conversation and Current.user set fails if conversation is not owned by the user" do

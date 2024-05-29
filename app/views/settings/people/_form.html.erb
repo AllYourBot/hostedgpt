@@ -35,6 +35,24 @@
       <%= user_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
+    <div class="my-5">
+      <%= user_fields.label :dark_mode, "Color Theme" %>
+      <div class="flex items-center justify-between outline-none pl-3 py-2 mt-2 w-full dark:text-black gap-1">
+        <%= user_fields.fields_for :preferences do |preferences_fields| %>
+          <% %w(dark light system).each do |value| %>
+            <div class="flex items-center gap-2">
+              <%= preferences_fields.radio_button :dark_mode, value, checked: Current.user.preferences[:dark_mode] == value %>
+              <%= user_fields.label :dark_mode, value.capitalize, class: "dark:text-gray-100", for: "person_personable_attributes_preferences_dark_mode_#{value}"%>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+     <div class="my-5 hidden">
+      <%= user_fields.label "Enable Tools" %>
+    </div>
+
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :openai_key, "OpenAI Key (for GPT-3.5 & 4)" %>
       <%= button_tag type: "button",
@@ -132,25 +150,12 @@
         placeholder: "Anthropic Key"
       %>
     </div>
-    <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-      <%= user_fields.label :dark_mode, "Color Theme" %>
-      <div class="flex items-center justify-between shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black gap-1">
-        <%= user_fields.fields_for :preferences do |preferences_fields| %>
-          <% %w(dark light system).each do |value| %>
-            <div class="flex items-center gap-2">
-              <%= preferences_fields.radio_button :dark_mode, value, checked: Current.user.preferences[:dark_mode] == value %>
-              <%= user_fields.label :dark_mode, value.capitalize, class: "dark:text-gray-100", for: "person_personable_attributes_preferences_dark_mode_#{value}"%>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
   <% end %>
 
   <div class="inline">
     <%= form.submit "Save",
       class: %|
-        inline-block font-medium
+        inline-block font-bold
         bg-gray-200 dark:bg-gray-900
         border border-gray-400
         rounded-lg py-3 px-5
@@ -160,4 +165,4 @@
     %>
     <%= link_to "Cancel", root_path, class: "float-right inline-block ml-5 py-3" %>
   </div>
-<% end %>
+<% end # form %>
