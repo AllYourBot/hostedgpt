@@ -3,6 +3,7 @@ class Toolbox < SDK
     [
       Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
+      Toolbox::Gmail
     ]
   end
 
@@ -110,7 +111,7 @@ class Toolbox < SDK
   def self.formatted_function_required_parameters(name)
     params = self.instance_method(name).parameters
     not_named = params.map(&:first) - [:keyreq, :key]
-    raise "You must use named parameters and #{name} does not." if not_named.present?
+    raise "Your method '#{name}' needs to use named parameters." if not_named.present?
 
     params.select { |p| p.first == :keyreq }.map do |_, param|
       formatted_param_properties(param).first

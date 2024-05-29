@@ -1,30 +1,27 @@
 class SDK::Verb
-  def initialize(url, bearer_token = nil)
+  def initialize(url, bearer_token = nil, headers = {}, statuses = [200])
     @url = url
     @bearer_token = bearer_token
+    @headers = reformat(headers)
+    @statuses = statuses
   end
 
   def no_params
     params
   end
 
-  def encode(params)
-    params.map do |key, val|
-      "#{key}=#{CGI.escape(val.to_s)}"
-    end.join("&")
+  private
+
+  def all_headers
+    @headers["Authorization"] = "Bearer #{@bearer_token}" if @bearer_token && @headers["Authorization"].blank?
+    @headers
   end
 
-  def better_to_hash(os)
-    if os.is_a?(OpenStruct) || os.is_a?(Hash)
-      os.to_h.transform_values do |val|
-        better_to_hash(val)
-      end
-    elsif os.is_a?(Array)
-      os.map do |val|
-        better_to_hash(val)
-      end
-    else
-      os
+  def reformat(headers)
+    h = headers.symbolize_keys
+    if (content_type = h.delete(:content_type))
+      h[:'Content-Type'] = content_type
     end
+    h
   end
 end
