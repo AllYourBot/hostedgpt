@@ -128,6 +128,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
     t.boolean "supports_images", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.string "api_url"
+    t.string "access_token"
+    t.datetime "deleted_at", precision: nil
+    t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
   end
 
   create_table "memories", force: :cascade do |t|

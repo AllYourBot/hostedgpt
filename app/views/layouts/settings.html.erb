@@ -21,6 +21,9 @@
         <%= render partial: "layouts/settings_item", collection: settings_items, locals: { controller: controller } %>
       </div>
     <% end %>
+      <div class="mx-3">
+        <%= link_to "Language Models", settings_language_models_path %>
+      </div>
   </section>
 <% end %>
 
