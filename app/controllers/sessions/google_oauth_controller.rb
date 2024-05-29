@@ -2,8 +2,12 @@ class Sessions::GoogleOauthController < ApplicationController
   skip_before_action :authenticate_user!
 
   def create
-    if auth[:provider].in?(addons)      && user = User.find_by(auth_uid: auth[:uid])
-      # TODO: Handle auth[:credentials][:scope]
+    if auth[:provider] == "gmail"      && Current.user
+      credential = Current.user.credentials.find_or_create_by(type: 'GmailCredential')
+      credential.update!(email: auth[:info][:email], properties: auth[:credentials], last_authenticated_at: Time.current)
+      credential.authentications.active.update_all(ended_at: Time.current)
+      credential.authentications.active.create!(user: Current.user, token: auth[:credentials][:token])
+
       redirect_to edit_settings_person_path, notice: "Saved"
       return
 
@@ -60,10 +64,6 @@ class Sessions::GoogleOauthController < ApplicationController
   end
 
   private
-
-  def addons
-    %w[ gmail google_tasks google_calendar ]
-  end
 
   def auth
     request.env['omniauth.auth']&.deep_symbolize_keys || {}

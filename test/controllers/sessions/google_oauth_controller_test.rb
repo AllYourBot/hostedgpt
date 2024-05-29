@@ -5,20 +5,22 @@ class Sessions::GoogleOauthControllerTest < ActionDispatch::IntegrationTest
     OmniAuth.config.test_mode = true
   end
 
-  test "should redirect to edit_settings after granting additional permissions for a VALID USER" do
-    OmniAuth.config.add_mock(:google_calendar, {uid: users(:rob).auth_uid})
-    get "/auth/google_calendar/callback"
+  test "should add a GmailCredential and redirect to edit_settings" do
+    login_as users(:keith)
+    OmniAuth.config.add_mock(:gmail, { uid: users(:rob).auth_uid,
+      credentials: { token: "abc123", refresh_token: "xyz789" },
+      info: { email: "krschacht@hostedgpt.com" },
+    })
+    get "/auth/gmail/callback"
     assert_redirected_to edit_settings_person_path
-  end
-
-  test "should redirect to registration after attempting to grant additional permissions for a MISSING USER" do
-    OmniAuth.config.add_mock(:google_calendar, {uid: 'BAD'})
-    get "/auth/google_calendar/callback"
-    assert_redirected_to new_user_path
+    assert users(:keith).gmail_credential.present?
+    assert_equal "krschacht@hostedgpt.com", users(:keith).gmail_credential.email
+    assert_equal "xyz789", users(:keith).gmail_credential.refresh_token
+    assert_equal "abc123", users(:keith).gmail_credential.active_authentication.token
   end
 
   test "should log you in for a user that exists" do
-    OmniAuth.config.add_mock(:google, {uid: users(:rob).auth_uid})
+    OmniAuth.config.add_mock(:google, { uid: users(:rob).auth_uid })
     get "/auth/google/callback"
     assert_redirected_to root_path
     assert_logged_in(users(:rob))
