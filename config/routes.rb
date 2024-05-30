@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     resources :assistants, except: [:index, :show]
     resource :person, only: [:edit, :update]
     resources :language_models
+    resources :api_services
   end
 
   get "/auth/:provider/callback" => "sessions/google_oauth#create"

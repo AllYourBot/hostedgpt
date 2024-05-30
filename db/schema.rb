@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_30_162948) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -46,6 +46,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "api_services", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "name", null: false
+    t.string "url", null: false
+    t.string "access_token"
+    t.datetime "deleted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "deleted_at"], name: "index_api_services_on_user_id_and_deleted_at"
   end
 
   create_table "assistants", force: :cascade do |t|
@@ -129,8 +140,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
-    t.string "api_url"
-    t.string "access_token"
     t.datetime "deleted_at", precision: nil
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
   end

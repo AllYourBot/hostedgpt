@@ -1,10 +1,10 @@
-<%= form_with(model: [:settings, language_model], class: "contents") do |form| %>
-  <% if language_model.errors.any? %>
+<%= form_with(model: [:settings, api_service], class: "contents") do |form| %>
+  <% if api_service.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(language_model.errors.count, "error") %> prohibited this language_model from being saved:</h2>
+      <h2><%= pluralize(api_service.errors.count, "error") %> prohibited this api_service from being saved:</h2>
 
       <ul>
-        <% language_model.errors.each do |error| %>
+        <% api_service.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
@@ -17,13 +17,13 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :description %>
-    <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+    <%= form.label :url %>
+    <%= form.text_field :url, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <div class="my-5">
-    <%= form.check_box :supports_images %>
-    <%= form.label :supports_images, "Supports Images?" %>
+    <%= form.label :access_token %>
+    <%= form.password_field :access_token, autocomplete: :off, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <%= form.submit "Save",
