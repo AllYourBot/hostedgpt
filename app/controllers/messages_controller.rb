@@ -79,7 +79,7 @@ class MessagesController < ApplicationController
   end
 
   def set_message
-    @message = Message.find(params[:id])
+    @message = Current.user.messages.find(params[:id])
   end
 
   def set_nav_conversations
