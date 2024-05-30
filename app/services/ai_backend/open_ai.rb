@@ -93,7 +93,9 @@ class AIBackend::OpenAI < AIBackend
       if content_chunk
         @stream_response_text += content_chunk
         yield content_chunk
-      elsif tool_calls_chunk && tool_calls_chunk.is_a?(Array)
+      end
+
+      if tool_calls_chunk && tool_calls_chunk.is_a?(Array)
         tool_calls_chunk.each_with_index do |tool_call, i|
           @stream_response_tool_calls[i] ||= {}
           @stream_response_tool_calls[i] = deep_streaming_merge(@stream_response_tool_calls[i], tool_call)

@@ -1,11 +1,10 @@
 class Toolbox < SDK
   def self.descendants
     [
-      Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
       Toolbox::Gmail,
       Toolbox::Memory,
-    ]
+    ] + (Rails.env.test? ? [Toolbox::HelloWorld] : [])
   end
 
   def self.call(name, args)

@@ -1,18 +1,37 @@
 class Toolbox::Gmail < Toolbox
 
   describe :email_myself, <<~S
-    Send an email to yourself with the indicated text
+    Send an email to yourself with the indicated message
   S
 
-  def email_myself(text_s:)
-    subject = text
-    if text.length > 60
+  def email_myself(message_s:)
+    subject = message_s
+    if message_s.length > 60
       subject = "Note to self"
-      body = text
+      body = message_s
     end
     to = Current.user.gmail_credential.email
 
     draft = create_draft(to: to, subject: subject, body: body)
+    raise "Unable to create message" if !draft&.try(:id)
+    send_draft(draft.id)
+
+    "Email has been sent"
+  end
+
+  describe :send_email_to_address, <<~S
+    Send an email message to any address. The email_address must be specified so if you were told the name of
+    a person to email and you were not previously told the email address for that name then BE SURE TO ASK for this
+    name's email address. Before you send any emails confirm the exact subject and message you are about to use so
+    that you are certain the user is okay with you sending.
+  S
+
+  def send_email_to_address(email_address_s:, subject_s:, message_s:)
+    draft = create_draft(
+      to: email_address_s,
+      subject: subject_s,
+      body: message_s
+    )
     raise "Unable to create message" if !draft&.id
     send_draft(draft.id)
 
@@ -83,7 +102,9 @@ class Toolbox::Gmail < Toolbox
   def refresh_token_if_needed(&block)
     2.times do |i|
       response = yield block
-      refresh_token && next if i == 0 && response.status == 401
+      expired_token = response.is_a?(Faraday::Response) && response.status == 401
+
+      refresh_token && next if i == 0 && expired_token
       return response
     end
   end
@@ -91,6 +112,8 @@ class Toolbox::Gmail < Toolbox
   def refresh_token
     if !Google.reauthenticate_credential(Current.user.gmail_credential)
       raise "Gmail no longer connected"
+    else
+      true
     end
   end
 
@@ -99,6 +122,8 @@ class Toolbox::Gmail < Toolbox
   end
 
   def bearer_token
-    Current.user.gmail_credential.active_authentication.token
+    token = Current.user&.gmail_credential&.reload&.active_authentication&.token
+    raise "Unable to find a user with Gmail credentials" unless token
+    token
   end
 end

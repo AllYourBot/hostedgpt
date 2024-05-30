@@ -48,8 +48,12 @@ class Message < ApplicationRecord
     !finished?
   end
 
-  def tool_call?
-    tool? || content_tool_calls.present?
+  def tool_response?
+    tool? || (content_tool_calls.present? && content_text.blank?)
+  end
+
+  def tool_related?
+    tool_response? || content_tool_calls.present?
   end
 
   private

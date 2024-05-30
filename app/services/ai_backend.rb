@@ -16,7 +16,7 @@ class AIBackend
     s = @assistant.instructions.to_s
 
     if @user.memories.present?
-      s += "\n\nNote these additional important items that you've been told:\n\n"
+      s += "\n\nNote these additional items that you've been told and remembered:\n\n"
       s += @user.memories.pluck(:detail).join("\n")
     end
 

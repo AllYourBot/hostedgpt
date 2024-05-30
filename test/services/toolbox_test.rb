@@ -2,7 +2,7 @@ require "test_helper"
 
 class ToolboxTest < ActiveSupport::TestCase
   test "tools returns information on all the tools" do
-    assert_equal 6, Toolbox.tools.length
+    assert_equal 7, Toolbox.tools.length
     assert Toolbox::OpenMeteo.tools.first[:function].values.all? { |value| value.present? }
     assert Toolbox::OpenMeteo.tools.first[:function][:description].length > 100
   end
