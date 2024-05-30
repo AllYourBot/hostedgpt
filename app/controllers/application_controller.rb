@@ -6,6 +6,8 @@ class ApplicationController < ActionController::Base
   after_action { response.headers.except! 'X-Frame-Options' }
 
   INSTRUCTIONS = <<~INSTRUCTIONS
+    You are a helpful assistant.
+
     ## Output instructions
     * do not output any multi-line code blocks
     * do not output any inline code blocks
