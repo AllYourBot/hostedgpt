@@ -33,6 +33,14 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should NOT show message when not owned by the logged in user" do
+    message_not_owned_by_user = messages(:filter_map)
+    assert_not_equal @user, message_not_owned_by_user.conversation.user
+
+    get message_url(message_not_owned_by_user)
+    assert_response :unauthorized
+  end
+
   test "should get edit" do
     get edit_assistant_message_url(@assistant, @message)
     assert_response :success

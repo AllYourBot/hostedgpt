@@ -79,7 +79,8 @@ class MessagesController < ApplicationController
   end
 
   def set_message
-    @message = Current.user.messages.find(params[:id])
+    @message = Message.find(params[:id])
+    redirect_to root_url, status: :unauthorized if @message.conversation.user != Current.user
   end
 
   def set_nav_conversations
