@@ -1,4 +1,6 @@
 class SDK
+  private
+
   def key
     raise "self.key is undefined. You need to override this method."
   end

@@ -9,19 +9,18 @@ class Toolbox < SDK
 
   def self.call(name, args)
     kname, method = name.split("_", 2)
-    instance = Toolbox.descendants.find { |k| k.to_s.downcase == "toolbox::#{kname}" }.new
-    raise "'#{kname}' does not match a class which is a descendant of SDK" if instance.nil?
-    raise "'#{method} does not exist on this class" if instance.class.instance_method(method).nil?
-
-    # arguments are what OpenAI calls them, parameters are what the ruby method expects
-    parameters = {}
-    allowed_args = instance.class.formatted_function_parameters_with_types(method).keys # args may include hallucinations
+    klass = Toolbox.descendants.find { |k| k.to_s.downcase == "toolbox::#{kname}" }
+    raise "'#{kname}' does not match a class which is a descendant of SDK. Your function name should be prepended with the class name." if klass.nil?
+    instance = klass.new
+    raise "'#{method} does not exist on this class" if klass.functions.exclude?(method.to_sym)
+    parameters = {} # arguments are what OpenAI calls them, parameters are what the ruby method expects
+    allowed_args = klass.formatted_function_parameters_with_types(method).keys # args may include hallucinations
 
     args.stringify_keys.slice(*allowed_args).each do |arg, val|
-      parameters[ instance.class.argument_to_parameter(method, arg) ] = val
+      parameters[ klass.argument_to_parameter(method, arg) ] = val
     end
 
-    instance.send(method, **parameters)
+    instance.public_send(method, **parameters)
   end
 
   class << self
