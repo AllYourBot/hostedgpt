@@ -1,14 +1,11 @@
 class Message < ApplicationRecord
-  include DocumentImage, Version, Cancellable
+  include DocumentImage, Version, Cancellable, Toolable
 
   belongs_to :assistant
   belongs_to :conversation
   belongs_to :content_document, class_name: "Document", optional: true
   belongs_to :run, optional: true
   has_one :latest_assistant_message_for, class_name: "Conversation", foreign_key: :last_assistant_message_id, dependent: :nullify
-  has_many :memories, dependent: :nullify
-
-  serialize :content_tool_calls, coder: JsonSerializer
 
   enum role: %w[user assistant tool].index_by(&:to_sym)
 
@@ -20,11 +17,8 @@ class Message < ApplicationRecord
 
   validates :role, presence: true
   validates :content_text, presence: true, unless: :assistant?
-  validates :tool_call_id, presence: true, if: :tool?
   validate  :validate_conversation,  if: -> { conversation.present? && Current.user }
   validate  :validate_assistant,     if: -> { assistant.present? && Current.user }
-
-  normalizes :tool_call_id, with: -> tool_call_id { tool_call_id[0...40] }
 
   after_create :start_assistant_reply, if: :user?
   after_create :set_last_assistant_message, if: :assistant?
@@ -46,14 +40,6 @@ class Message < ApplicationRecord
 
   def not_finished?
     !finished?
-  end
-
-  def tool_response?
-    tool? || (content_tool_calls.present? && content_text.blank?)
-  end
-
-  def tool_related?
-    tool_response? || content_tool_calls.present?
   end
 
   private

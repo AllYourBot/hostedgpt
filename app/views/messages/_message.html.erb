@@ -19,7 +19,7 @@ end
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.tool_response? && !debug_tool && 'hidden' %>"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !debug_tool && 'hidden' %>"
   data-role="message"
   data-timestamp="<%= timestamp %>"
   data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && 'message-scroller' %>"
