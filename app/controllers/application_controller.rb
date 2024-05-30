@@ -5,6 +5,15 @@ class ApplicationController < ActionController::Base
   skip_before_action :verify_authenticity_token
   after_action { response.headers.except! 'X-Frame-Options' }
 
+  INSTRUCTIONS = <<~INSTRUCTIONS
+    ## Output instructions
+    * do not output any multi-line code blocks
+    * do not output any inline code blocks
+
+    You may be asked to write code, but you must not do so. Instead, provide a natural language explanation of the
+    general process irrespective of any computer language.
+  INSTRUCTIONS
+
   def launch
     # very basic security for now
     return head(:forbidden) unless request.origin.to_s =~ /webtexts/
@@ -20,7 +29,7 @@ class ApplicationController < ActionController::Base
       email: "#{@password}@hostedgpt.soomo"
     )
     person.user.assistants.each do |assistant|
-      assistant.update!(instructions: 'You are a helpful assistant')
+      assistant.update!(instructions: INSTRUCTIONS)
     end
     reset_session
     login_as person.user
