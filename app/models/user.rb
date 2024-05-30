@@ -15,6 +15,7 @@ class User < ApplicationRecord
   has_many :conversations, dependent: :destroy
   has_many :credentials, dependent: :destroy
   has_many :authentications, dependent: :destroy
+  has_many :memories, dependent: :destroy
 
   has_one :email_credential, -> { type_is("EmailCredential") }, class_name: "Credential"
   has_one :gmail_credential, -> { type_is("GmailCredential") }, class_name: "Credential"

@@ -6,6 +6,7 @@ class Message < ApplicationRecord
   belongs_to :content_document, class_name: "Document", optional: true
   belongs_to :run, optional: true
   has_one :latest_assistant_message_for, class_name: "Conversation", foreign_key: :last_assistant_message_id, dependent: :nullify
+  has_many :memories, dependent: :nullify
 
   serialize :content_tool_calls, coder: JsonSerializer
 
