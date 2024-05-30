@@ -3,7 +3,8 @@ class Toolbox < SDK
     [
       Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
-      Toolbox::Gmail
+      Toolbox::Gmail,
+      Toolbox::Memory,
     ]
   end
 

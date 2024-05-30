@@ -12,6 +12,16 @@ class AIBackend::OpenAI < AIBackend
     end
   end
 
+  def initialize(user, assistant, conversation, message)
+    super(user, assistant, conversation, message)
+    raise ::OpenAI::ConfigurationError if user.openai_key.blank?
+    begin
+      @client = self.class.client.new(access_token: user.openai_key)
+    rescue ::Faraday::UnauthorizedError => e
+      raise ::OpenAI::ConfigurationError
+    end
+  end
+
   def self.get_tool_messages_by_calling(tool_calls_response)
     tool_calls = deep_json_parse(tool_calls_response)
 
@@ -46,18 +56,6 @@ class AIBackend::OpenAI < AIBackend
     puts "## UNHANDLED error calling tools: #{e.message}"
     puts e.backtrace.join("\n")
     raise ::Faraday::ParsingError
-  end
-
-  def initialize(user, assistant, conversation, message)
-    raise ::OpenAI::ConfigurationError if user.openai_key.blank?
-    begin
-      @client = self.class.client.new(access_token: user.openai_key)
-    rescue ::Faraday::UnauthorizedError => e
-      raise ::OpenAI::ConfigurationError
-    end
-    @assistant = assistant
-    @conversation = conversation
-    @message = message
   end
 
   def get_next_chat_message(&chunk_handler)
@@ -113,11 +111,11 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def system_message
-    return [] if @assistant.instructions.blank?
+    return [] if full_instructions.blank?
 
     [{
       role: 'system',
-      content: @assistant.instructions
+      content: full_instructions
     }]
   end
 

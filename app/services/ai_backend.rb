@@ -1,6 +1,28 @@
 class AIBackend
   attr :client
 
+  def initialize(user, assistant, conversation, message)
+    @user = user
+    @assistant = assistant
+    @conversation = conversation
+    @message = message
+  end
+
+  private
+
+  def full_instructions
+    return nil if @assistant.instructions.blank? && @user.memories.blank?
+
+    s = @assistant.instructions.to_s
+
+    if @user.memories.present?
+      s += "\n\nNote these additional important items that you've been told:\n\n"
+      s += @user.memories.pluck(:detail).join("\n")
+    end
+
+    s
+  end
+
   def deep_streaming_merge(hash1, hash2)
     merged_hash = hash1.dup
     hash2.each do |key, value|
