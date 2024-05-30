@@ -21,6 +21,7 @@ module MessagesHelper
       content_tag(:pre,
         class: %|
           p-0
+          overflow-x-hidden
           #{"language-#{language}" if language}
         |,
         data: {
@@ -56,7 +57,7 @@ module MessagesHelper
             span_tag("Copied!", data: { transition_target: "transitionable" }, class: "hidden ml-1")
           end
         end +
-        div_tag(class: "px-4 py-3") do
+        div_tag(class: "px-4 py-3 overflow-x-auto") do
           content_tag(:code, code, data: { clipboard_target: "text" })
         end
       end
