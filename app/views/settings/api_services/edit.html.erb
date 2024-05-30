@@ -1,0 +1,11 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <h1 class="font-bold text-4xl">
+   Editing  API Service <%= @api_service.name %>
+  </h1>
+
+  <%= render "form", api_service: @api_service %>
+
+  <p class="float-right inline-block ml-5">
+    <%= link_to "Cancel", settings_api_services_path, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium text-indigo-600 hover:text-indigo-900" %>
+  </p>
+</div>

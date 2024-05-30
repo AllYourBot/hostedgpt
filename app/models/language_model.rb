@@ -1,10 +1,8 @@
 # We don't care about large or not
 class LanguageModel < ApplicationRecord
-  encrypts :access_token
 
   belongs_to :user, optional: true
 
-  validates :api_url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]),  if: -> { api_url.present? }
   validates :name, :description, presence: true
 
   BEST_MODELS = {

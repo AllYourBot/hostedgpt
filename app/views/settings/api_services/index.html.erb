@@ -1,0 +1,13 @@
+<h1 class="font-bold text-4xl">
+API Services
+</h1>
+
+<p class="my-8">
+  <%= link_to "Add New", new_settings_api_service_path, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium text-indigo-600 hover:text-indigo-900" %>
+</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <%= render @api_services %>
+</div>
+
+  </table>

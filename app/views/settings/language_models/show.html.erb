@@ -13,14 +13,6 @@
         <td class="py-2">Images Supported?</td>
         <td class="px-4 py-2"><%= display_boolean(@language_model.supports_images?) %></td>
       </tr>
-      <tr>
-        <td class="py-2">API URL</td>
-        <td class="px-4 py-2"><%= n_a_if_blank(@language_model.api_url) %></td>
-      </tr>
-      <tr>
-        <td class="py-2">Access Token</td>
-        <td class="px-4 py-2"><%= @language_model.access_token.present? ? '[Hidden]' : 'Empty' %></td>
-      </tr>
     </tbody>
   </table>
 </div>
