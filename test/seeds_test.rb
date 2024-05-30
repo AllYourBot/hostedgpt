@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SeedsTest < ActiveSupport::TestCase
   def setup
-    Rails.application.load_seed 
+    Rails.application.load_seed
   end
 
   test 'seeds run without errors' do
