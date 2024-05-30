@@ -71,6 +71,7 @@ class AIBackend::OpenAI < AIBackend
         model: @assistant.model,
         messages: system_message + preceding_messages,
         tools: Toolbox.tools,
+		tool_choice: 'none', # let's not use tools for now
         stream: response_handler,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
       })
