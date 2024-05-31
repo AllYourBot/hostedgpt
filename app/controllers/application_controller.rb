@@ -19,6 +19,7 @@ class ApplicationController < ActionController::Base
       },
       email: "#{@password}@hostedgpt.soomo"
     )
+		person.user.assistants.create!(name: "GPT-4", language_model: LanguageModel.find_by(name: 'gpt-4-turbo'))
     person.user.assistants.each do |assistant|
       assistant.update!(instructions: 'You are a helpful assistant')
     end
