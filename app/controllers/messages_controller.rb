@@ -2,7 +2,7 @@ class MessagesController < ApplicationController
   include ActiveStorage::SetCurrent
   include HasConversationStarter
 
-	skip_before_action :verify_authenticity_token, only: [:create, :update]
+  skip_before_action :verify_authenticity_token, only: [:create, :update]
 
   before_action :set_version,               only: [:index, :update]
   before_action :set_conversation,          only: [:index]
