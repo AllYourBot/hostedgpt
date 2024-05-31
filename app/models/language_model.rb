@@ -35,18 +35,6 @@ class LanguageModel < ApplicationRecord
     BEST_MODELS[name] || name
   end
 
-  def ai_backend
-    if api_url.blank?
-      if name.starts_with?('gpt-')
-        AIBackend::OpenAI
-      else
-        AIBackend::Anthropic
-      end
-    else
-      AIBackend::OpenAI
-    end
-  end
-
   def created_by_current_user?
     user == Current.user
   end

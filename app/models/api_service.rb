@@ -10,6 +10,12 @@ class APIService < ApplicationRecord
 
   scope :ordered, -> { order(:name) }
 
+  normalizes :url, with: -> url { url.strip }
+
+  def ai_backend
+    driver == 'Anthropic' ? AIBackend::Anthropic : AIBackend::OpenAI
+  end
+
   def destroy
     raise ActiveRecord::ReadOnlyError 'System model cannot be deleted' if user.blank?
     if user.destroy_in_progress?

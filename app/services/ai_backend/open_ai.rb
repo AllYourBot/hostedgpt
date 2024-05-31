@@ -51,12 +51,12 @@ class AIBackend::OpenAI < AIBackend
 
   def initialize(user, assistant, conversation, message)
     begin
-      if assistant.language_model.api_url.blank?
+      if assistant.api_service.blank?
         raise ::OpenAI::ConfigurationError if user.openai_key.blank?
         @client = self.class.client.new(access_token: user.openai_key)
       else
-        Rails.logger.info "Connecting to API server at #{assistant.language_model.api_url} with access token of length #{assistant.language_model.access_token.to_s.length}"
-        @client = self.class.client.new(uri_base: assistant.language_model.api_url, access_token: assistant.language_model.access_token)
+        Rails.logger.info "Connecting to API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.access_token.to_s.length}"
+        @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.access_token)
       end
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError

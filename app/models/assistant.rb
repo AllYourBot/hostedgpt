@@ -12,6 +12,7 @@ class Assistant < ApplicationRecord
   delegate :supports_images?, to: :language_model
 
   belongs_to :language_model
+  belongs_to :api_service
 
   validates :tools, presence: true, allow_blank: true
   validates :name, presence: true
@@ -25,6 +26,16 @@ class Assistant < ApplicationRecord
 
     parts[0][0].capitalize +
       parts[1]&.try(:[], 0)&.capitalize.to_s
+  end
+
+  def ai_backend
+    if api_service.present?
+      api_service.ai_backend
+    elsif name.starts_with?('gpt-')
+      AIBackend::OpenAI
+    else
+      AIBackend::Anthropic
+    end
   end
 
   def destroy
