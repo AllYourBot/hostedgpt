@@ -45,3 +45,24 @@ gpt_3_5_turbo_0125:
     name: gpt-3.5-turbo
     description: gpt-3.5-turbo from fixtures
     supports_images: false
+
+camel:
+  user: keith
+  position: 13
+  name: camel
+  description: gpt-3.5-turbo from fixtures
+  supports_images: false
+
+guanaco:
+  user: keith
+  position: 14
+  name: guanaco:large
+  description: Guanaco (large)  from fixtures
+  supports_images: true
+
+alpaca:
+  user: taylor
+  position: 19
+  name: alpaca:medium
+  description: Alpaca (large) from fixtures
+  supports_images: true

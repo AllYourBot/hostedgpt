@@ -16,3 +16,11 @@ rob:
   anthropic_key: def789
   preferences: {}
   auth_uid: oauth_google_abc123
+
+taylor:
+  first_name: Taylor
+  password_digest: <%= BCrypt::Password.create('secret') %>
+  registered_at: 2024-05-31 08:40:05
+  openai_key: sk-xyz0123456789
+  anthropic_key: 
+  preferences: {}

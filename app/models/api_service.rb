@@ -4,6 +4,8 @@ class APIService < ApplicationRecord
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]),  if: -> { url.present? }
   validates :name, :url, presence: true
 
+  scope :ordered, -> { order(:name) }
+
   def destroy
     raise ActiveRecord::ReadOnlyError 'System model cannot be deleted' if user.blank?
     if user.destroy_in_progress?

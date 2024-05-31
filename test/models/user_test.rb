@@ -5,6 +5,19 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
+  test "has language models" do
+    assert_equal ["camel", "guanaco:large"], users(:keith).language_models.ordered.pluck(:name)
+    assert_equal ["alpaca:medium"], users(:taylor).language_models.ordered.pluck(:name)
+    assert_equal [], users(:rob).language_models.ordered.pluck(:name)
+  end
+
+  test "has usable language models" do
+    system = ["gpt-best", "best-claude", "gpt-4o", "gpt-4", "gpt-3.5-turbo", "gpt-3.5-turbo", "claude-3-opus-20240229", "claude-3-sonnet-20240229"].sort
+    assert_equal (system + ["camel", "guanaco:large"]).sort, users(:keith).usable_language_models.pluck(:name).sort
+    assert_equal (system + ["alpaca:medium"]).sort, users(:taylor).usable_language_models.pluck(:name).sort
+    assert_equal system, users(:rob).usable_language_models.pluck(:name).sort
+  end
+
   test "has a last_cancelled_message but can be nil" do
     assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
     assert_nil users(:rob).last_cancelled_message
