@@ -91,7 +91,7 @@ EXPOSE 3000
 # RUBY_VERSION is the only thing used from anything above
 FROM ruby:${RUBY_VERSION}-alpine AS development
 
-RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
+RUN apk add --no-cache git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
 
 ENV BUNDLE_CACHE=/tmp/bundle \
   BUNDLE_JOBS=2 \
@@ -106,7 +106,7 @@ RUN --mount=type=cache,id=gems,target=/tmp/bundle \
 RUN apk add --no-cache postgresql-client
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
-CMD ["./bin/dev"]
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
 
 #### END of DEV ####
 

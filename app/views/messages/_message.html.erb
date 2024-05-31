@@ -110,8 +110,7 @@ end
                   inline-block
                   ml-1
                   #{!thinking && 'hidden'}
-                |,
-                  data: { thinking: thinking }) +
+                |) +
                 span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && 'hidden') +
                 icon("stop",
                   variant: :solid,
