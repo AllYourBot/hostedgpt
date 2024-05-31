@@ -12,6 +12,7 @@ class Assistant < ApplicationRecord
   delegate :supports_images?, to: :language_model
 
   belongs_to :language_model
+  belongs_to :api_service
 
   validates :tools, presence: true, allow_blank: true
   validates :name, presence: true
@@ -35,6 +36,16 @@ class Assistant < ApplicationRecord
 
   def soft_delete!
     raise "Can't delete user's last assistant" if !soft_delete
+  end
+
+  def ai_backend
+    if api_service.present?
+      api_service.ai_backend
+    elsif name.starts_with?('gpt-')
+      AIBackend::OpenAI
+    else
+      AIBackend::Anthropic
+    end
   end
 
   def to_s
