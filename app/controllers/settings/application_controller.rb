@@ -7,15 +7,16 @@ class Settings::ApplicationController < ApplicationController
   def set_settings_menu
     # controller_name => array of items
     @settings_menu = {
+      people: {
+        "Your Account": edit_settings_person_path
+      },
+
       assistants: Current.user.assistants.ordered.map {
         |assistant| [ assistant, edit_settings_assistant_path(assistant) ]
       }.to_h.merge({
-        #'New Assistant': new_settings_assistant_path(assistant)
-      }),
+        "New Assistant": new_settings_assistant_path
+      })
 
-      people: {
-        'Account': edit_settings_person_path
-      }
     }
   end
 end

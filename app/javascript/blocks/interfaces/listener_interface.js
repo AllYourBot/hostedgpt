@@ -42,10 +42,12 @@ export default class extends Interface {
                         }
                       }
 
-  Disable()           { $.processing = null
-                        $.screenService.end()
-                        Flip.Transcriber.off()
-                        Play.Speaker.sound('pip')
+  Disable()           { if ($.processing != null) {
+                          $.processing = null
+                          $.screenService.end()
+                          Flip.Transcriber.off()
+                          Play.Speaker.sound('pip')
+                        }
                       }
 
   attr_consideration  = ''

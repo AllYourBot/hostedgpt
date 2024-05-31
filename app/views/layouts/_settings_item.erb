@@ -1,7 +1,6 @@
 <% item, link = settings_item %>
 <% selected = (controller.to_s == controller_name.to_s) %>
-<% selected = selected && params[:id] == item.id.to_s  if params[:id] %>
-
+<% selected = selected && params[:id] == item.try(:id)&.to_s %>
 <div class="
             flex justify-between items-center
             mb-1 p-1 pl-2

@@ -5,11 +5,7 @@ class GetNextAIMessageJob < ApplicationJob
   retry_on WaitForPrevious, wait: ->(run) { (2**run - 1).seconds }, attempts: 3
 
   def ai_backend
-    if @assistant.model.starts_with?('gpt-')
-      AIBackend::OpenAI
-    else
-      AIBackend::Anthropic
-    end
+    @assistant.language_model.ai_backend
   end
 
   def perform(user_id, message_id, assistant_id, attempt = 1)
@@ -45,7 +41,7 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
 
-    @message.content_tool_calls = response # This Typically, get_next_chat_message will simply return nil because it executes
+    @message.content_tool_calls = response # Typically, get_next_chat_message will simply return nil because it executes
                                            # the content_chunk block to return it's response incrementally. However, tool_call
                                            # responses don't make sense to stream because they can't be executed incrementally
                                            # so we just return the full tool response message at once. The only time we return
@@ -91,11 +87,10 @@ class GetNextAIMessageJob < ApplicationJob
       puts e.backtrace.join("\n") if Rails.env.development?
 
       if attempt < 3
-        @message.content_text = "(Error after #{attempt.ordinalize} try, retrying... #{msg&.slice(0..3000)})"
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
         GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(user_id, message_id, assistant_id, attempt+1)
       else
-        set_unexpected_error(msg)
+        set_unexpected_error(msg&.slice(0...2000))
         wrap_up_the_message
       end
     end
@@ -143,7 +138,7 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def wrap_up_the_message
-    call_tools_before_wrapping_up if @message.content_tool_calls.present?
+    call_tools_before_wrapping_up if @message.content_tool_calls.present? && @message.valid?
 
     GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
     @message.save!
