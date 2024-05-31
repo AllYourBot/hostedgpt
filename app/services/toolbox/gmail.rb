@@ -14,7 +14,7 @@ class Toolbox::Gmail < Toolbox
 
     draft = create_draft(to: to, subject: subject, body: body)
     raise "Unable to create message" if !draft&.try(:id)
-    send_draft(draft.id)
+    send_draft(draft.id)  # TODO: Change to send_message https://developers.google.com/gmail/api/reference/rest/v1/users.messages/send
 
     "Email has been sent"
   end
@@ -33,7 +33,7 @@ class Toolbox::Gmail < Toolbox
       body: message_s
     )
     raise "Unable to create message" if !draft&.id
-    send_draft(draft.id)
+    send_draft(draft.id)  # TODO: Change to send_message https://developers.google.com/gmail/api/reference/rest/v1/users.messages/send
 
     "Email has been sent"
   end
@@ -50,14 +50,14 @@ class Toolbox::Gmail < Toolbox
 
   def get_user_drafts
     # https://developers.google.com/gmail/api/reference/rest/v1/users.drafts/list
-    get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").params(
+    get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").param(
       maxResults: 100,
       includeSpamTrash: false,
     )
   end # .drafts.first.id    # {:drafts=> [{:id=>"r2958353423951382939", :message=>{:id=>"18fc47b5ef586361", :threadId=>"18fbbf7381c4bc73"}},
 
   def get_user_draft(id)
-    get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/#{id}").params(
+    get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/#{id}").param(
       format: :full
     )
   end
@@ -74,10 +74,10 @@ class Toolbox::Gmail < Toolbox
     encoded_message = Base64.urlsafe_encode64(message)
 
     refresh_token_if_needed do
-      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").headers(
+      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").header(
         content_type: "application/json",
       ).expected_status([200, 401]
-      ).params(
+      ).param(
         message: {
           raw: encoded_message
         }
@@ -87,10 +87,10 @@ class Toolbox::Gmail < Toolbox
 
   def send_draft(draft_id)
     refresh_token_if_needed do
-      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/send").headers(
+      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/send").header(
         content_type: "application/json",
       ).expected_status([200, 401]
-      ).params(
+      ).param(
         id: draft_id
       )
     end

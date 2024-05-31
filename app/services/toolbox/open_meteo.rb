@@ -10,7 +10,7 @@ class Toolbox::OpenMeteo < Toolbox
   def get_current_and_todays_weather(city_s:, state_province_or_region_s:, country_s: nil)
     location = get_location(city_s, state_province_or_region_s, country_s)
 
-    response = get("https://api.open-meteo.com/v1/forecast").params(
+    response = get("https://api.open-meteo.com/v1/forecast").param(
       past_days: 1,
       forecast_days: 1,
 
@@ -129,7 +129,7 @@ class Toolbox::OpenMeteo < Toolbox
     span = ((date_end.to_i - date_begin.to_i) / 30.days.to_f)
     raise "You attempted to query for more than 12 months" if span > 12.0
 
-    data = get("https://archive-api.open-meteo.com/v1/archive").params(
+    data = get("https://archive-api.open-meteo.com/v1/archive").param(
       latitude: location.latitude,
       longitude: location.longitude,
       timezone: location.timezone,
@@ -178,7 +178,7 @@ class Toolbox::OpenMeteo < Toolbox
   private
 
   def get_location(city_s, state_province_or_region_s, country_s = nil)
-    locations = get("https://geocoding-api.open-meteo.com/v1/search").params(
+    locations = get("https://geocoding-api.open-meteo.com/v1/search").param(
       name: city_s,
       count: 5,
       language: "en",

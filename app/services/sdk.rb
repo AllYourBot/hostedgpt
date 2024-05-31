@@ -1,4 +1,22 @@
 class SDK
+  def get(url, token = nil)
+    SDK::Get.new(
+      url: url,
+      bearer_token: token || bearer_token,
+      expected_status: expected_status,
+      header: header
+    )
+  end
+
+  def post(url, token = nil)
+    SDK::Post.new(
+      url: url,
+      bearer_token: token || bearer_token,
+      expected_status: expected_status,
+      header: header
+    )
+  end
+
   private
 
   def key
@@ -9,11 +27,15 @@ class SDK
     nil
   end
 
-  def get(url, token = nil)
-    SDK::Get.new(url, token || bearer_token)
+  def expected_status
+    nil
   end
 
-  def post(url, token = nil)
-    SDK::Post.new(url, token || bearer_token)
+  def header
+    nil
+  end
+
+  def param
+    nil
   end
 end
