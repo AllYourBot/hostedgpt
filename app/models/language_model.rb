@@ -24,6 +24,8 @@ class LanguageModel < ApplicationRecord
   end
 
   scope :ordered, -> { order(:position) }
+  scope :for_user, ->  (user) { where(user_id: [user.id, nil]) }
+  scope :system_wide, ->  { where(user_id: nil) }
 
   before_create :populate_position
 
