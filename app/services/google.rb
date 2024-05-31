@@ -3,9 +3,7 @@ class Google < SDK
   def self.reauthenticate_credential(credential)
     # from here: https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code
     begin
-      response = SDK::Post.new("https://oauth2.googleapis.com/token").header(
-        content_type: "application/x-www-form-urlencoded",
-      ).param(
+      response = SDK::Post.new(url: "https://oauth2.googleapis.com/token").www_content.param(
         client_id: Setting.google_auth_client_id,
         client_secret: Setting.google_auth_client_secret,
         refresh_token: credential.refresh_token,

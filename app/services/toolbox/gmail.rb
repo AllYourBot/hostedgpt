@@ -41,25 +41,33 @@ class Toolbox::Gmail < Toolbox
   private
 
   def get_user_profile
-    get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_params
+    refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_param
+    end
   end # #<OpenStruct emailAddress="krschacht@gmail.com", messagesTotal=874908, threadsTotal=536434, historyId="73971375">
 
   def get_user_labels
-    get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/labels").no_params
+    refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/labels").no_param
+    end
   end # .labels.last   # #<OpenStruct id="Label_8804082651400413034", name="F: international", messageListVisibility="show", labelListVisibility="labelHide", type="user">
 
   def get_user_drafts
     # https://developers.google.com/gmail/api/reference/rest/v1/users.drafts/list
-    get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").param(
-      maxResults: 100,
-      includeSpamTrash: false,
-    )
+    refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").param(
+        maxResults: 100,
+        includeSpamTrash: false,
+      )
+    end
   end # .drafts.first.id    # {:drafts=> [{:id=>"r2958353423951382939", :message=>{:id=>"18fc47b5ef586361", :threadId=>"18fbbf7381c4bc73"}},
 
   def get_user_draft(id)
-    get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/#{id}").param(
-      format: :full
-    )
+    refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/#{id}").param(
+        format: :full
+      )
+    end
   end
 
   def create_draft(to:, subject:, body:)
@@ -74,23 +82,17 @@ class Toolbox::Gmail < Toolbox
     encoded_message = Base64.urlsafe_encode64(message)
 
     refresh_token_if_needed do
-      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").header(
-        content_type: "application/json",
-      ).expected_status([200, 401]
-      ).param(
-        message: {
-          raw: encoded_message
-        }
+      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").param(
+          message: {
+            raw: encoded_message
+          }
       )
     end
   end # #<OpenStruct {:id: "r-5831085103476355142", :message: {:id: "18fc5c05dbc1932d", :threadId: "18fc5c05dbc1932d", :labelIds: ["DRAFT"]}}>
 
   def send_draft(draft_id)
     refresh_token_if_needed do
-      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/send").header(
-        content_type: "application/json",
-      ).expected_status([200, 401]
-      ).param(
+      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/send").param(
         id: draft_id
       )
     end
@@ -104,12 +106,12 @@ class Toolbox::Gmail < Toolbox
       response = yield block
       expired_token = response.is_a?(Faraday::Response) && response.status == 401
 
-      refresh_token && next if i == 0 && expired_token
+      refresh_token! && next if i == 0 && expired_token
       return response
     end
   end
 
-  def refresh_token
+  def refresh_token!
     if !Google.reauthenticate_credential(Current.user.gmail_credential)
       raise "Gmail no longer connected"
     else
@@ -125,5 +127,13 @@ class Toolbox::Gmail < Toolbox
     token = Current.user&.gmail_credential&.reload&.active_authentication&.token
     raise "Unable to find a user with Gmail credentials" unless token
     token
+  end
+
+  def header
+    { content_type: "application/json" }
+  end
+
+  def expected_status
+    [200, 401]
   end
 end
