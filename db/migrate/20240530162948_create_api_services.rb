@@ -3,6 +3,7 @@ class CreateAPIServices < ActiveRecord::Migration[7.1]
     create_table :api_services do |t|
       t.bigint :user_id
       t.string :name, null: false
+      t.string :driver, null: false
       t.string :url, null: false
       t.string :access_token, null: true
       t.timestamp :deleted_at, null: true, default: nil

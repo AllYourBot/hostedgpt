@@ -4,7 +4,11 @@
 # model remove the "{}" from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-#one: {}
+one:
+  name: ABC Power
+  url: http://test.com/models
+  access_token: abc-secret
+  driver: OpenAI
 # column: value
 #
 #two: {}
