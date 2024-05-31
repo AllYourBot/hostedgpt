@@ -51,6 +51,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_31_134924) do
   create_table "api_services", force: :cascade do |t|
     t.bigint "user_id"
     t.string "name", null: false
+    t.string "driver", null: false
     t.string "url", null: false
     t.string "access_token"
     t.datetime "deleted_at", precision: nil
