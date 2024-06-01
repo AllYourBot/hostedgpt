@@ -41,7 +41,7 @@ class Assistant < ApplicationRecord
   def ai_backend
     if api_service.present?
       api_service.ai_backend
-    elsif name.starts_with?('gpt-')
+    elsif language_model.name.starts_with?('gpt-')
       AIBackend::OpenAI
     else
       AIBackend::Anthropic
