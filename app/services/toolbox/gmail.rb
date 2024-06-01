@@ -38,6 +38,28 @@ class Toolbox::Gmail < Toolbox
     "Email has been sent"
   end
 
+  def check_inbox
+    inbox = get_threads(q: "in:inbox")
+    unread_inbox = get_threads(q: "in:inbox is:unread")
+    latest_message = get_message(:latest)
+    latest_sent_message = get_message(:latest_sent)
+
+    {
+      messages_in_inbox: inbox.length,
+      unread_messages_in_inbox: unread_inbox.length,
+      read_messages_in_inbox: inbox.length - unread_inbox.length,
+      most_recent_message: latest_message.to_h,
+      last_sent_message: latest_sent_message.to_h,
+    }
+  end
+
+  def check_sent_emails
+    sent_emails = get_threads(q: "in:sent")
+    {
+      sent_emails: sent_emails.length,
+    }
+  end
+
   private
 
   def get_user_profile
@@ -45,6 +67,34 @@ class Toolbox::Gmail < Toolbox
       get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_param
     end
   end # #<OpenStruct emailAddress="krschacht@gmail.com", messagesTotal=874908, threadsTotal=536434, historyId="73971375">
+
+  def get_messages(h = {})
+    refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages").param(h)
+    end&.try(:messages)
+  end
+
+  def get_message(id)
+    case id
+    when :latest
+      id = get_messages(q: "in:inbox", maxResults: 1).first.id
+    when :latest_sent
+      id = get_messages(q: "in:sent", maxResults: 1).first.id
+    end
+
+    data = refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages/#{id}").param(
+        format: :full
+      )
+    end
+    Message.new(data)
+  end
+
+  def get_threads(h = {})
+    refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/threads").param(h)
+    end&.try(:threads)
+  end
 
   def get_user_labels
     refresh_token_if_needed do
@@ -135,5 +185,80 @@ class Toolbox::Gmail < Toolbox
 
   def expected_status
     [200, 401]
+  end
+
+  class Message
+    def initialize(message_or_messages)
+      if message_or_messages.is_a?(Array)
+        message_or_messages.map { |m| Message.new(m) }
+      else
+        @message = message_or_messages
+      end
+    end
+
+    def id
+      @message.id
+    end
+
+    def thread_id
+      @message.thread_id
+    end
+
+    def from
+      @message.payload.headers.find { |h| h.name == "From" }.value
+    end
+
+    def from_email
+      from.match?(/\A<([^>]*)>/) ? $1 : from
+    end
+
+    def to
+      @message.payload.headers.find { |h| h.name == "To" }.value
+    end
+
+    def to_email
+      to.match?(/\A<([^>]*)>/) ? $1 : to
+    end
+
+    def subject
+      @message.payload.headers.find { |h| h.name == "Subject" }.value
+    end
+
+    def snippet
+      @message.snippet
+    end
+
+    def date
+      @message.payload.headers.find { |h| h.name == "Date" }.value
+    end
+
+    def body
+      Base64.decode64(@message.payload.parts.find { |p| p.mimeType == "text/plain" }.body.data.gsub(/-/, '+').gsub(/_/, '/'))
+    end
+
+    def body_html
+      Base64.decode64(@message.payload.parts.find { |p| p.mimeType == "text/html" }.body.data.gsub(/-/, '+').gsub(/_/, '/'))
+    end
+
+    def to_h
+      {
+        id: id,
+        thread_id: thread_id,
+        date: date,
+        from: from,
+        to: to,
+        subject: subject,
+        snippet: snippet,
+        body: body,
+      }
+    end
+
+    def data
+      @message
+    end
+
+    def inspect
+      "#<Message id:#{id} from:#{from_email} to:#{to_email} subject:#{subject}>"
+    end
   end
 end
