@@ -12,7 +12,7 @@ class Assistant < ApplicationRecord
   delegate :supports_images?, to: :language_model
 
   belongs_to :language_model
-  belongs_to :api_service
+  belongs_to :api_service, optional: true
 
   validates :tools, presence: true, allow_blank: true
   validates :name, presence: true
