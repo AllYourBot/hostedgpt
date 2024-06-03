@@ -31,7 +31,13 @@ module Authenticate
   end
 
   def authenticate_user!
-    redirect_to login_path, notice: 'Please login to proceed' unless current_user
+    return if current_user
+
+    if Feature.http_header_authentication?
+      render plain: 'Unauthorized', status: :unauthorized
+    else
+      redirect_to login_path, notice: 'Please login to proceed'
+    end
   end
 
   private
