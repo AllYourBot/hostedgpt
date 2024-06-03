@@ -31,7 +31,7 @@ module Authenticate
   end
 
   def authenticate_user!
-    redirect_to login_path unless current_user
+    redirect_to login_path, notice: 'Please login to proceed' unless current_user
   end
 
   private

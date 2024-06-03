@@ -40,7 +40,14 @@ class UsersController < ApplicationController
     if Feature.disabled?(:registration) ||
       (Feature.disabled?(:password_authentication) && Feature.disabled?(:google_authentication))
 
-      redirect_to root_path
+      alert =
+        if Feature.disabled?(:registration)
+          "Registration is disabled."
+        else
+          "Password and Google authentication are both disabled."
+        end
+
+      redirect_to root_path, alert: alert
     end
   end
 
