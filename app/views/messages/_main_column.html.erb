@@ -125,8 +125,12 @@
         <% end %>
       </div>
 
-      <div  id="composer"
-            class="flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= @assistant.images.blank? && 'relationship' %>"
+      <div class="<%= @assistant.not_deleted? && 'hidden' %> flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
+        <p class="text-center"><%= @assistant.name %> has been deleted and cannot assist any longer.</p>
+      </div>
+
+      <div id="composer"
+            class="<%= @assistant.deleted? && 'hidden' %> flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= !@assistant.supports_images? && 'relationship' %>"
             data-controller="composer image-upload"
       >
         <%= button_tag type: "button",
@@ -277,7 +281,8 @@
               mb-2 block
               pl-14 pr-12 relationship:pl-4 show-previews:pt-24
               bg-transparent
-              text-black placeholder-gray-500 dark:text-gray-200
+              text-black dark:text-gray-200
+              placeholder-gray-300 dark:placeholder-gray-500
               text-md
               rounded-2xl border-gray-300
               focus:ring-0 focus:border-gray-400 focus:shadow
@@ -288,7 +293,7 @@
 
           <!-- options for the composer right button -->
 
-          <% if Feature.enabled?(:voice) %>
+          <% if Feature.voice? %>
             <%= form.button type: "button",
               data: {
                 composer_target: "microphoneDisable",
@@ -331,7 +336,7 @@
 
           <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
 
-          <% if Feature.enabled?(:voice) %>
+          <% if Feature.voice? %>
             <div
               id="microphone-enable"
               data-composer-target="microphoneEnable"
@@ -377,7 +382,7 @@
               text-gray-100 dark:text-gray-600
               enabled:text-black
               enabled:dark:text-white
-              #{Feature.enabled?(:voice) && '!hidden'}
+              #{Feature.voice? && '!hidden'}
             | do
           %>
             <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
@@ -406,7 +411,7 @@
   data-controller="modal"
   data-action="keydown@document->modal#keydownQuestionOpen"
 >
-  <main class="modal-box max-w-5xl dark:bg-black">
+  <div class="modal-box max-w-5xl dark:bg-black">
     <header class="font-bold text-lg mb-5">
       Keyboard shortcuts
     </header>
@@ -487,7 +492,7 @@
         </figure>
       </section>
     </article>
-  </main>
+  </div>
   <form method="dialog" class="modal-backdrop no-focus-outline">
     <button id="modal-backdrop">close</button>
   </form>

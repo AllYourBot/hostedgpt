@@ -1,6 +1,28 @@
-<div id="spacer-above-fixed-assistant" class="absolute top-0 z-10 w-full h-5 bg-gray-50 dark:bg-gray-900"></div>
-<section id="assistants" data-controller="radio-behavior" data-radio-behavior-selected-class="relationship" class="pt-14">
+<section
+  id="assistants"
+  data-controller="radio-behavior transition"
+  data-radio-behavior-selected-class="relationship !flex"
+  data-transition-toggle-class="hidden"
+  class="pt-14 flex flex-col"
+>
   <%= render @nav_assistants %>
+
+  <%= button_tag type: "button",
+    class: %|
+      flex
+      text-sm
+      rounded-lg
+      mb-1 p-1 pl-2 pr-2 mr-5
+      hover:bg-gray-100 dark:hover:bg-gray-700
+      pointer
+      #{@nav_assistants.length <= Assistant::MAX_LIST_DISPLAY && 'hidden'}
+    |,
+    data: {
+      transition_target: "transitionable",
+      action: "transition#toggleClass",
+    } do %>
+    <%= icon "chevron-down", variant: :mini, class: 'text-gray-500 ml-[2px] mr-[14px]' %> Show All
+  <% end %>
 </section>
 
 <section class="text-gray-950 dark:text-gray-100 select-none">
