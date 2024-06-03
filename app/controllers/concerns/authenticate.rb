@@ -49,15 +49,20 @@ module Authenticate
   end
 
   def find_current_user_based_on_http_header
-    if Feature.registration?
-      Current.user = User.find_or_create_by!(auth_uid: request.headers[Setting.http_header_auth_uid]) do |user|
-        user.create_person!(email: request.headers[Setting.http_header_auth_email])
-        user.name = request.headers[Setting.authentication_http_header_name] || person.email
+    if request.headers[Setting.http_header_auth_uid].present?
+      if Feature.registration?
+        Current.user = User.find_or_create_by!(auth_uid: request.headers[Setting.http_header_auth_uid]) do |user|
+          user.create_person!(email: request.headers[Setting.http_header_auth_email])
+          user.name = request.headers[Setting.authentication_http_header_name] || person.email
+        end
+      else
+        Current.user = User.find_by(auth_uid: request.headers[Setting.http_header_auth_uid])
       end
+      Current.person = Current.user&.person
+      Current.user = nil if Current.person.nil?
     else
-      Current.user = User.find_by(auth_uid: request.headers[Setting.http_header_auth_uid])
+      Rails.logger.error "HTTP header #{Setting.http_header_auth_uid} is missing"
+      Current.person = Current.user = nil
     end
-    Current.person = Current.user&.person
-    Current.user = nil if Current.person.nil?
   end
 end
