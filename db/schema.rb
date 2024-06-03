@@ -311,7 +311,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_24_144314) do
     t.string "auth_uid"
     t.index ["auth_uid"], name: "index_users_on_auth_uid", unique: true
     t.index ["last_cancelled_message_id"], name: "index_users_on_last_cancelled_message_id"
-    t.index ["uid"], name: "index_people_on_uid", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
