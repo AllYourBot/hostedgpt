@@ -3,6 +3,8 @@ class SessionsController < ApplicationController
 
   layout "public"
 
+  before_action :ensure_authentication_allowed
+
   def new
   end
 
@@ -24,5 +26,13 @@ class SessionsController < ApplicationController
     reset_session
     Current.user = nil
     redirect_to login_path
+  end
+
+  private
+
+  def ensure_authentication_allowed
+    if Feature.disabled?(:password_authentication) && Feature.disabled?(:google_authentication)
+      redirect_to root_path, alert: "Password and Google authentication are both disabled."
+    end
   end
 end
