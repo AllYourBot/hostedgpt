@@ -1,6 +1,7 @@
 <%# locals: (assistant:, settings: true, assistant_counter: -1) %>
 <% selected = assistant == @assistant %>
 <% first = assistant_counter.zero? %>
+<% visible = assistant_counter <= Assistant::MAX_LIST_DISPLAY-1 || selected %>
 
 <div class="bg-gray-50 dark:bg-gray-900 <%= first && 'absolute top-[17px] left-0 pl-3 w-full z-10' %>">
   <%# This extra div ^ is needed because of the absolute positioning. It doesn't lay out properly if added to the div below. %>
@@ -8,16 +9,18 @@
               flex justify-between items-center
               mb-1 p-1 pl-2 pr-2 mr-5
               hover:bg-gray-100 dark:hover:bg-gray-700
-              bg-gray-50 dark:bg-transparent 
+              bg-gray-50 dark:bg-transparent
               dark:bg-gray-700
               group cursor-pointer
               text-sm rounded-lg
               <%= selected && 'relationship' %>
+              <%= !visible && 'hidden' %>
             "
       data-role="assistant"
       data-radio-behavior-target="radio"
       data-action="radio-changed@window->radio-behavior#select"
       data-radio-behavior-id-param="<%= assistant.id %>"
+      data-transition-target="<%= !visible && 'transitionable' %>"
   >
     <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
       <%= render partial: "layouts/assistant_avatar", locals: { assistant: assistant, size: 7, classes: "mr-2" } %>

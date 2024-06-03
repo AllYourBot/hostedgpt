@@ -149,4 +149,13 @@ class UserTest < ActiveSupport::TestCase
     new_user.update!(preferences: { dark_mode: "system" })
     assert_equal "system", new_user.preferences[:dark_mode]
   end
+
+  test "assistants scope filters out deleted vs assistants_including_deleted" do
+    assert_difference "users(:keith).assistants.length", -1 do
+      assert_no_difference "users(:keith).assistants_including_deleted.length" do
+        users(:keith).assistants.first.soft_delete
+        users(:keith).reload
+      end
+    end
+  end
 end
