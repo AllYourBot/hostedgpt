@@ -2,17 +2,18 @@
 
 export PORT="${PORT:-3000}"
 
-if command -v overmind > /dev/null 2>&1; then
-  bundle install
-  bin/rails db:prepare
-  exec overmind start -f Procfile.dev "$@"
-else
-  if ! gem list foreman -i --silent; then
-    echo "Installing foreman..."
-    gem install foreman
-  fi
-
-  bundle install
-  bin/rails db:prepare
-  exec foreman start -f Procfile.dev "$@"
+if ! gem list overmind -i --silent; then
+  echo "Installing overmind..."
+  gem install overmind
 fi
+
+bundle install
+bin/rails db:prepare
+
+# Trap SIGTERM and SIGINT and forward them to Overmind
+trap 'kill -TERM $PID' TERM INT
+exec overmind start -f Procfile.dev "$@" &
+PID=$!
+wait $PID
+trap - TERM INT
+wait $PID
