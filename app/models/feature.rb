@@ -32,7 +32,7 @@ class Feature
           features.fetch(feature&.to_sym)
         )
       rescue KeyError
-        raise KeyError, "You attempted to reference the Feature '#{feature}' but this is not configured within options.yml. Did you typo a feture name?"
+        raise KeyError, "You attempted to reference the Feature '#{feature}' but this is not configured within options.yml. Did you typo a feature name?"
       end
     end
 
