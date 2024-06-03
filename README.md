@@ -224,7 +224,7 @@ HTTP header authentication is an alternative method to authenticate users based 
    - Configure your authentication system to set the following request headers when directing users to the HostedGPT app:
    - `AUTHENTICATION_HTTP_HEADER_EMAIL` - Set this environment variable to the name of the HTTP request header which will contain the user's email address. This defaults to a check for a request header of `X-WEBAUTH-EMAIL` to find the user's email.
    - `AUTHENTICATION_HTTP_HEADER_NAME` - Set this environment variable to the name of the HTTP request header which will contain the user's full name (first and last). This defaults to a check for a request header of `X-WEBAUTH-NAME` to find the user's full name.
-   - `AUTHENTICATION_HTTP_HEADER_UID` - Set this environment variable to the name of the HTTP request header which will contain the user's identifier (any unique alphanumeric string). This defaults to a check for a request header of `X-WEBAUTH-UID` to find the user's unique ID.
+   - `AUTHENTICATION_HTTP_HEADER_UID` - Set this environment variable to the name of the HTTP request header which will contain the user's identifier (any unique alphanumeric string). This defaults to a check for a request header of `X-WEBAUTH-USER` to find the user's unique ID.
 
 3. **Test the connection:**
    - After you complete the configuration changes above and restart your server, however you direct users to the HostedGPT app you need to be sure that the request headers are present in that initial visit. This will do a find_or_create on the user: so it will register them if they've never been seen and log them in as that user if the information is already present.
