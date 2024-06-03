@@ -52,5 +52,6 @@ module Authenticate
       Current.user = User.find_by(auth_uid: request.headers[Setting.http_header_auth_uid])
     end
     Current.person = Current.user&.person
+    Current.user = nil if Current.person.nil?
   end
 end
