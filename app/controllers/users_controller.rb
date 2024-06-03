@@ -36,7 +36,7 @@ class UsersController < ApplicationController
 
   private
 
-  def ensure_registration
+  def ensure_registration_and_authentication_allowed
     if Feature.disabled?(:registration) ||
       (Feature.disabled?(:password_authentication) && Feature.disabled?(:google_authentication))
 
