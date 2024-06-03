@@ -52,7 +52,7 @@ module Authenticate
     if request.headers[Setting.http_header_auth_uid].present?
       if Feature.registration?
         Current.user = User.find_or_create_by!(auth_uid: request.headers[Setting.http_header_auth_uid]) do |user|
-          user.create_person!(email: request.headers[Setting.http_header_auth_email])
+          user.build_person(email: request.headers[Setting.http_header_auth_email])
           user.name = request.headers[Setting.authentication_http_header_name] || person.email
         end
       else
