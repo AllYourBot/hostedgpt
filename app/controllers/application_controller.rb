@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
       personable_type: 'User',
       personable_attributes: {
         password: (@password = SecureRandom.uuid),
-        name: 'Soomo User',
+        name: 'Student User',
         openai_key: ENV['DEFAULT_OPENAI_KEY'],
         anthropic_key: ENV['DEFAULT_ANTHROPIC_KEY']
       },
