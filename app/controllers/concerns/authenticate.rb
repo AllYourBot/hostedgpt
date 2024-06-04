@@ -2,8 +2,7 @@ module Authenticate
   extend ActiveSupport::Concern
 
   included do
-    before_action :current_user
-    helper_method :current_user
+    before_action :ensure_current_user
     before_action :authenticate_user!
   end
 
@@ -14,7 +13,7 @@ module Authenticate
     session[:current_user_id] = user.id
   end
 
-  def current_user
+  def ensure_current_user
     return Current.user unless Current.user.nil?
 
     if Feature.http_header_authentication?
@@ -27,11 +26,11 @@ module Authenticate
   end
 
   def user_signed_in?
-    current_user.present?
+    ensure_current_user.present?
   end
 
   def authenticate_user!
-    return if current_user
+    return if ensure_current_user
 
     if Feature.http_header_authentication?
       render plain: 'Unauthorized', status: :unauthorized
