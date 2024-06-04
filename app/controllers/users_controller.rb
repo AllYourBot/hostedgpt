@@ -3,7 +3,8 @@ class UsersController < ApplicationController
 
   layout "public"
 
-  before_action :ensure_registration_and_authentication_allowed, only: [:new, :create]
+  before_action :ensure_authentication_allowed, only: [:new, :create]
+  before_action :ensure_registration_allowed, only: [:new, :create]
   before_action :set_user, only: [:update]
 
   def new
@@ -36,18 +37,9 @@ class UsersController < ApplicationController
 
   private
 
-  def ensure_registration_and_authentication_allowed
-    if Feature.disabled?(:registration) ||
-      (Feature.disabled?(:password_authentication) && Feature.disabled?(:google_authentication))
-
-      alert =
-        if Feature.disabled?(:registration)
-          "Registration is disabled."
-        else
-          "Password and Google authentication are both disabled."
-        end
-
-      redirect_to root_path, alert: alert
+  def ensure_registration_allowed
+    if Feature.disabled?(:registration)
+      redirect_to root_path, alert: "Registration is disabled."
     end
   end
 
