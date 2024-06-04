@@ -174,7 +174,7 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
 
 #### HTTP header authentication
 
-HTTP header authentication is an alternative method to authenticate users based on custom HTTP request headers. This method is useful when you have an existing authentication system, and you want to direct them to HostedGPT and have them skip all authentication steps. They'll be taken right into the app and a HostedGPT user account will be created on the fly. This works by having your existing system set custom headers for authenticated users, e.g. a Reverse Proxy (e.g., [Traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/), [Caddy](https://caddyserver.com/docs/caddyfile/directives/forward_auth)) or a Zero Trust Network (e.g., [Tailscale](https://tailscale.com/kb/1312/serve#identity-headers)).
+HTTP header authentication is an alternative method to authenticate users based on custom HTTP request headers. This method is useful when you have an existing authentication system, and you want to direct users to HostedGPT and have them skip all authentication steps. They'll be taken right into the app and a HostedGPT user account will be created on the fly. This works by having your existing system set custom headers for authenticated users. This may be a Reverse Proxy (e.g., [Traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/) or [Caddy](https://caddyserver.com/docs/caddyfile/directives/forward_auth)) or a Zero Trust Network (e.g., [Tailscale](https://tailscale.com/kb/1312/serve#identity-headers)).
 
 **Steps to set up:**
 
