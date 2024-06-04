@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_24_144314) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -56,22 +56,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
     t.jsonb "tools", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "language_model_id"
     t.datetime "deleted_at", precision: nil
+    t.bigint "language_model_id"
     t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
     t.index ["user_id", "deleted_at"], name: "index_assistants_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_assistants_on_user_id"
-  end
-
-  create_table "authentications", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "credential_id", null: false
-    t.string "token"
-    t.datetime "ended_at", precision: nil
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["credential_id"], name: "index_authentications_on_credential_id"
-    t.index ["user_id"], name: "index_authentications_on_user_id"
   end
 
   create_table "chats", force: :cascade do |t|
@@ -93,18 +82,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
     t.index ["user_id"], name: "index_conversations_on_user_id"
-  end
-
-  create_table "credentials", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.string "type"
-    t.jsonb "properties"
-    t.string "email"
-    t.string "password_digest"
-    t.datetime "last_authenticated_at", precision: nil
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 
   create_table "documents", force: :cascade do |t|
@@ -130,16 +107,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "memories", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "message_id"
-    t.string "detail"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["message_id"], name: "index_memories_on_message_id"
-    t.index ["user_id"], name: "index_memories_on_user_id"
-  end
-
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.string "role", null: false
@@ -149,10 +116,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
+    t.datetime "cancelled_at"
     t.datetime "processed_at", precision: nil
     t.integer "index", null: false
     t.integer "version", null: false
-    t.datetime "cancelled_at"
     t.boolean "branched", default: false, null: false
     t.integer "branched_from_version"
     t.jsonb "content_tool_calls"
@@ -350,18 +317,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_30_154045) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "assistants", "language_models"
   add_foreign_key "assistants", "users"
-  add_foreign_key "authentications", "credentials"
-  add_foreign_key "authentications", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "conversations", "assistants"
   add_foreign_key "conversations", "messages", column: "last_assistant_message_id"
   add_foreign_key "conversations", "users"
-  add_foreign_key "credentials", "users"
   add_foreign_key "documents", "assistants"
   add_foreign_key "documents", "messages"
   add_foreign_key "documents", "users"
-  add_foreign_key "memories", "messages"
-  add_foreign_key "memories", "users"
   add_foreign_key "messages", "assistants"
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "documents", column: "content_document_id"
