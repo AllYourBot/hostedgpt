@@ -39,7 +39,7 @@ class UsersController < ApplicationController
 
   def ensure_registration_allowed
     if Feature.disabled?(:registration)
-      redirect_to root_path, alert: "Registration is disabled."
+      flash[:alert] = "Registration is disabled."
     end
   end
 
