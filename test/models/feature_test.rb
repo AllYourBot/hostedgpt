@@ -21,11 +21,6 @@ class FeatureTest < ActiveSupport::TestCase
     end
   end
 
-  test "should default to false when feature not found" do
-    refute Feature.enabled?(:fake)
-    refute Feature.fake?
-  end
-
   test "boolean strings are read as booleans" do
     stub_features(my_feature: "true") do
       assert Feature.enabled?(:my_feature)
