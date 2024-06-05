@@ -3,7 +3,7 @@ class UsersController < ApplicationController
 
   layout "public"
 
-  before_action :ensure_authentication_allowed, only: [:new, :create]
+  before_action :ensure_session_based_authentication_allowed, only: [:new, :create]
   before_action :ensure_registration_allowed, only: [:new, :create]
   before_action :set_user, only: [:update]
 

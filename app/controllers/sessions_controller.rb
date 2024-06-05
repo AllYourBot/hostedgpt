@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
 
   layout "public"
 
-  before_action :ensure_authentication_allowed
+  before_action :ensure_session_based_authentication_allowed, except: :destroy
 
   def new
   end
