@@ -3,7 +3,9 @@ import {Controller} from "@hotwired/stimulus"
 export default class extends Controller {
   connect() {
     this.bodyElement = document.body
-    this.wrapElement = document.getElementById("visualizer-wrap")
+    this.wrapElement = document.getElementById("visualizer-container")
+    if (this.wrapElement.getAttribute('data-connected') == 'true') return
+    this.wrapElement.setAttribute('data-connected', 'true')
 
     this.length = 45
     this.radius = 8.5

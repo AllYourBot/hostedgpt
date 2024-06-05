@@ -1,5 +1,6 @@
 <% if Feature.default_to_voice? && Feature.voice? %>
   <div
+    id="visualizer-overlay"
     data-controller="transition"
 
     data-transition-toggle-class="opacity-0"
@@ -32,7 +33,7 @@
       <% end %>
     </header>
     <div
-      id="visualizer-wrap"
+      id="visualizer-container"
       class="w-4/5 h-4/5 relative flex justify-center items-center"
       style="background-color: #d1684e"
       data-controller="visualizer"
