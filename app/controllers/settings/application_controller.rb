@@ -16,6 +16,7 @@ class Settings::ApplicationController < ApplicationController
       }.to_h.merge({
         "New Assistant": new_settings_assistant_path
       })
+
     }
   end
 end
