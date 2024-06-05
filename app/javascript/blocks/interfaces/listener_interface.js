@@ -54,6 +54,7 @@ export default class extends Interface {
 
   get engaged()       { return $.processing === true  }
   get dismissed()     { return $.processing === false }
+  get disabled()      { return $.processing === null }
 
   get supported()     { return Transcriber.supported }
 
