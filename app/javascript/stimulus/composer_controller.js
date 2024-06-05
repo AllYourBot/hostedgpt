@@ -63,7 +63,7 @@ export default class extends Controller {
     if (Listener.engaged) {
       this.disableMicrophone()
     } else if (Microphone.off) {
-      void this.enableMicrophone()
+      this.enableMicrophone()
     }
   }
 
@@ -77,14 +77,14 @@ export default class extends Controller {
       if (this.hasMicrophoneDisableTarget) this.microphoneDisableTarget.classList.add('!hidden')
       if (this.hasDisabledSubmitTarget) this.disabledSubmitTarget.classList.remove('!hidden')
     } else if (Listener.engaged)
-      void this.enableMicrophone()
+      this.enableMicrophone()
     else if (Listener.dismissed)
       this.blinkingMicrophone() // mic still on
     else if (Microphone.off)
       this.disableMicrophone()
   }
 
-  async enableMicrophone() {
+  enableMicrophone() {
     this.microphoneEnableTarget.classList.add('hidden')
     this.microphoneDisableTarget.classList.remove('hidden')
     this.microphoneDisableTarget.classList.remove('animate-blink')
