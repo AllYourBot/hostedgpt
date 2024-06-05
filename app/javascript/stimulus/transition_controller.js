@@ -65,7 +65,6 @@ export default class extends Controller {
     })
 
     if (this.secondToggleAfterDelayValue) {
-      console.log('second toggle queued up')
       this.secondToggleDelayHandler = setTimeout(() => this.secondToggleClass(), this.secondToggleAfterDelayValue)
     }
 
@@ -75,7 +74,6 @@ export default class extends Controller {
   }
 
   secondToggleClass() {
-    console.log('seocnd toggle fired')
     this.transitionableTargets.forEach(element => {
       this.secondToggleAfterDelayClasses.forEach(className => {
         element.classList.toggle(className)

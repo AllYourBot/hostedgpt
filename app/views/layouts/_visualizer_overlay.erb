@@ -15,7 +15,11 @@
     <header class="absolute right-0 top-0 ml-2 mt-2 mb-3 h-10 text-lg">
       <%= button_tag type: "button",
         data: {
-          action: "transition#toggleClass"
+          controller: "keyboard",
+          action: %|
+            keydown.esc@document->keyboard#click
+            transition#toggleClass
+          |
         },
         class: %|
           block cursor-pointer inline-flex mr-3 px-2 py-2 group
