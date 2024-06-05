@@ -102,11 +102,9 @@ export default class extends Controller {
   }
 
   animate() {
-    if (this.animationComplete) return
-
     this.mesh.rotation.x += this.rotatevalue + this.acceleration
     this.render()
-    if (!this.animationComplete) this.animationFrameId = requestAnimationFrame(() => {this.animate()})
+    this.animationFrameId = requestAnimationFrame(() => { this.animate() })
   }
 
   render() {
@@ -114,25 +112,28 @@ export default class extends Controller {
 
     var progress
 
-    this.animatestep = Math.max(0, Math.min(240, this.toend ? this.animatestep + 1 : this.animatestep - 4))
-    this.acceleration = this.easing(this.animatestep, 0, 1, 240)
+    if (this.animatestep < 240) {
+      this.animatestep = Math.max(0, Math.min(240, this.toend ? this.animatestep + 1 : this.animatestep - 4))
+      this.acceleration = this.easing(this.animatestep, 0, 1, 240)
 
-    if (this.acceleration > 0.35) {
-      progress = (this.acceleration - 0.35) / 0.65
-      this.group.rotation.y = -Math.PI / 2 * progress
-      this.group.position.z = 50 * progress
-      progress = Math.max(0, (this.acceleration - 0.97) / 0.03)
-      this.mesh.material.opacity = 1 - progress
-      this.ringcover.material.opacity = this.ring.material.opacity = progress
-      this.ring.scale.x = this.ring.scale.y = 0.9 + 0.1 * progress
-    }
-
-    if (this.animatestep == 240) {
-      console.log('done')
-      cancelAnimationFrame(this.animationFrameId)
-      this.animationComplete = true
-      void this.startSoundGraphic(this.renderer.domElement)
-      return
+      if (this.acceleration > 0.35) {
+        progress = (this.acceleration - 0.35) / 0.65
+        this.group.rotation.y = -Math.PI / 2 * progress
+        this.group.position.z = 50 * progress
+        progress = Math.max(0, (this.acceleration - 0.97) / 0.03)
+        this.mesh.material.opacity = 1 - progress
+        this.ringcover.material.opacity = this.ring.material.opacity = progress
+        this.ring.scale.x = this.ring.scale.y = 0.9 + 0.1 * progress
+      }
+    } else if (this.animatestep == 240) {
+      console.log(`start glob ${this.animatestep}`)
+      this.animatestep = 241
+      void this.startSoundGraphic()
+    } else if (this.animatestep == 242) {
+      console.log('glob', this.analyser)
+      this.analyser.getByteFrequencyData(this.dataArray)
+      // this.renderer.clearRect(0, 0, this.renderer.domElement.width, this.renderer.domElement.height)
+      this.glob.draw(this.dataArray, this.scene)
     }
 
     this.renderer.render(this.scene, this.camera)
@@ -144,28 +145,15 @@ export default class extends Controller {
     return c / 2 * ((t -= 2) * t * t + 2) + b
   }
 
-  async startSoundGraphic(canvas) {
-    let canvasCtx = canvas.getContext("2d")
-
-    if (!canvasCtx) {
-      const newCanvas = document.createElement("canvas")
-      newCanvas.width = canvas.width
-      newCanvas.height = canvas.height
-      newCanvas.style.position = canvas.style.position
-      newCanvas.style.top = canvas.style.top
-      newCanvas.style.left = canvas.style.left
-      canvas.parentNode.replaceChild(newCanvas, canvas)
-      canvas = newCanvas
-      canvasCtx = canvas.getContext("2d")
-    }
-
+  async startSoundGraphic() {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
     const stream = await navigator.mediaDevices.getUserMedia({audio: true})
-    const analyser = audioCtx.createAnalyser()
+    this.analyser = audioCtx.createAnalyser()
     const source = audioCtx.createMediaStreamSource(stream)
-    source.connect(analyser)
+    source.connect(this.analyser)
+    console.log(`analyzer`, this.analyser)
 
-    const glob = new Glob({
+    this.glob = new Glob({
       fillColor: "black",
       lineColor: "black",
       lineWidth: 2,
@@ -173,18 +161,10 @@ export default class extends Controller {
       frequencyBand: "mids"
     })
 
-    analyser.fftSize = 1024
-    const bufferLength = analyser.frequencyBinCount
-    const dataArray = new Uint8Array(bufferLength)
-
-    function draw() {
-      analyser.getByteFrequencyData(dataArray)
-      canvasCtx.clearRect(0, 0, canvas.width, canvas.height)
-      glob.draw(dataArray, canvasCtx)
-      requestAnimationFrame(draw)
-    }
-
-    draw()
+    this.analyser.fftSize = 1024
+    const bufferLength = this.analyser.frequencyBinCount
+    this.dataArray = new Uint8Array(bufferLength)
+    this.animatestep = 242
   }
 
 }
@@ -247,59 +227,25 @@ class AudioData {
   }
 }
 
-class Shapes {
-  constructor(canvasContext) {
-    this._canvasContext = canvasContext
-  }
-
-  toRadians(degrees) {
-    return degrees * (Math.PI / 180)
-  }
-
-  polygon(points, options) {
-    this._canvasContext.beginPath()
-    this._canvasContext.moveTo(points[0].x, points[0].y)
-    for (let i = 1; i < points.length; i++) {
-      this._canvasContext.lineTo(points[i].x, points[i].y)
-    }
-    this._canvasContext.closePath()
-    this._implementOptions(options)
-  }
-
-  _implementOptions(options) {
-    if (options.fillColor) {
-      this._canvasContext.fillStyle = options.fillColor
-      this._canvasContext.fill()
-    }
-    if (options.lineColor) {
-      this._canvasContext.strokeStyle = options.lineColor
-      this._canvasContext.lineWidth = options.lineWidth || 1
-      this._canvasContext.stroke()
-    }
-  }
-}
-
 class Glob {
   constructor(options = {}) {
     this._options = options
+    this.mesh = null
   }
 
-  draw(audioBufferData, canvas) {
-    const {height, width} = canvas.canvas
-    const shapes = new Shapes(canvas)
+  draw(audioBufferData, scene) {
+    console.log('drawing')
     const audioData = new AudioData(audioBufferData)
-    const centerX = width / 2
-    const centerY = height / 2
     this._options = {
       count: 100,
-      diameter: height / 3,
+      diameter: 5.55 * 2,
       frequencyBand: "mids",
       rounded: true,
       ...this._options
     }
 
     if (this._options.frequencyBand) audioData.setFrequencyBand(this._options.frequencyBand)
-    audioData.scaleData(Math.min(width, height))
+    audioData.scaleData(50)
 
     if (this._options?.mirroredX) {
       let n = 1
@@ -323,12 +269,19 @@ class Glob {
       let degrees = 360 / this._options.count
       let newDiameter = this._options.diameter + dataValue + Math.round(adjValue)
 
-      let x = centerX + (newDiameter / 2) * Math.cos(shapes.toRadians(degrees * i))
-      let y = centerY + (newDiameter / 2) * Math.sin(shapes.toRadians(degrees * i))
-      points.push({x, y})
+      let x = (newDiameter / 2) * Math.cos(THREE.MathUtils.degToRad(degrees * i))
+      let y = (newDiameter / 2) * Math.sin(THREE.MathUtils.degToRad(degrees * i))
+      points.push(new THREE.Vector3(x, y, 0))
     }
 
-    points.push(points[0])
-    shapes.polygon(points, this._options)
+    if (this.mesh) {
+      scene.remove(this.mesh)
+    }
+
+    const geometry = new THREE.BufferGeometry().setFromPoints(points)
+    const material = new THREE.LineBasicMaterial({color: 0xffffff, side: THREE.DoubleSide})
+    this.mesh = new THREE.LineLoop(geometry, material)
+    this.mesh.position.z = 100
+    scene.add(this.mesh)
   }
 }
