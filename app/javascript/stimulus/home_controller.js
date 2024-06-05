@@ -7,8 +7,9 @@ export default class extends Controller {
     this.bodyElement = document.body
     this.wrapElement = document.getElementById('wrap')
 
-    this.length = 30
-    this.radius = 5.6
+    this.length = 45
+    this.radius = 8.5
+    this.animationComplete = false
 
     this.rotatevalue = 0.035
     this.acceleration = 0
@@ -32,7 +33,7 @@ export default class extends Controller {
     this.mesh = new THREE.Mesh(geometry, material)
     this.group.add(this.mesh)
 
-    this.ringcover = new THREE.Mesh(new THREE.PlaneGeometry(50, 15, 1), new THREE.MeshBasicMaterial({color: 0xd1684e, opacity: 0, transparent: true}))
+    this.ringcover = new THREE.Mesh(new THREE.PlaneGeometry(60, 20, 1), new THREE.MeshBasicMaterial({color: 0xd1684e, opacity: 0, transparent: true}))
     this.ringcover.position.x = this.length + 1
     this.ringcover.rotation.y = Math.PI / 2
     this.group.add(this.ringcover)
@@ -48,18 +49,25 @@ export default class extends Controller {
       antialias: true
     })
     this.renderer.setPixelRatio(window.devicePixelRatio)
-    let size = this.element.getBoundingClientRect().height
-    this.renderer.setSize(size, size)
+    this.setSize()
     this.renderer.setClearColor('#d1684e')
 
     this.wrapElement.appendChild(this.renderer.domElement)
+    console.log(`canvas dom`, this.renderer.domElement)
 
     this.bodyElement.addEventListener('mousedown', this.start.bind(this), false)
     this.bodyElement.addEventListener('touchstart', this.start.bind(this), false)
     this.bodyElement.addEventListener('mouseup', this.back.bind(this), false)
     this.bodyElement.addEventListener('touchend', this.back.bind(this), false)
+    window.addEventListener('resize', this.setSize.bind(this))
 
     this.animate()
+  }
+
+  setSize() {
+    console.log('resized')
+    let size = this.element.getBoundingClientRect().height
+    this.renderer.setSize(size, size)
   }
 
   disconnect() {
@@ -67,11 +75,13 @@ export default class extends Controller {
     this.bodyElement.removeEventListener('touchstart', this.start.bind(this), false)
     this.bodyElement.removeEventListener('mouseup', this.back.bind(this), false)
     this.bodyElement.removeEventListener('touchend', this.back.bind(this), false)
+    window.removeEventListener('resize', this.back.bind(this))
   }
 
-  start() {
+  async start() {
     console.log('starting')
     this.toend = true
+    return
   }
 
   fakeShadow() {
@@ -92,13 +102,16 @@ export default class extends Controller {
   }
 
   animate() {
-    console.log(`animate: `, this.mesh)
+    if (this.animationComplete) return
+
     this.mesh.rotation.x += this.rotatevalue + this.acceleration
     this.render()
-    requestAnimationFrame(() => {this.animate()})
+    if (!this.animationComplete) this.animationFrameId = requestAnimationFrame(() => {this.animate()})
   }
 
   render() {
+    if (this.animationComplete) return
+
     var progress
 
     this.animatestep = Math.max(0, Math.min(240, this.toend ? this.animatestep + 1 : this.animatestep - 4))
@@ -114,6 +127,14 @@ export default class extends Controller {
       this.ring.scale.x = this.ring.scale.y = 0.9 + 0.1 * progress
     }
 
+    if (this.animatestep == 240) {
+      console.log('done')
+      cancelAnimationFrame(this.animationFrameId)
+      this.animationComplete = true
+      void this.startSoundGraphic(this.renderer.domElement)
+      return
+    }
+
     this.renderer.render(this.scene, this.camera)
   }
 
@@ -122,6 +143,50 @@ export default class extends Controller {
 
     return c / 2 * ((t -= 2) * t * t + 2) + b
   }
+
+  async startSoundGraphic(canvas) {
+    let canvasCtx = canvas.getContext("2d")
+
+    if (!canvasCtx) {
+      const newCanvas = document.createElement("canvas")
+      newCanvas.width = canvas.width
+      newCanvas.height = canvas.height
+      newCanvas.style.position = canvas.style.position
+      newCanvas.style.top = canvas.style.top
+      newCanvas.style.left = canvas.style.left
+      canvas.parentNode.replaceChild(newCanvas, canvas)
+      canvas = newCanvas
+      canvasCtx = canvas.getContext("2d")
+    }
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true})
+    const analyser = audioCtx.createAnalyser()
+    const source = audioCtx.createMediaStreamSource(stream)
+    source.connect(analyser)
+
+    const glob = new Glob({
+      fillColor: "black",
+      lineColor: "black",
+      lineWidth: 2,
+      count: 100,
+      frequencyBand: "mids"
+    })
+
+    analyser.fftSize = 1024
+    const bufferLength = analyser.frequencyBinCount
+    const dataArray = new Uint8Array(bufferLength)
+
+    function draw() {
+      analyser.getByteFrequencyData(dataArray)
+      canvasCtx.clearRect(0, 0, canvas.width, canvas.height)
+      glob.draw(dataArray, canvasCtx)
+      requestAnimationFrame(draw)
+    }
+
+    draw()
+  }
+
 }
 
 class CustomSinCurve extends THREE.Curve {
@@ -146,5 +211,124 @@ class CustomSinCurve extends THREE.Curve {
     z = this.radius * Math.sin(this.pi2 * 2 * (t - temp))
 
     return new THREE.Vector3(x, y, z).multiplyScalar(this.scale)
+  }
+}
+
+
+// Custom sound graphic
+
+class AudioData {
+  constructor(audioBufferData) {
+    this.data = audioBufferData
+  }
+
+  setFrequencyBand(band) {
+    let baseLength = Math.floor(this.data.length * .0625)
+    let lowsLength = Math.floor(this.data.length * .0625)
+    let midsLength = Math.floor(this.data.length * .375)
+
+    let bands = {
+      base: this.data.slice(0, baseLength),
+      lows: this.data.slice(baseLength + 1, baseLength + lowsLength),
+      mids: this.data.slice(baseLength + lowsLength + 1, baseLength + lowsLength + midsLength),
+      highs: this.data.slice(baseLength + lowsLength + midsLength + 1)
+    }
+
+    this.data = bands[band]
+  }
+
+  scaleData(maxSize) {
+    if (!(maxSize < 255)) return
+
+    this.data = this.data.map(value => {
+      let percent = Math.round((value / 255) * 100) / 100
+      return maxSize * percent
+    })
+  }
+}
+
+class Shapes {
+  constructor(canvasContext) {
+    this._canvasContext = canvasContext
+  }
+
+  toRadians(degrees) {
+    return degrees * (Math.PI / 180)
+  }
+
+  polygon(points, options) {
+    this._canvasContext.beginPath()
+    this._canvasContext.moveTo(points[0].x, points[0].y)
+    for (let i = 1; i < points.length; i++) {
+      this._canvasContext.lineTo(points[i].x, points[i].y)
+    }
+    this._canvasContext.closePath()
+    this._implementOptions(options)
+  }
+
+  _implementOptions(options) {
+    if (options.fillColor) {
+      this._canvasContext.fillStyle = options.fillColor
+      this._canvasContext.fill()
+    }
+    if (options.lineColor) {
+      this._canvasContext.strokeStyle = options.lineColor
+      this._canvasContext.lineWidth = options.lineWidth || 1
+      this._canvasContext.stroke()
+    }
+  }
+}
+
+class Glob {
+  constructor(options = {}) {
+    this._options = options
+  }
+
+  draw(audioBufferData, canvas) {
+    const {height, width} = canvas.canvas
+    const shapes = new Shapes(canvas)
+    const audioData = new AudioData(audioBufferData)
+    const centerX = width / 2
+    const centerY = height / 2
+    this._options = {
+      count: 100,
+      diameter: height / 3,
+      frequencyBand: "mids",
+      rounded: true,
+      ...this._options
+    }
+
+    if (this._options.frequencyBand) audioData.setFrequencyBand(this._options.frequencyBand)
+    audioData.scaleData(Math.min(width, height))
+
+    if (this._options?.mirroredX) {
+      let n = 1
+      for (let i = Math.ceil(audioData.data.length / 2); i < audioData.data.length; i++) {
+        audioData.data[i] = audioData.data[Math.ceil(audioData.data.length / 2) - n]
+        n++
+      }
+    }
+
+    let points = []
+    let highestFreqValue = audioData.data[Math.floor(audioData.data.length / this._options.count) * 99]
+
+    for (let i = 0; i < this._options.count; i++) {
+      let dataIndex = Math.floor(audioData.data.length / this._options.count) * i
+      let dataValue = audioData.data[dataIndex]
+
+      let perctDecrease = 100 - i * 10
+      let differenceToSmooth = dataValue - highestFreqValue
+      let adjValue = (i >= 0 && i <= 10) ? (-1 * differenceToSmooth * (perctDecrease / 100)) : 0
+
+      let degrees = 360 / this._options.count
+      let newDiameter = this._options.diameter + dataValue + Math.round(adjValue)
+
+      let x = centerX + (newDiameter / 2) * Math.cos(shapes.toRadians(degrees * i))
+      let y = centerY + (newDiameter / 2) * Math.sin(shapes.toRadians(degrees * i))
+      points.push({x, y})
+    }
+
+    points.push(points[0])
+    shapes.polygon(points, this._options)
   }
 }
