@@ -158,13 +158,20 @@ input:focus {
     @apply h-full font-sans text-gray-950 dark:text-gray-100 flex overflow-y-auto;
     -webkit-overflow-scrolling: touch;
     min-height: -webkit-fill-available;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
   }
 }
 
 @media not all and (prefers-color-scheme: dark) {
-  .dark :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(.active):hover,
-  .dark :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(.active):hover {
+  .dark
+    :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(
+      .active
+    ):hover,
+  .dark
+    :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(
+      .active
+    ):hover {
     background-color: rgb(59 59 61);
   }
 }
@@ -173,4 +180,8 @@ input:focus {
   .prose :where(a):not(:where([class~='not-prose'] *)) {
     color: #374151;
   }
+}
+
+nav {
+  -webkit-touch-callout: none !important;
 }
