@@ -2,10 +2,8 @@ import {Controller} from "@hotwired/stimulus"
 
 export default class extends Controller {
   connect() {
-    console.log('connected home')
-
     this.bodyElement = document.body
-    this.wrapElement = document.getElementById("voice-wrap")
+    this.wrapElement = document.getElementById("visualizer-wrap")
 
     this.length = 45
     this.radius = 8.5
@@ -53,7 +51,6 @@ export default class extends Controller {
     this.renderer.setClearColor('#d1684e')
 
     this.wrapElement.appendChild(this.renderer.domElement)
-    console.log(`canvas dom`, this.renderer.domElement)
 
     this.bodyElement.addEventListener('mousedown', this.start.bind(this), false)
     this.bodyElement.addEventListener('touchstart', this.start.bind(this), false)
@@ -61,11 +58,11 @@ export default class extends Controller {
     this.bodyElement.addEventListener('touchend', this.back.bind(this), false)
     window.addEventListener('resize', this.setSize.bind(this))
 
+    Invoke.Listener()
     this.animate()
   }
 
   setSize() {
-    console.log('resized')
     let size = this.element.getBoundingClientRect().height
     this.renderer.setSize(size, size)
   }
@@ -79,7 +76,6 @@ export default class extends Controller {
   }
 
   async start() {
-    console.log('starting')
     this.toend = true
     return
   }
@@ -126,12 +122,11 @@ export default class extends Controller {
         this.ring.scale.x = this.ring.scale.y = 0.9 + 0.1 * progress
       }
     } else if (this.animatestep == 240) {
-      console.log(`start glob ${this.animatestep}`)
       this.animatestep = 241
-      void this.startSoundGraphic()
-    } else if (this.animatestep == 242) {
-      this.analyser.getByteFrequencyData(this.dataArray)
-      this.glob.draw(this.dataArray, this.scene)
+      this.startSoundGraphic()
+    } else if (this.animatestep == 241 && Microphone.$.microphoneService.$.active) {
+      Microphone.$.microphoneService.$.audioVisualizer.getByteFrequencyData(Microphone.$.microphoneService.$.audioVisualizerDataArray)
+      this.glob.draw(Microphone.$.microphoneService.$.audioVisualizerDataArray, this.scene)
     }
 
     this.renderer.render(this.scene, this.camera)
@@ -143,28 +138,12 @@ export default class extends Controller {
     return c / 2 * ((t -= 2) * t * t + 2) + b
   }
 
-  async startSoundGraphic() {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-    const stream = await navigator.mediaDevices.getUserMedia({audio: true})
-    this.analyser = audioCtx.createAnalyser()
-    const source = audioCtx.createMediaStreamSource(stream)
-    source.connect(this.analyser)
-    console.log(`analyzer`, this.analyser)
-
+  startSoundGraphic() {
     this.glob = new Glob({
-      fillColor: "black",
-      lineColor: "black",
-      lineWidth: 2,
       count: 100,
       frequencyBand: "mids"
     })
-
-    this.analyser.fftSize = 1024
-    const bufferLength = this.analyser.frequencyBinCount
-    this.dataArray = new Uint8Array(bufferLength)
-    this.animatestep = 242
   }
-
 }
 
 class CustomSinCurve extends THREE.Curve {

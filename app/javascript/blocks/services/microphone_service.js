@@ -18,6 +18,11 @@ export default class extends Service {
       $.audioSource.connect($.audioProcessor)
       $.audioProcessor.connect($.audioContext.destination)
 
+      $.audioVisualizer = $.audioContext.createAnalyser()
+      $.audioSource.connect($.audioVisualizer)
+      $.audioVisualizer.fftSize = 1024
+      $.audioVisualizerDataArray = new Uint8Array($.audioVisualizer.frequencyBinCount)
+
       $.audioProcessor.onaudioprocess = (event) => processVolume(event)
       $.active = true
       $.volume = 0

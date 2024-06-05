@@ -8,6 +8,7 @@
     data-transition-second-toggle-after-delay-class="hidden"
     data-transition-second-toggle-after-delay-value="300"
 
+    data-turbo-permanent
     class="fixed inset-0 z-50 flex justify-center items-center bg-white dark:bg-black transition-opacity duration-300"
   >
     <header class="absolute right-0 top-0 ml-2 mt-2 mb-3 h-10 text-lg">
@@ -30,7 +31,12 @@
         %>
       <% end %>
     </header>
-    <div id="voice-wrap" class="w-4/5 h-4/5 relative flex justify-center items-center" style="background-color: #d1684e" data-controller="home">
+    <div
+      id="visualizer-wrap"
+      class="w-4/5 h-4/5 relative flex justify-center items-center"
+      style="background-color: #d1684e"
+      data-controller="visualizer"
+    >
     </div>
   </div>
 <% end %>
