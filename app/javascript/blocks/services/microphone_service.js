@@ -52,6 +52,7 @@ export default class extends Service {
     if ($.audioProcessor) $.audioProcessor.disconnect()
     if ($.microphoneSource) $.microphoneSource.disconnect()
     if ($.playerSource) $.playerSource.disconnect()
+    if ($.audioVisualizer) $.audioVisualizer.disconnect()
     if ($.audioContext) $.audioContext.close()
     if ($.stream) $.stream.getTracks().forEach(track => track.stop())
 
