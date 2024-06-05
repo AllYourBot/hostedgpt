@@ -12,7 +12,7 @@ export default class extends Controller {
     this.rotatevalue = 0.035
     this.acceleration = 0
     this.animatestep = 0
-    this.toend = false
+    this.startTransition = false
 
     this.pi2 = Math.PI * 2
 
@@ -52,33 +52,42 @@ export default class extends Controller {
 
     this.wrapElement.appendChild(this.renderer.domElement)
 
-    this.bodyElement.addEventListener('mousedown', this.start.bind(this), false)
-    this.bodyElement.addEventListener('touchstart', this.start.bind(this), false)
-    this.bodyElement.addEventListener('mouseup', this.back.bind(this), false)
-    this.bodyElement.addEventListener('touchend', this.back.bind(this), false)
-    window.addEventListener('resize', this.setSize.bind(this))
+    window.addEventListener('resize', this.boundSetSize)
 
-    Invoke.Listener()
     this.animate()
   }
 
+  async activate(event) {
+    event.currentTarget.classList.add("hidden")
+    this.startTransition = true
+    this.transitionDone = false
+    this.bootingDone = false
+    await Listener.$.screenService.start()
+    Play.Speaker.sound('booting', async() => {
+      await Invoke.Listener()
+      for (let i = 0; i < 20; i++) {
+        if (this.transitionDone) {
+          runAfter(0.2, () => {
+            Prompt.Speaker.toSay("Hello... ? ... ? ... ? ... I'm here.")
+          })
+          break
+        } else {
+          await sleep(100)
+        }
+      }
+    })
+  }
+
+  boundSetSize = () => { this.setSize() }
   setSize() {
     let size = this.element.getBoundingClientRect().height
     this.renderer.setSize(size, size)
   }
 
   disconnect() {
-    this.bodyElement.removeEventListener('mousedown', this.start.bind(this), false)
-    this.bodyElement.removeEventListener('touchstart', this.start.bind(this), false)
-    this.bodyElement.removeEventListener('mouseup', this.back.bind(this), false)
-    this.bodyElement.removeEventListener('touchend', this.back.bind(this), false)
-    window.removeEventListener('resize', this.back.bind(this))
+    window.removeEventListener('resize', this.boundSetSize)
   }
 
-  async start() {
-    this.toend = true
-    return
-  }
 
   fakeShadow() {
     var plain, i
@@ -89,9 +98,6 @@ export default class extends Controller {
     }
   }
 
-  back() {
-    //this.toend = false
-  }
 
   tilt(percent) {
     this.group.rotation.y = percent * 0.5
@@ -108,9 +114,9 @@ export default class extends Controller {
 
     var progress
 
-    if (this.animatestep < 240) {
-      this.animatestep = Math.max(0, Math.min(240, this.toend ? this.animatestep + 1 : this.animatestep - 4))
-      this.acceleration = this.easing(this.animatestep, 0, 1, 240)
+    if (this.animatestep < 950) {
+      this.animatestep = Math.max(0, Math.min(950, this.startTransition ? this.animatestep + 1 : this.animatestep - 4))
+      this.acceleration = this.easing(this.animatestep, 0, 1, 950)
 
       if (this.acceleration > 0.35) {
         progress = (this.acceleration - 0.35) / 0.65
@@ -121,10 +127,15 @@ export default class extends Controller {
         this.ringcover.material.opacity = this.ring.material.opacity = progress
         this.ring.scale.x = this.ring.scale.y = 0.9 + 0.1 * progress
       }
-    } else if (this.animatestep == 240) {
-      this.animatestep = 241
-      this.startSoundGraphic()
-    } else if (this.animatestep == 241 && Microphone.$.microphoneService.$.active) {
+    } else if (this.animatestep == 950) {
+      this.animatestep = 951
+      this.glob = new Glob({
+        count: 100,
+        frequencyBand: "mids"
+      })
+      this.transitionDone = true
+
+    } else if (this.animatestep == 951 && Microphone.$.microphoneService.$.active) {
       Microphone.$.microphoneService.$.audioVisualizer.getByteFrequencyData(Microphone.$.microphoneService.$.audioVisualizerDataArray)
       this.glob.draw(Microphone.$.microphoneService.$.audioVisualizerDataArray, this.scene)
     }
@@ -136,13 +147,6 @@ export default class extends Controller {
     if ((t /= d / 2) < 1) return c / 2 * t * t + b
 
     return c / 2 * ((t -= 2) * t * t + 2) + b
-  }
-
-  startSoundGraphic() {
-    this.glob = new Glob({
-      count: 100,
-      frequencyBand: "mids"
-    })
   }
 }
 

@@ -37,6 +37,25 @@
       style="background-color: #d1684e"
       data-controller="visualizer"
     >
+      <%= button_tag type: "button",
+        data: {
+          action: "visualizer#activate"
+        },
+        class: %|
+          absolute
+          top-2/3
+          left-1/2 transform -translate-x-1/2
+          cursor-pointer
+          px-10 py-2
+          text-sm
+          font-medium
+          text-gray-600
+          bg-white
+          rounded-md
+          shadow-md
+        | do %>
+          Enable
+      <% end %>
     </div>
   </div>
 <% end %>
