@@ -38,7 +38,7 @@ export default class extends Controller {
     this.ringcover.rotation.y = Math.PI / 2
     this.group.add(this.ringcover)
 
-    this.ring = new THREE.Mesh(new THREE.RingGeometry(5, 5.55, 32), new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 0, transparent: true}))
+    this.ring = new THREE.Mesh(new THREE.RingGeometry(7, 7.55, 64), new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 0, transparent: true}))
     this.ring.position.x = this.length + 1.1
     this.ring.rotation.y = Math.PI / 2
     this.group.add(this.ring)
@@ -130,9 +130,7 @@ export default class extends Controller {
       this.animatestep = 241
       void this.startSoundGraphic()
     } else if (this.animatestep == 242) {
-      console.log('glob', this.analyser)
       this.analyser.getByteFrequencyData(this.dataArray)
-      // this.renderer.clearRect(0, 0, this.renderer.domElement.width, this.renderer.domElement.height)
       this.glob.draw(this.dataArray, this.scene)
     }
 
@@ -200,6 +198,7 @@ class CustomSinCurve extends THREE.Curve {
 class AudioData {
   constructor(audioBufferData) {
     this.data = audioBufferData
+    this.maxSize = 255
   }
 
   setFrequencyBand(band) {
@@ -217,12 +216,12 @@ class AudioData {
     this.data = bands[band]
   }
 
-  scaleData(maxSize) {
-    if (!(maxSize < 255)) return
+  scaleData(size) {
+    if (!(size < this.maxSize)) return
 
     this.data = this.data.map(value => {
-      let percent = Math.round((value / 255) * 100) / 100
-      return maxSize * percent
+      let percent = Math.round((value / this.maxSize) * 100) / 100
+      return size * percent
     })
   }
 }
@@ -234,18 +233,17 @@ class Glob {
   }
 
   draw(audioBufferData, scene) {
-    console.log('drawing')
     const audioData = new AudioData(audioBufferData)
     this._options = {
       count: 100,
-      diameter: 5.55 * 2,
+      diameter: 6.7 * 2, // Set diameter to match the white circle
       frequencyBand: "mids",
       rounded: true,
       ...this._options
     }
 
     if (this._options.frequencyBand) audioData.setFrequencyBand(this._options.frequencyBand)
-    audioData.scaleData(50)
+    audioData.scaleData(60)
 
     if (this._options?.mirroredX) {
       let n = 1
@@ -255,9 +253,13 @@ class Glob {
       }
     }
 
+    // scale down everything
+    for (let i = 0; i < audioData.data.length; i++) {
+      audioData.data[i] = Math.pow(audioData.data[i], 0.7) * 0.6
+    }
+
     let points = []
     let highestFreqValue = audioData.data[Math.floor(audioData.data.length / this._options.count) * 99]
-
     for (let i = 0; i < this._options.count; i++) {
       let dataIndex = Math.floor(audioData.data.length / this._options.count) * i
       let dataValue = audioData.data[dataIndex]
@@ -267,7 +269,7 @@ class Glob {
       let adjValue = (i >= 0 && i <= 10) ? (-1 * differenceToSmooth * (perctDecrease / 100)) : 0
 
       let degrees = 360 / this._options.count
-      let newDiameter = this._options.diameter + dataValue + Math.round(adjValue)
+      let newDiameter = this._options.diameter + dataValue + Math.round(adjValue) + 0.5
 
       let x = (newDiameter / 2) * Math.cos(THREE.MathUtils.degToRad(degrees * i))
       let y = (newDiameter / 2) * Math.sin(THREE.MathUtils.degToRad(degrees * i))
@@ -278,9 +280,29 @@ class Glob {
       scene.remove(this.mesh)
     }
 
-    const geometry = new THREE.BufferGeometry().setFromPoints(points)
-    const material = new THREE.LineBasicMaterial({color: 0xffffff, side: THREE.DoubleSide})
-    this.mesh = new THREE.LineLoop(geometry, material)
+    // Create the shape for the glob
+    const shape = new THREE.Shape()
+    points.forEach((point, index) => {
+      if (index === 0) {
+        shape.moveTo(point.x, point.y)
+      } else {
+        shape.lineTo(point.x, point.y)
+      }
+    })
+    shape.closePath()
+
+    // Create the inner circle
+    const innerCircleRadius = this._options.diameter / 2
+    const innerCircle = new THREE.Path()
+    innerCircle.absarc(0, 0, innerCircleRadius, 0, Math.PI * 2, true)
+    shape.holes.push(innerCircle)
+
+    // Create the geometry and material
+    const geometry = new THREE.ShapeGeometry(shape)
+    const material = new THREE.MeshBasicMaterial({color: 0xffffff, side: THREE.DoubleSide})
+
+    // Create the mesh and add it to the scene
+    this.mesh = new THREE.Mesh(geometry, material)
     this.mesh.position.z = 100
     scene.add(this.mesh)
   }
