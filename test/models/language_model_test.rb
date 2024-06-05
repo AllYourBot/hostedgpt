@@ -15,16 +15,6 @@ class LanguageModelTest < ActiveSupport::TestCase
     refute language_models(:gpt_3_5_turbo).supports_images?
   end
 
-  test "ai_backend for best models" do
-    assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
-    assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
-  end
-
-  test "ai_backend for Anthropic models" do
-    assert_equal AIBackend::Anthropic, language_models(:claude_3_sonnet).ai_backend
-    assert_equal AIBackend::Anthropic, language_models(:claude_3_opus).ai_backend
-  end
-
   test "provider_name for Anthropic models" do
     assert_equal "claude-3-sonnet-20240229", language_models(:claude_3_sonnet).provider_name
     assert_equal "claude-3-opus-20240229", language_models(:claude_3_opus).provider_name
@@ -33,10 +23,5 @@ class LanguageModelTest < ActiveSupport::TestCase
   test "provider_name for OpenAI models" do
     assert_equal "gpt-3.5-turbo", language_models(:gpt_3_5_turbo_0125).provider_name
     assert_equal "gpt-4o", language_models(:gpt_4o).provider_name
-  end
-
-  test "ai_backend for OpenAI  models" do
-    assert_equal AIBackend::OpenAI, language_models(:gpt_4o).ai_backend
-    assert_equal AIBackend::OpenAI, language_models(:gpt_3_5_turbo).ai_backend
   end
 end

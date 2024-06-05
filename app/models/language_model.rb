@@ -10,7 +10,7 @@ class LanguageModel < ApplicationRecord
     'claude-best' => 'claude-3-opus-20240229'
   }
 
-  def read_only?
+  def readonly?
     user_id.blank?
   end
 
