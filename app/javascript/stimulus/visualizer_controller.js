@@ -45,9 +45,7 @@ export default class extends Controller {
 
     this.fakeShadow()
 
-    this.renderer = new THREE.WebGLRenderer({
-      antialias: true
-    })
+    this.renderer = new THREE.WebGLRenderer({ antialias: true })
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.setSize()
     this.renderer.setClearColor('#d1684e')
@@ -90,7 +88,6 @@ export default class extends Controller {
     window.removeEventListener('resize', this.boundSetSize)
   }
 
-
   fakeShadow() {
     var plain, i
     for (i = 0; i < 10; i++) {
@@ -99,7 +96,6 @@ export default class extends Controller {
       this.group.add(plain)
     }
   }
-
 
   tilt(percent) {
     this.group.rotation.y = percent * 0.5
@@ -147,7 +143,6 @@ export default class extends Controller {
 
   easing(t, b, c, d) {
     if ((t /= d / 2) < 1) return c / 2 * t * t + b
-
     return c / 2 * ((t -= 2) * t * t + 2) + b
   }
 }
@@ -176,9 +171,6 @@ class CustomSinCurve extends THREE.Curve {
     return new THREE.Vector3(x, y, z).multiplyScalar(this.scale)
   }
 }
-
-
-// Custom sound graphic
 
 class AudioData {
   constructor(audioBufferData) {
