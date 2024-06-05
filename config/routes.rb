@@ -1,7 +1,4 @@
 Rails.application.routes.draw do
-  get 'home/index'
-  get "/home", to: "home#index"
-
   namespace :settings do
     resources :assistants, except: [:index, :show]
     resource :person, only: [:edit, :update]
