@@ -6,6 +6,8 @@ import { Controller } from '@hotwired/stimulus'
 //   data-controller="transition"
 //   data-transition-toggle-class="!hidden"
 //   data-transition-after-timeout-value="3000"
+//   data-transition-second-toggle-after-delay-class="hidden"
+//   data-transition-second-toggle-after-delay-value="300"
 // >
 //   <div id="element-that-shows-and-hides" class="block" data-transition-target="transitionable"></div>
 //   <a href="#" data-action="transition#toggleClass">click to toggle</a>
@@ -14,9 +16,9 @@ import { Controller } from '@hotwired/stimulus'
 // Every element that is of target = me will have the class toggled.
 
 export default class extends Controller {
-  static classes = [ "toggle" ]
+  static classes = [ "toggle", "secondToggleAfterDelay" ]
   static targets = [ "transitionable" ]
-  static values = { afterTimeout: Number }
+  static values = { afterTimeout: Number, secondToggleAfterDelay: Number }
 
   connect() {
     this.on = false
@@ -62,9 +64,23 @@ export default class extends Controller {
       })
     })
 
+    if (this.secondToggleAfterDelayValue) {
+      console.log('second toggle queued up')
+      this.secondToggleDelayHandler = setTimeout(() => this.secondToggleClass(), this.secondToggleAfterDelayValue)
+    }
+
     // Showing and hiding elements can cause the page to flow differently, very similarly to what happens when the
     // browser size changes. Throw this event in case we have other listeners on the resize event.
     window.dispatchEvent(new CustomEvent('main-column-changed'))
+  }
+
+  secondToggleClass() {
+    console.log('seocnd toggle fired')
+    this.transitionableTargets.forEach(element => {
+      this.secondToggleAfterDelayClasses.forEach(className => {
+        element.classList.toggle(className)
+      })
+    })
   }
 
   toggleClassOn() {

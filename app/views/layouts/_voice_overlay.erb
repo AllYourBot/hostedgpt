@@ -1,9 +1,14 @@
 <% if Feature.default_to_voice? && Feature.voice? %>
   <div
     data-controller="transition"
-    data-transition-toggle-class="hidden"
+
+    data-transition-toggle-class="opacity-0"
     data-transition-target="transitionable"
-    class="fixed inset-0 z-50 flex justify-center items-center bg-white dark:bg-black"
+
+    data-transition-second-toggle-after-delay-class="hidden"
+    data-transition-second-toggle-after-delay-value="300"
+
+    class="fixed inset-0 z-50 flex justify-center items-center bg-white dark:bg-black transition-opacity duration-300"
   >
     <header class="absolute right-0 top-0 ml-2 mt-2 mb-3 h-10 text-lg">
       <%= button_tag type: "button",
