@@ -75,3 +75,9 @@ weather:
   assistant: samantha
   title: Weather
   last_assistant_message: weather_explained
+
+trees:
+  user: keith
+  assistant: keith_gpt3
+  title: Trees
+  last_assistant_message: trees_explained

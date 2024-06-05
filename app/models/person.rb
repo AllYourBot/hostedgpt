@@ -6,7 +6,7 @@ class Person < ApplicationRecord
 
   validate :personable_id_unchanged, on: :update
   validates_associated :personable
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validate :proper_personable_id, on: :update
 
   scope :ordered, -> { order(:created_at) }
@@ -22,7 +22,7 @@ class Person < ApplicationRecord
   end
 
   def proper_personable_id
-    if personable.id.blank?
+    if personable_id.present? && personable.id.blank?
       errors.add(:personable_id, 'must be provided on update')
     end
   end

@@ -26,6 +26,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
 - [Deploy the app on Fly.io](#deploy-the-app-on-fly)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
 - [Contribute as a developer / Running locally](#contribute-as-a-developer)
+- [Configure optional features](#configure-optional-features)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
 
@@ -65,11 +66,11 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 # Deploy the app on Fly
 
-Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free servie so Fly is actually less expensive over the long term.
+Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free service so Fly is actually less expensive over the long term.
 
 1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
 1. Install the Fly command-line tool [view instructions](https://fly.io/docs/hands-on/install-flyctl/)
-1. In the root directory of the repoistory you pulled down, run `fly launch --build-only` and say `Yes` to copy the existing fly.toml, but note that it will generate the wrong settings.
+1. In the root directory of the repository you pulled down, run `fly launch --build-only` and say `Yes` to copy the existing fly.toml, but note that it will generate the wrong settings.
 1. **The settings it shows are INCORRECT** so tell it you want to make changes
 1. When it opens your browser, change the Database to `Fly Postgres` with a name such as `hostedgpt-db` and you can set the configuration to `Development`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
@@ -80,7 +81,7 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 
 # Deploy the app on Heroku
 
-Heroku is a one-click option that will cost $10/monnth for the compute (dyno) and database. By default, apps use Eco dynos ($5) if you are subscribed to Eco. Otherwise, it defaults to Basic dynos ($7). The Eco dynos plan is shared across all Eco dynos in your account and is recommended if you plan on deploying many small apps to Heroku. Eco dynos "sleep" after 30 minutes of inactivity and take a few seconds to wake up. Basic dynos do not sleep.
+Heroku is a one-click option that will cost $10/month for the compute (dyno) and database. By default, apps use Eco dynos ($5) if you are subscribed to Eco. Otherwise, it defaults to Basic dynos ($7). The Eco dynos plan is shared across all Eco dynos in your account and is recommended if you plan on deploying many small apps to Heroku. Eco dynos "sleep" after 30 minutes of inactivity and take a few seconds to wake up. Basic dynos do not sleep.
 
 Eligible students can apply for Heroku platform credits through [Heroku for GitHub Students program](https://blog.heroku.com/github-student-developer-program).
 
@@ -93,7 +94,7 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
 
 # Contribute as a developer
 
-We welcome contributors! After you get your developoment environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.7. [View 0.7 Milestone](https://github.com/allyourbot/hostedgpt/milestone/6). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
+We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.7. [View 0.7 Milestone](https://github.com/allyourbot/hostedgpt/milestone/6). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
 ## Setting up development
 
@@ -132,6 +133,72 @@ Every time you pull new changes down, kill `bin/dev` and then re-run it. This wi
 If you're set up with Docker you run `docker compose run base rails test`. Note that the system tests, which use a headless browser, are not able to run in Docker. They will be run automatically for you if you create a Pull Request against the project.
 
 If you set up the app outside of Docker, then run the usual `bin/rails test` and `bin/rails test:system`.
+
+
+# Configure optional features
+
+The file `options.yml` contains a number of things you can configure. Simple flags are:
+
+- `REGISTRATON_FEATURE` is `true` by default but you can set to `false` to prevent any new people from creating an account.
+- `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It defaults to `false` but you may choose to enable this.
+
+
+## Authentication
+
+HostedGPT supports multiple authentication methods:
+
+<!-- no toc -->
+- [Password authentication](#password-authentication)
+- [Google OAuth authentication](#google-oauth-authentication)
+
+### Password authentication
+
+Password authentication is enabled by default. You can disable it by setting `PASSWORD_AUTHENTICATION_FEATURE` to `false`.
+
+### Google OAuth authentication
+
+Google OAuth authentication is disabled by default. You can enable it by setting `GOOGLE_AUTHENTICATION_FEATURE` to `true`.
+
+To enable Google OAuth authentication, you need to set up Google OAuth in the Google Cloud Console. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
+
+- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID (alternatively, you can add `google_auth_client_id` to your Rails credentials file)
+- `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret (alternatively, you can add `google_auth_client_secret` to your Rails credentials file)
+
+**Steps to set up:**
+
+1. **Go to the Google Cloud Console and Create a New Project:**
+   - Open your web browser and navigate to [Google Cloud Console](https://console.cloud.google.com/).
+   - Click on the project drop-down menu at the top of the page.
+   - Select "New Project"
+   - Enter a name for your project and click "Create"
+
+2. **Create OAuth Consent Screen:**
+   - In the navigation menu, go to "APIs & Services" > "OAuth consent screen"
+   - Select "Internal" and click "Create"
+   - Fill out the required fields (App name, User support email, etc.).
+   - Add your domain (if applicable) and authorized domains.
+   - Click "Save and Continue"
+
+3. **Create OAuth Credentials:**
+   - In the navigation menu, go to "APIs & Services" > "Credentials"
+   - Click on "Create Credentials" and select "OAuth client ID"
+   - Choose "Web application" as the application type.
+   - Fill out the required fields:
+     - **Name:** A descriptive name for your client ID, e.g. "HostedGPT"
+     - **Authorized JavaScript origins:** Your application's base URL, e.g., `https://hostedgpt.example.com`
+     - **Authorized Redirect URIs:** Add these paths but replace the base URL with yours:
+       - `https://hostedgpt.example.com/auth/google/callback`
+       - `https://hostedgpt.example.com/auth/gmail/callback`
+       - `https://hostedgpt.example.com/auth/google_tasks/callback`
+       - `https://hostedgpt.example.com/auth/google_calendar/callback`
+   - Click "Create"
+
+4. **Set Environment Variables:**
+   - After creating the credentials, you will see a dialog with your Client ID and Client Secret.
+   - Set the Client ID and Client Secret as environment variables in your application:
+     - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID ENV or `google_auth_client_id` in your Rails credentials file
+     - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret ENV or `google_auth_client_secret` in your Rails credentials file
+
 
 # Understanding the Docker configuration
 
