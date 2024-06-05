@@ -37,6 +37,10 @@ export default class extends Interface {
     }
   }
 
+  attach(player) {
+    $.microphoneService.attach(player)
+  }
+
   finalize() {
     $.poller?.end()
   }

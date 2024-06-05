@@ -2,6 +2,7 @@ import Service from "../service.js"
 
 export default class extends Service {
   logLevel_info
+  attrReader_player
 
   new() {
     $.player = new Audio()
