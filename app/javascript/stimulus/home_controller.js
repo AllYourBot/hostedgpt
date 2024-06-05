@@ -5,7 +5,7 @@ export default class extends Controller {
     console.log('connected home')
 
     this.bodyElement = document.body
-    this.wrapElement = document.getElementById('wrap')
+    this.wrapElement = document.getElementById("voice-wrap")
 
     this.length = 45
     this.radius = 8.5

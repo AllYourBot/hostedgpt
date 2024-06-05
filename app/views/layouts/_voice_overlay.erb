@@ -1,0 +1,31 @@
+<% if Feature.default_to_voice? && Feature.voice? %>
+  <div
+    data-controller="transition"
+    data-transition-toggle-class="hidden"
+    data-transition-target="transitionable"
+    class="fixed inset-0 z-50 flex justify-center items-center bg-white dark:bg-black"
+  >
+    <header class="absolute right-0 top-0 ml-2 mt-2 mb-3 h-10 text-lg">
+      <%= button_tag type: "button",
+        data: {
+          action: "transition#toggleClass"
+        },
+        class: %|
+          block cursor-pointer inline-flex mr-3 px-2 py-2 group
+        | do %>
+        <%= icon "x-mark",
+              variant: :outline,
+              size: 22,
+              class: %|
+                stroke-2
+                text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white
+              |,
+              title: "Close",
+              tooltip: :left
+        %>
+      <% end %>
+    </header>
+    <div id="voice-wrap" class="w-4/5 h-4/5 relative flex justify-center items-center" style="background-color: #d1684e" data-controller="home">
+    </div>
+  </div>
+<% end %>
