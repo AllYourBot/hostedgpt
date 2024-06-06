@@ -27,9 +27,11 @@ class Feature
     end
 
     def enabled?(feature)
-      ActiveModel::Type::Boolean.new.cast(
-        features.fetch(feature&.to_sym, false)
-      )
+      begin
+        ActiveModel::Type::Boolean.new.cast(features.fetch(feature&.to_sym))
+      rescue KeyError
+        raise KeyError, "You attempted to reference the Feature '#{feature}' but this is not configured within options.yml. Did you typo a feature name?"
+      end
     end
 
     def disabled?(feature)
