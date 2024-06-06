@@ -12,10 +12,10 @@ if (allowed_request_origins = ENV['ALLOWED_REQUEST_ORIGINS'].to_s.split(',')).an
         origins allowed_request_origins
 
         resource "*",
-					headers: :any,
-					methods: [:get, :post, :put, :patch, :delete, :options, :head],
-					credentials: true,
-					max_age: 86400
+          headers: :any,
+          methods: [:get, :post, :put, :patch, :delete, :options, :head],
+          credentials: true,
+          max_age: 86400
       end
     end
   end
