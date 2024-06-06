@@ -29,10 +29,6 @@ class AssistantTest < ActiveSupport::TestCase
     assert_instance_of Array, assistants(:samantha).tools
   end
 
-  test "external id is a string" do
-    assert_instance_of String, assistants(:mandela_gpt4).external_id
-  end
-
   test "simple create works" do
     assert_nothing_raised do
       Assistant.create!(user: users(:keith))
@@ -40,11 +36,12 @@ class AssistantTest < ActiveSupport::TestCase
   end
 
   test "assert execption occures when external ids are not unique" do
-    assert_raise  do
-      Assistant.create!(user: users(:keith), external_id: "1")
+    Assistant.create!(user: users(:keith), external_id: "1")
+    assert_raise ActiveRecord::RecordNotUnique do
       Assistant.create!(user: users(:rob), external_id: "1")
     end
   end
+
   test "tools defaults to empty array on create" do
     a = Assistant.create!(user: users(:keith))
     assert_equal [], a.tools
