@@ -37,7 +37,6 @@ rob_gpt4:
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-  images: true
 
 mandela_gpt4:
   user: rob
@@ -47,4 +46,3 @@ mandela_gpt4:
   description: OpenAI assistant GPT4
   instructions: Be helpful
   tools:  [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
-  images: true
