@@ -5,7 +5,7 @@ keith_desktop_browser:
   format: desktop
   user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15
   ip_address: 127.0.0.1
-  time_zone_offset_in_minutes: -6
+  time_zone_offset_in_minutes: 330
 
 keith_phone_browser:
   person: keith_registered
@@ -14,7 +14,7 @@ keith_phone_browser:
   format: phone
   user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15
   ip_address: 127.0.0.2
-  time_zone_offset_in_minutes: -6
+  time_zone_offset_in_minutes: -300
 
 keith_api:
   person: keith_registered
