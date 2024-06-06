@@ -50,9 +50,9 @@ class AssistantTest < ActiveSupport::TestCase
   end
 
   test "assert execption occures when external ids are not unique" do
-    Assistant.create!(user: users(:keith), external_id: "1")
+    Assistant.create!(user: users(:keith), language_model: language_models(:gpt_4), name: "new", external_id: "1")
     assert_raise ActiveRecord::RecordNotUnique do
-      Assistant.create!(user: users(:rob), external_id: "1")
+      Assistant.create!(user: users(:rob), language_model: language_models(:gpt_4), name: "new", external_id: "1")
     end
   end
 
@@ -117,8 +117,9 @@ class AssistantTest < ActiveSupport::TestCase
   end
 
   test "cannot soft_delete last assistant of a user" do
+    users(:rob).assistants.first.soft_delete!
     assert_raise do
-      users(:rob).assistants.first.soft_delete!
+      users(:rob).assistants.reload.first.soft_delete!
     end
   end
 
