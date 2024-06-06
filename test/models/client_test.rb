@@ -19,9 +19,11 @@ class ClientTest < ActiveSupport::TestCase
     end
   end
 
-  test "simple create works" do
+  test "simple create works and token is generated" do
     assert_nothing_raised do
       Client.create!(person: people(:keith_registered), platform: :ios, format: :phone)
     end
+
+    assert_not_nil Client.last.token
   end
 end

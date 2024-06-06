@@ -86,7 +86,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
 
   create_table "clients", force: :cascade do |t|
     t.bigint "person_id", null: false
-    t.string "token"
+    t.string "token", null: false
     t.string "platform"
     t.string "format"
     t.string "user_agent"
