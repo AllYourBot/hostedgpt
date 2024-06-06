@@ -9,10 +9,6 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of PasswordCredential, users(:keith).credentials.type_is('PasswordCredential').first
   end
 
-  test "has associated authentications" do
-    assert_instance_of Authentication, users(:keith).authentications.first
-  end
-
   test "has an associated password_credential" do
     assert_instance_of PasswordCredential, users(:keith).password_credential
   end
@@ -40,9 +36,11 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted upon destroy" do
-    assert_difference "Credential.count", -users(:keith).credentials.count do
-      assert_difference "Authentication.count", -users(:keith).authentications.count do
-        users(:keith).destroy
+    assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
+      assert_difference "Conversation.count", -users(:keith).conversations.count do
+        assert_difference "Credential.count", -users(:keith).credentials.count do
+          users(:keith).destroy
+        end
       end
     end
   end

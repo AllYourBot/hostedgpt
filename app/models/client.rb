@@ -3,8 +3,8 @@ class Client < ApplicationRecord
 
   belongs_to :person
 
-  has_one :authentication, -> { active }
-  has_many :authentications_including_inactive, class_name: "Authentication", inverse_of: :client, dependent: :destroy
+  has_one :authentication, -> { not_deleted }
+  has_many :authentications_including_deleted, class_name: "Authentication", inverse_of: :client, dependent: :destroy
 
   enum platform: %w[ ios android web api tool ].index_by(&:to_sym)
   enum format: %w[ desktop phone tablet tv unknown ].index_by(&:to_sym)
@@ -18,8 +18,8 @@ class Client < ApplicationRecord
   end
 
   def logout!
-    return false if authentication.blank?
-    authentication.update!(ended_at: Time.current)
+    return false unless authenticated?
+    authentication.deleted!
     reload_authentication
     true
   end

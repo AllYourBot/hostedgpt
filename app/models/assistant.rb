@@ -29,7 +29,7 @@ class Assistant < ApplicationRecord
 
   def soft_delete
     return false if user.assistants.count <= 1
-    update!(deleted_at: Time.now)
+    deleted!
     return true
   end
 

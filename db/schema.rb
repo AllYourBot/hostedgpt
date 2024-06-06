@@ -66,16 +66,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
   end
 
   create_table "authentications", force: :cascade do |t|
-    t.bigint "user_id", null: false
     t.bigint "credential_id", null: false
     t.bigint "client_id", null: false
     t.string "token"
-    t.datetime "ended_at", precision: nil
+    t.datetime "deleted_at", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["client_id"], name: "index_authentications_on_client_id"
     t.index ["credential_id"], name: "index_authentications_on_credential_id"
-    t.index ["user_id"], name: "index_authentications_on_user_id"
   end
 
   create_table "chats", force: :cascade do |t|
@@ -363,7 +361,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
   add_foreign_key "assistants", "users"
   add_foreign_key "authentications", "clients"
   add_foreign_key "authentications", "credentials"
-  add_foreign_key "authentications", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "clients", "people"
   add_foreign_key "conversations", "assistants"
