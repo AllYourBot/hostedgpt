@@ -24,7 +24,7 @@ Rails.application.routes.draw do
     resources :messages, only: [:index]
   end
 
-  # resources :messages, only: [:show, :update]
+  resources :messages, only: [:update] # only: [:show, :update]
   # resources :documents
   # resources :users, only: [:new, :create, :update]
 
