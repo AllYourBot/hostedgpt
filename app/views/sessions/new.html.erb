@@ -1,20 +1,20 @@
-<div class='flex flex-col items-center justify-center w-full h-screen space-y-4'>
+<div class="flex flex-col items-center justify-center w-full h-screen space-y-4">
 
   <div class="p-3 bg-white border border-gray-100 rounded-full">
     <%= image_tag("logo.svg", width: "24", height: "24", class: "text-gray-950") %>
   </div>
 
-  <h2 class='text-3xl font-semibold'>Welcome back</h2>
+  <h2 class="text-3xl font-semibold">Welcome back</h2>
 
   <% if Feature.registration? %>
-    <span class='text-sm text-center'>
+    <span class="text-sm text-center">
       Don't have an account? <%= link_to "Sign up", register_path, class: "underline" %>
     </span>
   <% end %>
 
   <% if Feature.google_authentication? %>
-    <%= button_to 'Log In with Google', '/auth/google',
-      method: 'post',
+    <%= button_to "Log In with Google", "/auth/google",
+      method: "post",
       class: %|
         text-white font-medium
         bg-brand-blue dark:bg-gray-900
@@ -23,40 +23,42 @@
         cursor-pointer
         hover:opacity-95
       |,
-      form_class: 'flex flex-col space-y-4 w-80',
+      form_class: "flex flex-col space-y-4 w-80",
       data: {
         turbo: false,
       }
     %>
-    <span class='text-sm text-center'>
+    <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && 'hidden' %>">
       - Or -
     </span>
   <% end %>
 
-  <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
-    <%= f.email_field :email,
-      value: params[:email],
-      id: "email",
-      autofocus: params[:email].present? ? false : true,
-      placeholder: "Email address",
-      class: "border border-gray-400 rounded p-3 dark:text-black"
-    %>
-    <%= f.password_field :password,
-      id: "password",
-      autofocus: params[:email].present? ? true : false,
-      placeholder: "Password",
-      class: "border border-gray-400 rounded p-3 dark:text-black"
-    %>
-    <%= f.submit "Log In",
-        class: %|
-          text-white font-medium
-          bg-brand-blue dark:bg-gray-900
-          border border-white dark:border-gray-400
-          rounded-lg p-4 text-center
-          cursor-pointer
-          hover:opacity-95
-        |,
-        data: { turbo_submits_with: "Authenticating..." }
-    %>
+  <% if Feature.password_authentication? %>
+    <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
+      <%= f.email_field :email,
+        value: params[:email],
+        id: "email",
+        autofocus: params[:email].present? ? false : true,
+        placeholder: "Email address",
+        class: "border border-gray-400 rounded p-3 dark:text-black"
+      %>
+      <%= f.password_field :password,
+        id: "password",
+        autofocus: params[:email].present? ? true : false,
+        placeholder: "Password",
+        class: "border border-gray-400 rounded p-3 dark:text-black"
+      %>
+      <%= f.submit "Log In",
+          class: %|
+            text-white font-medium
+            bg-brand-blue dark:bg-gray-900
+            border border-white dark:border-gray-400
+            rounded-lg p-4 text-center
+            cursor-pointer
+            hover:opacity-95
+          |,
+          data: { turbo_submits_with: "Authenticating..." }
+      %>
+    <% end %>
   <% end %>
 </div>

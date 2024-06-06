@@ -1,5 +1,6 @@
 shared:
   features:
+    default_to_voice: <%= ENV.fetch("DEFAULT_TO_VOICE_FEATURE", false) %>
     voice: <%= ENV.fetch("VOICE_FEATURE", false) %>
     registration: <%= ENV.fetch("REGISTRATION_FEATURE", true) %>
     password_authentication: <%= ENV.fetch("PASSWORD_AUTHENTICATION_FEATURE", true) %>

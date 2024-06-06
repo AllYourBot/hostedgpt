@@ -36,6 +36,22 @@ class ConversationTest < ActiveSupport::TestCase
     end
   end
 
+  test "Conversation should not be created with duplicate external ids" do
+    Conversation.create!(
+      user: users(:keith),
+      assistant: assistants(:samantha),
+      external_id: "dup1"
+    )
+
+    assert_raise ActiveRecord::RecordNotUnique do
+      Conversation.create!(
+        user: users(:keith),
+        assistant: assistants(:mandela_gpt4),
+        external_id: "dup1"
+      )
+    end
+  end
+
   test "associations are deleted upon destroy" do
     conversation = conversations(:greeting)
     message_count = conversation.messages.count * -1
