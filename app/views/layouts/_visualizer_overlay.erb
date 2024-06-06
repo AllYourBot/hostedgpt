@@ -1,0 +1,66 @@
+<% if Feature.default_to_voice? && Feature.voice? %>
+  <div
+    id="visualizer-overlay"
+    data-controller="transition"
+
+    data-transition-toggle-class="opacity-0"
+    data-transition-target="transitionable"
+
+    data-transition-second-toggle-after-delay-class="hidden"
+    data-transition-second-toggle-after-delay-value="300"
+
+    data-turbo-permanent
+    class="fixed inset-0 z-50 flex justify-center items-center bg-white dark:bg-black transition-opacity duration-300"
+  >
+    <header class="absolute right-0 top-0 ml-2 mt-2 mb-3 h-10 text-lg">
+      <%= button_tag type: "button",
+        data: {
+          controller: "keyboard",
+          action: %|
+            keydown.esc@document->keyboard#click
+            transition#toggleClass
+          |
+        },
+        class: %|
+          block cursor-pointer inline-flex mr-3 px-2 py-2 group
+        | do %>
+        <%= icon "x-mark",
+              variant: :outline,
+              size: 22,
+              class: %|
+                stroke-2
+                text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white
+              |,
+              title: "Close",
+              tooltip: :left
+        %>
+      <% end %>
+    </header>
+    <div
+      id="visualizer-container"
+      class="w-4/5 h-4/5 relative flex justify-center items-center"
+      style="background-color: #d1684e"
+      data-controller="visualizer"
+    >
+      <%= button_tag type: "button",
+        data: {
+          action: "visualizer#activate"
+        },
+        class: %|
+          absolute
+          top-2/3
+          left-1/2 transform -translate-x-1/2
+          cursor-pointer
+          px-10 py-2
+          text-sm
+          font-medium
+          text-gray-600
+          bg-white
+          rounded-md
+          shadow-md
+        | do %>
+          Enable
+      <% end %>
+    </div>
+  </div>
+<% end %>
