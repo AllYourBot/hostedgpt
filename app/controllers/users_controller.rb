@@ -3,21 +3,22 @@ class UsersController < ApplicationController
 
   layout "public"
 
-  before_action :ensure_registration, only: [:new, :create]
+  before_action :ensure_session_based_authentication_allowed, only: [:new, :create]
+  before_action :ensure_registration_allowed, only: [:new, :create]
   before_action :set_user, only: [:update]
 
   def new
     @person = Person.new
     @person.personable = User.new
+
+    flash[:errors]&.each { |error| @person.errors.add(:base, error) }
   end
 
   def create
     @person = Person.new(person_params)
 
     if @person.save
-      reset_session
       login_as @person.user
-
       redirect_to root_path
     else
       @person.errors.delete :personable
@@ -36,6 +37,12 @@ class UsersController < ApplicationController
 
   private
 
+  def ensure_registration_allowed
+    if Feature.disabled?(:registration)
+      flash[:alert] = "Registration is disabled."
+    end
+  end
+
   def set_user
     @user = Current.user if params[:id].to_i == Current.user.id
   end
@@ -48,9 +55,5 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(preferences: [:nav_closed, :dark_mode])
-  end
-
-  def ensure_registration
-    redirect_to root_path unless Feature.enabled?(:registration)
   end
 end

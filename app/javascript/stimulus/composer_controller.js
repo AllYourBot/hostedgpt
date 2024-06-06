@@ -42,6 +42,8 @@ export default class extends Controller {
   }
 
   determineSubmitButton() {
+    this.preventAccidentalSlashTyping()
+
     if (this.cleanInputValue.length < 1) {
       this.submitTarget.classList.add('hidden')
       if (this.hasMicrophoneEnableTarget && Listener.supported) this.microphoneEnableTarget.classList.remove('hidden') // TODO: remove when enabling feature
@@ -60,7 +62,7 @@ export default class extends Controller {
 
     if (Listener.engaged) {
       this.disableMicrophone()
-    } else if (Microphone.off){
+    } else if (Microphone.off) {
       this.enableMicrophone()
     }
   }
@@ -88,19 +90,20 @@ export default class extends Controller {
     this.microphoneDisableTarget.classList.remove('animate-blink')
     this.disableComposer()
     this.inputTarget.placeholder = "Speak aloud..."
-    Flip.Microphone.on()
+    if (Listener.disabled) Play.Speaker.sound("pop")
+    Invoke.Listener()
   }
 
   blinkingMicrophone() {
-    this.enableMicrophone()
     this.microphoneDisableTarget.classList.add('animate-blink')
+    Dismiss.Listener()
   }
 
   disableMicrophone() {
     this.microphoneEnableTarget.classList.remove('hidden')
     this.microphoneDisableTarget.classList.add('hidden')
     this.enableComposer()
-    Flip.Microphone.off()
+    Disable.Listener()
     this.determineSubmitButton()
   }
 
@@ -172,6 +175,12 @@ export default class extends Controller {
     this.formTarget.reset()
     this.focus()
     this.determineSubmitButton()
+  }
+
+  preventAccidentalSlashTyping() {
+    if (this.inputTarget.value.length == 1 && this.inputTarget.value[0] == '/') {
+      this.inputTarget.value = ''
+    }
   }
 
   smartPaste(event) {

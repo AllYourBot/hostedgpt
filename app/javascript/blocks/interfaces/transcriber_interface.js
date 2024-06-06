@@ -14,11 +14,11 @@ import Interface from "../interface.js"
 export default class extends Interface {
   logLevel_info
 
-  Flip(turnOn)        { if (turnOn && !$.active) {
+  async Flip(turnOn)  { if (turnOn && !$.active) {
                           $.active = true
                           $.transcriberService.start()
 
-                          Flip.Microphone.on()
+                          await Flip.Microphone.on()
                           Invoke.Listener()
 
                         } else if (!turnOn && $.active) {

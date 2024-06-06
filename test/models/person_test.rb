@@ -46,4 +46,11 @@ class PersonTest < ActiveSupport::TestCase
     assert person.save
     assert_instance_of User, person.personable
   end
+
+  test "person with invalid email format validation" do
+    person = Person.new(email: "invalid_email")
+    refute person.valid?
+    assert_includes person.errors[:email], "is invalid"
+    refute person.save, "Person with invalid email was saved"
+  end
 end

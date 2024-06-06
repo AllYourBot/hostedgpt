@@ -43,7 +43,7 @@ class MessagesController < ApplicationController
 
     if @message.save
       after_create_assistant_reply = @message.conversation.latest_message_for_version(@message.version)
-      GetNextAIMessageJob.perform_later(current_user.id, after_create_assistant_reply.id, @assistant.id)
+      GetNextAIMessageJob.perform_later(Current.user.id, after_create_assistant_reply.id, @assistant.id)
       redirect_to conversation_messages_path(@message.conversation, version: @message.version)
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
@@ -56,8 +56,6 @@ class MessagesController < ApplicationController
   end
 
   def update
-    # Clicking edit beneath a message actually submits to create and not here. This action is only used for next/prev conversation.
-    # In order to force a morph we PATCH to here and redirect.
     if @message.update(message_params)
       redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version)
     else
@@ -76,12 +74,13 @@ class MessagesController < ApplicationController
   end
 
   def set_assistant
-    @assistant = Current.user.assistants.find_by(id: params[:assistant_id])
+    @assistant = Current.user.assistants_including_deleted.find_by(id: params[:assistant_id])
     @assistant ||= @conversation.latest_message_for_version(@version).assistant
   end
 
   def set_message
     @message = Message.find(params[:id])
+    redirect_to root_url, status: :unauthorized if @message.conversation.user != Current.user
   end
 
   def set_nav_conversations

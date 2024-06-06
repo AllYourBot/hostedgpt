@@ -9,8 +9,9 @@ class AssistantTest < ActiveSupport::TestCase
     assert_instance_of Conversation, assistants(:samantha).conversations.first
   end
 
-  test "has associated messages (through conversations)" do
-    assert_instance_of Message, assistants(:samantha).messages.first
+  test "has supports_images?" do
+    assert assistants(:samantha).supports_images?
+    refute assistants(:keith_gpt3).supports_images?
   end
 
   test "has associated documents" do
@@ -25,13 +26,26 @@ class AssistantTest < ActiveSupport::TestCase
     assert_instance_of Step, assistants(:samantha).steps.first
   end
 
+  test "has associated messages (through conversations)" do
+    assert_instance_of Message, assistants(:samantha).messages.first
+  end
+
+  test "has associated language_model" do
+    assert_instance_of LanguageModel, assistants(:samantha).language_model
+  end
+
   test "tools is an array of objects" do
     assert_instance_of Array, assistants(:samantha).tools
   end
 
-  test "simple create works" do
+  test "simple create works and tool defaults to empty array" do
+    a = nil
     assert_nothing_raised do
-      Assistant.create!(user: users(:keith))
+      a = Assistant.create!(
+        user: users(:keith),
+        language_model: language_models(:gpt_4),
+        name: 'abc'
+      )
     end
   end
 
@@ -42,23 +56,35 @@ class AssistantTest < ActiveSupport::TestCase
     end
   end
 
-  test "tools defaults to empty array on create" do
-    a = Assistant.create!(user: users(:keith))
-    assert_equal [], a.tools
-  end
-
   test "associations are deleted upon destroy" do
     assistant = assistants(:samantha)
     conversation_count = assistant.conversations.count * -1
+    message_count = assistant.conversations.map { |c| c.messages.length }.sum * -1
     document_count = (assistant.documents.count+assistant.conversations.sum { |c| c.messages.sum { |m| m.documents.count }}) * -1
     run_count = assistant.runs.count * -1
     step_count = assistant.steps.count * -1
 
-    assert_difference "Conversation.count", conversation_count do
-      assert_difference "Document.count", document_count do
-        assert_difference "Run.count", run_count do
-          assert_difference "Step.count", step_count do
-            assistant.destroy
+    assert_difference "Message.count", message_count do
+      assert_difference "Conversation.count", conversation_count do
+        assert_difference "Document.count", document_count do
+          assert_difference "Run.count", run_count do
+            assert_difference "Step.count", step_count do
+              assistant.destroy
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test "associations are not deleted upon soft delete" do
+    assert_no_difference "Message.count" do
+      assert_no_difference "Conversation.count" do
+        assert_no_difference "Document.count" do
+          assert_no_difference "Run.count" do
+            assert_no_difference "Step.count" do
+              assistants(:samantha).soft_delete
+            end
           end
         end
       end
@@ -75,6 +101,30 @@ class AssistantTest < ActiveSupport::TestCase
   end
 
   test "initials will split on - and return two characters" do
-    assert_equal "G4", assistants(:keith_gpt4).initials
+    assert_equal "G4", assistants(:rob_gpt4).initials
+  end
+
+  test "language model validated" do
+    record = Assistant.new
+    refute record.valid?
+    assert record.errors[:language_model].present?
+  end
+
+  test "name validated" do
+    record = Assistant.new
+    refute record.valid?
+    assert record.errors[:name].present?
+  end
+
+  test "cannot soft_delete last assistant of a user" do
+    assert_raise do
+      users(:rob).assistants.first.soft_delete!
+    end
+  end
+
+  test "can soft_delete assistant of a user if they have more than one" do
+    assert_nothing_raised do
+      users(:keith).assistants.first.destroy
+    end
   end
 end

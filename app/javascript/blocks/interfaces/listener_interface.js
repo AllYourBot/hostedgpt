@@ -31,7 +31,6 @@ export default class extends Interface {
                           $.processing = true
                           await $.screenService.start()
                           Flip.Transcriber.on()
-                          Play.Speaker.sound('pop')
                         }
                       }
   log_Dismiss
@@ -42,10 +41,12 @@ export default class extends Interface {
                         }
                       }
 
-  Disable()           { $.processing = null
-                        $.screenService.end()
-                        Flip.Transcriber.off()
-                        Play.Speaker.sound('pip')
+  Disable()           { if ($.processing != null) {
+                          $.processing = null
+                          $.screenService.end()
+                          Flip.Transcriber.off()
+                          Play.Speaker.sound('pip')
+                        }
                       }
 
   attr_consideration  = ''
@@ -53,6 +54,7 @@ export default class extends Interface {
 
   get engaged()       { return $.processing === true  }
   get dismissed()     { return $.processing === false }
+  get disabled()      { return $.processing === null }
 
   get supported()     { return Transcriber.supported }
 

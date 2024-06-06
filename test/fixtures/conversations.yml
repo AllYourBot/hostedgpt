@@ -70,6 +70,18 @@ versioned2:
   title: Versioned v2 conversation
   last_assistant_message: msg2_v5
 
+weather:
+  user: keith
+  assistant: samantha
+  title: Weather
+  last_assistant_message: weather_explained
+
+trees:
+  user: keith
+  assistant: keith_gpt3
+  title: Trees
+  last_assistant_message: trees_explained
+
 openai_thread:
   user: keith
   assistant: samantha

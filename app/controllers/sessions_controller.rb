@@ -3,28 +3,23 @@ class SessionsController < ApplicationController
 
   layout "public"
 
+  before_action :ensure_session_based_authentication_allowed, except: :destroy
+
   def new
   end
 
   def create
-    person = Person.find_by(email: params[:email].strip.downcase)
+    person = Person.find_by(email: params[:email])
+    @user = person&.personable
 
-    if person.blank?
-      flash.now[:alert] = "Invalid email or password"
-      render :new, status: :unprocessable_entity
+    if person.present? && @user&.authenticate(params[:password])
+      login_as @user
+      redirect_to root_path
       return
     end
 
-    @user = person&.personable
-
-    if @user&.authenticate(params[:password])
-      reset_session
-      login_as @user
-      redirect_to root_path
-    else
-      flash.now[:alert] = "Invalid email or password"
-      render :new, status: :unprocessable_entity
-    end
+    flash.now[:alert] = "Invalid email or password"
+    render :new, status: :unprocessable_entity
   end
 
   def destroy

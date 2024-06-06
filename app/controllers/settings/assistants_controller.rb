@@ -1,5 +1,6 @@
 class Settings::AssistantsController < Settings::ApplicationController
   before_action :set_assistant, only: [:edit, :update, :destroy]
+  before_action :set_last_assistant, except: [:destroy]
 
   def new
     @assistant = Assistant.new
@@ -27,17 +28,27 @@ class Settings::AssistantsController < Settings::ApplicationController
   end
 
   def destroy
-    @assistant.destroy!
-    redirect_to new_settings_assistant_url, notice: "Deleted", status: :see_other
+    if @assistant.soft_delete
+      redirect_to new_settings_assistant_url, notice: "Deleted", status: :see_other
+    else
+      redirect_to new_settings_assistant_url, alert: "Cannot delete your last assistant", status: :see_other
+    end
   end
 
   private
 
   def set_assistant
-    @assistant = Current.user.assistants.find(params[:id])
+    @assistant = Current.user.assistants.find_by(id: params[:id])
+    if @assistant.nil?
+      redirect_to new_settings_assistant_url, notice: "The assistant was deleted", status: :see_other
+    end
+  end
+
+  def set_last_assistant
+    @last_assistant = Current.user.assistants.count <= 1
   end
 
   def assistant_params
-    params.require(:assistant).permit(:name, :description, :instructions)
+    params.require(:assistant).permit(:name, :description, :instructions, :language_model_id)
   end
 end

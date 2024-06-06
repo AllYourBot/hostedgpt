@@ -4,8 +4,10 @@ Rails.application.routes.draw do
     resource :person, only: [:edit, :update]
   end
 
-  root to: "assistants#index"
+  get "/auth/:provider/callback" => "sessions/google_oauth#create"
+  get "/auth/failure" => "sessions/google_oauth#destroy"
 
+  root to: "assistants#index"
   resources :assistants do
     resources :messages, only: [:new, :create, :edit]
   end
@@ -21,8 +23,6 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # routes to still be cleaned up:
-
-  resources :chats, only: [:index, :show, :create]
 
   get "/login", to: "sessions#new"
   post "/login", to: "sessions#create"
