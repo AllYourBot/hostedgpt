@@ -10,10 +10,8 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted upon destroy" do
-    clients_count = people(:keith_registered).clients.count * -1
-
     assert_difference "User.count", -1 do
-      assert_difference "Client.count", clients_count do
+      assert_difference "Client.count", -people(:keith_registered).clients.count do
         people(:keith_registered).destroy
       end
     end

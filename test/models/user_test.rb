@@ -40,11 +40,8 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted upon destroy" do
-    credentials_count = users(:keith).credentials.count * -1
-    authentications_count = users(:keith).authentications.count * -1
-
-    assert_difference "Credential.count", credentials_count do
-      assert_difference "Authentication.count", authentications_count do
+    assert_difference "Credential.count", -users(:keith).credentials.count do
+      assert_difference "Authentication.count", -users(:keith).authentications.count do
         users(:keith).destroy
       end
     end
