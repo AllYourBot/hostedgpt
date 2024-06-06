@@ -1,25 +1,3 @@
-# == Schema Information
-#
-# Table name: users
-#
-#  id                        :bigint           not null, primary key
-#  anthropic_key             :string
-#  first_name                :string           not null
-#  last_name                 :string
-#  openai_key                :string
-#  password_digest           :string
-#  preferences               :jsonb
-#  registered_at             :datetime
-#  last_cancelled_message_id :bigint
-#
-# Indexes
-#
-#  index_users_on_last_cancelled_message_id  (last_cancelled_message_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (last_cancelled_message_id => messages.id)
-#
 class User < ApplicationRecord
   include Personable, Registerable
   encrypts :openai_key, :anthropic_key

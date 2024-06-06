@@ -1,29 +1,3 @@
-# == Schema Information
-#
-# Table name: documents
-#
-#  id           :bigint           not null, primary key
-#  bytes        :integer          not null
-#  filename     :string           not null
-#  purpose      :string           not null
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  assistant_id :bigint
-#  message_id   :bigint
-#  user_id      :bigint           not null
-#
-# Indexes
-#
-#  index_documents_on_assistant_id  (assistant_id)
-#  index_documents_on_message_id    (message_id)
-#  index_documents_on_user_id       (user_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (assistant_id => assistants.id)
-#  fk_rails_...  (message_id => messages.id)
-#  fk_rails_...  (user_id => users.id)
-#
 class Document < ApplicationRecord
   belongs_to :user
   belongs_to :assistant, optional: true
