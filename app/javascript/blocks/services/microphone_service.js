@@ -13,10 +13,17 @@ export default class extends Service {
       const AudioContext = window.AudioContext || window.webkitAudioContext
       $.stream = await navigator.mediaDevices.getUserMedia({ audio: true, echoCancellation: true, noiseSuppression: true })
       $.audioContext = new AudioContext()
-      $.audioSource = $.audioContext.createMediaStreamSource($.stream)
+      $.microphoneSource = $.audioContext.createMediaStreamSource($.stream)
       $.audioProcessor = $.audioContext.createScriptProcessor(2048, 1, 1)
-      $.audioSource.connect($.audioProcessor)
+      $.microphoneSource.connect($.audioProcessor)
       $.audioProcessor.connect($.audioContext.destination)
+
+      $.audioVisualizer = $.audioContext.createAnalyser()
+      $.microphoneSource.connect($.audioVisualizer)
+      $.audioVisualizer.fftSize = 1024
+      $.audioVisualizerDataArray = new Uint8Array($.audioVisualizer.frequencyBinCount)
+
+      if ($.playerToAttach) _attachPlayer()
 
       $.audioProcessor.onaudioprocess = (event) => processVolume(event)
       $.active = true
@@ -26,10 +33,26 @@ export default class extends Service {
     }
   }
 
+  attach(player) {
+    $.playerToAttach = player
+    _attachPlayer()
+  }
+
+  _attachPlayer() {
+    if (!$.playerToAttach || !$.audioContext) return
+
+    $.playerSource = $.audioContext.createMediaElementSource($.playerToAttach)
+    $.playerSource.connect($.audioVisualizer)
+    $.playerSource.connect($.audioContext.destination)
+    $.playerToAttach = null
+  }
+
   log_end
   end() {
     if ($.audioProcessor) $.audioProcessor.disconnect()
-    if ($.audioSource) $.audioSource.disconnect()
+    if ($.microphoneSource) $.microphoneSource.disconnect()
+    if ($.playerSource) $.playerSource.disconnect()
+    if ($.audioVisualizer) $.audioVisualizer.disconnect()
     if ($.audioContext) $.audioContext.close()
     if ($.stream) $.stream.getTracks().forEach(track => track.stop())
 

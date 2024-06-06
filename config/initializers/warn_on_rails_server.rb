@@ -2,7 +2,7 @@ if defined?(Rails::Server)
   if ENV['RAILS_ENV'] == 'development' && ENV['USING_PROCFILE'] != 'true'
     puts ""
     puts "###"
-    puts "### WARNING: You are running 'rails server' outside of the Procfile.  This misses the SolidQueue and Tailwind."
+    puts "### WARNING: You're running 'rails server' outside of the Procfile. This fails to start SolidQueue and Tailwind."
     puts "###"
     puts "### Cancel this with Ctrl + c and instead run 'bin/dev'"
     puts "###"
@@ -12,4 +12,3 @@ if defined?(Rails::Server)
     gets
   end
 end
-

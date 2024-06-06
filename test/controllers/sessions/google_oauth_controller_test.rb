@@ -39,9 +39,11 @@ class Sessions::GoogleOauthControllerTest < ActionDispatch::IntegrationTest
       }
     }
     OmniAuth.config.add_mock(:google, details)
-    assert_no_difference "Person.count" do
-      assert_difference "User.count", 1 do
-        get "/auth/google/callback"
+    stub_features(google_authentication: true, registration: true) do
+      assert_no_difference "Person.count" do
+        assert_difference "User.count", 1 do
+          get "/auth/google/callback"
+        end
       end
     end
 
@@ -73,9 +75,11 @@ class Sessions::GoogleOauthControllerTest < ActionDispatch::IntegrationTest
       }
     }
     OmniAuth.config.add_mock(:google, details)
-    assert_no_difference "Person.count" do
-      assert_no_difference "User.count" do
-        get "/auth/google/callback"
+    stub_features(google_authentication: true, registration: true) do
+      assert_no_difference "Person.count" do
+        assert_no_difference "User.count" do
+          get "/auth/google/callback"
+        end
       end
     end
 
@@ -98,9 +102,11 @@ class Sessions::GoogleOauthControllerTest < ActionDispatch::IntegrationTest
       }
     }
     OmniAuth.config.add_mock(:google, details)
-    assert_difference "Person.count", 1 do
-      assert_difference "User.count", 1 do
-        get "/auth/google/callback"
+    stub_features(google_authentication: true, registration: true) do
+      assert_difference "Person.count", 1 do
+        assert_difference "User.count", 1 do
+          get "/auth/google/callback"
+        end
       end
     end
     new_user = User.last
