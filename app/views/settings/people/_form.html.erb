@@ -30,10 +30,16 @@
       <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
-    <div class="my-5">
-      <%= user_fields.label :password %>
-      <%= user_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
-    </div>
+    <% person.personable.credentials.type_is("PasswordCredential").each do |credential| %>
+      <%= user_fields.fields_for :credentials_attributes, credential, index: credential.id do |credential_fields| %>
+        <%= credential_fields.hidden_field :type, value: credential.type %>
+
+        <div class="my-5">
+          <%= credential_fields.label :password %>
+          <%= credential_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+        </div>
+      <% end %>
+    <% end %>
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :dark_mode, "Color Theme" %>
@@ -49,7 +55,7 @@
       </div>
     </div>
 
-    <% if Current.user.auth_uid %>
+    <% if Feature.google_tools? %>
       <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
         <%= user_fields.label "Enable Tools" %>
 

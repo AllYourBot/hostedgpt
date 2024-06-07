@@ -8,4 +8,11 @@ class ApplicationController < ActionController::Base
       head :not_found
     end
   end
+
+  def strip_all_but_first_credential(h)
+    first_cred = h["personable_attributes"]["credentials_attributes"].first
+    h["personable_attributes"]["credentials_attributes"] =
+      (first_cred.second["type"] == "PasswordCredential") && [first_cred].to_h
+    h
+  end
 end

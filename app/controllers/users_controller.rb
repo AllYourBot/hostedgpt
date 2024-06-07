@@ -61,15 +61,6 @@ class UsersController < ApplicationController
     strip_all_but_first_credential(h)
   end
 
-  def strip_all_but_first_credential(h)
-    first_cred = h["personable_attributes"]["credentials_attributes"]["0"]
-    h["personable_attributes"]["credentials_attributes"] = {
-      "0" => (first_cred["type"] == "PasswordCredential") &&
-        h["personable_attributes"]["credentials_attributes"]["0"]
-    }
-    h
-  end
-
   def user_params
     params.require(:user).permit(preferences: [:nav_closed, :dark_mode])
   end

@@ -43,6 +43,14 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil @controller.instance_variable_get('@person').errors
   end
 
+  test "should fail to update when credential type is altered" do
+    params = person_params
+    params["personable_attributes"]["credentials_attributes"][@person.user.password_credential.id]["type"] = "GoogleCredential"
+    patch settings_person_url, params: { person: params }
+    assert_response :unprocessable_entity
+    assert_not_nil @controller.instance_variable_get('@person').errors
+  end
+
   private
 
   def person_params
@@ -51,7 +59,10 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     params["personable_attributes"] = {}
     @person.user.slice(:first_name, :last_name, :openai_key).each { |k,v| params["personable_attributes"][k] = "#{v}-2" }
     params["personable_attributes"]["id"] = @person.user.id
-    params["personable_attributes"]["password"] = "secret"
+    params["personable_attributes"]["credentials_attributes"] = {
+      @person.user.password_credential.id => @person.user.password_credential.slice(:type).merge(password: "secret")
+    }
+
     params
   end
 end
