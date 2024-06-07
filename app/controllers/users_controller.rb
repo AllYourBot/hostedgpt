@@ -1,24 +1,27 @@
 class UsersController < ApplicationController
-  include Accessible
+  require_unauthenticated_access except: :update
 
-  layout "public"
-
-  before_action :ensure_session_based_authentication_allowed, only: [:new, :create]
+  before_action :ensure_user_authentication_allowed, only: [:new, :create]
   before_action :ensure_registration_allowed, only: [:new, :create]
   before_action :set_user, only: [:update]
+
+  layout "public"
 
   def new
     @person = Person.new
     @person.personable = User.new
 
-    flash[:errors]&.each { |error| @person.errors.add(:base, error) }
+    prettify_flash_error_messages
   end
 
   def create
     @person = Person.new(person_params)
 
     if @person.save
-      login_as @person.user
+      client = create_client_for @person
+      client.authenticate_with! @person.user.password_credential
+      authenticate_with client
+
       redirect_to root_path
     else
       @person.errors.delete :personable
@@ -39,7 +42,7 @@ class UsersController < ApplicationController
 
   def ensure_registration_allowed
     if Feature.disabled?(:registration)
-      flash[:alert] = "Registration is disabled."
+      head :not_found
     end
   end
 
@@ -47,10 +50,24 @@ class UsersController < ApplicationController
     @user = Current.user if params[:id].to_i == Current.user.id
   end
 
+  def prettify_flash_error_messages
+    flash[:errors]&.each { |error| @person.errors.add(:base, error) }
+  end
+
   def person_params
-    params.require(:person).permit(:email, :personable_type, personable_attributes: [
-      :name, :password
-    ])
+    h = params.require(:person).permit(:email, :personable_type, personable_attributes: [
+      :name, credentials_attributes: [ :type, :password ]
+    ]).to_h
+    strip_all_but_first_credential(h)
+  end
+
+  def strip_all_but_first_credential(h)
+    first_cred = h["personable_attributes"]["credentials_attributes"]["0"]
+    h["personable_attributes"]["credentials_attributes"] = {
+      "0" => (first_cred["type"] == "PasswordCredential") &&
+        h["personable_attributes"]["credentials_attributes"]["0"]
+    }
+    h
   end
 
   def user_params

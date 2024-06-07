@@ -1,7 +1,13 @@
 require "test_helper"
 
 class AuthenticationsControllerTest < ActionDispatch::IntegrationTest
-  test "should get new" do
+  test "should get redirected if already logged in" do
+    login_as users(:keith)
+    get login_path
+    assert_response :redirect
+  end
+
+  test "should get new if not logged in" do
     get login_path
     assert_response :success
   end
@@ -63,5 +69,12 @@ class AuthenticationsControllerTest < ActionDispatch::IntegrationTest
     login_as people(:keith_registered)
     get login_path
     assert_redirected_to root_url
+  end
+
+  test "should return not_found when all auth schemes are disabled" do
+    stub_features(password_authentication: false, google_authentication: false) do
+      get login_path
+      assert_response :not_found
+    end
   end
 end

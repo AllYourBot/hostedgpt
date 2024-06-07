@@ -46,7 +46,7 @@ module Authenticate
   end
 
   def create_client_for(person)
-    person.clients.create!(
+    Current.client || person.clients.create!(
       platform: :web,
       user_agent: "",
       ip_address: "",

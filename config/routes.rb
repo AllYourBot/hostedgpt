@@ -23,8 +23,8 @@ Rails.application.routes.draw do
   get "/register", to: "users#new"
   get "/logout", to: "authentications#destroy"
 
-  get "/auth/:provider/callback" => "sessions/google_oauth#create"
-  get "/auth/failure" => "sessions/google_oauth#destroy"
+  get "/authentications/:provider/callback" => "authentications/google_oauth#create"
+  get "/authentications/google_oauth/failure" => "authentications/google_oauth#destroy"
 
   resources :documents  # TODO: finish this feature
 
