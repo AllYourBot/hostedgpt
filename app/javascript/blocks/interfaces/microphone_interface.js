@@ -3,9 +3,9 @@ import Interface from "../interface.js"
 export default class extends Interface {
   logLevel_info
 
-  Flip(turnOn)        { if (turnOn && !$.active) {
+  async Flip(turnOn)  { if (turnOn && !$.active) {
                           $.active = true
-                          void $.microphoneService.start()
+                          await $.microphoneService.start()
                           Flip.Transcriber.on()
                         } else if (!turnOn && $.active) {
                           $.active = false
@@ -35,6 +35,10 @@ export default class extends Interface {
     $.microphoneService.onVolumeChanged = (num) => {
       if (num > 2) SpeakInto.Microphone.at.volume(num)
     }
+  }
+
+  attach(player) {
+    $.microphoneService.attach(player)
   }
 
   finalize() {

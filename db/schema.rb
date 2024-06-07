@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_24_144314) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_25_195516) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -56,8 +56,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_24_144314) do
     t.jsonb "tools", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at", precision: nil
     t.bigint "language_model_id"
+    t.datetime "deleted_at", precision: nil
+    t.text "external_id", comment: "The Backend AI's (e.g OpenAI) assistant id"
+    t.index ["external_id"], name: "index_assistants_on_external_id", unique: true
     t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
     t.index ["user_id", "deleted_at"], name: "index_assistants_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_assistants_on_user_id"
@@ -78,7 +80,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_24_144314) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "last_assistant_message_id"
+    t.text "external_id", comment: "The Backend AI system (e.g OpenAI) Thread Id"
     t.index ["assistant_id"], name: "index_conversations_on_assistant_id"
+    t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
     t.index ["user_id"], name: "index_conversations_on_user_id"
@@ -179,6 +183,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_24_144314) do
     t.jsonb "file_ids", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "external_id", comment: "The Backend AI system (e.g OpenAI) Run Id"
     t.index ["assistant_id"], name: "index_runs_on_assistant_id"
     t.index ["conversation_id"], name: "index_runs_on_conversation_id"
   end
@@ -290,6 +295,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_24_144314) do
     t.datetime "completed_at", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "external_id", comment: "The Backend AI system (e.g OpenAI) Step Id"
     t.index ["assistant_id"], name: "index_steps_on_assistant_id"
     t.index ["conversation_id"], name: "index_steps_on_conversation_id"
     t.index ["run_id"], name: "index_steps_on_run_id"

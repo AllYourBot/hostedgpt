@@ -37,3 +37,12 @@ rob_gpt4:
   description: OpenAI's GPT-4
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+
+mandela_gpt4:
+  user: rob
+  language_model: gpt_4
+  name: Mandela
+  description: OpenAI assistant GPT4
+  instructions: Be helpful
+  tools:  [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
+  external_id: OpenAI ID 1

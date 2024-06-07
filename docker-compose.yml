@@ -25,19 +25,13 @@ services:
     environment:
       - DATABASE_URL=postgres://app:secret@postgres/app_development
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
+      - ALLOWED_REQUEST_ORIGINS=${ALLOWED_REQUEST_ORIGINS}
+      - OVERMIND_COLORS=2,3,5
       - DEFAULT_OPENAI_KEY=${DEFAULT_OPENAI_KEY}
       - DEFAULT_ANTHROPIC_KEY=${DEFAULT_ANTHROPIC_KEY}
-      - ALLOWED_REQUEST_ORIGINS=${ALLOWED_REQUEST_ORIGINS}
     ports: ["3000:3000"]
     volumes:
       - .:/rails
-
-  worker:
-    <<: *base
-    restart: on-failure:3
-    tty: false
-    ports: []
-    command: bin/rails solid_queue:start
 
 volumes:
   hostedgpt_pgdata:
