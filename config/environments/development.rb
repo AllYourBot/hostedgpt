@@ -82,4 +82,7 @@ Rails.application.configure do
   config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16"]
 
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
+
+  # Uncomment if you want to force a different locale during development
+  # config.i18n.default_locale = :de
 end
