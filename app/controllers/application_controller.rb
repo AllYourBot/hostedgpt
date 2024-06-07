@@ -37,7 +37,9 @@ class ApplicationController < ActionController::Base
     login_as person.user
 
     render json: {
-      assistants: person.user.assistants.ordered
+      assistants: person.user.assistants.ordered.map do |a|
+				a.as_json(include: :language_model)
+			end
     }
   end
 
