@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   root to: "assistants#index"
 
-  resources :users, only: [:new, :create]
+  resources :users, only: [:new, :create, :update]
 
   resources :assistants do
     resources :messages, only: [:new, :create, :edit]
@@ -18,10 +18,10 @@ Rails.application.routes.draw do
     resource :person, only: [:edit, :update]
   end
 
-  get "/login", to: "sessions#new"
-  post "/login", to: "sessions#create"
+  get "/login", to: "authentications#new"
+  post "/login", to: "authentications#create"
   get "/register", to: "users#new"
-  get "/logout", to: "sessions#destroy"
+  get "/logout", to: "authentications#destroy"
 
   get "/auth/:provider/callback" => "sessions/google_oauth#create"
   get "/auth/failure" => "sessions/google_oauth#destroy"
