@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   # get "/auth/:provider/callback" => "sessions/google_oauth#create"
   # get "/auth/failure" => "sessions/google_oauth#destroy"
 
+	resources :language_models, only: [:index]
+
   # root to: "assistants#index"
   # resources :assistants do
   #   resources :messages, only: [:new, :create, :edit]
