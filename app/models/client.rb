@@ -7,7 +7,7 @@ class Client < ApplicationRecord
   has_many :authentications_including_deleted, class_name: "Authentication", inverse_of: :client, dependent: :destroy
 
   enum platform: %w[ ios android web api tool ].index_by(&:to_sym)
-  enum format: %w[ desktop phone tablet tv unknown ].index_by(&:to_sym)
+  #enum format: %w[ desktop phone tablet tv unknown ].index_by(&:to_sym)
 
   has_secure_token
 
@@ -15,6 +15,14 @@ class Client < ApplicationRecord
 
   def authenticated?
     authentication.present?
+  end
+
+  def authenticate_with!(credential)
+    if authentication
+      authentication&.deleted!
+      reload_authentication
+    end
+    create_authentication credential: credential
   end
 
   def logout!

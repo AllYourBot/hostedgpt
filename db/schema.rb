@@ -68,7 +68,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
   create_table "authentications", force: :cascade do |t|
     t.bigint "credential_id", null: false
     t.bigint "client_id", null: false
-    t.string "token"
+    t.string "token" # do we need this??
     t.datetime "deleted_at", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

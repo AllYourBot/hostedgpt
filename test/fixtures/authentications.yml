@@ -1,18 +1,12 @@
-keith_password_device1:
+keith_password:
   credential: keith_password
   client: keith_desktop_browser
-  deleted_at:
-  token:
-
-keith_password_device2:
-  credential: keith_password
-  client: keith_phone_browser
   deleted_at:
   token:
 
 keith_google:
   credential: keith_google
-  client: keith_desktop_browser
+  client: keith_phone_browser
   deleted_at:
   token: xyz01.a0AXooCgvPlObOgrUgug8OYnvKRssrp0rkzssxxcpUj4Dnj_XEsQ9CBRKaawiqVIyNbl6D67NnkXdYT7uWtrj1qmWG-s0nqeT-zbCE5oT8GHO3XObhjihHzVDhJUKDGTPNqnnj0xErmeyeECzmpdn8WmoSwkn8k2LLoE-6aCgYKAfASARMSFQHGX2MiIXAIUTQ9uJrqXU9Chsj5Cg0171
 
