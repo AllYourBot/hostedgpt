@@ -38,8 +38,8 @@ class ApplicationController < ActionController::Base
 
     render json: {
       assistants: person.user.assistants.ordered.map do |a|
-				a.as_json(include: :language_model)
-			end
+        a.as_json(include: :language_model)
+      end
     }
   end
 
