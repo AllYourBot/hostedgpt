@@ -1,55 +1,31 @@
 class Authentications::GoogleOauthController < ApplicationController
-  require_unauthenticated_access
-  # skip_before_action :authenticate_user!
+  allow_unauthenticated_access
 
   def create
-    if auth[:provider] == "gmail"      && Current.user
-      credential = Current.user.credentials.find_or_create_by(type: 'GmailCredential')
-      credential.update!(email: auth[:info][:email], properties: auth[:credentials], last_authenticated_at: Time.current)
-      credential.authentications.update_all(deleted_at: Time.current)
-      credential.authentications.create!(user: Current.user, token: auth[:credentials][:token])
+    if auth[:provider] == "gmail"         && Current.user
+      Current.user.gmail_credential&.destroy
+      add_person_credentials("GmailCredential").save!
+      redirect_to(edit_settings_person_path, notice: "Saved") && return
 
-      redirect_to edit_settings_person_path, notice: "Saved"
-      return
-
-    elsif auth[:provider] == "google"   && user = User.find_by(auth_uid: auth[:uid])
-      login_as user
-      redirect_to root_path # Successfully re-logged in as an existing google user
-      return
+    elsif auth[:provider] == "google"      && credential = GoogleCredential.find_by(oauth_id: auth[:uid])
+      @person = credential.user.person
 
     elsif Feature.disabled?(:registration)
-      redirect_to root_path, alert: "Registration is disabled"
-      return
+      redirect_to(root_path, alert: "Registration is disabled") && return
 
-    elsif auth[:provider] == "google"   && user = Person.find_by(email: auth_email)&.user
-      user.auth_uid = auth[:uid]
-      user.first_name = auth[:info][:first_name]
-      user.last_name = auth[:info][:last_name]
-      @person = user.person
+    elsif auth[:provider] == "google"      && user = Person.find_by(email: auth_email)&.user
+      @person = init_for_user(user)
 
-    elsif auth[:provider] == "google"   && @person = Person.find_by(email: auth_email)
-      @person.personable_type = "User"
-      @person.personable_attributes = {
-        auth_uid: auth[:uid],
-        first_name: auth[:info][:first_name],
-        last_name: auth[:info][:last_name]
-      }
+    elsif auth[:provider] == "google"      && @person = Person.find_by(email: auth_email)
+      @person = init_for_person(@person)
 
     elsif auth[:provider] == "google"
-      @person = Person.new({
-        personable_type: "User",
-        email: auth[:info][:email],
-        personable_attributes: {
-          first_name: auth[:info][:first_name],
-          last_name: auth[:info][:last_name],
-          auth_uid: auth[:uid],
-        }
-      })
+      @person = initialize_google_person
     end
 
     if @person&.save
-      login_as @person.user
-      redirect_to root_path # Successfully logged in after initializing a google oauth user
+      login_as(@person, credential: @person.user.reload.google_credential)
+      redirect_to root_path
     else
       @person&.errors&.delete :personable
       redirect_to new_user_path, errors: @person&.errors&.full_messages
@@ -57,20 +33,64 @@ class Authentications::GoogleOauthController < ApplicationController
   end
 
   def destroy
-    if auth[:provider].in? addons
+    if Current.user
       redirect_to edit_settings_person_path, alert: "Cancelled"
-    elsif auth[:provider] == "google"
-      redirect_to root_url
+    else
+      redirect_to login_path
     end
   end
 
   private
 
   def auth
-    request.env['omniauth.auth']&.deep_symbolize_keys || {}
+    request.env["omniauth.auth"]&.deep_symbolize_keys || {}
   end
 
   def auth_email
     auth.dig(:info, :email)
   end
+
+  def init_for_user(user)
+    user.google_credential.destroy if user.google_credential
+
+    user.first_name = auth[:info][:first_name]
+    user.last_name = auth[:info][:last_name]
+    @person = user.person
+    add_person_credentials("GoogleCredential")
+  end
+
+  def init_for_person(person)
+    @person.personable_type = "User"
+    @person.personable_attributes = {
+      first_name: auth[:info][:first_name],
+      last_name: auth[:info][:last_name]
+    }
+    add_person_credentials("GoogleCredential")
+  end
+
+  def initialize_google_person
+    @person = Person.new({
+    personable_type: "User",
+      email: auth_email,
+      personable_attributes: {
+        first_name: auth[:info][:first_name],
+        last_name: auth[:info][:last_name],
+      }
+    })
+    add_person_credentials("GoogleCredential")
+  end
+
+  def add_person_credentials(type)
+    p = Current.person || @person
+    p.user.credentials.build(
+      type: type,
+      oauth_id: auth[:uid],
+      oauth_email: auth[:info][:email],
+      oauth_token: auth[:credentials][:token],
+      oauth_refresh_token: auth[:credentials][:refresh_token],
+      properties: auth[:credentials].except(:token, :refresh_token)
+    )
+    p
+  end
+
 end

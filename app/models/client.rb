@@ -6,15 +6,14 @@ class Client < ApplicationRecord
   has_one :authentication, -> { not_deleted }
   has_many :authentications_including_deleted, class_name: "Authentication", inverse_of: :client, dependent: :destroy
 
-  enum platform: %w[ ios android web api tool ].index_by(&:to_sym)
-  #enum format: %w[ desktop phone tablet tv unknown ].index_by(&:to_sym)
+  enum platform: %w[ ios android web api ].index_by(&:to_sym)
 
   has_secure_token
 
   scope :ordered, -> { order(updated_at: :asc) }
 
   def authenticated?
-    authentication.present?
+    authentication.present? && authentication.persisted?
   end
 
   def authenticate_with!(credential)
@@ -22,7 +21,7 @@ class Client < ApplicationRecord
       authentication&.deleted!
       reload_authentication
     end
-    create_authentication credential: credential
+    create_authentication! credential: credential
   end
 
   def logout!

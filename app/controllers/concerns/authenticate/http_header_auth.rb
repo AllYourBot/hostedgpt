@@ -6,7 +6,7 @@ module Authenticate::HttpHeaderAuth
     return unless Feature.http_header_authentication? && http_header_external_id.present?
 
     if credential = find_credential_by_http_header || create_credential_by_http_header
-      create_client_for credential.user.person
+      find_or_create_client_for credential.user.person
     end
   end
 

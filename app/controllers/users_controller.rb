@@ -18,10 +18,7 @@ class UsersController < ApplicationController
     @person = Person.new(person_params)
 
     if @person.save
-      client = create_client_for @person
-      client.authenticate_with! @person.user.password_credential
-      authenticate_with client
-
+      login_as(@person, credential: @person.user.password_credential)
       redirect_to root_path
     else
       @person.errors.delete :personable

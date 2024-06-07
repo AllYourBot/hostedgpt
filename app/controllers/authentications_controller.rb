@@ -12,9 +12,7 @@ class AuthenticationsController < ApplicationController
     @user = person&.personable
 
     if person.present? && @user&.password_credential&.authenticate(params[:password])
-      client = create_client_for person
-      client.authenticate_with! @user.password_credential
-      authenticate_with client
+      login_as(person, credential: @user.password_credential)
       redirect_to root_path
       return
     end

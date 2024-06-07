@@ -8,6 +8,11 @@ module Authenticate
   end
 
   class_methods do
+    def allow_unauthenticated_access(**options)
+      skip_before_action :require_authentication, **options
+      before_action :restore_authentication, **options
+    end
+
     def require_unauthenticated_access(**options)
       skip_before_action :require_authentication, **options
       before_action :restore_authentication, :redirect_signed_in_user_to_root, **options
@@ -45,8 +50,14 @@ module Authenticate
     Client.find_by(token: session_token) unless session_token.blank?
   end
 
-  def create_client_for(person)
-    Current.client || person.clients.create!(
+  def login_as(user_or_person, credential:)
+    client = find_or_create_client_for(user_or_person)
+    client.authenticate_with! credential
+    session_authenticate_with client
+  end
+
+  def find_or_create_client_for(user_or_person)
+    Current.client || user_or_person.clients.create!(
       platform: :web,
       user_agent: "",
       ip_address: "",
@@ -64,10 +75,11 @@ module Authenticate
     Current.reset
   end
 
-  def authenticate_with(client)
-    Current.initialize_with(client: client)
-    session[:client_token] = client.token
-    cookies.signed.permanent[:client_token] = { value: client.token, httponly: true, same_site: :lax }
+  def session_authenticate_with(client)
+    if Current.initialize_with(client: client)
+      session[:client_token] = client.token
+      cookies.signed.permanent[:client_token] = { value: client.token, httponly: true, same_site: :lax }
+    end
   end
 
   def post_authenticating_url

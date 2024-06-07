@@ -1,10 +1,8 @@
 class GoogleCredential < Credential
-  validates :external_id, presence: true, uniqueness: true, on: :create, if: -> { password_digest.blank? }
-  validates :google_email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }, if: -> { external_id.present? }
+  validates :oauth_id, presence: true, uniqueness: true, on: :create
+  validates :oauth_token, presence: true
+  validates :oauth_refresh_token, presence: true
+  validates :oauth_email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 
-  normalizes :google_email, with: -> email { email.downcase.strip }
-
-  def refresh_token
-    properties.dig(:refresh_token)
-  end
+  normalizes :oauth_email, with: -> email { email.downcase.strip }
 end
