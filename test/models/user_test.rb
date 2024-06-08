@@ -21,6 +21,10 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of GmailCredential, users(:keith).gmail_credential
   end
 
+  test "has an associated http_header_credential" do
+    assert_instance_of HttpHeaderCredential, users(:rob).http_header_credential
+  end
+
   test "has a last_cancelled_message but can be nil" do
     assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
     assert_nil users(:rob).last_cancelled_message

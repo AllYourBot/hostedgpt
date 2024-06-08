@@ -77,38 +77,6 @@
             | %>
           <% end %>
         </div>
-
-        <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
-          <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            Enable the ability to assign this tool
-          </div>
-          <%= form.label :authorize_google_calendar,
-            "Authorize Google Calendar",
-            class: %|
-              inline-block font-medium
-              bg-gray-100 dark:bg-gray-900 dark:text-white
-              border border-gray-400
-              rounded-lg py-3 px-5
-              cursor-pointer
-              whitespace-nowrap
-          | %>
-        </div>
-
-        <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
-          <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            Enable the ability to assign this tool
-          </div>
-          <%= form.label :authorize_google_tasks,
-            "Authorize Google Tasks",
-            class: %|
-              inline-block font-medium
-              bg-gray-100 dark:bg-gray-900 dark:text-white
-              border border-gray-400
-              rounded-lg py-3 px-5
-              cursor-pointer
-              whitespace-nowrap
-          | %>
-        </div>
       </div>
     <% end %>
 
@@ -227,5 +195,3 @@
 <% end # form %>
 
 <%= button_to "Gmail", "/auth/gmail", id: "person_authorize_gmail", method: :post, data: { turbo: false }, class: "hidden" %>
-<%= button_to "Google Calendar", "/auth/google_calendar", id: "person_authorize_google_calendar", method: :post, data: { turbo: false }, class: "hidden" %>
-<%= button_to "Google Tasks", "/auth/google_tasks", id: "person_authorize_google_tasks", method: :post, data: { turbo: false }, class: "hidden" %>
