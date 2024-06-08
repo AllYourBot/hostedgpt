@@ -62,12 +62,9 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
     assert_equal response.body, 'Unauthorized'
   end
 
-  test "should render UN-AUTHORIZED if REGISTRATION DISABLED and NO HEADERS are provided" do
+  test "should render UN-AUTHORIZED if REGISTRATION DISABLED and NO HEADERS are provided and MANUAL AUTH IS DISABLED" do
     stub_features(
-      http_header_authentication: true,
-      password_authentication: false,
-      google_authentication: false,
-      registration: false
+      http_header_authentication: true,  # note: this disables manual auth (e.g. password, google)
     ) do
       get root_url
     end
@@ -80,9 +77,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
     refute HttpHeaderCredential.find_by(auth_uid: headers[Setting.http_header_auth_uid])
 
     stub_features(
-      http_header_authentication: true,
-      password_authentication: false,
-      google_authentication: false,
+      http_header_authentication: true, # note: this disables manual auth (e.g. password, google)
       registration: false
     ) do
       get root_url, headers: headers
@@ -97,8 +92,6 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
 
     stub_features(
       http_header_authentication: true,
-      password_authentication: false,
-      google_authentication: false,
       registration: false
     ) do
       get root_url, headers: headers
