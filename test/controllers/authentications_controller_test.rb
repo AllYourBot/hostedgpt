@@ -1,6 +1,16 @@
 require "test_helper"
 
 class AuthenticationsControllerTest < ActionDispatch::IntegrationTest
+  test "logging in creates an authentication with proper details" do
+    ActionDispatch::Request.stub_any_instance(:remote_ip, "1.2.3.4") do
+      ActionDispatch::Request.stub_any_instance(:user_agent, "TestUserAgent") do
+        login_as users(:keith)
+      end
+    end
+    assert_equal "TestUserAgent", Client.last.user_agent
+    assert_equal "1.2.3.4", Client.last.ip_address
+  end
+
   test "should get redirected to login page if logged out" do
     get new_assistant_message_path(assistants(:samantha))
     assert_redirected_to login_url

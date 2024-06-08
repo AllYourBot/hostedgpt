@@ -16,8 +16,8 @@ module Authenticate::LoginLogout
   def find_or_create_client_for(user_or_person)
     Current.client || user_or_person.clients.create!(
       platform: :web,
-      user_agent: "",
-      ip_address: "",
+      user_agent: request.user_agent,
+      ip_address: request.remote_ip,
       time_zone_offset_in_minutes: 0
     )
   end
