@@ -26,7 +26,7 @@ Rails.application.routes.draw do
   get "/auth/:provider/callback" => "authentications/google_oauth#create", as: :google_oauth
   get "/auth/failure" => "authentications/google_oauth#destroy"
 
-  resources :documents  # TODO: finish this feature
+  # resources :documents  TODO: finish this feature
 
   get "/rails/active_storage/postgresql/:encoded_key/*filename" => "active_storage/postgresql#show", as: :rails_postgresql_service
   put "/rails/active_storage/postgresql/:encoded_token" => "active_storage/postgresql#update", as: :update_rails_postgresql_service
