@@ -36,7 +36,7 @@ module Authenticate
 
   def request_authentication
     session[:return_to_after_authenticating] = request.url
-    if manual_authentication_allowed?
+    if manual_login_allowed?
       redirect_to login_url
     else
       render plain: 'Unauthorized', status: :unauthorized

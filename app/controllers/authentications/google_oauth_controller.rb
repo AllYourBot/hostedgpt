@@ -92,5 +92,4 @@ class Authentications::GoogleOauthController < ApplicationController
     )
     p
   end
-
 end

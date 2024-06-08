@@ -1,12 +1,17 @@
 module Authenticate::LoginLogout
 
-  private
-
   def login_as(user_or_person, credential:)
     client = find_or_create_client_for(user_or_person)
     client.authenticate_with! credential
     session_authenticate_with client
   end
+
+  def logout_current
+    Current.client.logout!
+    reset_authentication
+  end
+
+  private
 
   def find_or_create_client_for(user_or_person)
     Current.client || user_or_person.clients.create!(
@@ -17,12 +22,6 @@ module Authenticate::LoginLogout
     )
   end
 
-  def reset_authentication
-    session.delete(:session_token)
-    cookies.delete(:client_token)
-    Current.reset
-  end
-
   def session_authenticate_with(client)
     if Current.initialize_with(client: client)
       session[:client_token] = client.token
@@ -30,7 +29,13 @@ module Authenticate::LoginLogout
     end
   end
 
-  def manual_authentication_allowed?
+  def reset_authentication
+    session.delete(:session_token)
+    cookies.delete(:client_token)
+    Current.reset
+  end
+
+  def manual_login_allowed?
     Feature.password_authentication? || Feature.google_authentication?
   end
 end

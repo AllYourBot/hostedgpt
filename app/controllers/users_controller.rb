@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   require_unauthenticated_access except: :update
 
-  before_action :ensure_manual_authentication_allowed, only: [:new, :create]
+  before_action :ensure_manual_login_allowed, only: [:new, :create]
   before_action :ensure_registration_allowed, only: [:new, :create]
   before_action :set_user, only: [:update]
 

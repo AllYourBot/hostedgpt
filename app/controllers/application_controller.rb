@@ -3,8 +3,8 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def ensure_manual_authentication_allowed
-    return if manual_authentication_allowed?
+  def ensure_manual_login_allowed
+    return if manual_login_allowed?
     head :not_found
   end
 
