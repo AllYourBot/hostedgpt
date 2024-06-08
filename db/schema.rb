@@ -89,7 +89,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
     t.string "platform", comment: "e.g. ios android web"
     t.string "user_agent"
     t.string "ip_address"
-    t.integer "time_zone_offset_in_minutes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["person_id"], name: "index_clients_on_person_id"

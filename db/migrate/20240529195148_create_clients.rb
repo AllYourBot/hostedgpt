@@ -6,7 +6,6 @@ class CreateClients < ActiveRecord::Migration[7.1]
       t.string :platform, comment: "e.g. ios android web"
       t.string :user_agent
       t.string :ip_address
-      t.integer :time_zone_offset_in_minutes
 
       t.timestamps
     end

@@ -18,7 +18,6 @@ module Authenticate::LoginLogout
       platform: :web,
       user_agent: request.user_agent,
       ip_address: request.remote_ip,
-      time_zone_offset_in_minutes: 0
     )
   end
 

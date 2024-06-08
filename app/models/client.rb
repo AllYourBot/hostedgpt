@@ -1,6 +1,4 @@
 class Client < ApplicationRecord
-  include TimeZoneable
-
   belongs_to :person
 
   has_one :authentication, -> { not_deleted }
