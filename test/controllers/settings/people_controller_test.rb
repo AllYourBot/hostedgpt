@@ -3,16 +3,40 @@ require "test_helper"
 class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
   setup do
     @person = people(:keith_registered)
+    @user = @person.user
     login_as @person
   end
 
-  test "should get edit" do
+  test "should get edit with password field VISIBLE" do
+    assert @user.password_credential.present?
     get edit_settings_person_url
     assert_response :success
+    assert_match "Password", response.body
   end
 
-  test "should update user" do
+  test "should get edit with password field HIDDEN" do
+    ensure_authed_without_password!
+    assert_response :success
+    assert_no_match "Password", response.body
+  end
+
+  test "should update user who HAS a password" do
     params = person_params
+    assert params["personable_attributes"]["credentials_attributes"].present?
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+    assert_nil flash[:error]
+
+    assert_equal params.slice("email"), @person.reload.slice(:email)
+    assert_equal params["personable_attributes"].slice("id", "first_name", "last_name", "openai_key").values,
+      @person.user.slice(:id, :first_name, :last_name, :openai_key).values
+  end
+
+  test "should update user who DOES NOT have a password" do
+    ensure_authed_without_password!
+    params = person_params
+    refute params["personable_attributes"]["credentials_attributes"].present?
 
     patch settings_person_url, params: { person: params }
     assert_redirected_to edit_settings_person_url
@@ -59,10 +83,16 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     params["personable_attributes"] = {}
     @person.user.slice(:first_name, :last_name, :openai_key).each { |k,v| params["personable_attributes"][k] = "#{v}-2" }
     params["personable_attributes"]["id"] = @person.user.id
+
     params["personable_attributes"]["credentials_attributes"] = {
       @person.user.password_credential.id => @person.user.password_credential.slice(:type).merge(password: "secret")
-    }
+    } if @person.user.password_credential.present?
 
     params
+  end
+
+  def ensure_authed_without_password!
+    Client.last.authentication.update!(credential: credentials(:keith_google)) # ensure they're auth'd without password
+    credentials(:keith_password).destroy
   end
 end
