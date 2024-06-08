@@ -3,10 +3,9 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def ensure_user_authentication_allowed
-    if Feature.disabled?(:password_authentication) && Feature.disabled?(:google_authentication)
-      head :not_found
-    end
+  def ensure_manual_authentication_allowed
+    return if manual_authentication_allowed?
+    head :not_found
   end
 
   def strip_all_but_first_credential(h)

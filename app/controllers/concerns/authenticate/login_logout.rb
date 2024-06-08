@@ -29,4 +29,8 @@ module Authenticate::LoginLogout
       cookies.signed.permanent[:client_token] = { value: client.token, httponly: true, same_site: :lax }
     end
   end
+
+  def manual_authentication_allowed?
+    Feature.password_authentication? || Feature.google_authentication?
+  end
 end

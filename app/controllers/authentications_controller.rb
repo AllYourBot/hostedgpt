@@ -1,6 +1,6 @@
 class AuthenticationsController < ApplicationController
   require_unauthenticated_access only: [ :new, :create ]
-  before_action :ensure_user_authentication_allowed, except: :destroy
+  before_action :ensure_manual_authentication_allowed, except: :destroy
 
   layout "public"
 
