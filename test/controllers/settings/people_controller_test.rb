@@ -83,6 +83,7 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     params["personable_attributes"] = {}
     @person.user.slice(:first_name, :last_name, :openai_key).each { |k,v| params["personable_attributes"][k] = "#{v}-2" }
     params["personable_attributes"]["id"] = @person.user.id
+    params["personable_attributes"]["credentials_attributes"] = {}
 
     params["personable_attributes"]["credentials_attributes"] = {
       @person.user.password_credential.id => @person.user.password_credential.slice(:type).merge(password: "secret")

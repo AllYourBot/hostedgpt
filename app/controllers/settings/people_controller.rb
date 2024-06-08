@@ -20,6 +20,15 @@ class Settings::PeopleController < Settings::ApplicationController
       credentials_attributes: [ :type, :password ]
     ]).to_h
     strip_all_but_first_credential(h)
+    delete_blank_password_credential(h)
+    h
+  end
+
+  def delete_blank_password_credential(h)
+    if h.dig(:personable_attributes, :credentials_attributes, :password, 0).blank?
+      h[:personable_attributes][:credentials_attributes] = {}
+    end
+    h
   end
 
   def check_personable_id
