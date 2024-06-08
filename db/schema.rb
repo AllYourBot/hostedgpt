@@ -115,7 +115,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
     t.bigint "user_id", null: false
     t.string "type"
     t.string "password_digest"
-    t.string "oauth_id"
+    t.string "external_id", comment: "Credential models will alias this for their purpose (e.g. Google and HTTP Header)"
     t.string "oauth_email"
     t.string "oauth_token"
     t.string "oauth_refresh_token"
@@ -123,7 +123,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
     t.datetime "last_authenticated_at", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["oauth_id"], name: "index_credentials_on_oauth_id"
+    t.index ["external_id"], name: "index_credentials_on_external_id"
     t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 

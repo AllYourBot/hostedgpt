@@ -1,8 +1,19 @@
 require "test_helper"
 
 class PasswordCredentialTest < ActiveSupport::TestCase
-  test "needs to have a password" do
-    minimum_credential = users(:rob).credentials.new(type: "PasswordCredential", password: "abc123")
+  # See credential_test for tests in common to all credentials
+
+  setup do
+    @user = users(:rob)
+  end
+
+  test "simple create woroks" do
+    minimum_credential = @user.credentials.new(details)
+    assert minimum_credential.save
+  end
+
+  test "password is required" do
+    minimum_credential = @user.credentials.new(details)
     assert minimum_credential.valid?, "We were unable to verify the minimum password credential"
 
     minimum_credential.password = nil
@@ -22,7 +33,7 @@ class PasswordCredentialTest < ActiveSupport::TestCase
   end
 
   test "passwords must be 6 characters or longer" do
-    credential = users(:rob).credentials.new(type: "PasswordCredential", password: "12345")
+    credential = @user.credentials.new(details.merge(password: "12345"))
     refute credential.valid?
 
     credential.password += "6"
@@ -31,5 +42,12 @@ class PasswordCredentialTest < ActiveSupport::TestCase
 
   test "it can validate a password" do
     assert credentials(:keith_password).authenticate("secret")
+  end
+
+  def details
+    {
+      type: "PasswordCredential",
+      password: "password"
+    }
   end
 end
