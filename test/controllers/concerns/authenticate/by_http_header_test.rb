@@ -62,6 +62,19 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
     assert_equal response.body, 'Unauthorized'
   end
 
+  test "should render UN-AUTHORIZED if REGISTRATION DISABLED and NO HEADERS are provided" do
+    stub_features(
+      http_header_authentication: true,
+      password_authentication: false,
+      google_authentication: false,
+      registration: false
+    ) do
+      get root_url
+    end
+    assert_response :unauthorized
+    assert_equal response.body, 'Unauthorized'
+  end
+
   test "should render UN-AUTHORIZED if REGISTRATION DISABLED and NEW uid" do
     headers = new_http_auth_user
     refute HttpHeaderCredential.find_by(auth_uid: headers[Setting.http_header_auth_uid])
