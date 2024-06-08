@@ -29,7 +29,8 @@ class AutotitleConversationJob < ApplicationJob
     <<~END
       You extract a 2-4 word topic from text. I will give the text of a chat. You reply with the topic of this chat,
       but summarize the topic in 2-4 words. Even though it's not a complete sentence, capitalize the first letter of
-      the first word unless it's some odd anomaly like "iPhone".
+      the first word unless it's some odd anomaly like "iPhone". Make sure that your answer matches the language of
+      the text of the chat tht I give you.
 
       Example:
       ```
