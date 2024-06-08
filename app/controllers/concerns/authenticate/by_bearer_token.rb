@@ -1,4 +1,4 @@
-module Authenticate::BearerToken
+module Authenticate::ByBearerToken
 
   private
 

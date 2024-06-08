@@ -1,13 +1,19 @@
 require "test_helper"
 
 class AuthenticationsControllerTest < ActionDispatch::IntegrationTest
-  test "should get redirected if already logged in" do
+  test "should get redirected to login page if logged out" do
+    get new_assistant_message_path(assistants(:samantha))
+    assert_redirected_to login_url
+  end
+
+  test "should get redirected AWAY FROM login page if already logged in" do
     login_as users(:keith)
     get login_path
     assert_response :redirect
+    assert_redirected_to root_url
   end
 
-  test "should get new if not logged in" do
+  test "should GET TO login page if not logged in" do
     get login_path
     assert_response :success
   end

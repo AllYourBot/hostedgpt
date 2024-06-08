@@ -1,30 +1,13 @@
 require 'test_helper'
 
 class AuthenticateTest < ActionDispatch::IntegrationTest
+  # The user-initiated login flows (e.g. password and google oauth)
+  # are in test/controllers/authentications_controller_test
+  # and in test/controllers/authentications/*
+
   setup do
     @keith = users(:keith)
     @rob = users(:rob)
-  end
-
-  test "Session-based: should login user via session" do
-    stub_features(http_header_authentication: false) do
-      login_as(@keith)
-
-      get root_url
-      assert_response :redirect
-      assert_redirected_to new_assistant_message_path(@keith.assistants.ordered.first)
-      assert_logged_in(@keith)
-    end
-  end
-
-  test "Session-based: should redirect to login if not authenticated" do
-    stub_features(http_header_authentication: false) do
-      get root_url
-      assert_response :redirect
-      assert_redirected_to login_path
-      follow_redirect!
-      assert_equal flash[:notice], 'Please login to proceed'
-    end
   end
 
   test "HTTP header-based: should login user via HTTP header and redirect" do
@@ -50,7 +33,7 @@ class AuthenticateTest < ActionDispatch::IntegrationTest
 
       new_user = User.find_by(auth_uid: auth_uid)
       assert new_user.present?
-      assert_equal new_user.person.email, email
+      assert_equal new_user.email, email
 
       assert_response :redirect
       assert_redirected_to new_assistant_message_path(new_user.assistants.ordered.first)
