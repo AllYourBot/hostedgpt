@@ -143,24 +143,3 @@ claude_instant_1_2:
   name: claude-instant-1.2
   description: Claude Instant 1.2
   supports_images: false
-
-
-
-
-#_claude_3_sonnet:
-#     position: 18
-#     name: claude-3-sonnet-20240229
-#     supports_images: true
-#     description: claude-3-sonnet-20240229 from fixtures
-
-#_claude_3_opus:
-#     position: 17
-#     supports_images: true
-#     name: claude-3-opus-20240229
-#     description: claude-3-opus-20240229 from fixtures
-
-#_gpt_3_5_turbo_0125:
-#     position: 12
-#     name: gpt-3.5-turbo
-#     description: gpt-3.5-turbo from fixtures
-#     supports_images: false
