@@ -29,7 +29,7 @@ module Authenticate::LoginLogout
   end
 
   def reset_authentication
-    session.delete(:session_token)
+    session.delete(:client_token)
     cookies.delete(:client_token)
     Current.reset
   end
