@@ -55,7 +55,7 @@ class UsersController < ApplicationController
     h = params.require(:person).permit(:email, :personable_type, personable_attributes: [
       :name, credentials_attributes: [ :type, :password ]
     ]).to_h
-    strip_all_but_first_credential(h)
+    format_and_strip_all_but_first_valid_credential(h)
   end
 
   def user_params

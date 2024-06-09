@@ -17,18 +17,9 @@ class Settings::PeopleController < Settings::ApplicationController
   def person_params
     h = params.require(:person).permit(:email, personable_attributes: [
       :id, :first_name, :last_name, :password, :openai_key, :anthropic_key, preferences: [:dark_mode],
-      credentials_attributes: [ :type, :password ]
+      credentials_attributes: [ :id, :type, :password ]
     ]).to_h
-    strip_all_but_first_credential(h)
-    delete_blank_password_credential(h)
-    h
-  end
-
-  def delete_blank_password_credential(h)
-    if h.dig(:personable_attributes, :credentials_attributes, :password, 0).blank?
-      h[:personable_attributes][:credentials_attributes] = {}
-    end
-    h
+    format_and_strip_all_but_first_valid_credential(h)
   end
 
   def check_personable_id

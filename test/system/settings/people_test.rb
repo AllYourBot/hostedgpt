@@ -35,7 +35,7 @@ class Settings::PeopleTest < ApplicationSystemTestCase
     assert_equal attr.except(:email), @person.user.slice(:first_name, :last_name, :openai_key, :anthropic_key).symbolize_keys
   end
 
-    test "should update Person without setting the password" do
+  test "should update Person without setting the password" do
     attr = {
       email: @person.email+"-2",
       first_name: @person.user.first_name+"-2",
