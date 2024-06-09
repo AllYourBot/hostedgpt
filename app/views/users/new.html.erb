@@ -1,10 +1,8 @@
-<div class="flex flex-col items-center justify-center w-full h-screen space-y-4">
-
-   <div class="p-3 bg-white border border-gray-100 rounded-full">
+<div class="flex flex-col items-center justify-center w-full h-full space-y-4">
+  <div class="p-3 bg-white border border-gray-100 rounded-full">
     <%= image_tag("logo.svg", width: "24", height: "24", class: "text-gray-950") %>
   </div>
-
-  <h2 class="text-3xl font-semibold">Create your account</h2>
+  <h2 class='text-3xl font-semibold'>Create your account</h2>
 
   <% if @person.errors.any? %>
     <div id="error_explanation" class="px-3 py-2 mt-3 font-medium text-red-500 rounded-lg bg-red-50">
