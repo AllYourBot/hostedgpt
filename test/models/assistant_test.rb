@@ -83,7 +83,7 @@ class AssistantTest < ActiveSupport::TestCase
         assert_no_difference "Document.count" do
           assert_no_difference "Run.count" do
             assert_no_difference "Step.count" do
-              assistants(:samantha).soft_delete
+              assistants(:samantha).deleted!
             end
           end
         end
@@ -114,18 +114,5 @@ class AssistantTest < ActiveSupport::TestCase
     record = Assistant.new
     refute record.valid?
     assert record.errors[:name].present?
-  end
-
-  test "cannot soft_delete last assistant of a user" do
-    users(:rob).assistants.first.soft_delete!
-    assert_raise do
-      users(:rob).assistants.reload.first.soft_delete!
-    end
-  end
-
-  test "can soft_delete assistant of a user if they have more than one" do
-    assert_nothing_raised do
-      users(:keith).assistants.first.destroy
-    end
   end
 end

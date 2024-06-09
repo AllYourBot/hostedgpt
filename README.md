@@ -162,8 +162,6 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
      - **Authorized Redirect URIs:** Add these paths but replace the base URL with yours:
        - `https://hostedgpt.example.com/auth/google/callback`
        - `https://hostedgpt.example.com/auth/gmail/callback`
-       - `https://hostedgpt.example.com/auth/google_tasks/callback`
-       - `https://hostedgpt.example.com/auth/google_calendar/callback`
    - Click "Create"
 
 4. **Set Environment Variables:**

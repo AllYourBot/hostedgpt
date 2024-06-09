@@ -1,6 +1,7 @@
 class Settings::ApplicationController < ApplicationController
-  layout "settings"
   before_action :set_settings_menu
+
+  layout "settings"
 
   private
 

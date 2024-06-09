@@ -7,7 +7,7 @@ class Feature
     end
 
     def features_hash
-      defined?(@@features_hash) && !@@features_hash.nil? ? @@features_hash : nil
+      defined?(@@features_hash) && @@features_hash.present? ? @@features_hash : nil
     end
 
     def features_hash=(features)
