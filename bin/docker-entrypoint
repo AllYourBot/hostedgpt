@@ -10,6 +10,9 @@ else
     export RAILS_ENV=test
     echo "Running db:prepare"
     ./bin/rails db:prepare
+  elif echo "${1}" | grep -q "rails$" && [ "${2}" == "server" ]; then
+    echo "Running db:prepare"
+    ./bin/rails db:prepare
   else
     echo "Skipping db:prepare"
   fi

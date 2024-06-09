@@ -118,13 +118,13 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def set_response_error
-    @message.content_text = "(Received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
+    @message.content_text = "(I received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
       "experiencing trouble. Try again or ensure your API key is valid. You can change your API key by clicking your Profile in the bottom " +
       "left and then settings.)"
   end
 
   def set_unexpected_error(msg)
-    @message.content_text = "(Received a unexpected response from the API after retrying 3 times. The AI servers may be experiencing trouble. " +
+    @message.content_text = "(I received a unexpected response from the API after retrying 3 times. The AI servers may be experiencing trouble. " +
       "Try again later or if you keep getting this error ensure your API key is valid and you haven't run out of funds with your AI service.\n\n" +
       "#{msg}\n\nIt's also helpful if you report this to the app developers at: https://github.com/allyourbot/hostedgpt/discussions)"
   end
@@ -133,7 +133,7 @@ class GetNextAIMessageJob < ApplicationJob
     service = ai_backend.to_s.split('::').second
     url = service == 'OpenAI' ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
 
-    @message.content_text = "(Received a quota error. Your API key is probably valid but you may need to adding billing details. You are using " +
+    @message.content_text = "(I received a quota error. Your API key is probably valid but you may need to adding billing details. You are using " +
       "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
   end
 

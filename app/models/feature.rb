@@ -7,7 +7,7 @@ class Feature
     end
 
     def features_hash
-      defined?(@@features_hash) && !@@features_hash.nil? ? @@features_hash : nil
+      defined?(@@features_hash) && @@features_hash.present? ? @@features_hash : nil
     end
 
     def features_hash=(features)
@@ -27,9 +27,11 @@ class Feature
     end
 
     def enabled?(feature)
-      ActiveModel::Type::Boolean.new.cast(
-        features.fetch(feature&.to_sym, false)
-      )
+      begin
+        ActiveModel::Type::Boolean.new.cast(features.fetch(feature&.to_sym))
+      rescue KeyError
+        raise KeyError, "You attempted to reference the Feature '#{feature}' but this is not configured within options.yml. Did you typo a feature name?"
+      end
     end
 
     def disabled?(feature)

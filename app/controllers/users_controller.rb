@@ -1,23 +1,24 @@
 class UsersController < ApplicationController
-  include Accessible
+  require_unauthenticated_access except: :update
+
+  before_action :ensure_manual_login_allowed, only: [:new, :create]
+  before_action :ensure_registration_allowed, only: [:new, :create]
+  before_action :set_user, only: [:update]
 
   layout "public"
-
-  before_action :ensure_registration, only: [:new, :create]
-  before_action :set_user, only: [:update]
 
   def new
     @person = Person.new
     @person.personable = User.new
 
-    flash[:errors]&.each { |error| @person.errors.add(:base, error) }
+    prettify_flash_error_messages
   end
 
   def create
     @person = Person.new(person_params)
 
     if @person.save
-      login_as @person.user
+      login_as(@person, credential: @person.user.password_credential)
       redirect_to root_path
     else
       @person.errors.delete :personable
@@ -36,21 +37,28 @@ class UsersController < ApplicationController
 
   private
 
+  def ensure_registration_allowed
+    if Feature.disabled?(:registration)
+      head :not_found
+    end
+  end
+
   def set_user
     @user = Current.user if params[:id].to_i == Current.user.id
   end
 
+  def prettify_flash_error_messages
+    flash[:errors]&.each { |error| @person.errors.add(:base, error) }
+  end
+
   def person_params
-    params.require(:person).permit(:email, :personable_type, personable_attributes: [
-      :name, :password
-    ])
+    h = params.require(:person).permit(:email, :personable_type, personable_attributes: [
+      :name, credentials_attributes: [ :type, :password ]
+    ]).to_h
+    format_and_strip_all_but_first_valid_credential(h)
   end
 
   def user_params
     params.require(:user).permit(preferences: [:nav_closed, :dark_mode])
-  end
-
-  def ensure_registration
-    redirect_to root_path unless Feature.registration?
   end
 end
