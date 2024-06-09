@@ -45,11 +45,11 @@ module.exports = {
   },
   darkMode: [
     'variant',
-    [
-      '@media (prefers-color-scheme: dark) { &:is(.system *) }',
-      '&:is(.dark *)',
-    ],
+    ['@media (prefers-color-scheme: dark) { &:is(.system *) }', '&:is(.dark *)'],
   ],
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/aspect-ratio'),
