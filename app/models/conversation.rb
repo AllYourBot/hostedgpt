@@ -7,7 +7,7 @@ class Conversation < ApplicationRecord
   has_many :messages, dependent: :destroy
   has_many :runs, dependent: :destroy
   has_many :steps, dependent: :destroy
-  belongs_to :last_assistant_message, class_name: "Message", optional: true
+  belongs_to :last_assistant_message, class_name: "Message", inverse_of: :conversation, optional: true
 
   after_touch :set_title_async, if: -> { title.blank? && messages.count >= 2 }
 

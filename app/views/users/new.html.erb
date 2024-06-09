@@ -10,7 +10,7 @@
     <div id="error_explanation" class="px-3 py-2 mt-3 font-medium text-red-500 rounded-lg bg-red-50">
       <ul>
         <% @person.errors.full_messages.reverse.each do |error| # We want the User error first %>
-          <li><%= error.gsub('Personable ','').capitalize %><%# Cleanup "Personable password is ..." %></li>
+          <li><%= error.gsub(/Personable |credentials /, '').capitalize %><%# Cleanup "Personable password is ..." %></li>
         <% end %>
       </ul>
     </div>
@@ -59,33 +59,36 @@
       <% end %>
 
       <%= f.fields_for :personable_attributes, @person.personable do |user_fields| %>
-          <%= user_fields.label :password, class: "input input-bordered flex items-center justify-between" do %>
+        <%= user_fields.fields_for :credentials_attributes, @person.personable.credentials.build, index: "0" do |credential_fields| %>
+          <%= credential_fields.hidden_field :type, value: "PasswordCredential" %>
+          <%= credential_fields.label :password, class: "input input-bordered flex items-center justify-between" do %>
             <span>Password <span class="">*</span></span>
-            <%= user_fields.password_field :password,
+            <%= credential_fields.password_field :password,
               placeholder: "Password",
               class: "w-44 border-0 dark:text-black",
               data: { action: "focus->transition#toggleClassOn" }
             %>
           <% end %>
+        <% end %>
 
-          <div class="
-              overflow-hidden
-              <%= @person.errors.any? ? "max-h-40" : "max-h-0" %>
-              flex flex-col
-              transition-all duration-100 ease-in
-              space-y-4
-            "
-            data-transition-target="transitionable"
-          >
+        <div class="
+            overflow-hidden
+            <%= @person.errors.any? ? "max-h-40" : "max-h-0" %>
+            flex flex-col
+            transition-all duration-100 ease-in
+            space-y-4
+          "
+          data-transition-target="transitionable"
+        >
 
-            <%= user_fields.label :name, class: "input input-bordered flex items-center justify-between" do %>
-              <span>Full Name <span class="">*</span></span>
-              <%= user_fields.text_field :name,
-                placeholder: "First & Last name",
-                class: "w-44 border-0 dark:text-black"
-              %>
-            <% end %>
-          </div>
+          <%= user_fields.label :name, class: "input input-bordered flex items-center justify-between" do %>
+            <span>Full Name <span class="">*</span></span>
+            <%= user_fields.text_field :name,
+              placeholder: "First & Last name",
+              class: "w-44 border-0 dark:text-black"
+            %>
+          <% end %>
+        </div>
       <% end %>
       <%= f.submit "Sign Up",
         class: %|
