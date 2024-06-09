@@ -1,47 +1,145 @@
+# NOTE: This is not just test, this fixture is also loaded when a new production environment is set up
+
 gpt_best:
-    position: 1
-    supports_images: true
-    name: gpt-best
-    description: gpt-best from fixtures
+  position: 1
+  name: gpt-best
+  description: Best OpenAI Model
+  supports_images: true
 
 claude_best:
-    position: 2
-    name: best-claude
-    supports_images: true
-    description: claude-best from fixtures
+  position: 2
+  name: claude-best
+  description: Best Anthropic Model
+  supports_images: true
 
 gpt_4o:
-    position: 3
-    name: gpt-4o
-    supports_images: true
-    description: gpt-4ot from fixtures
+  position: 3
+  name: gpt-4o
+  description: GPT-4o (latest)
+  supports_images: true
 
-gpt_3_5_turbo:
-    position: 4
-    name: gpt-3.5-turbo
-    supports_images: false
-    description: gpt-3.5-turbo from fixtures
+gpt_4o_2024_05_13:
+  position: 4
+  name: gpt-4o-2024-05-13
+  description: GPT-4o Omni Multimodal (2024-05-13)
+  supports_images: true
 
-claude_3_sonnet:
-    position: 18
-    name: claude-3-sonnet-20240229
-    supports_images: true
-    description: claude-3-sonnet-20240229 from fixtures
+gpt_4_turbo:
+  position: 5
+  name: gpt-4-turbo
+  description: GPT-4 Turbo with Vision (latest)
+  supports_images: true
 
-claude_3_opus:
-    position: 17
-    supports_images: true
-    name: claude-3-opus-20240229
-    description: claude-3-opus-20240229 from fixtures
+gpt_4_turbo_2024_04_09:
+  position: 6
+  name: gpt-4-turbo-2024-04-09
+  description: GPT-4 Turbo with Vision (2024-04-09)
+  supports_images: true
+
+gpt_4_turbo_preview:
+  position: 7
+  name: gpt-4-turbo-preview
+  description: GPT-4 Turbo Preview
+  supports_images: false
+
+gpt_4_0125_preview:
+  position: 8
+  name: gpt-4-0125-preview
+  description: GPT-4 Turbo Preview (2024-01-25)
+  supports_images: false
+
+gpt_4_1106_preview:
+  position: 9
+  name: gpt-4-1106-preview
+  description: GPT-4 Turbo Preview (2023-11-06)
+  supports_images: false
+
+gpt_4_vision_preview:
+  position: 10
+  name: gpt-4-vision-preview
+  description: GPT-4 Turbo with Vision Preview (2023-11-06)
+  supports_images: true
+
+gpt_4_1106_vision_preview:
+  position: 11
+  name: gpt-4-1106-vision-preview
+  description: GPT-4 Turbo with Vision Preview (2023-11-06)
+  supports_images: true
 
 gpt_4:
-    position: 3
-    supports_images: true
-    name: gpt-4
-    description: gpt-4 from fixtures
+  position: 12
+  name: gpt-4
+  description: GPT-4 (latest)
+  supports_images: false
+
+gpt_4_0613:
+  position: 13
+  name: gpt-4-0613
+  description: GPT-4 Snapshot improved function calling (2023-06-13)
+  supports_images: false
+
+gpt_3_5_turbo:
+  position: 14
+  name: gpt-3.5-turbo
+  description: GPT-3.5 Turbo (latest)
+  supports_images: false
+
+gpt_3_5_turbo_16k_0613:
+  position: 15
+  name: gpt-3.5-turbo-16k-0613
+  description: GPT-3.5 Turbo (2022-06-13)
+  supports_images: false
 
 gpt_3_5_turbo_0125:
-    position: 12
-    name: gpt-3.5-turbo
-    description: gpt-3.5-turbo from fixtures
-    supports_images: false
+  position: 16
+  name: gpt-3.5-turbo-0125
+  description: GPT-3.5 Turbo (2022-01-25)
+  supports_images: false
+
+gpt_3_5_turbo_1106:
+  position: 17
+  name: gpt-3.5-turbo-1106
+  description: GPT-3.5 Turbo (2022-11-06)
+  supports_images: false
+
+gpt_3_5_turbo_instruct:
+  position: 18
+  name: gpt-3.5-turbo-instruct
+  description: GPT-3.5 Turbo Instruct
+  supports_images: false
+
+claude_3_opus_20240229:
+  position: 19
+  name: claude-3-opus-20240229
+  description: Claude 3 Opus (2024-02-29)
+  supports_images: true
+
+claude_3_sonnet_20240229:
+  position: 20
+  name: claude-3-sonnet-20240229
+  description: Claude 3 Sonnet (2024-02-29)
+  supports_images: true
+
+claude_3_haiku_20240307:
+  position: 21
+  name: claude-3-haiku-20240307
+  description: Claude 3 Haiku (2024-03-07)
+  supports_images: true
+
+claude_2_1:
+  position: 22
+  name: claude-2.1
+  description: Claude 2.1
+  supports_images: false
+
+claude_2_0:
+  position: 23
+  name: claude-2.0
+  description: Claude 2.0
+  supports_images: false
+
+claude_instant_1_2:
+  position: 24
+  name: claude-instant-1.2
+  description: Claude Instant 1.2
+  supports_images: false

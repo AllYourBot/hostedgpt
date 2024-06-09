@@ -1,8 +1,8 @@
-# We don't care about large or not
+# We don"t care about large or not
 class LanguageModel < ApplicationRecord
   BEST_MODELS = {
-    'gpt-best' => 'gpt-4o-2024-05-13',
-    'claude-best' => 'claude-3-opus-20240229'
+    "gpt-best" => "gpt-4o-2024-05-13",
+    "claude-best" => "claude-3-opus-20240229"
   }
 
   scope :ordered, -> { order(:position) }
@@ -18,7 +18,7 @@ class LanguageModel < ApplicationRecord
   end
 
   def ai_backend
-    if name.starts_with?('gpt-')
+    if name.starts_with?("gpt-")
       AIBackend::OpenAI
     else
       AIBackend::Anthropic

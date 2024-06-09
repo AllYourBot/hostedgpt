@@ -1,13 +1,11 @@
 require "active_record/fixtures"
 
-if Rails.env.development?
+puts "loading fixtures"
 
-  puts "loading fixtures"
-  order_to_load_fixtures = %w[people users tombstones language_models assistants conversations runs messages steps ]
+order_to_load_fixtures = %w[language_models]
 
-  ActiveRecord::Base.transaction do
-    ActiveRecord::Base.connection.disable_referential_integrity do
-      ActiveRecord::FixtureSet.create_fixtures(Rails.root.join('test', 'fixtures'), order_to_load_fixtures)
-    end
+ActiveRecord::Base.transaction do
+  ActiveRecord::Base.connection.disable_referential_integrity do
+    ActiveRecord::FixtureSet.create_fixtures(Rails.root.join('test', 'fixtures'), order_to_load_fixtures)
   end
 end

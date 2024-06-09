@@ -43,16 +43,16 @@ class AssistantTest < ActiveSupport::TestCase
     assert_nothing_raised do
       a = Assistant.create!(
         user: users(:keith),
-        language_model: language_models(:gpt_4),
+        language_model: language_models(:gpt_4o),
         name: 'abc'
       )
     end
   end
 
   test "assert execption occures when external ids are not unique" do
-    Assistant.create!(user: users(:keith), language_model: language_models(:gpt_4), name: "new", external_id: "1")
+    Assistant.create!(user: users(:keith), language_model: language_models(:gpt_4o), name: "new", external_id: "1")
     assert_raise ActiveRecord::RecordNotUnique do
-      Assistant.create!(user: users(:rob), language_model: language_models(:gpt_4), name: "new", external_id: "1")
+      Assistant.create!(user: users(:rob), language_model: language_models(:gpt_4o), name: "new", external_id: "1")
     end
   end
 
