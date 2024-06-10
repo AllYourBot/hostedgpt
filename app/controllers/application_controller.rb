@@ -19,6 +19,9 @@ class ApplicationController < ActionController::Base
     # very basic security for now
     return head(:forbidden) unless ENV['ALLOWED_REQUEST_ORIGINS'].to_s.split(',').include?(request.origin)
 
+		reset_session
+		Current.reset
+
     uuid = password = SecureRandom.uuid
     person = Person.create!(
       personable_type: 'User',
@@ -35,7 +38,7 @@ class ApplicationController < ActionController::Base
     person.user.assistants.each do |assistant|
       assistant.update!(instructions: INSTRUCTIONS)
     end
-    reset_session
+
     login_as(person, credential: person.user.password_credential)
 
     render json: {
