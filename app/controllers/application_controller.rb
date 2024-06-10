@@ -19,16 +19,17 @@ class ApplicationController < ActionController::Base
     # very basic security for now
     return head(:forbidden) unless ENV['ALLOWED_REQUEST_ORIGINS'].to_s.split(',').include?(request.origin)
 
+    uuid = password = SecureRandom.uuid
     person = Person.create!(
       personable_type: 'User',
       personable_attributes: {
         name: 'Student User',
-        credentials_attributes: {
-          type: 'PasswordCredential',
-          password: (@password = SecureRandom.uuid)
-        }
       },
-      email: "#{@password}@hostedgpt.soomo"
+      email: "#{uuid}@hostedgpt.soomo"
+    )
+    person.user.create_password_credential!(
+      type: 'PasswordCredential',
+      password: password
     )
     person.user.assistants.create!(name: "GPT-4", language_model: LanguageModel.find_by(name: 'gpt-4-turbo'))
     person.user.assistants.each do |assistant|
