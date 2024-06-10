@@ -3,6 +3,7 @@ class Toolbox < SDK
     [
       Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
+      Toolbox::Dalle
     ]
   end
 
