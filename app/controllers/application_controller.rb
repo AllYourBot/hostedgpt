@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   include Authenticate
 
-  skip_before_action :authenticate_user!, only: [:launch]
+  allow_unauthenticated_access only: [:launch]
   skip_before_action :verify_authenticity_token, only: [:launch]
 
   INSTRUCTIONS = <<~INSTRUCTIONS
