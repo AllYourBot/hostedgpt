@@ -49,7 +49,7 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def initialize(user, assistant, conversation, message)
-		openai_key = user.openai_key || ENV["DEFAULT_OPENAI_KEY"]
+    openai_key = user.openai_key || ENV["DEFAULT_OPENAI_KEY"]
     raise ::OpenAI::ConfigurationError if openai_key.blank?
     begin
       @client = self.class.client.new(access_token: openai_key)
