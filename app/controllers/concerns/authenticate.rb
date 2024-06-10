@@ -1,72 +1,57 @@
 module Authenticate
   extend ActiveSupport::Concern
+  include LoginLogout
+  include ByCookie, ByHttpHeader
 
   included do
-    before_action :ensure_current_user
-    before_action :authenticate_user!
+    before_action :require_authentication
+    helper_method :signed_in?
   end
 
-  def login_as(user)
-    return if Feature.http_header_authentication?
-
-    reset_session
-    session[:current_user_id] = user.id
-  end
-
-  def ensure_current_user
-    return Current.user unless Current.user.nil?
-
-    if Feature.http_header_authentication?
-      find_current_user_based_on_http_header
-    else
-      find_current_user_based_on_session
+  class_methods do
+    def allow_unauthenticated_access(**options)
+      skip_before_action :require_authentication, **options
+      before_action :restore_authentication, **options
     end
 
-    Current.user
-  end
-
-  def user_signed_in?
-    ensure_current_user.present?
-  end
-
-  def authenticate_user!
-    return if ensure_current_user
-
-    if Feature.http_header_authentication?
-      render plain: 'Unauthorized', status: :unauthorized
-    else
-      redirect_to login_path, notice: 'Please login to proceed'
+    def require_unauthenticated_access(**options)
+      skip_before_action :require_authentication, **options
+      before_action :restore_authentication, :redirect_signed_in_user_to_root, **options
     end
   end
 
   private
 
-  def find_current_user_based_on_session
-    Current.user = User.find_by(id: session[:current_user_id])
-    Current.person = Current.user&.person
-    Current.user = nil if Current.person.nil?
+  def signed_in?
+    Current.user.present?
   end
 
-  def find_current_user_based_on_http_header
-    if request.headers[Setting.http_header_auth_uid].blank?
-      Rails.logger.error "HTTP header #{Setting.http_header_auth_uid} is missing"
-      Current.person = Current.user = nil
-      return
-    end
-
-    Current.user = user_find_or_create_by_auth_uid
-    Current.person = Current.user&.person
-    Current.user = nil if Current.person.nil?
+  def require_authentication
+    restore_authentication || request_authentication
   end
 
-  def user_find_or_create_by_auth_uid
-    if Feature.registration?
-      User.find_or_create_by!(auth_uid: request.headers[Setting.http_header_auth_uid]) do |user|
-        user.build_person(email: request.headers[Setting.http_header_auth_email])
-        user.name = request.headers[Setting.authentication_http_header_name] || person.email
-      end
+  def restore_authentication
+    Current.initialize_with(client: find_client)
+  end
+
+  def request_authentication
+    session[:return_to_after_authenticating] = request.url
+    if manual_login_allowed?
+      redirect_to login_url
     else
-      User.find_by(auth_uid: request.headers[Setting.http_header_auth_uid])
+      render plain: 'Unauthorized', status: :unauthorized
     end
+  end
+
+  def redirect_signed_in_user_to_root
+    redirect_to root_url if signed_in?
+  end
+
+  def find_client
+    find_client_by_cookie || find_client_by_http_header
+  end
+
+  def post_authenticating_url
+    session.delete(:return_to_after_authenticating) || root_url
   end
 end

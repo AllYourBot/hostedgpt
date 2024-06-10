@@ -1,0 +1,9 @@
+keith_password:
+  credential: keith_password
+  client: keith_desktop_browser
+  deleted_at:
+
+keith_google:
+  credential: keith_google
+  client: keith_phone_browser
+  deleted_at:

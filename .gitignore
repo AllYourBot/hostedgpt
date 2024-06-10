@@ -46,6 +46,7 @@
 .byebug_history
 /.vscode
 /.ruby-version
+.issues
 
 # Mac
 

@@ -5,6 +5,18 @@ class PersonTest < ActiveSupport::TestCase
     assert_instance_of User, people(:keith_registered).user
   end
 
+  test "has associated clients" do
+    assert_instance_of Client, people(:keith_registered).clients.first
+  end
+
+  test "associations are deleted upon destroy" do
+    assert_difference "User.count", -1 do
+      assert_difference "Client.count", -people(:keith_registered).clients.count do
+        people(:keith_registered).destroy
+      end
+    end
+  end
+
   test "encrypts email" do
     person = people(:rob_registered)
     old_email = person.email
@@ -17,7 +29,7 @@ class PersonTest < ActiveSupport::TestCase
 
   # Appears length limit for email addresses is 256
   test "encrypts long emails" do
-    user = User.new password: "password", first_name: "John", last_name: "Doe"
+    user = User.new first_name: "John", last_name: "Doe"
     long_email_address = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@xxx.net"
     assert_equal 256, long_email_address.length
     person = Person.new email: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@xxx.net", personable: user
@@ -35,16 +47,34 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test "it cleans and formats the email address before saving" do
-    user = User.new password: "password", first_name: "John", last_name: "Doe"
+    user = User.new first_name: "John", last_name: "Doe"
     person = Person.new email: "  EXAMPLE@gmail.com  ", personable: user
     person.save!
     assert_equal "example@gmail.com", person.email
   end
 
   test "it can create a nested user" do
-    person = Person.new email: "example@gmail.com", personable_attributes: { password: "password", first_name: "John", last_name: "Doe" }, personable_type: "User"
-    assert person.save
+    person = Person.new({
+      email: "example@gmail.com",
+      personable_type: "User",
+      personable_attributes: {
+        first_name: "John",
+        last_name: "Doe",
+        credentials_attributes: {
+          '0' => {
+            type: "PasswordCredential",
+            password: "password",
+          }
+        }
+      }
+    })
+    assert_difference "User.count", 1 do
+      assert_difference "Credential.count", 1 do
+        assert person.save
+      end
+    end
     assert_instance_of User, person.personable
+    assert_instance_of PasswordCredential, person.user.credentials.first
   end
 
   test "person with invalid email format validation" do

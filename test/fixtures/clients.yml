@@ -1,0 +1,34 @@
+keith_desktop_browser:
+  person: keith_registered
+  token: xyz001
+  platform: web
+  user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15
+  ip_address: 127.0.0.1
+
+keith_phone_browser:
+  person: keith_registered
+  token: xyz002
+  platform: web
+  user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15
+  ip_address: 127.0.0.2
+
+keith_api:
+  person: keith_registered
+  token: xyz003
+  platform: api
+  user_agent:
+  ip_address:
+
+keith_tool:
+  person: keith_registered
+  token: xyz004
+  platform: tool
+  user_agent:
+  ip_address:
+
+rob_browser:
+  person: rob_registered
+  token: xyz005
+  platform: web
+  user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15
+  ip_address: 127.0.0.1

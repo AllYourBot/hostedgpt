@@ -1,3 +1,8 @@
+# Specify a list of origins that are allowed to send cross-origin requests
+# and connect via Websocket. Be sure to include the scheme. For example:
+#
+#   export ALLOWED_REQUEST_ORIGINS=https://myhost.com,https://myotherhost.com
+#
 if (allowed_request_origins = ENV['ALLOWED_REQUEST_ORIGINS'].to_s.split(',')).any?
   Rails.application.configure do
     config.action_cable.allowed_request_origins = allowed_request_origins
@@ -7,10 +12,10 @@ if (allowed_request_origins = ENV['ALLOWED_REQUEST_ORIGINS'].to_s.split(',')).an
         origins allowed_request_origins
 
         resource "*",
-        headers: :any,
-        methods: [:get, :post, :put, :patch, :delete, :options, :head],
-        credentials: true,
-        max_age: 86400
+          headers: :any,
+          methods: [:get, :post, :put, :patch, :delete, :options, :head],
+          credentials: true,
+          max_age: 86400
       end
     end
   end
