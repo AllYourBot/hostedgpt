@@ -17,4 +17,3 @@ shared:
     http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
-    allowed_request_origins: <%= ENV["ALLOWED_REQUEST_ORIGINS"] || "" %>
