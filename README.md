@@ -110,10 +110,10 @@ You may want to read about [configuring optional features](#configure-optional-f
 
 ## Configure optional features
 
-The file `options.yml` contains a number of things you can configure. Simple flags are:
+The file `options.yml` contains a number of Features and Settings you can configure. Simple flags are:
 
 - `REGISTRATON_FEATURE` is `true` by default but you can set to `false` to prevent any new people from creating an account.
-- `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It defaults to `false` but you may choose to enable this.
+- `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
 
 ### Authentication
 
@@ -197,13 +197,14 @@ We welcome contributors! After you get your development environment setup, revie
 The easiest way to get up and running is to use the provided docker compose workflow. The only things you need installed on your computer are Docker and Git.
 
 1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running
-2. Clone your fork `git clone [repository url]`
-3. `cd` into your clone
-4. Run `docker compose up --build` to start the app
-5. Open [http://localhost:3000](http://localhost:3000) and register as a new user
-6. Run tests: `docker compose run base rails test` The app has comprehensive test coverage but note that system tests currently do not work in docker.
-7. Open the rails console: `docker compose run base rails console`
-8. Run a psql console: `docker compose run base psql`
+1. Clone your fork `git clone [repository url]`
+1. `cd` into your clone
+1. Run `docker compose up --build` to start the app
+1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
+1. Run tests: `docker compose run base rails test` The app has comprehensive test coverage but note that system tests currently do not work in docker.
+1. Open the rails console: `docker compose run base rails console`
+1. Run a psql console: `docker compose run base psql`
+1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
 
 Every time you pull new changes down, kill docker (if it's running) and re-run:
 `docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
@@ -217,10 +218,11 @@ HostedGPT requires these services to be running:
 - ImageMagick (`brew install imagemagick` should work on Mac )
 
 1. `cd` into your local repository clone
-2. `rbenv install` to install the correct ruby version (it reads the .ruby-version in the repo)
-3. `bin/dev` starts up all the services, installs gems, and inits database (don't run **db:setup** as it will not configure encryption properly)
-4. Open [http://localhost:3000](http://localhost:3000) and register as a new user
-5. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
+1. `rbenv install` to install the correct ruby version (it reads the .ruby-version in the repo)
+1. `bin/dev` starts up all the services, installs gems, and inits database (don't run **db:setup** as it will not configure encryption properly)
+1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
+1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
+1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
 
 Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
 
