@@ -90,6 +90,7 @@ export default class extends Controller {
     this.microphoneDisableTarget.classList.remove('animate-blink')
     this.disableComposer()
     this.inputTarget.placeholder = "Speak aloud..."
+    if (Listener.disabled) Play.Speaker.sound("pop")
     Invoke.Listener()
   }
 

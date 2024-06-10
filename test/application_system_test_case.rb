@@ -18,7 +18,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     visit logout_path
     assert_current_path login_path
-    fill_in "email", with: user.person.email
+    fill_in "email", with: user.email
     fill_in "password", with: password
     click_text "Log In"
     assert_current_path new_assistant_message_path(assistant)
