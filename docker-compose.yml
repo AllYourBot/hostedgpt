@@ -26,16 +26,16 @@ services:
       # Be sure to add environment variables to config/options.yml
       - DATABASE_URL=postgres://app:secret@postgres/app_development
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
-      - ALLOWED_REQUEST_ORIGINS=${ALLOWED_REQUEST_ORIGINS}
-      - DEFAULT_LLM_KEYS=${DEFAULT_LLM_KEYS}
-      - DEFAULT_OPENAI_KEY=${DEFAULT_OPENAI_KEY}
-      - DEFAULT_ANTHROPIC_KEY=${DEFAULT_ANTHROPIC_KEY}
-      - GOOGLE_AUTH_CLIENT_ID=${GOOGLE_AUTH_CLIENT_ID}
-      - GOOGLE_AUTH_CLIENT_SECRET=${GOOGLE_AUTH_CLIENT_SECRET}
-      - HTTP_HEADER_AUTH_EMAIL=${HTTP_HEADER_AUTH_EMAIL}
-      - HTTP_HEADER_AUTH_NAME=${HTTP_HEADER_AUTH_NAME}
-      - HTTP_HEADER_AUTH_UID=${HTTP_HEADER_AUTH_UID}
       - OVERMIND_COLORS=2,3,5
+      - ALLOWED_REQUEST_ORIGINS
+      - DEFAULT_LLM_KEYS_FEATURE
+      - DEFAULT_OPENAI_KEY
+      - DEFAULT_ANTHROPIC_KEY
+      - GOOGLE_AUTH_CLIENT_ID
+      - GOOGLE_AUTH_CLIENT_SECRET
+      - HTTP_HEADER_AUTH_EMAIL
+      - HTTP_HEADER_AUTH_NAME
+      - HTTP_HEADER_AUTH_UID
     ports: ["3000:3000"]
     volumes:
       - .:/rails
