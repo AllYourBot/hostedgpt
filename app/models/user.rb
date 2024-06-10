@@ -28,10 +28,10 @@ class User < ApplicationRecord
   end
 
 	def openai_key
-		self.attributes["openai_key"] || Setting.default_openai_key
+		self.attributes["openai_key"] || (Feature.default_llm_keys? ? Setting.default_openai_key : nil)
 	end
 
 	def anthropic_key
-		self.attributes["anthropic_key"] || Setting.default_anthropic_key
+		self.attributes["anthropic_key"] || (Feature.default_llm_keys? ? Setting.default_anthropic_key : nil)
 	end
 end
