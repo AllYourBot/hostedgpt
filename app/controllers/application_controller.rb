@@ -22,10 +22,11 @@ class ApplicationController < ActionController::Base
     person = Person.create!(
       personable_type: 'User',
       personable_attributes: {
-        password: (@password = SecureRandom.uuid),
         name: 'Student User',
-        openai_key: ENV['DEFAULT_OPENAI_KEY'],
-        anthropic_key: ENV['DEFAULT_ANTHROPIC_KEY']
+        credentials_attributes: {
+          type: 'PasswordCredential',
+          password: (@password = SecureRandom.uuid)
+        }
       },
       email: "#{@password}@hostedgpt.soomo"
     )
@@ -34,7 +35,7 @@ class ApplicationController < ActionController::Base
       assistant.update!(instructions: INSTRUCTIONS)
     end
     reset_session
-    login_as person.user
+    login_as(person, credential: person.user.password_credential)
 
     render json: {
       assistants: person.user.assistants.ordered.map do |a|

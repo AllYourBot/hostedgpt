@@ -23,6 +23,14 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :credentials
   serialize :preferences, coder: JsonSerializer
 
+  def openai_key
+    self[:openai_key] || ENV['DEFAULT_OPENAI_KEY']
+  end
+
+  def anthropic_key
+    self[:anthropic_key] || ENV['DEFAULT_ANTHROPIC_KEY']
+  end
+
   def preferences
     attributes["preferences"].with_defaults(dark_mode: "system")
   end
