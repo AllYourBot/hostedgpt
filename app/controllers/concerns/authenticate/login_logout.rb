@@ -24,7 +24,7 @@ module Authenticate::LoginLogout
   def session_authenticate_with(client)
     if Current.initialize_with(client: client)
       session[:client_token] = client.token
-      cookies.signed.permanent[:client_token] = { value: client.token, httponly: true, same_site: :lax }
+      cookies.signed.permanent[:client_token] = { value: client.token, httponly: true, same_site: :none }
     end
   end
 
