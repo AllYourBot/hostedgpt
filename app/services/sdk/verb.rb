@@ -32,7 +32,7 @@ class SDK::Verb
     self.class.new(**smart_merge(args, { expected_status: s }))
   end
 
-  def no_param
+  def no_params
     param
   end
 

@@ -92,6 +92,8 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 1. Run `fly deploy`
 1. It will automatically deploy 2 servers instead of just 1 so after it finishes deploy run `fly scale count app=1` to scale down to 1 machine.
 
+1. Assuming you chose `Development` as the DB size in the step above, now you should run `bin/rails db:fly[APP_NAME_FROM_EARLIER,swap,512]` This will increase the swap on your database machine so that it runs a bit better.
+
 You may want to read about [configuring optional features](#configure-optional-features).
 
 ## Deploy the app on Heroku

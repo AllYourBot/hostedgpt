@@ -17,6 +17,8 @@ class SDK
     )
   end
 
+  alias_method :patch, :post
+
   private
 
   def key

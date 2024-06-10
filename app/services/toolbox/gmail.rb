@@ -64,7 +64,7 @@ class Toolbox::Gmail < Toolbox
 
   def get_user_profile
     refresh_token_if_needed do
-      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_param
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_params
     end
   end # #<OpenStruct emailAddress="krschacht@gmail.com", messagesTotal=874908, threadsTotal=536434, historyId="73971375">
 
@@ -98,7 +98,7 @@ class Toolbox::Gmail < Toolbox
 
   def get_user_labels
     refresh_token_if_needed do
-      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/labels").no_param
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/labels").no_params
     end
   end # .labels.last   # #<OpenStruct id="Label_8804082651400413034", name="F: international", messageListVisibility="show", labelListVisibility="labelHide", type="user">
 

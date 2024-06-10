@@ -1,4 +1,17 @@
 namespace :db do
+  desc "Change fly VM"
+  task :fly, [:app_name, :command, :detail] => :environment do |t, args|
+    if args[:app_name].nil? || args[:command].nil? || args[:detail].nil?
+      puts "Missing arguments. Call with bin/rails fly[APP_NAME,]"
+    end
+
+    if args[:command] == "swap"
+      Fly.new.change_db_swap(args[:app_name], args[:detail])
+    else
+      puts "Unrecognized command #{args[:command]}"
+    end
+  end
+
   desc "Setup database encryption and update credentials"
   task :setup_encryption, [:send_to_fly] => :environment do |t, args|
     args.with_defaults(send_to_fly: false)

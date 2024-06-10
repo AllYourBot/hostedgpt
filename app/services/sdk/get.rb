@@ -1,6 +1,7 @@
 class SDK::Get < SDK::Verb
   def param(params = {})
-    response = Faraday.get(@url + "?" + params.to_h.to_query) do |req|
+    hash = OpenStruct.new(params).to_h
+    response = Faraday.get(@url + "?" + hash.to_query) do |req|
       req.headers = @headers
     end
 

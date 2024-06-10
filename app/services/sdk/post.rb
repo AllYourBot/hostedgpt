@@ -1,9 +1,10 @@
 class SDK::Post < SDK::Verb
   def param(params = {})
+    hash = OpenStruct.new(params).to_h
     if @headers[:"Content-Type"] == "application/x-www-form-urlencoded"
-      body = params.to_h.to_query
+      body = hash.to_query
     else
-      body = params.to_h.to_json
+      body = hash.to_json
     end
 
     response = Faraday.post(@url) do |req|
