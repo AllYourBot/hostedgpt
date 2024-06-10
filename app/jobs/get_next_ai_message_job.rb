@@ -150,7 +150,10 @@ class GetNextAIMessageJob < ApplicationJob
   def call_tools_before_wrapping_up
     puts "\n### Calling tools" unless Rails.env.test?
 
-    msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
+    msgs = []
+    Current.set(user: @user) do
+      msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
+    end
 
     index = @message.index
     msgs.each do |tool_message| # one message for each tool executed
