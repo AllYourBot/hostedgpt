@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   root to: "assistants#index"
 
-	post '/soomo/launch' => 'application#launch'
+  post '/soomo/launch' => 'application#launch'
 
   resources :users, only: [:new, :create, :update]
 
