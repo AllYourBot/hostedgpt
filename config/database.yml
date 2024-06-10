@@ -20,4 +20,5 @@ production:
   <<: *default
   database: hostedgpt_production
   username: hostedgpt
-  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] %>=
+  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] %>
+  
