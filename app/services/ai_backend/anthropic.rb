@@ -13,9 +13,10 @@ class AIBackend::Anthropic < AIBackend
   end
 
   def initialize(user, assistant, conversation, message)
-    raise ::Anthropic::ConfigurationError if user.anthropic_key.blank?
+    access_token = user.anthropic_key || ENV["DEFAULT_ANTHROPIC_KEY"]
+    raise ::Anthropic::ConfigurationError if access_token.blank?
     begin
-      @client = self.class.client.new(access_token: user.anthropic_key)
+      @client = self.class.client.new(access_token: access_token)
     rescue ::Faraday::UnauthorizedError => e
       raise ::Anthropic::ConfigurationError
     end
