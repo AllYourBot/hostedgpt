@@ -16,12 +16,6 @@ unless Rails.env.test?
   order_to_load_fixtures = %w[language_models]
 
   ActiveRecord::Base.transaction do
-    begin
     ActiveRecord::FixtureSet.create_fixtures(Rails.root.join("test", "fixtures"), order_to_load_fixtures)
-
-    rescue => e
-      binding.pry
-
-    end
   end
 end
