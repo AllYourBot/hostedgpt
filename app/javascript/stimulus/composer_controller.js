@@ -55,6 +55,12 @@ export default class extends Controller {
     }
   }
 
+  editPrevious() {
+    const messageEdits = document.querySelectorAll("[data-role='message-edit']")
+    const lastEdit = messageEdits[messageEdits.length - 1]
+    if (lastEdit) lastEdit.click()
+  }
+
   toggleMicrophone(event) {
     if (!this.hasMicrophoneEnableTarget || !Listener.supported) return // TODO: remove when enabling feature
 

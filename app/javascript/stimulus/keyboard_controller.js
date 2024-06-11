@@ -15,6 +15,11 @@ export default class extends Controller {
     event.preventDefault()
   }
 
+  submit(event) {
+    this.element.closest('form').requestSubmit()
+    event.preventDefault()
+  }
+
   get lastOfTheTargets() {
     return this.keyboardableTargets.slice(-1)[0]
   }
