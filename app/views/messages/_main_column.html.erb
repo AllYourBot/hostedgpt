@@ -239,7 +239,7 @@
           <%= form.hidden_field :index, value: @messages&.length %>
           <%= form.hidden_field :version, value: @version %>
           <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
-            <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
+            <%= document_form.file_field :file, accept: "image/*", class: "hidden", data: { image_upload_target: "file" } %>
           <% end %>
 
           <%= form.text_area :content_text,
