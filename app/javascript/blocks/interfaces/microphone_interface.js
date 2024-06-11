@@ -6,12 +6,16 @@ export default class extends Interface {
   async Flip(turnOn)  { if (turnOn && !$.active) {
                           $.active = true
                           await $.microphoneService.start()
-                          Flip.Transcriber.on()
+                          await Flip.Transcriber.on()
                         } else if (!turnOn && $.active) {
                           $.active = false
                           $.microphoneService.end()
-                          Flip.Transcriber.off()
+                          await Flip.Transcriber.off()
                         }
+                      }
+
+  async Approve()     { await $.microphoneService.start()
+                        $.microphoneService.end()
                       }
 
   log_SpeakInto

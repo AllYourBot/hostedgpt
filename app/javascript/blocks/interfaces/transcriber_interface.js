@@ -16,18 +16,22 @@ export default class extends Interface {
 
   async Flip(turnOn)  { if (turnOn && !$.active) {
                           $.active = true
-                          $.transcriberService.start()
-
+                          await $.transcriberService.start()
                           await Flip.Microphone.on()
-                          Invoke.Listener()
+                          await Invoke.Listener()
 
                         } else if (!turnOn && $.active) {
                           $.active = false
                           $.transcriberService.end()
 
-                          Flip.Microphone.off()
-                          Disable.Listener()
+                          await Flip.Microphone.off()
+                          await Disable.Listener()
                         }
+                      }
+
+  async Approve()     { let approved = await $.transcriberService.start()
+                        $.transcriberService.end()
+                        return approved
                       }
 
   log_SpeakTo
