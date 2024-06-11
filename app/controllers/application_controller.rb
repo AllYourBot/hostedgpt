@@ -18,31 +18,55 @@ class ApplicationController < ActionController::Base
   def launch
     # very basic security for now
     return head(:forbidden) unless ENV['ALLOWED_REQUEST_ORIGINS'].to_s.split(',').include?(request.origin)
+    return head(:not_found) unless (jwt_secret_key = ENV['HOSTEDGPT_JWT_SECRET_KEY']).present?
+    return head(:unauthorized) unless (jwt = params[:jwt]).present?
 
-		reset_session
-		Current.reset
+    claims = begin
+      logger.debug "\n\n#{JWT.decode(jwt, jwt_secret_key, true, algorithm: 'HS256')&.first}\n\n"
+      JWT.decode(jwt, jwt_secret_key, true, algorithm: 'HS256')&.first
+    rescue JWT::ExpiredSignature
+      logger.warn "JWT expired: #{jwt}"
+      return head(:unauthorized)
+    rescue JWT::DecodeError
+      logger.warn "JWT invalid: #{jwt}"
+      return head(:unauthorized)
+    end
+    email = "#{claims['sub']}@hostedgpt.soomo"
+    course_id, element_family_id = claims['cid'], claims['fid']
 
-    uuid = password = SecureRandom.uuid
-    person = Person.create!(
-      personable_type: 'User',
-      personable_attributes: {
-        name: 'Student User',
-      },
-      email: "#{uuid}@hostedgpt.soomo"
-    )
-    person.user.create_password_credential!(
-      type: 'PasswordCredential',
-      password: password
-    )
-    person.user.assistants.create!(name: "GPT-4", language_model: LanguageModel.find_by(name: 'gpt-4-turbo'))
-    person.user.assistants.each do |assistant|
-      assistant.update!(instructions: INSTRUCTIONS)
+    reset_session
+    Current.reset
+
+    unless credential = HttpHeaderCredential.find_by(auth_uid: claims['sub'])
+      Person.transaction do
+        user = User.create!(name: "Student User")
+        Person.create!(personable: user, email: email)
+        HttpHeaderCredential.create!(user: user, external_id: claims['sub'])
+      rescue ActiveRecord::RecordNotUnique
+      end
+      credential = HttpHeaderCredential.find_by!(auth_uid: claims['sub'])
+    end
+    person = credential.user.person
+
+    assistants = [
+      ["GPT-4o", "gpt-4o"],
+      ["GPT-4", "gpt-4-turbo"],
+      ["GPT-3.5", "gpt-3.5-turbo"],
+      ["Claude 3 Opus", "claude-3-opus-20240229"],
+      ["Claude 3 Sonnet", "claude-3-sonnet-20240229"]
+    ].map do |(assistant_name, model_name)|
+      person.user.assistants.create!(
+        name: assistant_name,
+        description: "#{course_id}:#{element_family_id}:#{Time.now.utc.iso8601}",
+        instructions: INSTRUCTIONS,
+        language_model: LanguageModel.find_by(name: model_name)
+      )
     end
 
-    login_as(person, credential: person.user.password_credential)
+    login_as(person, credential: credential)
 
     render json: {
-      assistants: person.user.assistants.ordered.map do |a|
+      assistants: assistants.map do |a|
         a.as_json(include: :language_model)
       end
     }

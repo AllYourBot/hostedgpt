@@ -25,10 +25,11 @@ services:
     environment:
       - DATABASE_URL=postgres://app:secret@postgres/app_development
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
-      - ALLOWED_REQUEST_ORIGINS=${ALLOWED_REQUEST_ORIGINS}
+      - ALLOWED_REQUEST_ORIGINS
       - OVERMIND_COLORS=2,3,5
-      - DEFAULT_OPENAI_KEY=${DEFAULT_OPENAI_KEY}
-      - DEFAULT_ANTHROPIC_KEY=${DEFAULT_ANTHROPIC_KEY}
+      - DEFAULT_OPENAI_KEY
+      - DEFAULT_ANTHROPIC_KEY
+      - HOSTEDGPT_JWT_SECRET_KEY
     ports: ["3000:3000"]
     volumes:
       - .:/rails
