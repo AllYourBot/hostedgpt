@@ -14,11 +14,13 @@
   <div class="my-5">
     <%= form.label :name %>
     <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+    <span>Used when connecting to APIs</span>
   </div>
 
   <div class="my-5">
     <%= form.label :description %>
     <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+    <span>Used in language model selections</span>
   </div>
 
   <% if Current.user.api_services.exists? %>
