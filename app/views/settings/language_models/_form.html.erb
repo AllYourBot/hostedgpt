@@ -21,6 +21,23 @@
     <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
+  <% if Current.user.api_services.exists? %>
+    <div class="my-5">
+      <%= form.label :api_service_id  %><br/>
+      <%= form.select :api_service_id,
+        Current.user.api_services.ordered.pluck(:name, :id) + [['Built-In', nil]],
+        {},
+        class: %|
+          block
+          border border-gray-200 outline-none
+          shadow rounded-md
+          px-3 py-2 mt-2
+          w-full
+          dark:text-black
+        |
+      %>
+    </div>
+  <% end %>
   <div class="my-5">
     <%= form.check_box :supports_images %>
     <%= form.label :supports_images, "Supports Images?" %>

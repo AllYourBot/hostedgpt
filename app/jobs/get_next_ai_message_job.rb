@@ -5,7 +5,7 @@ class GetNextAIMessageJob < ApplicationJob
   retry_on WaitForPrevious, wait: ->(run) { (2**run - 1).seconds }, attempts: 3
 
   def ai_backend
-    @assistant.ai_backend
+    @assistant.language_model.ai_backend
   end
 
   def perform(user_id, message_id, assistant_id, attempt = 1)

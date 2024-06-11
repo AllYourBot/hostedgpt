@@ -2,6 +2,7 @@
 class LanguageModel < ApplicationRecord
 
   belongs_to :user, optional: true
+  belongs_to :api_service, optional: true
 
   validates :name, :description, presence: true
 
@@ -9,6 +10,16 @@ class LanguageModel < ApplicationRecord
     'gpt-best' => 'gpt-4o-2024-05-13',
     'claude-best' => 'claude-3-opus-20240229'
   }
+
+  def ai_backend
+    if api_service.present?
+      api_service.ai_backend
+    elsif name.starts_with?('gpt-')
+      AIBackend::OpenAI
+    else
+      AIBackend::Anthropic
+    end
+  end
 
   def readonly?
     user_id.blank?

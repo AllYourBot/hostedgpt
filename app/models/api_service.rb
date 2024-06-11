@@ -4,6 +4,7 @@ class APIService < ApplicationRecord
   DRIVERS = %w(Anthropic OpenAI)
 
   belongs_to :user
+
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]),  if: -> { url.present? }
   validates :name, :url, presence: true
   validates :driver, inclusion: { in: DRIVERS }
