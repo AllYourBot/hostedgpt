@@ -1,4 +1,4 @@
-# We don't care about large or not
+# We don"t care about large or not
 class LanguageModel < ApplicationRecord
 
   belongs_to :user, optional: true
@@ -7,8 +7,8 @@ class LanguageModel < ApplicationRecord
   validates :name, :description, presence: true
 
   BEST_MODELS = {
-    'gpt-best' => 'gpt-4o-2024-05-13',
-    'claude-best' => 'claude-3-opus-20240229'
+    "gpt-best" => "gpt-4o-2024-05-13",
+    "claude-best" => "claude-3-opus-20240229"
   }
 
   def ai_backend

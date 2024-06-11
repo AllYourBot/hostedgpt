@@ -12,6 +12,7 @@ gem "importmap-rails" # Use JavaScript with ESM import maps [https://github.com/
 gem "turbo-rails", "~> 2.0.5"
 gem "stimulus-rails"
 gem "tailwindcss-rails", "~> 2.6.0"
+gem "rack-cors"
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"

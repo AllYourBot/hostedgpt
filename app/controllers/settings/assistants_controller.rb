@@ -28,7 +28,7 @@ class Settings::AssistantsController < Settings::ApplicationController
   end
 
   def destroy
-    if @assistant.soft_delete
+    if Current.user.assistants.count > 1 && @assistant.deleted!
       redirect_to new_settings_assistant_url, notice: "Deleted", status: :see_other
     else
       redirect_to new_settings_assistant_url, alert: "Cannot delete your last assistant", status: :see_other

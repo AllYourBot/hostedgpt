@@ -84,14 +84,16 @@ export default class extends Controller {
       this.disableMicrophone()
   }
 
-  enableMicrophone() {
+  async enableMicrophone() {
     this.microphoneEnableTarget.classList.add('hidden')
     this.microphoneDisableTarget.classList.remove('hidden')
     this.microphoneDisableTarget.classList.remove('animate-blink')
     this.disableComposer()
     this.inputTarget.placeholder = "Speak aloud..."
-    if (Listener.disabled) Play.Speaker.sound("pop")
-    Invoke.Listener()
+    if (Listener.disabled) {
+      await Invoke.Listener()
+      Play.Speaker.sound("pop")
+    }
   }
 
   blinkingMicrophone() {

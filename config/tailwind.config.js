@@ -47,9 +47,12 @@ module.exports = {
     'variant',
     [
       '@media (prefers-color-scheme: dark) { &:is(.system *) }',
-      '&:is(.dark *)',
+      '&:is(.dark *)'
     ],
   ],
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/aspect-ratio'),
@@ -57,6 +60,3 @@ module.exports = {
     require('@tailwindcss/container-queries'),
   ],
 }
-
-
-

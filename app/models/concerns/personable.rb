@@ -6,4 +6,5 @@ module Personable
   end
 
   delegate :email, to: :person
+  delegate :clients, to: :person
 end

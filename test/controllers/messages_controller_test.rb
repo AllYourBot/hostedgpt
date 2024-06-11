@@ -138,7 +138,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "messages can still be viewed when attached to a soft-deleted assistant" do
-    assert @assistant.soft_delete
+    @assistant.deleted!
     get conversation_messages_url(@conversation, version: 1)
     assert @conversation.messages.count > 0
     assert_select 'div[data-role="message"]', count: @conversation.messages.count
@@ -164,7 +164,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "the composer is hidden when viewing a list of messages attached to an assistant that has been soft-deleted" do
-    @assistant.soft_delete
+    @assistant.deleted!
     get conversation_messages_url(@conversation, version: 1)
     assert_response :success
     assert_contains_text "main footer", "Samantha has been deleted and cannot assist any longer."
@@ -173,7 +173,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "viewing messages in a conversation which has history but the assistant has been soft deleted, the conversation history can still be viewed" do
-    @assistant.soft_delete
+    @assistant.deleted!
     message = messages(:message2_v1)
 
     patch message_url(message, version: 2), params: { message: { id: message.id } }
