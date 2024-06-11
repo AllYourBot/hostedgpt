@@ -58,11 +58,20 @@ export default class extends Controller {
   }
 
   async activate(event) {
-    event.currentTarget.classList.add("hidden")
+    let button = event.currentTarget
+    button.classList.add("hidden")
+
+    let canProceed = await this.doPermissionPrompts()
+    if (!canProceed) {
+      alert("The app needs microphone access to work. Click the circle (i) in the address bar and reset permissions in order to try again.")
+      button.classList.remove("hidden")
+      return
+    }
+
     this.startTransition = true
     this.transitionDone = false
     this.bootingDone = false
-    await Listener.$.screenService.start()
+
     Play.Speaker.sound('booting', async() => {
       await Invoke.Listener()
       for (let i = 0; i < 20; i++) {
@@ -76,6 +85,15 @@ export default class extends Controller {
         }
       }
     })
+  }
+
+  async doPermissionPrompts() {
+    await Listener.$.screenService.start()
+    // await Approve.Microphone.access() - this version doesn't return true or false
+    let micApproved = await Approve.Transcriber.access()
+    if (!micApproved) return false
+    await sleep(0.5) // if we try to play the boot sound right away w/o a delay it doesn't succeed, not sure why
+    return true
   }
 
   boundSetSize = () => { this.setSize() }
