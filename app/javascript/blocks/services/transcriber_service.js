@@ -14,7 +14,7 @@ export default class extends Service {
     if ($.recognizer) {
       $.recognizer.onstart = () => _onStart()
       $.recognizer.onend = () => _onEnd()
-      $.recognizer.onerror = () => _onError()
+      $.recognizer.onerror = (e) => _onError(e)
       $.recognizer.onresult = (event) => _onResult(event)
     }
   }
@@ -32,7 +32,7 @@ export default class extends Service {
     }
   }
 
-  start()         { $.intendedState = 'started';  _executeStart() }
+  async start()   { $.intendedState = 'started';  return await _executeStart() }
   restart()       { $.intendedState = 'started';  _executeRestart() }
   end()           { $.intendedState = 'ended';    _executeEnd() }
   get listening()  { $.state == 'started' }
@@ -41,12 +41,30 @@ export default class extends Service {
 
   // Exeuctors
 
-  _executeStart() {
+  async _executeStart() {
     if (!$.recognizer) return
 
-    if ($.state != 'started')
-      $.recognizer.start() // triggers _onStart() callback
-    else
+    if ($.state != 'started') {
+      try {
+        $.recognizer.start() // triggers _onStart() callback
+      } catch(e) {
+        return Promise.resolve(false)
+      }
+
+      return new Promise((resolve) => {
+        const checkState = () => {
+          if ($.state === 'started')
+            resolve(true)
+          else if ($.state === 'rejected')
+            resolve(false)
+          else
+            runAfter(1, () => checkState())
+        }
+        checkState()
+      })
+      // return a promise that loop forever, every 200 ms checking if $.state == 'started' and then the promise resolves when it is
+
+    } else
       _onStart()
   }
 
@@ -79,12 +97,20 @@ export default class extends Service {
 
   log_onEnd
   _onEnd() {
+    if ($.state == 'rejected') return
+
     $.state = 'ended' // we may not intend this but we're here, ensures recognizer will restart
     if ($.intendedState != 'ended') _executeIntendedState()
   }
 
   log_onError
-  _onError() {
+  _onError(e) {
+    if (e.error == 'not-allowed') {
+      $.state = 'rejected'
+      $.intendedState = 'rejected'
+      return
+    }
+
     _executeIntendedState()
   }
 

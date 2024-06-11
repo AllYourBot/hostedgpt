@@ -1,6 +1,8 @@
 shared:
   features:
+    default_to_voice: <%= ENV.fetch("DEFAULT_TO_VOICE_FEATURE", false) %>
     voice: <%= ENV.fetch("VOICE_FEATURE", false) %>
+    google_tools: <%= ENV.fetch("GOOGLE_TOOLS", false) %>
     registration: <%= ENV.fetch("REGISTRATION_FEATURE", true) %>
     password_authentication: <%= ENV.fetch("PASSWORD_AUTHENTICATION_FEATURE", true) %>
     google_authentication: <%= ENV.fetch("GOOGLE_AUTHENTICATION_FEATURE", false) %>

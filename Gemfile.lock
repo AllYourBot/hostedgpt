@@ -188,6 +188,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.3-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.16.3-x86_64-darwin)
+      racc (~> 1.4)
     nokogiri (1.16.3-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
@@ -232,6 +234,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.7.3)
     rack (3.0.9.1)
+    rack-cors (2.0.2)
+      rack (>= 2.0.0)
     rack-protection (4.0.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0, < 4)
@@ -370,11 +374,14 @@ GEM
       railties (>= 7.0.0)
     tailwindcss-rails (2.6.0-arm64-darwin)
       railties (>= 7.0.0)
+    tailwindcss-rails (2.6.0-x86_64-darwin)
+      railties (>= 7.0.0)
     tailwindcss-rails (2.6.0-x86_64-linux)
       railties (>= 7.0.0)
     thor (1.3.1)
     tiktoken_ruby (0.0.6-aarch64-linux)
     tiktoken_ruby (0.0.6-arm64-darwin)
+    tiktoken_ruby (0.0.6-x86_64-darwin)
     tiktoken_ruby (0.0.6-x86_64-linux)
     timecop (0.9.8)
     timeout (0.4.1)
@@ -408,6 +415,7 @@ PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
   arm64-darwin-23
+  x86_64-darwin-23
   x86_64-linux
 
 DEPENDENCIES
@@ -431,6 +439,7 @@ DEPENDENCIES
   pg (~> 1.1)
   pry-rails
   puma (>= 5.0)
+  rack-cors
   rails (~> 7.1.3)
   rails_heroicon (~> 2.2.0)
   redcarpet (~> 3.6.0)

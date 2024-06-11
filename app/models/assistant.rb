@@ -27,16 +27,6 @@ class Assistant < ApplicationRecord
       parts[1]&.try(:[], 0)&.capitalize.to_s
   end
 
-  def soft_delete
-    return false if user.assistants.count <= 1
-    update!(deleted_at: Time.now)
-    return true
-  end
-
-  def soft_delete!
-    raise "Can't delete user's last assistant" if !soft_delete
-  end
-
   def to_s
     name
   end

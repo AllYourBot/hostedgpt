@@ -1,4 +1,4 @@
-<%= form_with(model: [:settings, person], class: "contents") do |form| %>
+<%= form_with(model: person, url: settings_person_path, class: "contents") do |form| %>
   <% if person.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
@@ -30,12 +30,18 @@
       <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
-    <div class="my-5">
-      <%= user_fields.label :password %>
-      <%= user_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
-    </div>
+    <% person.personable.credentials.type_is("PasswordCredential").each do |credential| %>
+      <%= user_fields.fields_for :credentials_attributes, credential, index: credential.id do |credential_fields| %>
+        <%= credential_fields.hidden_field :type, value: credential.type %>
 
-    <div class="my-5">
+        <div class="my-5">
+          <%= credential_fields.label :password %>
+          <%= credential_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :dark_mode, "Color Theme" %>
       <div class="flex items-center justify-between outline-none pl-3 py-2 mt-2 w-full dark:text-black gap-1">
         <%= user_fields.fields_for :preferences do |preferences_fields| %>
@@ -49,9 +55,30 @@
       </div>
     </div>
 
-     <div class="my-5 hidden">
-      <%= user_fields.label "Enable Tools" %>
-    </div>
+    <% if Feature.google_tools? %>
+      <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
+        <%= user_fields.label "Enable Tools" %>
+
+        <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
+          <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
+            Enable the ability to assign <span class="font-semibold">Gmail</span> to an assistant
+          </div>
+          <% if Current.user.gmail_credential %>
+            <div class="text-green-700 font-bold">Enabled</div>
+          <% else %>
+            <%= form.label :authorize_gmail, "Authorized Gmail",
+              class: %|
+                inline-block font-medium
+                bg-gray-100 dark:bg-gray-900 dark:text-white
+                border border-gray-400
+                rounded-lg py-3 px-5
+                cursor-pointer
+                whitespace-nowrap
+            | %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
       <%= user_fields.label :openai_key, "OpenAI Key (for GPT-3.5 & 4)" %>
@@ -166,3 +193,5 @@
     <%= link_to "Cancel", root_path, class: "float-right inline-block ml-5 py-3" %>
   </div>
 <% end # form %>
+
+<%= button_to "Gmail", "/auth/gmail", id: "person_authorize_gmail", method: :post, data: { turbo: false }, class: "hidden" %>

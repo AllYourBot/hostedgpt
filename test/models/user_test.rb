@@ -5,26 +5,47 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
+  test "has associated credentials" do
+    assert_instance_of PasswordCredential, users(:keith).credentials.type_is('PasswordCredential').first
+  end
+
+  test "has an associated password_credential" do
+    assert_instance_of PasswordCredential, users(:keith).password_credential
+  end
+
+  test "has an associated google_credential" do
+    assert_instance_of GoogleCredential, users(:keith).google_credential
+  end
+
+  test "has an associated gmail_credential" do
+    assert_instance_of GmailCredential, users(:keith).gmail_credential
+  end
+
+  test "has an associated http_header_credential" do
+    assert_instance_of HttpHeaderCredential, users(:rob).http_header_credential
+  end
+
   test "has a last_cancelled_message but can be nil" do
     assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
     assert_nil users(:rob).last_cancelled_message
   end
 
-  test "user needs to have a password unless they have auth_uid" do
-    minimum_user = User.new(first_name: 'John', last_name: 'Doe', password: 'abc123')
-    assert minimum_user.valid?, "We were unable to verify the minimum user"
-
-    minimum_user.password = nil
-    refute minimum_user.valid?, "The password should be required"
-
-    minimum_user.auth_uid = "abc123"
-    assert minimum_user.valid?, "The password should be allowed to be blank when auth_uid is set"
+  test "assistants scope filters out deleted vs assistants_including_deleted" do
+    assert_difference "users(:keith).assistants.length", -1 do
+      assert_no_difference "users(:keith).assistants_including_deleted.length" do
+        users(:keith).assistants.first.deleted!
+        users(:keith).reload
+      end
+    end
   end
 
-  test "user can change something like their first name w/o having to reenter their password" do
-    user = users(:keith)
-    assert_nothing_raised do
-      user.update!(first_name: "New")
+  test "associations are deleted upon destroy" do
+    assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
+      assert_difference "Conversation.count", -users(:keith).conversations.count do
+        assert_difference "Credential.count", -users(:keith).credentials.count do
+          users(:keith).destroy
+        end
+      end
     end
   end
 
@@ -49,7 +70,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should validate a user with minimum information" do
-    user = User.new(password: "password", password_confirmation: "password", first_name: "John", last_name: "Doe")
+    user = User.new(first_name: "John", last_name: "Doe")
     person = Person.new(email: "example@gmail.com", personable: user)
     assert person.valid?
   end
@@ -64,98 +85,6 @@ class UserTest < ActiveSupport::TestCase
   test "although last name is required for create it's not required for update" do
     assert_nothing_raised do
       users(:keith).update!(last_name: nil)
-    end
-  end
-
-  test "it can update a user with a new password" do
-    user = users(:keith)
-    old_password_hash = user.password_digest
-    user.update(password: "password")
-    assert user.valid?
-    refute_equal old_password_hash, user.password_digest
-  end
-
-  test "passwords must be 6 characters or longer" do
-    user = User.new(first_name: "John", last_name: "Doe")
-    bad_short_passwords = ["", "12345"]
-
-    bad_short_passwords.each do |bad_password|
-      user.password = bad_password
-      user.valid?
-      assert user.errors[:password].present?
-    end
-
-    good_password = "123456"
-    user.password = good_password
-    assert user.valid?
-    refute user.errors[:password].present?
-  end
-
-  test "it can validate a password" do
-    user = users(:keith)
-    assert user.authenticate("secret")
-  end
-
-  test "it destroys assistants on destroy" do
-    assistant = assistants(:samantha)
-    assistant.user.destroy
-    assert_raises ActiveRecord::RecordNotFound do
-      assistant.reload
-    end
-  end
-
-  test "it destroys conversations on destroy" do
-    conversation = conversations(:greeting)
-    conversation.user.destroy
-    assert_raises ActiveRecord::RecordNotFound do
-      conversation.reload
-    end
-  end
-
-  test "boolean values within preferences get converted back and forth properly" do
-    assert_nil users(:keith).preferences[:nav_closed]
-    assert_nil users(:keith).preferences[:kids]
-    assert_nil users(:keith).preferences[:city]
-
-    users(:keith).update!(preferences: {
-      nav_closed: true,
-      kids: 2,
-      city: "Austin"
-    })
-    users(:keith).reload
-
-    assert users(:keith).preferences[:nav_closed]
-    assert_equal 2, users(:keith).preferences[:kids]
-    assert_equal "Austin", users(:keith).preferences[:city]
-
-    users(:keith).update!(preferences: {
-      nav_closed: "false",
-
-    })
-
-    refute users(:keith).preferences[:nav_closed]
-  end
-
-  test "dark_mode preference defaults to system and it can update user dark_mode preference" do
-    new_user = User.create!(password: 'password', first_name: 'First', last_name: 'Last')
-    assert_equal "system", new_user.preferences[:dark_mode]
-
-    new_user.update!(preferences: { dark_mode: "light" })
-    assert_equal "light", new_user.preferences[:dark_mode]
-
-    new_user.update!(preferences: { dark_mode: "dark" })
-    assert_equal "dark", new_user.preferences[:dark_mode]
-
-    new_user.update!(preferences: { dark_mode: "system" })
-    assert_equal "system", new_user.preferences[:dark_mode]
-  end
-
-  test "assistants scope filters out deleted vs assistants_including_deleted" do
-    assert_difference "users(:keith).assistants.length", -1 do
-      assert_no_difference "users(:keith).assistants_including_deleted.length" do
-        users(:keith).assistants.first.soft_delete
-        users(:keith).reload
-      end
     end
   end
 end

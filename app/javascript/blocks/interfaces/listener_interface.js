@@ -12,7 +12,7 @@ export default class extends Interface {
 
   log_Tell
   async Tell(words)   { if (_intendedDismiss(words)) {
-                          Dismiss.Listener()
+                          await Dismiss.Listener()
                           return
                         }
                         if (_intendedInvoke(words)) Invoke.Listener()
@@ -30,23 +30,22 @@ export default class extends Interface {
   async Invoke()      { if (!$.processing) {
                           $.processing = true
                           await $.screenService.start()
-                          Flip.Transcriber.on()
-                          Play.Speaker.sound('pop')
+                          await Flip.Transcriber.on()
                         }
                       }
   log_Dismiss
-  Dismiss()           { if ($.processing) {
+  async Dismiss()     { if ($.processing) {
                           $.processing = false
-                          Flip.Transcriber.on() // so it can wait for "wake" words
-                          Play.Speaker.sound('pip')
+                          await Flip.Transcriber.on() // so it can wait for "wake" words
+                          await Play.Speaker.sound('pip')
                         }
                       }
 
-  Disable()           { if ($.processing != null) {
+  async Disable()     { if ($.processing != null) {
                           $.processing = null
                           $.screenService.end()
-                          Flip.Transcriber.off()
-                          Play.Speaker.sound('pip')
+                          await Flip.Transcriber.off()
+                          await Play.Speaker.sound('pip')
                         }
                       }
 
@@ -55,6 +54,7 @@ export default class extends Interface {
 
   get engaged()       { return $.processing === true  }
   get dismissed()     { return $.processing === false }
+  get disabled()      { return $.processing === null }
 
   get supported()     { return Transcriber.supported }
 

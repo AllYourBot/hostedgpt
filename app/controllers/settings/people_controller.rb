@@ -5,20 +5,21 @@ class Settings::PeopleController < Settings::ApplicationController
   end
 
   def update
-    if Current.person.update(person_params)
-      redirect_to edit_settings_person_path, notice: "Saved", status: :see_other
-    else
-      @person = Current.person
-      render :edit, status: :unprocessable_entity
-    end
+    Current.person.update!(person_params)
+    redirect_to edit_settings_person_path, notice: "Saved", status: :see_other
+  rescue
+    @person = Current.person
+    render :edit, status: :unprocessable_entity
   end
 
   private
 
   def person_params
-    params.require(:person).permit(:email, personable_attributes: [
-      :id, :first_name, :last_name, :password, :openai_key, :anthropic_key, preferences: [:dark_mode]
-    ])
+    h = params.require(:person).permit(:email, personable_attributes: [
+      :id, :first_name, :last_name, :password, :openai_key, :anthropic_key, preferences: [:dark_mode],
+      credentials_attributes: [ :id, :type, :password ]
+    ]).to_h
+    format_and_strip_all_but_first_valid_credential(h)
   end
 
   def check_personable_id
