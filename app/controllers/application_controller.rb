@@ -22,7 +22,6 @@ class ApplicationController < ActionController::Base
     return head(:unauthorized) unless (jwt = params[:jwt]).present?
 
     claims = begin
-      logger.debug "\n\n#{JWT.decode(jwt, jwt_secret_key, true, algorithm: 'HS256')&.first}\n\n"
       JWT.decode(jwt, jwt_secret_key, true, algorithm: 'HS256')&.first
     rescue JWT::ExpiredSignature
       logger.warn "JWT expired: #{jwt}"
