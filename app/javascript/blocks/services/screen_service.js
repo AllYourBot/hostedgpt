@@ -56,7 +56,7 @@ export default class extends Service {
   async _getFirstFrameAsImage() {
     const imageCapture = new ImageCapture(track.clone())
     const bitmap = await imageCapture.grabFrame()
-    const canvas = document.createElement('canvas')
+    const canvas = _getCanvas()
     canvas.width = bitmap.width
     canvas.height = bitmap.height
     const context = canvas.getContext('2d')
@@ -65,10 +65,7 @@ export default class extends Service {
   }
 
   async _getImageOfVideo() {
-    let canvas = document.querySelector('canvas')
-    if (canvas == null) {
-      canvas = document.createElement('canvas')
-    }
+    let canvas = _getCanvas()
     const video = document.createElement('video')
 
     video.autoplay = true
@@ -87,5 +84,13 @@ export default class extends Service {
         resolve(null)
       }
     })
+  }
+
+  _getCanvas() {
+    let existingCanvas = document.getElementById('screenshare')
+    if (existingCanvas) return existingCanvas
+    let canvas = document.createElement('canvas')
+    canvas.id = 'screenshare'
+    return canvas
   }
 }
