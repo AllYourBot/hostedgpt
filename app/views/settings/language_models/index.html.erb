@@ -3,7 +3,14 @@ Language Models
 </h1>
 
 <p class="my-8">
-  <%= link_to "Add New", new_settings_language_model_path, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium text-indigo-600 hover:text-indigo-900" %>
+  <%= link_to "Add New",
+    new_settings_language_model_path,
+    class: %| inline-block font-bold
+      bg-gray-200 dark:bg-gray-900
+      border border-gray-400
+      rounded-lg py-3 px-5
+      cursor-pointer
+    | %>
 </p>
 
 <table id="language-models" class="w-full table-auto border-b border-gray-300">
