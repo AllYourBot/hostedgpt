@@ -17,7 +17,7 @@ Rails.application.routes.draw do
     resources :assistants, except: [:index, :show]
     resource :person, only: [:edit, :update]
     resources :language_models
-    resources :api_services
+    resources :api_services, except: [:show]
   end
 
   get "/login", to: "authentications#new"

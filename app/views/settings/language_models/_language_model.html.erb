@@ -1,9 +1,0 @@
-<div class="bg-white rounded-lg shadow p-3 border-2 border-gray-200 m-1 gap-2">
-  <h3 class="text-lg font-medium mb-2"><%= language_model.name %></h3>
-  <p class="text-gray-600 mb-4"><%= language_model.description %></p>
-  <% if language_model.created_by_current_user? %>
-    <%= link_to "Edit", edit_settings_language_model_path(language_model), class: "text-indigo-600 hover:text-indigo-900" %>
-  <% else %>
-    <%= link_to "View", settings_language_model_path(language_model), class: "text-indigo-600 hover:text-indigo-900" %>
-  <% end %>
-</div>

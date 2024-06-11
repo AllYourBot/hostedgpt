@@ -1,14 +1,11 @@
 class Settings::APIServicesController < Settings::ApplicationController
-  before_action :set_api_service, only: [:show, :edit, :update, :destroy]
+  before_action :set_api_service, only: [:edit, :update, :destroy]
 
   def index
     @api_services = APIService.all.order(updated_at: :desc)
   end
 
   def edit
-  end
-
-  def show
   end
 
   def new
