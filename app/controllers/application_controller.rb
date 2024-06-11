@@ -1,7 +1,24 @@
 class ApplicationController < ActionController::Base
   include Authenticate
 
+  def default_render
+    if api_request?
+      json_payload = user_defined_ivars.map { |i| [ i.to_s[1..], instance_variable_get(i) ] }.to_h
+      render json: json_payload, status: :ok
+    else
+      super
+    end
+  end
+
   private
+
+  def api_request?
+    request.format.json?
+  end
+
+  def user_defined_ivars
+    instance_variables.select { |i| !i.to_s.starts_with?('@_') }
+  end
 
   def ensure_manual_login_allowed
     return if manual_login_allowed?
