@@ -2,7 +2,7 @@ class Settings::APIServicesController < Settings::ApplicationController
   before_action :set_api_service, only: [:edit, :update, :destroy]
 
   def index
-    @api_services = APIService.all.order(updated_at: :desc)
+    @api_services = Current.user.api_services.all.order(updated_at: :desc)
   end
 
   def edit
@@ -45,7 +45,10 @@ class Settings::APIServicesController < Settings::ApplicationController
   end
 
   def set_api_service
-    @api_service = APIService.find_by(id: params[:id])
+    @api_service = Current.user.api_services.find_by(id: params[:id])
+    if @api_service.nil?
+      redirect_to new_settings_api_service_url, notice: "The API Service could not be found", status: :see_other
+    end
   end
 
   def api_service_params
