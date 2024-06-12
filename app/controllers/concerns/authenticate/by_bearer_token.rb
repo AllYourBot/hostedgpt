@@ -24,5 +24,6 @@ module Authenticate::ByBearerToken
   def render_unauthorized
     self.headers['WWW-Authenticate'] = 'Token realm="Application"'
     render json: { error: "Authentication Bearer token was invalid" }, status: :unauthorized
+    nil
   end
 end
