@@ -6,7 +6,7 @@ class Current < ActiveSupport::CurrentAttributes
   def self.initialize_with(client: nil)
     self.client = client
 
-    if client&.is_a?(Client) && client&.authenticated?
+    if client&.is_a?(Client) && client.authenticated?
       self.person = client.person
       self.user = client.person&.user
     end
