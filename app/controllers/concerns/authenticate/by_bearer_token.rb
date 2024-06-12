@@ -6,7 +6,7 @@ module Authenticate::ByBearerToken
     authenticate_with_http_token do |double_token, options|
       client, client_token = parse_double_token(double_token)
 
-      if client_token && ActiveSupport::SecurityUtils.secure_compare(client.token, client_token)
+      if client && client_token && ActiveSupport::SecurityUtils.secure_compare(client.token, client_token)
         client
       else
         render_unauthorized

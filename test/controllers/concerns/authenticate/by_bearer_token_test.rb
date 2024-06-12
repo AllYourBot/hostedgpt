@@ -26,6 +26,12 @@ class Authenticate::ByBearerTokenTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
+  test "auth fails when an authentication does not exist" do
+    client = clients(:rob_browser)
+    get conversation_messages_path(conversations(:greeting), version: 1), headers: bearer_token_for(client, "#{client.id}:#{client.token}")
+    assert_response :unauthorized
+  end
+
   private
 
   def bearer_token_for(client, token = nil)
