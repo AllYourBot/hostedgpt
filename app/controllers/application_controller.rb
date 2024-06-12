@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   include Authenticate
 
+  before_action :set_system_ivars
+
   def default_render
     if api_request?
       json_payload = user_defined_ivars.map { |i| [ i.to_s[1..], instance_variable_get(i) ] }.to_h
@@ -12,12 +14,20 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def set_system_ivars
+    @system_ivars = public_ivars
+  end
+
+  def public_ivars
+    instance_variables.select { |i| !i.to_s.starts_with?('@_') }
+  end
+
   def api_request?
     request.format.json?
   end
 
   def user_defined_ivars
-    instance_variables.select { |i| !i.to_s.starts_with?('@_') }
+    public_ivars - @system_ivars
   end
 
   def ensure_manual_login_allowed

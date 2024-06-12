@@ -1,12 +1,14 @@
 require 'test_helper'
 
 class Authenticate::ByBearerTokenTest < ActionDispatch::IntegrationTest
-  test "should auth user with a bearer token and returns JSON" do
+  test "should auth user with a bearer token and returns proper JSON" do
     get conversation_messages_path(conversations(:greeting), version: 1), headers: bearer_token_for(clients(:keith_api))
     assert_response :success
+    data = nil
     assert_nothing_raised do
-      JSON.parse(response.body)
+      data = JSON.parse(response.body)
     end
+    refute data.keys.include?("rendered_format")
   end
 
   test "auth fails when bearer token is missing" do
