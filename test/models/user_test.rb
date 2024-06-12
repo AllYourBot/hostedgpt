@@ -100,4 +100,13 @@ class UserTest < ActiveSupport::TestCase
       users(:keith).update!(last_name: nil)
     end
   end
+
+  test "it treats blank String API keys as nil to allow for default keys" do
+    stub_features(default_llm_keys: false) do
+      user = users(:keith)
+      user.update!(openai_key: '', anthropic_key: ' ')
+      assert_nil user.openai_key
+      assert_nil user.anthropic_key
+    end
+  end
 end

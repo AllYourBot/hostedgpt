@@ -27,7 +27,7 @@ class PasswordCredentialTest < ActiveSupport::TestCase
 
   test "it can update the password" do
     old_password_hash = credentials(:keith_password).password_digest
-    credentials(:keith_password).update(password: "password")
+    credentials(:keith_password).update!(password: "password")
     assert credentials(:keith_password).valid?
     refute_equal old_password_hash, credentials(:keith_password).password_digest
   end

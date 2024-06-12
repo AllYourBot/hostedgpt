@@ -172,7 +172,8 @@ end
             <%= link_to edit_assistant_message_path(message.assistant, message),
               class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
               data: {
-                role: "edit",
+                role: "message-edit",
+                composer_target: "messageEdit",
                 turbo_frame: "message-#{message.id}",
               } do %>
               <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>

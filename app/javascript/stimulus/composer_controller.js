@@ -55,6 +55,12 @@ export default class extends Controller {
     }
   }
 
+  editPrevious() {
+    const messageEdits = document.querySelectorAll("[data-role='message-edit']")
+    const lastEdit = messageEdits[messageEdits.length - 1]
+    if (lastEdit) lastEdit.click()
+  }
+
   toggleMicrophone(event) {
     if (!this.hasMicrophoneEnableTarget || !Listener.supported) return // TODO: remove when enabling feature
 
@@ -117,7 +123,7 @@ export default class extends Controller {
 
   async focus() {
     if (viewport('md')) {
-      this.inputTarget.placeholder = 'ENTER  to submit'
+      this.inputTarget.placeholder = 'RETURN  to submit'
     } else {
       this.inputTarget.placeholder = ''
     }
@@ -131,7 +137,7 @@ export default class extends Controller {
 
   blur() {
     if (viewport('md')) {
-      this.inputTarget.placeholder = '/  to focus input'
+      this.inputTarget.placeholder = '/  to focus input   ↑  to edit last message'
     } else {
       this.inputTarget.placeholder = ''
     }

@@ -48,4 +48,12 @@ class User < ApplicationRecord
       @destroy_in_progress = false
     end
   end
+
+  def openai_key
+    self.attributes["openai_key"].presence || (Feature.default_llm_keys? ? Setting.default_openai_key : nil)
+  end
+
+  def anthropic_key
+    self.attributes["anthropic_key"].presence || (Feature.default_llm_keys? ? Setting.default_anthropic_key : nil)
+  end
 end
