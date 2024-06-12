@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
   end
 
   def user_defined_ivars
-    public_ivars - @system_ivars
+    public_ivars - @system_ivars - ["system_ivar"]
   end
 
   def ensure_manual_login_allowed

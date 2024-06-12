@@ -6,6 +6,7 @@ class Authenticate::ByBearerTokenTest < ActionDispatch::IntegrationTest
     assert_response :success
     data = proper_json_response
     refute data.keys.include?("rendered_format")
+    refute data.keys.include?("system_ivar")
   end
 
   test "GET request that redirects should auth user and return a special JSON response for redirect" do
