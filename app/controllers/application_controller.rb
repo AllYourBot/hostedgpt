@@ -3,12 +3,26 @@ class ApplicationController < ActionController::Base
 
   before_action :set_system_ivars
 
-  def default_render
+  def default_render(*args)
     if api_request?
       json_payload = user_defined_ivars.map { |i| [ i.to_s[1..], instance_variable_get(i) ] }.to_h
       render json: json_payload, status: :ok
     else
-      super
+      super(*args)
+    end
+  end
+
+  def redirect_to(*args)
+    if api_request?
+      options = args.extract_options!
+      status = options[:status]
+
+      if status == :see_other
+        render json: options.merge(redirect_to: args.first), status: :ok
+        return
+      end
+    else
+      super(*args)
     end
   end
 
