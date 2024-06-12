@@ -3,7 +3,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   before_action :set_language_model, only: [:show]
 
   def index
-    @language_models = LanguageModel.all.order(updated_at: :desc)
+    @language_models = LanguageModel.for_user(Current.user).order(updated_at: :desc)
   end
 
   def edit
@@ -44,7 +44,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   def set_users_language_model
     @language_model = Current.user.language_models.find_by(id: params[:id])
     if @language_model.nil?
-      redirect_to new_settings_language_model_url, notice: "The language_model was deleted", status: :see_other
+      redirect_to new_settings_language_model_url, notice: "The Language Model could not be found", status: :see_other
     end
   end
 

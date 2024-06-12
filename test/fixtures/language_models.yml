@@ -148,6 +148,7 @@ camel:
   user: keith
   position: 25
   name: camel
+  api_service: keith_service
   description: gpt-3.5-turbo from fixtures
   supports_images: false
 
@@ -155,6 +156,7 @@ guanaco:
   user: keith
   position: 26
   name: guanaco:large
+  api_service: keith_service
   description: Guanaco (large)  from fixtures
   supports_images: true
 
