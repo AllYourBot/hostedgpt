@@ -12,7 +12,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "has usable language models" do
-    system = ["gpt-best", "best-claude", "gpt-4o", "gpt-4", "gpt-3.5-turbo", "gpt-3.5-turbo", "claude-3-opus-20240229", "claude-3-sonnet-20240229"].sort
+    system = LanguageModel.where(user_id: nil).all.pluck(:name).sort
     assert_equal (system + ["camel", "guanaco:large"]).sort, users(:keith).usable_language_models.pluck(:name).sort
     assert_equal (system + ["alpaca:medium"]).sort, users(:taylor).usable_language_models.pluck(:name).sort
     assert_equal system, users(:rob).usable_language_models.pluck(:name).sort
