@@ -31,6 +31,30 @@ class FeatureTest < ActiveSupport::TestCase
     end
   end
 
+  test "a user's preferences can ENABLE a feature which is globally DISABLED" do
+    user = users(:keith)
+    user.preferences = user.preferences.merge(feature: { my_feature: true })
+    user.save!
+
+    stub_features(my_feature: false) do
+      Current.set(user: user) do
+        assert Feature.enabled?(:my_feature)
+      end
+    end
+  end
+
+   test "a user's preferences can DISABLE a feature which is globally ENABLED" do
+    user = users(:keith)
+    user.preferences = user.preferences.merge(feature: { my_feature: false })
+    user.save!
+
+    stub_features(my_feature: true) do
+      Current.set(user: user) do
+        refute Feature.enabled?(:my_feature)
+      end
+    end
+  end
+
   test "password and google auth are DISABLED if HTTP header auth is ENABLED" do
     stub_features(
       http_header_authentication: true,

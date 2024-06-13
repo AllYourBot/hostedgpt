@@ -30,7 +30,7 @@ class Feature
       feature_value = Current.user&.preferences&.dig(:feature, feature.to_sym)
 
       begin
-        feature_value ||= features.fetch(feature.to_sym)
+        feature_value = feature_value.to_s.presence || features.fetch(feature.to_sym)
       rescue KeyError
         raise KeyError, "You attempted to reference the Feature '#{feature}' but this is not configured within options.yml. Did you typo a feature name?"
       end
