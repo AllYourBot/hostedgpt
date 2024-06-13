@@ -1,5 +1,7 @@
 class TestClient::OpenAI
-  def initialize(access_token:)
+  attr_reader :uri_base
+  def initialize(access_token:, uri_base:nil)
+    @uri_base = uri_base
   end
 
   def self.api_response
@@ -11,7 +13,7 @@ class TestClient::OpenAI
   end
 
   def self.default_text
-    "Hello this is model #{@@model} with instruction nil! How can I assist you today?"
+    "Hello this is model #{@@model} with instruction #{@@instruction.inspect}! How can I assist you today?"
   end
 
   def self.api_text_response
@@ -25,7 +27,7 @@ class TestClient::OpenAI
           "index"=>0,
           "delta"=>{
             "role"=>"assistant",
-            "content"=> text || default_text
+            "content"=> text || default_text, #"Hello this is model #{model} with instruction #{system_message.to_s.inspect}! How can I assist you today?",
           },
           "logprobs"=>nil,
           "finish_reason"=>"stop"
@@ -72,6 +74,7 @@ class TestClient::OpenAI
 
   def chat(**args)
     @@model = args.dig(:parameters, :model) || "no model"
+    @@instruction = args.dig(:parameters, :messages).first[:content]
 
     proc = args.dig(:parameters, :stream)
     raise "No stream proc provided. When calling get_next_chat_message in tests be sure to include a block" if proc.nil?

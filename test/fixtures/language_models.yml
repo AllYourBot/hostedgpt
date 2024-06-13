@@ -164,6 +164,14 @@ alpaca:
   user: taylor
   position: 27
   name: alpaca:medium
+  api_service: taylor_anthropic_service
   description: Alpaca (large) from fixtures
   supports_images: true
 
+pacos:
+  user: taylor
+  position: 28
+  name: pacos-imagine
+  api_service: taylor_openai_service
+  description: Lama pacos (large) from fixtures
+  supports_images: true

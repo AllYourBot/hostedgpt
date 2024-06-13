@@ -56,6 +56,19 @@ class APIServiceTest < ActiveSupport::TestCase
     refute_nil api_service.reload.deleted_at
   end
 
+  test "destroy with assistant" do
+    language_model = language_models(:alpaca)
+    assert_nil language_model.reload.deleted_at
+    assert_difference "language_model.reload.assistants.count", -1 do
+      assert_no_difference 'Assistant.count' do
+        assert_no_difference 'LanguageModel.count' do
+          assert language_model.destroy!
+        end 
+      end
+    end
+    assert_not_nil language_model.reload.deleted_at
+  end
+
   test "cannot create record without user" do
     record = APIService.new(api_service_params.except(:user))
     assert_no_difference "APIService.count" do

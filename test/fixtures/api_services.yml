@@ -11,3 +11,17 @@ rob_service:
   url: http://rob-test.com/models
   access_token: rob-secret
   driver: Anthropic
+
+taylor_anthropic_service:
+  name: Taylor Anth Server
+  user: :taylor
+  url: http://taylor.org/doit
+  access_token: ta-secret
+  driver: Anthropic
+
+taylor_openai_service:
+  name: Taylor OpenAI Server
+  user: :taylor
+  url: http://taylor.org/doit-open
+  access_token: open-secret
+  driver: OpenAI

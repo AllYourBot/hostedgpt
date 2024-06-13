@@ -19,6 +19,16 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     assert_equal @test_client.messages(model: "gpt-4o", system: "You are a helpful assistant"), @anthropic.get_next_chat_message
   end
 
+  test "get_next_chat_message works with APIService" do
+    anthropic = AIBackend::Anthropic.new(users(:taylor),
+      assistants(:alpaca_asst),
+      @conversation,
+      @conversation.latest_message_for_version(:latest)
+    )
+    assert_equal "http://taylor.org/doit", anthropic.client.uri_base
+    assert_equal "Hello this is model alpaca:medium with instruction \"Take 5 then 4\"! How can I assist you today?", anthropic.get_next_chat_message
+  end
+
   test "preceding_messages constructs a proper response and pivots on images" do
     preceding_messages = @anthropic.send(:preceding_messages)
 

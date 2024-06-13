@@ -55,3 +55,12 @@ alpaca_asst:
   instructions: Take 5 then 4
   tools:  []
   external_id: 
+
+pacos_asst:
+  user: taylor
+  language_model: pacos
+  name: Travel/Flowers
+  description: Flowers themed travel advice (Pacos backed)
+  instructions: Point out flower-related local items, also historical events involving flowers
+  tools:  []
+  external_id: 

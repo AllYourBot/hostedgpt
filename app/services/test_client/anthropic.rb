@@ -1,5 +1,7 @@
 class TestClient::Anthropic
-  def initialize(access_token:)
+  attr_reader :uri_base
+  def initialize(access_token:, uri_base:nil)
+    @uri_base = uri_base
   end
 
   def self.text

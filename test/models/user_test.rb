@@ -7,14 +7,14 @@ class UserTest < ActiveSupport::TestCase
 
   test "has language models" do
     assert_equal ["camel", "guanaco:large"], users(:keith).language_models.ordered.pluck(:name)
-    assert_equal ["alpaca:medium"], users(:taylor).language_models.ordered.pluck(:name)
+    assert_equal ["alpaca:medium", "pacos-imagine"], users(:taylor).language_models.ordered.pluck(:name)
     assert_equal [], users(:rob).language_models.ordered.pluck(:name)
   end
 
   test "has usable language models" do
     system = LanguageModel.where(user_id: nil).all.pluck(:name).sort
     assert_equal (system + ["camel", "guanaco:large"]).sort, users(:keith).usable_language_models.pluck(:name).sort
-    assert_equal (system + ["alpaca:medium"]).sort, users(:taylor).usable_language_models.pluck(:name).sort
+    assert_equal (system + ["alpaca:medium", "pacos-imagine"]).sort, users(:taylor).usable_language_models.pluck(:name).sort
     assert_equal system, users(:rob).usable_language_models.pluck(:name).sort
   end
 
