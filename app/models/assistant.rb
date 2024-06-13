@@ -31,4 +31,8 @@ class Assistant < ApplicationRecord
   def to_s
     name
   end
+
+  def not_deleted?
+    deleted_at.nil?
+  end
 end
