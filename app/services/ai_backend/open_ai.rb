@@ -49,10 +49,9 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def initialize(user, assistant, conversation, message)
-    openai_key = user.openai_key || ENV["DEFAULT_OPENAI_KEY"]
-    raise ::OpenAI::ConfigurationError if openai_key.blank?
+    raise ::OpenAI::ConfigurationError if user.openai_key.blank?
     begin
-      @client = self.class.client.new(access_token: openai_key)
+      @client = self.class.client.new(access_token: user.openai_key)
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
     end
@@ -66,16 +65,13 @@ class AIBackend::OpenAI < AIBackend
     @stream_response_tool_calls = []
     response_handler = block_given? ? stream_handler(&chunk_handler) : nil
 
-    tools_enabled = false
     begin
       response = @client.chat(parameters: {
         model: @assistant.language_model.provider_name,
         messages: system_message + preceding_messages,
         stream: response_handler,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
-      }.merge(tools_enabled ? {
-        tools: Toolbox.tools
-      } : {}))
+      })
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
     end
