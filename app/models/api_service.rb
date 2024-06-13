@@ -1,19 +1,18 @@
 class APIService < ApplicationRecord
-  encrypts :access_token
-
-  DRIVERS = %w(Anthropic OpenAI)
+  DRIVERS = %w(OpenAI Anthropic)
 
   belongs_to :user
 
   has_many :language_models, -> { not_deleted }
 
-  validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]),  if: -> { url.present? }
+  validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
   validates :name, :url, presence: true
   validates :driver, inclusion: { in: DRIVERS }
 
-  scope :ordered, -> { order(:name) }
-
+  encrypts :access_token
   normalizes :url, with: -> url { url.strip }
+
+  scope :ordered, -> { order(:name) }
 
   def ai_backend
     driver == 'Anthropic' ? AIBackend::Anthropic : AIBackend::OpenAI

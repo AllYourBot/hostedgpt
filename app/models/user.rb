@@ -1,12 +1,13 @@
 class User < ApplicationRecord
   include Personable, Registerable
-  encrypts :openai_key, :anthropic_key
 
   has_secure_password validations: false
   has_person_name
 
   validates :first_name, presence: true
   validates :last_name, presence: true, on: :create
+
+  encrypts :openai_key, :anthropic_key
 
   has_many :assistants, -> { not_deleted }
   has_many :assistants_including_deleted, class_name: "Assistant", inverse_of: :user, dependent: :destroy
