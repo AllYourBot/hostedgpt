@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include Authenticate
 
+  skip_before_action :verify_authenticity_token, if: :api_request?
   before_action :set_system_ivars
 
   def default_render(*args)
