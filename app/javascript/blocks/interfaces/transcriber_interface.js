@@ -14,53 +14,46 @@ import Interface from "../interface.js"
 export default class extends Interface {
   logLevel_info
 
-  async Flip(turnOn)  { if (turnOn && !$.active) {
-                          $.active = true
-                          await $.transcriberService.start()
-                          await Flip.Microphone.on()
-                          await Invoke.Listener()
+  async Flip(turnOn)    { if (turnOn && !$.active) {
+                            $.active = true
+                            await $.transcriberService.start()
+                            await Flip.Microphone.on()
+                            await Invoke.Listener()
 
-                        } else if (!turnOn && $.active) {
-                          $.active = false
-                          $.transcriberService.end()
+                          } else if (!turnOn && $.active) {
+                            $.active = false
+                            $.transcriberService.end()
 
-                          await Flip.Microphone.off()
-                          await Disable.Listener()
+                            await Flip.Microphone.off()
+                            await Disable.Listener()
+                          }
                         }
-                      }
 
-  async Approve()     { let approved = await $.transcriberService.start()
-                        $.transcriberService.end()
-                        return approved
-                      }
+  async Approve()       { let approved = await $.transcriberService.start()
+                          $.transcriberService.end()
+                          return approved
+                        }
 
   log_SpeakTo
-  SpeakTo(text)       { $.words += text+' '
-                        if (!$.poller?.handler) $.poller = runEvery(0.2, () => {
-                          log('enough silence...')
-                          if (Microphone.msOfSilence <= 1800) return // what if there is background noise?
+  SpeakTo(text)         { $.words += text+' '
+                          _shortWaitThenTell()
+                        }
 
-                          void Tell.Listener.to.consider($.words)
-                          $.words = ''
-                          $.poller.end()
-                        })
-                      }
+  Cover()               { $.covered = true }
+  Uncover()             { $.transcriberService.restart()
+                          $.covered = false
+                          Play.Speaker.sound('pop', () => {
+                            Loop.Speaker.every(8, 'typing1')
+                          })
+                        }
 
-  Cover()             { $.covered = true }
-  Uncover()           { $.transcriberService.restart()
-                        $.covered = false
-                        Play.Speaker.sound('pop', () => {
-                          Loop.Speaker.every(8, 'typing1')
-                        })
-                      }
+  attr_words            = ''
+  attr_active           = false
 
-  attr_words          = ''
-  attr_active         = false
+  get on()              { return $.active }
+  get off()             { return !$.active }
 
-  get on()            { return $.active }
-  get off()           { return !$.active }
-
-  get supported()     { return Transcriber.$.transcriberService.$.recognizer != null }
+  get supported()       { return Transcriber.$.transcriberService.$.recognizer != null }
 
   new() {
     $.covered = false
@@ -70,4 +63,25 @@ export default class extends Interface {
       SpeakTo.Transcriber.with.words(text)
     }
   }
+
+  _shortWaitThenTell()  { if (!$.tellPoller?.handler) $.tellPoller = runEvery(0.2, () => {
+                            if (Microphone.msOfSilence <= 1800) return // what if there is background noise?
+                            log('enough silence to start processing...')
+
+                            Tell.Listener.to.consider($.words)
+
+                            $.words = ''
+                            $.tellPoller.end()
+                            _longWaitThenDismis()
+                          })
+                        }
+
+  _longWaitThenDismis() { if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
+                            if (Microphone.msOfSilence <= 30000) return // what if there is background noise?
+                            log('enough silence to dismiss...')
+
+                            Dismiss.Listener()
+                            $.dismissPoller.end()
+                          })
+                        }
 }
