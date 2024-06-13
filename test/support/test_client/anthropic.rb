@@ -4,11 +4,11 @@ module TestClient
     def initialize(access_token:, uri_base:nil)
       @uri_base = uri_base
     end
-  
+
     def self.text
       nil
     end
-  
+
     # This response is a valid example response from the API.
     #
     # Stub this method to respond with something more specific if needed.
@@ -40,7 +40,6 @@ module TestClient
           "stop_reason"=>"end_turn",
           "stop_sequence"=>nil,
           "usage"=>{"input_tokens"=>10, "output_tokens"=>19}
-  
         }.dig("content", 0, "text")
       end
     end

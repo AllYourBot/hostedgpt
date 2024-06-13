@@ -4,19 +4,19 @@ module TestClient
     def initialize(access_token:, uri_base:nil)
       @uri_base = uri_base
     end
-  
+
     def self.api_response
       raise "When using the OpenAI test client you need to stub the .api_response method typically with either text_response or function_call_response"
     end
-  
+
     def self.text
       raise "When using the OpenAI test client for api_text_response you need to stub the .text method"
     end
-  
+
     def self.default_text
       "Hello this is model #{@@model} with instruction #{@@instruction.inspect}! How can I assist you today?"
     end
-  
+
     def self.api_text_response
       {
         "id"=> "chatcmpl-abc123abc123abc123abc123abc12",
@@ -38,19 +38,19 @@ module TestClient
         "system_fingerprint"=>nil
       }
     end
-  
+
     def self.id
       "call_BlAN9iRiAD6aCzmBWCjzYxjj"
     end
-  
+
     def self.function
       raise "When using the OpenAI test client for api_function_response you need to stub the .function method"
     end
-  
+
     def self.arguments
       {:city=>"Austin", :state=>"TX", :country=>"US"}.to_json
     end
-  
+
     def self.api_function_response(count = 1)
       {
         "choices" => [
@@ -72,11 +72,11 @@ module TestClient
         ]
       }
     end
-  
+
     def chat(**args)
       @@model = args.dig(:parameters, :model) || "no model"
       @@instruction = args.dig(:parameters, :messages).first[:content]
-  
+
       proc = args.dig(:parameters, :stream)
       raise "No stream proc provided. When calling get_next_chat_message in tests be sure to include a block" if proc.nil?
       proc.call(self.class.api_response)

@@ -86,7 +86,7 @@ class LanguageModelTest < ActiveSupport::TestCase
       assert_no_difference 'Assistant.count' do
         assert_no_difference 'LanguageModel.count' do
           assert language_model.destroy!
-        end 
+        end
       end
     end
     assert_not_nil language_model.reload.deleted_at
@@ -97,7 +97,7 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_equal users(:keith), language_model.user
     assert_difference 'LanguageModel.count', -2 do
       assert users(:keith).destroy!
-    end 
+    end
     assert_equal 0, LanguageModel.where(id: language_model.id).count
   end
 

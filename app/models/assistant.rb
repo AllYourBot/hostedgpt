@@ -22,12 +22,12 @@ class Assistant < ApplicationRecord
 
 
   def destroy_in_database!
-     @destroy_in_database = true
-     begin
-       destroy!
-     ensure 
-       @destroy_in_database = false
-     end
+    @destroy_in_database = true
+    begin
+      destroy!
+    ensure
+      @destroy_in_database = false
+    end
   end
 
   def destroy

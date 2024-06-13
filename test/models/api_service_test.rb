@@ -63,7 +63,7 @@ class APIServiceTest < ActiveSupport::TestCase
       assert_no_difference 'Assistant.count' do
         assert_no_difference 'LanguageModel.count' do
           assert language_model.destroy!
-        end 
+        end
       end
     end
     assert_not_nil language_model.reload.deleted_at

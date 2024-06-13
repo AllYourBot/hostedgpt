@@ -28,7 +28,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response }do
         streamed_text = ""
         open_ai.get_next_chat_message { |chunk| streamed_text += chunk }
-    assert_equal <<-END_INSTRUCTION.chomp, streamed_text
+        assert_equal <<-END_INSTRUCTION.chomp, streamed_text
 Hello this is model pacos-imagine with instruction \"Point out flower-related local items, also historical events involving flowers\"! How can I assist you today?
 END_INSTRUCTION
       end
