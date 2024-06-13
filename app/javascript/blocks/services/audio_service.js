@@ -23,7 +23,7 @@ export default class extends Service {
     _doThePlaying(audio, onEnd)
   }
 
-  _doThePlaying(audio, onEnd) {
+  async _doThePlaying(audio, onEnd) {
     $.playing = true
     try {
       $.player.onended = null
@@ -37,7 +37,11 @@ export default class extends Service {
     $.player.volume = 1
     $.player.src = audio.length >= 30 ? audio : _files(audio)
 
-    $.player.play()
+    try {
+      await $.player.play()
+    } catch(e) {
+      // one cause of exception is if we pause immediately after calling play
+    }
   }
 
   stop() {
