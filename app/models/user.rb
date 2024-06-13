@@ -33,7 +33,7 @@ class User < ApplicationRecord
 
   # Which ones can they choose for their api services
   def usable_language_models
-    LanguageModel.for_user(self)
+    LanguageModel.for_user(self).not_deleted
   end
 
   def destroy_in_progress?

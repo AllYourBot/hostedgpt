@@ -4,6 +4,8 @@ class LanguageModel < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :api_service, optional: true
 
+  has_many :assistants, -> { not_deleted }
+
   validates :name, :description, presence: true
 
   BEST_MODELS = {
@@ -31,16 +33,16 @@ class LanguageModel < ApplicationRecord
       super
     else
       update!(deleted_at: Time.now)
+      assistants.each { |assistant| assistant.destroy! }
     end
   end
 
   scope :ordered, -> { order(:position) }
-  scope :for_user, ->  (user) { where(user_id: [user.id, nil]) }
+  scope :for_user, ->  (user) { where(user_id: [user.id, nil]).not_deleted }
   scope :system_wide, ->  { where(user_id: nil) }
 
   before_create :populate_position
 
-  has_many :assistants
 
   def provider_name
     BEST_MODELS[name] || name

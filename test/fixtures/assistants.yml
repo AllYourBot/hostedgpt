@@ -46,3 +46,12 @@ mandela_gpt4:
   instructions: Be helpful
   tools:  [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
   external_id: OpenAI ID 1
+
+alpaca_asst:
+  user: taylor
+  language_model: alpaca
+  name: Game Alpaca 
+  description: Play games (Alpaca backed)
+  instructions: Take 5 then 4
+  tools:  []
+  external_id: 

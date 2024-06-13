@@ -74,6 +74,52 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
   end
 
+  test "ai_backend for user models" do
+    assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
+    assert_equal AIBackend::OpenAI, language_models(:guanaco).ai_backend
+  end
+
+  test "destroy is soft-delete" do
+    language_model = language_models(:alpaca)
+    assert_nil language_model.reload.deleted_at
+    assert_difference "language_model.reload.assistants.count", -1 do
+      assert_no_difference 'Assistant.count' do
+        assert_no_difference 'LanguageModel.count' do
+          assert language_model.destroy!
+        end 
+      end
+    end
+    assert_not_nil language_model.reload.deleted_at
+  end
+
+  test "can delete from db when deleting user" do
+    language_model = language_models(:camel)
+    assert_equal users(:keith), language_model.user
+    assert_difference 'LanguageModel.count', -2 do
+      assert users(:keith).destroy!
+    end 
+    assert_equal 0, LanguageModel.where(id: language_model.id).count
+  end
+
+  test "for_user scope" do
+    list = LanguageModel.for_user(users(:keith)).all.pluck(:name)
+    assert list.include?('camel')
+    assert list.include?('gpt-best')
+    refute list.include?('alpaca')
+
+    list = LanguageModel.for_user(users(:taylor)).all.pluck(:name)
+    refute list.include?('camel')
+    assert list.include?('gpt-best')
+    assert list.include?('alpaca:medium')
+  end
+
+  test "system_wide scope" do
+    list = LanguageModel.system_wide.all.pluck(:name)
+    assert list.include?('gpt-best')
+    refute list.include?('camel')
+    refute list.include?('alpaca:medium')
+  end
+
   test "provider_name for best models" do
     assert_equal "gpt-4o-2024-05-13", language_models(:gpt_best).provider_name
     assert_equal "claude-3-opus-20240229", language_models(:claude_best).provider_name

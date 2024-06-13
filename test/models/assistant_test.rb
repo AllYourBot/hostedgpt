@@ -56,7 +56,7 @@ class AssistantTest < ActiveSupport::TestCase
     end
   end
 
-  test "associations are deleted upon destroy" do
+  test "associations are deleted upon destroy_in_database" do
     assistant = assistants(:samantha)
     conversation_count = assistant.conversations.count * -1
     message_count = assistant.conversations.map { |c| c.messages.length }.sum * -1
@@ -69,12 +69,29 @@ class AssistantTest < ActiveSupport::TestCase
         assert_difference "Document.count", document_count do
           assert_difference "Run.count", run_count do
             assert_difference "Step.count", step_count do
-              assistant.destroy
+              assistant.destroy_in_database!
             end
           end
         end
       end
     end
+  end
+
+  test "associations are left intact upon destroy" do
+    assistant = assistants(:samantha)
+
+    assert_no_difference "Message.count" do
+      assert_no_difference "Conversation.count" do
+        assert_no_difference "Document.count" do
+          assert_no_difference "Run.count" do
+            assert_no_difference "Step.count" do
+              assistant.destroy!
+            end
+          end
+        end
+      end
+    end
+    refute_nil assistant.deleted_at
   end
 
   test "associations are not deleted upon soft delete" do

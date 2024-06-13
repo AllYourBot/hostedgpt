@@ -5,6 +5,8 @@ class APIService < ApplicationRecord
 
   belongs_to :user
 
+  has_many :language_models, -> { not_deleted }
+
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]),  if: -> { url.present? }
   validates :name, :url, presence: true
   validates :driver, inclusion: { in: DRIVERS }
@@ -23,6 +25,7 @@ class APIService < ApplicationRecord
       super
     else
       update!(deleted_at: Time.now)
+      language_models.each { |language_model| language_model.destroy! }
     end
   end
 end
