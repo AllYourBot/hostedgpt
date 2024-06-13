@@ -5,9 +5,53 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_instance_of Assistant, language_models(:gpt_4o).assistants.first
   end
 
+  test "can have User" do
+    assert_instance_of User, language_models(:guanaco).user
+    assert_nil language_models(:gpt_best).user
+  end
+
+  test "can have API Service" do
+    assert_instance_of APIService, language_models(:guanaco).api_service
+    assert_nil language_models(:gpt_best).api_service
+  end
+
+  test "validates name" do
+    record = LanguageModel.new(name: '')
+    refute record.valid?
+    assert_equal ["can't be blank"], record.errors[:name]
+  end
+
+  test "validates description" do
+    record = LanguageModel.new(description: '')
+    refute record.valid?
+    assert_equal ["can't be blank"], record.errors[:description]
+  end
+
   test "is readonly?" do
     assert language_models(:gpt_best).readonly?
-    assert language_models(:claude_best).readonly?
+    assert !language_models(:alpaca).readonly?
+  end
+
+  test "cannot create without user" do
+    record = LanguageModel.new(name: "demo name", description: "good one", supports_images: false)
+    assert record.valid?
+    assert record.readonly?
+    assert_no_difference 'LanguageModel.count' do
+      assert_raises ActiveRecord::ReadOnlyRecord do
+        refute record.save
+      end
+    end
+  end
+
+  test "can create" do
+    record = LanguageModel.new(name: "demo name", description: "good one", supports_images: true, user: users(:rob))
+    assert record.valid?
+    assert_difference 'LanguageModel.count' do
+      assert record.save
+    end
+    record.reload
+    assert_equal users(:rob).id, record.user_id
+    assert record.position > 0
   end
 
   test "supports_images?" do
