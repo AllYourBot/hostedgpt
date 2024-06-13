@@ -17,6 +17,7 @@ class Assistant < ApplicationRecord
   validates :name, presence: true
 
   scope :ordered, -> { order(:id) }
+  scope :not_deleted, -> { where(deleted_at: nil) }
 
   def initials
     return nil if name.blank?
