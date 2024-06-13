@@ -1,5 +1,9 @@
 # We don"t care about large or not
 class LanguageModel < ApplicationRecord
+  BEST_MODELS = {
+    "gpt-best" => "gpt-4o-2024-05-13",
+    "claude-best" => "claude-3-opus-20240229"
+  }
 
   belongs_to :user, optional: true
   belongs_to :api_service, optional: true
@@ -8,10 +12,11 @@ class LanguageModel < ApplicationRecord
 
   validates :name, :description, presence: true
 
-  BEST_MODELS = {
-    "gpt-best" => "gpt-4o-2024-05-13",
-    "claude-best" => "claude-3-opus-20240229"
-  }
+  before_create :populate_position
+
+  scope :ordered, -> { order(:position) }
+  scope :for_user, ->  (user) { where(user_id: [user.id, nil]).not_deleted }
+  scope :system_wide, ->  { where(user_id: nil) }
 
   def ai_backend
     if api_service.present?
@@ -37,13 +42,6 @@ class LanguageModel < ApplicationRecord
     end
   end
 
-  scope :ordered, -> { order(:position) }
-  scope :for_user, ->  (user) { where(user_id: [user.id, nil]).not_deleted }
-  scope :system_wide, ->  { where(user_id: nil) }
-
-  before_create :populate_position
-
-
   def provider_name
     BEST_MODELS[name] || name
   end
@@ -52,9 +50,10 @@ class LanguageModel < ApplicationRecord
     user == Current.user
   end
 
+  private
+
   def populate_position
     return unless position.blank?
     self.position = (LanguageModel.maximum(:position) || 0) + 1
   end
-
 end
