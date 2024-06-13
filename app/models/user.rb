@@ -26,4 +26,12 @@ class User < ApplicationRecord
   def preferences
     attributes["preferences"].with_defaults(dark_mode: "system")
   end
+
+  def openai_key
+    self.attributes["openai_key"].presence || (Feature.default_llm_keys? ? Setting.default_openai_key : nil)
+  end
+
+  def anthropic_key
+    self.attributes["anthropic_key"].presence || (Feature.default_llm_keys? ? Setting.default_anthropic_key : nil)
+  end
 end
