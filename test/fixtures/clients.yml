@@ -19,13 +19,6 @@ keith_api:
   user_agent:
   ip_address:
 
-keith_tool:
-  person: keith_registered
-  token: xyz004
-  platform: tool
-  user_agent:
-  ip_address:
-
 rob_browser:
   person: rob_registered
   token: xyz005
