@@ -88,12 +88,27 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "it treats blank String API keys as nil to allow for default keys" do
-    stub_features(default_llm_keys: false) do
-      user = users(:keith)
-      user.update!(openai_key: '', anthropic_key: ' ')
-      assert_nil user.preferred_openai_key
-      assert_nil user.preferred_anthropic_key
+  test "when default_llm_keys is enabled but left blank then user keys will be used" do
+    user = users(:keith)
+    user.update!(openai_key: "GPT321", anthropic_key: "CLAUDE123")
+
+    stub_features(default_llm_keys: true) do
+      stub_settings(default_openai_key: " ", default_anthropic_key: "") do
+        assert_equal "GPT321", user.preferred_openai_key
+        assert_equal "CLAUDE123", user.preferred_anthropic_key
+      end
+    end
+  end
+
+  test "when default_llm_keys is enabled then empty user keys will fall back to default keys" do
+    user = users(:keith)
+    user.update!(openai_key: " ", anthropic_key: nil)
+
+    stub_features(default_llm_keys: true) do
+      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123") do
+        assert_equal "gpt321", user.preferred_openai_key
+        assert_equal "claude123", user.preferred_anthropic_key
+      end
     end
   end
 end
