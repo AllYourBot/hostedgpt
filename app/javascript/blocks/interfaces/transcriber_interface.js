@@ -44,6 +44,7 @@ export default class extends Interface {
                           $.covered = false
                           Play.Speaker.sound('pop', () => {
                             Loop.Speaker.every(8, 'typing1')
+                            _longWaitThenDismis()
                           })
                         }
 
@@ -72,7 +73,6 @@ export default class extends Interface {
 
                             $.words = ''
                             $.tellPoller.end()
-                            _longWaitThenDismis()
                           })
                         }
 
