@@ -92,8 +92,8 @@ class UserTest < ActiveSupport::TestCase
     stub_features(default_llm_keys: false) do
       user = users(:keith)
       user.update!(openai_key: '', anthropic_key: ' ')
-      assert_nil user.openai_key
-      assert_nil user.anthropic_key
+      assert_nil user.preferred_openai_key
+      assert_nil user.preferred_anthropic_key
     end
   end
 end
