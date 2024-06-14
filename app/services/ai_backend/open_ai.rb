@@ -49,9 +49,9 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def initialize(user, assistant, conversation, message)
-    raise ::OpenAI::ConfigurationError if user.openai_key.blank?
+    raise ::OpenAI::ConfigurationError if user.preferred_openai_key.blank?
     begin
-      @client = self.class.client.new(access_token: user.openai_key)
+      @client = self.class.client.new(access_token: user.preferred_openai_key)
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
     end

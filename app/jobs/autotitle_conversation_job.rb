@@ -8,7 +8,7 @@ class AutotitleConversationJob < ApplicationJob
   def perform(conversation_id)
     conversation = Conversation.find(conversation_id)
     Current.user = conversation.user
-    return false if Current.user.openai_key.blank? # should we use anthropic key if that's all the user has?
+    return false if Current.user.preferred_openai_key.blank? # should we use anthropic key if that's all the user has?
 
     messages = conversation.messages.ordered.limit(4)
     raise ConversationNotReady  if messages.empty?
