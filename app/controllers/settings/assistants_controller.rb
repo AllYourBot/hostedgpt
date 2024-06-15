@@ -13,7 +13,7 @@ class Settings::AssistantsController < Settings::ApplicationController
     @assistant = Current.user.assistants.new(assistant_params)
 
     if @assistant.save
-      redirect_to edit_settings_assistant_path(@assistant), notice: "Saved"
+      redirect_to edit_settings_assistant_path(@assistant), notice: "Saved", status: :see_other
     else
       render :new, status: :unprocessable_entity
     end

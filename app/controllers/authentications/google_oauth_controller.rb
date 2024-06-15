@@ -34,7 +34,7 @@ class Authentications::GoogleOauthController < ApplicationController
 
   def destroy
     if Current.user
-      redirect_to edit_settings_person_path, alert: "Cancelled"
+      redirect_to edit_settings_person_path, alert: "Cancelled", status: :see_other
     else
       redirect_to login_path
     end

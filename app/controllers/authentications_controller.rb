@@ -9,10 +9,10 @@ class AuthenticationsController < ApplicationController
 
   def create
     person = Person.find_by(email: params[:email])
-    @user = person&.personable
+    user = person&.personable
 
-    if person.present? && @user&.password_credential&.authenticate(params[:password])
-      login_as(person, credential: @user.password_credential)
+    if person.present? && user&.password_credential&.authenticate(params[:password])
+      login_as(person, credential: user.password_credential)
       redirect_to root_path
       return
     end

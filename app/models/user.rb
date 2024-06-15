@@ -54,7 +54,11 @@ class User < ApplicationRecord
     self.attributes["openai_key"].presence || (Feature.default_llm_keys? ? Setting.default_openai_key : nil)
   end
 
-  def anthropic_key
-    self.attributes["anthropic_key"].presence || (Feature.default_llm_keys? ? Setting.default_anthropic_key : nil)
+  def preferred_openai_key
+    self.openai_key.presence || (Feature.default_llm_keys? ? Setting.default_openai_key : nil)
+  end
+
+  def preferred_anthropic_key
+    self.anthropic_key.presence || (Feature.default_llm_keys? ? Setting.default_anthropic_key : nil)
   end
 end

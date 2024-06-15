@@ -27,11 +27,15 @@ class Feature
     end
 
     def enabled?(feature)
+      feature_value = Current.user&.preferences&.dig(:feature, feature.to_sym)
+
       begin
-        ActiveModel::Type::Boolean.new.cast(features.fetch(feature&.to_sym))
+        feature_value = feature_value.to_s.presence || features.fetch(feature.to_sym)
       rescue KeyError
         raise KeyError, "You attempted to reference the Feature '#{feature}' but this is not configured within options.yml. Did you typo a feature name?"
       end
+
+      feature_value.to_b
     end
 
     def disabled?(feature)
