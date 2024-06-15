@@ -2,7 +2,7 @@ class Settings::APIServicesController < Settings::ApplicationController
   before_action :set_api_service, only: [:edit, :update, :destroy]
 
   def index
-    @api_services = Current.user.api_services.all.order(updated_at: :desc)
+    @api_services = Current.user.api_services.ordered
   end
 
   def edit
@@ -16,7 +16,7 @@ class Settings::APIServicesController < Settings::ApplicationController
     @api_service = Current.user.api_services.new(api_service_params)
 
     if @api_service.save
-      redirect_to settings_api_services_path, notice: "Saved"
+      redirect_to settings_api_services_path, notice: "Saved", status: :see_other
     else
       render :new, status: :unprocessable_entity
     end
@@ -36,13 +36,6 @@ class Settings::APIServicesController < Settings::ApplicationController
   end
 
   private
-
-  def set_users_api_service
-    @api_service = Current.user.api_services.find_by(id: params[:id])
-    if @api_service.nil?
-      redirect_to new_settings_api_service_url, notice: "The API Service was deleted", status: :see_other
-    end
-  end
 
   def set_api_service
     @api_service = Current.user.api_services.find_by(id: params[:id])
