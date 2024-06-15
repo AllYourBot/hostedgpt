@@ -27,8 +27,8 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create language_model" do
-    params = language_models(:camel).slice(:name, :api_service_id, :description, :supports_images)
-    params[:name] = "new service"
+    params = language_models(:camel).slice(:api_name, :api_service_id, :description, :supports_images)
+    params[:api_name] = "new service"
 
     assert_difference("LanguageModel.count") do
       post settings_language_models_url, params: { language_model: params }
@@ -36,7 +36,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to settings_language_models_url
     assert_nil flash[:error]
-    assert_equal params, LanguageModel.last.slice(:name, :api_service_id, :description, :supports_images)
+    assert_equal params, LanguageModel.last.slice(:api_name, :api_service_id, :description, :supports_images)
     assert_equal @user, LanguageModel.last.user
   end
 
@@ -71,23 +71,23 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not update other user's language_model" do
-    original_params = language_models(:alpaca).slice(:name, :description)
-    params = {"name": "New Name", "description": "New Desc"}
+    original_params = language_models(:alpaca).slice(:api_name, :description)
+    params = {"api_name": "New Name", "description": "New Desc"}
     patch settings_language_model_url(language_models(:alpaca)), params: { language_model: params }
 
     assert_redirected_to new_settings_language_model_url
     assert_nil flash[:error]
     assert_equal "The Language Model could not be found", flash[:notice]
-    assert_equal original_params, language_models(:alpaca).reload.slice(:name, :description)
+    assert_equal original_params, language_models(:alpaca).reload.slice(:api_name, :description)
   end
 
   test "should update language_model" do
-    params = {"name" => "New Name", "description" => "New Desc", "supports_images" => true}
+    params = {"api_name" => "New Name", "description" => "New Desc", "supports_images" => true}
     patch settings_language_model_url(@language_model), params: { language_model: params }
 
     assert_redirected_to edit_settings_language_model_url(@language_model)
     assert_nil flash[:error]
-    assert_equal params, @language_model.reload.slice(:name, :description, :supports_images)
+    assert_equal params, @language_model.reload.slice(:api_name, :description, :supports_images)
   end
 
   test "destroy should soft-delete language_model" do

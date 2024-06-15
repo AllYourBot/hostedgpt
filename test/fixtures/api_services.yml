@@ -2,26 +2,26 @@ keith_service:
   name: Keith Server
   user: :keith
   url: http://test.com/models
-  access_token: abc-secret
+  token: abc-secret
   driver: OpenAI
 
 rob_service:
   name: Rob Server
   user: :rob
   url: http://rob-test.com/models
-  access_token: rob-secret
+  token: rob-secret
   driver: Anthropic
 
 taylor_anthropic_service:
   name: Taylor Anth Server
   user: :taylor
   url: http://taylor.org/doit
-  access_token: ta-secret
+  token: ta-secret
   driver: Anthropic
 
 taylor_openai_service:
   name: Taylor OpenAI Server
   user: :taylor
   url: http://taylor.org/doit-open
-  access_token: open-secret
+  token: open-secret
   driver: OpenAI

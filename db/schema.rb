@@ -49,15 +49,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_10_180800) do
   end
 
   create_table "api_services", force: :cascade do |t|
-    t.bigint "user_id"
+    t.bigint "user_id", null: false
     t.string "name", null: false
-    t.string "driver", null: false
+    t.string "driver", null: false, comment: "What API spec does this service conform to, e.g. OpenAI or Anthropic"
     t.string "url", null: false
-    t.string "access_token"
+    t.string "token"
     t.datetime "deleted_at", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id", "deleted_at"], name: "index_api_services_on_user_id_and_deleted_at"
+    t.index ["user_id"], name: "index_api_services_on_user_id"
   end
 
   create_table "assistants", force: :cascade do |t|
@@ -70,7 +71,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_10_180800) do
     t.datetime "updated_at", null: false
     t.bigint "language_model_id"
     t.datetime "deleted_at", precision: nil
-    t.bigint "api_service_id"
     t.text "external_id", comment: "The Backend AI's (e.g OpenAI) assistant id"
     t.index ["external_id"], name: "index_assistants_on_external_id", unique: true
     t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
@@ -155,16 +155,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_10_180800) do
 
   create_table "language_models", force: :cascade do |t|
     t.integer "position", null: false
-    t.string "name", null: false
+    t.string "api_name", null: false, comment: "This is the name that API calls are expecting."
     t.text "description", null: false
     t.boolean "supports_images", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.datetime "deleted_at", precision: nil
+    t.bigint "users_id"
     t.bigint "api_service_id"
     t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
+    t.index ["users_id"], name: "index_language_models_on_users_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -374,6 +376,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_10_180800) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "api_services", "users"
   add_foreign_key "assistants", "language_models"
   add_foreign_key "assistants", "users"
   add_foreign_key "authentications", "clients"
@@ -388,6 +391,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_10_180800) do
   add_foreign_key "documents", "messages"
   add_foreign_key "documents", "users"
   add_foreign_key "language_models", "api_services"
+  add_foreign_key "language_models", "users", column: "users_id"
   add_foreign_key "messages", "assistants"
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "documents", column: "content_document_id"

@@ -10,7 +10,7 @@ class LanguageModel < ApplicationRecord
 
   has_many :assistants, -> { not_deleted }
 
-  validates :name, :description, presence: true
+  validates :api_name, :description, presence: true
 
   before_create :populate_position
 
@@ -21,7 +21,7 @@ class LanguageModel < ApplicationRecord
   def ai_backend
     if api_service.present?
       api_service.ai_backend
-    elsif name.starts_with?('gpt-')
+    elsif api_name.starts_with?('gpt-')
       AIBackend::OpenAI
     else
       AIBackend::Anthropic
@@ -29,7 +29,7 @@ class LanguageModel < ApplicationRecord
   end
 
   def readonly?
-    user_id.blank?
+    !new_record? && user.blank?
   end
 
   def destroy
@@ -43,7 +43,7 @@ class LanguageModel < ApplicationRecord
   end
 
   def provider_name
-    BEST_MODELS[name] || name
+    BEST_MODELS[api_name] || api_name
   end
 
   def created_by_current_user?

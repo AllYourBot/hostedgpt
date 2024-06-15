@@ -9,7 +9,7 @@ class APIService < ApplicationRecord
   validates :name, :url, presence: true
   validates :driver, inclusion: { in: DRIVERS }
 
-  encrypts :access_token
+  encrypts :token
   normalizes :url, with: -> url { url.strip }
 
   scope :ordered, -> { order(:name) }

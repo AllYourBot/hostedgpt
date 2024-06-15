@@ -84,12 +84,12 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update api_service" do
-    params = {"name" => "New Name", "url" => "http://new-url.com", "access_token" => "new secret token"}
+    params = {"name" => "New Name", "url" => "http://new-url.com", "token" => "new secret token"}
     patch settings_api_service_url(@api_service), params: { api_service: params }
 
     assert_redirected_to edit_settings_api_service_url(@api_service)
     assert_nil flash[:error]
-    assert_equal params, @api_service.reload.slice(:name, :url, :access_token)
+    assert_equal params, @api_service.reload.slice(:name, :url, :token)
   end
 
   test "destroy should soft-delete api_service" do

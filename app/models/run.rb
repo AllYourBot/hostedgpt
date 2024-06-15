@@ -14,6 +14,6 @@ class Run < ApplicationRecord
   private
 
   def set_model
-    self.model = assistant&.language_model&.name
+    self.model = assistant&.language_model&.api_name
   end
 end

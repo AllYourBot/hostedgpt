@@ -6,16 +6,16 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "has language models" do
-    assert_equal ["camel", "guanaco:large"], users(:keith).language_models.ordered.pluck(:name)
-    assert_equal ["alpaca:medium", "pacos-imagine"], users(:taylor).language_models.ordered.pluck(:name)
-    assert_equal [], users(:rob).language_models.ordered.pluck(:name)
+    assert_equal ["camel", "guanaco:large"], users(:keith).language_models.ordered.pluck(:api_name)
+    assert_equal ["alpaca:medium", "pacos-imagine"], users(:taylor).language_models.ordered.pluck(:api_name)
+    assert_equal [], users(:rob).language_models.ordered.pluck(:api_name)
   end
 
   test "has usable language models" do
-    system = LanguageModel.where(user_id: nil).all.pluck(:name).sort
-    assert_equal (system + ["camel", "guanaco:large"]).sort, users(:keith).usable_language_models.pluck(:name).sort
-    assert_equal (system + ["alpaca:medium", "pacos-imagine"]).sort, users(:taylor).usable_language_models.pluck(:name).sort
-    assert_equal system, users(:rob).usable_language_models.pluck(:name).sort
+    system = LanguageModel.where(user_id: nil).all.pluck(:api_name).sort
+    assert_equal (system + ["camel", "guanaco:large"]).sort, users(:keith).usable_language_models.pluck(:api_name).sort
+    assert_equal (system + ["alpaca:medium", "pacos-imagine"]).sort, users(:taylor).usable_language_models.pluck(:api_name).sort
+    assert_equal system, users(:rob).usable_language_models.pluck(:api_name).sort
   end
 
   test "has associated credentials" do

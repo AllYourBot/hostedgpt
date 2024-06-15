@@ -33,13 +33,13 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal ["is invalid"], record.errors[:url]
   end
 
-  test "encrypts access_token" do
+  test "encrypts token" do
     api_service = api_services(:keith_service)
-    old_cipher_text = api_service.ciphertext_for(:access_token)
-    api_service.update!(access_token: "new secret")
+    old_cipher_text = api_service.ciphertext_for(:token)
+    api_service.update!(token: "new secret")
     assert api_service.reload
-    refute_equal old_cipher_text, api_service.ciphertext_for(:access_token)
-    assert_equal "new secret", api_service.access_token
+    refute_equal old_cipher_text, api_service.ciphertext_for(:token)
+    assert_equal "new secret", api_service.token
   end
 
   test "ai_backend" do
@@ -91,6 +91,6 @@ class APIServiceTest < ActiveSupport::TestCase
       name: "ABC Serv",
       driver: "Anthropic",
       url: "http://abcdef.com/models",
-      access_token: "access-token"}
+      token: "access-token"}
   end
 end

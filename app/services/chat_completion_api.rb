@@ -58,7 +58,7 @@ class ChatCompletionAPI
     end
 
     client = OpenAI::Client.new(
-      access_token: Current.user.preferred_openai_key,
+      token: Current.user.preferred_openai_key,
       request_timeout: 240,
     )
 

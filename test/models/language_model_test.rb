@@ -16,9 +16,9 @@ class LanguageModelTest < ActiveSupport::TestCase
   end
 
   test "validates name" do
-    record = LanguageModel.new(name: '')
+    record = LanguageModel.new(api_name: '')
     refute record.valid?
-    assert_equal ["can't be blank"], record.errors[:name]
+    assert_equal ["can't be blank"], record.errors[:api_name]
   end
 
   test "validates description" do
@@ -32,19 +32,18 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert !language_models(:alpaca).readonly?
   end
 
-  test "cannot create without user" do
-    record = LanguageModel.new(name: "demo name", description: "good one", supports_images: false)
+  # But controller populates the user_id implicitly
+  test "can create without user" do
+    record = LanguageModel.new(api_name: "demo name", description: "good one", supports_images: false)
     assert record.valid?
-    assert record.readonly?
-    assert_no_difference 'LanguageModel.count' do
-      assert_raises ActiveRecord::ReadOnlyRecord do
-        refute record.save
-      end
+    refute record.readonly?
+    assert_difference 'LanguageModel.count' do
+      assert record.save
     end
   end
 
   test "can create" do
-    record = LanguageModel.new(name: "demo name", description: "good one", supports_images: true, user: users(:rob))
+    record = LanguageModel.new(api_name: "demo name", description: "good one", supports_images: true, user: users(:rob))
     assert record.valid?
     assert_difference 'LanguageModel.count' do
       assert record.save
@@ -102,19 +101,19 @@ class LanguageModelTest < ActiveSupport::TestCase
   end
 
   test "for_user scope" do
-    list = LanguageModel.for_user(users(:keith)).all.pluck(:name)
+    list = LanguageModel.for_user(users(:keith)).all.pluck(:api_name)
     assert list.include?('camel')
     assert list.include?('gpt-best')
     refute list.include?('alpaca')
 
-    list = LanguageModel.for_user(users(:taylor)).all.pluck(:name)
+    list = LanguageModel.for_user(users(:taylor)).all.pluck(:api_name)
     refute list.include?('camel')
     assert list.include?('gpt-best')
     assert list.include?('alpaca:medium')
   end
 
   test "system_wide scope" do
-    list = LanguageModel.system_wide.all.pluck(:name)
+    list = LanguageModel.system_wide.all.pluck(:api_name)
     assert list.include?('gpt-best')
     refute list.include?('camel')
     refute list.include?('alpaca:medium')

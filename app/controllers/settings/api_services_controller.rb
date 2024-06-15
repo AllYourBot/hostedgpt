@@ -52,6 +52,6 @@ class Settings::APIServicesController < Settings::ApplicationController
   end
 
   def api_service_params
-    params.require(:api_service).permit(:name, :url, :access_token, :driver)
+    params.require(:api_service).permit(:name, :url, :token, :driver)
   end
 end
