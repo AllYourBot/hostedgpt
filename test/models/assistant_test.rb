@@ -69,7 +69,7 @@ class AssistantTest < ActiveSupport::TestCase
         assert_difference "Document.count", document_count do
           assert_difference "Run.count", run_count do
             assert_difference "Step.count", step_count do
-              assistant.destroy_in_database!
+              assistant.destroy!
             end
           end
         end
@@ -77,7 +77,7 @@ class AssistantTest < ActiveSupport::TestCase
     end
   end
 
-  test "associations are left intact upon destroy" do
+  test "associations are left intact upon delete!" do
     assistant = assistants(:samantha)
 
     assert_no_difference "Message.count" do
@@ -85,7 +85,7 @@ class AssistantTest < ActiveSupport::TestCase
         assert_no_difference "Document.count" do
           assert_no_difference "Run.count" do
             assert_no_difference "Step.count" do
-              assistant.destroy!
+              assistant.delete!
             end
           end
         end

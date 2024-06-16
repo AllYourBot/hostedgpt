@@ -16,7 +16,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get index without table if user has none" do
-    @api_service.destroy!
+    @api_service.delete!
     get settings_api_services_url
     assert_response :success
     assert_select 'table', count: 0
@@ -44,7 +44,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "cannot view a deleted record" do
-    @api_service.destroy!
+    @api_service.delete!
     get edit_settings_api_service_url(@api_service)
     assert_response :see_other
     assert_redirected_to new_settings_api_service_url

@@ -35,7 +35,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   end
 
   def destroy
-    @language_model.destroy!
+    @language_model.delete!
     redirect_to new_settings_language_model_url, notice: "Deleted", status: :see_other
   end
 

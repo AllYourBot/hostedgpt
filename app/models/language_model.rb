@@ -9,6 +9,7 @@ class LanguageModel < ApplicationRecord
   belongs_to :api_service, optional: true
 
   has_many :assistants, -> { not_deleted }
+  has_many :assistants_including_deleted, class_name: "Assistant", dependent: :destroy
 
   validates :api_name, :description, presence: true
 
@@ -32,14 +33,10 @@ class LanguageModel < ApplicationRecord
     !new_record? && user.blank?
   end
 
-  def destroy
+  def delete!
     raise ActiveRecord::ReadOnlyError 'System model cannot be deleted' if user.blank?
-    if user.destroy_in_progress?
-      super
-    else
-      update!(deleted_at: Time.now)
-      assistants.each { |assistant| assistant.destroy! }
-    end
+    update!(deleted_at: Time.now)
+    assistants.each { |assistant| assistant.deleted! }
   end
 
   def provider_name

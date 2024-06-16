@@ -31,7 +31,7 @@ class Settings::APIServicesController < Settings::ApplicationController
   end
 
   def destroy
-    @api_service.destroy!
+    @api_service.delete!
     redirect_to new_settings_api_service_url, notice: "Deleted", status: :see_other
   end
 

@@ -51,18 +51,18 @@ class APIServiceTest < ActiveSupport::TestCase
     api_service = api_services(:keith_service)
     assert_nil api_service.reload.deleted_at
     assert_no_difference "APIService.count" do
-      api_service.destroy!
+      api_service.delete!
     end
     refute_nil api_service.reload.deleted_at
   end
 
-  test "destroy with assistant" do
+  test "delete with assistant" do
     language_model = language_models(:alpaca)
     assert_nil language_model.reload.deleted_at
     assert_difference "language_model.reload.assistants.count", -1 do
       assert_no_difference 'Assistant.count' do
         assert_no_difference 'LanguageModel.count' do
-          assert language_model.destroy!
+          assert language_model.delete!
         end
       end
     end

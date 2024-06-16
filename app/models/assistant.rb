@@ -19,21 +19,8 @@ class Assistant < ApplicationRecord
 
   scope :ordered, -> { order(:id) }
 
-  def destroy_in_database!
-    @destroy_in_database = true
-    begin
-      destroy!
-    ensure
-      @destroy_in_database = false
-    end
-  end
-
-  def destroy
-    if @destroy_in_database || user.destroy_in_progress?
-      super
-    else
-      update!(deleted_at: Time.now) # We leave all the conversations, messages etc still intact.
-    end
+  def delete!
+    update!(deleted_at: Time.now)
   end
 
   def initials

@@ -78,13 +78,13 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_equal AIBackend::OpenAI, language_models(:guanaco).ai_backend
   end
 
-  test "destroy is soft-delete" do
+  test "delete is soft-delete" do
     language_model = language_models(:alpaca)
     assert_nil language_model.reload.deleted_at
     assert_difference "language_model.reload.assistants.count", -1 do
       assert_no_difference 'Assistant.count' do
         assert_no_difference 'LanguageModel.count' do
-          assert language_model.destroy!
+          assert language_model.delete!
         end
       end
     end

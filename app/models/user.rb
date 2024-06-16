@@ -32,19 +32,6 @@ class User < ApplicationRecord
     attributes["preferences"].with_defaults(dark_mode: "system")
   end
 
-  def destroy_in_progress?
-    @destroy_in_progress
-  end
-
-  def destroy
-    @destroy_in_progress = true
-    begin
-      super
-    ensure
-      @destroy_in_progress = false
-    end
-  end
-
   def openai_key
     self.attributes["openai_key"].presence || (Feature.default_llm_keys? ? Setting.default_openai_key : nil)
   end
