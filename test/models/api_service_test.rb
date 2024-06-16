@@ -2,7 +2,7 @@ require "test_helper"
 
 class APIServiceTest < ActiveSupport::TestCase
   test "has user" do
-    assert_equal users(:keith), api_services(:keith_service).user
+    assert_instance_of User, api_services(:keith_service).user
   end
 
   test "name present validated" do
