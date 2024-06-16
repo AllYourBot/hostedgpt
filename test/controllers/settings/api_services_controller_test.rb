@@ -55,7 +55,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_api_service_url(@api_service)
     assert_response :success
     assert_contains_text "div#nav-container", "Your Account"
-    assert_select "h1", "Editing  API Service Keith Server"
+    assert_select "h1", "Editing API Service Keith Server"
     assert_select "form"
   end
 

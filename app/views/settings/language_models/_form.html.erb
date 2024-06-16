@@ -1,7 +1,7 @@
 <%= form_with(model: [:settings, language_model], class: "contents") do |form| %>
   <% if language_model.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(language_model.errors.count, "error") %> prohibited this language_model from being saved:</h2>
+      <h2><%= pluralize(language_model.errors.count, "error") %> prohibited this language model from being saved:</h2>
 
       <ul>
         <% language_model.errors.each do |error| %>

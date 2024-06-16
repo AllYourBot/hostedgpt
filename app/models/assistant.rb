@@ -10,6 +10,7 @@ class Assistant < ApplicationRecord
   has_many :messages, dependent: :destroy
 
   delegate :supports_images?, to: :language_model
+  delegate :api_service, to: :language_model
 
   belongs_to :language_model
 
@@ -17,9 +18,6 @@ class Assistant < ApplicationRecord
   validates :name, presence: true
 
   scope :ordered, -> { order(:id) }
-
-  delegate :api_service, to: :language_model
-
 
   def destroy_in_database!
     @destroy_in_database = true

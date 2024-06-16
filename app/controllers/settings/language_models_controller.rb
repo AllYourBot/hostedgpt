@@ -1,6 +1,6 @@
 class Settings::LanguageModelsController < Settings::ApplicationController
   before_action :set_users_language_model, only: [:edit, :update, :destroy]
-  before_action :set_language_model, only: [:show]
+  before_action :set_system_language_model, only: [:show]
 
   def index
     @language_models = LanguageModel.for_user(Current.user).order(updated_at: :desc)
@@ -48,7 +48,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
     end
   end
 
-  def set_language_model
+  def set_system_language_model
     @language_model = LanguageModel.find_by(id: params[:id])
   end
 

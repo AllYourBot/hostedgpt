@@ -44,8 +44,15 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_language_model_url(@language_model)
     assert_response :success
     assert_contains_text "div#nav-container", "Your Account"
-    assert_select "h1", "Editing  Language Model camel"
+    assert_select "h1", "Editing Language Model camel"
     assert_select "form"
+  end
+
+  test "should not allow viewing other user's records" do
+    get edit_settings_language_model_url(language_models(:pacos))
+    assert_response :see_other
+    assert_redirected_to new_settings_language_model_url
+    assert_equal "The Language Model could not be found", flash[:notice]
   end
 
   test "cannot view a deleted record" do

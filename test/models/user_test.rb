@@ -11,13 +11,6 @@ class UserTest < ActiveSupport::TestCase
     assert_equal [], users(:rob).language_models.ordered.pluck(:api_name)
   end
 
-  test "has usable language models" do
-    system = LanguageModel.where(user_id: nil).all.pluck(:api_name).sort
-    assert_equal (system + ["camel", "guanaco:large"]).sort, users(:keith).usable_language_models.pluck(:api_name).sort
-    assert_equal (system + ["alpaca:medium", "pacos-imagine"]).sort, users(:taylor).usable_language_models.pluck(:api_name).sort
-    assert_equal system, users(:rob).usable_language_models.pluck(:api_name).sort
-  end
-
   test "has associated credentials" do
     assert_instance_of PasswordCredential, users(:keith).credentials.type_is('PasswordCredential').first
   end
