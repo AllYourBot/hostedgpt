@@ -34,15 +34,22 @@ class SoomoLaunchesController < ApplicationController
       Person.transaction do
         user = User.create!(name: "Student User")
         person = Person.create!(personable: user, email: email)
-        client = person.clients.create!(platform: 'api')
         credential = HttpHeaderCredential.create!(user: user, external_id: claims['sub'])
-        client.authenticate_with!(credential)
       rescue ActiveRecord::RecordNotUnique
       end
       credential = HttpHeaderCredential.find_by!(auth_uid: claims['sub'])
     end
     person = credential.user.person
-    client = person.clients.api.last
+
+    Person.transaction do
+      person = Person.lock.find(person.id)
+      unless person.clients.api.authenticated.exists?
+        client = person.clients.create!(platform: 'api')
+        client.authenticate_with!(credential)
+      end
+    end
+
+    client = person.clients.api.authenticated.last
 
     assistants = [
       ["GPT-4o", "gpt-4o"],
