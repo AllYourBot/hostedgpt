@@ -155,7 +155,7 @@ class GetNextAIMessageJob < ApplicationJob
     puts "\n### Calling tools" unless Rails.env.test?
 
     msgs = []
-    Current.set(user: @user) do
+    Current.set(user: @user, message: @message) do
       msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
     end
 

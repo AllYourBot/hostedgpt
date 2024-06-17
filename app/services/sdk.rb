@@ -1,13 +1,43 @@
 class SDK
-  def self.key
+  def get(url, token = nil)
+    SDK::Get.new(
+      url: url,
+      bearer_token: token || bearer_token,
+      expected_status: expected_status,
+      header: header
+    )
+  end
+
+  def post(url, token = nil)
+    SDK::Post.new(
+      url: url,
+      bearer_token: token || bearer_token,
+      expected_status: expected_status,
+      header: header
+    )
+  end
+
+  alias_method :patch, :post
+
+  private
+
+  def key
     raise "self.key is undefined. You need to override this method."
   end
 
-  def self.get(url)
-    SDK::Get.new(url)
+  def bearer_token
+    nil
   end
 
-  def self.post(url, bearer_token_proc = ->{ nil })
-    SDK::Post.new(url, bearer_token_proc)
+  def expected_status
+    nil
+  end
+
+  def header
+    nil
+  end
+
+  def param
+    nil
   end
 end

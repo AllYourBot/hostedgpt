@@ -18,7 +18,7 @@ end
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.tool_call? && 'hidden' %>"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.tool_related? && 'hidden' %>"
   data-role="message"
   data-timestamp="<%= timestamp %>"
   data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && 'message-scroller' %>"
