@@ -4,7 +4,7 @@ class Toolbox::Memory < Toolbox
     This will commit details to memory so that in all future conversations with the user this knowledge will be available to us.
     Use this function any any time the user explicitly indicates they want us to remember. Or if they don't explicitly indicate,
     also remember if the user tell us something about themselves which seems like the kind of a thing a friend or personal
-    assistant might want to know. This includes personal preferences, hobbies or things they value, the names of people that
+    assistant might want to know. This includes personal preferences, favorites, hobbies or things they value, the names of people that
     are important to them, dates of significance, and recurring activities or routines — also remember revisions or elaborations
     on any of these things which you've already remembered.
   S
