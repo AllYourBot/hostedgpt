@@ -47,7 +47,9 @@ class UserTest < ActiveSupport::TestCase
     assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
       assert_difference "Conversation.count", -users(:keith).conversations.count do
         assert_difference "Credential.count", -users(:keith).credentials.count do
-          users(:keith).destroy
+          assert_difference "Memory.count", -users(:keith).memories.count do
+            users(:keith).destroy
+          end
         end
       end
     end

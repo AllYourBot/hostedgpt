@@ -20,8 +20,7 @@ class Settings::MemoriesControllerTest < ActionDispatch::IntegrationTest
 
   test "destroy should soft-delete assistant" do
     login_as users(:keith)
-    memory_count = users(:keith).memories.count
-    assert_difference "Memory.count", -1*memory_count do
+    assert_difference "Memory.count", -users(:keith).memories.count do
       delete settings_memories_url
     end
 
