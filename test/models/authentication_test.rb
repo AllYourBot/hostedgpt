@@ -1,16 +1,17 @@
 require "test_helper"
 
 class AuthenticationTest < ActiveSupport::TestCase
-  test "has an associated user" do
-    assert_instance_of User, authentications(:keith_email_device1).user
-  end
-
   test "has associated credential" do
-    assert_instance_of EmailCredential, authentications(:keith_email_device1).credential
+    assert_instance_of PasswordCredential, authentications(:keith_password).credential
   end
 
-  test "active returns correct authentications" do
-    assert_equal 2, credentials(:keith_gmail).authentications.length
-    assert_equal 1, credentials(:keith_gmail).authentications.active.length
+  test "has associated client" do
+    assert_instance_of Client, authentications(:keith_password).client
+  end
+
+  test "soft delete works" do
+    assert_changes "authentications(:keith_password).deleted_at" do
+      authentications(:keith_password).deleted!
+    end
   end
 end

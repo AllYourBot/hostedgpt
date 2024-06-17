@@ -90,7 +90,11 @@ class GetNextAIMessageJob < ApplicationJob
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
         GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(user_id, message_id, assistant_id, attempt+1)
       else
-        set_unexpected_error(msg&.slice(0...2000))
+        error_text = nil
+        begin
+          error_text = e&.response&.dig(:body, "error", "message")
+        end
+        set_unexpected_error(msg&.slice(0...1500), error_text)
         wrap_up_the_message
       end
     end
@@ -123,10 +127,10 @@ class GetNextAIMessageJob < ApplicationJob
       "left and then settings.)"
   end
 
-  def set_unexpected_error(msg)
-    @message.content_text = "(I received a unexpected response from the API after retrying 3 times. The AI servers may be experiencing trouble. " +
+  def set_unexpected_error(msg, text)
+    @message.content_text = "(I received a unexpected response from the API after retrying 3 times, \"#{text}\". The AI servers may be experiencing trouble. " +
       "Try again later or if you keep getting this error ensure your API key is valid and you haven't run out of funds with your AI service.\n\n" +
-      "#{msg}\n\nIt's also helpful if you report this to the app developers at: https://github.com/allyourbot/hostedgpt/discussions)"
+      "It's also helpful if you report this to the app developers at: https://github.com/allyourbot/hostedgpt/discussions)\n\n:#{msg}"
   end
 
   def set_billing_error

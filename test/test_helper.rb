@@ -20,24 +20,25 @@ class ActionDispatch::IntegrationTest
 
   Capybara.default_max_wait_time = 8
 
-  def login_as(user_or_person)
+  def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
       user_or_person.user
     else
       user_or_person
     end
-    post login_path, params: { email: user.person.email, password: "secret" }
+    post login_path, params: { email: user.email, password: password }
     assert_response :redirect
-    follow_redirect!
-    follow_redirect!
+    follow_redirect! # root
+    follow_redirect! # conversation
     assert_response :success
   end
 
   def assert_logged_in(user = nil)
+    client = Client.find_by(token: session.fetch(:client_token))
     if user.nil?
-      assert session.fetch(:current_user_id)
+      assert_nil client&.person&.user
     else
-      assert_equal session[:current_user_id], user.id
+      assert_equal client&.person&.user, user
     end
   end
 end
@@ -46,7 +47,7 @@ module ActiveSupport
   class TestCase
     include Turbo::Broadcastable::TestHelper
     include ActiveJob::TestHelper
-    include FeatureHelpers
+    include OptionsHelpers
     include PostgresqlHelper
     include ViewHelpers
 

@@ -57,13 +57,16 @@ end
 
       <turbo-frame id="message-<%= message.id %>">
 
-      <div
-        id="message-text-<%= message.id %>"
-        class="hidden"
-        data-clipboard-target="text"
-        data-speaker-target="text <%= message.assistant? && 'assistantText' %>"
-        data-thinking="<%= thinking ? 'true' : 'false' %>"
-      ><%= message.content_text %></div>
+        <div
+          class="hidden"
+          data-clipboard-target="text"
+        ><%= format_for_copying message.content_text %></div>
+        <div
+          class="hidden"
+          data-speaker-target="text <%= message.assistant? && "assistantText" %>"
+          data-thinking="<%= thinking ? "true" : "false" %>"
+        ><%= format_for_speaking message.content_text %></div>
+
         <div
           data-role="content-text"
           class="prose break-words leading-normal dark:[&_*]:text-gray-100 dark:marker:text-gray-100"
@@ -102,7 +105,7 @@ end
               </div>
             <% end %>
           <% end %>
-          <%= formatted_text = format message.content_text,
+          <%= formatted_text = format_for_display message.content_text,
                 append_inside_tag: span_tag("", class: %|
                   animate-breathe
                   w-3 h-3
@@ -182,7 +185,8 @@ end
             <%= link_to edit_assistant_message_path(message.assistant, message),
               class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
               data: {
-                role: "edit",
+                role: "message-edit",
+                composer_target: "messageEdit",
                 turbo_frame: "message-#{message.id}",
               } do %>
               <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>

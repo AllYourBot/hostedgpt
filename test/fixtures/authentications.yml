@@ -1,23 +1,14 @@
-keith_email_device1:
-  user: keith
-  credential: keith_email
-  ended_at:
-  token:
+keith_password:
+  credential: keith_password
+  client: keith_desktop_browser
+  deleted_at:
 
-keith_email_device2:
-  user: keith
-  credential: keith_email
-  ended_at:
-  token:
+keith_google:
+  credential: keith_google
+  client: keith_phone_browser
+  deleted_at:
 
-keith_gmail_expired:
-  user: keith
-  credential: keith_gmail
-  ended_at: 2023-12-30 1:02:00
-  token: ya29.a0AXooCgvPlObOgrUgug8OYnvKRssrp0rkzssxxcpUj4Dnj_XEsQ9CBRKaawiqVIyNbl6D67NnkXdYT7uWtrj1qmWG-s0nqeT-zbCE5oT8GHO3XObhjihHzVDhJUKDGTPNqnnj0xErmeyeECzmpdn8WmoSwkn8k2LLoE-6aCgYKAfASARMSFQHGX2MiIXAIUTQ9uJrqXU9Chsj5Cg0171
-
-keith_gmail_active:
-  user: keith
-  credential: keith_gmail
-  ended_at:
-  token: xyz.a0AXooCgvPlObOgrUgug8OYnvKRssrp0rkzssxxcpUj4Dnj_XEsQ9CBRKaawiqVIyNbl6D67NnkXdYT7uWtrj1qmWG-s0nqeT-zbCE5oT8GHO3XObhjihHzVDhJUKDGTPNqnnj0xErmeyeECzmpdn8WmoSwkn8k2LLoE-6aCgYKAfASARMSFQHGX2MiIXAIUTQ9uJrqXU9Chsj5Cg0171
+keith_api:
+  credential: keith_google
+  client: keith_api
+  deleted_at:

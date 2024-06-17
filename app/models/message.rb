@@ -3,9 +3,9 @@ class Message < ApplicationRecord
 
   belongs_to :assistant
   belongs_to :conversation
-  belongs_to :content_document, class_name: "Document", optional: true
+  belongs_to :content_document, class_name: "Document", inverse_of: :message, optional: true
   belongs_to :run, optional: true
-  has_one :latest_assistant_message_for, class_name: "Conversation", foreign_key: :last_assistant_message_id, dependent: :nullify
+  has_one :latest_assistant_message_for, class_name: "Conversation", inverse_of: :last_assistant_message, dependent: :nullify
 
   enum role: %w[user assistant tool].index_by(&:to_sym)
 

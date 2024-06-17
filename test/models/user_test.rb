@@ -5,24 +5,24 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
-  test "has associated conversations" do
-    assert_instance_of Conversation, users(:keith).conversations.first
-  end
-
   test "has associated credentials" do
-    assert_instance_of EmailCredential, users(:keith).credentials.type_is('EmailCredential').first
+    assert_instance_of PasswordCredential, users(:keith).credentials.type_is('PasswordCredential').first
   end
 
-  test "has associated authentications" do
-    assert_instance_of Authentication, users(:keith).authentications.first
+  test "has an associated password_credential" do
+    assert_instance_of PasswordCredential, users(:keith).password_credential
   end
 
-  test "has an associated email_credential" do
-    assert_instance_of EmailCredential, users(:keith).email_credential
+  test "has an associated google_credential" do
+    assert_instance_of GoogleCredential, users(:keith).google_credential
   end
 
   test "has an associated gmail_credential" do
     assert_instance_of GmailCredential, users(:keith).gmail_credential
+  end
+
+  test "has an associated http_header_credential" do
+    assert_instance_of HttpHeaderCredential, users(:rob).http_header_credential
   end
 
   test "has associated memories" do
@@ -34,21 +34,22 @@ class UserTest < ActiveSupport::TestCase
     assert_nil users(:rob).last_cancelled_message
   end
 
-  test "user needs to have a password unless they have auth_uid" do
-    minimum_user = User.new(first_name: 'John', last_name: 'Doe', password: 'abc123')
-    assert minimum_user.valid?, "We were unable to verify the minimum user"
-
-    minimum_user.password = nil
-    refute minimum_user.valid?, "The password should be required"
-
-    minimum_user.auth_uid = "abc123"
-    assert minimum_user.valid?, "The password should be allowed to be blank when auth_uid is set"
+  test "assistants scope filters out deleted vs assistants_including_deleted" do
+    assert_difference "users(:keith).assistants.length", -1 do
+      assert_no_difference "users(:keith).assistants_including_deleted.length" do
+        users(:keith).assistants.first.deleted!
+        users(:keith).reload
+      end
+    end
   end
 
-  test "user can change something like their first name w/o having to reenter their password" do
-    user = users(:keith)
-    assert_nothing_raised do
-      user.update!(first_name: "New")
+  test "associations are deleted upon destroy" do
+    assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
+      assert_difference "Conversation.count", -users(:keith).conversations.count do
+        assert_difference "Credential.count", -users(:keith).credentials.count do
+          users(:keith).destroy
+        end
+      end
     end
   end
 
@@ -73,7 +74,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should validate a user with minimum information" do
-    user = User.new(password: "password", password_confirmation: "password", first_name: "John", last_name: "Doe")
+    user = User.new(first_name: "John", last_name: "Doe")
     person = Person.new(email: "example@gmail.com", personable: user)
     assert person.valid?
   end
@@ -91,94 +92,26 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "it can update a user with a new password" do
+  test "when default_llm_keys is enabled but left blank then user keys will be used" do
     user = users(:keith)
-    old_password_hash = user.password_digest
-    user.update(password: "password")
-    assert user.valid?
-    refute_equal old_password_hash, user.password_digest
-  end
+    user.update!(openai_key: "GPT321", anthropic_key: "CLAUDE123")
 
-  test "passwords must be 6 characters or longer" do
-    user = User.new(first_name: "John", last_name: "Doe")
-    bad_short_passwords = ["", "12345"]
-
-    bad_short_passwords.each do |bad_password|
-      user.password = bad_password
-      user.valid?
-      assert user.errors[:password].present?
+    stub_features(default_llm_keys: true) do
+      stub_settings(default_openai_key: " ", default_anthropic_key: "") do
+        assert_equal "GPT321", user.preferred_openai_key
+        assert_equal "CLAUDE123", user.preferred_anthropic_key
+      end
     end
-
-    good_password = "123456"
-    user.password = good_password
-    assert user.valid?
-    refute user.errors[:password].present?
   end
 
-  test "it can validate a password" do
+  test "when default_llm_keys is enabled then empty user keys will fall back to default keys" do
     user = users(:keith)
-    assert user.authenticate("secret")
-  end
+    user.update!(openai_key: " ", anthropic_key: nil)
 
-  test "it destroys assistants on destroy" do
-    assistant = assistants(:samantha)
-    assistant.user.destroy
-    assert_raises ActiveRecord::RecordNotFound do
-      assistant.reload
-    end
-  end
-
-  test "it destroys conversations on destroy" do
-    conversation = conversations(:greeting)
-    conversation.user.destroy
-    assert_raises ActiveRecord::RecordNotFound do
-      conversation.reload
-    end
-  end
-
-  test "boolean values within preferences get converted back and forth properly" do
-    assert_nil users(:keith).preferences[:nav_closed]
-    assert_nil users(:keith).preferences[:kids]
-    assert_nil users(:keith).preferences[:city]
-
-    users(:keith).update!(preferences: {
-      nav_closed: true,
-      kids: 2,
-      city: "Austin"
-    })
-    users(:keith).reload
-
-    assert users(:keith).preferences[:nav_closed]
-    assert_equal 2, users(:keith).preferences[:kids]
-    assert_equal "Austin", users(:keith).preferences[:city]
-
-    users(:keith).update!(preferences: {
-      nav_closed: "false",
-
-    })
-
-    refute users(:keith).preferences[:nav_closed]
-  end
-
-  test "dark_mode preference defaults to system and it can update user dark_mode preference" do
-    new_user = User.create!(password: 'password', first_name: 'First', last_name: 'Last')
-    assert_equal "system", new_user.preferences[:dark_mode]
-
-    new_user.update!(preferences: { dark_mode: "light" })
-    assert_equal "light", new_user.preferences[:dark_mode]
-
-    new_user.update!(preferences: { dark_mode: "dark" })
-    assert_equal "dark", new_user.preferences[:dark_mode]
-
-    new_user.update!(preferences: { dark_mode: "system" })
-    assert_equal "system", new_user.preferences[:dark_mode]
-  end
-
-  test "assistants scope filters out deleted vs assistants_including_deleted" do
-    assert_difference "users(:keith).assistants.length", -1 do
-      assert_no_difference "users(:keith).assistants_including_deleted.length" do
-        users(:keith).assistants.first.soft_delete
-        users(:keith).reload
+    stub_features(default_llm_keys: true) do
+      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123") do
+        assert_equal "gpt321", user.preferred_openai_key
+        assert_equal "claude123", user.preferred_anthropic_key
       end
     end
   end

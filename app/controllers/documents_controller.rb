@@ -1,5 +1,5 @@
 class DocumentsController < ApplicationController
-  skip_before_action :authenticate_user!
+  require_unauthenticated_access
   before_action :set_document, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -20,7 +20,7 @@ class DocumentsController < ApplicationController
     @document = Document.new(document_params)
 
     if @document.save
-      redirect_to @document, notice: "Document was successfully created."
+      redirect_to @document, notice: "Document was successfully created.", status: :see_other
     else
       render :new, status: :unprocessable_entity
     end

@@ -58,6 +58,18 @@ class AIBackend::OpenAI < AIBackend
     raise ::Faraday::ParsingError
   end
 
+  def initialize(user, assistant, conversation, message)
+    raise ::OpenAI::ConfigurationError if user.preferred_openai_key.blank?
+    begin
+      @client = self.class.client.new(access_token: user.preferred_openai_key)
+    rescue ::Faraday::UnauthorizedError => e
+      raise ::OpenAI::ConfigurationError
+    end
+    @assistant = assistant
+    @conversation = conversation
+    @message = message
+  end
+
   def get_next_chat_message(&chunk_handler)
     @stream_response_text = ""
     @stream_response_tool_calls = []

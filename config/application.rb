@@ -2,6 +2,12 @@ require_relative "boot"
 
 require "rails/all"
 
+# future gems
+require_relative "../lib/string"
+require_relative "../lib/false_class"
+require_relative "../lib/true_class"
+require_relative "../lib/nil_class"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)

@@ -1,7 +1,9 @@
 class Person < ApplicationRecord
+  delegated_type :personable, types: %w[ User Tombstone ], dependent: :destroy
+  has_many :clients, dependent: :destroy
+
   encrypts :email, deterministic: true
 
-  delegated_type :personable, types: %w[User Tombstone]
   accepts_nested_attributes_for :personable
 
   validate :personable_id_unchanged, on: :update
