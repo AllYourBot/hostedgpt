@@ -4,7 +4,9 @@ class Authentications::GoogleOauthController < ApplicationController
   def create
     if auth[:provider] == "gmail"         && Current.user
       Current.user.gmail_credential&.destroy
-      add_person_credentials("GmailCredential").save!
+      cred = add_person_credentials("GmailCredential")
+      raise "You did not check all the permission boxes. Try again." unless cred.has_permission? %w(userinfo.email gmail.modify)
+      cred.save!
       redirect_to(edit_settings_person_path, notice: "Saved") && return
 
     elsif auth[:provider] == "google"      && credential = GoogleCredential.find_by(oauth_id: auth[:uid])
@@ -30,9 +32,11 @@ class Authentications::GoogleOauthController < ApplicationController
       @person&.errors&.delete :personable
       redirect_to new_user_path, errors: @person&.errors&.full_messages
     end
+  rescue => e
+    redirect_to edit_settings_person_path, alert: "Error. #{e.message}", status: :see_other
   end
 
-  def destroy
+  def failure
     if Current.user
       redirect_to edit_settings_person_path, alert: "Cancelled", status: :see_other
     else
@@ -90,6 +94,5 @@ class Authentications::GoogleOauthController < ApplicationController
       oauth_refresh_token: auth[:credentials][:refresh_token],
       properties: auth[:credentials].except(:token, :refresh_token)
     )
-    p
   end
 end
