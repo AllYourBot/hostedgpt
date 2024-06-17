@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_17_100905) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -123,6 +123,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["external_id"], name: "index_credentials_on_external_id"
+    t.index ["type", "external_id"], name: "index_credentials_on_type_and_external_id", unique: true
+    t.index ["type", "oauth_email"], name: "index_credentials_on_type_and_oauth_email", unique: true
     t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 
@@ -192,6 +194,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_012618) do
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_people_on_email", unique: true
     t.index ["personable_type", "personable_id"], name: "index_people_on_personable"
   end
 
