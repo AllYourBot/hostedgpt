@@ -1,26 +1,25 @@
 class Toolbox < SDK
   def self.descendants
     [
-      Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
-    ]
+      Toolbox::Memory,
+    ] + (Rails.env.test? ? [Toolbox::HelloWorld] : [])
   end
 
   def self.call(name, args)
     kname, method = name.split("_", 2)
     klass = Toolbox.descendants.find { |k| k.to_s.downcase == "toolbox::#{kname}" }
-    raise "'#{kname}' does not match a class which is a descendant of SDK" if klass.nil?
-    raise "'#{method} does not exist on this class" if klass.method(method).nil?
-
-    # arguments are what OpenAI calls them, parameters are what the ruby method expects
-    parameters = {}
+    raise "'#{kname}' does not match a class which is a descendant of SDK. Your function name should be prepended with the class name." if klass.nil?
+    instance = klass.new
+    raise "'#{method} does not exist on this class" if klass.functions.exclude?(method.to_sym)
+    parameters = {} # arguments are what OpenAI calls them, parameters are what the ruby method expects
     allowed_args = klass.formatted_function_parameters_with_types(method).keys # args may include hallucinations
 
     args.stringify_keys.slice(*allowed_args).each do |arg, val|
       parameters[ klass.argument_to_parameter(method, arg) ] = val
     end
 
-    klass.send(method, **parameters)
+    instance.public_send(method, **parameters)
   end
 
   class << self
@@ -38,7 +37,7 @@ class Toolbox < SDK
 
     def default_description_for(name)
       name.to_s.split("_").join(" ").capitalize + " given " +
-        self.method(name).parameters.reject { |p| p.first == :opt }.map(&:second).to_sentence
+        self.formatted_function_required_parameters(name).to_sentence
     end
   end
 
@@ -70,11 +69,11 @@ class Toolbox < SDK
   end
 
   def self.functions
-    self.methods(false) - Toolbox.methods
+    self.instance_methods(false) - Toolbox.instance_methods
   end
 
   def self.function_parameters(name)
-    self.method(name).parameters.map(&:second)
+    self.instance_method(name).parameters.map(&:second)
   end
 
   def self.formatted_function_parameters_with_types(name)
@@ -108,9 +107,9 @@ class Toolbox < SDK
   end
 
   def self.formatted_function_required_parameters(name)
-    params = self.method(name).parameters
+    params = self.instance_method(name).parameters
     not_named = params.map(&:first) - [:keyreq, :key]
-    raise "You must use named parameters and #{name} does not." if not_named.present?
+    raise "Your method '#{name}' needs to use named parameters." if not_named.present?
 
     params.select { |p| p.first == :keyreq }.map do |_, param|
       formatted_param_properties(param).first
@@ -123,7 +122,7 @@ class Toolbox < SDK
     if @@argument_to_parameter[method].empty?
       @@argument_to_parameter[method]
 
-      self.method(method).parameters.map(&:second).each do |param|
+      self.instance_method(method).parameters.map(&:second).each do |param|
         arg = formatted_param_properties(param).first
         @@argument_to_parameter[method][arg] = param
       end
