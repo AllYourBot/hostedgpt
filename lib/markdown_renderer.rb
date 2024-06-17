@@ -1,4 +1,4 @@
-Dir[File.join(File.dirname(__FILE__), 'redcarpet', '*.rb')].each { |file| require file }
+Dir[File.join(File.dirname(__FILE__), "redcarpet", "*.rb")].each { |file| require file }
 
 class MarkdownRenderer
   class << self

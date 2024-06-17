@@ -9,7 +9,7 @@ export default class extends Interface {
   logLevel_info
 
   log_Tell
-  async Tell(words) { if (this.engaged && _intendedDismiss(words)) {
+  async Tell(words)   { if (this.engaged && _intendedDismiss(words)) {
                           await Dismiss.Listener()
                           return
                         }
