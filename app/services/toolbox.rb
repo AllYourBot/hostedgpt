@@ -2,6 +2,7 @@ class Toolbox < SDK
   def self.descendants
     [
       Toolbox::OpenMeteo,
+      Toolbox::Memory,
     ] + (Rails.env.test? ? [Toolbox::HelloWorld] : [])
   end
 
