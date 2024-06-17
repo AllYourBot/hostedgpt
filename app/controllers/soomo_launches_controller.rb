@@ -37,13 +37,16 @@ class SoomoLaunchesController < ApplicationController
     unless credential = HttpHeaderCredential.find_by(auth_uid: claims['sub'])
       Person.transaction do
         user = User.create!(name: "Student User")
-        Person.create!(personable: user, email: email)
-        HttpHeaderCredential.create!(user: user, external_id: claims['sub'])
+        person = Person.create!(personable: user, email: email)
+        client = person.clients.create!(platform: 'api')
+        credential = HttpHeaderCredential.create!(user: user, external_id: claims['sub'])
+        client.authenticate_with!(credential)
       rescue ActiveRecord::RecordNotUnique
       end
       credential = HttpHeaderCredential.find_by!(auth_uid: claims['sub'])
     end
     person = credential.user.person
+    client = person.clients.api.last
 
     assistants = [
       ["GPT-4o", "gpt-4o"],
@@ -59,9 +62,8 @@ class SoomoLaunchesController < ApplicationController
       )
     end
 
-    login_as(person, credential: credential)
-
     render json: {
+      api_key: client.bearer_token,
       assistants: assistants.map do |a|
         a.as_json(include: :language_model)
       end
