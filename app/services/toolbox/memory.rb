@@ -12,7 +12,9 @@ class Toolbox::Memory < Toolbox
   def remember_detail_about_user(detail_s:)
     raise "Current user & message needs to be set" unless Current.user && Current.message
 
-    Current.user.memories.create!(detail: detail_s, message: Current.message)
+    conversation_messages = Current.message.conversation.messages.for_conversation_version(Current.message.version)
+    related_message = conversation_messages.where("messages.id < ?", Current.message.id).last
+    Current.user.memories.create!(detail: detail_s, message: related_message)
     "This has been remembered"
   end
 end

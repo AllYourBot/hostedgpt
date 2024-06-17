@@ -7,7 +7,7 @@ class Toolbox::MemoryTest < ActiveSupport::TestCase
 
   test "remember_detail_about_user creates a new memory with Current set" do
     assert_difference "Memory.count", 1 do
-      Current.set(user: users(:keith), message: messages(:identify_photo)) do
+      Current.set(user: users(:keith), message: messages(:photo_identified)) do
         @memory.remember_detail_about_user(detail_s: "Keith owns a cat")
       end
     end
