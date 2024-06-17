@@ -14,7 +14,6 @@ class SoomoLaunchesController < ApplicationController
   INSTRUCTIONS
 
   def create
-    # very basic security for now
     return head(:forbidden) unless ENV['ALLOWED_REQUEST_ORIGINS'].to_s.split(',').include?(request.origin)
     return head(:not_found) unless (jwt_secret_key = ENV['HOSTEDGPT_JWT_SECRET_KEY']).present?
     return head(:unauthorized) unless (jwt = params[:jwt]).present?
@@ -30,9 +29,6 @@ class SoomoLaunchesController < ApplicationController
     end
     email = "#{claims['sub']}@hostedgpt.soomo"
     course_id, element_family_id = claims['cid'], claims['fid']
-
-    reset_session
-    Current.reset
 
     unless credential = HttpHeaderCredential.find_by(auth_uid: claims['sub'])
       Person.transaction do
