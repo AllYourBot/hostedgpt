@@ -1,6 +1,7 @@
 class Current < ActiveSupport::CurrentAttributes
   attribute :person
   attribute :user
+  attribtue :message
   attribute :client
 
   def self.initialize_with(client: nil)
