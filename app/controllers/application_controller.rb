@@ -51,7 +51,6 @@ class ApplicationController < ActionController::Base
 
     assistants = [
       ["GPT-4o", "gpt-4o"],
-      ["GPT-4", "gpt-4-turbo"],
       ["GPT-3.5", "gpt-3.5-turbo"],
       ["Claude 3 Opus", "claude-3-opus-20240229"],
       ["Claude 3 Sonnet", "claude-3-sonnet-20240229"]
