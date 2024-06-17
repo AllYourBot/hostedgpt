@@ -3,20 +3,21 @@ import Interface from "../interface.js"
 // To clarify the verbs:
 // Invoke a Listener and it starts listening
 // Dismiss a Listener and you can re-invoke it with wake words, so it's listening just not paying attention
-// Mute a Listener and it completely ignores everything it hears, but the mic stays on
-// Unmute a Listener and it clears any buffered audio before it starts listening again
 // Disable a Listener and it completely stops working and will be fully re-initialized if you Invoke again
 
 export default class extends Interface {
   logLevel_info
 
   log_Tell
-  async Tell(words)   { if (_intendedDismiss(words)) {
+  async Tell(words)   { if (this.engaged && _intendedDismiss(words)) {
                           await Dismiss.Listener()
                           return
                         }
-                        if (_intendedInvoke(words)) Invoke.Listener()
-                        if (!$.processing) return // gave Invoke() a chance
+                        if (_intendedInvoke(words)) {
+                          await Invoke.Listener()
+                          words = _removeSpeechBeforeName(words)
+                        }
+                        if (!$.processing) return // Invoke() did not succeed
 
                         if (_referencingTheScreen(words))
                           $.attachment = await $.screenService.takeScreenshot()
@@ -81,5 +82,12 @@ export default class extends Interface {
     Play.Speaker.sound('jeep', () => {
       Loop.Speaker.every(4, 'thinking')
     })
+  }
+
+  _removeSpeechBeforeName(words) {
+    if (words.downcase().includes("samantha"))
+      return words.slice(words.downcase().indexOf("samantha"))
+    else
+      return words
   }
 }

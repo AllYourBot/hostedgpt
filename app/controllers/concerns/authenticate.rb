@@ -1,7 +1,7 @@
 module Authenticate
   extend ActiveSupport::Concern
   include LoginLogout
-  include ByCookie, ByHttpHeader
+  include ByCookie, ByHttpHeader, ByBearerToken
 
   included do
     before_action :require_authentication
@@ -35,6 +35,8 @@ module Authenticate
   end
 
   def request_authentication
+    return if performed?
+
     session[:return_to_after_authenticating] = request.url
     if manual_login_allowed?
       redirect_to login_url
@@ -48,7 +50,7 @@ module Authenticate
   end
 
   def find_client
-    find_client_by_cookie || find_client_by_http_header
+    find_client_by_cookie || find_client_by_http_header || find_client_by_bearer_token
   end
 
   def post_authenticating_url

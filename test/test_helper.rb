@@ -47,7 +47,7 @@ module ActiveSupport
   class TestCase
     include Turbo::Broadcastable::TestHelper
     include ActiveJob::TestHelper
-    include FeatureHelpers
+    include OptionsHelpers
     include PostgresqlHelper
     include ViewHelpers
 

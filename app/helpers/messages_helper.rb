@@ -1,10 +1,18 @@
 require "./lib/markdown_renderer"
 
 module MessagesHelper
-  def format(text, append_inside_tag:)
+  def format_for_copying(text)
+    text
+  end
+
+  def format_for_speaking(text)
+    ::MarkdownRenderer.render_for_speaking(text)
+  end
+
+  def format_for_display(text, append_inside_tag:)
     escaped_text = html_escape(text)
 
-    html = ::MarkdownRenderer.render(
+    html = ::MarkdownRenderer.render_for_display(
       escaped_text,
       block_code: block_code
     )
