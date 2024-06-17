@@ -3,6 +3,7 @@ class Toolbox < SDK
     [
       Toolbox::OpenMeteo,
       Toolbox::Memory,
+      Toolbox::Gmail,
     ] + (Rails.env.test? ? [Toolbox::HelloWorld] : [])
   end
 

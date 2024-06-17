@@ -5,9 +5,6 @@ class SDK::Get < SDK::Verb
       req.headers = @headers
     end
 
-    raise "Unexpected response: #{response.status} - #{response.body}" if !response.status.in? @expected_statuses
-    return response if response.status != 200
-
-    OpenData.new JSON.parse(response.body)
+    handle(response)
   end
 end
