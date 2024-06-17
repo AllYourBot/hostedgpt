@@ -8,7 +8,7 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
       { name: "Paris", country: "United States", admin1: "Tennessee" },
       { name: "Paris", country: "United States", admin1: "Kentucky" },
       { name: "Paris", country: "United States", admin1: "Illinois" },
-    ].map(&OpenStruct.method(:new))
+    ].map(&OpenData.method(:new))
 
     @open_meteo = Toolbox::OpenMeteo.new
   end

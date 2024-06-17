@@ -8,6 +8,6 @@ class SDK::Get < SDK::Verb
     raise "Unexpected response: #{response.status} - #{response.body}" if !response.status.in? @expected_statuses
     return response if response.status != 200
 
-    JSON.parse(response.body, object_class: OpenStruct)
+    OpenData.new JSON.parse(response.body)
   end
 end

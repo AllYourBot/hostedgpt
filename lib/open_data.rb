@@ -41,9 +41,19 @@ class OpenData
     @@data_classes[key] ||= Data.define(*key)
 
     values = hash.transform_values do |value|
-      value.is_a?(Hash) ? self.class.new(value) : value
+      parse_value(value)
     end
     @@data_classes[key].new(**values)
+  end
+
+  def parse_value(value)
+    if value.is_a?(Hash)
+      self.class.new(value)
+    elsif value.is_a?(Array)
+      value.map { |v| parse_value(v) }
+    else
+      value
+    end
   end
 
   def recursive_to_h(os)

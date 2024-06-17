@@ -216,7 +216,7 @@ class Toolbox::OpenMeteo < Toolbox
   end
 
   def extract_data_from(response)
-    OpenStruct.new({
+    OpenData.new({
       degrees_unit: unit(response.current_units.temperature_2m),
       qty_unit: unit(response.current_units.precipitation),
       yest_high: response.daily.temperature_2m_max[0],
