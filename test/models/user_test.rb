@@ -25,6 +25,10 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of HttpHeaderCredential, users(:rob).http_header_credential
   end
 
+  test "has associated memories" do
+    assert_instance_of Memory, users(:keith).memories.first
+  end
+
   test "has a last_cancelled_message but can be nil" do
     assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
     assert_nil users(:rob).last_cancelled_message
