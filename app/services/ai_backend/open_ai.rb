@@ -12,6 +12,16 @@ class AIBackend::OpenAI < AIBackend
     end
   end
 
+  def initialize(user, assistant, conversation, message)
+    super(user, assistant, conversation, message)
+    raise ::OpenAI::ConfigurationError if user.preferred_openai_key.blank?
+    begin
+      @client = self.class.client.new(access_token: user.preferred_openai_key)
+    rescue ::Faraday::UnauthorizedError => e
+      raise ::OpenAI::ConfigurationError
+    end
+  end
+
   def self.get_tool_messages_by_calling(tool_calls_response)
     tool_calls = deep_json_parse(tool_calls_response)
 
@@ -113,11 +123,11 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def system_message
-    return [] if @assistant.instructions.blank?
+    return [] if full_instructions.blank?
 
     [{
-      role: 'system',
-      content: @assistant.instructions
+      role: "system",
+      content: full_instructions
     }]
   end
 
