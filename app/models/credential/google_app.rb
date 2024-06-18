@@ -1,4 +1,4 @@
-module GoogleApp
+module Credential::GoogleApp
   extend ActiveSupport::Concern
 
   included do
