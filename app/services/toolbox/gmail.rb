@@ -39,6 +39,11 @@ class Toolbox::Gmail < Toolbox
     "Email has been sent"
   end
 
+  describe :check_inbox, <<~S
+    Check the users gmail inbox to see how many messages are in there, how many are unread vs read, and what the
+    latest message is.
+  S
+
   def check_inbox
     inbox = get_threads(q: "in:inbox")
     unread_inbox = get_threads(q: "in:inbox is:unread")
@@ -56,12 +61,57 @@ class Toolbox::Gmail < Toolbox
 
   private
 
-  def get_user_profile
+
+  def create_draft(to:, subject:, body:)
+    message = <<~S
+      From: krschacht@gmail.com
+      To: #{to}
+      Subject: #{subject}
+
+      #{body}
+    S
+
+    encoded_message = Base64.urlsafe_encode64(message)
+
     refresh_token_if_needed do
-      r = get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_params
-      r
+      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").param(
+          message: {
+            raw: encoded_message
+          }
+      )
     end
-  end # #<OpenStruct emailAddress="krschacht@gmail.com", messagesTotal=874908, threadsTotal=536434, historyId="73971375">
+  end
+
+  def send_draft(draft_id)
+    refresh_token_if_needed do
+      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/send").param(
+        id: draft_id
+      )
+    end
+  end
+
+  # TODO: We should be able to send a message direclty, without first creating a draft.
+  # But I can't get this API call to work.
+  #
+  # def message_send(from:, to:, subject:, body:)
+  #   message = <<~S
+  #     From: #{from}
+  #     To: #{to}
+  #     Subject: #{subject}
+
+  #     #{body}
+  #   S
+
+  #   encoded_message = Base64.urlsafe_encode64(message)
+
+  #   refresh_token_if_needed do
+  #     post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages/send").param(
+  #         message: {
+  #           raw: encoded_message
+  #         }
+  #     )
+  #   end
+  # end
 
   def get_messages(h = {})
     refresh_token_if_needed do
@@ -85,84 +135,44 @@ class Toolbox::Gmail < Toolbox
     Message.new(data)
   end
 
-  def get_threads(h = {})
-    refresh_token_if_needed do
-      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/threads").param(h)
-    end&.threads
-  end
+  # These API calls work but we are not using them yet.
+  #
+  # def get_user_profile
+  #   refresh_token_if_needed do
+  #     r = get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_params
+  #     r
+  #   end
+  # end
 
-  def get_user_labels
-    refresh_token_if_needed do
-      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/labels").no_params
-    end
-  end # .labels.last   # #<OpenStruct id="Label_8804082651400413034", name="F: international", messageListVisibility="show", labelListVisibility="labelHide", type="user">
+  # def get_threads(h = {})
+  #   refresh_token_if_needed do
+  #     get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/threads").param(h)
+  #   end&.threads
+  # end
 
-  def get_user_drafts
-    # https://developers.google.com/gmail/api/reference/rest/v1/users.drafts/list
-    refresh_token_if_needed do
-      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").param(
-        maxResults: 100,
-        includeSpamTrash: false,
-      )
-    end
-  end # .drafts.first.id    # {:drafts=> [{:id=>"r2958353423951382939", :message=>{:id=>"18fc47b5ef586361", :threadId=>"18fbbf7381c4bc73"}},
+  # def get_user_labels
+  #   refresh_token_if_needed do
+  #     get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/labels").no_params
+  #   end
+  # end # .labels.last   # #<OpenStruct id="Label_8804082651400413034", name="F: international", messageListVisibility="show", labelListVisibility="labelHide", type="user">
 
-  def get_user_draft(id)
-    refresh_token_if_needed do
-      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/#{id}").param(
-        format: :full
-      )
-    end
-  end
+  # def get_user_drafts
+  #   # https://developers.google.com/gmail/api/reference/rest/v1/users.drafts/list
+  #   refresh_token_if_needed do
+  #     get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").param(
+  #       maxResults: 100,
+  #       includeSpamTrash: false,
+  #     )
+  #   end
+  # end # .drafts.first.id    # {:drafts=> [{:id=>"r2958353423951382939", :message=>{:id=>"18fc47b5ef586361", :threadId=>"18fbbf7381c4bc73"}},
 
-  def create_draft(to:, subject:, body:)
-    message = <<~S
-      From: krschacht@gmail.com
-      To: #{to}
-      Subject: #{subject}
-
-      #{body}
-    S
-
-    encoded_message = Base64.urlsafe_encode64(message)
-
-    refresh_token_if_needed do
-      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts").param(
-          message: {
-            raw: encoded_message
-          }
-      )
-    end
-  end # #<OpenStruct {:id: "r-5831085103476355142", :message: {:id: "18fc5c05dbc1932d", :threadId: "18fc5c05dbc1932d", :labelIds: ["DRAFT"]}}>
-
-  def message_send(from:, to:, subject:, body:)
-    message = <<~S
-      From: #{from}
-      To: #{to}
-      Subject: #{subject}
-
-      #{body}
-    S
-
-    encoded_message = Base64.urlsafe_encode64(message)
-
-    refresh_token_if_needed do
-      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages/send").param(
-          message: {
-            raw: encoded_message
-          }
-      )
-    end
-  end
-
-  def send_draft(draft_id)
-    refresh_token_if_needed do
-      post("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/send").param(
-        id: draft_id
-      )
-    end
-  end # #<OpenStruct {:id: "18fc5cb7c7c88199", :threadId: "18fc5c05dbc1932d", :labelIds: ["CATEGORY_PERSONAL", "SENT"]}>
-
+  # def get_user_draft(id)
+  #   refresh_token_if_needed do
+  #     get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/drafts/#{id}").param(
+  #       format: :full
+  #     )
+  #   end
+  # end
 
   # Utilities
 

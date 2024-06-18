@@ -38,6 +38,15 @@ class GmailCredentialTest < ActiveSupport::TestCase
     assert_equal ["has already been taken"], keith_cred.errors[:oauth_id]
   end
 
+  test "permissions returns the permissions" do
+    assert_equal ["gmail.modify", "userinfo.email"], credentials(:keith_gmail).permissions
+  end
+
+  test "has_permission? works with single permission and array of permissions" do
+    assert credentials(:keith_gmail).has_permission?("gmail.modify")
+    assert credentials(:keith_gmail).has_permission?(["userinfo.email", "gmail.modify"])
+  end
+
   private
 
   def details

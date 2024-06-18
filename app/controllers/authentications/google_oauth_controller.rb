@@ -2,9 +2,9 @@ class Authentications::GoogleOauthController < ApplicationController
   allow_unauthenticated_access
 
   def create
-    if auth[:provider] == "gmail"         && Current.user
+    if    auth[:provider] == "gmail"       && Current.user
       Current.user.gmail_credential&.destroy
-      cred = add_person_credentials("GmailCredential")
+      _, cred = add_person_credentials("GmailCredential")
       raise "You did not check all the permission boxes. Try again." unless cred.has_permission? %w(userinfo.email gmail.modify)
       cred.save!
       redirect_to(edit_settings_person_path, notice: "Saved") && return
@@ -60,7 +60,7 @@ class Authentications::GoogleOauthController < ApplicationController
     user.first_name = auth[:info][:first_name]
     user.last_name = auth[:info][:last_name]
     @person = user.person
-    add_person_credentials("GoogleCredential")
+    add_person_credentials("GoogleCredential").first
   end
 
   def init_for_person(person)
@@ -69,7 +69,7 @@ class Authentications::GoogleOauthController < ApplicationController
       first_name: auth[:info][:first_name],
       last_name: auth[:info][:last_name]
     }
-    add_person_credentials("GoogleCredential")
+    add_person_credentials("GoogleCredential").first
   end
 
   def initialize_google_person
@@ -81,12 +81,12 @@ class Authentications::GoogleOauthController < ApplicationController
         last_name: auth[:info][:last_name],
       }
     })
-    add_person_credentials("GoogleCredential")
+    add_person_credentials("GoogleCredential").first
   end
 
   def add_person_credentials(type)
     p = Current.person || @person
-    p.user.credentials.build(
+    c = p.user.credentials.build(
       type: type,
       oauth_id: auth[:uid],
       oauth_email: auth[:info][:email],
@@ -94,5 +94,6 @@ class Authentications::GoogleOauthController < ApplicationController
       oauth_refresh_token: auth[:credentials][:refresh_token],
       properties: auth[:credentials].except(:token, :refresh_token)
     )
+    [p, c]
   end
 end
