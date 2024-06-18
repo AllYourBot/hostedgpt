@@ -1,4 +1,15 @@
 class SDK::Verb
+  class ResponseError < StandardError
+    attr_reader :status, :body, :response
+
+    def initialize(response)
+      @response = response
+      @status = response.status
+      @body = JSON.parse(response.body) rescue nil
+      super("Unexpected response: #{response.status} - #{response.body}")
+    end
+  end
+
   def initialize(
     url:,
     bearer_token: nil,
@@ -12,6 +23,13 @@ class SDK::Verb
     header.merge!({ Authorization: "Bearer #{bearer_token}" }) if bearer_token
     @headers = fix_keys(header)
     @expected_statuses = Array(expected_status)
+  end
+
+  def handle(response)
+    raise ResponseError.new(response) if !response.status.in? @expected_statuses
+    return response if response.status != 200
+
+    OpenData.new JSON.parse(response.body)
   end
 
   def json_content
