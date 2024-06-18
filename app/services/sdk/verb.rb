@@ -85,4 +85,12 @@ class SDK::Verb
     end
     merged_hash
   end
+
+  def get(url, &block)
+    Faraday.get(url, &block)
+  end
+
+  def post(url, &block)
+    Faraday.post(url, &block)
+  end
 end

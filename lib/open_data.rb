@@ -34,6 +34,18 @@ class OpenData
     OpenData.new(self.to_h.merge(input.to_h))
   end
 
+  def ==(other)
+    to_h == other.to_h
+  end
+
+  def eql?(other)
+    self == other
+  end
+
+  def inspect
+    @data.inspect.gsub('<data', '<OpenData')
+  end
+
   private
 
   def parse_hash(hash)
@@ -76,9 +88,5 @@ class OpenData
     else
       @data.send(method_name, *arguments, &block)
     end
-  end
-
-  def inspect
-    @data.inspect.gsub('<data', '<OpenData')
   end
 end
