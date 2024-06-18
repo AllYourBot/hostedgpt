@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_one :password_credential, -> { type_is("PasswordCredential") }, class_name: "Credential", inverse_of: :user
   has_one :google_credential, -> { type_is("GoogleCredential") }, class_name: "Credential", inverse_of: :user
   has_one :gmail_credential, -> { type_is("GmailCredential") }, class_name: "Credential", inverse_of: :user
+  has_one :google_tasks_credential, -> { type_is("GoogleTasksCredential") }, class_name: "Credential", inverse_of: :user
   has_one :http_header_credential, -> { type_is("HttpHeaderCredential") }, class_name: "Credential", inverse_of: :user
 
   belongs_to :last_cancelled_message, class_name: "Message", optional: true
