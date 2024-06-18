@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_10_180800) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_18_154046) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -160,13 +160,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_10_180800) do
     t.boolean "supports_images", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
     t.datetime "deleted_at", precision: nil
-    t.bigint "users_id"
+    t.bigint "user_id"
     t.bigint "api_service_id"
     t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
-    t.index ["users_id"], name: "index_language_models_on_users_id"
+    t.index ["user_id"], name: "index_language_models_on_user_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -391,7 +390,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_10_180800) do
   add_foreign_key "documents", "messages"
   add_foreign_key "documents", "users"
   add_foreign_key "language_models", "api_services"
-  add_foreign_key "language_models", "users", column: "users_id"
+  add_foreign_key "language_models", "users"
   add_foreign_key "messages", "assistants"
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "documents", column: "content_document_id"
