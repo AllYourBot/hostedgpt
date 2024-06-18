@@ -4,6 +4,8 @@ class OpenData
   def initialize(input)
     if input.is_a?(Hash)
       @data = parse_hash(input)
+    elsif input.is_a?(Array)
+      @data = parse_value(input)
     else
       begin
         @data = parse_hash(JSON.parse(input))
@@ -73,6 +75,8 @@ class OpenData
   def method_missing(method_name, *arguments, &block)
     if OpenData.instance_methods.include?(method_name) || OpenData.private_instance_methods.include?(method_name)
       super
+    elsif method_name.to_s[-1] == "="
+      raise "Error trying to set value #{method_name} on read-only data structure."
     else
       @data.send(method_name, *arguments, &block)
     end
