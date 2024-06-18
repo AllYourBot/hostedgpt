@@ -42,6 +42,11 @@ class GmailCredentialTest < ActiveSupport::TestCase
     assert_equal ["gmail.modify", "userinfo.email"], credentials(:keith_gmail).permissions
   end
 
+  test "permissions returns empty array when properties is blank" do
+    credentials(:keith_gmail).properties = {}
+    assert_equal [], credentials(:keith_gmail).permissions
+  end
+
   test "has_permission? works with single permission and array of permissions" do
     assert credentials(:keith_gmail).has_permission?("gmail.modify")
     assert credentials(:keith_gmail).has_permission?(["userinfo.email", "gmail.modify"])
