@@ -10,9 +10,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
 
 ## Top features of HostedGPT
 
-- **Your private conversations are not being used for training!**
-  ChatGPT uses your private conversations history to train its models. [OpenAI disclosed this in this article](https://help.openai.com/en/articles/7730893-data-controls-faq), and if you disable it then you lose all your conversation history!
-- **Use GPT-4 and Claude 3 without two $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. HostedGPT costs nothing so you just pay for your GPT-4 and Claude 3 API usage.
+- **Use GPT-4 and Claude 3 without two $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your GPT-4 and Claude 3 API usage.
 - **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
 - **You will never hit the '_You've reached the current usage cap_' errors**.
 
@@ -114,6 +112,20 @@ The file `options.yml` contains a number of Features and Settings you can config
 
 - `REGISTRATON_FEATURE` is `true` by default but you can set to `false` to prevent any new people from creating an account.
 - `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
+- `GOOGLE_TOOLS_FEATURE` — This is an experimental feature that enables your assistant to access your Gmail (and soon Google Tasks and Calendar).
+
+### Configuring Google Tools
+
+You first need to follow all the steps in the [Google OAuth instructions](#google-oauth-authentication). The only step that is optional is that you can leave `GOOGLE_AUTHENTICATION_FEATURE` set to false, which means you don't have to enable new users to register with Google. However, following all the steps will also set up Google Auth so you can connect Google Tools to your assistants. After, you complete those steps, here is the additional configuration you need to do in order to enable the Google tools:
+
+1. **Go back to the OAuth Consent Screen:**
+   - In the navigation menu, go to "APIs & Services" > "OAuth consent screen" > click Edit App
+   - It starts you on "OAuth consent screen" which is already done, at the bottom click "Save and Continue" to advance to "Scopes"
+   - Click "Add or Remove Scopes", check "userinfo.email" and then in "Manually add scopes" paste these URLs, one at a time:
+     - https://www.googleapis.com/auth/gmail.modify  (then click "Add To Table")
+     - https://www.googleapis.com/auth/tasks  (then click "Add To Table")
+
+2. **Finally, set `GOOGLE_TOOLS_FEATURE` to true**
 
 ### Authentication
 
@@ -146,10 +158,12 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
 
 2. **Create OAuth Consent Screen:**
    - In the navigation menu, go to "APIs & Services" > "OAuth consent screen"
-   - Select "Internal" and click "Create"
+   - If you want to restrict this to users in your Google Workspace, select "Internal". If you want to let people use any Google account, select "External", and then click "Create"
    - Fill out the required fields (App name, User support email, etc.).
-   - Add your domain (if applicable) and authorized domains.
+   - Add your domain and authorized domains.
    - Click "Save and Continue"
+   - Leaves Scopes blank and click "Save and Continue"
+   - On the "Test Users" screen you can enter a few email address that you want to test with, then "Save and Continue"
 
 3. **Create OAuth Credentials:**
    - In the navigation menu, go to "APIs & Services" > "Credentials"
@@ -157,10 +171,10 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
    - Choose "Web application" as the application type.
    - Fill out the required fields:
      - **Name:** A descriptive name for your client ID, e.g. "HostedGPT"
-     - **Authorized JavaScript origins:** Your application's base URL, e.g., `https://hostedgpt.example.com`
+     - **Authorized JavaScript origins:** Your application's base URL, e.g., `https://example.com`
      - **Authorized Redirect URIs:** Add these paths but replace the base URL with yours:
-       - `https://hostedgpt.example.com/auth/google/callback`
-       - `https://hostedgpt.example.com/auth/gmail/callback`
+       - `https://example.com/auth/google/callback`
+       - `https://example.com/auth/gmail/callback`
    - Click "Create"
 
 4. **Set Environment Variables:**
