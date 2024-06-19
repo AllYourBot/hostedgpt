@@ -61,7 +61,9 @@
 
         <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
           <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            Enable the ability to assign <span class="font-semibold">Gmail</span> to an assistant
+            Enable <span class="font-semibold">Gmail</span> for assistants.<br>
+            Trouble?
+            <%= link_to "Delete app connection", "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
           </div>
           <% if Current.user.gmail_credential %>
             <div class="text-green-700 font-bold">Enabled</div>
@@ -194,4 +196,14 @@
   </div>
 <% end # form %>
 
-<%= button_to "Gmail", "/auth/gmail", id: "person_authorize_gmail", method: :post, data: { turbo: false }, class: "hidden" %>
+<%= button_to "Gmail",
+  "/auth/gmail",
+  id: "person_authorize_gmail",
+  method: :post,
+  data: {
+    turbo: false, # w/o this submits w/ ajax and the user won't see it
+    controller: "confirm",
+    confirm_text_value: "When you see the permission checkboxes, you need to Select All for this feature to work. Got it?"
+  },
+  class: "hidden"
+%>

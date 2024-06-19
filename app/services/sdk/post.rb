@@ -12,9 +12,6 @@ class SDK::Post < SDK::Verb
       req.body = body
     end
 
-    raise "Unexpected response: #{response.status} - #{response.body}" if !response.status.in? @expected_statuses
-    return response if response.status != 200
-
-    OpenData.new JSON.parse(response.body)
+    handle(response)
   end
 end

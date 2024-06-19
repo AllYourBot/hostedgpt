@@ -1,9 +1,10 @@
 class Toolbox < SDK
   def self.descendants
-    [
+    ([
       Toolbox::OpenMeteo,
       Toolbox::Memory,
-    ] + (Rails.env.test? ? [Toolbox::HelloWorld] : [])
+      Feature.google_tools? && Current.user&.gmail_credential ? Toolbox::Gmail : nil,
+    ] + (Rails.env.test? ? [Toolbox::HelloWorld] : [])).compact
   end
 
   def self.call(name, args)
