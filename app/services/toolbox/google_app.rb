@@ -1,6 +1,10 @@
 module Toolbox::GoogleApp
   extend ActiveSupport::Concern
 
+  def app_name
+    self.class.to_s.gsub("Toolbox::", "").gsub(/(?<!\A)([A-Z])/, ' \1')
+  end
+
   def refresh_token_if_needed(&block)
     2.times do |i|
       response = yield block
@@ -33,10 +37,13 @@ module Toolbox::GoogleApp
   end
 
   def header
-    { content_type: "application/json" }
+    {
+      content_type: "application/json",
+      "Accept-Encoding": "gzip"
+    }
   end
 
   def expected_status
-    [200, 401, 403]
+    [200, 204, 401, 403]
   end
 end

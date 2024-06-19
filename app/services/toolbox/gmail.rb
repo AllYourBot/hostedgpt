@@ -178,8 +178,4 @@ class Toolbox::Gmail < Toolbox
   def app_credential
     Current.user&.gmail_credential
   end
-
-  def app_name
-    "Gmail"
-  end
 end
