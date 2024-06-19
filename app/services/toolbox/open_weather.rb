@@ -1,5 +1,5 @@
 class Toolbox::OpenWeather < Toolbox
-  # Followed this guide: https://open-meteo.com/en/docs
+  # Followed this guide: https://openweathermap.org/current
 
   def self.key
     Setting.openweather_key
@@ -12,14 +12,14 @@ class Toolbox::OpenWeather < Toolbox
   S
 
   def self.get_current_and_todays_weather(city_s:, state_province_or_region_s:, country_s: nil)
-    location = get("https://api.openweathermap.org/geo/1.0/direct").params({
+    location = get("https://api.openweathermap.org/geo/1.0/direct").param({
       q: "#{city_s},#{state_province_or_region_s}",
       country_s: country_s,
       limit: 1,
       appid: key
     }.compact).first
 
-    response = get("https://api.openweathermap.org/data/3.0/onecall").params(
+    response = get("https://api.openweathermap.org/data/3.0/onecall").param(
       lat: location.lat,
       lon: location.lon,
       units: :imperial,

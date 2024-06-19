@@ -15,7 +15,7 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
     end
 
     message_text = @test_client.messages(model: "claude-3-opus-20240229")
-    assert_equal message_text, @conversation.latest_message_for_version(:latest).content_text
+    assert @conversation.latest_message_for_version(:latest).content_text.include? "Hello this is model claude-3-opus-20240229 with instruction"
   end
 
   test "returns early if the message id was invalid" do

@@ -18,6 +18,9 @@ Rails.application.routes.draw do
     resource :person, only: [:edit, :update]
     resources :language_models
     resources :api_services, except: [:show]
+    resources :memories, only: [:index] do
+      delete :destroy, on: :collection
+    end
   end
 
   get "/login", to: "authentications#new"

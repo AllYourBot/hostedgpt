@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :api_services_including_deleted, class_name: "APIService", dependent: :destroy
   has_many :conversations, dependent: :destroy
   has_many :credentials, dependent: :destroy
+  has_many :memories, dependent: :destroy
 
   has_one :password_credential, -> { type_is("PasswordCredential") }, class_name: "Credential", inverse_of: :user
   has_one :google_credential, -> { type_is("GoogleCredential") }, class_name: "Credential", inverse_of: :user

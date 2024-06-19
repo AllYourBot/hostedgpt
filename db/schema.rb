@@ -136,6 +136,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154046) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["external_id"], name: "index_credentials_on_external_id"
+    t.index ["type", "external_id"], name: "index_credentials_on_type_and_external_id", unique: true
+    t.index ["type", "oauth_email"], name: "index_credentials_on_type_and_oauth_email", unique: true
     t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 
@@ -166,6 +168,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154046) do
     t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_language_models_on_user_id"
+  end
+
+  create_table "memories", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "message_id"
+    t.string "detail"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_memories_on_message_id"
+    t.index ["user_id"], name: "index_memories_on_user_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -211,6 +223,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154046) do
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_people_on_email", unique: true
     t.index ["personable_type", "personable_id"], name: "index_people_on_personable"
   end
 

@@ -43,7 +43,8 @@ END_INSTRUCTION
       TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response }do
         streamed_text = ""
         @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal "Hello this is model claude-3-opus-20240229 with instruction \"Can you hear me?\"! How can I assist you today?", streamed_text
+        expected = "Hello this is model claude-3-opus-20240229 with instruction \"\\n\\nNote these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\"! How can I assist you today?"
+        assert_equal expected, streamed_text
       end
     end
   end

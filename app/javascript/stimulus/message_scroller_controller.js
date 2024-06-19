@@ -64,7 +64,7 @@ export default class extends Controller {
     window.wasScrolledToBottom = true // even if we don't get the full way, it was the intention
 
     this.scrollableTarget.scrollTo({
-      top: this.bottom,
+      top: this.anchorBottom() || this.bottom,
       behavior: this.instantlyValue ? "auto" : "smooth"
     })
 
@@ -79,5 +79,11 @@ export default class extends Controller {
     }
 
     setTimeout(() => { window.scrolledDownForSystemTestsToCheck = true }, 500)
+  }
+
+  anchorBottom() {
+    const elementId = window.location.hash.substring(1) // Remove the '#' from the hash
+    const element = document.getElementById(elementId)
+    return element ? element.getBoundingClientRect().top + window.scrollY - element.getBoundingClientRect().height : null
   }
 }
