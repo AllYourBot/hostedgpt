@@ -180,16 +180,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
     t.index ["user_id"], name: "index_memories_on_user_id"
   end
 
-  create_table "memories", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "message_id"
-    t.string "detail"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["message_id"], name: "index_memories_on_message_id"
-    t.index ["user_id"], name: "index_memories_on_user_id"
-  end
-
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.string "role", null: false
