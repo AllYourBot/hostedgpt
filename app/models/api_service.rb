@@ -1,5 +1,8 @@
 class APIService < ApplicationRecord
-  DRIVERS = %w(OpenAI Anthropic)
+  DRIVER_OPEN_AI = "OpenAI"
+  DRIVER_ANTHROPIC = "Anthropic"
+
+  DRIVERS = [DRIVER_OPEN_AI, DRIVER_ANTHROPIC]
 
   belongs_to :user
 

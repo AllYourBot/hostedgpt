@@ -19,18 +19,16 @@ Language Models
       <th>Name</th>
       <th>Description</th>
       <th>API Service</th>
-      <th>Owner</th>
     </tr>
   </thead>
 
   <tbody>
     <% @language_models.each do |language_model| %>
       <%= turbo_frame_tag dom_id(language_model) do %>
-        <tr class="<%= cycle('bg-gray-100', 'bg-white') %> cursor-pointer" data-href="<%= language_model_edit_show_path(language_model) %>">
+        <tr class="<%= cycle('bg-gray-100', 'bg-white') %> cursor-pointer" data-href="<%= edit_settings_language_model_path(language_model) %>">
           <td><%= language_model.api_name %></td>
           <td><%= language_model.description %></td>
-          <td><%= n_a_if_blank(language_model.api_service.try(:description)) %></td>
-          <td><%= language_model.created_by_current_user? ? 'User' : 'System' %></td>
+          <td><%= n_a_if_blank(language_model.api_service.name) %></td>
         </tr>
       <% end %>
     <% end %>

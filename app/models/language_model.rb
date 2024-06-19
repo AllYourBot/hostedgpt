@@ -1,12 +1,15 @@
 # We don"t care about large or not
 class LanguageModel < ApplicationRecord
+  BEST_GPT = "gpt-best"
+  BEST_CLAUDE = "claude-best"
+
   BEST_MODELS = {
-    "gpt-best" => "gpt-4o-2024-05-13",
-    "claude-best" => "claude-3-opus-20240229"
+    BEST_GPT => "gpt-4o-2024-05-13",
+    BEST_CLAUDE => "claude-3-opus-20240229"
   }
 
-  belongs_to :user, optional: true
-  belongs_to :api_service, optional: true
+  belongs_to :user
+  belongs_to :api_service
 
   has_many :assistants, -> { not_deleted }
   has_many :assistants_including_deleted, class_name: "Assistant", dependent: :destroy
@@ -16,25 +19,11 @@ class LanguageModel < ApplicationRecord
   before_create :populate_position
 
   scope :ordered, -> { order(:position) }
-  scope :for_user, ->  (user) { where(user_id: [user.id, nil]).not_deleted }
-  scope :system_wide, ->  { where(user_id: nil) }
+  scope :for_user, ->  (user) { where(user_id: user.id).not_deleted }
 
-  def ai_backend
-    if api_service.present?
-      api_service.ai_backend
-    elsif api_name.starts_with?('gpt-')
-      AIBackend::OpenAI
-    else
-      AIBackend::Anthropic
-    end
-  end
-
-  def readonly?
-    !new_record? && user.blank?
-  end
+  delegate :ai_backend, to: :api_service
 
   def delete!
-    raise ActiveRecord::ReadOnlyError 'System model cannot be deleted' if user.blank?
     update!(deleted_at: Time.now)
     assistants.each { |assistant| assistant.deleted! }
   end
