@@ -1,11 +1,39 @@
-keith_service:
+keith_openai_service:
+  name: OpenAI
+  user: keith
+  url: https://api.openai.com/
+  token: abc-secret
+  driver: OpenAI
+
+keith_anthropic_service:
+  name: Anthropic
+  user: keith
+  url: https://api.anthropic.com/
+  token: abc-secret
+  driver: Anthropic
+
+keith_other_service:
   name: Keith Server
-  user: :keith
+  user: keith
   url: http://test.com/models
   token: abc-secret
   driver: OpenAI
 
-rob_service:
+rob_openai_service:
+  name: OpenAI
+  user: :rob
+  url: https://api.openai.com/
+  token: rob-secret
+  driver: OpenAI
+
+rob_anthropic_service:
+  name: Anthropic
+  user: :rob
+  url: https://api.anthropic.com/
+  token: rob-secret
+  driver: Anthropic
+
+rob_other_service:
   name: Rob Server
   user: :rob
   url: http://rob-test.com/models

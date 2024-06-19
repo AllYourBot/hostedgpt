@@ -32,15 +32,15 @@ keith_gpt3:
 
 rob_gpt4:
   user: rob
-  language_model: gpt_4o
+  language_model: rob_gpt
   name: GPT-4
-  description: OpenAI's GPT-4
+  description: OpenAI's GPT
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
 mandela_gpt4:
   user: rob
-  language_model: gpt_4o
+  language_model: rob_gpt
   name: Mandela
   description: OpenAI assistant GPT4
   instructions: Be helpful

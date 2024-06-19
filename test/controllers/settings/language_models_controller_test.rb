@@ -10,7 +10,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
   test "should get index for keith user" do
     get settings_language_models_url
     assert_response :success
-    assert_select "table#language-models tbody tr", count: 26
+    assert_select "table#language-models tbody tr", count: 17
     assert_select "p a", "Add New"
   end
 
@@ -18,7 +18,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     get logout_path
     login_as users(:rob)
     get settings_language_models_url
-    assert_select "table#language-models tbody tr", count: 24
+    assert_select "table#language-models tbody tr", count: 10
   end
 
   test "should get new" do
@@ -70,7 +70,11 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "form should display a DELETE button even if this is your last language model" do
-    language_models(:guanaco).destroy!
+    @user.language_models.each do |record|
+      next if record == @language_model
+      record.destroy!
+    end
+    @user.reload
     assert @user.language_models.length == 1, "User needs to have only one language model"
     get edit_settings_language_model_url(@language_model)
     assert_response :success
