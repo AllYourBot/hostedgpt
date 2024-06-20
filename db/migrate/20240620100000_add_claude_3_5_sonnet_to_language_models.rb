@@ -8,6 +8,12 @@ class AddClaude35SonnetToLanguageModels < ActiveRecord::Migration[7.0]
       supports_images: true
     )
 
+    LanguageModel.class_eval do
+      def readonly?
+        false
+      end
+    end
+
     # Increment the position of existing Language Models where position >= 19
     LanguageModel.where('position >= 19').where.not(name: 'claude-3-5-sonnet-20240620').find_each do |model|
       model.update(position: model.position + 1)
