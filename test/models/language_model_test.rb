@@ -22,7 +22,7 @@ class LanguageModelTest < ActiveSupport::TestCase
 
   test "provider_name for best models" do
     assert_equal "gpt-4o-2024-05-13", language_models(:gpt_best).provider_name
-    assert_equal "claude-3-opus-20240229", language_models(:claude_best).provider_name
+    assert_equal "claude-3-5-sonnet-20240620", language_models(:claude_best).provider_name
   end
 
   test "provider_name for non-best models" do
