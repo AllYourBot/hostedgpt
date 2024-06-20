@@ -14,7 +14,7 @@ class AddClaude35SonnetToLanguageModels < ActiveRecord::Migration[7.0]
     end
 
     Assistant.where(name: "Claude 3 Opus").update_all(name: "Claude 3.5 Sonnet")
-    Assistant.where(name: "Claude 3 Sonnet").update_all(name: "Claude 3 Opus", language_model: LanguageModel.find_by(name: "claude-3-opus-20240229"))
+    Assistant.where(name: "Claude 3 Sonnet").update_all(name: "Claude 3 Opus", language_model_id: LanguageModel.find_by(name: "claude-3-opus-20240229").id)
   end
 
   def down
