@@ -106,4 +106,20 @@ class SDK::Verb
       Faraday.post(url, &block)
     end
   end
+
+  def patch(url, &block)
+    if self.class.respond_to?("mocked_response_patch_#{@calling_method}")
+      self.class.send("mocked_response_patch_#{@calling_method}")
+    else
+      Faraday.patch(url, &block)
+    end
+  end
+
+  def delete(url, &block)
+    if self.class.respond_to?("mocked_response_delete_#{@calling_method}")
+      self.class.send("mocked_response_delete_#{@calling_method}")
+    else
+      Faraday.delete(url, &block)
+    end
+  end
 end

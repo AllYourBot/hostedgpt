@@ -19,6 +19,16 @@ class SDK
     )
   end
 
+  def patch(url, token = nil)
+    SDK::Patch.new(
+      url: url,
+      bearer_token: token || bearer_token,
+      expected_status: expected_status,
+      header: header,
+      calling_method: calling_method(__method__),
+    )
+  end
+
   def delete(url, token = nil)
     SDK::Delete.new(
       url: url,
@@ -28,8 +38,6 @@ class SDK
       calling_method: calling_method(__method__),
     )
   end
-
-  alias_method :patch, :post
 
   private
 

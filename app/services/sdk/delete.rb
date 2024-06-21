@@ -1,7 +1,7 @@
 class SDK::Delete < SDK::Verb
   def param(params = {})
     hash = OpenData.new(params).to_h
-    response = Faraday.delete(@url + "?" + hash.to_query) do |req|
+    response = delete(@url + "?" + hash.to_query) do |req|
       req.headers = @headers
     end
 
