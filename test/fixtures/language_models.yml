@@ -108,45 +108,51 @@ gpt_3_5_turbo_instruct:
   description: GPT-3.5 Turbo Instruct
   supports_images: false
 
-claude_3_opus_20240229:
+claude_3_5_sonnet_20240620:
   position: 19
+  api_name: claude-3-5-sonnet-20240620
+  description: Claude 3.5 Sonnet (2024-06-20)
+  supports_images: true
+
+claude_3_opus_20240229:
+  position: 20
   api_name: claude-3-opus-20240229
   description: Claude 3 Opus (2024-02-29)
   supports_images: true
 
 claude_3_sonnet_20240229:
-  position: 20
+  position: 21
   api_name: claude-3-sonnet-20240229
   description: Claude 3 Sonnet (2024-02-29)
   supports_images: true
 
 claude_3_haiku_20240307:
-  position: 21
+  position: 22
   api_name: claude-3-haiku-20240307
   description: Claude 3 Haiku (2024-03-07)
   supports_images: true
 
 claude_2_1:
-  position: 22
+  position: 23
   api_name: claude-2.1
   description: Claude 2.1
   supports_images: false
 
 claude_2_0:
-  position: 23
+  position: 24
   api_name: claude-2.0
   description: Claude 2.0
   supports_images: false
 
 claude_instant_1_2:
-  position: 24
+  position: 25
   api_name: claude-instant-1.2
   description: Claude Instant 1.2
   supports_images: false
 
 camel:
   user: keith
-  position: 25
+  position: 26
   api_name: camel
   api_service: keith_service
   description: gpt-3.5-turbo from fixtures
@@ -154,7 +160,7 @@ camel:
 
 guanaco:
   user: keith
-  position: 26
+  position: 27
   api_name: guanaco:large
   api_service: keith_service
   description: Guanaco (large)  from fixtures
@@ -162,7 +168,7 @@ guanaco:
 
 alpaca:
   user: taylor
-  position: 27
+  position: 28
   api_name: alpaca:medium
   api_service: taylor_anthropic_service
   description: Alpaca (large) from fixtures
@@ -170,7 +176,7 @@ alpaca:
 
 pacos:
   user: taylor
-  position: 28
+  position: 29
   api_name: pacos-imagine
   api_service: taylor_openai_service
   description: Lama pacos (large) from fixtures
