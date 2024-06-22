@@ -95,6 +95,7 @@ class SDK::Verb
     if self.class.respond_to?("mocked_response_get_#{@calling_method}")
       self.class.send("mocked_response_get_#{@calling_method}")
     else
+      possible_test_warning(:get)
       Faraday.get(url, &block)
     end
   end
@@ -103,6 +104,7 @@ class SDK::Verb
     if self.class.respond_to?("mocked_response_post_#{@calling_method}")
       self.class.send("mocked_response_post_#{@calling_method}")
     else
+      possible_test_warning(:post)
       Faraday.post(url, &block)
     end
   end
@@ -111,6 +113,7 @@ class SDK::Verb
     if self.class.respond_to?("mocked_response_patch_#{@calling_method}")
       self.class.send("mocked_response_patch_#{@calling_method}")
     else
+      possible_test_warning(:patch)
       Faraday.patch(url, &block)
     end
   end
@@ -119,7 +122,12 @@ class SDK::Verb
     if self.class.respond_to?("mocked_response_delete_#{@calling_method}")
       self.class.send("mocked_response_delete_#{@calling_method}")
     else
+      possible_test_warning(:delete)
       Faraday.delete(url, &block)
     end
+  end
+
+  def possible_test_warning(verb)
+    puts "WARNING: live API call in test. USE: stub_#{verb}_response(:#{@calling_method}, status: ___, response: _______) do; ...; end" if Rails.env.test?
   end
 end

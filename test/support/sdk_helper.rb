@@ -28,14 +28,9 @@ module SDKHelpers
   end
 
   def response_for(status, hash)
-    response = hash.except(:status)
-    if response.keys.length == 1 && response[:response]
-      response = response[:response]
-    end
-
     OpenData.new(
       status: status,
-      body: response.to_json,
+      body: hash.to_json,
     )
   end
 end

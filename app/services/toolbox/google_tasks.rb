@@ -15,8 +15,6 @@ class Toolbox::GoogleTasks < Toolbox
   # [ ] Create a task by specifying a special list and specifying a future due date. Confirm it appears on the list.
   # [ ] Undo that task. Confirm it disappears.
 
-#          * always tell the user this title didn't work
-
   # [ ] Make sure you have a dummy task on your main list and delete it using the position. Confirm it disappears.
   # [ ] Undo that deletion passing in the position. Confirm you get an error.
   # [ ] Undo that deletion passing in the ID. Confirm it reappears.
@@ -73,10 +71,13 @@ class Toolbox::GoogleTasks < Toolbox
     list = pick_best(input: list_s, options: get_lists, key: :title, error_type: "task list")
 
     task = get_task_by_id_or_position(task_id_or_position_s, list: list)
-    if !!task.try(:deleted)
+
+    if !!task.try(:deleted) == true && is_deleted == false
       task = update_task(task, deleted: false)
-    else
+    elsif !!task.try(:deleted) == false && is_deleted == true
       task = delete_task(task)
+    else
+      raise "Task '#{task.title}' is already #{!!task.try(:deleted) ? 'deleted' : 'restored'}."
     end
 
     is_deleted = !!task.try(:deleted)
@@ -120,11 +121,13 @@ class Toolbox::GoogleTasks < Toolbox
       updated_task = move_task_to_list(updated_task, snoozed_list)
       list = snoozed_list
     end
+
     if (list.title == "Snoozed" && (
           (format_time(due_date_s).present? && updated_task.try(:due)&.to_date == Date.today) ||
           (due_date_s == "clear" && updated_task.try(:due).nil?)
     ))
       updated_task = move_task_to_list(updated_task, default_list, keep_due: false)
+      list = default_list
     end
 
     params = {
@@ -138,6 +141,7 @@ class Toolbox::GoogleTasks < Toolbox
 
     {
       good_summary: "Updated '#{updated_task.title}'",
+      task: task_for_display(updated_task).merge(list: list.title),
       undo_by: undo_task(:change_task, params),
     }
   end
@@ -151,6 +155,7 @@ class Toolbox::GoogleTasks < Toolbox
     refresh_tasks
     list = pick_best(input: list_s, options: get_lists, key: :title, error_type: "task list")
     tasks = get_tasks_for_list(list).map.with_index { |t, i| task_for_display(t).merge(position: i+1, list: list.title) }
+
     {
       good_summary: "You have #{tasks.length} items on your '#{list.title}' list.",
       tasks: tasks,
@@ -190,7 +195,7 @@ class Toolbox::GoogleTasks < Toolbox
       [b.second, a.first] <=> [a.second, b.first]
     end
 
-    index = highest_match_sort_with_lowest_index_tiebreaker.filter { |pair| pair.second > 0.8 }&.first&.first # returns the index
+    index = highest_match_sort_with_lowest_index_tiebreaker.filter { |pair| pair.second > 0.7 }&.first&.first # returns the index
     raise "Unable to find a #{error_type} with the name '#{input}'" if index.nil?
     options[index]
   end

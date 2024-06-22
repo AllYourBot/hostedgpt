@@ -78,38 +78,8 @@ module Toolbox::GoogleTasks::APIHelpers
         due: format_time(due),
         status: !!completed ? "completed" : "needsAction",
         completed: completed.presence && format_time(completed),
-        deleted: deleted
+        deleted: deleted,
       }.compact) # w/o this it updates values to nil
-    end
-  end
-
-  def get_task_by_id(task_id, list: nil)
-    default = list || default_list
-    raise "Could not find a task list named '#{list}'" if default.nil?
-    begin
-      task = get_task_from_list_id(task_id, default.id)
-    rescue => e
-      raise "Could not find a task with the id '#{task_id}' on the '#{list.title}` list`. Did you intend a different list?" if task.nil?
-    end
-  end
-
-  def get_task_from_list_id(task_id, list_id)
-    refresh_token_if_needed do
-      get("https://tasks.googleapis.com/tasks/v1/lists/#{list_id}/tasks/#{task_id}").param(
-        fields: "id,etag,title,notes,due,links,selfLink,deleted"
-      )
-    end
-  end
-
-  def get_task_by_position(position_input, list: nil)
-    list ||= default_list
-    position = position_input.to_i
-    tasks = get_tasks_for_list(list)
-    begin
-      position = position-1 if position > 0
-      tasks.fetch(position)
-    rescue => e
-      raise "Could not find a task at position '#{position_input}'. Position must be a number. Try again or you can get_tasks and lookup by ID instead."
     end
   end
 
@@ -124,6 +94,36 @@ module Toolbox::GoogleTasks::APIHelpers
   def is_position(id_or_position)
     id_or_position = id_or_position.to_i if id_or_position.to_s == id_or_position.to_i.to_s
     id_or_position.is_a?(Integer)
+  end
+
+  def get_task_by_position(position_input, list: nil)
+    list ||= default_list
+    position = position_input.to_i
+    tasks = get_tasks_for_list(list)
+    begin
+      position = position-1 if position > 0
+      tasks.fetch(position)
+    rescue => e
+      raise "Could not find a task at position '#{position_input}'. Position must be a number. Try again or you can get_tasks and lookup by ID instead."
+    end
+  end
+
+  def get_task_by_id(task_id, list: nil)
+    default = list || default_list
+    raise "Could not find a task list named '#{list}'" if default.nil?
+    begin
+      task = get_task_for_list_id(task_id, default.id)
+    rescue => e
+      raise "Could not find a task with the id '#{task_id}' on the '#{list.title}` list`. Did you intend a different list?" if task.nil?
+    end
+  end
+
+  def get_task_for_list_id(task_id, list_id)
+    refresh_token_if_needed do
+      get("https://tasks.googleapis.com/tasks/v1/lists/#{list_id}/tasks/#{task_id}").param(
+        fields: "id,etag,title,notes,due,links,selfLink,deleted"
+      )
+    end
   end
 
   def list_id_of(task)
@@ -150,6 +150,6 @@ module Toolbox::GoogleTasks::APIHelpers
   end
 
   def task_for_display(task)
-    task.to_h.slice(:id, :title, :notes, :due)
+    task.to_h.slice(:id, :title, :notes, :due, :status)
   end
 end
