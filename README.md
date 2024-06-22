@@ -88,6 +88,7 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
 1. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly.
 1. Run `fly deploy --ha=false`
+1. Assuming you chose `Development` as the DB size in the step above, now you should run `bin/rails db:fly[APP_NAME_FROM_EARLIER,swap,512]` This will increase the swap on your database machine so that it doesn't crash.
 
 You may want to read about [configuring optional features](#configure-optional-features).
 
