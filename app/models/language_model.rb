@@ -5,7 +5,7 @@ class LanguageModel < ApplicationRecord
 
   BEST_MODELS = {
     BEST_GPT => "gpt-4o-2024-05-13",
-    BEST_CLAUDE => "claude-3-opus-20240229"
+    BEST_CLAUDE => "claude-3-5-sonnet-20240620"
   }
 
   belongs_to :user
@@ -22,6 +22,15 @@ class LanguageModel < ApplicationRecord
   scope :for_user, ->  (user) { where(user_id: user.id).not_deleted }
 
   delegate :ai_backend, to: :api_service
+
+  # Added for use in migrations; validations in the present code refer to columns not present in earlier migrations.
+  def self.create_without_validation!(attributes)
+    record = new(attributes)
+    if !record.save(validate: false)
+      raise "Could not create LanguageModel record for #{attributes.inspect}"
+    end
+    record
+  end
 
   def delete!
     update!(deleted_at: Time.now)

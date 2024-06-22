@@ -144,8 +144,16 @@ gpt_3_5_turbo_instruct:
   description: GPT-3.5 Turbo Instruct
   supports_images: false
 
-claude_3_opus_20240229:
+claude_3_5_sonnet_20240620:
   position: 19
+  user: keith
+  api_service: keith_anthropic_service
+  api_name: claude-3-5-sonnet-20240620
+  description: Claude 3.5 Sonnet (2024-06-20)
+  supports_images: true
+
+claude_3_opus_20240229:
+  position: 20
   user: keith
   api_service: keith_anthropic_service
   api_name: claude-3-opus-20240229
@@ -153,7 +161,7 @@ claude_3_opus_20240229:
   supports_images: true
 
 claude_3_sonnet_20240229:
-  position: 20
+  position: 21
   user: keith
   api_service: keith_anthropic_service
   api_name: claude-3-sonnet-20240229
@@ -161,7 +169,7 @@ claude_3_sonnet_20240229:
   supports_images: true
 
 claude_3_haiku_20240307:
-  position: 21
+  position: 22
   user: keith
   api_service: keith_anthropic_service
   api_name: claude-3-haiku-20240307
@@ -169,7 +177,7 @@ claude_3_haiku_20240307:
   supports_images: true
 
 claude_2_1:
-  position: 22
+  position: 23
   user: keith
   api_service: keith_anthropic_service
   api_name: claude-2.1
@@ -177,7 +185,7 @@ claude_2_1:
   supports_images: false
 
 claude_2_0:
-  position: 23
+  position: 24
   user: rob
   api_service: rob_anthropic_service
   api_name: claude-2.0
@@ -185,7 +193,7 @@ claude_2_0:
   supports_images: false
 
 claude_instant_1_2:
-  position: 24
+  position: 25
   user: rob
   api_service: rob_anthropic_service
   api_name: claude-instant-1.2
@@ -193,7 +201,7 @@ claude_instant_1_2:
   supports_images: false
 
 camel:
-  position: 25
+  position: 26
   user: keith
   api_name: camel
   api_service: keith_other_service
@@ -201,7 +209,7 @@ camel:
   supports_images: false
 
 guanaco:
-  position: 26
+  position: 27
   user: keith
   api_name: guanaco:large
   api_service: keith_other_service
@@ -209,7 +217,7 @@ guanaco:
   supports_images: true
 
 alpaca:
-  position: 27
+  position: 28
   user: taylor
   api_name: alpaca:medium
   api_service: taylor_anthropic_service
@@ -217,7 +225,7 @@ alpaca:
   supports_images: true
 
 pacos:
-  position: 28
+  position: 29
   user: taylor
   api_name: pacos-imagine
   api_service: taylor_openai_service
@@ -225,7 +233,7 @@ pacos:
   supports_images: true
 
 rob_gpt:
-  position: 3
+  position: 30
   user: rob
   api_service: rob_openai_service
   api_name: gpt-4o

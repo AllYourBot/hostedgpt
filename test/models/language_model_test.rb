@@ -90,7 +90,7 @@ class LanguageModelTest < ActiveSupport::TestCase
   test "can delete from db when deleting user" do
     language_model = language_models(:camel)
     assert_equal users(:keith), language_model.user
-    assert_difference 'LanguageModel.count', -17 do
+    assert_difference 'LanguageModel.count', -18 do
       assert users(:keith).destroy!
     end
     assert_equal 0, LanguageModel.where(id: language_model.id).count
@@ -107,9 +107,16 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert list.include?('alpaca:medium')
   end
 
+  test "create_without_validation!" do
+    record = assert_difference 'LanguageModel.count' do
+      LanguageModel.create_without_validation!({api_name: '', description: '', supports_images:false, user: users(:rob)})
+    end
+    assert_equal '',  record.api_name
+  end
+
   test "provider_name for best models" do
     assert_equal "gpt-4o-2024-05-13", language_models(:gpt_best).provider_name
-    assert_equal "claude-3-opus-20240229", language_models(:claude_best).provider_name
+    assert_equal "claude-3-5-sonnet-20240620", language_models(:claude_best).provider_name
   end
 
   test "provider_name for non-best models" do
