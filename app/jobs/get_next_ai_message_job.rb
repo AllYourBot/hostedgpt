@@ -150,7 +150,7 @@ class GetNextAIMessageJob < ApplicationJob
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
-    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id}, #{attempt})" unless Rails.env.test?
+    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id}, #{@attempt})" unless Rails.env.test?
   end
 
   def call_tools_before_wrapping_up
