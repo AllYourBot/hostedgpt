@@ -1,4 +1,4 @@
-class SDK::Post < SDK::Verb
+class SDK::Patch < SDK::Verb
   def param(params = {})
     hash = OpenData.new(params).to_h
     if @headers[:"Content-Type"] == "application/x-www-form-urlencoded"
@@ -7,7 +7,7 @@ class SDK::Post < SDK::Verb
       body = hash.to_json
     end
 
-    response = post(@url) do |req|
+    response = patch(@url) do |req|
       req.headers = @headers
       req.body = body
     end

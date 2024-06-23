@@ -27,6 +27,10 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of GmailCredential, users(:keith).gmail_credential
   end
 
+  test "has an associated google_tasks_credential" do
+    assert_instance_of GoogleTasksCredential, users(:keith).google_tasks_credential
+  end
+
   test "has an associated http_header_credential" do
     assert_instance_of HttpHeaderCredential, users(:rob).http_header_credential
   end

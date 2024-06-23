@@ -1,10 +1,15 @@
 class Toolbox < SDK
   def self.descendants
-    ([
+    gmail_active = Feature.google_tools? && Current.user&.gmail_credential || nil
+    tasks_active = Feature.google_tools? && Current.user&.google_tasks_credential || nil
+    test_env = Rails.env.test? || nil
+    [
+      test_env && Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
       Toolbox::Memory,
-      Feature.google_tools? && Current.user&.gmail_credential ? Toolbox::Gmail : nil,
-    ] + (Rails.env.test? ? [Toolbox::HelloWorld] : [])).compact
+      gmail_active && Toolbox::Gmail,
+      tasks_active && Toolbox::GoogleTasks,
+    ].compact
   end
 
   def self.call(name, args)
