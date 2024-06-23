@@ -240,6 +240,46 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
     end
   end
 
+  test "change_task can mark something as completed by specifying the task position" do
+    input = {
+      completed: true
+    }
+    stub_change_task(input) do
+      response = @google_tasks.change_task(
+        task_id_or_position_s: 1,
+        is_completed: input[:completed]
+      )
+      assert_equal "Updated 'Title of task'", response[:good_summary]
+      assert_equal "completed", response[:task][:status]
+      assert_equal "change_task(task_id_or_position: \"mockid\", completed: \"false\")", response[:undo_by]
+    end
+  end
+
+  test "change_task errors when attempting to un-complete something by specifying the task position" do
+    stub_change_task(completed: false) do
+      error = assert_raises do
+        @google_tasks.change_task(task_id_or_position_s: 1, is_completed: false)
+      end
+      assert_equal "To uncomplete you must call change_task with a task ID.", error.message
+    end
+  end
+
+  test "change_task can mark something as un-completed by specifying the task ID" do
+    input = {
+      id: "mockid",
+      completed: false
+    }
+    stub_change_task(input) do
+      response = @google_tasks.change_task(
+        task_id_or_position_s: input[:id],
+        is_completed: input[:completed]
+      )
+      assert_equal "Updated 'Title of task'", response[:good_summary]
+      assert_equal "needsAction", response[:task][:status]
+      assert_equal "change_task(task_id_or_position: \"mockid\", completed: \"true\")", response[:undo_by]
+    end
+  end
+
   test "get_tasks returns tasks for the main list when nothing provoided" do
     stub_get_tasks do
       response = @google_tasks.get_tasks
