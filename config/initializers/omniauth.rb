@@ -4,11 +4,11 @@ end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
-    name: 'google'
+    name: "google"
   }
 
   provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
-    name: 'gmail',
+    name: "gmail",
     scope: %|
       email
       https://www.googleapis.com/auth/gmail.modify
@@ -16,4 +16,14 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     # Permissions explained: https://stackoverflow.com/questions/19102557/google-oauth-scope-for-sending-mail
     include_granted_scopes: true
   }
+
+  provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
+    name: "google_tasks",
+    scope: %|
+      email
+      https://www.googleapis.com/auth/tasks
+    |,
+    include_granted_scopes: true
+  }
+
 end

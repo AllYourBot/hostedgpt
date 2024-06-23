@@ -36,6 +36,7 @@ export default class extends Interface {
 
   log_SpeakTo
   SpeakTo(text)         { $.words += text+' '
+                          $.dismissPoller?.end()
                           _shortWaitThenTell()
                         }
 
