@@ -1,6 +1,14 @@
 class OpenData
   @@data_classes = {}
 
+  def self.for(input)
+    if input.is_a?(Array)
+      input.map { |i| OpenData.new(i) }
+    else
+      OpenData.new(input)
+    end
+  end
+
   def initialize(input)
     if input.is_a?(Hash)
       @data = parse_hash(input)
@@ -34,6 +42,22 @@ class OpenData
 
   def merge(input)
     OpenData.new(self.to_h.merge(input.to_h))
+  end
+
+  def try(name)
+    super || @data.try(name)
+  end
+
+  def ==(other)
+    to_h == other.to_h
+  end
+
+  def eql?(other)
+    self == other
+  end
+
+  def inspect
+    @data.inspect.gsub('<data', '<OpenData')
   end
 
   private
@@ -80,9 +104,5 @@ class OpenData
     else
       @data.send(method_name, *arguments, &block)
     end
-  end
-
-  def inspect
-    @data.inspect.gsub('<data', '<OpenData')
   end
 end

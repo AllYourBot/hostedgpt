@@ -2,23 +2,28 @@ class Authentications::GoogleOauthController < ApplicationController
   allow_unauthenticated_access
 
   def create
-    if    auth[:provider] == "gmail"       && Current.user
+    if    auth[:provider] == "gmail"           && Current.user
       Current.user.gmail_credential&.destroy
       _, cred = add_person_credentials("GmailCredential")
       raise "You did not check all the permission boxes. Try again." unless cred.has_permission? %w(userinfo.email gmail.modify)
-      cred.save!
-      redirect_to(edit_settings_person_path, notice: "Saved") && return
+      cred.save! && redirect_to(edit_settings_person_path, notice: "Saved") && return
 
-    elsif auth[:provider] == "google"      && credential = GoogleCredential.find_by(oauth_id: auth[:uid])
+    elsif auth[:provider] == "google_tasks"    && Current.user
+      Current.user.google_tasks_credential&.destroy
+      _, cred = add_person_credentials("GoogleTasksCredential")
+      raise "You did not check all the permission boxes. Try again." unless cred.has_permission? %w(userinfo.email tasks)
+      cred.save! && redirect_to(edit_settings_person_path, notice: "Saved") && return
+
+    elsif auth[:provider] == "google"          && credential = GoogleCredential.find_by(oauth_id: auth[:uid])
       @person = credential.user.person
 
     elsif Feature.disabled?(:registration)
       redirect_to(root_path, alert: "Registration is disabled") && return
 
-    elsif auth[:provider] == "google"      && user = Person.find_by(email: auth_email)&.user
+    elsif auth[:provider] == "google"          && user = Person.find_by(email: auth_email)&.user
       @person = init_for_user(user)
 
-    elsif auth[:provider] == "google"      && @person = Person.find_by(email: auth_email)
+    elsif auth[:provider] == "google"          && @person = Person.find_by(email: auth_email)
       @person = init_for_person(@person)
 
     elsif auth[:provider] == "google"

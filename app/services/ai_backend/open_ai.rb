@@ -78,11 +78,9 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def system_message
-    return [] if full_instructions.blank?
-
     [{
       role: "system",
-      content: full_instructions
+      content: full_instructions.to_s + "\nThe current time & date for the user is " + DateTime.current.strftime("%-l:%M%P on %A, %B %-d, %Y")
     }]
   end
 

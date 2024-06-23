@@ -1,4 +1,5 @@
 class Toolbox::Gmail < Toolbox
+  include GoogleApp
 
   describe :email_myself, <<~S
     Send an email to yourself with the indicated message
@@ -61,6 +62,11 @@ class Toolbox::Gmail < Toolbox
 
   private
 
+  def get_user_profile
+    refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_params
+    end
+  end
 
   def create_draft(to:, subject:, body:)
     message = <<~S
@@ -113,6 +119,12 @@ class Toolbox::Gmail < Toolbox
   #   end
   # end
 
+  def get_threads(h = {})
+    refresh_token_if_needed do
+      get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/threads").param(h)
+    end&.threads
+  end
+
   def get_messages(h = {})
     refresh_token_if_needed do
       get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages").param(h)
@@ -137,18 +149,7 @@ class Toolbox::Gmail < Toolbox
 
   # These API calls work but we are not using them yet.
   #
-  # def get_user_profile
-  #   refresh_token_if_needed do
-  #     r = get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_params
-  #     r
-  #   end
-  # end
 
-  # def get_threads(h = {})
-  #   refresh_token_if_needed do
-  #     get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/threads").param(h)
-  #   end&.threads
-  # end
 
   # def get_user_labels
   #   refresh_token_if_needed do
@@ -174,119 +175,7 @@ class Toolbox::Gmail < Toolbox
   #   end
   # end
 
-  # Utilities
-
-  def refresh_token_if_needed(&block)
-    2.times do |i|
-      response = yield block
-      expired_token   = response.is_a?(Faraday::Response) && response.status == 401
-      if response.is_a?(Faraday::Response) && response.status == 403
-        raise "Missing permissions. Tell the user to: Add your Gmail permissions again in your account settings."
-      end
-
-      refresh_token! && next if i == 0 && expired_token
-      return response
-    end
-  end
-
-  def refresh_token!
-    if !Google.reauthenticate_credential(Current.user.gmail_credential)
-      raise "Gmail no longer connected"
-    else
-      true
-    end
-  end
-
-  def uid
-    Current.user&.gmail_credential.oauth_id
-  end
-
-  def bearer_token
-    token = Current.user&.gmail_credential&.oauth_token
-    raise "Unable to find a user with Gmail credentials" unless token
-    token
-  end
-
-  def header
-    { content_type: "application/json" }
-  end
-
-  def expected_status
-    [200, 401, 403]
-  end
-
-  class Message
-    def initialize(message_or_messages)
-      if message_or_messages.is_a?(Array)
-        message_or_messages.map { |m| Message.new(m) }
-      else
-        @message = message_or_messages
-      end
-    end
-
-    def id
-      @message.id
-    end
-
-    def thread_id
-      @message.threadId
-    end
-
-    def from
-      @message.payload.headers.find { |h| h.name == "From" }.value
-    end
-
-    def from_email
-      from.match?(/\A<([^>]*)>/) ? $1 : from
-    end
-
-    def to
-      @message.payload.headers.find { |h| h.name == "To" }.value
-    end
-
-    def to_email
-      to.match?(/\A<([^>]*)>/) ? $1 : to
-    end
-
-    def subject
-      @message.payload.headers.find { |h| h.name == "Subject" }.value
-    end
-
-    def snippet
-      @message.snippet
-    end
-
-    def date
-      @message.payload.headers.find { |h| h.name == "Date" }.value
-    end
-
-    def body
-      Base64.decode64(@message.payload.parts.find { |p| p.mimeType == "text/plain" }&.body&.data&.gsub(/-/, '+')&.gsub(/_/, '/'))
-    end
-
-    def body_html
-      Base64.decode64(@message.payload.parts.find { |p| p.mimeType == "text/html" }&.body&.data&.gsub(/-/, '+')&.gsub(/_/, '/'))
-    end
-
-    def to_h
-      {
-        id: id,
-        thread_id: thread_id,
-        date: date,
-        from: from,
-        to: to,
-        subject: subject,
-        snippet: snippet,
-        body: body || body_html,
-      }
-    end
-
-    def data
-      @message
-    end
-
-    def inspect
-      "#<Message id:#{id} from:#{from_email} to:#{to_email} subject:#{subject}>"
-    end
+  def app_credential
+    Current.user&.gmail_credential
   end
 end
