@@ -20,7 +20,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
     @language_model = Current.user.language_models.new(language_model_params)
 
     if @language_model.save
-      redirect_to settings_language_models_path, notice: "Saved"
+      redirect_to settings_language_models_path, notice: "Saved", status: :see_other
     else
       render :new, status: :unprocessable_entity
     end
