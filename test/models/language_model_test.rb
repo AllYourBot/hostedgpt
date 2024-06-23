@@ -5,14 +5,13 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_instance_of Assistant, language_models(:gpt_4o).assistants.first
   end
 
-  test "can have User" do
+  test "has User" do
     assert_instance_of User, language_models(:guanaco).user
-    assert_nil language_models(:gpt_best).user
   end
 
-  test "can have API Service" do
+  test "has API Service" do
     assert_instance_of APIService, language_models(:guanaco).api_service
-    assert_nil language_models(:gpt_best).api_service
+    assert_instance_of APIService, language_models(:gpt_best).api_service
   end
 
   test "validates name" do
@@ -27,23 +26,20 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_equal ["can't be blank"], record.errors[:description]
   end
 
-  test "is readonly?" do
-    assert language_models(:gpt_best).readonly?
-    assert !language_models(:alpaca).readonly?
+  test "cannot create without user" do
+    record = LanguageModel.new(api_name: "demo name", description: "good one", api_service: api_services(:rob_other_service), supports_images: false)
+    refute record.valid?
+    assert_equal ["must exist"], record.errors[:user]
   end
 
-  # But controller populates the user_id implicitly
-  test "can create without user" do
+  test "cannot create without api_service" do
     record = LanguageModel.new(api_name: "demo name", description: "good one", supports_images: false)
-    assert record.valid?
-    refute record.readonly?
-    assert_difference 'LanguageModel.count' do
-      assert record.save
-    end
+    refute record.valid?
+    assert_equal ["must exist"], record.errors[:api_service]
   end
 
   test "can create" do
-    record = LanguageModel.new(api_name: "demo name", description: "good one", supports_images: true, user: users(:rob))
+    record = LanguageModel.new(api_name: "demo name", description: "good one", supports_images: true, api_service: api_services(:rob_other_service), user: users(:rob))
     assert record.valid?
     assert_difference 'LanguageModel.count' do
       assert record.save
@@ -94,7 +90,7 @@ class LanguageModelTest < ActiveSupport::TestCase
   test "can delete from db when deleting user" do
     language_model = language_models(:camel)
     assert_equal users(:keith), language_model.user
-    assert_difference 'LanguageModel.count', -2 do
+    assert_difference 'LanguageModel.count', -18 do
       assert users(:keith).destroy!
     end
     assert_equal 0, LanguageModel.where(id: language_model.id).count
@@ -108,15 +104,14 @@ class LanguageModelTest < ActiveSupport::TestCase
 
     list = LanguageModel.for_user(users(:taylor)).all.pluck(:api_name)
     refute list.include?('camel')
-    assert list.include?('gpt-best')
     assert list.include?('alpaca:medium')
   end
 
-  test "system_wide scope" do
-    list = LanguageModel.system_wide.all.pluck(:api_name)
-    assert list.include?('gpt-best')
-    refute list.include?('camel')
-    refute list.include?('alpaca:medium')
+  test "create_without_validation!" do
+    record = assert_difference 'LanguageModel.count' do
+      LanguageModel.create_without_validation!({api_name: '', description: '', supports_images:false, user: users(:rob)})
+    end
+    assert_equal '',  record.api_name
   end
 
   test "provider_name for best models" do

@@ -15,13 +15,9 @@ class AIBackend::Anthropic < AIBackend
   def initialize(user, assistant, conversation, message)
     super(user, assistant, conversation, message)
     begin
-      if assistant.api_service.blank?
-        raise ::Anthropic::ConfigurationError if user.preferred_anthropic_key.blank?
-        @client = self.class.client.new(access_token: user.preferred_anthropic_key)
-      else
-        Rails.logger.info "Connecting to Anthropic API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.token.to_s.length}"
-        @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.token)
-      end
+      raise ::Anthropic::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.token.blank?
+      Rails.logger.info "Connecting to Anthropic API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.token.to_s.length}"
+      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.token)
     rescue ::Faraday::UnauthorizedError => e
       raise ::Anthropic::ConfigurationError
     end

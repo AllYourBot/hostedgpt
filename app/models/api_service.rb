@@ -1,5 +1,11 @@
 class APIService < ApplicationRecord
-  DRIVERS = %w(OpenAI Anthropic)
+  DRIVER_OPEN_AI = "OpenAI"
+  DRIVER_ANTHROPIC = "Anthropic"
+
+  URL_OPEN_AI = "https://api.openai.com/"
+  URL_ANTHROPIC = "https://api.anthropic.com/"
+
+  DRIVERS = [DRIVER_OPEN_AI, DRIVER_ANTHROPIC]
 
   belongs_to :user
 
@@ -16,6 +22,21 @@ class APIService < ApplicationRecord
 
   def ai_backend
     driver == 'Anthropic' ? AIBackend::Anthropic : AIBackend::OpenAI
+  end
+
+  # In general we don't know, but for some URLs we can tell
+  def requires_token?
+    [URL_OPEN_AI, URL_ANTHROPIC].include?(url)
+  end
+
+  def effective_token
+    token.presence || default_llm_key
+  end
+
+  def default_llm_key
+    return nil unless Feature.default_llm_keys?
+    return Setting.default_openai_key if url == URL_OPEN_AI
+    return Setting.default_anthropic_key if url == URL_ANTHROPIC
   end
 
   def delete!

@@ -2,7 +2,7 @@ require "test_helper"
 
 class APIServiceTest < ActiveSupport::TestCase
   test "has user" do
-    assert_instance_of User, api_services(:keith_service).user
+    assert_instance_of User, api_services(:keith_other_service).user
   end
 
   test "name present validated" do
@@ -34,7 +34,7 @@ class APIServiceTest < ActiveSupport::TestCase
   end
 
   test "encrypts token" do
-    api_service = api_services(:keith_service)
+    api_service = api_services(:keith_other_service)
     old_cipher_text = api_service.ciphertext_for(:token)
     api_service.update!(token: "new secret")
     assert api_service.reload
@@ -43,12 +43,12 @@ class APIServiceTest < ActiveSupport::TestCase
   end
 
   test "ai_backend" do
-    assert_equal AIBackend::Anthropic, api_services(:rob_service).ai_backend
-    assert_equal AIBackend::OpenAI, api_services(:keith_service).ai_backend
+    assert_equal AIBackend::Anthropic, api_services(:rob_other_service).ai_backend
+    assert_equal AIBackend::OpenAI, api_services(:keith_other_service).ai_backend
   end
 
   test "soft_deletion" do
-    api_service = api_services(:keith_service)
+    api_service = api_services(:keith_other_service)
     assert_nil api_service.reload.deleted_at
     assert_no_difference "APIService.count" do
       api_service.delete!

@@ -30,8 +30,8 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_nil flash[:error]
 
     assert_equal params.slice("email"), @person.reload.slice(:email)
-    assert_equal params["personable_attributes"].slice("id", "first_name", "last_name", "openai_key").values,
-      @person.user.slice(:id, :first_name, :last_name, :openai_key).values
+    assert_equal params["personable_attributes"].slice("id", "first_name", "last_name").values,
+      @person.user.slice(:id, :first_name, :last_name).values
   end
 
   test "for user who has password, should update details while leaving PASSWORD UNCHANGED" do
@@ -45,8 +45,8 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_nil flash[:error]
 
     assert_equal params.slice("email"), @person.reload.slice(:email)
-    assert_equal params["personable_attributes"].slice("id", "first_name", "last_name", "openai_key").values,
-      @person.user.slice(:id, :first_name, :last_name, :openai_key).values
+    assert_equal params["personable_attributes"].slice("id", "first_name", "last_name").values,
+      @person.user.slice(:id, :first_name, :last_name).values
     assert @user.password_credential.reload.authenticate("secret")
   end
 

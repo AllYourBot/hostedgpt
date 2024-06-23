@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_22_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -163,7 +163,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at", precision: nil
-    t.bigint "user_id"
+    t.bigint "user_id", null: false
     t.bigint "api_service_id"
     t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
@@ -379,8 +379,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
     t.datetime "registered_at", default: -> { "CURRENT_TIMESTAMP" }
     t.string "first_name", null: false
     t.string "last_name"
-    t.string "openai_key"
-    t.string "anthropic_key"
     t.jsonb "preferences"
     t.bigint "last_cancelled_message_id"
     t.index ["last_cancelled_message_id"], name: "index_users_on_last_cancelled_message_id"

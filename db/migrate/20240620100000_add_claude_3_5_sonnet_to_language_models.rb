@@ -4,7 +4,7 @@ class AddClaude35SonnetToLanguageModels < ActiveRecord::Migration[7.0]
     LanguageModel.reset_column_information
 
     # Insert 'claude-3-5-sonnet-20240620' with position 20
-    LanguageModel.create!(
+    LanguageModel.create_without_validation!(
       position: 19,
       api_name: 'claude-3-5-sonnet-20240620',
       description: 'Claude 3.5 Sonnet (2024-06-20)',

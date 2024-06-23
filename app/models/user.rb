@@ -7,8 +7,6 @@ class User < ApplicationRecord
   validates :first_name, presence: true
   validates :last_name, presence: true, on: :create
 
-  encrypts :openai_key, :anthropic_key
-
   has_many :assistants, -> { not_deleted }
   has_many :assistants_including_deleted, class_name: "Assistant", inverse_of: :user, dependent: :destroy
   has_many :language_models, -> { not_deleted }
@@ -34,15 +32,8 @@ class User < ApplicationRecord
     attributes["preferences"].with_defaults(dark_mode: "system")
   end
 
+  # Not quite a keeper
   def openai_key
-    self.attributes["openai_key"].presence || (Feature.default_llm_keys? ? Setting.default_openai_key : nil)
-  end
-
-  def preferred_openai_key
-    self.openai_key.presence || (Feature.default_llm_keys? ? Setting.default_openai_key : nil)
-  end
-
-  def preferred_anthropic_key
-    self.anthropic_key.presence || (Feature.default_llm_keys? ? Setting.default_anthropic_key : nil)
+    api_services.where(driver: APIService::DRIVER_OPEN_AI).where.not(token: nil).first&.token
   end
 end
