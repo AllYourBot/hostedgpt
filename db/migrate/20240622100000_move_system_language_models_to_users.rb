@@ -15,7 +15,7 @@ class MoveSystemLanguageModelsToUsers < ActiveRecord::Migration[7.1]
 
       LanguageModel.where(user_id: nil).each do |system_language_model|
         Rails.logger.info "`Create copy of language_model record #{system_language_model.api_name} for user #{user.id}"
-        user_language_model = user.language_models.create(system_language_model.slice(:api_name, :description, :supports_images, :deleted_at))
+        user_language_model = user.language_models.create(system_language_model.slice(:api_name, :name, :supports_images, :deleted_at))
         if system_language_model.api_name =~ /^gpt/
           user_language_model.api_service = openai_api_service
         else

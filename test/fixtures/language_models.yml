@@ -1,151 +1,247 @@
-# NOTE: This is not just test, this fixture is also loaded when a new production environment is set up
+# Taylor's Language Models
+
+alpaca:
+  position: 1
+  user: taylor
+  name: Alpaca (large) from fixtures
+  api_service: taylor_anthropic_service
+  api_name: alpaca:medium
+  supports_images: true
+
+pacos:
+  position: 2
+  user: taylor
+  name: Lama pacos (large) from fixtures
+  api_service: taylor_openai_service
+  api_name: pacos-imagine
+  supports_images: true
+
+
+# Rob's Language Models
+
+gpt_4_turbo:
+  position: 1
+  user: rob
+  name: GPT-4 Turbo with Vision (latest)
+  api_name: gpt-4-turbo
+  api_service: rob_openai_service
+  supports_images: true
+
+gpt_4_turbo_2024_04_09:
+  position: 2
+  user: rob
+  name: GPT-4 Turbo with Vision (2024-04-09)
+  api_name: gpt-4-turbo-2024-04-09
+  api_service: rob_openai_service
+  supports_images: true
+
+gpt_4_turbo_preview:
+  position: 3
+  user: rob
+  name: GPT-4 Turbo Preview
+  api_name: gpt-4-turbo-preview
+  api_service: rob_openai_service
+  supports_images: false
+
+gpt_4_0125_preview:
+  position: 4
+  user: rob
+  name: GPT-4 Turbo Preview (2024-01-25)
+  api_name: gpt-4-0125-preview
+  api_service: rob_openai_service
+  supports_images: false
+
+gpt_3_5_turbo_0125:
+  position: 5
+  user: rob
+  name: GPT-3.5 Turbo (2022-01-25)
+  api_name: gpt-3.5-turbo-0125
+  api_service: rob_openai_service
+  supports_images: false
+
+gpt_3_5_turbo_1106:
+  position: 6
+  user: rob
+  name: GPT-3.5 Turbo (2022-11-06)
+  api_name: gpt-3.5-turbo-1106
+  api_service: rob_openai_service
+  supports_images: false
+
+gpt_3_5_turbo_instruct:
+  position: 7
+  user: rob
+  name: GPT-3.5 Turbo Instruct
+  api_name: gpt-3.5-turbo-instruct
+  api_service: rob_openai_service
+  supports_images: false
+
+claude_2_0:
+  position: 8
+  user: rob
+  name: Claude 2.0
+  api_name: claude-2.0
+  api_service: rob_anthropic_service
+  supports_images: false
+
+claude_instant_1_2:
+  position: 9
+  user: rob
+  name: Claude Instant 1.2
+  api_name: claude-instant-1.2
+  api_service: rob_anthropic_service
+  supports_images: false
+
+rob_gpt:
+  position: 10
+  user: rob
+  name: GPT-4o (latest)
+  api_name: gpt-4o
+  api_service: rob_openai_service
+  supports_images: true
+
+
+# Keith's Language Models
 
 gpt_best:
   position: 1
-  name: gpt-best
-  description: Best OpenAI Model
+  user: keith
+  name: Best OpenAI Model
+  api_name: gpt-best
+  api_service: keith_openai_service
   supports_images: true
 
 claude_best:
   position: 2
-  name: claude-best
-  description: Best Anthropic Model
+  user: keith
+  name: Best Anthropic Model
+  api_service: keith_anthropic_service
+  api_name: claude-best
   supports_images: true
 
 gpt_4o:
   position: 3
-  name: gpt-4o
-  description: GPT-4o (latest)
+  user: keith
+  name: GPT-4o (latest)
+  api_name: gpt-4o
+  api_service: keith_openai_service
   supports_images: true
 
 gpt_4o_2024_05_13:
   position: 4
-  name: gpt-4o-2024-05-13
-  description: GPT-4o Omni Multimodal (2024-05-13)
+  user: keith
+  name: GPT-4o Omni Multimodal (2024-05-13)
+  api_name: gpt-4o-2024-05-13
+  api_service: keith_openai_service
   supports_images: true
-
-gpt_4_turbo:
-  position: 5
-  name: gpt-4-turbo
-  description: GPT-4 Turbo with Vision (latest)
-  supports_images: true
-
-gpt_4_turbo_2024_04_09:
-  position: 6
-  name: gpt-4-turbo-2024-04-09
-  description: GPT-4 Turbo with Vision (2024-04-09)
-  supports_images: true
-
-gpt_4_turbo_preview:
-  position: 7
-  name: gpt-4-turbo-preview
-  description: GPT-4 Turbo Preview
-  supports_images: false
-
-gpt_4_0125_preview:
-  position: 8
-  name: gpt-4-0125-preview
-  description: GPT-4 Turbo Preview (2024-01-25)
-  supports_images: false
 
 gpt_4_1106_preview:
   position: 9
-  name: gpt-4-1106-preview
-  description: GPT-4 Turbo Preview (2023-11-06)
+  user: keith
+  name: GPT-4 Turbo Preview (2023-11-06)
+  api_name: gpt-4-1106-preview
+  api_service: keith_openai_service
   supports_images: false
 
 gpt_4_vision_preview:
   position: 10
-  name: gpt-4-vision-preview
-  description: GPT-4 Turbo with Vision Preview (2023-11-06)
+  user: keith
+  name: GPT-4 Turbo with Vision Preview (2023-11-06)
+  api_name: gpt-4-vision-preview
+  api_service: keith_openai_service
   supports_images: true
 
 gpt_4_1106_vision_preview:
   position: 11
-  name: gpt-4-1106-vision-preview
-  description: GPT-4 Turbo with Vision Preview (2023-11-06)
+  user: keith
+  name: GPT-4 Turbo with Vision Preview (2023-11-06)
+  api_name: gpt-4-1106-vision-preview
+  api_service: keith_openai_service
   supports_images: true
 
 gpt_4:
   position: 12
-  name: gpt-4
-  description: GPT-4 (latest)
+  user: keith
+  name: GPT-4 (latest)
+  api_name: gpt-4
+  api_service: keith_openai_service
   supports_images: false
 
 gpt_4_0613:
   position: 13
-  name: gpt-4-0613
-  description: GPT-4 Snapshot improved function calling (2023-06-13)
+  user: keith
+  name: GPT-4 Snapshot improved function calling (2023-06-13)
+  api_name: gpt-4-0613
+  api_service: keith_openai_service
   supports_images: false
 
 gpt_3_5_turbo:
   position: 14
-  name: gpt-3.5-turbo
-  description: GPT-3.5 Turbo (latest)
+  user: keith
+  name: GPT-3.5 Turbo (latest)
+  api_name: gpt-3.5-turbo
+  api_service: keith_openai_service
   supports_images: false
 
 gpt_3_5_turbo_16k_0613:
   position: 15
-  name: gpt-3.5-turbo-16k-0613
-  description: GPT-3.5 Turbo (2022-06-13)
-  supports_images: false
-
-gpt_3_5_turbo_0125:
-  position: 16
-  name: gpt-3.5-turbo-0125
-  description: GPT-3.5 Turbo (2022-01-25)
-  supports_images: false
-
-gpt_3_5_turbo_1106:
-  position: 17
-  name: gpt-3.5-turbo-1106
-  description: GPT-3.5 Turbo (2022-11-06)
-  supports_images: false
-
-gpt_3_5_turbo_instruct:
-  position: 18
-  name: gpt-3.5-turbo-instruct
-  description: GPT-3.5 Turbo Instruct
+  user: keith
+  name: GPT-3.5 Turbo (2022-06-13)
+  api_name: gpt-3.5-turbo-16k-0613
+  api_service: keith_openai_service
   supports_images: false
 
 claude_3_5_sonnet_20240620:
-  position: 19
-  name: claude-3-5-sonnet-20240620
-  description: Claude 3.5 Sonnet (2024-06-20)
+  position: 16
+  user: keith
+  name: Claude 3.5 Sonnet (2024-06-20)
+  api_name: claude-3-5-sonnet-20240620
+  api_service: keith_anthropic_service
   supports_images: true
 
 claude_3_opus_20240229:
-  position: 20
-  name: claude-3-opus-20240229
-  description: Claude 3 Opus (2024-02-29)
+  position: 17
+  user: keith
+  name: Claude 3 Opus (2024-02-29)
+  api_name: claude-3-opus-20240229
+  api_service: keith_anthropic_service
   supports_images: true
 
 claude_3_sonnet_20240229:
-  position: 21
-  name: claude-3-sonnet-20240229
-  description: Claude 3 Sonnet (2024-02-29)
+  position: 18
+  user: keith
+  name: Claude 3 Sonnet (2024-02-29)
+  api_name: claude-3-sonnet-20240229
+  api_service: keith_anthropic_service
   supports_images: true
 
 claude_3_haiku_20240307:
-  position: 22
-  name: claude-3-haiku-20240307
-  description: Claude 3 Haiku (2024-03-07)
+  position: 19
+  user: keith
+  name: Claude 3 Haiku (2024-03-07)
+  api_name: claude-3-haiku-20240307
+  api_service: keith_anthropic_service
   supports_images: true
 
 claude_2_1:
-  position: 23
-  name: claude-2.1
-  description: Claude 2.1
+  position: 20
+  user: keith
+  name: Claude 2.1
+  api_name: claude-2.1
+  api_service: keith_anthropic_service
   supports_images: false
 
-claude_2_0:
-  position: 24
-  name: claude-2.0
-  description: Claude 2.0
+camel:
+  position: 21
+  user: keith
+  name: gpt-3.5-turbo from fixtures
+  api_service: keith_other_service
+  api_name: camel
   supports_images: false
 
-claude_instant_1_2:
-  position: 25
-  name: claude-instant-1.2
-  description: Claude Instant 1.2
-  supports_images: false
+guanaco:
+  position: 22
+  user: keith
+  name: Guanaco (large) from fixtures
+  api_service: keith_other_service
+  api_name: guanaco:large
+  supports_images: true
