@@ -170,10 +170,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
-    t.datetime "cancelled_at"
     t.datetime "processed_at", precision: nil
     t.integer "index", null: false
     t.integer "version", null: false
+    t.datetime "cancelled_at"
     t.boolean "branched", default: false, null: false
     t.integer "branched_from_version"
     t.jsonb "content_tool_calls"
