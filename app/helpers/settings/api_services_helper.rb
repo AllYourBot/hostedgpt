@@ -1,7 +1,7 @@
 module Settings
   module APIServicesHelper
     def official?(model)
-      openai?(model) && anthropic?(model)
+      openai?(model) || anthropic?(model)
     end
 
     def openai?(api_service)
