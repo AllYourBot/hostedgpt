@@ -94,15 +94,15 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "special instruction link is visible for openai & anthropic url" do
-    get edit_settings_api_service_url(api_services(:rob_openai_service))
-    assert_select "button#instructions"
+    get edit_settings_api_service_url(api_services(:keith_openai_service))
+    assert_select "button#instructions:not(.hidden)"
 
-    get edit_settings_api_service_url(api_services(:rob_anthropic_service))
-    assert_select "button#instructions"
+    get edit_settings_api_service_url(api_services(:keith_anthropic_service))
+    assert_select "button#instructions:not(.hidden)"
   end
 
   test "special instruction link is NOT visible for other urls" do
-    get edit_settings_api_service_url(api_services(:rob_other_service))
-    assert_select "button#instructions", count: 0
+    get edit_settings_api_service_url(api_services(:keith_other_service))
+    assert_select "button#instructions.hidden"
   end
 end
