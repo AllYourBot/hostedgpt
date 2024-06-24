@@ -19,10 +19,6 @@ class Assistant < ApplicationRecord
 
   scope :ordered, -> { order(:id) }
 
-  def delete!
-    update!(deleted_at: Time.now)
-  end
-
   def initials
     return nil if name.blank?
 

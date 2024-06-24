@@ -56,7 +56,7 @@ class AssistantTest < ActiveSupport::TestCase
     end
   end
 
-  test "associations are deleted upon destroy_in_database" do
+  test "associations are deleted upon destroy" do
     assistant = assistants(:samantha)
     conversation_count = assistant.conversations.count * -1
     message_count = assistant.conversations.map { |c| c.messages.length }.sum * -1

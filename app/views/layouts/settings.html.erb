@@ -21,12 +21,6 @@
         <%= render partial: "layouts/settings_item", collection: settings_items, locals: { controller: controller } %>
       </div>
     <% end %>
-    <div class="rounded-s-lg  mb-1 pl-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-      <%= link_to "API Services", settings_api_services_path %>
-    </div>
-    <div class="mt-5 rounded-s-lg  mb-1 pl-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-      <%= link_to "Language Models", settings_language_models_path %>
-    </div>
   </section>
 <% end %>
 
