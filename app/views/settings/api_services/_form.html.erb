@@ -40,8 +40,8 @@
   <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
     <%= form.label :token %>
     <%= button_tag type: "button",
-      id: "how-openai",
-      class: "underline text-blue-600 #{official?(api_service) && 'hidden'}",
+      id: "instructions",
+      class: "underline text-blue-600 #{!official?(api_service) && 'hidden'}",
       data: {
         transition_target: "transitionable",
         action: "transition#toggleClass",
