@@ -114,13 +114,13 @@ class GetNextAIMessageJob < ApplicationJob
   private
 
   def set_openai_error
-    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT-3.5 or GPT-4. Click your Profile in the bottom " +
-      "left and then Settings. You will find OpenAI Key instructions.)"
+    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)"
   end
 
   def set_anthropic_error
     @message.content_text = "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
-      "left and then Settings. You will find Anthropic Key instructions.)"
+      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
   end
 
   def set_response_error

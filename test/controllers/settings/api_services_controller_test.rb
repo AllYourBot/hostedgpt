@@ -46,7 +46,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     @api_service.deleted!
     get edit_settings_api_service_url(@api_service)
     assert_response :see_other
-    assert_redirected_to new_settings_api_service_url
+    assert_redirected_to settings_api_services_url
     assert_equal "The API Service could not be found", flash[:alert]
   end
 
@@ -54,7 +54,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_api_service_url(@api_service)
     assert_response :success
     assert_contains_text "div#nav-container", "Your Account"
-    assert_select "h1", "Editing API Service OpenAI"
+    assert_select "h1", "Editing OpenAI"
     assert_select "form"
   end
 
@@ -69,7 +69,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     params = {"name": "New Name", "url": "http://new-url.com"}
     patch settings_api_service_url(api_services(:rob_other_service)), params: { api_service: params }
 
-    assert_redirected_to new_settings_api_service_url
+    assert_redirected_to settings_api_services_url
     assert_equal "The API Service could not be found", flash[:alert]
     assert_equal original_params, api_services(:rob_other_service).reload.slice(:name, :url)
   end
@@ -78,17 +78,17 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     params = {"name" => "New Name", "url" => "http://new-url.com", "token" => "new secret token"}
     patch settings_api_service_url(@api_service), params: { api_service: params }
 
-    assert_redirected_to edit_settings_api_service_url(@api_service)
+    assert_redirected_to settings_api_services_url
     assert_equal params, @api_service.reload.slice(:name, :url, :token)
   end
 
   test "destroy should soft-delete api_service" do
-    assert_difference "APIService.count", 0 do
+    assert_no_difference "APIService.count" do
       delete settings_api_service_url(@api_service)
     end
 
     assert @api_service.reload.deleted?
-    assert_redirected_to new_settings_api_service_url
+    assert_redirected_to settings_api_services_url
     assert flash[:notice].present?, "There should have been a success message"
     refute flash[:alert].present?, "There should NOT have been an error message"
   end
