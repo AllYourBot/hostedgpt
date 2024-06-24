@@ -30,19 +30,39 @@ keith_gpt3:
   instructions: Include a Zen perspective when possilbe
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
+
 rob_gpt4:
   user: rob
-  language_model: gpt_4o
+  language_model: rob_gpt
   name: GPT-4
-  description: OpenAI's GPT-4
+  description: OpenAI's GPT
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
 mandela_gpt4:
   user: rob
-  language_model: gpt_4o
+  language_model: rob_gpt
   name: Mandela
   description: OpenAI assistant GPT4
   instructions: Be helpful
   tools:  [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
   external_id: OpenAI ID 1
+
+
+alpaca_asst:
+  user: taylor
+  language_model: alpaca
+  name: Game Alpaca
+  description: Play games (Alpaca backed)
+  instructions: Take 5 then 4
+  tools:  []
+  external_id:
+
+pacos_asst:
+  user: taylor
+  language_model: pacos
+  name: Travel/Flowers
+  description: Flowers themed travel advice (Pacos backed)
+  instructions: Point out flower-related local items, also historical events involving flowers
+  tools:  []
+  external_id:

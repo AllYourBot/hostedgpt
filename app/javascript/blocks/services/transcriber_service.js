@@ -1,7 +1,7 @@
 import Service from "../service.js"
 
 export default class extends Service {
-  logLevel_info
+  logLevel_debug
   attrAccessor_onTextReceived
   attrReader_listening
 

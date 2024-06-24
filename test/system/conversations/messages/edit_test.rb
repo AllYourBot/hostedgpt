@@ -9,7 +9,7 @@ class ConversationMessagesEditTest < ApplicationSystemTestCase
     visit_and_scroll_wait conversation_messages_path(@conversation)
     @message = messages(:alive)
     @msg = last_user_message
-    @btn = @msg.find_role("edit")
+    @btn = @msg.find_role("message-edit")
     @msg.hover
   end
 
@@ -21,10 +21,10 @@ class ConversationMessagesEditTest < ApplicationSystemTestCase
     assert_equal messages(:examine_this).content_text, third.find_role("content-text").text
 
     third.hover
-    assert_no_selector "##{third[:id]} [data-role='edit']"
+    assert_no_selector "##{third[:id]} [data-role='message-edit']"
 
     first_message.hover
-    assert_selector "##{first_message[:id]} [data-role='edit']"
+    assert_selector "##{first_message[:id]} [data-role='message-edit']"
   end
 
   test "edit icon shows a tooltip" do

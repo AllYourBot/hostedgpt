@@ -19,11 +19,14 @@ class AuthenticationsController::GoogleOauthControllerTest < ActionDispatch::Int
   test "should add a GmailCredential and redirect to edit_settings" do
     user = users(:rob)
     login_as user
-    seemingly_conflicting_uid = users(:keith).google_credential.oauth_id
     details = {
-      uid: seemingly_conflicting_uid,
-      credentials: { token: "abc123", refresh_token: "xyz789" },
-      info: { email: "krschacht@hostedgpt.com" }
+      uid: "rob-abc123",
+      credentials: {
+        token: "abc123",
+        refresh_token: "xyz789",
+        scope: "https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/userinfo.email"
+      },
+      info: { email: "rob.personal@gmail.com" }
     }
     OmniAuth.config.add_mock(:gmail, details)
 
@@ -33,6 +36,50 @@ class AuthenticationsController::GoogleOauthControllerTest < ActionDispatch::Int
     assert_redirected_to edit_settings_person_path
     assert_equal "Saved", flash[:notice]
     assert_credential_matches_details(user.reload.gmail_credential, details)
+  end
+
+  test "should add a GoogleTasksCredential and redirect to edit_settings" do
+    user = users(:rob)
+    login_as user
+    details = {
+      uid: "rob-abc123",
+      credentials: {
+        token: "abc123",
+        refresh_token: "xyz789",
+        scope: "https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/userinfo.email"
+      },
+      info: { email: "rob.personal@gmail.com" }
+    }
+    OmniAuth.config.add_mock(:google_tasks, details)
+
+    refute user.google_tasks_credential.present?
+    get google_oauth_path(provider: "google_tasks")
+
+    assert_redirected_to edit_settings_person_path
+    assert_equal "Saved", flash[:notice]
+    assert_credential_matches_details(user.reload.google_tasks_credential, details)
+  end
+
+  test "show error and should NOT add a GmailCredential when not all permissions are granted" do
+    user = users(:rob)
+    login_as user
+    details = {
+      uid: "rob-abc123",
+      credentials: {
+        token: "abc123",
+        refresh_token: "xyz789",
+        scope: "https://www.googleapis.com/auth/userinfo.email"
+      },
+      info: { email: "krschacht@hostedgpt.com" }
+    }
+    OmniAuth.config.add_mock(:gmail, details)
+
+    refute user.gmail_credential.present?
+    get google_oauth_path(provider: "gmail")
+
+    assert_redirected_to edit_settings_person_path
+    assert_equal "Error. You did not check all the permission boxes. Try again.", flash[:alert]
+    refute user.reload.gmail_credential
   end
 
   test "should log you in for a user that exists" do
@@ -174,5 +221,6 @@ class AuthenticationsController::GoogleOauthControllerTest < ActionDispatch::Int
     assert_equal details[:info][:email], credential.oauth_email
     assert_equal details[:credentials][:token], credential.oauth_token
     assert_equal details[:credentials][:refresh_token], credential.oauth_refresh_token
+    assert_equal details[:credentials].except(:token, :refresh_token), credential.properties
   end
 end

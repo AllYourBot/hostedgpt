@@ -1,0 +1,25 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <h1 class="text-3xl">
+   Editing <%= @api_service.name %>
+  </h1>
+
+  <%= render "form", api_service: @api_service %>
+
+  <%= button_to "Delete",
+      settings_api_service_path(@api_service),
+      method: :delete,
+      data: { turbo_confirm: "Are you sure?" },
+      form: { class: "inline-block" },
+      class: %|
+        ml-5 py-3 px-5
+        bg-white dark:bg-gray-500
+        border border-gray-300 dark:border-gray-500
+        rounded-lg
+        font-medium
+      |
+  %>
+
+  <p class="float-right inline-block ml-5">
+    <%= link_to "Back", settings_api_services_path, class: "float-right inline-block ml-5 py-3" %>
+  </p>
+</div>

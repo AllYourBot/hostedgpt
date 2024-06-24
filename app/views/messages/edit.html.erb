@@ -30,12 +30,15 @@
         rows: 1,
         data: {
           inline_edit_target: "input",
-          controller: "textarea-autogrow",
+          controller: "textarea-autogrow keyboard",
+          action: %|
+            keydown.meta+enter->keyboard#submit
+          %|
         }
       %>
 
       <div class="flex justify-center items-center text-sm font-medium">
-        <%= form.submit "Save & Submit",
+        <%= form.submit "Save & Submit (⌘ RETURN)",
           data: {
             role: "save",
             turbo_submits_with: "Saving..."
@@ -46,8 +49,12 @@
             bg-gray-200 dark:bg-gray-900
             border border-gray-400
         | %>
-        <%= link_to "Cancel", @message,
-          data: { role: "cancel" },
+        <%= link_to "Cancel (ESC)", @message,
+          data: {
+            controller: "keyboard",
+            action: "keydown.esc@document->keyboard#click",
+            role: "cancel"
+          },
           class: "inline-block ml-5"
         %>
       </div>

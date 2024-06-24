@@ -3,8 +3,9 @@ class Client < ApplicationRecord
 
   has_one :authentication, -> { not_deleted }
   has_many :authentications_including_deleted, class_name: "Authentication", inverse_of: :client, dependent: :destroy
+  scope :authenticated, -> { joins(:authentication).merge(Authentication.not_deleted) }
 
-  enum platform: %w[ ios android web ].index_by(&:to_sym)
+  enum platform: %w[ ios android web api ].index_by(&:to_sym)
 
   has_secure_token
 
@@ -27,6 +28,11 @@ class Client < ApplicationRecord
     authentication.deleted!
     reload_authentication
     true
+  end
+
+  def bearer_token
+    return nil unless api?
+    "#{id}:#{token}"
   end
 
   def to_s

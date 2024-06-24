@@ -5,6 +5,10 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
+  test "has associated language_models" do
+    assert_instance_of LanguageModel, users(:keith).language_models.first
+  end
+
   test "has associated credentials" do
     assert_instance_of PasswordCredential, users(:keith).credentials.type_is('PasswordCredential').first
   end
@@ -21,8 +25,16 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of GmailCredential, users(:keith).gmail_credential
   end
 
+  test "has an associated google_tasks_credential" do
+    assert_instance_of GoogleTasksCredential, users(:keith).google_tasks_credential
+  end
+
   test "has an associated http_header_credential" do
     assert_instance_of HttpHeaderCredential, users(:rob).http_header_credential
+  end
+
+  test "has associated memories" do
+    assert_instance_of Memory, users(:keith).memories.first
   end
 
   test "has a last_cancelled_message but can be nil" do
@@ -40,33 +52,19 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted upon destroy" do
-    assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
-      assert_difference "Conversation.count", -users(:keith).conversations.count do
-        assert_difference "Credential.count", -users(:keith).credentials.count do
-          users(:keith).destroy
+    assert_difference "APIService.count", -users(:keith).api_services_including_deleted.count do
+      assert_difference "LanguageModel.count", -users(:keith).language_models_including_deleted.count do
+        assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
+          assert_difference "Conversation.count", -users(:keith).conversations.count do
+            assert_difference "Credential.count", -users(:keith).credentials.count do
+              assert_difference "Memory.count", -users(:keith).memories.count do
+                users(:keith).destroy
+              end
+            end
+          end
         end
       end
     end
-  end
-
-  test "encrypts openai_key" do
-    user = users(:keith)
-    old_openai_key = user.openai_key
-    old_cipher_text = user.ciphertext_for(:openai_key)
-    user.update!(openai_key: "new one")
-    assert user.reload
-    refute_equal old_cipher_text, user.ciphertext_for(:openai_key)
-    assert_equal "new one", user.openai_key
-  end
-
-  test "encrypts anthropic_key" do
-    user = users(:keith)
-    old_anthropic_key = user.anthropic_key
-    old_cipher_text = user.ciphertext_for(:anthropic_key)
-    user.update!(anthropic_key: "new one")
-    assert user.reload
-    refute_equal old_cipher_text, user.ciphertext_for(:anthropic_key)
-    assert_equal "new one", user.anthropic_key
   end
 
   test "should validate a user with minimum information" do

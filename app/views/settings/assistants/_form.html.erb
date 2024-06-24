@@ -27,7 +27,7 @@
   <div class="my-5">
     <%= form.label :language_model_id  %><br/>
     <%= form.select :language_model_id,
-      LanguageModel.ordered.pluck(:description, :id),
+      LanguageModel.for_user(Current.user).ordered.pluck(:name, :id),
       {},
       class: %|
         block
@@ -36,8 +36,7 @@
         px-3 py-2 mt-2
         w-full
         dark:text-black
-      |
-    %>
+    | %>
   </div>
 
   <div class="my-5">
@@ -56,6 +55,7 @@
         px-3 py-2 mt-2
         dark:text-black
         h-18
+        overflow-y-auto
       |,
       data: {
         controller: "textarea-autogrow",
