@@ -18,7 +18,7 @@ class LanguageModel < ApplicationRecord
 
   validates :api_name, :name, :position, presence: true
 
-  before_save :soft_delete_assistants, if: -> { deleted_at && deleted_at_changed? && deleted_at_was.nil? }
+  before_save :soft_delete_assistants, if: -> { has_attribute?(:deleted_at) && deleted_at && deleted_at_changed? && deleted_at_was.nil? }
 
   scope :ordered, -> { order(:position) }
   scope :for_user, ->(user) { where(user_id: user.id).not_deleted }
@@ -32,6 +32,15 @@ class LanguageModel < ApplicationRecord
   def created_by_current_user?
     user == Current.user
   end
+
+  def self.create_without_validation!(attributes)
+    record = LanguageModel.new(attributes)
+    if !record.save(validate: false)
+      raise "Could not create LanguageModel record for #{attributes.inspect}"
+    end
+    record
+  end
+
 
   private
 
