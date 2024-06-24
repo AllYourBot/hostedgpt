@@ -28,7 +28,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
 
   def update
     if @language_model.update(language_model_params)
-      redirect_to edit_settings_language_model_path(@language_model), notice: "Saved", status: :see_other
+      redirect_to settings_language_models_path, notice: "Saved", status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
@@ -36,7 +36,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
 
   def destroy
     @language_model.deleted!
-    redirect_to new_settings_language_model_url, notice: "Deleted", status: :see_other
+    redirect_to settings_language_models_path, notice: "Deleted", status: :see_other
   end
 
   private
@@ -44,7 +44,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   def set_users_language_model
     @language_model = Current.user.language_models.find_by(id: params[:id])
     if @language_model.nil?
-      redirect_to new_settings_language_model_url, status: :see_other, alert: "The Language Model could not be found"
+      redirect_to settings_language_models_path, status: :see_other, alert: "The Language Model could not be found"
     end
   end
 

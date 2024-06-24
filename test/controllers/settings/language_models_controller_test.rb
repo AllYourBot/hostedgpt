@@ -37,14 +37,14 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_language_model_url(@language_model)
     assert_response :success
     assert_contains_text "div#nav-container", "Your Account"
-    assert_select "h1", "Editing Language Model gpt-best"
+    assert_select "h1", "Editing gpt-best"
     assert_select "form"
   end
 
   test "should not allow viewing other user's records" do
     get edit_settings_language_model_url(language_models(:pacos))
     assert_response :see_other
-    assert_redirected_to new_settings_language_model_url
+    assert_redirected_to settings_language_models_path
     assert_equal "The Language Model could not be found", flash[:alert]
   end
 
@@ -52,7 +52,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     @language_model.deleted!
     get edit_settings_language_model_url(@language_model)
     assert_response :see_other
-    assert_redirected_to new_settings_language_model_url
+    assert_redirected_to settings_language_models_path
     assert_equal "The Language Model could not be found", flash[:alert]
   end
 
@@ -79,7 +79,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     params = {"api_name": "New Name", "name": "New Desc"}
     patch settings_language_model_url(language_models(:alpaca)), params: { language_model: params }
 
-    assert_redirected_to new_settings_language_model_url
+    assert_redirected_to settings_language_models_url
     assert_equal "The Language Model could not be found", flash[:alert]
     assert_equal original_params, language_models(:alpaca).reload.slice(:api_name, :name)
   end
@@ -88,18 +88,18 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     params = {"api_name" => "New Name", "name" => "New Desc", "supports_images" => true}
     patch settings_language_model_url(@language_model), params: { language_model: params }
 
-    assert_redirected_to edit_settings_language_model_url(@language_model)
+    assert_redirected_to settings_language_models_url
     assert_equal "Saved", flash[:notice]
     assert_equal params, @language_model.reload.slice(:api_name, :name, :supports_images)
   end
 
   test "destroy should soft-delete language_model" do
-    assert_difference "LanguageModel.count", 0 do
+    assert_no_difference "LanguageModel.count" do
       delete settings_language_model_url(@language_model)
     end
 
     assert @language_model.reload.deleted?
-    assert_redirected_to new_settings_language_model_url
+    assert_redirected_to settings_language_models_url
     assert flash[:notice].present?, "There should have been a success message"
     refute flash[:alert].present?, "There should NOT have been an error message"
   end
