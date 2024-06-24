@@ -16,7 +16,7 @@ class Settings::PeopleController < Settings::ApplicationController
 
   def person_params
     h = params.require(:person).permit(:email, personable_attributes: [
-      :id, :first_name, :last_name, :password, :openai_key, :anthropic_key, preferences: [:dark_mode],
+      :id, :first_name, :last_name, :password, preferences: [:dark_mode],
       credentials_attributes: [ :id, :type, :password ]
     ]).to_h
     format_and_strip_all_but_first_valid_credential(h)
