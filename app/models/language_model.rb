@@ -2,10 +2,12 @@
 class LanguageModel < ApplicationRecord
   BEST_GPT = "gpt-best"
   BEST_CLAUDE = "claude-best"
+  BEST_GROQ = "groq-best"
 
   BEST_MODELS = {
     BEST_GPT => "gpt-4o-2024-05-13",
-    BEST_CLAUDE => "claude-3-5-sonnet-20240620"
+    BEST_CLAUDE => "claude-3-5-sonnet-20240620",
+    BEST_GROQ => "llama3-70b-8192",
   }
 
   belongs_to :user

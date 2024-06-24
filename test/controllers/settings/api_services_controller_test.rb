@@ -10,7 +10,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get settings_api_services_url
     assert_response :success
-    assert_select "table#api-services tbody tr", count: 3
+    assert_select "table#api-services tbody tr", count: 4
     assert_select "p a", "Add New"
     assert_select "p#no-api-services", false
   end

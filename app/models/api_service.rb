@@ -1,6 +1,7 @@
 class APIService < ApplicationRecord
   URL_OPEN_AI = "https://api.openai.com/"
   URL_ANTHROPIC = "https://api.anthropic.com/"
+  URL_GROQ = "https://api.groq.com/openai/v1/"
 
   belongs_to :user
 
@@ -36,6 +37,7 @@ class APIService < ApplicationRecord
     return nil unless Feature.default_llm_keys?
     return Setting.default_openai_key if url == URL_OPEN_AI
     return Setting.default_anthropic_key if url == URL_ANTHROPIC
+    return Setting.default_groq_key if url == URL_ANTHROPIC
   end
 
   def soft_delete_language_models
