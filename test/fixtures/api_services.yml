@@ -3,53 +3,55 @@ keith_openai_service:
   user: keith
   url: https://api.openai.com/
   token: abc-secret
-  driver: OpenAI
+  driver: openai
 
 keith_anthropic_service:
   name: Anthropic
   user: keith
   url: https://api.anthropic.com/
   token: abc-secret
-  driver: Anthropic
+  driver: anthropic
 
 keith_other_service:
   name: Keith Server
   user: keith
   url: http://test.com/models
   token: abc-secret
-  driver: OpenAI
+  driver: openai
+
 
 rob_openai_service:
   name: OpenAI
-  user: :rob
+  user: rob
   url: https://api.openai.com/
   token: rob-secret
-  driver: OpenAI
+  driver: openai
 
 rob_anthropic_service:
   name: Anthropic
-  user: :rob
+  user: rob
   url: https://api.anthropic.com/
   token: rob-secret
-  driver: Anthropic
+  driver: anthropic
 
 rob_other_service:
   name: Rob Server
-  user: :rob
+  user: rob
   url: http://rob-test.com/models
   token: rob-secret
-  driver: Anthropic
+  driver: anthropic
+
 
 taylor_anthropic_service:
   name: Taylor Anth Server
-  user: :taylor
+  user: taylor
   url: http://taylor.org/doit
   token: ta-secret
-  driver: Anthropic
+  driver: anthropic
 
 taylor_openai_service:
   name: Taylor OpenAI Server
-  user: :taylor
+  user: taylor
   url: http://taylor.org/doit-open
   token: open-secret
-  driver: OpenAI
+  driver: openai

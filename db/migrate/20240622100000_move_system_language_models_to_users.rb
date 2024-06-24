@@ -7,15 +7,15 @@ class MoveSystemLanguageModelsToUsers < ActiveRecord::Migration[7.1]
   # 6. Add a constraint to the language_models table that user_id cannot be NULL
   def up
     Rails.logger.info "Create api_services/language_models records for all #{User.count} users records"
-    User.all.each do |user|
+    User.all.find_each do |user|
       Rails.logger.info "Create api_services records for OpenAI for user #{user.id}"
-      openai_api_service = user.api_services.create!(name: "OpenAI", driver: "OpenAI", url: "https://api.openai.com/", token: user.openai_key)
+      openai_api_service = user.api_services.create!(name: "OpenAI", driver: :openai, url: "https://api.openai.com/", token: user.openai_key)
       Rails.logger.info "Create api_services records for Anthropic for user #{user.id}"
-      anthropic_api_service = user.api_services.create!(name: "Anthropic", driver: "Anthropic", url: "https://api.anthropic.com/", token: user.anthropic_key)
+      anthropic_api_service = user.api_services.create!(name: "Anthropic", driver: :anthropic, url: "https://api.anthropic.com/", token: user.anthropic_key)
 
       LanguageModel.where(user_id: nil).each do |system_language_model|
         Rails.logger.info "`Create copy of language_model record #{system_language_model.api_name} for user #{user.id}"
-        user_language_model = user.language_models.create(system_language_model.slice(:api_name, :description, :supports_images, :deleted_at))
+        user_language_model = user.language_models.create(system_language_model.slice(:api_name, :name, :supports_images, :deleted_at))
         if system_language_model.api_name =~ /^gpt/
           user_language_model.api_service = openai_api_service
         else

@@ -19,7 +19,7 @@
   <div class="my-5">
     <%= form.label :driver %>
     <%= form.select :driver,
-        APIService::DRIVERS,
+        APIService.drivers.keys,
         {},
         class: %|
           block
@@ -37,8 +37,81 @@
     <%= form.text_field :url, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
-  <div class="my-5">
+  <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
     <%= form.label :token %>
+    <%= button_tag type: "button",
+      id: "how-openai",
+      class: "underline text-blue-600 #{official?(api_service) && 'hidden'}",
+      data: {
+        transition_target: "transitionable",
+        action: "transition#toggleClass",
+      } do
+      %>How do I get?
+    <% end %>
+    <ol id="openai-instructions"
+        data-transition-target="<%= openai?(api_service) && 'transitionable' %>"
+        class="
+          list-decimal
+          my-3 p-2 pl-8
+          border border-gray-200
+          bg-gray-50 dark:bg-transparent
+          hidden
+        "
+    >
+      <li>Sign up for OpenAI's
+        <%= link_to "Platform", "https://platform.openai.com/",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>, you can sign in with your ChatGPT account.
+      </li>
+      <li>Click "API Keys" on the left (or
+        <%= link_to "take me to API Keys", "https://platform.openai.com/api-keys",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>).</li>
+      <li>Verify your phone number.</li>
+      <li>Click "Create new secret key", name it something like "HostedGPT" and paste it below.</li>
+      <li>Ensure you have billing set up by clicking "Settings" and "Billing" (or
+        <%= link_to "take me to Billing", "https://platform.openai.com/account/billing/overview",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>).</li>
+      <li>Add a "Payment method."</li>
+    </ol>
+     <ol id="anthropic-instructions"
+        data-transition-target="<%= anthropic?(api_service) && 'transitionable' %>"
+        class="
+          list-decimal
+          my-3 p-2 pl-8
+          border border-gray-200
+          bg-gray-50 dark:bg-transparent
+          hidden
+        "
+     >
+      <li>Sign up for Anthropic's web
+        <%= link_to "Console", "https://console.anthropic.com/",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>.
+      </li>
+      <li>Click your profile in the top right and select "API Keys" (or
+        <%= link_to "take me to API Keys", "https://console.anthropic.com/settings/keys",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>).
+      </li>
+      <li>Click "Create Key" and name it somethign like "HostedGPT."</li>
+      <li>Click "Copy key" and paste it below.</li>
+      <li>Then, click your profile and select "Plans & Billing" (or
+        <%= link_to "take me to Plans", "https://console.anthropic.com/settings/plans",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>).
+      </li>
+      <li>Click "Claim" if you have any free credits or if you have no free credits click
+        "Select Plan" and just pick the "Build" plan.
+      </li>
+    </ol>
     <%= form.text_field :token, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 

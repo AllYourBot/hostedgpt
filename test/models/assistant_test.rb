@@ -77,7 +77,7 @@ class AssistantTest < ActiveSupport::TestCase
     end
   end
 
-  test "associations are left intact upon delete!" do
+  test "associations are left intact upon soft delete" do
     assistant = assistants(:samantha)
 
     assert_no_difference "Message.count" do
@@ -85,7 +85,7 @@ class AssistantTest < ActiveSupport::TestCase
         assert_no_difference "Document.count" do
           assert_no_difference "Run.count" do
             assert_no_difference "Step.count" do
-              assistant.delete!
+              assistant.deleted!
             end
           end
         end

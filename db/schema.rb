@@ -158,7 +158,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_22_100000) do
   create_table "language_models", force: :cascade do |t|
     t.integer "position", null: false
     t.string "api_name", null: false, comment: "This is the name that API calls are expecting."
-    t.text "description", null: false
+    t.string "name", null: false
     t.boolean "supports_images", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

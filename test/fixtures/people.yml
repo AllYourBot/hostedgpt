@@ -11,6 +11,10 @@ rob_registered:
   personable_type: User
   personable_id: <%= ActiveRecord::FixtureSet.identify(:rob) %>
 
+taylor_registered:
+  email: taylor@hostedgpt.com
+  personable_type: User
+  personable_id: <%= ActiveRecord::FixtureSet.identify(:taylor) %>
+
 ali_invited:
   email: ali@hostedgpt.com
-

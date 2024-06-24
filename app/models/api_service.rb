@@ -1,37 +1,36 @@
 class APIService < ApplicationRecord
-  DRIVER_OPEN_AI = "OpenAI"
-  DRIVER_ANTHROPIC = "Anthropic"
-
   URL_OPEN_AI = "https://api.openai.com/"
   URL_ANTHROPIC = "https://api.anthropic.com/"
-
-  DRIVERS = [DRIVER_OPEN_AI, DRIVER_ANTHROPIC]
 
   belongs_to :user
 
   has_many :language_models, -> { not_deleted }
 
+  enum driver: %w[ openai anthropic ].index_by(&:to_sym)
+
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
   validates :name, :url, presence: true
-  validates :driver, inclusion: { in: DRIVERS }
 
-  encrypts :token
   normalizes :url, with: -> url { url.strip }
+  encrypts :token
+
+  before_save :soft_delete_language_models, if: -> { deleted_at && deleted_at_changed? && deleted_at_was.nil? }
 
   scope :ordered, -> { order(:name) }
 
   def ai_backend
-    driver == 'Anthropic' ? AIBackend::Anthropic : AIBackend::OpenAI
+    openai? ? AIBackend::OpenAI : AIBackend::Anthropic
   end
 
-  # In general we don't know, but for some URLs we can tell
   def requires_token?
-    [URL_OPEN_AI, URL_ANTHROPIC].include?(url)
+    [URL_OPEN_AI, URL_ANTHROPIC].include?(url) # other services may require it but we don't always know
   end
 
   def effective_token
     token.presence || default_llm_key
   end
+
+  private
 
   def default_llm_key
     return nil unless Feature.default_llm_keys?
@@ -39,8 +38,7 @@ class APIService < ApplicationRecord
     return Setting.default_anthropic_key if url == URL_ANTHROPIC
   end
 
-  def delete!
-    update!(deleted_at: Time.now)
-    language_models.each { |language_model| language_model.delete! }
+  def soft_delete_language_models
+    language_models.each { |language_model| language_model.deleted! }
   end
 end

@@ -1,8 +1,12 @@
 require "test_helper"
 
 class APIServiceTest < ActiveSupport::TestCase
-  test "has user" do
-    assert_instance_of User, api_services(:keith_other_service).user
+  test "has an associated user" do
+    assert_instance_of User, api_services(:keith_openai_service).user
+  end
+
+  test "has associated language_models" do
+    assert_instance_of LanguageModel, api_services(:keith_openai_service).language_models.first
   end
 
   test "name present validated" do
@@ -11,13 +15,7 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal ["can't be blank"], record.errors[:name]
   end
 
-  test "driver list validated" do
-    record = APIService.new(driver: 'oink')
-    refute record.valid?
-    assert_equal ["is not included in the list"], record.errors[:driver]
-  end
-
-  test "URL present validated" do
+  test "url present validated" do
     record = APIService.new(url: ' ')
     refute record.valid?
     assert_equal ["can't be blank"], record.errors[:url]
@@ -42,55 +40,71 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal "new secret", api_service.token
   end
 
-  test "ai_backend" do
-    assert_equal AIBackend::Anthropic, api_services(:rob_other_service).ai_backend
-    assert_equal AIBackend::OpenAI, api_services(:keith_other_service).ai_backend
+  test "both ai_backends are specified for best models" do
+    assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
+    assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
   end
 
-  test "soft_deletion" do
-    api_service = api_services(:keith_other_service)
-    assert_nil api_service.reload.deleted_at
-    assert_no_difference "APIService.count" do
-      api_service.delete!
-    end
-    refute_nil api_service.reload.deleted_at
-  end
-
-  test "delete with assistant" do
-    language_model = language_models(:alpaca)
-    assert_nil language_model.reload.deleted_at
-    assert_difference "language_model.reload.assistants.count", -1 do
-      assert_no_difference 'Assistant.count' do
-        assert_no_difference 'LanguageModel.count' do
-          assert language_model.delete!
-        end
-      end
-    end
-    assert_not_nil language_model.reload.deleted_at
+  test "both ai_backends can be specified for user models" do
+    assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
+    assert_equal AIBackend::OpenAI, language_models(:guanaco).ai_backend
   end
 
   test "cannot create record without user" do
-    record = APIService.new(api_service_params.except(:user))
-    assert_no_difference "APIService.count" do
-      refute record.save
-      assert_equal ["User must exist"],  record.errors.full_messages
-    end
+    record = APIService.new(create_params.except(:user))
+    refute record.valid?
+    assert_equal ["User must exist"],  record.errors.full_messages
   end
 
   test "can create record" do
-    record = APIService.new(api_service_params)
-    assert_difference "APIService.count" do
-      assert record.save, record.errors.full_messages.inspect
+    APIService.create!(create_params)
+  end
+
+  test "soft delete also soft deletes language_models" do
+    assert_difference "users(:rob).language_models.reload.count", -api_services(:rob_openai_service).language_models.count do
+      assert_difference "users(:rob).api_services.reload.count", -1 do
+        assert_changes "language_models(:rob_gpt).reload.deleted_at", from: nil do
+          assert_changes "api_services(:rob_openai_service).deleted_at", from: nil do
+            api_services(:rob_openai_service).deleted!
+          end
+        end
+      end
+    end
+  end
+
+  test "when default_llm_keys is enabled but left blank then user keys will be used" do
+    api_services(:keith_openai_service).update!(token: "GPT321")
+    api_services(:keith_anthropic_service).update!(token: "CLAUDE123")
+
+    stub_features(default_llm_keys: true) do
+      stub_settings(default_openai_key: " ", default_anthropic_key: "") do
+        assert_equal "GPT321", api_services(:keith_openai_service).effective_token
+        assert_equal "CLAUDE123", api_services(:keith_anthropic_service).effective_token
+      end
+    end
+  end
+
+  test "when default_llm_keys is enabled then empty user keys will fall back to default keys" do
+    api_services(:keith_openai_service).update!(token: " ")
+    api_services(:keith_anthropic_service).update!(token: nil)
+
+    stub_features(default_llm_keys: true) do
+      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123") do
+        assert_equal "gpt321", api_services(:keith_openai_service).effective_token
+        assert_equal "claude123", api_services(:keith_anthropic_service).effective_token
+      end
     end
   end
 
   private
 
-  def api_service_params
-    {user: users(:taylor),
+  def create_params
+    {
+      user: users(:taylor),
       name: "ABC Serv",
-      driver: "Anthropic",
+      driver: :anthropic,
       url: "http://abcdef.com/models",
-      token: "access-token"}
+      token: "access-token"
+    }
   end
 end

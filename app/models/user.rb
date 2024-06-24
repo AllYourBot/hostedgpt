@@ -4,9 +4,6 @@ class User < ApplicationRecord
   has_secure_password validations: false
   has_person_name
 
-  validates :first_name, presence: true
-  validates :last_name, presence: true, on: :create
-
   has_many :assistants, -> { not_deleted }
   has_many :assistants_including_deleted, class_name: "Assistant", inverse_of: :user, dependent: :destroy
   has_many :language_models, -> { not_deleted }
@@ -25,15 +22,13 @@ class User < ApplicationRecord
 
   belongs_to :last_cancelled_message, class_name: "Message", optional: true
 
+  validates :first_name, presence: true
+  validates :last_name, presence: true, on: :create
+
   accepts_nested_attributes_for :credentials
   serialize :preferences, coder: JsonSerializer
 
   def preferences
     attributes["preferences"].with_defaults(dark_mode: "system")
-  end
-
-  # Not quite a keeper
-  def openai_key
-    api_services.where(driver: APIService::DRIVER_OPEN_AI).where.not(token: nil).first&.token
   end
 end

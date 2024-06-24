@@ -14,28 +14,16 @@ class LanguageModel < ApplicationRecord
   has_many :assistants, -> { not_deleted }
   has_many :assistants_including_deleted, class_name: "Assistant", dependent: :destroy
 
-  validates :api_name, :description, presence: true
+  before_validation :populate_position, unless: :position
 
-  before_create :populate_position
+  validates :api_name, :name, :position, presence: true
+
+  before_save :soft_delete_assistants, if: -> { deleted_at && deleted_at_changed? && deleted_at_was.nil? }
 
   scope :ordered, -> { order(:position) }
-  scope :for_user, ->  (user) { where(user_id: user.id).not_deleted }
+  scope :for_user, ->(user) { where(user_id: user.id).not_deleted }
 
   delegate :ai_backend, to: :api_service
-
-  # Added for use in migrations; validations in the present code refer to columns not present in earlier migrations.
-  def self.create_without_validation!(attributes)
-    record = new(attributes)
-    if !record.save(validate: false)
-      raise "Could not create LanguageModel record for #{attributes.inspect}"
-    end
-    record
-  end
-
-  def delete!
-    update!(deleted_at: Time.now)
-    assistants.each { |assistant| assistant.deleted! }
-  end
 
   def provider_name
     BEST_MODELS[api_name] || api_name
@@ -48,7 +36,10 @@ class LanguageModel < ApplicationRecord
   private
 
   def populate_position
-    return unless position.blank?
-    self.position = (LanguageModel.maximum(:position) || 0) + 1
+    self.position = (user&.language_models&.maximum(:position) || 0) + 1
+  end
+
+  def soft_delete_assistants
+    assistants.update_all(deleted_at: Time.current)
   end
 end

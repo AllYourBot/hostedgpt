@@ -20,8 +20,15 @@ class Settings::ApplicationController < ApplicationController
         |assistant| [ assistant, edit_settings_assistant_path(assistant) ]
       }.to_h.merge({
         "New Assistant": new_settings_assistant_path
-      })
+      }),
 
+      language_models: {
+        "Language Models": settings_language_models_path,
+      },
+
+      api_services: {
+        "API Services": settings_api_services_path,
+      },
     }
   end
 end

@@ -5,9 +5,8 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
-  test "has language models" do
-    assert users(:keith).language_models.ordered.pluck(:api_name).include?("camel")
-    assert users(:taylor).language_models.ordered.pluck(:api_name).include?("pacos-imagine")
+  test "has associated language_models" do
+    assert_instance_of LanguageModel, users(:keith).language_models.first
   end
 
   test "has associated credentials" do
@@ -53,11 +52,15 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted upon destroy" do
-    assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
-      assert_difference "Conversation.count", -users(:keith).conversations.count do
-        assert_difference "Credential.count", -users(:keith).credentials.count do
-          assert_difference "Memory.count", -users(:keith).memories.count do
-            users(:keith).destroy
+    assert_difference "APIService.count", -users(:keith).api_services_including_deleted.count do
+      assert_difference "LanguageModel.count", -users(:keith).language_models_including_deleted.count do
+        assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
+          assert_difference "Conversation.count", -users(:keith).conversations.count do
+            assert_difference "Credential.count", -users(:keith).credentials.count do
+              assert_difference "Memory.count", -users(:keith).memories.count do
+                users(:keith).destroy
+              end
+            end
           end
         end
       end

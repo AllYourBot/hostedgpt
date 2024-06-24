@@ -24,15 +24,15 @@ class Settings::APIServicesController < Settings::ApplicationController
 
   def update
     if @api_service.update(api_service_params)
-      redirect_to edit_settings_api_service_path(@api_service), notice: "Saved", status: :see_other
+      redirect_to settings_api_services_path, notice: "Saved", status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @api_service.delete!
-    redirect_to new_settings_api_service_url, notice: "Deleted", status: :see_other
+    @api_service.deleted!
+    redirect_to settings_api_services_path, notice: "Deleted", status: :see_other
   end
 
   private
@@ -40,7 +40,7 @@ class Settings::APIServicesController < Settings::ApplicationController
   def set_api_service
     @api_service = Current.user.api_services.find_by(id: params[:id])
     if @api_service.nil?
-      redirect_to new_settings_api_service_url, notice: "The API Service could not be found", status: :see_other
+      redirect_to settings_api_services_path, alert: "The API Service could not be found", status: :see_other
     end
   end
 
