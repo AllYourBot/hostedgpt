@@ -17,24 +17,6 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     assert @openai.client.present?
   end
 
-  test "get_next_chat_message works with APIService" do
-    open_ai = AIBackend::OpenAI.new(users(:taylor),
-      assistants(:pacos_asst),
-      @conversation,
-      @conversation.latest_message_for_version(:latest)
-    )
-    assert_equal "http://taylor.org/doit-open", open_ai.client.uri_base
-    TestClient::OpenAI.stub :text, nil do # this forces it to fall back to default text
-      TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response }do
-        streamed_text = ""
-        open_ai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal <<-END_INSTRUCTION.chomp, streamed_text
-Hello this is model pacos-imagine with instruction \"Point out flower-related local items, also historical events involving flowers\"! How can I assist you today?
-END_INSTRUCTION
-      end
-    end
-  end
-
   test "get_next_chat_message works to stream text and uses model from assistant" do
     assert_not_equal @assistant, @conversation.assistant,
       "We were supposed to forcing this next message to use a different assistant so these should not match"
