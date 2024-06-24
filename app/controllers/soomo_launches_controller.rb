@@ -55,7 +55,7 @@ class SoomoLaunchesController < ApplicationController
       ["GPT-4o", "gpt-4o"],
       ["GPT-3.5", "gpt-3.5-turbo"],
       ["Claude 3 Opus", "claude-3-opus-20240229"],
-      ["Claude 3 Sonnet", "claude-3-sonnet-20240229"]
+      ["Claude 3.5 Sonnet", "claude-3-5-sonnet-20240620"]
     ].map do |(assistant_name, model_name)|
       person.user.assistants.create!(
         name: assistant_name,
