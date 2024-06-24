@@ -1,5 +1,6 @@
 class CreateAuthentications < ActiveRecord::Migration[7.1]
   def change
+    drop_table :authentications if table_exists?(:authentications)
     create_table :authentications do |t|
       t.references :credential, null: false, foreign_key: true
       t.references :client, null: false, foreign_key: true

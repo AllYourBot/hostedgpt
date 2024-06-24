@@ -6,6 +6,7 @@ export default class extends Controller {
   initialize() {
     this.onResize = undefined
     this.autogrow = this.autogrow.bind(this)
+    this.minHeight = parseInt(getComputedStyle(this.element).height, 10)
   }
 
   connect() {
@@ -28,8 +29,13 @@ export default class extends Controller {
   throttledAutogrow = throttle((event) => { if (!event.detail?.fromAutogrow) this.autogrow(event) }, 50)
   autogrow() {
     const prevHeight = getComputedStyle(this.element).height
+    const maxHeight = Math.max(window.innerHeight - 200, this.minHeight)
+    if (maxHeight == parseInt(prevHeight, 10)) return
+
     this.element.style.height = 'auto'
-    const newHeight = `${this.element.scrollHeight+2}px` // scrollHeight is two less than computedHeight, this prevents jumps
+    let newHeight = Math.min(maxHeight, this.element.scrollHeight + 2) // scrollHeight is two less than computedHeight, this prevents jumps
+    if (newHeight == maxHeight) this.element.style.overflowY = 'auto'
+    newHeight = `${newHeight}px`
     this.element.style.height = newHeight
 
     if (prevHeight != newHeight) window.dispatchEvent(new CustomEvent('main-column-changed', { detail: { fromAutogrow: true } })) // TODO: prevents infinite event loop, why is this happening sometimes?

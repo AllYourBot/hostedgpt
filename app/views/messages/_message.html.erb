@@ -9,6 +9,7 @@
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
 <% last_message_done = last_message && !thinking && message.content_text.present? %>
+<% debug_tool = false %>
 <%
 if message.versions.present?
   previous_version  = message.versions.push(nil)[ message.versions.index(message.version)-1 ]
@@ -18,10 +19,10 @@ end
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.tool_call? && 'hidden' %>"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !debug_tool && "hidden" %>"
   data-role="message"
   data-timestamp="<%= timestamp %>"
-  data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && 'message-scroller' %>"
+  data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && "message-scroller" %>"
   data-message-scroller-scroll-down-value="<%= scroll_down %>"
   data-message-scroller-only-scroll-down-if-scrolled-to-bottom-value="<%= only_scroll_down_if_was_bottom %>"
   data-message-scroller-instantly-value="<%= initial_page_load %>"
@@ -125,6 +126,15 @@ end
                 )
           %>
         </div>
+
+        <% if debug_tool && message.content_tool_calls.present? %>
+          <div
+            data-role="content-text"
+            class="prose break-words leading-normal dark:[&_*]:text-gray-100 dark:marker:text-gray-100"
+          >
+            <%= formatted_text = format "```\n#{message.content_tool_calls}\n```" %>
+          </div>
+        <% end %>
 
         <div class="
           flex justify-start

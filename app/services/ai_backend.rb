@@ -1,6 +1,64 @@
 class AIBackend
   attr :client
 
+  def initialize(user, assistant, conversation, message)
+    @user = user
+    @assistant = assistant
+    @conversation = conversation
+    @message = message
+  end
+
+  def self.get_tool_messages_by_calling(tool_calls_response)
+    tool_calls = deep_json_parse(tool_calls_response)
+
+    # We could parallelize function calling using ruby threads
+    tool_calls.map do |tool_call|
+      id = tool_call.dig(:id)
+      function_name = tool_call.dig(:function, :name)
+      function_arguments = tool_call.dig(:function, :arguments)
+
+      raise "Unexpected tool call: #{id}, #{function_name}, and #{function_arguments}" if function_name.blank? || function_arguments.nil?
+
+      function_response = begin
+        Toolbox.call(function_name, function_arguments)
+      rescue => e
+        puts "## Handled error calling tools: #{e.message}" unless Rails.env.test?
+        puts e.backtrace.join("\n") unless Rails.env.test?
+
+        <<~STR.gsub("\n", " ")
+          An unexpected error occurred (#{e.message}). You were querying information to help you answer a users question. Because this information
+          is not available at this time, DO NOT MAKE ANY GUESSES as you attempt to answer the users questions. Instead, consider attempting a
+          different query OR let the user know you attempted to retrieve some information but the website is having difficulties at this time.
+        STR
+      end
+
+      {
+        role: "tool",
+        content: function_response.to_json,
+        tool_call_id: id,
+      }
+    end
+  rescue => e
+    puts "## UNHANDLED error calling tools: #{e.message}"
+    puts e.backtrace.join("\n")
+    raise ::Faraday::ParsingError
+  end
+
+  private
+
+  def full_instructions
+    return nil if @assistant.instructions.blank? && @user.memories.blank?
+
+    s = @assistant.instructions.to_s
+
+    if @user.memories.present?
+      s += "\n\nNote these additional items that you've been told and remembered:\n\n"
+      s += @user.memories.pluck(:detail).join("\n")
+    end
+
+    s
+  end
+
   def deep_streaming_merge(hash1, hash2)
     merged_hash = hash1.dup
     hash2.each do |key, value|

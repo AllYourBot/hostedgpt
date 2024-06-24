@@ -18,6 +18,9 @@ Rails.application.routes.draw do
   namespace :settings do
     resources :assistants, except: [:index, :show]
     resource :person, only: [:edit, :update]
+    resources :memories, only: [:index] do
+      delete :destroy, on: :collection
+    end
   end
 
   get "/login", to: "authentications#new"
@@ -26,7 +29,7 @@ Rails.application.routes.draw do
   get "/logout", to: "authentications#destroy"
 
   get "/auth/:provider/callback" => "authentications/google_oauth#create", as: :google_oauth
-  get "/auth/failure" => "authentications/google_oauth#destroy"
+  get "/auth/failure" => "authentications/google_oauth#failure" # connected in omniauth.rb
 
   # resources :documents  TODO: finish this feature
 

@@ -9,7 +9,11 @@ class Settings::ApplicationController < ApplicationController
     # controller_name => array of items
     @settings_menu = {
       people: {
-        "Your Account": edit_settings_person_path
+        "Your Account": edit_settings_person_path,
+      },
+
+      memories: {
+        "Assistant Memories": settings_memories_path,
       },
 
       assistants: Current.user.assistants.ordered.map {

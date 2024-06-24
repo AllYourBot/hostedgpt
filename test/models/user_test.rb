@@ -21,8 +21,16 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of GmailCredential, users(:keith).gmail_credential
   end
 
+  test "has an associated google_tasks_credential" do
+    assert_instance_of GoogleTasksCredential, users(:keith).google_tasks_credential
+  end
+
   test "has an associated http_header_credential" do
     assert_instance_of HttpHeaderCredential, users(:rob).http_header_credential
+  end
+
+  test "has associated memories" do
+    assert_instance_of Memory, users(:keith).memories.first
   end
 
   test "has a last_cancelled_message but can be nil" do
@@ -43,7 +51,9 @@ class UserTest < ActiveSupport::TestCase
     assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
       assert_difference "Conversation.count", -users(:keith).conversations.count do
         assert_difference "Credential.count", -users(:keith).credentials.count do
-          users(:keith).destroy
+          assert_difference "Memory.count", -users(:keith).memories.count do
+            users(:keith).destroy
+          end
         end
       end
     end

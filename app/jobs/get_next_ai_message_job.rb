@@ -16,6 +16,7 @@ class GetNextAIMessageJob < ApplicationJob
     @conversation = @message.conversation
     @assistant    = Assistant.find(assistant_id)
     @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index-1)
+    @attempt      = attempt
 
     return false          if generation_was_cancelled? || message_is_populated?
     raise WaitForPrevious if @prev_message&.not_finished?
@@ -26,7 +27,8 @@ class GetNextAIMessageJob < ApplicationJob
 
     puts "\n### Wait for reply" unless Rails.env.test?
 
-    response = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
+    response = Current.set(user: @user, message: @message) do
+      ai_backend.new(@conversation.user, @assistant, @conversation, @message)
       .get_next_chat_message do |content_chunk|
         @message.content_text += content_chunk
 
@@ -40,7 +42,7 @@ class GetNextAIMessageJob < ApplicationJob
           raise ResponseCancelled
         end
       end
-
+    end
     @message.content_tool_calls = response # Typically, get_next_chat_message will simply return nil because it executes
                                            # the content_chunk block to return it's response incrementally. However, tool_call
                                            # responses don't make sense to stream because they can't be executed incrementally
@@ -148,14 +150,14 @@ class GetNextAIMessageJob < ApplicationJob
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
-    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
+    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id}, #{@attempt})" unless Rails.env.test?
   end
 
   def call_tools_before_wrapping_up
     puts "\n### Calling tools" unless Rails.env.test?
 
     msgs = []
-    Current.set(user: @user) do
+    Current.set(user: @user, message: @message) do
       msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
     end
 

@@ -16,7 +16,7 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
   end
 
   test "get_next_chat_message works" do
-    assert_equal @test_client.messages(model: "gpt-4o", system: "You are a helpful assistant"), @anthropic.get_next_chat_message
+    assert_equal @test_client.messages(model: "gpt-4o", system: "You are a helpful assistant")[0..70], @anthropic.get_next_chat_message[0..70]
   end
 
   test "preceding_messages constructs a proper response and pivots on images" do

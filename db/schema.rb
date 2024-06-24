@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_17_100905) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -151,6 +151,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_17_100905) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "memories", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "message_id"
+    t.string "detail"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_memories_on_message_id"
+    t.index ["user_id"], name: "index_memories_on_user_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.string "role", null: false
@@ -160,10 +170,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_17_100905) do
     t.bigint "content_document_id"
     t.bigint "run_id"
     t.bigint "assistant_id", null: false
-    t.datetime "cancelled_at"
     t.datetime "processed_at", precision: nil
     t.integer "index", null: false
     t.integer "version", null: false
+    t.datetime "cancelled_at"
     t.boolean "branched", default: false, null: false
     t.integer "branched_from_version"
     t.jsonb "content_tool_calls"
@@ -372,6 +382,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_17_100905) do
   add_foreign_key "documents", "assistants"
   add_foreign_key "documents", "messages"
   add_foreign_key "documents", "users"
+  add_foreign_key "memories", "messages"
+  add_foreign_key "memories", "users"
   add_foreign_key "messages", "assistants"
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "documents", column: "content_document_id"

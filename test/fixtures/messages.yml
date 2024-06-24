@@ -4,7 +4,7 @@ hear_me:
   assistant: samantha
   conversation: greeting
   role: user
-  content_text: Can you hear <b>me</b>?
+  content_text: Can you hear <b>me</b>? I live in Austin, Texas
   content_document:
   run:
   created_at: 2023-12-30 1:00:00
@@ -27,7 +27,7 @@ identify_photo:
   conversation: greeting
   role: user
   content_text: |
-    Can you identify photos?
+    I own a cat. Can you identify photos?
 
     jpg
     png
