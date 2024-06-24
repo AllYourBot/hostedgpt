@@ -75,23 +75,27 @@ class APIServiceTest < ActiveSupport::TestCase
   test "when default_llm_keys is enabled but left blank then user keys will be used" do
     api_services(:keith_openai_service).update!(token: "GPT321")
     api_services(:keith_anthropic_service).update!(token: "CLAUDE123")
+    api_services(:keith_groq_service).update!(token: "GROQ123")
 
     stub_features(default_llm_keys: true) do
-      stub_settings(default_openai_key: " ", default_anthropic_key: "") do
+      stub_settings(default_openai_key: " ", default_anthropic_key: "", default_groq_key: nil) do
         assert_equal "GPT321", api_services(:keith_openai_service).effective_token
         assert_equal "CLAUDE123", api_services(:keith_anthropic_service).effective_token
+        assert_equal "GROQ123", api_services(:keith_groq_service).effective_token
       end
     end
   end
 
   test "when default_llm_keys is enabled then empty user keys will fall back to default keys" do
     api_services(:keith_openai_service).update!(token: " ")
-    api_services(:keith_anthropic_service).update!(token: nil)
+    api_services(:keith_anthropic_service).update!(token: "")
+    api_services(:keith_groq_service).update!(token: nil)
 
     stub_features(default_llm_keys: true) do
-      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123") do
+      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123", default_groq_key: "groq123") do
         assert_equal "gpt321", api_services(:keith_openai_service).effective_token
         assert_equal "claude123", api_services(:keith_anthropic_service).effective_token
+        assert_equal "groq123", api_services(:keith_groq_service).effective_token
       end
     end
   end

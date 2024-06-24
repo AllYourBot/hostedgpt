@@ -12,6 +12,13 @@ keith_anthropic_service:
   token: abc-secret
   driver: anthropic
 
+keith_groq_service:
+  name: Groq
+  user: keith
+  url: https://api.groq.com/openai/v1/
+  token: abc-secret
+  driver: openai
+
 keith_other_service:
   name: Keith Server
   user: keith

@@ -93,11 +93,14 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     refute flash[:alert].present?, "There should NOT have been an error message"
   end
 
-  test "special instruction link is visible for openai & anthropic url" do
+  test "special instruction link is visible for openai, anthropic, & groq url" do
     get edit_settings_api_service_url(api_services(:keith_openai_service))
     assert_select "button#instructions:not(.hidden)"
 
     get edit_settings_api_service_url(api_services(:keith_anthropic_service))
+    assert_select "button#instructions:not(.hidden)"
+
+    get edit_settings_api_service_url(api_services(:keith_groq_service))
     assert_select "button#instructions:not(.hidden)"
   end
 

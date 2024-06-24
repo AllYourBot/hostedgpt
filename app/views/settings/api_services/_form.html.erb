@@ -49,14 +49,14 @@
       %>How do I get?
     <% end %>
     <ol id="openai-instructions"
-        data-transition-target="<%= openai?(api_service) && 'transitionable' %>"
-        class="
-          list-decimal
-          my-3 p-2 pl-8
-          border border-gray-200
-          bg-gray-50 dark:bg-transparent
-          hidden
-        "
+      data-transition-target="<%= openai?(api_service) && 'transitionable' %>"
+      class="
+        list-decimal
+        my-3 p-2 pl-8
+        border border-gray-200
+        bg-gray-50 dark:bg-transparent
+        hidden
+      "
     >
       <li>Sign up for OpenAI's
         <%= link_to "Platform", "https://platform.openai.com/",
@@ -79,14 +79,14 @@
       <li>Add a "Payment method."</li>
     </ol>
      <ol id="anthropic-instructions"
-        data-transition-target="<%= anthropic?(api_service) && 'transitionable' %>"
-        class="
-          list-decimal
-          my-3 p-2 pl-8
-          border border-gray-200
-          bg-gray-50 dark:bg-transparent
-          hidden
-        "
+      data-transition-target="<%= anthropic?(api_service) && 'transitionable' %>"
+      class="
+        list-decimal
+        my-3 p-2 pl-8
+        border border-gray-200
+        bg-gray-50 dark:bg-transparent
+        hidden
+      "
      >
       <li>Sign up for Anthropic's web
         <%= link_to "Console", "https://console.anthropic.com/",
@@ -111,6 +111,29 @@
       <li>Click "Claim" if you have any free credits or if you have no free credits click
         "Select Plan" and just pick the "Build" plan.
       </li>
+    </ol>
+    <ol id="openai-instructions"
+        data-transition-target="<%= groq?(api_service) && 'transitionable' %>"
+        class="
+          list-decimal
+          my-3 p-2 pl-8
+          border border-gray-200
+          bg-gray-50 dark:bg-transparent
+          hidden
+        "
+    >
+      <li>Create an account on
+        <%= link_to "Groq Cloud Console", "https://console.groq.com/",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %> and log in.
+      </li>
+      <li>Click "API Keys" on the left (or
+        <%= link_to "take me to API Keys", "https://console.groq.com/keys",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>).</li>
+      <li>Click "Create API Key", name it something like "HostedGPT" and paste it below.</li>
     </ol>
     <%= form.text_field :token, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
