@@ -3,7 +3,7 @@ require "test_helper"
 class AIBackend::OpenAITest < ActiveSupport::TestCase
   setup do
     @conversation = conversations(:attachments)
-    @assistant = assistants(:keith_claude3)
+    @assistant = assistants(:keith_gpt4)
     @openai = AIBackend::OpenAI.new(
       users(:keith),
       @assistant,
@@ -19,13 +19,17 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
   test "get_next_chat_message works to stream text and uses model from assistant" do
     assert_not_equal @assistant, @conversation.assistant,
-      "We want to force this next message to use a different assistant so these should not match"
+      "We were supposed to forcing this next message to use a different assistant so these should not match"
 
+    assert_equal "https://api.openai.com/", @openai.client.uri_base
     TestClient::OpenAI.stub :text, nil do # this forces it to fall back to default text
       TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response }do
         streamed_text = ""
         @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal "Hello this is model claude-3-opus-20240229 with instruction nil! How can I assist you today?", streamed_text
+        expected_start = "Hello this is model gpt-4o with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\n\\nThe current time & date for the user is"
+        expected_end = "\"! How can I assist you today?"
+        assert streamed_text.start_with?(expected_start)
+        assert streamed_text.end_with?(expected_end)
       end
     end
   end

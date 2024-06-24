@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_24_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -46,6 +46,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "api_services", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.string "driver", null: false, comment: "What API spec does this service conform to, e.g. OpenAI or Anthropic"
+    t.string "url", null: false
+    t.string "token"
+    t.datetime "deleted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "deleted_at"], name: "index_api_services_on_user_id_and_deleted_at"
+    t.index ["user_id"], name: "index_api_services_on_user_id"
   end
 
   create_table "assistants", force: :cascade do |t|
@@ -144,11 +157,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
 
   create_table "language_models", force: :cascade do |t|
     t.integer "position", null: false
+    t.string "api_name", null: false, comment: "This is the name that API calls are expecting."
     t.string "name", null: false
-    t.text "description", null: false
     t.boolean "supports_images", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
+    t.bigint "user_id", null: false
+    t.bigint "api_service_id"
+    t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
+    t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
+    t.index ["user_id"], name: "index_language_models_on_user_id"
   end
 
   create_table "memories", force: :cascade do |t|
@@ -360,8 +379,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
     t.datetime "registered_at", default: -> { "CURRENT_TIMESTAMP" }
     t.string "first_name", null: false
     t.string "last_name"
-    t.string "openai_key"
-    t.string "anthropic_key"
     t.jsonb "preferences"
     t.bigint "last_cancelled_message_id"
     t.index ["last_cancelled_message_id"], name: "index_users_on_last_cancelled_message_id"
@@ -369,6 +386,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "api_services", "users"
   add_foreign_key "assistants", "language_models"
   add_foreign_key "assistants", "users"
   add_foreign_key "authentications", "clients"
@@ -382,6 +400,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_100000) do
   add_foreign_key "documents", "assistants"
   add_foreign_key "documents", "messages"
   add_foreign_key "documents", "users"
+  add_foreign_key "language_models", "api_services"
+  add_foreign_key "language_models", "users"
   add_foreign_key "memories", "messages"
   add_foreign_key "memories", "users"
   add_foreign_key "messages", "assistants"

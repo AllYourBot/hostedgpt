@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   namespace :settings do
     resources :assistants, except: [:index, :show]
     resource :person, only: [:edit, :update]
+    resources :language_models
+    resources :api_services, except: [:show]
     resources :memories, only: [:index] do
       delete :destroy, on: :collection
     end

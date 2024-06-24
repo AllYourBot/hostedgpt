@@ -59,7 +59,14 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_message
     return true
   rescue OpenAI::ConfigurationError => e
-    set_openai_error
+    name = @assistant.language_model.api_service.name
+    if name == "OpenAI"
+      set_openai_error
+    elsif name == "Groq"
+      set_groq_error
+    else
+      set_generic_error(name)
+    end
     wrap_up_the_message
     return true
   rescue Anthropic::ConfigurationError => e
@@ -114,13 +121,23 @@ class GetNextAIMessageJob < ApplicationJob
   private
 
   def set_openai_error
-    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT-3.5 or GPT-4. Click your Profile in the bottom " +
-      "left and then Settings. You will find OpenAI Key instructions.)"
+    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)"
+  end
+
+  def set_groq_error
+    @message.content_text = "(You need to enter a valid API key for Groq to use Llama. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find Groq Key instructions.)"
+  end
+
+  def set_generic_error(name)
+    @message.content_text = "(There is a configuration error with the #{name} API Service. Maybe you have an invalid API key? Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find #{name} there.)"
   end
 
   def set_anthropic_error
     @message.content_text = "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
-      "left and then Settings. You will find Anthropic Key instructions.)"
+      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
   end
 
   def set_response_error

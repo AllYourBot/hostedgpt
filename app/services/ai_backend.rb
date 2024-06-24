@@ -47,8 +47,6 @@ class AIBackend
   private
 
   def full_instructions
-    return nil if @assistant.instructions.blank? && @user.memories.blank?
-
     s = @assistant.instructions.to_s
 
     if @user.memories.present?
@@ -56,7 +54,8 @@ class AIBackend
       s += @user.memories.pluck(:detail).join("\n")
     end
 
-    s
+    s += "\n\nThe current time & date for the user is {{ " + DateTime.current.strftime("%-l:%M%P on %A, %B %-d, %Y") + " }}"
+    s.strip
   end
 
   def deep_streaming_merge(hash1, hash2)

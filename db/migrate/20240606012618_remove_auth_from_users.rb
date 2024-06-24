@@ -4,7 +4,7 @@ class RemoveAuthFromUsers < ActiveRecord::Migration[7.1]
       credential = user.credentials.build(
         type: "PasswordCredential",
         password_digest: user.password_digest,
-        last_authenticated_at: user.person.updated_at
+        last_authenticated_at: (user.person.updated_at rescue nil)
       )
       credential.save(validate: false) # skips password verification
     end

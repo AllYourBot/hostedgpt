@@ -22,8 +22,8 @@
     iosPWASplash('/apple-touch-icon.png', '#ffffff')
   <% end %>
   <%= javascript_tag do %>
-    // NOTE: This is not safe for multi-user environments. Fix before we default-enable the voice Feature
-    openAIKey = "<%= Current.user&.openai_key %>"
+    // HACK: Fix before we default-enable the voice Feature
+    openAIKey = "<%= Current.user&.api_services&.openai&.with_token&.first&.token %>"
   <% end %>
   <!-- /ios-pwa-splash screen-->
   <!-- /PWA -->
