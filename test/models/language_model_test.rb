@@ -96,14 +96,6 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert list.include?('alpaca:medium')
   end
 
-  test "create_without_validation!" do
-    record = assert_difference 'LanguageModel.count' do
-      # These columns cannot are "not null" in the schema
-      LanguageModel.create_without_validation!(api_name: '', name: '', supports_images:false, user: users(:rob), position: 123)
-    end
-    assert_equal '',  record.api_name
-  end
-
   private
 
   def create_params

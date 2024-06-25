@@ -1,5 +1,4 @@
 class CreateLanguageModels < ActiveRecord::Migration[7.1]
-
   def up
     create_table :language_models do |t|
       t.integer :position, null: false
@@ -42,7 +41,7 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
       [23, 'claude-2.0', 'Claude 2.0', false],
       [24, 'claude-instant-1.2', 'Claude Instant 1.2', false]
     ].each do |position, name, description, supports_images|
-      LanguageModel.create_without_validation!(position: position, name: name, description: description, supports_images: supports_images)
+      create_without_validation!(position: position, name: name, description: description, supports_images: supports_images)
     end
 
     max_position = 24
@@ -50,7 +49,7 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
     # Respect some users who may have added their own model values in the assistants table
     (Assistant.all.pluck(:model).uniq - LanguageModel.all.pluck(:name)).each do |model_name|
       Rails.logger.info "Create language_models record from assistants column value: #{model_name.inspect}. Setting supports_images to false, update manually if it has support"
-      LanguageModel.create_without_validation!(name: model_name, description: model_name, position: max_position += 1, supports_images: false)
+      create_without_validation!(name: model_name, description: model_name, position: max_position += 1, supports_images: false)
     end
 
     add_reference :assistants, :language_model, null: true, foreign_key: { to_table: :language_models}
@@ -73,5 +72,13 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
 
     remove_column :assistants, :language_model_id
     drop_table :language_models
+  end
+
+  def create_without_validation!(attributes)
+    record = LanguageModel.new(attributes)
+    if !record.save(validate: false)
+      raise "Could not create LanguageModel record for #{attributes.inspect}"
+    end
+    record
   end
 end

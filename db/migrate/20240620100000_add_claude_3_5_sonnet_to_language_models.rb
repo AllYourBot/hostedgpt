@@ -4,7 +4,7 @@ class AddClaude35SonnetToLanguageModels < ActiveRecord::Migration[7.0]
     LanguageModel.reset_column_information
 
     # Insert 'claude-3-5-sonnet-20240620' with position 20
-    LanguageModel.create_without_validation!(
+    create_without_validation!(
       position: 19,
       api_name: 'claude-3-5-sonnet-20240620',
       name: 'Claude 3.5 Sonnet (2024-06-20)',
@@ -30,5 +30,13 @@ class AddClaude35SonnetToLanguageModels < ActiveRecord::Migration[7.0]
 
   def down
     raise "This migration can't be reversed easily."
+  end
+
+  def create_without_validation!(attributes)
+    record = LanguageModel.new(attributes)
+    if !record.save(validate: false)
+      raise "Could not create LanguageModel record for #{attributes.inspect}"
+    end
+    record
   end
 end

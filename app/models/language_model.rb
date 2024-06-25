@@ -35,15 +35,6 @@ class LanguageModel < ApplicationRecord
     user == Current.user
   end
 
-  def self.create_without_validation!(attributes)
-    record = LanguageModel.new(attributes)
-    if !record.save(validate: false)
-      raise "Could not create LanguageModel record for #{attributes.inspect}"
-    end
-    record
-  end
-
-
   private
 
   def populate_position
