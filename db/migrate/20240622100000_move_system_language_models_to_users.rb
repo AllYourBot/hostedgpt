@@ -5,6 +5,11 @@ class MoveSystemLanguageModelsToUsers < ActiveRecord::Migration[7.1]
   # 4. Delete the openai_key and anthropic_key columns from the users table
   # 5. Delete the language_models records that have user_id = NULL
   # 6. Add a constraint to the language_models table that user_id cannot be NULL
+
+  class ::User < ::ApplicationRecord
+    encrypts :openai_key, :anthropic_key
+  end
+
   def up
     Rails.logger.info "Create api_services/language_models records for all #{User.count} users records"
     User.all.find_each do |user|
