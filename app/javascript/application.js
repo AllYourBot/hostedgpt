@@ -8,7 +8,7 @@ setInterval(() => {
   if (consumer.connection.isOpen() != window.isConnected) {
     window.isConnected = consumer.connection.isOpen()
     console.log(`cable ${window.isConnected ? 'connected' : 'DISCONNECTED'}`)
-    const elem = document.getElementById('connection-status')
+    //const elem = document.getElementById('connection-status')
     if (!window.isConnected) {
       if (elem) {
         elem.classList.add('bg-red-400')
