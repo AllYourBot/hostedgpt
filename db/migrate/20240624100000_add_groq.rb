@@ -25,7 +25,7 @@ class AddGroq < ActiveRecord::Migration[7.0]
         asst = user.assistants.find_by(name: name)
         next if asst.nil?
         asst.deleted! if asst.conversations.count == 0
-        asst.deleted! if asst.conversations.count == 1 && asst.conversation.first.messages.count <= 2
+        asst.deleted! if asst.conversations.count == 1 && asst.conversations.first.messages.count <= 2
       end
 
       user.assistants.create!(name: "Meta Llama 3 70b", language_model: language_model)
