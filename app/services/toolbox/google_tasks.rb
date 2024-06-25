@@ -117,13 +117,13 @@ class Toolbox::GoogleTasks < Toolbox
       completed: is_completed && Time.current,
     )
 
-    if (list.title == "My Tasks" && format_time(due_date_s).present? && updated_task.try(:due)&.to_date > Date.today)
+    if (list.title == "My Tasks" && format_time(due_date_s).present? && updated_task.try(:due)&.to_date > Date.current)
       updated_task = move_task_to_list(updated_task, snoozed_list)
       list = snoozed_list
     end
 
     if (list.title == "Snoozed" && (
-          (format_time(due_date_s).present? && updated_task.try(:due)&.to_date == Date.today) ||
+          (format_time(due_date_s).present? && updated_task.try(:due)&.to_date == Date.current) ||
           (due_date_s == "clear" && updated_task.try(:due).nil?)
     ))
       updated_task = move_task_to_list(updated_task, default_list, keep_due: false)
@@ -175,7 +175,7 @@ class Toolbox::GoogleTasks < Toolbox
     end
 
     loop do
-      tasks_to_unsnooze = get_tasks_for_list(snoozed_list, due_max: Date.today)
+      tasks_to_unsnooze = get_tasks_for_list(snoozed_list, due_max: Date.current)
       tasks_to_unsnooze.each do |task|
         move_task_to_list(task, default_list, keep_due: false)
       end

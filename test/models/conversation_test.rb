@@ -99,15 +99,15 @@ class ConversationTest < ActiveSupport::TestCase
   end
 
   test "#grouped_by_increasing_time_interval_for_user" do
-    Timecop.freeze do
+    Timecop.freeze(Time.current.beginning_of_day + 12.hours) do
       user = User.create!(first_name: "John", last_name: "Doe")
 
       # Create 3 conversations in each of these intervals
       [
-        Date.today,
-        1.week.ago,
-        1.month.ago,
-        1.year.ago
+        Time.zone.today,
+        1.week.ago.in_time_zone,
+        1.month.ago.in_time_zone,
+        1.year.ago.in_time_zone
       ].each do |timestamp|
         3.times do
           Conversation.create!(
