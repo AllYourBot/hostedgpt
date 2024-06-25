@@ -120,7 +120,7 @@ class Toolbox::OpenMeteo < Toolbox
     date_end = Date.parse(date_span_end_s).beginning_of_day
 
     if date_begin == date_end &&
-      date_begin.in?([ Date.today.beginning_of_day, (Date.today - 1.day).beginning_of_day ])
+      date_begin.in?([ Date.current.beginning_of_day, (Date.current - 1.day).beginning_of_day ])
 
       return get_current_and_todays_weather(city_s: city_s, state_province_or_region_s: state_province_or_region_s, country_s: country_s)
     end

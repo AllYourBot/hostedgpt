@@ -147,11 +147,11 @@ module Scopes::Lib
         table_column = "#{@ar_class.table_name}.#{column.name}"
 
         @ar_class.auto_scope "#{label}", -> {
-          now = column.type == :date ? Date.today : Time.current
+          now = column.type == :date ? Date.current : Time.current
           where("#{table_column} is not null and #{table_column} <= ?", now)
         }, column: column.name
         @ar_class.auto_scope "not_#{label}", -> {
-          now = column.type == :date ? Date.today : Time.current
+          now = column.type == :date ? Date.current : Time.current
           where("#{table_column} is null or #{table_column} > ?", now)
         }, column: column.name
 
@@ -170,19 +170,19 @@ module Scopes::Lib
         label = column.name.gsub(/(_at|_on)$/, "")
 
         @ar_class.define_method "#{label}?" do
-          now = column.type == :date ? Date.today : Time.current
+          now = column.type == :date ? Date.current : Time.current
           send(column.name).present? && send(column.name) <= now
         end
 
         @ar_class.define_method "not_#{label}?" do
-          now = column.type == :date ? Date.today : Time.current
+          now = column.type == :date ? Date.current : Time.current
           send(column.name).blank? || send(column.name) > now
         end
 
         @ar_class.define_method "#{label}!" do
           return if send(column.name)
 
-          now = column.type == :date ? Date.today : Time.current
+          now = column.type == :date ? Date.current : Time.current
           update!(column.name => now)
         end
       end
