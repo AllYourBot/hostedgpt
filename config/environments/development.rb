@@ -76,7 +76,10 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
 
+  # Since most people will not set the variable, polling will not be logged
+  config.solid_queue.silence_polling = ENV["SOLID_QUEUE_LOG_POLLING_ON"] != "false"
+
   config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16"]
 
-  config.hosts << ENV['DEV_HOST'] if ENV['DEV_HOST'].present?
+  config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
 end

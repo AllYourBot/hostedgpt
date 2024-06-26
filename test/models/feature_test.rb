@@ -21,11 +21,6 @@ class FeatureTest < ActiveSupport::TestCase
     end
   end
 
-  test "should default to false when feature not found" do
-    refute Feature.enabled?(:fake)
-    refute Feature.fake?
-  end
-
   test "boolean strings are read as booleans" do
     stub_features(my_feature: "true") do
       assert Feature.enabled?(:my_feature)
@@ -33,6 +28,30 @@ class FeatureTest < ActiveSupport::TestCase
 
     stub_features(my_feature: "false") do
       refute Feature.enabled?(:my_feature)
+    end
+  end
+
+  test "a user's preferences can ENABLE a feature which is globally DISABLED" do
+    user = users(:keith)
+    user.preferences = user.preferences.merge(feature: { my_feature: true })
+    user.save!
+
+    stub_features(my_feature: false) do
+      Current.set(user: user) do
+        assert Feature.enabled?(:my_feature)
+      end
+    end
+  end
+
+  test "a user's preferences can DISABLE a feature which is globally ENABLED" do
+    user = users(:keith)
+    user.preferences = user.preferences.merge(feature: { my_feature: false })
+    user.save!
+
+    stub_features(my_feature: true) do
+      Current.set(user: user) do
+        refute Feature.enabled?(:my_feature)
+      end
     end
   end
 
@@ -64,6 +83,12 @@ class FeatureTest < ActiveSupport::TestCase
       assert Feature.password_authentication?
       refute Feature.enabled?(:google_authentication)
       refute Feature.google_authentication?
+    end
+  end
+
+  test "referencing a feature that does not exist raises an exception" do
+    assert_raises do
+      Feature.foobar?
     end
   end
 end

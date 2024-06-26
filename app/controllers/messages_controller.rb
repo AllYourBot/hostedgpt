@@ -13,10 +13,9 @@ class MessagesController < ApplicationController
   def index
     if @version.blank?
       version = @conversation.messages.order(:created_at).last&.version
-      redirect_to conversation_messages_path(
-        params[:conversation_id],
-        version: version
-      ) if version
+      if version
+        redirect_to conversation_messages_path(params[:conversation_id], version: version), status: :see_other
+      end
     end
 
     @messages = @conversation.messages.for_conversation_version(@version)
@@ -43,8 +42,8 @@ class MessagesController < ApplicationController
 
     if @message.save
       after_create_assistant_reply = @message.conversation.latest_message_for_version(@message.version)
-      GetNextAIMessageJob.perform_later(current_user.id, after_create_assistant_reply.id, @assistant.id)
-      redirect_to conversation_messages_path(@message.conversation, version: @message.version)
+      GetNextAIMessageJob.perform_later(Current.user.id, after_create_assistant_reply.id, @assistant.id)
+      redirect_to conversation_messages_path(@message.conversation, version: @message.version), status: :see_other
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
       set_nav_conversations
@@ -57,7 +56,7 @@ class MessagesController < ApplicationController
 
   def update
     if @message.update(message_params)
-      redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version)
+      redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version), status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
@@ -80,6 +79,7 @@ class MessagesController < ApplicationController
 
   def set_message
     @message = Message.find(params[:id])
+    redirect_to root_url, status: :unauthorized if @message.conversation.user != Current.user
   end
 
   def set_nav_conversations

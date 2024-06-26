@@ -36,6 +36,22 @@ class ConversationTest < ActiveSupport::TestCase
     end
   end
 
+  test "Conversation should not be created with duplicate external ids" do
+    Conversation.create!(
+      user: users(:keith),
+      assistant: assistants(:samantha),
+      external_id: "dup1"
+    )
+
+    assert_raise ActiveRecord::RecordNotUnique do
+      Conversation.create!(
+        user: users(:keith),
+        assistant: assistants(:mandela_gpt4),
+        external_id: "dup1"
+      )
+    end
+  end
+
   test "associations are deleted upon destroy" do
     conversation = conversations(:greeting)
     message_count = conversation.messages.count * -1
@@ -83,15 +99,15 @@ class ConversationTest < ActiveSupport::TestCase
   end
 
   test "#grouped_by_increasing_time_interval_for_user" do
-    Timecop.freeze do
-      user = User.create!(password: "secret", first_name: "John", last_name: "Doe")
+    Timecop.freeze(Time.current.beginning_of_day + 12.hours) do
+      user = User.create!(first_name: "John", last_name: "Doe")
 
       # Create 3 conversations in each of these intervals
       [
-        Date.today,
-        1.week.ago,
-        1.month.ago,
-        1.year.ago
+        Time.zone.today,
+        1.week.ago.in_time_zone,
+        1.month.ago.in_time_zone,
+        1.year.ago.in_time_zone
       ].each do |timestamp|
         3.times do
           Conversation.create!(

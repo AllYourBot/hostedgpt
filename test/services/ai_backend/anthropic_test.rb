@@ -4,7 +4,7 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
   setup do
     @conversation = conversations(:attachments)
     @anthropic = AIBackend::Anthropic.new(users(:keith),
-      assistants(:samantha),
+      assistants(:keith_claude3),
       @conversation,
       @conversation.latest_message_for_version(:latest)
     )
@@ -16,7 +16,10 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
   end
 
   test "get_next_chat_message works" do
-    assert_equal @test_client.messages(model: "gpt-4", system: "You are a helpful assistant"), @anthropic.get_next_chat_message
+    assert_equal "https://api.anthropic.com/", @anthropic.client.uri_base
+    streamed_text = @test_client.messages(model: "claude_3_opus_20240229", system: "You are a helpful assistant")
+
+    assert_equal "Hello this is model claude_3_opus_20240229 with instruction \"You are a helpful assistant\"! How can I assist you today?", streamed_text
   end
 
   test "preceding_messages constructs a proper response and pivots on images" do

@@ -10,6 +10,7 @@ class Assistant < ApplicationRecord
   has_many :messages, dependent: :destroy
 
   delegate :supports_images?, to: :language_model
+  delegate :api_service, to: :language_model
 
   belongs_to :language_model
 
@@ -25,16 +26,6 @@ class Assistant < ApplicationRecord
 
     parts[0][0].capitalize +
       parts[1]&.try(:[], 0)&.capitalize.to_s
-  end
-
-  def soft_delete
-    return false if user.assistants.count <= 1
-    update!(deleted_at: Time.now)
-    return true
-  end
-
-  def soft_delete!
-    raise "Can't delete user's last assistant" if !soft_delete
   end
 
   def to_s

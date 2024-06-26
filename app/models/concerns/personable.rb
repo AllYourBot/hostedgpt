@@ -3,7 +3,8 @@ module Personable
 
   included do
     has_one :person, as: :personable, touch: true
-  end
 
-  delegate :email, to: :person
+    delegate :email, to: :person
+    delegate :clients, to: :person
+  end
 end

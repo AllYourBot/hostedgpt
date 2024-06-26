@@ -239,12 +239,12 @@
           <%= form.hidden_field :index, value: @messages&.length %>
           <%= form.hidden_field :version, value: @version %>
           <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
-            <%= document_form.file_field :file, class: "hidden", data: { image_upload_target: "file" } %>
+            <%= document_form.file_field :file, accept: "image/*", class: "hidden", data: { image_upload_target: "file" } %>
           <% end %>
 
           <%= form.text_area :content_text,
             id: "composer-input",
-            placeholder: "ENTER  to submit",
+            placeholder: "RETURN to submit   ↑ to edit last message",
             data: {
               composer_target: "input",
               image_upload_target: "content",
@@ -273,6 +273,8 @@
 
                 keydown.ctrl+m@document->composer#toggleMicrophone
                 keydown.meta+m@document->composer#toggleMicrophone
+
+                keydown.up->composer#editPrevious
               |
             },
             rows: 1,
@@ -419,7 +421,7 @@
       <section class="flex-1 pr-0 md:pr-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Open new chat
+            Open new conversation
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -492,8 +494,43 @@
         </figure>
       </section>
     </article>
+    <header class="font-semibold text-lg my-5 pb-1 border-b-2 border-gray-100">
+      Inside chat input
+    </header>
+    <article class="flex flex-col md:flex-row">
+      <section class="flex-1 pr-0 md:pr-5">
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Submit your chat
+          </figcaption>
+          <kbd class="w-50 text-right flex flex-row gap-1">
+            <div class="key">RETURN</div>
+          </kbd>
+        </figure>
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            Edit previous chat
+          </figcaption>
+          <kbd class="w-50 text-right flex flex-row gap-1">
+            <div class="key">↑</div>
+          </kbd>
+        </figure>
+      </section>
+      <section class="flex-1 pl-0 md:pl-5">
+        <figure class="flex py-2">
+          <figcaption class="flex-grow flex items-center">
+            <span>Unfocus chat input</span>
+          </figcaption>
+          <kbd class="w-50 text-right flex flex-row gap-1">
+            <div class="key">ESC</div>
+          </kbd>
+        </figure>
+      </section>
+    </article>
   </div>
   <form method="dialog" class="modal-backdrop no-focus-outline">
     <button id="modal-backdrop">close</button>
   </form>
 </dialog>
+
+<%= render "layouts/visualizer_overlay" %>

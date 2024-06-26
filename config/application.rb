@@ -2,6 +2,12 @@ require_relative "boot"
 
 require "rails/all"
 
+# future gems
+require_relative "../lib/string"
+require_relative "../lib/false_class"
+require_relative "../lib/true_class"
+require_relative "../lib/nil_class"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -24,7 +30,7 @@ module HostedGPT
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("lib")
 
     config.options = config_for(:options)

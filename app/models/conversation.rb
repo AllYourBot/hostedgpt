@@ -7,7 +7,7 @@ class Conversation < ApplicationRecord
   has_many :messages, dependent: :destroy
   has_many :runs, dependent: :destroy
   has_many :steps, dependent: :destroy
-  belongs_to :last_assistant_message, class_name: "Message", optional: true
+  belongs_to :last_assistant_message, class_name: "Message", inverse_of: :conversation, optional: true
 
   after_touch :set_title_async, if: -> { title.blank? && messages.count >= 2 }
 
@@ -33,11 +33,11 @@ class Conversation < ApplicationRecord
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
     values = [
       nil,
-      Date.today.beginning_of_day,
-      (Date.today - 1.day).beginning_of_day,
-      (Date.today - 1.week).beginning_of_day,
-      (Date.today - 1.month).beginning_of_day,
-      (Date.today - 2.months).beginning_of_day,
+      Date.current.beginning_of_day,
+      (Date.current - 1.day).beginning_of_day,
+      (Date.current - 1.week).beginning_of_day,
+      (Date.current - 1.month).beginning_of_day,
+      (Date.current - 2.months).beginning_of_day,
       nil
     ].each_cons(2).map do |range_start, range_end|
       range = case

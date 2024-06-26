@@ -33,6 +33,14 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should NOT show message when not owned by the logged in user" do
+    message_not_owned_by_user = messages(:filter_map)
+    assert_not_equal @user, message_not_owned_by_user.conversation.user
+
+    get message_url(message_not_owned_by_user)
+    assert_response :unauthorized
+  end
+
   test "should get edit" do
     get edit_assistant_message_url(@assistant, @message)
     assert_response :success
@@ -130,7 +138,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "messages can still be viewed when attached to a soft-deleted assistant" do
-    assert @assistant.soft_delete
+    @assistant.deleted!
     get conversation_messages_url(@conversation, version: 1)
     assert @conversation.messages.count > 0
     assert_select 'div[data-role="message"]', count: @conversation.messages.count
@@ -156,7 +164,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "the composer is hidden when viewing a list of messages attached to an assistant that has been soft-deleted" do
-    @assistant.soft_delete
+    @assistant.deleted!
     get conversation_messages_url(@conversation, version: 1)
     assert_response :success
     assert_contains_text "main footer", "Samantha has been deleted and cannot assist any longer."
@@ -165,7 +173,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "viewing messages in a conversation which has history but the assistant has been soft deleted, the conversation history can still be viewed" do
-    @assistant.soft_delete
+    @assistant.deleted!
     message = messages(:message2_v1)
 
     patch message_url(message, version: 2), params: { message: { id: message.id } }
@@ -178,7 +186,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "when there are many assistants only a few are shown in the nav bar" do
     5.times do |x|
-      @user.assistants.create! name: "New assistant #{x+1}", language_model: LanguageModel.find_by(name: 'gpt-3.5-turbo')
+      @user.assistants.create! name: "New assistant #{x+1}", language_model: LanguageModel.find_by(api_name: 'gpt-3.5-turbo')
     end
     get conversation_messages_url(@conversation, version: 1)
     @user.assistants.each do |assistant|

@@ -7,8 +7,7 @@ class AutotitleConversationJob < ApplicationJob
 
   def perform(conversation_id)
     conversation = Conversation.find(conversation_id)
-    Current.user = conversation.user
-    return false if Current.user.openai_key.blank? # should we use anthropic key if that's all the user has?
+    return false if conversation.assistant.api_service.effective_token.blank? # should we use anthropic key if that's all the user has?
 
     messages = conversation.messages.ordered.limit(4)
     raise ConversationNotReady  if messages.empty?
@@ -29,7 +28,8 @@ class AutotitleConversationJob < ApplicationJob
     <<~END
       You extract a 2-4 word topic from text. I will give the text of a chat. You reply with the topic of this chat,
       but summarize the topic in 2-4 words. Even though it's not a complete sentence, capitalize the first letter of
-      the first word unless it's some odd anomaly like "iPhone".
+      the first word unless it's some odd anomaly like "iPhone". Make sure that your answer matches the language of
+      the text of the chat tht I give you.
 
       Example:
       ```

@@ -13,7 +13,7 @@ class Settings::AssistantsController < Settings::ApplicationController
     @assistant = Current.user.assistants.new(assistant_params)
 
     if @assistant.save
-      redirect_to edit_settings_assistant_path(@assistant), notice: "Saved"
+      redirect_to edit_settings_assistant_path(@assistant), notice: "Saved", status: :see_other
     else
       render :new, status: :unprocessable_entity
     end
@@ -28,7 +28,7 @@ class Settings::AssistantsController < Settings::ApplicationController
   end
 
   def destroy
-    if @assistant.soft_delete
+    if Current.user.assistants.count > 1 && @assistant.deleted!
       redirect_to new_settings_assistant_url, notice: "Deleted", status: :see_other
     else
       redirect_to new_settings_assistant_url, alert: "Cannot delete your last assistant", status: :see_other

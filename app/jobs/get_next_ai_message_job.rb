@@ -16,6 +16,7 @@ class GetNextAIMessageJob < ApplicationJob
     @conversation = @message.conversation
     @assistant    = Assistant.find(assistant_id)
     @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index-1)
+    @attempt      = attempt
 
     return false          if generation_was_cancelled? || message_is_populated?
     raise WaitForPrevious if @prev_message&.not_finished?
@@ -26,7 +27,8 @@ class GetNextAIMessageJob < ApplicationJob
 
     puts "\n### Wait for reply" unless Rails.env.test?
 
-    response = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
+    response = Current.set(user: @user, message: @message) do
+      ai_backend.new(@conversation.user, @assistant, @conversation, @message)
       .get_next_chat_message do |content_chunk|
         @message.content_text += content_chunk
 
@@ -40,7 +42,7 @@ class GetNextAIMessageJob < ApplicationJob
           raise ResponseCancelled
         end
       end
-
+    end
     @message.content_tool_calls = response # Typically, get_next_chat_message will simply return nil because it executes
                                            # the content_chunk block to return it's response incrementally. However, tool_call
                                            # responses don't make sense to stream because they can't be executed incrementally
@@ -57,7 +59,14 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_message
     return true
   rescue OpenAI::ConfigurationError => e
-    set_openai_error
+    name = @assistant.language_model.api_service.name
+    if name == "OpenAI"
+      set_openai_error
+    elsif name == "Groq"
+      set_groq_error
+    else
+      set_generic_error(name)
+    end
     wrap_up_the_message
     return true
   rescue Anthropic::ConfigurationError => e
@@ -90,7 +99,11 @@ class GetNextAIMessageJob < ApplicationJob
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
         GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(user_id, message_id, assistant_id, attempt+1)
       else
-        set_unexpected_error(msg&.slice(0...2000))
+        error_text = nil
+        begin
+          error_text = e&.response&.dig(:body, "error", "message")
+        end
+        set_unexpected_error(msg&.slice(0...1500), error_text)
         wrap_up_the_message
       end
     end
@@ -108,32 +121,42 @@ class GetNextAIMessageJob < ApplicationJob
   private
 
   def set_openai_error
-    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT-3.5 or GPT-4. Click your Profile in the bottom " +
-      "left and then Settings. You will find OpenAI Key instructions.)"
+    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)"
+  end
+
+  def set_groq_error
+    @message.content_text = "(You need to enter a valid API key for Groq to use Llama. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find Groq Key instructions.)"
+  end
+
+  def set_generic_error(name)
+    @message.content_text = "(There is a configuration error with the #{name} API Service. Maybe you have an invalid API key? Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find #{name} there.)"
   end
 
   def set_anthropic_error
     @message.content_text = "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
-      "left and then Settings. You will find Anthropic Key instructions.)"
+      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
   end
 
   def set_response_error
-    @message.content_text = "(Received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
+    @message.content_text = "(I received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
       "experiencing trouble. Try again or ensure your API key is valid. You can change your API key by clicking your Profile in the bottom " +
       "left and then settings.)"
   end
 
-  def set_unexpected_error(msg)
-    @message.content_text = "(Received a unexpected response from the API after retrying 3 times. The AI servers may be experiencing trouble. " +
+  def set_unexpected_error(msg, text)
+    @message.content_text = "(I received a unexpected response from the API after retrying 3 times, \"#{text}\". The AI servers may be experiencing trouble. " +
       "Try again later or if you keep getting this error ensure your API key is valid and you haven't run out of funds with your AI service.\n\n" +
-      "#{msg}\n\nIt's also helpful if you report this to the app developers at: https://github.com/allyourbot/hostedgpt/discussions)"
+      "It's also helpful if you report this to the app developers at: https://github.com/allyourbot/hostedgpt/discussions)\n\n:#{msg}"
   end
 
   def set_billing_error
     service = ai_backend.to_s.split('::').second
     url = service == 'OpenAI' ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
 
-    @message.content_text = "(Received a quota error. Your API key is probably valid but you may need to adding billing details. You are using " +
+    @message.content_text = "(I received a quota error. Your API key is probably valid but you may need to adding billing details. You are using " +
       "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
   end
 
@@ -144,13 +167,16 @@ class GetNextAIMessageJob < ApplicationJob
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
-    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
+    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id}, #{@attempt})" unless Rails.env.test?
   end
 
   def call_tools_before_wrapping_up
     puts "\n### Calling tools" unless Rails.env.test?
 
-    msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
+    msgs = []
+    Current.set(user: @user, message: @message) do
+      msgs = ai_backend.get_tool_messages_by_calling(@message.content_tool_calls)
+    end
 
     index = @message.index
     msgs.each do |tool_message| # one message for each tool executed

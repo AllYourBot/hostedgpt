@@ -41,6 +41,10 @@ class MessageTest < ActiveSupport::TestCase
     assert_instance_of Conversation, messages(:im_a_bot).latest_assistant_message_for
   end
 
+  test "has associated memories" do
+    assert_instance_of Memory, messages(:hear_me).memories.first
+  end
+
   test "content_tool_calls starts as empty hash" do
     h = {}
     assert_equal h, Message.new.content_tool_calls
@@ -229,5 +233,12 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
     messages(:dont_know_day).destroy
     assert_nil users(:keith).reload.last_cancelled_message
+  end
+
+  test "a destroyed message nullifies associated memories" do
+    memory = messages(:hear_me).memories.first
+    messages(:hear_me).destroy
+
+    assert_nil memory.reload.message
   end
 end
