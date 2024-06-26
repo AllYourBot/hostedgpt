@@ -217,12 +217,3 @@ en:
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
     pm: pm
-  models:
-    conversation:
-      groupings:
-        today: Today
-        yesterday: Yesterday
-        this_week: This Week
-        this_month: This Month
-        last_month: Last Month
-        older: Older

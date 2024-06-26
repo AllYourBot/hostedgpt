@@ -19,13 +19,13 @@ class Person < ApplicationRecord
 
   def personable_id_unchanged
     if personable_id_changed? && persisted?
-      errors.add(:personable_id, I18n.t('errors.messages.cannot_be_changed_after_creation'))
+      errors.add(:personable_id)
     end
   end
 
   def proper_personable_id
     if personable_id.present? && personable.id.blank?
-      errors.add(:personable_id, I18n.t('errors.messages.must_be_provided_on_update'))
+      errors.add(:personable_id)
     end
   end
 end

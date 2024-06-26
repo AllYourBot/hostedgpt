@@ -225,12 +225,3 @@ de:
       long: "%A, %d. %B %Y, %H:%M Uhr"
       short: "%d. %b, %H:%M Uhr"
     pm: nachmittags
-  models:
-    conversation:
-      groupings:
-        today: Heute
-        yesterday: Gestern
-        this_week: Diese Woche
-        this_month: Dieser Monat
-        last_month: Letzter Monat
-        older: Älter
