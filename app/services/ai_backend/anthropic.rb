@@ -13,15 +13,14 @@ class AIBackend::Anthropic < AIBackend
   end
 
   def initialize(user, assistant, conversation, message)
-    raise ::Anthropic::ConfigurationError if user.anthropic_key.blank?
+    super(user, assistant, conversation, message)
     begin
-      @client = self.class.client.new(access_token: user.anthropic_key)
+      raise ::Anthropic::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
+      Rails.logger.info "Connecting to Anthropic API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
+      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token)
     rescue ::Faraday::UnauthorizedError => e
       raise ::Anthropic::ConfigurationError
     end
-    @assistant = assistant
-    @conversation = conversation
-    @message = message
   end
 
   def get_next_chat_message(&chunk_received_handler)
@@ -44,11 +43,12 @@ class AIBackend::Anthropic < AIBackend
     end
 
     response_handler = nil unless block_given?
+    response = nil
 
     begin
       response = @client.messages(
         model: @assistant.language_model.provider_name,
-        system: @assistant.instructions,
+        system: full_instructions,
         messages: preceding_messages,
         parameters: {
           max_tokens: 2000, # we should really set this dynamically, based on the model, to the max

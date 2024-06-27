@@ -19,7 +19,7 @@ class UsersController < ApplicationController
 
     if @person.save
       login_as(@person, credential: @person.user.password_credential)
-      redirect_to root_path
+      redirect_to root_path, status: :see_other
     else
       @person.errors.delete :personable
       render :new, status: :unprocessable_entity

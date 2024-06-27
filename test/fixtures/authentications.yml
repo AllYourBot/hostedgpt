@@ -7,3 +7,8 @@ keith_google:
   credential: keith_google
   client: keith_phone_browser
   deleted_at:
+
+keith_api:
+  credential: keith_google
+  client: keith_api
+  deleted_at:
