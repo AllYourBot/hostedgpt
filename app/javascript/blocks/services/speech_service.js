@@ -28,9 +28,9 @@ export default class extends Service {
       })
     } catch (error) {
       throw new Error("Service is currently unavailable")
+    } finally {
+      apiTimeoutHandler.end()
     }
-
-    apiTimeoutHandler.end()
 
     if (!ttsResponse.ok) {
       let errorMessage = "Failed to generate audio";

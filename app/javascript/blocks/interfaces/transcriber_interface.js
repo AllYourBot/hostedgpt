@@ -77,7 +77,9 @@ export default class extends Interface {
                           })
                         }
 
-  _longWaitThenDismis() { if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
+  _longWaitThenDismis() { SpeakInto.Microphone.at.volume(1) // restart silence counter
+
+                          if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
                             if (Microphone.msOfSilence <= 30000) return // what if there is background noise?
                             log('enough silence to dismiss...')
 

@@ -84,7 +84,7 @@ export default class extends Service {
         audioUrl = await SpeechService.audioFromOpenAI(text)
       } catch(error) {
         log(`  error fetching job ${index} attempt ${i}${i == 3 ? ' - giving up' : ''}`)
-        await sleep(500)
+        await sleep(0.5)
       }
 
       if (audioUrl != undefined) break
@@ -117,7 +117,7 @@ export default class extends Service {
         _speakThenLoop(job.index, job.words, job.audioUrl)
         return
       } else {
-        await sleep(250)
+        await sleep(0.25)
         _speakingLoop()
         return
       }
