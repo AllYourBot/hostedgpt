@@ -9,7 +9,7 @@ export default class extends Controller {
     this.assistantTextTargetsCount = this.assistantTextTargets.length
     this.thoughtsSentCount = 0
 
-    console.log(`## connected with ${this.textTargets.length} text and ${this.assistantTextTargetsCount} assistantText`)
+    //console.log(`## connected with ${this.textTargets.length} text and ${this.assistantTextTargetsCount} assistantText`)
 
     document.addEventListener('turbo:before-stream-render', this.parseReplaceWords) // the streaming response triggers this
     if (this.hasAssistantTextTarget) this.assistantTextTargets.last().addEventListener('turbo:morph-element', this.firstParseWords) // in the 1st response an empty reply message can be there
@@ -42,12 +42,12 @@ export default class extends Controller {
     if (!target) return
     if (source == 'morph' &&
        (target != this.assistantTextTargets.last() || target != this.textTargets.last())) {
-      console.log(`morphed but not last`, target, this.assistantTextTargets.last(), this.textTargets.last())
+      //console.log(`morphed but not last`, target, this.assistantTextTargets.last(), this.textTargets.last())
       return
     }
     if (Microphone.off) return
 
-    console.log(`## parsingWords (${source})`, target)
+    //console.log(`## parsingWords (${source})`, target)
 
     const thinking = target.getAttribute('data-thinking') === 'true'
     const thoughts = SpeechService.splitIntoThoughts(target.innerText)

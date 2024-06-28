@@ -5,7 +5,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  Microphone.finalize()
+  Microphone.$.poller?.end()
 })
 
 test('new creates a MicrophoneService', () => {

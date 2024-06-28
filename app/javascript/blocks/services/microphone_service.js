@@ -12,7 +12,7 @@ export default class extends Service {
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext
       $.stream = await navigator.mediaDevices.getUserMedia({ audio: true, echoCancellation: true, noiseSuppression: true })
-      $.audioContext = new AudioContext()
+      if (!$.audioContext) $.audioContext = new AudioContext()
       $.microphoneSource = $.audioContext.createMediaStreamSource($.stream)
       $.audioProcessor = $.audioContext.createScriptProcessor(2048, 1, 1)
       $.microphoneSource.connect($.audioProcessor)
@@ -47,13 +47,12 @@ export default class extends Service {
     $.playerToAttach = null
   }
 
-  log_end
-  end() {
+  async end() {
     if ($.audioProcessor) $.audioProcessor.disconnect()
     if ($.microphoneSource) $.microphoneSource.disconnect()
-    if ($.playerSource) $.playerSource.disconnect()
+    if ($.playerSource) $.playerSource.disconnect($.audioVisualizer)
     if ($.audioVisualizer) $.audioVisualizer.disconnect()
-    if ($.audioContext) $.audioContext.close()
+    //if ($.audioContext) $.audioContext.close()  This inadvertently stops the player, we'll re-use this context
     if ($.stream) $.stream.getTracks().forEach(track => track.stop())
 
     $.active = false
