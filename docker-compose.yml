@@ -28,7 +28,6 @@ services:
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
       - OVERMIND_COLORS=2,3,5
       - VOICE_FEATURE
-      - DEFAULT_LLM_KEYS_FEATURE
       - REGISTRATION_FEATURE
       - PASSWORD_AUTHENTICATION_FEATURE
       - GOOGLE_AUTHENTICATION_FEATURE
