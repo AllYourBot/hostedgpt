@@ -38,6 +38,7 @@ export default class extends Service {
     $.player.src = audio.length >= 30 ? audio : _files(audio)
 
     try {
+      $.player.load()
       await $.player.play()
     } catch(e) {
       // one cause of exception is if we pause immediately after calling play
