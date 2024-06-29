@@ -44,7 +44,7 @@ export default class extends Interface {
 
   async Disable()     { if ($.processing != null) {
                           $.processing = null
-                          $.screenService.end()
+                          await $.screenService.end()
                           await Flip.Transcriber.off()
                           await Play.Speaker.sound('pip')
                         }

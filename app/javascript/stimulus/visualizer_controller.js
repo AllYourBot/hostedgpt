@@ -81,7 +81,7 @@ export default class extends Controller {
           })
           break
         } else {
-          await sleep(100)
+          await sleep(0.1)
         }
       }
     })

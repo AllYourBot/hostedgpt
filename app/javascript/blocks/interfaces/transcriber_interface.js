@@ -16,21 +16,21 @@ export default class extends Interface {
 
   async Flip(turnOn)    { if (turnOn && !$.active) {
                             $.active = true
+                            $.covered = false
                             await $.transcriberService.start()
                             await Flip.Microphone.on()
                             await Invoke.Listener()
 
                           } else if (!turnOn && $.active) {
                             $.active = false
-                            $.transcriberService.end()
-
+                            await $.transcriberService.end()
                             await Flip.Microphone.off()
                             await Disable.Listener()
                           }
                         }
 
   async Approve()       { let approved = await $.transcriberService.start()
-                          $.transcriberService.end()
+                          await $.transcriberService.end()
                           return approved
                         }
 
@@ -77,7 +77,9 @@ export default class extends Interface {
                           })
                         }
 
-  _longWaitThenDismis() { if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
+  _longWaitThenDismis() { SpeakInto.Microphone.at.volume(1) // restart silence counter
+
+                          if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
                             if (Microphone.msOfSilence <= 30000) return // what if there is background noise?
                             log('enough silence to dismiss...')
 
