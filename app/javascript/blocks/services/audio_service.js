@@ -17,11 +17,11 @@ export default class extends Service {
     $.loopHandler = runEvery(interval, () => _doThePlaying(audio))
   }
 
-  async play(audio, onEnd) {
+  async play(audioUrlOrName, onEnd) {
     if (!$.player) return
     $.loopHandler?.end()
 
-    await _doThePlaying(audio, onEnd)
+    await _doThePlaying(audioUrlOrName, onEnd)
   }
 
   async _doThePlaying(audioUrlOrName, onEnd) {
@@ -72,11 +72,11 @@ export default class extends Service {
 
   async speakNow(text, onEnd) {
     request = new SpeechService()
-    audioUrl = request.audioFromOpenAI(text)
+    audioUrl = await request.audioFromOpenAI(text)
     play(audioUrl, onEnd)
   }
 
-  sayNext(words) {
+  speakNext(words) {
     if (words == undefined) return
 
     const index = $.queue.length
