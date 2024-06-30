@@ -26,7 +26,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response }do
         streamed_text = ""
         @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        expected_start = "Hello this is model gpt-4o with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\n\\nThe current time & date for the user is"
+        expected_start = "Hello this is model gpt-4o with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\n\\nFor the user, the current time"
         expected_end = "\"! How can I assist you today?"
         assert streamed_text.start_with?(expected_start)
         assert streamed_text.end_with?(expected_end)

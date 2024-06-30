@@ -5,11 +5,16 @@ export default class extends Service {
   attrAccessor_executed
   attrReader_cleared
   attrReader_type
+  attrAccessor_func
 
   new(type) {
     $.executed = false
     $.cleared = false
     $.type = type
+  }
+
+  run() {
+    if ($.func) $.func()
   }
 
   end() {

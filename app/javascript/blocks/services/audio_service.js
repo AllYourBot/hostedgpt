@@ -7,7 +7,7 @@ export default class extends Service {
   new() {
     $.player = new (window.AudioContext || window.webkitAudioContext)()
     $.playerSource = null
-    $.queue = []
+    $.queue = new QueueService()
     $.playing = false
     $.speaking = false
     $.busy = false
@@ -17,11 +17,11 @@ export default class extends Service {
     $.loopHandler = runEvery(interval, () => _doThePlaying(audio))
   }
 
-  async play(audio, onEnd) {
+  async play(audioUrlOrName, onEnd) {
     if (!$.player) return
     $.loopHandler?.end()
 
-    await _doThePlaying(audio, onEnd)
+    await _doThePlaying(audioUrlOrName, onEnd)
   }
 
   async _doThePlaying(audioUrlOrName, onEnd) {
@@ -65,17 +65,18 @@ export default class extends Service {
       $.playerSource.onended = null
       $.playerSource.stop()
     }
-    $.queue = []
+    _resetQueue()
     $.playing = false
     $.busy = false
   }
 
   async speakNow(text, onEnd) {
-    const audio = await SpeechService.audioFromOpenAI(text)
-    play(audio, onEnd)
+    request = new SpeechService()
+    audioUrl = await request.audioFromOpenAI(text)
+    play(audioUrl, onEnd)
   }
 
-  sayNext(words) {
+  speakNext(words) {
     if (words == undefined) return
 
     const index = $.queue.length
@@ -83,6 +84,7 @@ export default class extends Service {
     $.queue.push({
       index: index,
       words: words,
+      request: null,
       audioUrl: null,
       generated: false,
       played: false,
@@ -93,35 +95,21 @@ export default class extends Service {
   }
 
   async _queueWordsToSay(index) {
-    const text = $.queue[index].words
+    const text = $.queue.at(index).words
     let audioUrl
     $.busy = true
 
-    for (let i = 1; i <= 3; i++) {
-      try {
-        // log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`)
-        audioUrl = await SpeechService.audioFromOpenAI(text)
-      } catch(error) {
-        log(`  error fetching job ${index} attempt ${i}${i == 3 ? ' - giving up' : ''}`)
-        await sleep(0.5)
-      }
-
-      if (audioUrl != undefined) break
-    }
-    if (audioUrl == undefined) $.queue[index].errored = true
-
-    $.queue[index].audioUrl = audioUrl
-    $.queue[index].generated = true
+    await $.queue.queueRequest(index, text)
 
     void _speakingLoop('generation')
   }
 
   async _speakingLoop(trigger) {
-    const jobsToPlay = $.queue.filter((job) => !job.spoken)
-    // if (trigger) {
-    //   log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`)
-    //   jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`))
-    // }
+    const jobsToPlay = $.queue.all.filter((job) => !job.spoken)
+    if (trigger) {
+      log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`, 'debug')
+      jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`), 'debug')
+    }
 
     if (jobsToPlay.length > 0) {
       const job = jobsToPlay[0]
@@ -158,7 +146,7 @@ export default class extends Service {
     play(audioUrl, () => {
       $.speaking = false
       // f (._plabackSoundTimeoutHandler) clearTimeout(._plabackSoundTimeoutHandler)
-      // log(`  done #${index} - ${words.slice(0,10)}...`)
+      log(`  done #${index} - ${words.slice(0,10)}...`, 'debug')
       _speakingLoop('playback')
     }, words)
   }
@@ -167,7 +155,13 @@ export default class extends Service {
   _doneSpeaking() {
     $.playing = false
     $.busy = false
-    $.queue = []
+    _resetQueue()
+  }
+
+  _resetQueue() {
+    log('resetting queue')
+    $.queue.reset()
+    $.queue = new QueueService()
   }
 
   async _loadAudioUrl(url) {

@@ -1,23 +1,21 @@
 g.runAfter = (timeInSec, func) => {
   const timeout = new TimeoutService('setTimeout')
-  const handler = setTimeout(() => {
+  timeout.func = () => {
     timeout.executed = true
     timeout.end()
     func()
-  }, timeInSec*1000)
-
-  timeout.handler = handler
+  }
+  timeout.handler = setTimeout(timeout.func, timeInSec * 1000)
   return timeout
 }
 
 g.runEvery = (timeInSec, func) => {
   const timeout = new TimeoutService('setInterval')
-  const handler = setInterval(() => {
+  timeout.func = () => {
     timeout.executed = true
     func()
-  }, timeInSec*1000)
-
-  timeout.handler = handler
+  }
+  timeout.handler = setInterval(timeout.func, timeInSec * 1000)
   return timeout
 }
 

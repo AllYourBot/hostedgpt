@@ -17,7 +17,7 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
     )
 
     instructions = backend.send(:full_instructions)
-    assert instructions.starts_with?("The current time & date")
+    assert instructions.starts_with?("For the user, the current time")
     refute instructions.include?("remembered")
   end
 
