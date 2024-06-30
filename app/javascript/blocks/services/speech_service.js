@@ -50,7 +50,7 @@ export default class extends Service {
   static splitIntoThoughts(text) {
     if (!text) return []
     text = text.replace(". . .", "...")
-    const thoughts = text.split(/(?<=[^ ][\.,:!\?;…] |[\n，。．！？；：])/)
+    const thoughts = text.split(/(?<=[^ ][\.:!\?;…] |[\n，。．！？；：])/)
     return thoughts.reject(t => t.strip().empty())
   }
 }
