@@ -14,7 +14,6 @@ export default class extends Interface {
 
   new() {
     $.audioService = new AudioService
-    //Microphone.attach($.audioService.player)
     $.audioService.onBusyChanged = (busy) => {
       console.log(`onbusyChanged(${busy})`)
       if (busy)

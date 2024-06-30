@@ -45,7 +45,7 @@ export default class extends Controller {
       //console.log(`morphed but not last`, target, this.assistantTextTargets.last(), this.textTargets.last())
       return
     }
-    if (Microphone.off) return
+    if (Listener.disabled) return
 
     //console.log(`## parsingWords (${source})`, target)
 
