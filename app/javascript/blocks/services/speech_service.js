@@ -2,13 +2,14 @@ import Service from "../service.js"
 
 export default class extends Service {
   logLevel_info
+  attrReader_apiTimeoutHandler
 
-  static async audioFromOpenAI(text) {
+  async audioFromOpenAI(text) {
     const ttsAbortController = new AbortController()
     const openAITTSUrl = "https://api.openai.com/v1/audio/speech"
     let ttsResponse
 
-    const apiTimeoutHandler = runAfter(3, () => ttsAbortController.abort())
+    $.apiTimeoutHandler = runAfter(3, () => ttsAbortController.abort())
 
     try {
       ttsResponse = await fetch(openAITTSUrl, {
@@ -29,7 +30,7 @@ export default class extends Service {
     } catch (error) {
       throw new Error("Service is currently unavailable")
     } finally {
-      apiTimeoutHandler.end()
+      $.apiTimeoutHandler.end()
     }
 
     if (!ttsResponse.ok) {
@@ -45,6 +46,10 @@ export default class extends Service {
     var audioUrl = window.URL.createObjectURL(blob)
 
     return audioUrl
+  }
+
+  cancel() {
+    $.apiTimeoutHandler?.run()
   }
 
   static splitIntoThoughts(text) {

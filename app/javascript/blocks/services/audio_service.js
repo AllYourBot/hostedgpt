@@ -65,14 +65,15 @@ export default class extends Service {
       $.playerSource.onended = null
       $.playerSource.stop()
     }
-    $.queue = []
+    _resetQueue()
     $.playing = false
     $.busy = false
   }
 
   async speakNow(text, onEnd) {
-    const audio = await SpeechService.audioFromOpenAI(text)
-    play(audio, onEnd)
+    request = new SpeechService()
+    audioUrl = request.audioFromOpenAI(text)
+    play(audioUrl, onEnd)
   }
 
   sayNext(words) {
@@ -83,6 +84,7 @@ export default class extends Service {
     $.queue.push({
       index: index,
       words: words,
+      request: null,
       audioUrl: null,
       generated: false,
       played: false,
@@ -99,8 +101,10 @@ export default class extends Service {
 
     for (let i = 1; i <= 3; i++) {
       try {
-        // log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`)
-        audioUrl = await SpeechService.audioFromOpenAI(text)
+        log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`, 'debug')
+        request = new SpeechService()
+        $.queue[index].request = request
+        audioUrl = await request.audioFromOpenAI(text)
       } catch(error) {
         log(`  error fetching job ${index} attempt ${i}${i == 3 ? ' - giving up' : ''}`)
         await sleep(0.5)
@@ -118,10 +122,10 @@ export default class extends Service {
 
   async _speakingLoop(trigger) {
     const jobsToPlay = $.queue.filter((job) => !job.spoken)
-    // if (trigger) {
-    //   log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`)
-    //   jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`))
-    // }
+    if (trigger) {
+      log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`, 'debug')
+      jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`), 'debug')
+    }
 
     if (jobsToPlay.length > 0) {
       const job = jobsToPlay[0]
@@ -158,7 +162,7 @@ export default class extends Service {
     play(audioUrl, () => {
       $.speaking = false
       // f (._plabackSoundTimeoutHandler) clearTimeout(._plabackSoundTimeoutHandler)
-      // log(`  done #${index} - ${words.slice(0,10)}...`)
+      log(`  done #${index} - ${words.slice(0,10)}...`, 'debug')
       _speakingLoop('playback')
     }, words)
   }
@@ -167,6 +171,13 @@ export default class extends Service {
   _doneSpeaking() {
     $.playing = false
     $.busy = false
+    _resetQueue()
+  }
+
+  _resetQueue() {
+    $.queue.forEach(item => {
+      item.request?.cancel()
+    })
     $.queue = []
   }
 
