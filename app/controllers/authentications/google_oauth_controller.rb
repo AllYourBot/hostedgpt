@@ -35,7 +35,8 @@ class Authentications::GoogleOauthController < ApplicationController
       redirect_to root_path
     else
       @person&.errors&.delete :personable
-      redirect_to new_user_path, errors: @person&.errors&.full_messages
+      msg = @person.errors.full_messages.map { |m| m.gsub(/Personable |credentials /, '') }.to_sentence.capitalize
+      redirect_to new_user_path, alert: msg
     end
   rescue => e
     redirect_to edit_settings_person_path, alert: "Error. #{e.message}", status: :see_other

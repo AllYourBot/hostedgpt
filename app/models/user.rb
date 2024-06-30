@@ -23,12 +23,20 @@ class User < ApplicationRecord
   belongs_to :last_cancelled_message, class_name: "Message", optional: true
 
   validates :first_name, presence: true
-  validates :last_name, presence: true, on: :create
+  validates :last_name, presence: true, on: :create, unless: :creating_google_credential?
 
   accepts_nested_attributes_for :credentials
   serialize :preferences, coder: JsonSerializer
 
   def preferences
     attributes["preferences"].with_defaults(dark_mode: "system")
+  end
+
+  private
+
+  def creating_google_credential?
+    return false unless credential = credentials.first
+
+    !credential.persisted? && credential.type == "GoogleCredential"
   end
 end

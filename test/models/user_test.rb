@@ -85,4 +85,6 @@ class UserTest < ActiveSupport::TestCase
       users(:keith).update!(last_name: nil)
     end
   end
+
+  # Tests for creating_google_credential? are in person_test
 end
