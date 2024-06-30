@@ -7,7 +7,7 @@ export default class extends Service {
   new() {
     $.player = new (window.AudioContext || window.webkitAudioContext)()
     $.playerSource = null
-    $.queue = []
+    $.queue = new QueueService()
     $.playing = false
     $.speaking = false
     $.busy = false
@@ -95,33 +95,17 @@ export default class extends Service {
   }
 
   async _queueWordsToSay(index) {
-    const text = $.queue[index].words
+    const text = $.queue.at(index).words
     let audioUrl
     $.busy = true
 
-    for (let i = 1; i <= 3; i++) {
-      try {
-        log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`, 'debug')
-        request = new SpeechService()
-        $.queue[index].request = request
-        audioUrl = await request.audioFromOpenAI(text)
-      } catch(error) {
-        log(`  error fetching job ${index} attempt ${i}${i == 3 ? ' - giving up' : ''}`)
-        await sleep(0.5)
-      }
-
-      if (audioUrl != undefined) break
-    }
-    if (audioUrl == undefined) $.queue[index].errored = true
-
-    $.queue[index].audioUrl = audioUrl
-    $.queue[index].generated = true
+    await $.queue.queueRequest(index, text)
 
     void _speakingLoop('generation')
   }
 
   async _speakingLoop(trigger) {
-    const jobsToPlay = $.queue.filter((job) => !job.spoken)
+    const jobsToPlay = $.queue.all.filter((job) => !job.spoken)
     if (trigger) {
       log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`, 'debug')
       jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`), 'debug')
@@ -175,10 +159,9 @@ export default class extends Service {
   }
 
   _resetQueue() {
-    $.queue.forEach(item => {
-      item.request?.cancel()
-    })
-    $.queue = []
+    log('resetting queue')
+    $.queue.reset()
+    $.queue = new QueueService()
   }
 
   async _loadAudioUrl(url) {
