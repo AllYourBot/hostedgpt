@@ -36,6 +36,7 @@ class Authentications::GoogleOauthController < ApplicationController
     else
       @person&.errors&.delete :personable
       msg = @person.errors.full_messages.map { |m| m.gsub(/Personable |credentials /, '') }.to_sentence.capitalize
+      msg += " Cannot try again until you remove this website as a \"Google third-party connection\"." if msg.downcase.include?("oauth refresh token can't be blank")
       redirect_to new_user_path, alert: msg
     end
   rescue => e
