@@ -1,34 +1,8 @@
+import "@hotwired/turbo-rails"
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
-import { cable } from "@hotwired/turbo-rails"
 
-window.isConnected = true
-window.cable = cable
-window.consumer = await cable.createConsumer()
-setInterval(() => {
-  if (consumer.connection.isOpen() != window.isConnected) {
-    window.isConnected = consumer.connection.isOpen()
-    console.log(`cable ${window.isConnected ? 'connected' : 'DISCONNECTED'}`)
-    //const elem = document.getElementById('connection-status')
-    if (!window.isConnected) {
-      if (elem) {
-        elem.classList.add('bg-red-400')
-        elem.classList.add('text-white')
-      }
-    } else {
-      if (elem) {
-        elem.classList.remove('bg-red-400')
-        elem.classList.remove('text-white')
-        elem.classList.add('text-gray-200')
-      }
-    }
-  }
-}, 500)
-window.consumer.connection.open()
 
-// TODO: Remove this debug code
-// This is included in main just for awhile to aid with some debugging
-// Also remove "timestamp:" from message broadcasts
-
+// BEGIN debug code
 let oldTimestamp
 
 // console.log('Document: refresh')
