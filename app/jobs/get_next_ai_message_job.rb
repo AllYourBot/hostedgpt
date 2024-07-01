@@ -194,11 +194,11 @@ class GetNextAIMessageJob < ApplicationJob
       )
 
       content_hash = JSON.parse(tool_message[:content])
-  
+
       if content_hash.has_key?('url_of_dalle_generated_image')
         url_of_dalle_generated_image = content_hash['url_of_dalle_generated_image']
       end
-      
+
     end
 
     assistant_reply = @conversation.messages.create!(
