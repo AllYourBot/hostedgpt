@@ -44,10 +44,7 @@ export default class extends Interface {
   Cover()               { $.covered = true }
   Uncover()             { $.covered = false
                           $.transcriberService.restart()
-                          Play.Speaker.sound('pop', () => {
-                            Loop.Speaker.every(8, 'typing1')
-                            _longWaitThenDismis()
-                          })
+                          _longWaitThenDismis()
                         }
 
   attr_words            = ''
