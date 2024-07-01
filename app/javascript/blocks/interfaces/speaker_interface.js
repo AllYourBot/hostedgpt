@@ -16,10 +16,7 @@ export default class extends Interface {
     $.audioService = new AudioService
     $.audioService.onBusyChanged = (busy) => {
       console.log(`onbusyChanged(${busy})`)
-      if (busy)
-        Cover.Transcriber()
-      else
-        Uncover.Transcriber()
+      if (!busy) Uncover.Transcriber()
     }
   }
 }
