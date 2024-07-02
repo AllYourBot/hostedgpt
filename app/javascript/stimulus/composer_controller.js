@@ -56,6 +56,8 @@ export default class extends Controller {
   }
 
   editPrevious() {
+    if (this.inputTarget.value != "") return
+
     const messageEdits = document.querySelectorAll("[data-role='message-edit']")
     const lastEdit = messageEdits[messageEdits.length - 1]
     if (lastEdit) lastEdit.click()
