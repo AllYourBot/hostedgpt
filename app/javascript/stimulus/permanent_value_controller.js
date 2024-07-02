@@ -13,25 +13,13 @@ export default class extends Controller {
     this.element.removeEventListener('turbo:morph-element', this.boundRestoreValue)
   }
 
-  boundSaveValue = (event) => { this.saveValue(event) }
-  saveValue(event) {
-    // this.savedValue = event.target.value
-    // this.savedTarget = event.target
-    // console.log(`## saving value "${event.target.value}" or "${this.element.value}" = `, this.savedValue)
+  boundSaveValue = () => { this.saveValue() }
+  saveValue() {
     this.savedTarget = this.element.value
   }
 
-  boundRestoreValue = (event) => { this.restoreValue(event) }
-  restoreValue(event) {
+  boundRestoreValue = () => { this.restoreValue() }
+  restoreValue() {
     this.element.value = this.savedTarget
-    // console.log(`## finding element "${this.savedTarget.id}"`, document.getElementById(`${this.savedTarget.id}`).id)
-    // console.log(`## original element: `, this.element.id)
-    // console.log(`## target element: `, event.target.id)
-
-    // this.element.value = this.savedValue
-    // document.getElementById(`${this.savedTarget.id}`).value = this.savedValue
-    // event.target.value = this.savedValue
-
-    // console.log(`## new element set to ${this.element.value} and ${document.getElementById(`${this.savedTarget.id}`).value} and ${event.target.value}`)
   }
 }
