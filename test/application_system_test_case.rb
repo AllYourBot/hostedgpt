@@ -76,6 +76,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     key_array = keys.split('+').collect do |key|
       case key
+      when 'up'
+        :arrow_up
       when 'meta'
         :command
       when 'esc'
@@ -269,8 +271,16 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def assert_composer_blank(msg = nil)
     msg ||= "Composer input did not clear"
     assert_true msg do
-      find("#composer textarea").value.blank?
+      composer.value.blank?
     end
+  end
+
+  def composer
+    find(composer_selector)
+  end
+
+  def composer_selector
+    "#composer textarea"
   end
 
   def hover_last_message
