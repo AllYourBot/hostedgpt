@@ -1,39 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { playbackIndex: { type: Number, default: undefined } }
-  static outlets = [ "playback" ]
+  static values = {index: Number, sentencesIndex: Number, speakerActive: Boolean }
 
   connect() {
-    console.log(`speaker connected with index initially ${this.playbackIndexValue}`)
-  }
-  // initialize() {
-  //   this.playbackIndexValue = this.activePlaybackOutlets?.indexValue
-  // }
-
-  stop() {
-    this.playbackIndexValue = undefined
-    this.setActivePlaybackIndex(undefined)
+    console.log(`playback connected for message ${this.indexValue} and it's initially active = ${this.speakerActiveValue}`)
   }
 
-  playbackIndexValueChanged() {
-    if (!this.playbackIndexValue) return // we want to ignore it's default value state
-    console.log(`playback index value changed to ${this.playbackIndexValue}`)
-    if (this.hasPlaybackOutlet) runAfter(0, () => { // runAfter 0 simply pushes this to the end of the callback chain to solve a race
-      this.setActivePlaybackIndex(this.playbackIndexValue)
-    }, 0)
-  }
+  speakerActiveValueChanged() {
+    if (!this.speaker) return
 
-  setActivePlaybackIndex(index) {
-    this.playbackOutlets.each(playback => {
-      const active = playback.indexValue == index
-      if (active != playback.speakerActiveValue) playback.speakerActiveValue = active
-    })
-  }
-
-  playbackOutletConnected(playback) {
-    playback.speaker = this   // so playback instances can call into auto-speaker
-    playback.speakerActiveValueChanged() // runs on init, but may have failed w/o speaker so re-do it
+    if (this.speakerActiveValue) {
+      console.log(`active value for ${this.indexValue} is now ${this.speakerActiveValue}`)
+      this.speaker.playbackIndexValue = this.indexValue
+    }
   }
 
   // static targets = [ "assistantText" ]

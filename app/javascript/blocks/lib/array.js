@@ -16,6 +16,9 @@ Array.prototype.include = function(...args) { return this.includes(...args) }
 Array.prototype.exclude = function(...args) { return !this.includes(...args) }
 Array.prototype.sum = function() { return this.reduce((acc, val) => acc + val, 0) }
 Array.prototype.select = function(...args) { return this.filter(...args) }
+Array.prototype.find = function (...args) { return this.filter(...args).first() }
+Array.prototype.each = Array.prototype.forEach
+Array.prototype.eachWithIndex = function (callback) { return this.forEach((item, index) => callback(item, index)) }
 Array.prototype.reject = function(callback) { return this.filter(e => !callback(e)) }
 Array.prototype.uniq = function() { return [...new Set(this)] }
 Array.prototype.collect = function(...args) { return this.map(...args) }
