@@ -15,7 +15,7 @@ test('runAfter can been declared, it returns a TimeoutService', async() => {
   expect(timeout.constructor).toBe(TimeoutService)
 })
 
-test('runAfter executed flag', async() => {
+test('runAfter runs and sets the executed flag', async() => {
   let counter = 0
   timeout = runAfter(1, () => { counter += 1 })
   expect(timeout.executed).toStrictEqual(false)
@@ -26,7 +26,18 @@ test('runAfter executed flag', async() => {
   expect(counter).toBe(1)
 })
 
-test('runAfter cleared flag', async() => {
+test('runAfter can be run early and sets the flag', async () => {
+  let counter = 0
+  timeout = runAfter(1, () => {counter += 1})
+  expect(timeout.executed).toStrictEqual(false)
+  expect(counter).toBe(0)
+
+  timeout.run()
+  expect(timeout.executed).toStrictEqual(true)
+  expect(counter).toBe(1)
+})
+
+test('runAfter end cleared flag', async() => {
   timeout = runAfter(1, () => 'hello')
   expect(timeout.cleared).toStrictEqual(false)
   timeout.end()
@@ -45,7 +56,7 @@ test('runEvery can been declared and it returns a TimeoutService', async() => {
   expect(timeout.constructor).toBe(TimeoutService)
 })
 
-test('runEvery executed flag', async() => {
+test('runEvery runs and sets the executed flag', async() => {
   let counter = 0
   timeout = runEvery(1, () => counter += 1)
   expect(timeout.executed).toStrictEqual(false)
@@ -56,7 +67,18 @@ test('runEvery executed flag', async() => {
   expect(counter).toBeGreaterThan(1)
 })
 
-test('runEvery cleared flag', async() => {
+test('runEvery runs early and sets the executed flag', async () => {
+  let counter = 0
+  timeout = runEvery(1, () => counter += 1)
+  expect(timeout.executed).toStrictEqual(false)
+  expect(counter).toBe(0)
+
+  timeout.run()
+  expect(timeout.executed).toStrictEqual(true)
+  expect(counter).toBeGreaterThan(0)
+})
+
+test('runEvery end cleared flag', async() => {
   timeout = runEvery(1, () => {})
   expect(timeout.cleared).toStrictEqual(false)
   timeout.end()

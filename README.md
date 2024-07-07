@@ -205,7 +205,7 @@ HTTP header authentication is an alternative method to authenticate users based 
 
 ## Contribute as a developer
 
-We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.7. [View 0.7 Milestone](https://github.com/allyourbot/hostedgpt/milestone/6). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
+We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently wrapping up v0.7 and starting 0.8 [View 0.8 Milestone](https://github.com/allyourbot/hostedgpt/milestone/8). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
 ### Setting up development
 

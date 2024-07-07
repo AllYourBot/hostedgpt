@@ -26,7 +26,7 @@ export default class extends Service {
     return $.started
   }
 
-  end() {
+  async end() {
     if ($.media) {
       const tracks = $.media.getVideoTracks()
       tracks.forEach(track => track.stop())

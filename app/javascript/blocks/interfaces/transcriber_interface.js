@@ -16,21 +16,19 @@ export default class extends Interface {
 
   async Flip(turnOn)    { if (turnOn && !$.active) {
                             $.active = true
+                            $.covered = false
                             await $.transcriberService.start()
-                            await Flip.Microphone.on()
                             await Invoke.Listener()
 
                           } else if (!turnOn && $.active) {
                             $.active = false
-                            $.transcriberService.end()
-
-                            await Flip.Microphone.off()
+                            await $.transcriberService.end()
                             await Disable.Listener()
                           }
                         }
 
   async Approve()       { let approved = await $.transcriberService.start()
-                          $.transcriberService.end()
+                          await $.transcriberService.end()
                           return approved
                         }
 
@@ -62,12 +60,14 @@ export default class extends Interface {
     $.transcriberService = new TranscriberService
     $.transcriberService.onTextReceived = (text) => {
       if ($.covered) return
+      $.silenceService.restartCounter()
       SpeakTo.Transcriber.with.words(text)
     }
+    $.silenceService = new SilenceService()
   }
 
   _shortWaitThenTell()  { if (!$.tellPoller?.handler) $.tellPoller = runEvery(0.2, () => {
-                            if (Microphone.msOfSilence <= 1800) return // what if there is background noise?
+                            if ($.silenceService.msOfSilence <= 1000) return
                             log('enough silence to start processing...')
 
                             Tell.Listener.to.consider($.words)
@@ -77,8 +77,10 @@ export default class extends Interface {
                           })
                         }
 
-  _longWaitThenDismis() { if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
-                            if (Microphone.msOfSilence <= 30000) return // what if there is background noise?
+  _longWaitThenDismis() { $.silenceService.restartCounter()
+
+                          if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
+                            if ($.silenceService.msOfSilence <= 30000) return
                             log('enough silence to dismiss...')
 
                             Dismiss.Listener()

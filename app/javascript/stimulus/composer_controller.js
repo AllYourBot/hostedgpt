@@ -56,6 +56,8 @@ export default class extends Controller {
   }
 
   editPrevious() {
+    if (this.inputTarget.value != "") return
+
     const messageEdits = document.querySelectorAll("[data-role='message-edit']")
     const lastEdit = messageEdits[messageEdits.length - 1]
     if (lastEdit) lastEdit.click()
@@ -66,11 +68,10 @@ export default class extends Controller {
 
     event.preventDefault()
 
-    if (Listener.engaged) {
+    if (Listener.engaged)
       this.disableMicrophone()
-    } else if (Microphone.off) {
+    else if (Listener.disabled)
       this.enableMicrophone()
-    }
   }
 
   boundDetermineMicButton = (event) => { this.determineMicButton(event) }
@@ -86,7 +87,7 @@ export default class extends Controller {
       this.enableMicrophone()
     else if (Listener.dismissed)
       this.blinkingMicrophone() // mic still on
-    else if (Microphone.off)
+    else if (Listener.disabled)
       this.disableMicrophone()
   }
 

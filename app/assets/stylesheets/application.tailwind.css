@@ -136,15 +136,15 @@ input:focus {
 
 /* Prose styling */
 
-.prose :where(pre):not(:where([class~='not-prose'] *)) {
+.prose :where(pre):not(:where([class~="not-prose"] *)) {
   @apply mx-0 mt-5 mb-3;
 }
 
-.prose :where(.prose > :first-child):not(:where([class~='not-prose'] *)) {
+.prose :where(.prose > :first-child):not(:where([class~="not-prose"] *)) {
   @apply mt-0;
 }
 
-.prose :where(p):not(:where([class~='not-prose'] *)) {
+.prose :where(p):not(:where([class~="not-prose"] *)) {
   @apply mb-3;
 }
 
@@ -153,31 +153,35 @@ input:focus {
     @apply h-full overscroll-none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: -webkit-fill-available;
   }
   body {
     @apply h-full font-sans text-gray-950 dark:text-gray-100 flex overflow-y-auto;
     -webkit-overflow-scrolling: touch;
     min-height: -webkit-fill-available;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
-      env(safe-area-inset-left);
   }
 }
 
 @media not all and (prefers-color-scheme: dark) {
   .dark
-    :where(.menu li:not(.menu-title):not(.disabled) > :not(ul):not(details):not(.menu-title)):not(
-      .active
-    ):hover,
+    :where(
+      .menu
+        li:not(.menu-title):not(.disabled)
+        > :not(ul):not(details):not(.menu-title)
+    ):not(.active):hover,
   .dark
-    :where(.menu li:not(.menu-title):not(.disabled) > details > summary:not(.menu-title)):not(
-      .active
-    ):hover {
+    :where(
+      .menu
+        li:not(.menu-title):not(.disabled)
+        > details
+        > summary:not(.menu-title)
+    ):not(.active):hover {
     background-color: rgb(59 59 61);
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  .prose :where(a):not(:where([class~='not-prose'] *)) {
+  .prose :where(a):not(:where([class~="not-prose"] *)) {
     color: #374151;
   }
 }

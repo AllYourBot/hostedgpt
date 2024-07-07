@@ -63,7 +63,7 @@ end
         ><%= format_for_copying message.content_text %></div>
         <div
           class="hidden"
-          data-speaker-target="text <%= message.assistant? && "assistantText" %>"
+          data-speaker-target="text <%= message.assistant? ? "assistantText" : "userText" %>"
           data-thinking="<%= thinking ? "true" : "false" %>"
         ><%= format_for_speaking message.content_text %></div>
 

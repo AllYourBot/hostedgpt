@@ -7,21 +7,20 @@ export default class extends Interface {
                           $.active = true
                           await $.microphoneService.start()
                           await Flip.Transcriber.on()
+
                         } else if (!turnOn && $.active) {
                           $.active = false
-                          $.microphoneService.end()
+                          await $.microphoneService.end()
                           await Flip.Transcriber.off()
                         }
                       }
 
   async Approve()     { await $.microphoneService.start()
-                        $.microphoneService.end()
+                        await $.microphoneService.end()
                       }
 
   log_SpeakInto
   SpeakInto(num)      { $.volume = num
-                        // $.volumeBuffer.push(num)
-                        // if ($.volumeBuffer.length > 6) $.volumeBuffer.shift()
                         $.msOfSilence = 0
 
                         if (!$.poller) $.poller = runEvery(0.2, () => { $.msOfSilence += 200 })
@@ -43,9 +42,5 @@ export default class extends Interface {
 
   attach(player) {
     $.microphoneService.attach(player)
-  }
-
-  finalize() {
-    $.poller?.end()
   }
 }

@@ -1,7 +1,7 @@
 import Service from "../service.js"
 
 export default class extends Service {
-  logLevel_debug
+  logLevel_info
   attrAccessor_onTextReceived
   attrReader_listening
 
@@ -89,13 +89,11 @@ export default class extends Service {
 
   // After state change
 
-  log_onStart
   _onStart() {
     $.state = 'started' // we may not intend this but we're here
     if ($.intendedState != 'started') _executeIntendedState()
   }
 
-  log_onEnd
   _onEnd() {
     if ($.state == 'rejected') return
 
@@ -103,7 +101,6 @@ export default class extends Service {
     if ($.intendedState != 'ended') _executeIntendedState()
   }
 
-  log_onError
   _onError(e) {
     if (e.error == 'not-allowed') {
       $.state = 'rejected'
