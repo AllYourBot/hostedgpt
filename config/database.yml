@@ -4,6 +4,8 @@ default: &default
   host: localhost
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   port: <%= ENV['HOSTEDGPT_DATABASE_PORT'] || 5432 %>
+  username: <%= ENV['HOSTEDGPT_DB_USERNAME'] || "app" %>
+  password: <%= ENV["HOSTEDGPT_PB_PASSWORD"] || "secret" %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
   gssencmode: disable
 <% end %>
@@ -21,4 +23,3 @@ production:
   database: hostedgpt_production
   username: hostedgpt
   password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] %>
-  
