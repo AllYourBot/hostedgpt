@@ -1,25 +1,18 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  host: localhost
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   port: <%= ENV['HOSTEDGPT_DATABASE_PORT'] || 5432 %>
-  username: <%= ENV['HOSTEDGPT_DB_USERNAME'] || "app" %>
-  password: <%= ENV["HOSTEDGPT_PB_PASSWORD"] || "secret" %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
   gssencmode: disable
 <% end %>
+  url: <%= ENV['DATABASE_URL'] %>
 
 development:
   <<: *default
-  database: <%= ENV['HOSTEDGPT_DEV_DB'] || "hostedgpt_development" %>
 
 test:
   <<: *default
-  database: <%= ENV['HOSTEDGPT_TEST_DB'] || "hostedgpt_test" %>
 
 production:
   <<: *default
-  database: hostedgpt_production
-  username: hostedgpt
-  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] %>

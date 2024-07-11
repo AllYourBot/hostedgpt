@@ -229,12 +229,10 @@ Every time you pull new changes down, kill docker (if it's running) and re-run:
 HostedGPT requires these services to be running:
 
 - Postgres ([installation instructions](https://www.postgresql.org/download/))
-  - Default database username: `app`
-  - Default database password: `secret`
-  - Default dev database: `hostedgpt_development`
-  - Default test database: `hostedgpt_test`
-  - You can override via environment variables - see `config/database.yml`
-  - *Note that the docker compose workflow uses `DATABASE_URL` instead, which overrides anything in `config/database.yml`*
+  - Use environment variable `DATABASE_URL` to specify the connection parameters
+  - *Make sure to set that environment variable in your setup!*
+  - Recommended (development): `DATABASE_URL=postgres://app:secret@localhost/hostedgpt_development`
+  - Recommended (test): `DATABASE_URL=postgres://app:secret@localhost/hostedgpt_test`
 - rbenv ([installation instructions](https://github.com/rbenv/rbenv))
 - ImageMagick (`brew install imagemagick` should work on Mac )
 
