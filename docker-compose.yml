@@ -24,7 +24,7 @@ services:
       target: development
     environment:
       # Be sure to add environment variables to config/options.yml
-      - DATABASE_URL=postgres://app:secret@postgres/app_development
+      - DATABASE_URL
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
       - OVERMIND_COLORS=2,3,5
       - VOICE_FEATURE
