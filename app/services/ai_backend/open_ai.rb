@@ -35,6 +35,7 @@ class AIBackend::OpenAI < AIBackend
         tools: Toolbox.tools,
         stream: response_handler,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
+        stream_options: {include_usage: true}
       })
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
@@ -53,6 +54,12 @@ class AIBackend::OpenAI < AIBackend
     proc do |intermediate_response, bytesize|
       content_chunk = intermediate_response.dig("choices", 0, "delta", "content")
       tool_calls_chunk = intermediate_response.dig("choices", 0, "delta", "tool_calls")
+
+      # input and output tokens are sent in the same response
+      if (input_tokens, output_tokens = intermediate_response["usage"]&.values_at("prompt_tokens", "completion_tokens"))
+        @message.input_token_count += input_tokens
+        @message.output_token_count += output_tokens
+      end
 
       print content_chunk if Rails.env.development?
       if content_chunk

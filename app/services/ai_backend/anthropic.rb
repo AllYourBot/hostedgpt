@@ -28,6 +28,15 @@ class AIBackend::Anthropic < AIBackend
 
     response_handler = proc do |intermediate_response, bytesize|
       chunk = intermediate_response.dig("delta", "text")
+
+      # input and output tokens are sent in different responses
+      if (input_tokens = intermediate_response.dig("message", "usage", "input_tokens"))
+        @message.input_token_count += input_tokens
+      end
+      if (output_tokens = intermediate_response.dig("message", "usage", "output_tokens"))
+        @message.output_token_count += output_tokens
+      end
+
       print chunk if Rails.env.development?
       if chunk
         stream_response_text += chunk
