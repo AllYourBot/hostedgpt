@@ -11,7 +11,7 @@ fi
 # Remove once #185 is fixed for overmind
 # https://github.com/DarthSim/overmind/issues/185
 RUBY_PLATFORM=$(ruby -e "puts Gem::Platform.local")
-if [[ $RUBY_PLATFORM == aarch64-linux* ]]; then
+if [[ "$RENDER" != "true" && $RUBY_PLATFORM == aarch64-linux* ]]; then
 
   OVERMIND_DIR=$(ruby -e 'puts Gem::Specification.find_by_name("overmind").gem_dir')
   OVERMIND_BIN=$(ruby -e 'puts Gem::bin_path("overmind", "overmind")')
