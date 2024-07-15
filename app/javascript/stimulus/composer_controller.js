@@ -111,7 +111,7 @@ export default class extends Controller {
   }
 
   userDisableMicrophone() {
-    this.userDisableMicrophone(true)
+    this.disableMicrophone(true)
   }
 
   disableMicrophone(userClicked = false) {

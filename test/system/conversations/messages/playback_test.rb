@@ -12,7 +12,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     speaker = page.find("[data-controller~='speaker']")
     refute speaker["data-speaker-playback-index-value"], "initial index should not be present"
 
-    messages = page.all("[data-role='assistant-message']")
+    messages = page.all("[data-subrole='assistant-message']")
     assert_equal 2, messages.length
 
     assert_equal "1",     messages[0]["data-playback-index-value"]
@@ -27,7 +27,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
   test "ensure playback index & auto-speaker index stay in sync" do
     visit_and_scroll_wait conversation_messages_path(@conversation, version: 1, last_message_playback_active: true)
     speaker = page.find("[data-controller~='speaker']")
-    messages = page.all("[data-role='assistant-message']")
+    messages = page.all("[data-subrole='assistant-message']")
     assert_equal 2, messages.length
 
     assert_equal "3", speaker["data-speaker-playback-index-value"], "initial index should have been set"
@@ -41,7 +41,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     assert_equal "true",  messages[1]["data-playback-speaker-active-value"]
 
     # Setting a message to speaker-active propogates
-    page.execute_script("document.querySelectorAll(`[data-role='assistant-message']`)[0].setAttribute('data-playback-speaker-active-value', 'true')")
+    page.execute_script("document.querySelectorAll(`[data-subrole='assistant-message']`)[0].setAttribute('data-playback-speaker-active-value', 'true')")
 
     assert_equal "1", speaker["data-speaker-playback-index-value"]
     assert_equal "true", messages[0]["data-playback-speaker-active-value"]

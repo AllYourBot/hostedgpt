@@ -18,15 +18,19 @@ export default class extends Controller {
   // }
 
   startSpeakingMessage() {
-    console.log('startSpeakingMessage()')
+    console.log(`startSpeakingMessage(${this.indexValue})`)
     this.speaker.playbackIndexValue = this.indexValue
 
-    this.observer = new MutationObserver(() => this.speakMessage('mutation'))
-    this.observer.observe(this.assistantTextTarget, {
+    this.observer = new MutationObserver((mutations) => {
+      if (mutations.some(mutation => mutation.target == this.element)) {
+        console.log('mutation', mutations)
+        this.speakMessage('mutation')
+      }
+    })
+    this.observer.observe(this.element, {
       characterData: true,
       childList: true,
-      subtree: true,
-      attributes: true
+      subtree: true
     })
 
     window.debug = this.assistantTextTarget
@@ -34,14 +38,9 @@ export default class extends Controller {
   }
 
   stopSpeakingMessage() {
-    console.log('stopSpeakingMessage()')
+    console.log(`stopSpeakingMessage(${this.indexValue})`)
     this.observer?.disconnect()
   }
-
-  // speak() {
-  //   console.log(`speak()`)
-  //   Prompt.Speaker.toSay("I am testing this feature")
-  // }
 
   speakMessage(src = '') {
     console.log(`speakMessage(${Listener.disabled}) ${src} :: ${this.indexValue} = ${this.assistantTextTarget.innerText}`)
@@ -57,7 +56,7 @@ export default class extends Controller {
     this.speakSentencesFromTo(sentences, this.sentencesIndexValue, toSentenceIndex)
     this.sentencesIndexValue = toSentenceIndex + 1
 
-    if (thinkingDone) done()
+    if (thinkingDone) this.done()
   }
 
   speakSentencesFromTo(sentences, fromIndex, toIndex) {
@@ -71,7 +70,11 @@ export default class extends Controller {
   }
 
   done() {
-    this.speakerActiveValue = false
+    console.log(`done() for ${this.indexValue}`)
     this.speaker?.advancePlayback()
+  }
+
+  preserveStimulusValues(e) {
+    if (e.target == this.element && e.detail.attributeName == "data-playback-sentences-index-value") e.preventDefault()
   }
 }
