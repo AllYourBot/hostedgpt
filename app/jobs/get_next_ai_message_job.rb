@@ -1,3 +1,6 @@
+include ActionView::RecordIdentifier
+require "nokogiri/xml/node"
+
 class GetNextAIMessageJob < ApplicationJob
   include ActionView::Helpers::RenderingHelper
   class ResponseCancelled < StandardError; end
@@ -121,10 +124,9 @@ class GetNextAIMessageJob < ApplicationJob
         message_counter: message.index
       }.merge(locals)
     )
-    target = "message-contents-#{message.id}"
     dom = Nokogiri::HTML.fragment(html)
-    html = dom.at_css("#"+target).inner_html
-    message.broadcast_update_to message.conversation, target: target, html: html
+    html = dom.at_id(dom_id message).inner_html
+    message.broadcast_update_to message.conversation, target: message, html: html
   end
 
   private
