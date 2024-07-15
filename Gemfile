@@ -9,8 +9,8 @@ gem "sprockets-rails" # The original asset pipeline for Rails [https://github.co
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 gem "importmap-rails" # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
-gem "turbo-rails", "~> 2.0.5"
-gem "stimulus-rails"
+gem "turbo-rails", git: "https://github.com/hotwired/turbo-rails.git", branch: "main"
+gem "stimulus-rails", git: "https://github.com/hotwired/stimulus-rails.git", branch: "main"
 gem "tailwindcss-rails", "~> 2.6.0"
 gem "rack-cors"
 

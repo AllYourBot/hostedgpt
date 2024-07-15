@@ -6,101 +6,60 @@ export default class extends Controller {
 
   connect() {
     console.log(`speaker connected with index initially ${this.playbackIndexValue}`)
+    this.autoplayNextOutlet = false
   }
-  // initialize() {
-  //   this.playbackIndexValue = this.activePlaybackOutlets?.indexValue
-  // }
+
+  start() {
+    this.autoplayNextOutlet = true
+    this.setPlaybackIndexAhead()
+  }
 
   stop() {
     this.playbackIndexValue = undefined
-    this.setActivePlaybackIndex(undefined)
   }
 
   playbackIndexValueChanged() {
     if (!this.playbackIndexValue) return // we want to ignore it's default value state
     console.log(`playback index value changed to ${this.playbackIndexValue}`)
     if (this.hasPlaybackOutlet) runAfter(0, () => { // runAfter 0 simply pushes this to the end of the callback chain to solve a race
-      this.setActivePlaybackIndex(this.playbackIndexValue)
+      this.startThePlayback(this.playbackIndexValue)
     }, 0)
   }
 
-  setActivePlaybackIndex(index) {
-    this.playbackOutlets.each(playback => {
+  startThePlayback(index) {
+    runAfter(0, () => this.playbackOutlets.each(playback => {
       const active = playback.indexValue == index
-      if (active != playback.speakerActiveValue) playback.speakerActiveValue = active
-    })
+      if (active)
+        playback.startSpeakingMessage()
+      else
+        playback.stopSpeakingMessage()
+    }))
   }
 
   playbackOutletConnected(playback) {
-    playback.speaker = this   // so playback instances can call into auto-speaker
-    playback.speakerActiveValueChanged() // runs on init, but may have failed w/o speaker so re-do it
+    console.log('playbackOutletConnected', playback.indexValue)
+    playback.speaker = this // so playback instances can call into auto-speaker
+    if (this.autoplayNextOutlet) {
+      this.autoplayNextOutlet = false
+    } else {
+      console.log(`connected but ${Listener.disabled}`)
+      if (Listener.disabled && playback.indexValue > this.playbackIndexValue) this.setPlaybackIndexAhead()
+    }
   }
 
-  // static targets = [ "assistantText" ]
+  advancePlayback() {
+    if (this.playbackOutlets.last().indexValue == this.playbackIndexValue) {
+      console.log('advancePlayback but no next outlet exists')
+      this.autoplayNextOutlet = true
+      this.setPlaybackIndexAhead()
+    } else {
+      this.playbackIndexValue = this.playbackOutlets.last().indexValue
+      console.log(`advancePlayback to ${this.playbackIndexValue}`)
+    }
+  }
 
-  // get newlyCreatedConversation() {
-  //   return params.from == "create" &&
-  //     new RegExp(`^/assistants/\\d+/messages/new`).test(request.referer_path)
-  // }
-
-  // connect() {
-  //   window.debug = this
-  //   this.sentencesIndex = 0
-  //   this.messagesIndex = this.assistantTextTargets.length
-
-  //   document.addEventListener('turbo:visit', this.boundInit) // turbo visit is firing again when messagers stream in, need to make sure this ONLY fires once on initial page load
-  //   document.addEventListener('turbo:morph', this.boundSpeakMessages)
-  //   document.addEventListener('turbo:before-stream-render', this.boundSpeakMessages)
-
-  //   this.init()
-  // }
-
-  // boundInit = () => { this.init() }
-  // init() {
-  //   console.log('init()')
-
-  //   if (this.newlyCreatedConversation) {
-  //     console.log('subtracting 1')
-  //     this.messagesIndex = this.assistantTextTargets.length - 1
-  //   }
-
-  //   this.speakMessages()
-  // }
-
-  // disconnect() {
-  //   document.removeEventListener('turbo:visit', this.boundInit)
-  //   document.removeEventListener('turbo:morph', this.boundSpeakMessages)
-  //   document.removeEventListener('turbo:before-stream-render', this.boundSpeakMessages)
-  // }
-
-  // boundSpeakMessages = () => { this.speakMessages() }
-  // speakMessages() {
-  //   console.log(`speakMessages() :: ${this.messagesIndex} of ${this.assistantTextTargets.length}`)
-  //   let message, sentences, messageDone, toSentenceIndex
-  //   if (Listener.disabled) return
-
-  //   for (this.messagesIndex; this.messagesIndex < this.assistantTextTargets.length; this.messagesIndex ++) {
-  //     message = this.assistantTextTargets[this.messagesIndex]
-
-  //     sentences = SpeechService.splitIntoThoughts(message.innerText)
-  //     if (sentences.length == 0) continue
-  //     console.log(`processing message ${this.messagesIndex}...`, sentences)
-  //     messageDone = message.getAttribute('data-thinking') === 'false'
-  //     toSentenceIndex = messageDone ? sentences.length : sentences.length-1
-  //     if (toSentenceIndex < 0) toSentenceIndex = 0
-
-  //     console.log(`speaking from ${this.sentencesIndex} to ${toSentenceIndex} (done? ${messageDone})`)
-  //     this.speakSentencesFromTo(sentences, this.sentencesIndex, toSentenceIndex)
-  //     this.sentenceIndex = messageDone ? 0 : toSentenceIndex+1
-  //   }
-  //   if (!messageDone) this.messagesIndex -= 1 // we need to check this message again
-  // }
-
-  // speakSentencesFromTo(sentences, fromIndex, toIndex) {
-  //   for (let i = fromIndex; fromIndex <= toIndex; i ++) {
-  //     if (!sentences[i]) break
-  //     if (sentences[i].includes('::ServerError') || sentences[i].includes('Faraday::')) break  // client is displaying a server error
-  //     Prompt.Speaker.toSay(sentences[i])
-  //   }
-  // }
+  setPlaybackIndexAhead() {
+    if (!this.hasPlaybackOutlet) return
+    this.playbackIndexValue = this.playbackOutlets.last().indexValue + 2
+  }
 }

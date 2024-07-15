@@ -140,6 +140,7 @@
           w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px]
         "
         data-controller="composer image-upload"
+        data-composer-speaker-outlet="[data-controller~='speaker']"
       >
         <%= button_tag type: "button",
               id: "attach-button",
@@ -305,7 +306,7 @@
             <%= form.button type: "button",
               data: {
                 composer_target: "microphoneDisable",
-                action: "composer#disableMicrophone"
+                action: "composer#userDisableMicrophone"
               },
               id: "microphone-disable",
               class: %w|
@@ -399,7 +400,7 @@
           <div
             id="composer-overlay"
             data-composer-target="overlay"
-            data-action="click->composer#disableMicrophone"
+            data-action="click->composer#userDisableMicrophone"
             class="absolute inset-0 bg-white dark:bg-gray-800 !bg-opacity-65 hidden">
           </div>
 

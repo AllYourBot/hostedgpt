@@ -1,4 +1,5 @@
 class GetNextAIMessageJob < ApplicationJob
+  include ActionView::Helpers::RenderingHelper
   class ResponseCancelled < StandardError; end
   class WaitForPrevious < StandardError; end
 
@@ -111,11 +112,19 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def self.broadcast_updated_message(message, locals = {})
-    message.broadcast_replace_to message.conversation, locals: {
-      only_scroll_down_if_was_bottom: true,
-      timestamp: (Time.current.to_f*1000).to_i,
-      streamed: true,
-    }.merge(locals)
+    html = ApplicationController.render(
+      partial: 'messages/message',
+      locals: {
+        message: message,
+        only_scroll_down_if_was_bottom: true,
+        streamed: true,
+        message_counter: message.index
+      }.merge(locals)
+    )
+    target = "message-contents-#{message.id}"
+    dom = Nokogiri::HTML.fragment(html)
+    html = dom.at_css("#"+target).inner_html
+    message.broadcast_update_to message.conversation, target: target, html: html
   end
 
   private

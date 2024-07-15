@@ -19,7 +19,6 @@ class MessagesController < ApplicationController
     end
 
     @messages = @conversation.messages.for_conversation_version(@version)
-    @last_message_playback_active = params[:last_message_playback_active].to_b
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
       content_text: [nil, ""],
@@ -44,10 +43,7 @@ class MessagesController < ApplicationController
     if @message.save
       after_create_assistant_reply = @message.conversation.latest_message_for_version(@message.version)
       GetNextAIMessageJob.perform_later(Current.user.id, after_create_assistant_reply.id, @assistant.id)
-      extra_params = if request.referer == new_assistant_message_path(@assistant)
-        { last_message_playback_active: true }
-      end
-      redirect_to conversation_messages_path(@message.conversation, version: @message.version, **extra_params.to_h), status: :see_other
+      redirect_to conversation_messages_path(@message.conversation, version: @message.version), status: :see_other
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
       set_nav_conversations
