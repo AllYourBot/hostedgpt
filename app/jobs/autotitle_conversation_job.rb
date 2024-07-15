@@ -12,10 +12,11 @@ class AutotitleConversationJob < ApplicationJob
     messages = conversation.messages.ordered.limit(4)
     raise ConversationNotReady  if messages.empty?
 
-    new_title = generate_title_for(messages.map(&:content_text).join("\n"))
+    Current.set(user: conversation.user) do
+      new_title = generate_title_for(messages.map(&:content_text).join("\n"))
+    end
     conversation.update!(title: new_title)
   end
-
 
   private
 
