@@ -304,7 +304,7 @@
             <%= form.button type: "button",
               data: {
                 composer_target: "microphoneDisable",
-                action: "composer#disableMicrophone"
+                action: "composer#userDisableMicrophone"
               },
               id: "microphone-disable",
               class: %w|
@@ -398,7 +398,7 @@
           <div
             id="composer-overlay"
             data-composer-target="overlay"
-            data-action="click->composer#disableMicrophone"
+            data-action="click->composer#userDisableMicrophone"
             class="absolute inset-0 bg-white dark:bg-gray-800 !bg-opacity-65 hidden">
           </div>
 

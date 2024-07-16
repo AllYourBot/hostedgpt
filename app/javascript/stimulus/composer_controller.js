@@ -108,7 +108,11 @@ export default class extends Controller {
     Dismiss.Listener()
   }
 
-  disableMicrophone() {
+  userDisableMicrophone() {
+    this.disableMicrophone(true)
+  }
+
+  disableMicrophone(userClicked = false) {
     this.microphoneEnableTarget.classList.remove('hidden')
     this.microphoneDisableTarget.classList.add('hidden')
     this.enableComposer()
