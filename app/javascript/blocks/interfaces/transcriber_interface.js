@@ -17,8 +17,7 @@ export default class extends Interface {
 
   async Flip(turnOn)    { if (turnOn && !$.active) {
                             $.active = true
-                            $.covered = false
-                            await $.transcriberService.start()
+                            Uncover.Transcriber()
                             await Invoke.Listener()
 
                           } else if (!turnOn && $.active) {
@@ -41,7 +40,10 @@ export default class extends Interface {
                           _shortWaitThenTell()
                         }
 
-  Cover()               { $.covered = true }
+  Cover()               { $.covered = true
+                          $.silenceService.stop()
+                        }
+
   Uncover()             { $.covered = false
                           $.transcriberService.restart()
                           _longWaitThenDismis()
@@ -65,7 +67,7 @@ export default class extends Interface {
                             if ($.silenceService.msOfSilence <= 1000) return
                             log('enough silence to start processing...')
 
-                            if (! $.covered) $.covered = true
+                            if (! $.covered) Cover.Transcriber()
                             Tell.Listener.to.consider($.words)
 
                             $.words = ''

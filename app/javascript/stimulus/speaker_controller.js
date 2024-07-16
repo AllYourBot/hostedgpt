@@ -6,20 +6,21 @@ export default class extends Controller {
 
   connect() {
     console.log(`speaker connected with index initially ${this.playbackIndexValue}`)
-    if (Listener.enabled) this.setPlaybackIndexLast() // navigated from messages/new to conversation/#/messages
+    if (Listener.enabled) this.setPlaybackIndexLast('suppressCallback') // navigated from messages/new to conversation/#/messages
   }
 
   start() {
     console.log('speaker start()')
-    this.setPlaybackIndexAhead()
+    this.setPlaybackIndexLast()
   }
 
   stop() {
-    console.log('speaker stopx()')
+    console.log('speaker stop()')
     this.playbackIndexValue = undefined
   }
 
   playbackIndexValueChanged() {
+    if (this.suppressCallback) { this.suppressCallback = false; return }
     console.log(`playback index value changed to ${this.playbackIndexValue}`)
     if (!this.playbackIndexValue) return // we want to ignore it's default value state
     if (this.hasPlaybackOutlet) runAfter(0, () => { // runAfter 0 simply pushes this to the end of the callback chain to solve a race
@@ -31,7 +32,7 @@ export default class extends Controller {
     console.log(`startThePlayback(${index}) from ${from}`)
     runAfter(0, () => this.playbackOutlets.each(playback => {
       const active = playback.indexValue == index
-      console.log(`${playback.indexValue}: active = ${active}`)
+      //console.log(`${playback.indexValue}: active = ${active}`)
       if (active)
         playback.startSpeakingMessage()
       else
@@ -40,37 +41,24 @@ export default class extends Controller {
   }
 
   playbackOutletConnected(playback) {
-    console.log(`playbackOutletConnected ${playback.indexValue} with autoplay = ${this.autoplayNextOutlet}`)
+    console.log(`playbackOutletConnected ${playback.indexValue} with Listener enabled? ${Listener.enabled}`)
     playback.speaker = this // so playback instances can call into auto-speaker
-    if (Listener.disabled) { // these connections are happening on initial page load
-      if (playback.indexValue > this.playbackIndexValue) this.setPlaybackIndexAhead()
-    } else {
-      runAfter(0, () => this.startThePlayback(this.playbackIndexValue))
-    }
+    if (Listener.disabled) // these connections are happening on initial page load
+      this.setPlaybackIndexLast()
+    else
+      runAfter(0, () => this.startThePlayback(this.playbackIndexValue, 'connected'))
   }
 
   advancePlayback() {
-    if (this.playbackOutlets.last().indexValue == this.playbackIndexValue) {
-      console.log('advancePlayback but no next outlet exists')
-      this.setPlaybackIndexAhead()
-    } else {
-      this.playbackIndexValue = this.playbackOutlets.last().indexValue
-      console.log(`advancePlayback to ${this.playbackIndexValue}`)
-    }
+    this.setPlaybackIndexLast()
   }
 
-  setPlaybackIndexLast() {
-    if (this.hasPlaybackOutlet)
-      this.playbackIndexValue = this.playbackOutlets.last().indexValue
-    else
-      this.playbackIndexValue = 1
-  }
+  setPlaybackIndexLast(suppressCallback = false) {
+    this.suppressCallback = suppressCallback
+    const lastValue = this.hasPlaybackOutlet ? this.playbackOutlets.last().indexValue : 0
 
-  setPlaybackIndexAhead() {
-    if (this.hasPlaybackOutlet)
-      this.playbackIndexValue = this.playbackOutlets.last().indexValue + 2
-    else
-      this.playbackIndexValue = 1
+    if (!this.playbackIndexValue || lastValue > this.playbackIndexValue) this.playbackIndexValue = lastValue
+    console.log(`set index value to ${this.playbackIndexValue}`)
   }
 
   preserveStimulusValues(e) {

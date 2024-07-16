@@ -108,7 +108,7 @@ export default class extends Service {
     const jobsToPlay = $.queue.all.filter((job) => !job.spoken)
     if (trigger) {
       log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`, 'debug')
-      jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`), 'debug')
+      jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`, 'debug'))
     }
 
     if (jobsToPlay.length > 0) {
@@ -159,7 +159,6 @@ export default class extends Service {
   }
 
   _resetQueue() {
-    log('resetting queue')
     $.queue.reset()
     $.queue = new QueueService()
   }

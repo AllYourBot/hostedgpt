@@ -24,7 +24,7 @@ export default class extends Controller {
     this.observer = new MutationObserver((mutations) => {
       if (mutations.some(mutation => mutation.target == this.element)) {
         console.log('mutation', mutations)
-        this.speakMessage('mutation')
+        this.messageTextUpdated('mutation')
       }
     })
     this.observer.observe(this.element, {
@@ -34,7 +34,7 @@ export default class extends Controller {
     })
 
     window.debug = this.assistantTextTarget
-    this.speakMessage('initial')
+    this.messageTextUpdated('initial')
   }
 
   stopSpeakingMessage() {
@@ -42,30 +42,28 @@ export default class extends Controller {
     this.observer?.disconnect()
   }
 
-  speakMessage(src = '') {
-    console.log(`speakMessage(${Listener.disabled}) ${src} :: ${this.indexValue} = ${this.assistantTextTarget.innerText}`)
+  messageTextUpdated(src = '') {
+    console.log(`${this.indexValue}: messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})(${this.assistantTextTarget.innerText})(${this.assistantTextTarget.innerHTML})`)
     if (Listener.disabled) return
-    const sentences = SpeechService.splitIntoThoughts(this.assistantTextTarget.innerText)
+    const sentences = SpeechService.splitIntoThoughts(this.assistantTextTarget.textContent)
     if (sentences.length == 0) return
 
     console.log(`processing message ${this.indexValue}...`, sentences)
     const thinkingDone = this.assistantTextTarget.getAttribute('data-thinking') === 'false'
-    const toSentenceIndex = thinkingDone ? sentences.length : sentences.length - 1
+    const toSentenceIndex = thinkingDone ? sentences.length-1 : sentences.length-2
 
     console.log(`speaking from ${this.sentencesIndexValue} to ${toSentenceIndex} (done? ${thinkingDone})`)
-    this.speakSentencesFromTo(sentences, this.sentencesIndexValue, toSentenceIndex)
-    this.sentencesIndexValue = toSentenceIndex + 1
+    this.speakSentencesTo(sentences, toSentenceIndex)
 
     if (thinkingDone) this.done()
   }
 
-  speakSentencesFromTo(sentences, fromIndex, toIndex) {
-    toIndex = Math.max(toIndex, 0)
-    if (fromIndex >= toIndex) return
-    for (let i = fromIndex; fromIndex <= toIndex; i ++) {
-      if (!sentences[i]) break
-      if (sentences[i].includes('::ServerError') || sentences[i].includes('Faraday::')) break  // client is displaying a server error
-      Prompt.Speaker.toSay(sentences[i])
+  speakSentencesTo(sentences, toIndex) {
+    if (this.sentencesIndexValue > toIndex) return
+    for (this.sentencesIndexValue; this.sentencesIndexValue <= toIndex; this.sentencesIndexValue ++) {
+      if (!sentences[this.sentencesIndexValue]) break
+      if (sentences[this.sentencesIndexValue].includes('::ServerError') || sentences[this.sentencesIndexValue].includes('Faraday::')) break  // client is displaying a server error
+      Prompt.Speaker.toSay(sentences[this.sentencesIndexValue])
     }
   }
 

@@ -20,15 +20,15 @@ export default class extends Interface {
                         $.attachment    = await _takeScreenshotIfNeeded(words)
                         _playThinkingSounds()
                       }
-  log_Invoke
   async Invoke()      { if (!$.processing) {
+                          log('Invoked')
                           $.processing = true
                           await $.screenService.start()
                           await Flip.Transcriber.on()
-                        }
+                        } else Uncover.Transcriber()
                       }
-  log_Dismiss
   async Dismiss()     { if ($.processing) {
+                          log('Dismissed')
                           $.processing = false
                           await Flip.Transcriber.on() // so it can wait for "wake" words
                           await Play.Speaker.sound('pip')
@@ -36,6 +36,7 @@ export default class extends Interface {
                       }
 
   async Disable()     { if ($.processing != null) {
+                          log('Disabled')
                           $.processing = null
                           await $.screenService.end()
                           await Flip.Transcriber.off()
