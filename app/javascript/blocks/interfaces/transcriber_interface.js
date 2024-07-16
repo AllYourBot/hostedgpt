@@ -15,7 +15,10 @@ export default class extends Interface {
   logLevel_info
   attrReader_covered
 
-  async Flip(turnOn)    { if (turnOn && !$.active) {
+  async Flip(turnOn)    { if (turnOn && $.active) {
+                            Uncover.Transcriber()
+
+                          } else if (turnOn && !$.active) {
                             $.active = true
                             Uncover.Transcriber()
                             await Invoke.Listener()

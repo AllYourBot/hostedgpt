@@ -24,7 +24,7 @@ export default class extends Interface {
                           log('Invoked')
                           $.processing = true
                           await $.screenService.start()
-                          await Flip.Transcriber.on() // TODO: with multiple streamed messages after dismissing, this did not Uncover the transcriber. Why??
+                          await Flip.Transcriber.on()
                         } else Uncover.Transcriber()
                       }
   async Dismiss()     { if ($.processing) {
