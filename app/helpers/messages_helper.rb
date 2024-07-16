@@ -1,6 +1,22 @@
 require "./lib/markdown_renderer"
 
 module MessagesHelper
+  def render_avatar_for(message)
+    if message.user?
+      render partial: "layouts/user_avatar",      locals: { user: Current.user,           size: 7, classes: "mt-1" }
+    else
+      render partial: "layouts/assistant_avatar", locals: { assistant: message.assistant, size: 7, classes: "mt-1" }
+    end
+  end
+
+  def from_name_for(message)
+    case message.role
+      when "user" then "You"
+      when "assistant" then message.assistant.name
+      when "tool" then "Tool"
+    end
+  end
+
   def format_for_copying(text)
     text
   end

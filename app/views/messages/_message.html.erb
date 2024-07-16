@@ -28,12 +28,9 @@ end
   data-message-scroller-instantly-value="<%= initial_page_load %>"
 >
   <div class="flex">
-    <div class="flex flex-col items-center w-6 ml-1">
-      <% if message.user? %>
-        <%= render partial: "layouts/user_avatar", locals: { user: Current.user, size: 7, classes: "mt-1" } %>
-      <% else %>
-        <%= render partial: "layouts/assistant_avatar", locals: { assistant: message.assistant, size: 7, classes: "mt-1" } %>
-      <% end %>
+    <!-- Left Column -->
+    <div class="w-6 ml-1 flex">
+      <%= render_avatar_for(message) %>
     </div>
 
     <!-- Right Column -->
@@ -47,15 +44,10 @@ end
       class="flex-1 min-w-0 ml-3 mr-8 text-base text-gray-950 dark:text-gray-100">
 
       <div class="mt-[6px] mb-1 font-semibold" data-role="from">
-        <%= case message.role
-          when "user" then "You"
-          when "assistant" then message.assistant.name
-          when "tool" then "Tool"
-          end
-        %>
+        <%= from_name_for(message) %>
       </div>
 
-      <turbo-frame id="message-<%= message.id %>">
+      <turbo-frame id="message-text-<%= message.id %>">
 
         <div
           class="hidden"
@@ -187,7 +179,7 @@ end
               data: {
                 role: "message-edit",
                 composer_target: "messageEdit",
-                turbo_frame: "message-#{message.id}",
+                turbo_frame: "message-text-#{message.id}",
               } do %>
               <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
             <% end %>
