@@ -25,6 +25,7 @@ end %>
   data-playback-index-value="<%= message_counter %>"
   data-playback-sentences-index-value="0"
   data-playback-done-prompting-value="false"
+  data-playback-transition-outlet="[data-subrole='playback-control-<%= message.id %>']"
   data-action="turbo:before-morph-attribute->playback#preserveStimulusValues"
 >
   <!-- Left Column -->
@@ -192,14 +193,15 @@ end %>
             class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
             data: {
               role: "playback",
+              subrole: "playback-control-#{message.id}",
+              controller: "transition",
+              transition_toggle_class: "hidden",
               action: %|
-                playback#speak
-                transition#toggleClassOn
+                playback#toggleSpeakingMessage
               |,
-              # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
           } do %>
-            <%= icon "speaker-wave", variant: :outline, size: 18, title: "Read aloud", data: { transition_target: "transitionable" } %>
-            <%= icon "stop-circle", variant: :outline, size: 18, title: "Stop", data: { transition_target: "transitionable" }, class: "hidden" %>
+            <%= icon "speaker-wave", variant: :outline, size: 19, title: "Read aloud #{message_counter}", data: { transition_target: "transitionable" } %>
+            <%= icon "stop-circle", variant: :outline, size: 19, title: "Stop", data: { transition_target: "transitionable" }, class: "hidden" %>
           <% end %>
           <%= button_tag type: "button",
                 class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",

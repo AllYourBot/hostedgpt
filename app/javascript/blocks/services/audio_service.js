@@ -66,6 +66,7 @@ export default class extends Service {
       $.playerSource.stop()
     }
     _resetQueue()
+    $.speaking = false
     $.playing = false
     $.busy = false
   }
@@ -125,7 +126,7 @@ export default class extends Service {
         return
       } else {
         await sleep(0.25)
-        _speakingLoop()
+        _speakingLoop('waiting')
         return
       }
     } else if (!$.speaking) _doneSpeaking()

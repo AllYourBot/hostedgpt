@@ -27,7 +27,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     last_sent_at = Time.current
     @message.update!(processed_at: Time.current, content_text: "")
-    GetNextAIMessageJob.broadcast_updated_message(@message, thinking: true) # signal to user that we're waiting on API
+    GetNextAIMessageJob.broadcast_updated_message(@message, thinking: true) # thinking shows dot, signaling to user that we're waiting now on ai_backend
 
     puts "\n### Wait for reply" unless Rails.env.test?
 

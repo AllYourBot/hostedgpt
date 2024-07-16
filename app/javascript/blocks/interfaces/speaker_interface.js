@@ -2,6 +2,7 @@ import Interface from "../interface.js"
 
 export default class extends Interface {
   logLevel_info
+  attrAccessor_onBusyDone
 
   log_Prompt
   Prompt(sentence)          { $.audioService.speakNext(sentence) }
@@ -15,13 +16,18 @@ export default class extends Interface {
   new() {
     $.audioService = new AudioService
     $.audioService.onBusyChanged = (busy) => {
-      //log(`onbusyChanged(${busy})`)
-      if (busy) Cover.Transcriber()
-      if (!busy) {
+      if (busy) {
+        Cover.Transcriber()
+
+      } else if (!busy && !Listener.disabled) {
         Play.Speaker.sound('pop', () => {
           Loop.Speaker.every(8, 'typing1')
         })
         Invoke.Listener()
+        if ($.onBusyDone) $.onBusyDone()
+
+      } else if (!busy) {
+        if ($.onBusyDone) $.onBusyDone()
       }
     }
   }

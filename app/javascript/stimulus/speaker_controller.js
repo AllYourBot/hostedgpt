@@ -20,8 +20,9 @@ export default class extends Controller {
   }
 
   playbackIndexValueChanged() {
+    console.log(`## playbackIndex = ${this.playbackIndexValue}`)
     if (this.suppressCallback) { this.suppressCallback = false; return }
-    console.log(`playback index value changed to ${this.playbackIndexValue}`)
+    //console.log(`playback index value changed to ${this.playbackIndexValue}`)
     if (!this.playbackIndexValue) return // we want to ignore it's default value state
     if (this.hasPlaybackOutlet) runAfter(0, () => { // runAfter 0 simply pushes this to the end of the callback chain to solve a race
       this.startThePlayback(this.playbackIndexValue, 'playbackIndexValueChanged')
@@ -29,7 +30,7 @@ export default class extends Controller {
   }
 
   startThePlayback(index, from = null) {
-    console.log(`startThePlayback(${index}) from ${from}`)
+    //console.log(`startThePlayback(${index}) from ${from}`)
     runAfter(0, () => this.playbackOutlets.each(playback => {
       const active = playback.indexValue == index
       //console.log(`${playback.indexValue}: active = ${active}`)
@@ -41,10 +42,10 @@ export default class extends Controller {
   }
 
   playbackOutletConnected(playback) {
-    console.log(`playbackOutletConnected ${playback.indexValue} with Listener enabled? ${Listener.enabled}`)
+    //console.log(`playbackOutletConnected ${playback.indexValue} with Listener enabled? ${Listener.enabled}`)
     playback.speaker = this // so playback instances can call into auto-speaker
     if (Listener.disabled) // these connections are happening on initial page load
-      this.setPlaybackIndexLast()
+      runAfter(0, () => this.setPlaybackIndexLast())
     else
       runAfter(0, () => this.startThePlayback(this.playbackIndexValue, 'connected'))
   }
@@ -58,7 +59,7 @@ export default class extends Controller {
     const lastValue = this.hasPlaybackOutlet ? this.playbackOutlets.last().indexValue : 0
 
     if (!this.playbackIndexValue || lastValue > this.playbackIndexValue) this.playbackIndexValue = lastValue
-    console.log(`set index value to ${this.playbackIndexValue}`)
+    //console.log(`set index value to ${this.playbackIndexValue}`)
   }
 
   preserveStimulusValues(e) {

@@ -3,22 +3,29 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static values = { index: Number, sentencesIndex: Number }
   static targets = [ "assistantText" ]
+  static outlets = [ "transition" ]
 
   connect() {
-    console.log(`playback connected for message ${this.indexValue}`, this.element)
+    this.manualSpeaking = false
   }
 
-  // speakerActiveValueChanged() {
-  //   if (!this.speaker) return
+  toggleSpeakingMessage() {
+    this.manualSpeaking = !this.manualSpeaking
 
-  //   if (this.speakerActiveValue)
-  //     this.startSpeakingMessage()
-  //   else
-  //     this.stopSpeakingMessage()
-  // }
+    if (this.manualSpeaking) {
+      if (this.hasTransitionOutlet) this.transitionOutlet.toggleClassOn()
+      Speaker.onBusyDone = () => this.toggleSpeakingMessage()
+      this.sentencesIndexValue = 0
+      this.startSpeakingMessage()
+    } else {
+      Speaker.onBusyDone = () => {}
+      if (this.hasTransitionOutlet) this.transitionOutlet.toggleClassOff()
+      Reset.Speaker()
+      this.stopSpeakingMessage()
+    }
+  }
 
   startSpeakingMessage() {
-    console.log(`startSpeakingMessage(${this.indexValue})`)
     this.speaker.playbackIndexValue = this.indexValue
 
     this.observer = new MutationObserver((mutations) => {
@@ -33,29 +40,27 @@ export default class extends Controller {
       subtree: true
     })
 
-    window.debug = this.assistantTextTarget
     this.messageTextUpdated('initial')
   }
 
   stopSpeakingMessage() {
-    console.log(`stopSpeakingMessage(${this.indexValue})`)
     this.observer?.disconnect()
   }
 
   messageTextUpdated(src = '') {
-    console.log(`${this.indexValue}: messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})(${this.assistantTextTarget.innerText})(${this.assistantTextTarget.innerHTML})`)
-    if (Listener.disabled) return
+    //console.log(`${this.indexValue}: messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})`)
+    if (Listener.disabled && !this.manualSpeaking) return
     const sentences = SpeechService.splitIntoThoughts(this.assistantTextTarget.textContent)
     if (sentences.length == 0) return
 
-    console.log(`processing message ${this.indexValue}...`, sentences)
+    //console.log(`processing message ${this.indexValue}...`, sentences)
     const thinkingDone = this.assistantTextTarget.getAttribute('data-thinking') === 'false'
     const toSentenceIndex = thinkingDone ? sentences.length-1 : sentences.length-2
 
-    console.log(`speaking from ${this.sentencesIndexValue} to ${toSentenceIndex} (done? ${thinkingDone})`)
+    //console.log(`speaking from ${this.sentencesIndexValue} to ${toSentenceIndex} (done? ${thinkingDone})`)
     this.speakSentencesTo(sentences, toSentenceIndex)
 
-    if (thinkingDone) this.done()
+    if (thinkingDone && !this.manualSpeaking) this.speaker?.advancePlayback()
   }
 
   speakSentencesTo(sentences, toIndex) {
@@ -65,11 +70,6 @@ export default class extends Controller {
       if (sentences[this.sentencesIndexValue].includes('::ServerError') || sentences[this.sentencesIndexValue].includes('Faraday::')) break  // client is displaying a server error
       Prompt.Speaker.toSay(sentences[this.sentencesIndexValue])
     }
-  }
-
-  done() {
-    console.log(`done() for ${this.indexValue}`)
-    this.speaker?.advancePlayback()
   }
 
   preserveStimulusValues(e) {
