@@ -22,3 +22,4 @@ Array.prototype.eachWithIndex = function (callback) { return this.forEach((item,
 Array.prototype.reject = function(callback) { return this.filter(e => !callback(e)) }
 Array.prototype.uniq = function() { return [...new Set(this)] }
 Array.prototype.collect = function(...args) { return this.map(...args) }
+Array.prototype.index = function (valueOrPredicate) { return (typeof valueOrPredicate === 'function') ? this.findIndex(valueOrPredicate) : this.indexOf(valueOrPredicate) }

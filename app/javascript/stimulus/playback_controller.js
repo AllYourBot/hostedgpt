@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { index: Number, sentencesIndex: Number }
+  static values = { id: Number, sentencesIndex: Number }
   static targets = [ "assistantText" ]
   static outlets = [ "transition" ]
 
@@ -26,8 +26,6 @@ export default class extends Controller {
   }
 
   startSpeakingMessage() {
-    this.speaker.playbackIndexValue = this.indexValue
-
     this.observer = new MutationObserver((mutations) => {
       if (mutations.some(mutation => mutation.target == this.element)) {
         console.log('mutation', mutations)
@@ -48,12 +46,12 @@ export default class extends Controller {
   }
 
   messageTextUpdated(src = '') {
-    //console.log(`${this.indexValue}: messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})`)
+    //console.log(`${this.idValue}: messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})`)
     if (Listener.disabled && !this.manualSpeaking) return
     const sentences = SpeechService.splitIntoThoughts(this.assistantTextTarget.textContent)
     if (sentences.length == 0) return
 
-    //console.log(`processing message ${this.indexValue}...`, sentences)
+    //console.log(`processing message ${this.idValue}...`, sentences)
     const thinkingDone = this.assistantTextTarget.getAttribute('data-thinking') === 'false'
     const toSentenceIndex = thinkingDone ? sentences.length-1 : sentences.length-2
 

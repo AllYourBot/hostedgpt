@@ -22,7 +22,7 @@ end %>
   class="flex mb-5 ml-9 sm:ml-3 md:ml-8 group flex <%= message.only_tool_response? && !debug_tool_messages && "hidden" %>"
   data-controller="<%= message.assistant? && "playback" %>"
 
-  data-playback-index-value="<%= message_counter %>"
+  data-playback-id-value="<%= message.id %>"
   data-playback-sentences-index-value="0"
   data-playback-done-prompting-value="false"
   data-playback-transition-outlet="[data-subrole='playback-control-<%= message.id %>']"
