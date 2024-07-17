@@ -35,7 +35,7 @@ class SoomoLaunchesController < ApplicationController
         user = User.create!(name: "Student User")
         person = Person.create!(personable: user, email: email)
         credential = HttpHeaderCredential.create!(user: user, external_id: claims['sub'])
-      rescue ActiveRecord::RecordNotUnique
+      rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
       end
       credential = HttpHeaderCredential.find_by!(auth_uid: claims['sub'])
     end
