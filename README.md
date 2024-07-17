@@ -115,6 +115,31 @@ The file `options.yml` contains a number of Features and Settings you can config
 - `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
 - `GOOGLE_TOOLS_FEATURE` — This is an experimental feature that enables your assistant to access your Gmail (and soon Google Tasks and Calendar).
 
+Additionally, certain features can only be configured with environment variables. These are:
+
+- `CLOUDFLARE_STORAGE_FEATURE` - This is a feature that allows you to store message attachments in Cloudflare's R2 storage. By default this is false, but you can set it to `true` to enable it. You must configure Cloudflare first for it to work.
+
+### Configuring Cloudflare Storage
+
+First you need to sign up for Cloudflare. The free tier allows 10 GB of storage. After you sign up, you need to create a new bucket and an API token. The API token should have "Object Read and Write" access to your bucket. Take note of your Access Key ID and your Secret Access Key along with your Account ID. Set the following environment variables:
+
+- `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare Account ID
+- `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
+- `CLOUDFLARE_SECRET_ACCESS_KEY` - Your Cloudflare Secret Access Key
+- `CLOUDFLARE_BUCKET` - The name of the bucket you created
+
+or you can add these to your Rails credentials file:
+
+```yaml
+cloudflare:
+  account_id: "your-account-id"
+  access_key_id: "your-access-key-id"
+  secret_access_key: "your-secret-access-key"
+  bucket: "your-bucket-name"
+```
+
+Then be sure to set the `CLOUDFLARE_STORAGE_FEATURE` environment variable to `true`.
+
 ### Configuring Google Tools
 
 You first need to follow all the steps in the [Google OAuth instructions](#google-oauth-authentication). The only step that is optional is that you can leave `GOOGLE_AUTHENTICATION_FEATURE` set to false, which means you don't have to enable new users to register with Google. However, following all the steps will also set up Google Auth so you can connect Google Tools to your assistants. After, you complete those steps, here is the additional configuration you need to do in order to enable the Google tools:

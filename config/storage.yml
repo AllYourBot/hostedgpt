@@ -7,3 +7,11 @@ local:
 local_public:
   service: Postgresql
   public: true # the generated URLs will not expire
+
+cloudflare:
+  service: S3
+  endpoint: https://<%= ENV["CLOUDFLARE_ACCOUNT_ID"] || Rails.application.credentials.dig(:cloudflare, :account_id) %>.r2.cloudflarestorage.com
+  access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || Rails.application.credentials.dig(:cloudflare, :access_key_id) %>
+  secret_access_key: <%= ENV["CLOUDFLARE_SECRET_ACCESS_KEY"] || Rails.application.credentials.dig(:cloudflare, :secret_access_key) %>
+  region: auto
+  bucket: <%= ENV["CLOUDFLARE_BUCKET"] || Rails.application.credentials.dig(:cloudflare, :bucket) %>

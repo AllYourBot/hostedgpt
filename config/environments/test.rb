@@ -36,9 +36,10 @@ Rails.application.configure do
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
 
-  # Store uploaded files on the local file system in a temporary directory.
+  # Store uploaded files in the db for testing
   config.active_storage.service = :test
-  config.active_storage.variant_processor = :mini_magick # vips is better but does not work on Mac Apple Silicon so using this in dev & test
+  # vips is better but does not work on Mac Apple Silicon so using this in dev & test
+  config.active_storage.variant_processor = :mini_magick
 
   config.action_mailer.perform_caching = false
 

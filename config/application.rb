@@ -33,6 +33,13 @@ module HostedGPT
     config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("lib")
 
+    # Active Storage
+    if ENV["CLOUDFLARE_STORAGE_FEATURE"] == "true"
+      config.active_storage.service = :cloudflare
+    else
+      config.active_storage.service = :local
+    end
+
     config.options = config_for(:options)
   end
 end
