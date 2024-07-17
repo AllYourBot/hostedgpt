@@ -10,8 +10,6 @@ services:
       POSTGRES_PASSWORD: secret
     volumes:
     - hostedgpt_pgdata:/var/lib/postgresql/data
-    ports:
-    - 5433:5432
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "app", "-d", "app_development"]
       interval: 1s

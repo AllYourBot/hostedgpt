@@ -1,10 +1,20 @@
+# TODO: remove test, local, and local_public options from this file
+#  figure out how to migrate existing records to handle that change
+
 test:
   service: Postgresql
 
 local:
   service: Postgresql
 
+database:
+  service: Postgresql
+
 local_public:
+  service: Postgresql
+  public: true # the generated URLs will not expire
+
+database_public:
   service: Postgresql
   public: true # the generated URLs will not expire
 

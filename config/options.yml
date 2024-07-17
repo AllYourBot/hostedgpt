@@ -8,6 +8,7 @@ shared:
     http_header_authentication: <%= ENV.fetch("HTTP_HEADER_AUTHENTICATION_FEATURE", false) %>
     voice: <%= ENV.fetch("VOICE_FEATURE", false) %>
     default_to_voice: <%= ENV.fetch("DEFAULT_TO_VOICE_FEATURE", false) %>
+    cloudflare_storage: <%= ENV.fetch("CLOUDFLARE_STORAGE_FEATURE", false) %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     default_openai_key: <%= ENV["DEFAULT_OPENAI_KEY"] %>

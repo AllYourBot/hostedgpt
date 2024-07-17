@@ -37,7 +37,7 @@ module HostedGPT
     if ENV["CLOUDFLARE_STORAGE_FEATURE"] == "true"
       config.active_storage.service = :cloudflare
     else
-      config.active_storage.service = :local
+      config.active_storage.service = :database
     end
 
     config.options = config_for(:options)

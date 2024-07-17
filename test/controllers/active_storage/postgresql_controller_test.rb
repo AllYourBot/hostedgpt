@@ -122,7 +122,7 @@ class ActiveStorage::PostgresqlControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "showing public blob & blob variant" do
-    with_service(:local_public) do
+    with_service(:database_public) do
       blob = create_blob(content_type: "image/jpeg")
 
       get blob.send(url_method)
@@ -133,7 +133,7 @@ class ActiveStorage::PostgresqlControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "showing public blob variant" do
-    with_service(:local_public) do
+    with_service(:database_public) do
       blob = create_file_blob.variant(resize_to_limit: [100, 100]).processed
       get blob.send(url_method)
       assert_response :ok
