@@ -38,8 +38,7 @@ Rails.application.configure do
 
   # Store uploaded files in the db for testing
   config.active_storage.service = :test
-  # vips is better but does not work on Mac Apple Silicon so using this in dev & test
-  config.active_storage.variant_processor = :mini_magick
+  config.active_storage.variant_processor = :mini_magick # vips is better but does not work on Mac Apple Silicon so using this in dev & test
 
   config.action_mailer.perform_caching = false
 

@@ -34,8 +34,7 @@ Rails.application.configure do
     config.cache_store = :null_store
   end
 
-  # vips is better but does not work on Mac Apple Silicon so using this in dev & test
-  config.active_storage.variant_processor = :mini_magick
+  config.active_storage.variant_processor = :mini_magick # vips is better but does not work on Mac Apple Silicon so using this in dev & test
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
