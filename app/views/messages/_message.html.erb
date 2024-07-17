@@ -29,6 +29,7 @@ end %>
   <!-- Right Column -->
   <div
     id="message-contents-<%= message.id %>"
+    data-role="message-contents"
     class="flex-1 min-w-0 ml-3 mr-8 text-base text-gray-950 dark:text-gray-100"
     data-controller="
       clipboard
@@ -67,7 +68,7 @@ end %>
                 class: "w-full h-auto flex focus:outline-none",
                 data: {
                   controller: "image-loader",
-                  image_loader_message_scroller_outlet: "[data-role='message']",
+                  image_loader_message_scroller_outlet: "[data-role='message-contents']",
                   image_loader_url_value: message.document_image_path(:small),
                   action: "modal#open",
                   role: "image-preview",
