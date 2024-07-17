@@ -10,8 +10,8 @@ local_public:
 
 cloudflare:
   service: S3
-  endpoint: https://<%= ENV["CLOUDFLARE_ACCOUNT_ID"] || Rails.application.credentials.dig(:cloudflare, :account_id) %>.r2.cloudflarestorage.com
-  access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || Rails.application.credentials.dig(:cloudflare, :access_key_id) %>
-  secret_access_key: <%= ENV["CLOUDFLARE_SECRET_ACCESS_KEY"] || Rails.application.credentials.dig(:cloudflare, :secret_access_key) %>
+  endpoint: https://<%= Setting.cloudflare_account_id %>.r2.cloudflarestorage.com
+  access_key_id: <%= Setting.cloudflare_access_key_id %>
+  secret_access_key: <%= Setting.cloudflare_secret_access_key %>
   region: auto
-  bucket: <%= ENV["CLOUDFLARE_BUCKET"] || Rails.application.credentials.dig(:cloudflare, :bucket) %>
+  bucket: <%= Setting.cloudflare_bucket %>

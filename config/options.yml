@@ -18,3 +18,7 @@ shared:
     http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
+    cloudflare_account_id: <%= ENV["CLOUDFLARE_ACCOUNT_ID"] || Rails.application.credentials.dig(:cloudflare, :account_id) %>
+    cloudflare_access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || Rails.application.credentials.dig(:cloudflare, :access_key_id) %>
+    cloudflare_secret_access_key: <%= ENV["CLOUDFLARE_SECRET_ACCESS_KEY"] || Rails.application.credentials.dig(:cloudflare, :secret_access_key) %>
+    cloudflare_bucket: <%= ENV["CLOUDFLARE_BUCKET"] || Rails.application.credentials.dig(:cloudflare, :bucket) %>
