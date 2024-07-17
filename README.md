@@ -117,7 +117,7 @@ The file `options.yml` contains a number of Features and Settings you can config
 
 Additionally, certain features can only be configured with environment variables. These are:
 
-- `CLOUDFLARE_STORAGE_FEATURE` - This is a feature that allows you to store message attachments in Cloudflare's R2 storage. By default this is false, but you can set it to `true` to enable it. You must configure Cloudflare first for it to work.
+- `CLOUDFLARE_STORAGE_FEATURE` - This is a feature that allows you to store message attachments in Cloudflare's R2 storage. When this is false, attachments are stored within postgres. This is the default configuration. But you can set it to `true` to enable it. You must configure Cloudflare Storage first for it to work.
 
 ### Configuring Cloudflare Storage
 
