@@ -1,4 +1,4 @@
-version: '3.1'
+version: "3.1"
 
 services:
   postgres:
@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: app_development
       POSTGRES_PASSWORD: secret
     volumes:
-    - hostedgpt_pgdata:/var/lib/postgresql/data
+      - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "app", "-d", "app_development"]
       interval: 1s
