@@ -17,9 +17,15 @@ end %>
 
 <div
   id="<%= dom_id message %>"
+  class="flex mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !debug_tool_messages && "hidden" %>"
   data-role="message"
   data-subrole="<%= message.role %>-message"
-  class="flex mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !debug_tool_messages && "hidden" %>"
+
+  data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && "message-scroller" %>"
+
+  data-message-scroller-scroll-down-value="<%= scroll_down %>"
+  data-message-scroller-only-scroll-down-if-scrolled-to-bottom-value="<%= only_scroll_down_if_was_bottom %>"
+  data-message-scroller-instantly-value="<%= initial_page_load %>"
 >
   <!-- Left Column -->
   <div class="w-6 ml-1 flex">
@@ -35,13 +41,8 @@ end %>
       clipboard
       transition
       <%= message.has_document_image? && "modal" %>
-      <%= (scroll_down || only_scroll_down_if_was_bottom) && "message-scroller" %>
     "
     data-transition-toggle-class="hidden"
-
-    data-message-scroller-scroll-down-value="<%= scroll_down %>"
-    data-message-scroller-only-scroll-down-if-scrolled-to-bottom-value="<%= only_scroll_down_if_was_bottom %>"
-    data-message-scroller-instantly-value="<%= initial_page_load %>"
   >
     <div class="mt-[6px] mb-1 font-semibold" data-role="from">
       <%= from_name_for(message) %>
@@ -65,58 +66,37 @@ end %>
       >
         <% if message.has_document_image? %>
           <%= button_tag type: "button",
-                class: "w-full h-auto flex focus:outline-none",
-                data: {
-                  controller: "image-loader",
-                  image_loader_message_scroller_outlet: "[data-role='message-contents']",
-                  image_loader_url_value: message.document_image_path(:small),
-                  action: "modal#open",
-                  role: "image-preview",
-                } do
-          %>
+            class: "w-full h-auto flex focus:outline-none",
+            data: {
+              role: "image-preview",
+              controller: "image-loader",
+              image_loader_message_scroller_outlet: "[data-role='message']",
+              image_loader_url_value: message.document_image_path(:small),
+              action: "modal#open",
+          } do %>
             <%= image_tag message.document_image_path(:small, fallback: ""),
-                  data: {
-                    image_loader_target: "image",
-                    action: %|
-                      error->image-loader#retryAfterDelay
-                      load->image-loader#show
-                    |
-                  },
-                  class: %|
-                    my-0
-                    mx-auto
-                    max-w-full
-                    border-2 border-gray-100 dark:border-gray-400
-                    rounded-md
-                  |,
-                  width: 1,
-                  height: 1
-            %>
+              class: %|
+                my-0
+                mx-auto
+                max-w-full
+                border-2 border-gray-100 dark:border-gray-400
+                rounded-md
+              |,
+              width: 1,
+              height: 1,
+              data: {
+                image_loader_target: "image",
+                action: %|
+                  error->image-loader#retryAfterDelay
+                  load->image-loader#show
+                |
+            } %>
             <div data-role="image-loader" class="mx-auto hidden" data-image-loader-target="loader">
               <%= spinner size: 6, class: "text-black dark:text-white" %>
             </div>
           <% end %>
         <% end %>
-        <%= formatted_text = format_for_display message.content_text,
-              append_inside_tag: span_tag("", class: %|
-                animate-breathe
-                w-3 h-3
-                rounded-full
-                bg-black dark:bg-white
-                inline-block
-                ml-1
-                #{!thinking && 'hidden'}
-              |) +
-              span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && 'hidden') +
-              icon("stop",
-                variant: :solid,
-                size: 17,
-                title: "Stopped",
-                tooltip: :top,
-                data: { role: "cancelled" },
-                class: "inline-block pl-1 #{message.not_cancelled? && 'hidden'}"
-              )
-        %>
+        <%= formatted_text = format_for_display message.content_text, append_inside_tag: thinking_html(message, thinking) %>
       </div>
 
       <% if debug_tool_messages && message.content_tool_calls.present? %>
@@ -185,16 +165,16 @@ end %>
           <% end %>
         <% elsif message.assistant? && message.assistant.not_deleted? %>
           <%= button_tag type: "button",
-                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
-                data: {
-                  role: "clipboard",
-                  action: %|
-                    clipboard#copy
-                    transition#toggleClassOn
-                    mouseleave->transition#toggleClassOff
-                  |,
-                  keyboard_target: formatted_text.present? && formatted_text.exclude?('keyboard-target') ? "keyboardable" : nil,
-                  # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
+            class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
+            data: {
+              role: "clipboard",
+              action: %|
+                clipboard#copy
+                transition#toggleClassOn
+                mouseleave->transition#toggleClassOff
+              |,
+              keyboard_target: formatted_text.present? && formatted_text.exclude?('keyboard-target') ? "keyboardable" : nil,
+              # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
           } do %>
             <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
             <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
@@ -218,10 +198,6 @@ end %>
                     form_class: "inline-block p-0",
                     class: "truncate w-full py-2 px-4 text-left",
                     method: :post,
-                    data: {
-                      turbo_frame: "_top",
-                      turbo_action: "replace",
-                    },
                     params: { message: {
                       conversation_id: conversation.id,
                       assistant_id: assistant.id,
@@ -229,8 +205,11 @@ end %>
                       index: message.index,
                       branched: true,
                       branched_from_version: message.version
-                    } } do
-                  %>
+                    } },
+                    data: {
+                      turbo_frame: "_top",
+                      turbo_action: "replace",
+                  } do %>
                     Using <%= assistant.name %>
                   <% end %>
                 </li>
@@ -245,22 +224,20 @@ end %>
       <dialog class="modal no-focus-outline" data-modal-target="dialog" data-role="image-modal">
         <main class="modal-box max-w-5xl p-0 rounded-none">
           <article
+            class="flex flex-col md:flex-row justify-center"
             data-controller="image-loader"
             data-image-loader-message-scroller-outlet="[data-role='message']"
             data-image-loader-url-value="<%= message.document_image_path(:large) %>"
             data-turbo-permanent
-            class="flex flex-col md:flex-row justify-center"
           >
             <%= image_tag message.document_image_path(:large, fallback: ""),
+              class: "w-full h-auto",
               data: {
                 image_loader_target: "image",
                 action: %|
                   error->image-loader#retryAfterDelay
                   load->image-loader#show
-                |
-              },
-              class: "w-full h-auto"
-            %>
+            | } %>
             <div data-role="image-loader" class="hidden p-5" data-image-loader-target="loader">
               <%= spinner size: 6, class: "text-black dark:text-white" %>
             </div>

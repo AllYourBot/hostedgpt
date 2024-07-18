@@ -38,6 +38,27 @@ module MessagesHelper
     return html.html_safe
   end
 
+  def thinking_html(message, thinking)
+    span_tag("", class: %|
+      animate-breathe
+      w-3 h-3
+      rounded-full
+      bg-black dark:bg-white
+      inline-block
+      ml-1
+      #{!thinking && 'hidden'}
+    |) +
+    span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && 'hidden') +
+    icon("stop",
+      variant: :solid,
+      size: 17,
+      title: "Stopped",
+      tooltip: :top,
+      data: { role: "cancelled" },
+      class: "inline-block pl-1 #{message.not_cancelled? && 'hidden'}"
+    )
+  end
+
   private
 
   def block_code
