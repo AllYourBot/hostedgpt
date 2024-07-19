@@ -28,6 +28,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
 - [Configure optional features](#configure-optional-features)
+  - [Give assistant access to your Google apps](#configuring-google-tools)
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
     - [Google OAuth authentication](#google-oauth-authentication)
@@ -109,36 +110,23 @@ You may want to read about [configuring optional features](#configure-optional-f
 
 ## Configure optional features
 
-The file `options.yml` contains a number of Features and Settings you can configure. Simple flags are:
+There are a number of optional feature flags that can be set and settings that can be configured. All of these can be seen in the file `options.yml`, however each is explained below and can be activated by setting environment variables.
 
-- `REGISTRATON_FEATURE` is `true` by default but you can set to `false` to prevent any new people from creating an account.
-- `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
-- `GOOGLE_TOOLS_FEATURE` — This is an experimental feature that enables your assistant to access your Gmail (and soon Google Tasks and Calendar).
-
-Additionally, certain features can only be configured with environment variables. These are:
-
-- `CLOUDFLARE_STORAGE_FEATURE` - This is a feature that allows you to store message attachments in Cloudflare's R2 storage. When this is false, attachments are stored within postgres. This is the default configuration. But you can set it to `true` to enable it. You must configure Cloudflare Storage first for it to work.
-
-### Configuring Cloudflare Storage
-
-First you need to sign up for Cloudflare. The free tier allows 10 GB of storage. After you sign up, you need to create a new bucket and an API token. The API token should have "Object Read and Write" access to your bucket. Take note of your Access Key ID and your Secret Access Key along with your Account ID. Set the following environment variables:
-
-- `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare Account ID
-- `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
-- `CLOUDFLARE_SECRET_ACCESS_KEY` - Your Cloudflare Secret Access Key
-- `CLOUDFLARE_BUCKET` - The name of the bucket you created
-
-or you can add these to your Rails credentials file:
-
-```yaml
-cloudflare:
-  account_id: "your-account-id"
-  access_key_id: "your-access-key-id"
-  secret_access_key: "your-secret-access-key"
-  bucket: "your-bucket-name"
-```
-
-Then be sure to set the `CLOUDFLARE_STORAGE_FEATURE` environment variable to `true`.
+- `REGISTRATON_FEATURE` is `true` by default, but you can set to `false` to prevent any new people from creating an account.
+- `DEFAULT_LLM_KEYS` is `false` by default so each user is expected to add LLM API keys to their user settings. Set this to `true` if you want to configure LLM API keys that will be shared by all users. Set one or more of the additional variables in order to use this feature. The app will still check if the user has added their own API keys for any services and will use those instead of the default ones.
+  - `DEFAULT_OPENAI_KEY` will be used by the pre-configured OpenAI API Service
+  - `DEFAULT_ANTHROPIC_KEY` will be used by the pre-configured Anthropic API Service
+  - `DEFAULT_GROQ_KEY` will be used by the pre-configured Groq API Service
+- `CLOUDFLARE_STORAGE_FEATURE` is `false` by default so any files that are uploaded while chatting with your assistant will be stored in postgres. This is recommended for small deployments. Set this to `true` if you would like to store message attachments in Cloudflare's R2 storage (this mimics AWS S3). You must also sign up for Cloudflare. The free tier allows 10 GB of storage. After you sign up, you need to create a new bucket and an API token. The API token should have "Object Read and Write" access to your bucket. Take note of your Access Key ID and your Secret Access Key along with your Account ID. Set the following environment variables:
+  - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare Account ID
+  - `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
+  - `CLOUDFLARE_SECRET_ACCESS_KEY` - Your Cloudflare Secret Access Key
+  - `CLOUDFLARE_BUCKET` - The name of the bucket you created
+- `GOOGLE_TOOLS_FEATURE` is `false` by default because this feature is still in development. Set this to `true` if you would like to try the experimental feature where your assistant can access your Gmail, Google Tasks, and soon Google Calendar. After enabling, you need to set up Google OAuth and include the apps as part of the consent flow. See [Configure Google Tools](#configuring-google-tools). After this is done, when each user goes to Settings within the app, there will be a button to explicitly connect their account to Gmail, Google Tasks, and/or Google Calendar. Review `gmail.rb` and `google_tasks.rb` in the directory `app/services/toolbox/` to see what capabilities have currently been built.
+- `VOICE_FEATURE` is `false` by default. This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
+- `PASSWORD_AUTHENTICATION_FEATURE` is `true` by default, see the [Authentication](#authentication) section for more details.
+- `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
+- `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
 
 ### Configuring Google Tools
 
@@ -171,8 +159,8 @@ Google OAuth authentication is disabled by default. You can enable it by setting
 
 To enable Google OAuth authentication, you need to set up Google OAuth in the Google Cloud Console. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
 
-- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID (alternatively, you can add `google_auth_client_id` to your Rails credentials file)
-- `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret (alternatively, you can add `google_auth_client_secret` to your Rails credentials file)
+- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret
 
 **Steps to set up:**
 
@@ -206,10 +194,12 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
 4. **Set Environment Variables:**
    - After creating the credentials, you will see a dialog with your Client ID and Client Secret.
    - Set the Client ID and Client Secret as environment variables in your application:
-     - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID ENV or `google_auth_client_id` in your Rails credentials file
-     - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret ENV or `google_auth_client_secret` in your Rails credentials file
+     - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID
+     - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret
 
 #### HTTP header authentication
+
+Note: Enabling this automatically disables Password-based and Google-auth based authentication.
 
 HTTP header authentication is an alternative method to authenticate users based on custom HTTP request headers. This method is useful when you have an existing authentication system, and you want to direct users to HostedGPT and have them skip all authentication steps. They'll be taken right into the app and a HostedGPT user account will be created on the fly. This works by having your existing system set custom headers for authenticated users. This may be a Reverse Proxy (e.g., [Traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/) or [Caddy](https://caddyserver.com/docs/caddyfile/directives/forward_auth)) or a Zero Trust Network (e.g., [Tailscale](https://tailscale.com/kb/1312/serve#identity-headers)).
 
