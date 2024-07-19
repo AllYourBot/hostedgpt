@@ -7,6 +7,7 @@ require_relative "../lib/string"
 require_relative "../lib/false_class"
 require_relative "../lib/true_class"
 require_relative "../lib/nil_class"
+require_relative "../app/models/feature"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -14,6 +15,8 @@ Bundler.require(*Rails.groups)
 
 module HostedGPT
   class Application < Rails::Application
+    config.options = config_for(:options)
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.1
 
@@ -34,12 +37,10 @@ module HostedGPT
     config.eager_load_paths << Rails.root.join("lib")
 
     # Active Storage
-    if ENV["CLOUDFLARE_STORAGE_FEATURE"] == "true"
+    if Feature.cloudflare_storage?
       config.active_storage.service = :cloudflare
     else
       config.active_storage.service = :database
     end
-
-    config.options = config_for(:options)
   end
 end
