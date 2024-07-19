@@ -44,6 +44,7 @@ gem "tiktoken_ruby", "~> 0.0.6"
 gem "solid_queue", "~> 0.2.1"
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable
+gem "aws-sdk-s3", require: false
 
 gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2", "~> 1.1"

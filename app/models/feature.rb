@@ -27,7 +27,9 @@ class Feature
     end
 
     def enabled?(feature)
-      feature_value = Current.user&.preferences&.dig(:feature, feature.to_sym)
+      feature_value = if defined?(Current)
+        Current.user&.preferences&.dig(:feature, feature.to_sym)
+      end
 
       begin
         feature_value = feature_value.to_s.presence || features.fetch(feature.to_sym)
