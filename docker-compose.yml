@@ -1,4 +1,4 @@
-version: '3.1'
+version: "3.1"
 
 services:
   postgres:
@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: app_development
       POSTGRES_PASSWORD: secret
     volumes:
-    - hostedgpt_pgdata:/var/lib/postgresql/data
+      - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "app", "-d", "app_development"]
       interval: 1s
@@ -42,6 +42,11 @@ services:
       - HTTP_HEADER_AUTH_EMAIL
       - HTTP_HEADER_AUTH_NAME
       - HTTP_HEADER_AUTH_UID
+      - CLOUDFLARE_STORAGE_FEATURE
+      - CLOUDFLARE_ACCOUNT_ID
+      - CLOUDFLARE_ACCESS_KEY_ID
+      - CLOUDFLARE_SECRET_ACCESS_KEY
+      - CLOUDFLARE_BUCKET
     ports: ["3000:3000"]
     volumes:
       - .:/rails

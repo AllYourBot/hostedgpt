@@ -5,6 +5,7 @@
 
 app = 'hostedgpt'
 primary_region = 'dfw'
+swap_size_mb = 512
 console_command = '/rails/bin/rails console'
 
 [build]
@@ -43,7 +44,7 @@ console_command = '/rails/bin/rails console'
       X-Forwarded-Proto = 'https'
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
 
