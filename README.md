@@ -112,6 +112,7 @@ You may want to read about [configuring optional features](#configure-optional-f
 
 There are a number of optional feature flags that can be set and settings that can be configured. All of these can be seen in the file `options.yml`, however each is explained below and can be activated by setting environment variables.
 
+- `PRODUCTION_HOST` is blank but you should ideally set this if you are deploying the app with a public domain to protect against host header attacks. For example, set it to `example.com` (leave off https). You may add multiple host names separated by comma, `example.fly.dev, example.com` (whitespace is ignored).
 - `REGISTRATON_FEATURE` is `true` by default, but you can set to `false` to prevent any new people from creating an account.
 - `DEFAULT_LLM_KEYS` is `false` by default so each user is expected to add LLM API keys to their user settings. Set this to `true` if you want to configure LLM API keys that will be shared by all users. Set one or more of the additional variables in order to use this feature. The app will still check if the user has added their own API keys for any services and will use those instead of the default ones.
   - `DEFAULT_OPENAI_KEY` will be used by the pre-configured OpenAI API Service
