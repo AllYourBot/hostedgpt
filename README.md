@@ -84,7 +84,7 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise `curl -L https://fly.io/install.sh | sh` ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
 1. Think of an internal Fly name for your app, it has to be unique to all of Fly, and then in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME_YOU_CHOSE`
 
-    - Say "Yes" when it asks if you want to tweak these settings
+   - Say "Yes" when it asks if you want to tweak these settings
 
 1. When it opens your browser, change the Database to `Fly Postgres` with a unique name such as `[APP_NAME]-db` and you can set the configuration to `Development`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
@@ -263,6 +263,7 @@ HostedGPT requires these services to be running:
 1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
 1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
 1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
+1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `bin/rails db:fixtures:load`
 
 Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
 
