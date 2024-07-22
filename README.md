@@ -83,7 +83,9 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
 1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise `curl -L https://fly.io/install.sh | sh` ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
 1. Think of an internal Fly name for your app, it has to be unique to all of Fly, and then in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME_YOU_CHOSE`
-  * Say "Yes" when it asks if you want to tweak these settings
+
+   - Say "Yes" when it asks if you want to tweak these settings
+
 1. When it opens your browser, change the Database to `Fly Postgres` with a unique name such as `[APP_NAME]-db` and you can set the configuration to `Development`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
 1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
@@ -134,11 +136,12 @@ There are a number of optional feature flags that can be set and settings that c
 You first need to follow all the steps in the [Google OAuth instructions](#google-oauth-authentication). The only step that is optional is that you can leave `GOOGLE_AUTHENTICATION_FEATURE` set to false, which means you don't have to enable new users to register with Google. However, following all the steps will also set up Google Auth so you can connect Google Tools to your assistants. After, you complete those steps, here is the additional configuration you need to do in order to enable the Google tools:
 
 1. **Go back to the OAuth Consent Screen:**
+
    - In the navigation menu, go to "APIs & Services" > "OAuth consent screen" > click Edit App
    - It starts you on "OAuth consent screen" which is already done, at the bottom click "Save and Continue" to advance to "Scopes"
    - Click "Add or Remove Scopes", check "userinfo.email" and then in "Manually add scopes" paste these URLs, one at a time:
-     - https://www.googleapis.com/auth/gmail.modify  (then click "Add To Table")
-     - https://www.googleapis.com/auth/tasks  (then click "Add To Table")
+     - https://www.googleapis.com/auth/gmail.modify (then click "Add To Table")
+     - https://www.googleapis.com/auth/tasks (then click "Add To Table")
 
 2. **Finally, set `GOOGLE_TOOLS_FEATURE` to true**
 
@@ -147,6 +150,7 @@ You first need to follow all the steps in the [Google OAuth instructions](#googl
 HostedGPT supports multiple authentication methods:
 
 <!-- no toc -->
+
 - [Password authentication](#password-authentication)
 - [Google OAuth authentication](#google-oauth-authentication)
 
@@ -166,12 +170,14 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
 **Steps to set up:**
 
 1. **Go to the Google Cloud Console and Create a New Project:**
+
    - Open your web browser and navigate to [Google Cloud Console](https://console.cloud.google.com/).
    - Click on the project drop-down menu at the top of the page.
    - Select "New Project"
    - Enter a name for your project and click "Create"
 
 2. **Create OAuth Consent Screen:**
+
    - In the navigation menu, go to "APIs & Services" > "OAuth consent screen"
    - If you want to restrict this to users in your Google Workspace, select "Internal". If you want to let people use any Google account, select "External", and then click "Create"
    - Fill out the required fields (App name, User support email, etc.).
@@ -181,6 +187,7 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
    - On the "Test Users" screen you can enter a few email address that you want to test with, then "Save and Continue"
 
 3. **Create OAuth Credentials:**
+
    - In the navigation menu, go to "APIs & Services" > "Credentials"
    - Click on "Create Credentials" and select "OAuth client ID"
    - Choose "Web application" as the application type.
@@ -207,9 +214,11 @@ HTTP header authentication is an alternative method to authenticate users based 
 **Steps to set up:**
 
 1. **Enable the feature:**
+
    - Since HTTP header authentication is disabled by default set the environment variable `HTTP_HEADER_AUTHENTICATION_FEATURE` to `true`. This will automatically disable password and Google OAuth authentication methods.
 
 2. **Configure the request headers:**
+
    - Beware: enabling HTTP header authentication will allow anyone with direct access to the application to impersonate any user by setting the custom headers, if not properly secured. You must ensure that the custom headers are set by a trusted source and are not easily spoofed.
    - Configure your authentication system to set the following request headers when directing users to the HostedGPT app:
    - `HTTP_HEADER_AUTH_EMAIL` - Set this environment variable to the name of the HTTP request header which will contain the user's email address. This defaults to a check for a request header of `X-WEBAUTH-EMAIL` to find the user's email.
@@ -235,6 +244,7 @@ The easiest way to get up and running is to use the provided docker compose work
 1. Run tests: `docker compose run base rails test` The app has comprehensive test coverage but note that system tests currently do not work in docker.
 1. Open the rails console: `docker compose run base rails console`
 1. Run a psql console: `docker compose run base psql`
+1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `docker compose run base rails db:fixtures:load`
 1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
 
 Every time you pull new changes down, kill docker (if it's running) and re-run:
@@ -254,6 +264,7 @@ HostedGPT requires these services to be running:
 1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
 1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
 1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
+1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `bin/rails db:fixtures:load`
 
 Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
 
