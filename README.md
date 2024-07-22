@@ -84,7 +84,7 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise `curl -L https://fly.io/install.sh | sh` ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
 1. Think of an internal Fly name for your app, it has to be unique to all of Fly, and then in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME_YOU_CHOSE`
 
-- Say "Yes" when it asks if you want to tweak these settings
+    - Say "Yes" when it asks if you want to tweak these settings
 
 1. When it opens your browser, change the Database to `Fly Postgres` with a unique name such as `[APP_NAME]-db` and you can set the configuration to `Development`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
