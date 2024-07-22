@@ -243,7 +243,7 @@ The easiest way to get up and running is to use the provided docker compose work
 1. Run tests: `docker compose run base rails test` The app has comprehensive test coverage but note that system tests currently do not work in docker.
 1. Open the rails console: `docker compose run base rails console`
 1. Run a psql console: `docker compose run base psql`
-1. Load fixtures: `docker compose run base rails db:fixtures:load`
+1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `docker compose run base rails db:fixtures:load`
 1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
 
 Every time you pull new changes down, kill docker (if it's running) and re-run:
