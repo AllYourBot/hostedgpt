@@ -17,7 +17,7 @@ export default class extends Interface {
     $.audioService.onBusyChanged = (busy) => {
       if (busy) {
         Cover.Transcriber()
-      else
+      } else
         Uncover.Transcriber()
     }
   }
