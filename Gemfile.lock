@@ -233,6 +233,11 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.6)
+    postmark (1.25.1)
+      json
+    postmark-rails (0.22.1)
+      actionmailer (>= 3.0.0)
+      postmark (>= 1.21.3, < 2.0)
     prism (0.19.0)
     protocol (2.0.0)
       ruby_parser (~> 3.0)
@@ -448,6 +453,7 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 1.1)
   omniauth-rails_csrf_protection (~> 1.0.2)
   pg (~> 1.1)
+  postmark-rails
   pry-rails
   puma (>= 5.0)
   rack-cors

@@ -3,7 +3,15 @@
   <%= render "head" %>
   <body class="font-sans text-gray-950 dark:text-gray-100 system">
     <main class="flex bg-white dark:bg-gray-800  w-full dark:dark:text-gray-100">
-      <%= content_for?(:main) ? yield(:main) : yield %>
+      <div class="flex flex-col items-center justify-center w-full h-full space-y-4">
+        <div class="p-3 bg-white border border-gray-100 rounded-full">
+          <%= image_tag("logo.svg", width: "24", height: "24", class: "text-gray-950") %>
+        </div>
+
+        <h2 class='text-3xl font-semibold'><%= content_for?(:heading) ? yield(:heading) : "Welcome back" %></h2>
+
+        <%= content_for?(:main) ? yield(:main) : yield %>
+      </div>
     </main>
     <%= render "layouts/toast" %>
   </body>

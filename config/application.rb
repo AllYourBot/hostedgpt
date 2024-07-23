@@ -8,6 +8,7 @@ require_relative "../lib/false_class"
 require_relative "../lib/true_class"
 require_relative "../lib/nil_class"
 require_relative "../app/models/feature"
+require_relative "../app/models/setting"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -28,6 +29,11 @@ module HostedGPT
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Info include generic and useful information about system operation, but avoids logging too much
+    # information to avoid inadvertent exposure of personally identifiable information (PII). If you
+    # want to log everything, set the level to "debug".
+    config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
@@ -42,5 +48,24 @@ module HostedGPT
     else
       config.active_storage.service = :database
     end
+
+    # Action Mailer
+    Setting.require_keys(:action_mailer_host)
+    config.action_mailer.default_url_options = { host: Setting.action_mailer_host }
+
+    if Feature.postmark_mailer?
+      Setting.require_keys(
+        :postmark_server_api_token,
+        :postmark_from_email,
+        :postmark_password_reset_template_alias
+      )
+
+      config.action_mailer.delivery_method = :postmark
+      config.action_mailer.postmark_settings = { api_token: Setting.postmark_server_api_token }
+    end
+
+    # Password Reset email
+    config.password_reset_token_ttl_minutes = (Setting.password_reset_token_ttl_minutes.presence || 30).to_i
+    config.password_reset_token_purpose = "password_reset"
   end
 end

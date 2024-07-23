@@ -1,0 +1,23 @@
+<% content_for :heading, "Forgot your password?" %>
+
+<%= form_with url: password_reset_path, class: "flex flex-col space-y-4 w-80" do |f| %>
+  <%= f.label :email, class: "input input-bordered flex items-center justify-between" do %>
+    <span>Email <span class="">*</span></span>
+    <%= f.email_field :email,
+      autofocus: true,
+      placeholder: "Email",
+      class: "w-44 border-0 dark:text-black"
+    %>
+  <% end %>
+
+  <%= f.submit 'Send reset email',
+        class: %|
+          text-white font-medium
+          bg-brand-blue dark:bg-gray-900
+          border border-white dark:border-gray-400
+          rounded-lg p-4 text-center
+          cursor-pointer
+          hover:opacity-95
+        |
+  %>
+<%end%>
