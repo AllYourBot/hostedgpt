@@ -4,7 +4,7 @@ export default class extends Interface {
   logLevel_info
 
   log_Prompt
-  Prompt(words)             { $.audioService.speakNext(words) }
+  Prompt(sentence)          { $.audioService.speakNext(sentence) }
   Reset()                   { $.audioService.stop() }
   async Play(sound, onEnd)  { await $.audioService.play(sound, onEnd) }
   Loop(sec, sound)          { $.audioService.playEvery(sec, sound) }
@@ -15,10 +15,9 @@ export default class extends Interface {
   new() {
     $.audioService = new AudioService
     $.audioService.onBusyChanged = (busy) => {
-      console.log(`onbusyChanged(${busy})`)
-      if (busy)
+      if (busy) {
         Cover.Transcriber()
-      else
+      } else
         Uncover.Transcriber()
     }
   }
