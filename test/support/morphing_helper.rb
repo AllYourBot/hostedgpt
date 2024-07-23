@@ -7,8 +7,9 @@ module MorphingHelper
 
     yield
 
-    sleep 1 # this delay is so long b/c we wait 0.5s before scrolling the page down
-    assert get_scroll_position("section #messages") > @messages_scroll_position, "The page should have scrolled down further"
+    assert_true "The page should have scrolled down further" do
+      get_scroll_position("section #messages") > @messages_scroll_position
+    end
     assert_hidden "#scroll-button", "The page did not scroll all the way down"
     assert tagged?("nav"), "The page did not morph; a tagged element got replaced."
     assert tagged?(first_message), "The page did not morph; a tagged element got replaced."
@@ -39,7 +40,7 @@ module MorphingHelper
       find(selector_or_element)
     end
 
-    page.execute_script("arguments[0]._morphMonitor = true", element)
+    page.execute_script("arguments[0]._taggedForMonitoring = true", element)
   end
 
   def tagged?(selector_or_element)
@@ -49,6 +50,6 @@ module MorphingHelper
       find(selector_or_element)
     end
 
-    element[:'_morphMonitor']
+    element[:'_taggedForMonitoring']
   end
 end

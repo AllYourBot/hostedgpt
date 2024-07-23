@@ -319,4 +319,8 @@ class Capybara::Node::Element
   def find_role(label)
     find("[data-role='#{label}']", visible: :all)
   end
+
+  def find_target(label, controller:)
+    find("[data-#{controller}-target='#{label}']", visible: :all)
+  end
 end
