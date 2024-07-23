@@ -2,7 +2,6 @@ import Service from "../service.js"
 
 export default class extends Service {
   logLevel_info
-  attrAccessor_onTextReceived
   attrReader_listening
 
   new() {
@@ -33,7 +32,7 @@ export default class extends Service {
   }
 
   async start()   { $.intendedState = 'started';  return await _executeStart() }
-  restart()       { $.intendedState = 'started';  _executeRestart() }
+  async restart() { $.intendedState = 'started';  return await _executeRestart() }
   end()           { $.intendedState = 'ended';    _executeEnd() }
   get listening()  { $.state == 'started' }
   get ended()      { $.state == 'ended' }
@@ -73,6 +72,8 @@ export default class extends Service {
 
     if ($.state == 'started')
       _executeEnd() // will eventually trigger _onStart() b/c of intendedState
+    else if ($.state == 'ended')
+      _executeStart()
     else
       _onStart()
   }
@@ -120,6 +121,6 @@ export default class extends Service {
 
     if (transcript.length <= 1) return
 
-    $.onTextReceived(transcript)
+    SpeakTo.Transcriber.with.words(transcript)
   }
 }
