@@ -1,6 +1,22 @@
 require "./lib/markdown_renderer"
 
 module MessagesHelper
+  def render_avatar_for(message)
+    if message.user?
+      render partial: "layouts/user_avatar",      locals: { user: Current.user,           size: 7, classes: "mt-1" }
+    else
+      render partial: "layouts/assistant_avatar", locals: { assistant: message.assistant, size: 7, classes: "mt-1" }
+    end
+  end
+
+  def from_name_for(message)
+    case message.role
+      when "user" then "You"
+      when "assistant" then message.assistant.name
+      when "tool" then "Tool"
+    end
+  end
+
   def format_for_copying(text)
     text
   end
@@ -20,6 +36,27 @@ module MessagesHelper
     html = "<p></p>" if html.blank?
     html = append(html, append_inside_tag) if append_inside_tag
     return html.html_safe
+  end
+
+  def thinking_html(message, thinking)
+    span_tag("", class: %|
+      animate-breathe
+      w-3 h-3
+      rounded-full
+      bg-black dark:bg-white
+      inline-block
+      ml-1
+      #{!thinking && 'hidden'}
+    |) +
+    span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && 'hidden') +
+    icon("stop",
+      variant: :solid,
+      size: 17,
+      title: "Stopped",
+      tooltip: :top,
+      data: { role: "cancelled" },
+      class: "inline-block pl-1 #{message.not_cancelled? && 'hidden'}"
+    )
   end
 
   private

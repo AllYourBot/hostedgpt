@@ -50,11 +50,11 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal h, Message.new.content_tool_calls
   end
 
-  test "name returns a properly formatted string" do
-    assert_equal users(:keith).first_name, messages(:hear_me).name
-    assert_equal "Samantha", messages(:yes_i_do).name
-    assert_equal "OpenAI", messages(:popstate_event).name # strips off non-alphanumeric
-    assert_nil messages(:weather_tool_result).name
+  test "name_for_api returns a properly formatted string" do
+    assert_equal users(:keith).first_name, messages(:hear_me).name_for_api
+    assert_equal "Samantha", messages(:yes_i_do).name_for_api
+    assert_equal "OpenAI", messages(:popstate_event).name_for_api # strips off non-alphanumeric
+    assert_nil messages(:weather_tool_result).name_for_api
   end
 
   test "finished? returns true if processed and missing either content_text or content_tool_calls" do
