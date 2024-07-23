@@ -60,7 +60,7 @@ function init() {
           return
         }
         const testName = matches[1]
-        options.push(`-t=${testName}`)
+        options.push(`-t=${escapeRegExp(testName)}`)
       } else
         options.push(`-t=.*`)
 
@@ -99,4 +99,8 @@ function requireLibThen(init) { // look in test_helper.js for test env version o
 
     init()
   })()
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }

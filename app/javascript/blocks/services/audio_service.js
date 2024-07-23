@@ -5,7 +5,7 @@ export default class extends Service {
   attrReader_player
 
   new() {
-    $.player = new (window.AudioContext || window.webkitAudioContext)()
+    $.player = new (w.AudioContext || w.webkitAudioContext)()
     $.playerSource = null
     $.queue = new QueueService()
     $.playing = false

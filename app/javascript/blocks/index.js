@@ -17,6 +17,7 @@
 g.process = (typeof process === 'undefined') ? {} : process
 g.mode = (typeof window !== 'undefined' && window.mock === undefined) ? 'browser' : 'node'
 g.blocks = {
+  mode: g.mode,
   env: (() => {
     const env = process?.env?.NODE_ENV ?? (g.mode == 'browser' ? window.blocks_env : 'development')
 
@@ -54,7 +55,14 @@ g.allMethodsCall = (actionFunction) => {
 
 // Finish init
 
-if (g.mode == 'browser') {
+if (g.blocks.mode == 'browser') {
+  if (g.blocks.env.isTest)
+    await import('/assets/blocks/test_mocks.js')
+  else {
+    g.w = window
+    g.n = navigator
+  }
+
   await importDir('lib')
   for (const subdir of subdirsExceptLib('lib'))
     await importDir(subdir)
