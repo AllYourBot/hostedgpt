@@ -6,6 +6,7 @@ import("blocks").then(() => {
 // Utilities for test environment
 window.imageLoadingForSystemTestsToCheck = {}
 window.logs = []
+window.blocks_env = document.getElementsByTagName('html')[0].getAttribute('data-role') // see blocks/index.js
 
 // Debug code
 // console.log('Document: refresh')

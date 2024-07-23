@@ -16,9 +16,9 @@
 
 g.process = (typeof process === 'undefined') ? {} : process
 g.mode = (typeof window !== 'undefined' && window.mock === undefined) ? 'browser' : 'node'
-g.node = {
+g.blocks = {
   env: (() => {
-    const env = process?.env?.NODE_ENV ?? 'development'
+    const env = process?.env?.NODE_ENV ?? (g.mode == 'browser' ? window.blocks_env : 'development')
 
     const envFunc =                     () => env
     envFunc.                            toString = () => env
@@ -30,11 +30,11 @@ g.node = {
 
     // Supports:
     //
-    // node.env()
-    // ${node.env}
-    // node.env.s
-    // node.isTest
-    // node.isDevelopment
+    // blocks.env()
+    // ${blocks.env}
+    // blocks.env.s
+    // blocks.env.isTest
+    // blocks.env.isDevelopment
 
     return envFunc
   })()
@@ -53,6 +53,7 @@ g.allMethodsCall = (actionFunction) => {
 }
 
 // Finish init
+
 if (g.mode == 'browser') {
   await importDir('lib')
   for (const subdir of subdirsExceptLib('lib'))
