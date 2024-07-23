@@ -9,8 +9,10 @@ export default class extends Interface {
   logLevel_info
 
   log_Tell
-  async Tell(words)   { if (this.engaged && _intendedDismiss(words)) {
-                          await Dismiss.Listener()
+  async Tell(words)   { if (await _dismissIfNeeded(words)) return
+                        words = await _invokeIfNeeded(words)
+                        if (!$.processing) {
+                          Uncover.Transcriber()
                           return
                         }
                         log(`consideration = ${words}`)
@@ -57,14 +59,36 @@ export default class extends Interface {
     $.screenService = new ScreenService
   }
 
+  async _dismissIfNeeded(words) {
+    if (!engaged() || ! _intendedDismiss(words)) return false
+
+    await Dismiss.Listener()
+    Uncover.Transcriber()
+    return true
+  }
+
   _intendedDismiss(words) {
     return words.downcase().includeAny(["hold on", "hold up", "one sec", "one second", "stop", "on a call"]) &&
       words.downcase().includeAny(["samantha"])
   }
 
+  async _invokeIfNeeded(words) {
+    if (! _intendedInvoke(words)) return words
+
+    await Invoke.Listener()
+    return _removeSpeechBeforeName(words)
+  }
+
   _intendedInvoke(words) {
     return words.downcase().includeAny(["samantha", "i'm back", "i am back", "i'm here"]) &&
       words.downcase().includeAny(["samantha"]) //TODO; let's recognize these phrases without "samantha" and simply reply with "are you talking to me?"
+  }
+
+  _removeSpeechBeforeName(words) {
+    if (words.downcase().includes("samantha"))
+      return words.slice(words.downcase().indexOf("samantha"))
+    else
+      return words
   }
 
   async _takeScreenshotIfNeeded(words) {
@@ -81,12 +105,5 @@ export default class extends Interface {
     Play.Speaker.sound('jeep', () => {
       Loop.Speaker.every(4, 'thinking')
     })
-  }
-
-  _removeSpeechBeforeName(words) {
-    if (words.downcase().includes("samantha"))
-      return words.slice(words.downcase().indexOf("samantha"))
-    else
-      return words
   }
 }
