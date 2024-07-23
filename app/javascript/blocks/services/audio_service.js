@@ -66,6 +66,7 @@ export default class extends Service {
       $.playerSource.stop()
     }
     _resetQueue()
+    $.speaking = false
     $.playing = false
     $.busy = false
   }
@@ -159,7 +160,6 @@ export default class extends Service {
   }
 
   _resetQueue() {
-    log('resetting queue')
     $.queue.reset()
     $.queue = new QueueService()
   }
