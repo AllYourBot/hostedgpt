@@ -8,10 +8,8 @@ class PasswordResetsController < ApplicationController
   end
 
   def create
-    user_agent = request.env['HTTP_USER_AGENT']
-    os = get_item_in_str(user_agent, KNOWN_OPERATING_SYSTEMS) || "unknown operating system"
-    browser = get_item_in_str(user_agent, KNOWN_BROWSERS) || "unknown browser"
-
+    os = request.operating_system
+    browser = request.browser
     SendResetPasswordEmailJob.perform_later(params[:email], os, browser) # queue as a job to avoid timing attacks
 
     redirect_to '/login', notice: 'If an account with that email was found, we have sent a link to reset the password'
