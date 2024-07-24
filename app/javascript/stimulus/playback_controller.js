@@ -30,7 +30,7 @@ export default class extends Controller {
   }
 
   beginSpeakingMessage() {
-    //console.log('### beginSpeakingMessage()')
+    console.log('### beginSpeakingMessage()')
     this.observer = this.connectMessageObserver(() => this.messageTextUpdated('observer'))
     this.messageTextUpdated('initial')
   }
@@ -48,7 +48,7 @@ export default class extends Controller {
   }
 
   messageTextUpdated(src = '') {
-    //console.log(`${this.idValue}: messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})`)
+    console.log(`${this.idValue}: messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})`)
     if (Listener.disabled && !this.playClicked) return
     const sentences = SpeechService.splitIntoThoughts(this.assistantTextTarget.textContent)
     if (sentences.length == 0) return
@@ -57,20 +57,23 @@ export default class extends Controller {
     const toSentenceIndex = thinkingDone ? sentences.length-1 : sentences.length-2
     this.speakSentencesTo(sentences, toSentenceIndex)
 
-    if (thinkingDone && !this.playClicked) this.speaker?.advancePlayback()
+    if (thinkingDone && !this.playClicked) this.speaker?.playbackFinishedPrompting()
   }
 
   async speakSentencesTo(sentences, toIndex) {
     if (this.sentencesIndexValue > toIndex) return
     for (this.sentencesIndexValue; this.sentencesIndexValue <= toIndex; this.sentencesIndexValue ++) {
       if (!sentences[this.sentencesIndexValue]) break
-      if (sentences[this.sentencesIndexValue].includes('::ServerError') || sentences[this.sentencesIndexValue].includes('Faraday::')) break  // client is displaying a server error
+      if (sentences[this.sentencesIndexValue].includes('::ServerError') || sentences[this.sentencesIndexValue].includes('Faraday::')) {
+        // client is displaying a server error
+        break
+      }
       if (!blocks.env.isTest)
         Prompt.Speaker.toSay(sentences[this.sentencesIndexValue])
       else {
         console.log(`isTest: playback_controller: Prompt.Speaker.toSay(${sentences[this.sentencesIndexValue]})`)
-        await sleep(2)
-        Speaker.onBusyDone()
+        await sleep(1)
+        if (Speaker.onBusyDone) Speaker.onBusyDone()
       }
     }
   }
@@ -80,8 +83,8 @@ export default class extends Controller {
   connectMessageObserver(callback) {
     return new MutationObserver((mutations) => {
       if (mutations.some(mutation => mutation.target == this.element)) {
-        //console.log('mutation', mutations)
-        this.messageTextUpdated('mutation')
+        console.log('mutation', mutations)
+        callback()
       }
     }).observe(this.element, {
       characterData: true,
@@ -92,6 +95,6 @@ export default class extends Controller {
 
   preserveStimulusValues(e) {
     // FIXME: Eventually rails will have an official solution. Check this issue: https://github.com/hotwired/turbo/issues/1210
-    if (e.target == this.element && e.detail.attributeName == 'data-playback-sentences-index-value') { console.log(`## preventing morph`, e); e.preventDefault() }
+    if (e.target == this.element && e.detail.attributeName == 'data-playback-sentences-index-value') e.preventDefault()
   }
 }

@@ -7,10 +7,12 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
   setup do
     login_as users(:keith)
     @conversation = conversations(:hello_claude)
-    visit_and_scroll_wait conversation_messages_path(@conversation, version: 1)
+    # Oddly, visit_and_scroll_wait in here causes tests to fail when running in parallel
   end
 
   test "when page loads a play buttons are visible, click play changes it to stop, audio plays, and it reverts when audo is completed" do
+    visit_and_scroll_wait conversation_messages_path(@conversation)
+
     first_assistant_message.hover
     first_play = first_assistant_message.find_role("play")
     assert first_play.visible?
@@ -33,6 +35,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
   end
 
   test "playback controller does not reconnect when another chunk of message streams" do
+    visit_and_scroll_wait conversation_messages_path(@conversation)
     inner_message_that_will_get_replaced = second_assistant_message.find_role("inner-message")
     tag second_assistant_message
     tag inner_message_that_will_get_replaced
@@ -51,10 +54,11 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
   end
 
   test "sentences-index-value does not revert when the page morphs" do
+    visit_and_scroll_wait conversation_messages_path(@conversation)
     page.execute_script("arguments[0].setAttribute('data-playback-sentences-index-value', '123')", second_assistant_message.native)
 
     assert_page_morphed do
-      @conversation.messages.create!(role: :assistant, assistant: @conversation.assistant, content_text: "Hello, world!"*50)
+      @conversation.messages.create!(role: :assistant, assistant: @conversation.assistant, content_text: "Hello, world!")
       @conversation.broadcast_refresh # morph
     end
 
@@ -62,6 +66,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
   end
 
   test "when stop button is pressed it stops playback" do
+    visit_and_scroll_wait conversation_messages_path(@conversation)
     second_assistant_message.hover
     play = second_assistant_message.find_role("play")
     stop = second_assistant_message.find_role("stop")

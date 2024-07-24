@@ -309,8 +309,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_equal text, toast[:innerText]
   end
 
-  def visit_and_scroll_wait(path)
+  def visit_and_scroll_wait(path, debug: false)
     visit path
+
+    path_without_query = URI.parse(path).path # ignore_query only ignores it from the current_path so strip ourselves
+    assert_current_path path_without_query, ignore_query: true
+
     wait_for_initial_scroll_down
   end
 end
