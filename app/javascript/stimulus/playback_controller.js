@@ -57,7 +57,7 @@ export default class extends Controller {
     const toSentenceIndex = thinkingDone ? sentences.length-1 : sentences.length-2
     this.speakSentencesTo(sentences, toSentenceIndex)
 
-    if (thinkingDone && !this.playClicked) this.speaker?.playbackFinishedPrompting()
+    if (thinkingDone && !this.playClicked) this.speaker?.playbackFinishedPrompting(this.idValue)
   }
 
   async speakSentencesTo(sentences, toIndex) {

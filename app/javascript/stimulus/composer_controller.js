@@ -4,6 +4,7 @@ import viewport from "stimulus/utils/viewport"
 export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
     "disabledSubmit", "microphoneEnable", "microphoneDisable" ]
+  static outlets = [ "speaker" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -100,6 +101,7 @@ export default class extends Controller {
     if (Listener.disabled) {
       await Invoke.Listener()
       Play.Speaker.sound("pop")
+      this.speakerOutlet.micActivated()
     }
   }
 
