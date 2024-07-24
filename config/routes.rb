@@ -1,8 +1,4 @@
 Rails.application.routes.draw do
-  get 'password_resets/new'
-  get 'password_resets/create'
-  get 'password_resets/edit'
-  get 'password_resets/update'
   root to: "assistants#index"
 
   resources :users, only: [:new, :create, :update]

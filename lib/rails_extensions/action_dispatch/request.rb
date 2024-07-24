@@ -1,15 +1,13 @@
 module ActionDispatch
-  KNOWN_OPERATING_SYSTEMS = ["Windows", "Macintosh", "Linux", "Android", "iPhone"].freeze
-  KNOWN_BROWSERS = ["Chrome", "Safari", "Firefox", "Edge", "Opera"].freeze
-
   class Request
+    KNOWN_OPERATING_SYSTEMS = ["Windows", "Macintosh", "Linux", "Android", "iPhone"].freeze
+    KNOWN_BROWSERS = ["Chrome", "Safari", "Firefox", "Edge", "Opera"].freeze
+
     def browser
-      user_agent = env['HTTP_USER_AGENT']
       get_item_in_str(user_agent, KNOWN_BROWSERS) || "unknown browser"
     end
 
     def operating_system
-      user_agent = env['HTTP_USER_AGENT']
       get_item_in_str(user_agent, KNOWN_OPERATING_SYSTEMS) || "unknown operating system"
     end
 

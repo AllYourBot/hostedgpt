@@ -29,11 +29,6 @@ module HostedGPT
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    # Info include generic and useful information about system operation, but avoids logging too much
-    # information to avoid inadvertent exposure of personally identifiable information (PII). If you
-    # want to log everything, set the level to "debug".
-    config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
-
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

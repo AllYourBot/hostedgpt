@@ -3,7 +3,8 @@ class PasswordMailerPreview < ActionMailer::Preview
 
   # Preview this email at http://localhost:3000/rails/mailers/password_mailer/reset
   def reset
-    PasswordMailer.reset
+    # PasswordMailer.reset
+    "no preview available"
   end
 
 end

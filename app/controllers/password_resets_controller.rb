@@ -12,7 +12,7 @@ class PasswordResetsController < ApplicationController
     browser = request.browser
     SendResetPasswordEmailJob.perform_later(params[:email], os, browser) # queue as a job to avoid timing attacks
 
-    redirect_to '/login', notice: 'If an account with that email was found, we have sent a link to reset the password'
+    redirect_to login_path, notice: "If an account with that email was found, we have sent a link to reset the password"
   end
 
   def edit
@@ -20,13 +20,12 @@ class PasswordResetsController < ApplicationController
   end
 
   def update
-    @person = find_signed_person(params[:token])
-    password_credential = @person&.personable&.password_credential
+    person = find_signed_person(params[:token])
 
-    if password_credential&.update(password_params)
-      redirect_to '/login', notice: 'Your password was reset succesfully. Please sign in.'
+    if person&.personable&.password_credential&.update(password_params)
+      redirect_to login_path, notice: "Your password was reset succesfully. Please sign in."
     else
-      render 'edit', alert: 'There was an error resetting your password'
+      render "edit", alert: "There was an error resetting your password"
     end
   end
 
@@ -35,7 +34,7 @@ class PasswordResetsController < ApplicationController
   def find_signed_person(token)
     Person.find_signed!(token, purpose: Rails.application.config.password_reset_token_purpose)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    redirect_to '/login', alert: 'Your token has expired. Please try again'
+    redirect_to login_path, alert: "Your token has expired. Please try again"
   end
 
   def password_params

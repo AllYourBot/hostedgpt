@@ -45,13 +45,11 @@ gem "solid_queue", "~> 0.2.1"
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable
 gem "aws-sdk-s3", require: false
+gem "postmark-rails"
 
 gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2", "~> 1.1"
 gem "omniauth-rails_csrf_protection", "~> 1.0.2"
-
-# Action Mailer
-gem 'postmark-rails'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -84,4 +82,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "minitest-stub_any_instance"
+  gem "rails-controller-testing"
 end
