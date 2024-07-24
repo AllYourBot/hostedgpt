@@ -45,12 +45,4 @@ class PasswordResetsController < ApplicationController
     person_params = format_and_strip_all_but_first_valid_credential(h)
     { password: person_params[:personable_attributes][:credentials_attributes][0][:password] }
   end
-
-  def get_item_in_str(str, items)
-    items.each do |item|
-      if str.include?(item)
-        return item
-      end
-    end
-  end
 end
