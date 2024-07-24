@@ -19,9 +19,9 @@ export default class extends Service {
   }
 
   _initSpeechRecognizer() {
-    if ('webkitSpeechRecognition' in window)
+    if ('webkitSpeechRecognition' in w)
       $.recognizer = new webkitSpeechRecognition()
-    else if ('SpeechRecognition' in window)
+    else if ('SpeechRecognition' in w)
       $.recognizer = new SpeechRecognition()
 
     if ($.recognizer) {

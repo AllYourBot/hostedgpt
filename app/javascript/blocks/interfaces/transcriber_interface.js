@@ -25,6 +25,8 @@ export default class extends Interface {
 
                           } else if (!turnOn && $.active) {
                             $.active = false
+                            $.dismissPoller?.end()
+                            $.silenceService.stop()
                             await $.transcriberService.end()
                             await Disable.Listener()
                           }
