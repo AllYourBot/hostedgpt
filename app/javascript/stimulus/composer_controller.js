@@ -119,6 +119,7 @@ export default class extends Controller {
     this.microphoneDisableTarget.classList.add('hidden')
     this.enableComposer()
     Disable.Listener()
+    if (userClicked) this.speakerOutlet?.micDisabled()
     this.determineSubmitButton()
   }
 

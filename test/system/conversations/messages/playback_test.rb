@@ -10,6 +10,18 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     # Oddly, visit_and_scroll_wait in here causes tests to fail when running in parallel
   end
 
+  test "sentence controller values do not revert when the page morphs" do
+    visit_and_scroll_wait conversation_messages_path(@conversation)
+    page.execute_script("arguments[0].setAttribute('data-playback-sentences-index-value', '123')", second_assistant_message.native)
+
+    assert_page_morphed do
+      @conversation.messages.create!(role: :assistant, assistant: @conversation.assistant, content_text: "Hello, world!")
+      @conversation.broadcast_refresh
+    end
+
+    assert_equal "123", second_assistant_message["data-playback-sentences-index-value"], "The playback sentence value should not have changed"
+  end
+
   test "when page loads a play buttons are visible, click play changes it to stop, audio plays, and it reverts when audo is completed" do
     visit_and_scroll_wait conversation_messages_path(@conversation)
 
@@ -51,18 +63,6 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
 
     assert tagged?(second_assistant_message)
     refute tagged?(inner_message_that_will_get_replaced)
-  end
-
-  test "sentences-index-value does not revert when the page morphs" do
-    visit_and_scroll_wait conversation_messages_path(@conversation)
-    page.execute_script("arguments[0].setAttribute('data-playback-sentences-index-value', '123')", second_assistant_message.native)
-
-    assert_page_morphed do
-      @conversation.messages.create!(role: :assistant, assistant: @conversation.assistant, content_text: "Hello, world!")
-      @conversation.broadcast_refresh # morph
-    end
-
-    assert_equal "123", second_assistant_message["data-playback-sentences-index-value"], "The playback sentence value should not have changed"
   end
 
   test "when stop button is pressed it stops playback" do

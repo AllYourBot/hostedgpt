@@ -55,7 +55,7 @@ export default class extends Controller {
 
     const thinkingDone = this.assistantTextTarget.getAttribute('data-thinking') === 'false'
     const toSentenceIndex = thinkingDone ? sentences.length-1 : sentences.length-2
-    this.speakSentencesTo(sentences, toSentenceIndex)
+    this.speakSentencesTo(sentences, toSentenceIndex) // intentionally *not* awaiting to call speaker.finish.. sooner
 
     if (thinkingDone && !this.playClicked) this.speaker?.playbackFinishedPrompting(this.idValue)
   }

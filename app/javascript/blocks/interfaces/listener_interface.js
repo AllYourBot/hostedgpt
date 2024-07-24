@@ -40,7 +40,7 @@ export default class extends Interface {
                           $.processing = null
                           await $.screenService.end()
                           await Flip.Transcriber.off()
-                          await Play.Speaker.sound('pip')
+                          await Play.Speaker.sound('pip') // this aborts any speaking that was mid-sentence
                         }
                       }
 

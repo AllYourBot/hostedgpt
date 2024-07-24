@@ -71,6 +71,14 @@ export default class extends Controller {
     if (Listener.enabled) this.waitingForNextPlaybackValue = true
   }
 
+  // 3. When the mic is disabled and a message continues to stream, we stop any playback immediately and mark
+  // the full message as spoken so if the mic is re-enabled it will not re-speak any of this message.
+
+  micDisabled() {
+    this.waitingForNextPlaybackValue = false
+    this.playedbackIdValue = this.lastPlaybackId
+  }
+
   // Utilities
 
   playAndStopOthers(idToPlay) {
@@ -91,9 +99,14 @@ export default class extends Controller {
     return this.playbackOutlets[curIndex + 1]?.idValue
   }
 
+  get lastPlaybackId() {
+    if (!this.hasPlaybackOutlet) return undefined
+    return this.playbackOutlets.last().idValue
+  }
+
   preserveStimulusValues(e) {
     // FIXME: Eventually rails will have an official solution. Check this issue: https://github.com/hotwired/turbo/issues/1210
-    if (e.target == this.element && e.detail.attributeName == "data-speaker-playedback-id-value") e.preventDefault()
-    if (e.target == this.element && e.detail.attributeName == "data-speaker-waiting-for-next-playback-value") e.preventDefault()
+    if (e.target == this.element && e.detail.attributeName == 'data-speaker-playedback-id-value') e.preventDefault()
+    if (e.target == this.element && e.detail.attributeName == 'data-speaker-waiting-for-next-playback-value') e.preventDefault()
   }
 }
