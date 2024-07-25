@@ -12,7 +12,7 @@ class Setting
       )
     end
 
-    def require_keys(*keys)
+    def require_keys!(*keys)
       keys.each do |key|
         if send(key).blank?
           abort "ERROR: Please set the #{key.upcase} environment variable or secret" # if we're missing a required setting then fail fast and don't start the app

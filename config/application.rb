@@ -45,11 +45,11 @@ module HostedGPT
     end
 
     # Action Mailer
-    Setting.require_keys(:action_mailer_host)
+    Setting.require_keys!(:action_mailer_host)
     config.action_mailer.default_url_options = { host: Setting.action_mailer_host }
 
     if Feature.postmark_mailer?
-      Setting.require_keys(
+      Setting.require_keys!(
         :postmark_server_api_token,
         :postmark_from_email,
         :postmark_password_reset_template_alias
