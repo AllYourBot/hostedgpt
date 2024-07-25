@@ -82,7 +82,8 @@ export default class extends Controller {
 
   connectMessageObserver(callback) {
     return new MutationObserver((mutations) => {
-      if (mutations.some(mutation => mutation.target == this.element)) {
+      if (mutations.some(mutation =>
+        mutation.target == this.element || this.element.contains(mutation.target))) {
         console.log('mutation', mutations)
         callback()
       }
