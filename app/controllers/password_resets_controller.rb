@@ -22,7 +22,7 @@ class PasswordResetsController < ApplicationController
   def update
     person = find_signed_person(params[:token])
 
-    if person&.personable&.password_credential&.update(password_params)
+    if person.user&.password_credential&.update(password_params)
       redirect_to login_path, notice: "Your password was reset succesfully. Please sign in."
     else
       render "edit", alert: "There was an error resetting your password"
