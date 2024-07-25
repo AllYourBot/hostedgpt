@@ -42,5 +42,9 @@ module HostedGPT
     else
       config.active_storage.service = :database
     end
+
+    config.to_prepare do # FIXME: Remove this after ...
+      ActionCable::Channel::Base.include ActionCableBasePatch
+    end
   end
 end
