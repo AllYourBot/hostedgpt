@@ -71,6 +71,36 @@ g.w = {
 
     currentTime: 0,
   })),
+
+  SpeechRecognition: jest.fn().mockImplementation(() => ({
+    continuous: null,
+    lang: null,
+    onstart: () => { },
+    onend: () => { },
+    onerror: () => { },
+    onresult: () => { },
+    onsoundstart: () => { },
+    onspeechstart: () => { },
+    onsoundend: () => { },
+    onspeechend: () => { },
+    start: () => { },
+    abort: () => { },
+  })),
+
+  webkitSpeechRecognition: jest.fn().mockImplementation(() => ({
+    continuous: null,
+    lang: null,
+    onstart: () => { },
+    onend: () => { },
+    onerror: () => { },
+    onresult: () => { },
+    onsoundstart: () => { },
+    onspeechstart: () => { },
+    onsoundend: () => { },
+    onspeechend: () => { },
+    start: () => { },
+    abort: () => { },
+  })),
 }
 
 g.n = {
@@ -93,19 +123,4 @@ g.Audio = jest.fn().mockImplementation(() => ({
   volume: null,
   src: null,
   play: () => { },
-}))
-
-g.SpeechRecognition = g.webkitSpeechRecognition = jest.fn().mockImplementation(() => ({
-  continuous: null,
-  lang: null,
-  onstart: () => { },
-  onend: () => { },
-  onerror: () => { },
-  onresult: () => { },
-  onsoundstart: () => { },
-  onspeechstart: () => { },
-  onsoundend: () => { },
-  onspeechend: () => { },
-  start: () => { },
-  abort: () => { },
 }))
