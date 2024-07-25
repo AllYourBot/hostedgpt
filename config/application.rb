@@ -60,7 +60,7 @@ module HostedGPT
     end
 
     # Password Reset email
-    config.password_reset_token_ttl_minutes = (Setting.password_reset_token_ttl_minutes.presence || 30).to_i
+    config.password_reset_token_ttl_minutes = 30
     config.password_reset_token_purpose = "password_reset"
   end
 end

@@ -29,7 +29,3 @@ shared:
     postmark_password_reset_template_alias: <%= ENV["POSTMARK_PASSWORD_RESET_TEMPLATE_ALIAS"] || Rails.application.credentials[:postmark_password_reset_template_alias] %>
     action_mailer_host: <%= ENV["ACTION_MAILER_HOST"] %>
     product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>
-    support_url: <%= ENV["SUPPORT_URL"] %>
-    company_name: <%= ENV["COMPANY_NAME"] %>
-    company_address: <%= ENV["COMPANY_ADDRESS"] %>
-    password_reset_token_ttl_minutes: <%= ENV["PASSWORD_RESET_TOKEN_TTL_MINUTES"] %>

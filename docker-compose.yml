@@ -53,10 +53,6 @@ services:
       - POSTMARK_PASSWORD_RESET_TEMPLATE_ALIAS
       - ACTION_MAILER_HOST
       - PRODUCT_NAME
-      - SUPPORT_URL
-      - COMPANY_NAME
-      - COMPANY_ADDRESS
-      - PASSWORD_RESET_TOKEN_TTL_MINUTES
     ports: ["3000:3000"]
     volumes:
       - .:/rails
