@@ -3,16 +3,15 @@ require "postmark-rails/templated_mailer"
 class PasswordMailer < PostmarkRails::TemplatedMailer
   def reset
     person = params[:person]
+    user = person.user
 
     ttl_minutes = Rails.application.config.password_reset_token_ttl_minutes
 
-    @token = person.signed_id(
+    token = user.signed_id(
       purpose: Rails.application.config.password_reset_token_purpose,
       expires_in: ttl_minutes.minutes
     )
-    token_url = password_reset_edit_url(token: @token)
-
-    user = person.personable
+    change_password_url = edit_password_url(token: token)
 
     ttl_sentence = ActiveSupport::Duration.build(ttl_minutes * 60).as_sentence
 
@@ -21,7 +20,7 @@ class PasswordMailer < PostmarkRails::TemplatedMailer
       product_name: Setting.product_name,
       name: user.first_name,
       token_ttl: ttl_sentence,
-      action_url: token_url,
+      action_url: change_password_url,
       operating_system: params[:os],
       browser_name: params[:browser],
     }
