@@ -43,7 +43,7 @@ module HostedGPT
       config.active_storage.service = :database
     end
 
-    config.to_prepare do # FIXME: Remove this after ...
+    config.to_prepare do # FIXME: Remove this hack after Rails PR merges in: https://github.com/rails/rails/pull/52421
       ActionCable::Channel::Base.include ActionCableBasePatch
     end
   end

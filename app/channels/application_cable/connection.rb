@@ -8,6 +8,8 @@ module ApplicationCable
         # the broadcast happens.
         #
         # The fix is to re-broadcast the last message to the client after the connection is established.
+        #
+        # FIXME: See if there is any conclusion on this Rails Issue: https://github.com/rails/rails/issues/52420
         event = ActiveSupport::Notifications::Event.new(*args)
 
         if event.payload[:channel_class] == "Turbo::StreamsChannel"
