@@ -9,7 +9,8 @@ shared:
     http_header_authentication: <%= ENV.fetch("HTTP_HEADER_AUTHENTICATION_FEATURE", false) %>
     voice: <%= ENV.fetch("VOICE_FEATURE", false) %>
     default_to_voice: <%= ENV.fetch("DEFAULT_TO_VOICE_FEATURE", false) %>
-    postmark_mailer: <%= ENV.fetch("POSTMARK_MAILER_FEATURE", false) %>
+    password_reset_email: <%= ENV.fetch("PASSWORD_RESET_EMAIL_FEATURE", false) %>
+    email_sender_postmark: <%= ENV.fetch("EMAIL_SENDER_POSTMARK_FEATURE", false) %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     default_openai_key: <%= ENV["DEFAULT_OPENAI_KEY"] %>
@@ -27,5 +28,5 @@ shared:
     postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] %>
     postmark_from_email: <%= ENV["POSTMARK_FROM_EMAIL"] || Rails.application.credentials[:postmark_from_email] %>
     postmark_password_reset_template_alias: <%= ENV["POSTMARK_PASSWORD_RESET_TEMPLATE_ALIAS"] || Rails.application.credentials[:postmark_password_reset_template_alias] %>
-    action_mailer_host: <%= ENV["ACTION_MAILER_HOST"] %>
+    email_host: <%= ENV["EMAIL_HOST"] %>
     product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>

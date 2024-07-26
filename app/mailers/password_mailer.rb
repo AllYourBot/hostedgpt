@@ -16,7 +16,7 @@ class PasswordMailer < PostmarkRails::TemplatedMailer
     ttl_sentence = ActiveSupport::Duration.build(ttl_minutes * 60).as_sentence
 
     self.template_model = {
-      product_url: Setting.action_mailer_host,
+      product_url: Setting.email_host,
       product_name: Setting.product_name,
       name: user.first_name,
       token_ttl: ttl_sentence,

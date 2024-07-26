@@ -44,23 +44,24 @@ module HostedGPT
       config.active_storage.service = :database
     end
 
-    # Action Mailer
-    Setting.require_keys!(:action_mailer_host)
-    config.action_mailer.default_url_options = { host: Setting.action_mailer_host }
+    # Password Reset
+    if Feature.password_reset_email?
+      Setting.require_keys!(:email_host)
 
-    if Feature.postmark_mailer?
-      Setting.require_keys!(
-        :postmark_server_api_token,
-        :postmark_from_email,
-        :postmark_password_reset_template_alias
-      )
+      config.action_mailer.default_url_options = { host: Setting.email_host }
+      config.password_reset_token_ttl_minutes = 30
+      config.password_reset_token_purpose = "password_reset"
 
-      config.action_mailer.delivery_method = :postmark
-      config.action_mailer.postmark_settings = { api_token: Setting.postmark_server_api_token }
+      if Feature.email_sender_postmark?
+        Setting.require_keys!(
+          :postmark_server_api_token,
+          :postmark_from_email,
+          :postmark_password_reset_template_alias
+        )
+
+        config.action_mailer.delivery_method = :postmark
+        config.action_mailer.postmark_settings = { api_token: Setting.postmark_server_api_token }
+      end
     end
-
-    # Password Reset email
-    config.password_reset_token_ttl_minutes = 30
-    config.password_reset_token_purpose = "password_reset"
   end
 end
