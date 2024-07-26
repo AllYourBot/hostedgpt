@@ -3,6 +3,7 @@ import Service from "../service.js"
 export default class extends Service {
   logLevel_info
   attrReader_listening
+  attrAccessor_onSound
 
   new() {
     $.intendedState = 'ended'
@@ -28,14 +29,15 @@ export default class extends Service {
       $.recognizer.continuous = true
       // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
       $.recognizer.lang = "" // blank uses system's default language
+      $.recognizer.interimResults = true
     }
   }
 
   async start()   { $.intendedState = 'started';  return await _executeStart() }
   async restart() { $.intendedState = 'started';  return await _executeRestart() }
   end()           { $.intendedState = 'ended';    _executeEnd() }
-  get listening()  { $.state == 'started' }
-  get ended()      { $.state == 'ended' }
+  get listening() { $.state == 'started' }
+  get ended()     { $.state == 'ended' }
 
 
   // Exeuctors
@@ -116,6 +118,7 @@ export default class extends Service {
     let transcript = ""
     for (let i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) transcript += event.results[i][0].transcript
+      else if ($.onSound) $.onSound()
     }
     transcript = transcript.trim()
 

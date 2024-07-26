@@ -67,6 +67,7 @@ export default class extends Interface {
     $.covered = false
     $.silenceService = new SilenceService
     $.transcriberService = new TranscriberService
+    $.transcriberService.onSound = () => $.silenceService.restartCounter()
   }
 
   _shortWaitThenTell()  { if (!$.tellPoller?.handler) $.tellPoller = runEvery(0.2, () => {
