@@ -183,6 +183,12 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     end
   end
 
+  # TODO: What about clicking play button while speaking is engaged. Should this be supported, or should
+  # the play buttons be hidden, or should clicking play disable speaking?
+  #
+  # test "can click play on any previous message during speaking and speaking will continue to work" do
+  # end
+
   private
 
   def assistant_messages

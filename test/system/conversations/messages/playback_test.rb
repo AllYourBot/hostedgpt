@@ -22,7 +22,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     assert_equal "123", second_assistant_message["data-playback-sentences-index-value"], "The playback sentence value should not have changed"
   end
 
-  test "when page loads a play buttons are visible, click play changes it to stop, audio plays, and it reverts when audo is completed" do
+  test "when page loads a play buttons are visible, click play changes it to stop, audio plays, and it reverts when audo is completed and it can be clicked again" do
     visit_and_scroll_wait conversation_messages_path(@conversation)
 
     first_assistant_message.hover
@@ -41,6 +41,15 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     assert first_play.visible?, "The play button that was NOT clicked should not have changed"
 
     second_assistant_message.hover
+    assert_true "Play button should have reappeared at the end of playback" do
+      second_play.visible?
+    end
+
+    # Try playing a second time
+    second_play.click
+    refute second_play.visible?
+    assert second_assistant_message.find_role("stop").visible?, "Play should have changed to stop upon click"
+
     assert_true "Play button should have reappeared at the end of playback" do
       second_play.visible?
     end
