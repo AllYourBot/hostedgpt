@@ -1,7 +1,7 @@
 require "application_system_test_case"
 
 class ConversationMessagesTest < ApplicationSystemTestCase
-  include MorphingHelper
+  include NavigationHelper
 
   setup do
     15.times { |i| users(:keith).conversations.create!(assistant: assistants(:samantha), title: "Conversation #{i+1}") }

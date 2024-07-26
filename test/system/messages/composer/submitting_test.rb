@@ -1,6 +1,8 @@
 require "application_system_test_case"
 
 class MessagesComposerSubmittingTest < ApplicationSystemTestCase
+  include NavigationHelper
+
   setup do
     @user = users(:keith)
     login_as @user
@@ -29,7 +31,9 @@ class MessagesComposerSubmittingTest < ApplicationSystemTestCase
 
     send_keys "Entered text so we can now submit"
     assert @submit.visible?
-    send_keys "enter"
+    assert_conversation_navigation_finished do
+      send_keys "enter"
+    end
 
     assert_composer_blank
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
@@ -44,44 +48,53 @@ class MessagesComposerSubmittingTest < ApplicationSystemTestCase
     assert_equal "First line\nSecond line", composer.value
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
-    send_keys "enter"
+    assert_conversation_navigation_finished do
+      send_keys "enter"
+    end
 
     assert_composer_blank
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
   end
 
   test "submitting a couple messages to an existing conversation with ENTER works" do
-    click_text @long_conversation.title
-    wait_for_images_to_load
+    visit_and_scroll_wait conversation_messages_path(@long_conversation)
     starting_path = current_path
 
-    send_keys "This is a message"
-    send_keys "enter"
+    assert_active composer_selector
+    assert_page_morphed do
+      send_keys "This is a message"
+      send_keys "enter"
+    end
 
     assert_composer_blank
     assert_equal starting_path, current_path, "The page should not have changed urls"
 
-
-    send_keys "This is a second message"
-    send_keys "enter"
+    assert_page_morphed do
+      send_keys "This is a second message"
+      send_keys "enter"
+    end
 
     assert_composer_blank
     assert_equal starting_path, current_path, "The page should not have changed urls"
   end
 
   test "submitting a couple messages to an existing conversation with CLICKING works" do
-    click_text @long_conversation.title
-    wait_for_images_to_load
+    visit_and_scroll_wait conversation_messages_path(@long_conversation)
     starting_path = current_path
 
-    send_keys "This is a message"
-    click_element @submit
+    assert_active composer_selector
+    assert_page_morphed do
+      send_keys "This is a message"
+      click_element @submit
+    end
 
     assert_composer_blank
     assert_equal starting_path, current_path, "The page should not have changed urls"
 
-    send_keys "This is a second message"
-    click_element @submit
+    assert_page_morphed do
+      send_keys "This is a second message"
+      click_element @submit
+    end
 
     assert_composer_blank
     assert_equal starting_path, current_path, "The page should not have changed urls"

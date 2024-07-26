@@ -1,5 +1,13 @@
-module MorphingHelper
+module NavigationHelper
   private
+
+  def assert_conversation_navigation_finished(&block)
+    tag("turbo-frame#conversation section")
+    yield
+    assert_false "the #conversation turbo-frame never changed" do
+      tagged?("turbo-frame#conversation section")
+    end
+  end
 
   def assert_page_morphed
     raise "No block given" unless block_given?

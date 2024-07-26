@@ -1,6 +1,8 @@
 require "application_system_test_case"
 
 class MessagesComposerTest < ApplicationSystemTestCase
+  include NavigationHelper
+
   setup do
     @user = users(:keith)
     login_as @user
@@ -15,7 +17,9 @@ class MessagesComposerTest < ApplicationSystemTestCase
 
     sleep 0.2
 
-    click_text @long_conversation.title
+    assert_conversation_navigation_finished do
+      click_text @long_conversation.title
+    end
     wait_for_images_to_load
     assert_active composer_selector
   end

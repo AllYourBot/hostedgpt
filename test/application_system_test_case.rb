@@ -35,7 +35,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     else
       find(selector_or_element, wait: wait)
     end
-    assert_equal element, page.active_element, error_msg || "Expected element to be the active element, but it is not"
+    assert_true(error_msg || "Expected element to be the active element, but it is not") do
+      page.active_element == element
+    end
   end
 
   def assert_visible(selector, error_msg = nil, wait: Capybara.default_max_wait_time)
@@ -234,26 +236,34 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def assert_true(msg = nil, opts = {}, &block)
     timeout = opts[:wait] || Capybara.default_max_wait_time
+    prev_default_wait = Capybara.default_max_wait_time
 
+    Capybara.default_max_wait_time = 0
     Timeout.timeout(timeout) do
       sleep 0.25 until block.call
     end
   rescue Timeout::Error
     assert false, msg || "Expected block to return true, but it did not"
+  ensure
+    Capybara.default_max_wait_time = prev_default_wait
   end
 
   def assert_false(msg = nil, opts = {}, &block)
     timeout = opts[:wait] || Capybara.default_max_wait_time
+    prev_default_wait = Capybara.default_max_wait_time
 
+    Capybara.default_max_wait_time = 0
     Timeout.timeout(timeout) do
       sleep 0.25 until !block.call
     end
   rescue Timeout::Error
     refute true, msg || "Expected block to return false, but it did not"
+  ensure
+    Capybara.default_max_wait_time = prev_default_wait
   end
 
   def wait_for_images_to_load
-    assert_false "all the image loaders should have disappeared", wait: 10 do
+    assert_false "all the image loaders should have disappeared" do
       all("[data-role='image-loader']", visible: :all).map(&:visible?).include?(true)
     end
 
