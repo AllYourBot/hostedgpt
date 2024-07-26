@@ -31,11 +31,16 @@ class SoomoLaunchesController < ApplicationController
     course_id, element_family_id = claims['cid'], claims['fid']
 
     unless credential = HttpHeaderCredential.find_by(auth_uid: claims['sub'])
-      Person.transaction do
-        user = User.create!(name: "Student User")
-        person = Person.create!(personable: user, email: email)
-        credential = HttpHeaderCredential.create!(user: user, external_id: claims['sub'])
+      begin
+        Person.transaction do
+          user = User.create!(name: "Student User")
+          person = Person.create!(personable: user, email: email)
+          HttpHeaderCredential.create!(user: user, external_id: claims['sub'])
+        end
       rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+        # either the Person or HttpHeaderCredential could not be created,
+        # presumably because another thread just created them due to a
+        # parallel launch request.
       end
       credential = HttpHeaderCredential.find_by!(auth_uid: claims['sub'])
     end
