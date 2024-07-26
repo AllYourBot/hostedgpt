@@ -149,7 +149,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     end
   end
 
-  test "if a second assistant reply comes DURING speaking the first one, the first still finishes and then the second auto-plays" do
+  test "if a second assistant reply comes DURING speaking the first one, the first still finishes and then the second auto plays" do
       stub_features(voice: true) do
       visit conversation_messages_path(@conversation)
 
@@ -180,6 +180,41 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
 
       assert_finished_speaking second_reply
       assert_spoke_to_sentence "1", assistant_messages[3]
+    end
+  end
+
+  test "if an assistant reply turns into a tool call (which hides the message), when the final assistant reply comes it auto plays" do
+    stub_features(voice: true) do
+      visit conversation_messages_path(@conversation)
+
+      enable_mic.click
+
+      user_speaks "What is the weather in Austin?"
+      stream_ai_reply ""
+      first_reply = Message.last
+      assistant_message_count = assistant_messages.length
+
+      first_reply.update!(content_tool_calls: [{ type: "function" }])
+      assert first_reply.only_tool_response?
+      first_reply.conversation.broadcast_refresh
+
+      assert_true "assistant message should have disappeared from screen" do
+        assistant_messages.length == assistant_message_count - 1
+      end
+
+      second_reply = nil
+      assert_difference "Message.count", 1 do
+        stub_new_ai_reply
+        second_reply = Message.last
+        stream_ai_reply "I've checked the weather and it's sunny today.", message: second_reply
+      end
+
+      assert_true "a new assistant message should have appeared on screen" do
+        assistant_messages.length == assistant_message_count
+      end
+
+      assert_finished_speaking Message.last
+      assert_spoke_to_sentence "1", assistant_messages[2]
     end
   end
 

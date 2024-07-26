@@ -21,7 +21,7 @@ end %>
   data-role="message"
   data-subrole="<%= message.role %>-message"
 
-  data-controller="<%= message.assistant? && "playback" %>"
+  data-controller="<%= message.assistant? && !message.only_tool_response? && "playback" %>"
   data-playback-id-value="<%= message.id %>"
   data-playback-sentences-index-value="0"
   data-playback-done-prompting-value="false"

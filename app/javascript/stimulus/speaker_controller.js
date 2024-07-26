@@ -49,6 +49,11 @@ export default class extends Controller {
     }
   }
 
+  playbackOutletDisconnected(playback) {
+    console.log(`playbackOutletDisconnected(${playback.idValue})`) // happens when assistant msg is turned into a tool call
+    if (!this.waitingForNextPlaybackValue) this.waitingForNextPlaybackValue = true
+  }
+
   // There are two edge cases to consider:
   //
   // 1. When an old conversation loads (i.e. there are already assistant messages), we treat these as if they
