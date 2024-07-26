@@ -5,7 +5,7 @@ export default class extends Interface {
   attrAccessor_onBusyDone
 
   log_Prompt
-  Prompt(sentence)          { $.audioService.speakNext(sentence) }
+  Prompt(sentence)          { if (!blocks.env.isTest) $.audioService.speakNext(sentence) }
   Stop()                    { $.audioService.stop() }
   async Play(sound, onEnd)  { await $.audioService.play(sound, onEnd) }
   Loop(sec, sound)          { $.audioService.playEvery(sec, sound) }

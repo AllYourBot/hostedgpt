@@ -22,76 +22,79 @@ export default class extends Controller {
   }
 
   clickedStart() {
+    this.sentencesIndexValue = 0
+
     if (this.hasTransitionOutlet) this.transitionOutlet.toggleClassOn()
     Speaker.onBusyDone = () => this.toggleSpeakingMessage()
     this.beginSpeakingMessage()
-
-    this.sentencesIndexValue = 0
   }
 
   beginSpeakingMessage() {
-    console.log('### beginSpeakingMessage()')
+    console.log(`${this.idValue}: beginSpeakingMessage()`)
     this.observer = this.connectMessageObserver(() => this.messageTextUpdated('observer'))
     this.messageTextUpdated('initial')
   }
 
   clickedStop() {
+    Stop.Speaker()
+
     if (this.hasTransitionOutlet) this.transitionOutlet.toggleClassOff()
     Speaker.onBusyDone = () => { }
     this.discontinueSpeakingMessage()
-
-    Stop.Speaker()
   }
 
   discontinueSpeakingMessage() {
+    console.log(`${this.idValue}: discontinueSpeakingMessage() and observer is`, this.observer)
     this.observer?.disconnect()
+    this.observer = undefined
   }
 
   messageTextUpdated(src = '') {
-    console.log(`${this.idValue}: messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})`)
+    console.log(`${this.idValue}:   messageTextUpdated(${src}) ${Listener.enabled ? 'enabled' : 'disabled'} :: from ${this.sentencesIndexValue} to ... (${this.assistantTextTarget.textContent})`)
     if (Listener.disabled && !this.playClicked) return
     const sentences = SpeechService.splitIntoThoughts(this.assistantTextTarget.textContent)
     if (sentences.length == 0) return
 
-    const thinkingDone = this.assistantTextTarget.getAttribute('data-thinking') === 'false'
-    const toSentenceIndex = thinkingDone ? sentences.length-1 : sentences.length-2
-    this.speakSentencesTo(sentences, toSentenceIndex) // intentionally *not* awaiting to call speaker.finish.. sooner
-
-    if (thinkingDone && !this.playClicked) this.speaker?.playbackFinishedPrompting(this.idValue)
+    const isThinkingDone = this.assistantTextTarget.getAttribute('data-thinking') === 'false'
+    const toSentenceIndex = isThinkingDone ? sentences.length-1 : sentences.length-2
+    this.speakSentencesTo(sentences, toSentenceIndex, isThinkingDone)
   }
 
-  async speakSentencesTo(sentences, toIndex) {
+  speakSentencesTo(sentences, toIndex, isThinkingDone) {
     if (this.sentencesIndexValue > toIndex) return
-    for (this.sentencesIndexValue; this.sentencesIndexValue <= toIndex; this.sentencesIndexValue ++) {
-      if (!sentences[this.sentencesIndexValue]) break
-      if (sentences[this.sentencesIndexValue].includes('::ServerError') || sentences[this.sentencesIndexValue].includes('Faraday::')) {
-        // client is displaying a server error
-        break
-      }
-      if (!blocks.env.isTest)
-        Prompt.Speaker.toSay(sentences[this.sentencesIndexValue])
-      else {
-        console.log(`isTest: playback_controller: Prompt.Speaker.toSay(${sentences[this.sentencesIndexValue]})`)
-        await sleep(1)
-        if (Speaker.onBusyDone) Speaker.onBusyDone()
-      }
+    console.log(`${this.idValue}:     speakSentencesTo(${this.sentencesIndexValue} to ... ${toIndex})`)
+    while (this.sentencesIndexValue <= toIndex) {
+      const i = this.sentencesIndexValue
+      this.sentencesIndexValue ++
+
+      if (!sentences[i]) break
+      if (sentences[i].includes('::ServerError') || sentences[i].includes('Faraday::')) return
+
+      Prompt.Speaker.toSay(sentences[i])
     }
+    console.log(`${this.idValue}:      sentenceIndex set to ${this.sentencesIndexValue} (${toIndex} was passed in)`)
+    if (isThinkingDone && !this.playClicked) this.speaker?.playbackFinishedPrompting(this.idValue)
+    if (blocks.env.isTest && Speaker.onBusyDone) runAfter(1, () => Speaker.onBusyDone())
   }
 
   // Utilities
 
   connectMessageObserver(callback) {
-    return new MutationObserver((mutations) => {
+    const observer = new MutationObserver((mutations) => {
       if (mutations.some(mutation =>
         mutation.target == this.element || this.element.contains(mutation.target))) {
-        console.log('mutation', mutations)
+        console.log(`${this.idValue}: mutation`)
         callback()
       }
-    }).observe(this.element, {
+    })
+
+    observer.observe(this.element, {
       characterData: true,
       childList: true,
       subtree: true
     })
+
+    return observer
   }
 
   preserveStimulusValues(e) {

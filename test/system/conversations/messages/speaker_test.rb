@@ -149,7 +149,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     end
   end
 
-  test "if a second assistant reply comes DURING speaking the first one, the second reply auto-plays" do
+  test "if a second assistant reply comes DURING speaking the first one, the first still finishes and then the second auto-plays" do
       stub_features(voice: true) do
       visit conversation_messages_path(@conversation)
 
@@ -169,6 +169,11 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
         second_reply = Message.last
         stream_ai_reply "The weather is sunny with a high of 100 degrees.", message: second_reply
       end
+
+      assert_true "new assistant message did not appear on the screen" do
+        assistant_messages.length == 4
+      end
+      assert_spoke_to_sentence "0", assistant_messages[3] # new msg should not start yet
 
       stream_ai_reply "One second. I'm checking the weather.", message: first_reply
       assert_spoke_to_sentence "2", assistant_messages[2]

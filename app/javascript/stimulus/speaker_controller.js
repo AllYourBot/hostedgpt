@@ -82,6 +82,7 @@ export default class extends Controller {
   // Utilities
 
   playAndStopOthers(idToPlay) {
+    this.waitingForNextPlaybackValue = false
     console.log(`playing(${idToPlay})`)
     runAfter(0, () => this.playbackOutlets.each(playback => {
       const active = playback.idValue == idToPlay

@@ -186,7 +186,7 @@ end %>
                   playback#toggleSpeakingMessage
                 |,
             } do %>
-              <%= icon "speaker-wave", variant: :outline, size: 19, title: "Read aloud #{message_counter}", data: { role: "play", transition_target: "transitionable" } %>
+              <%= icon "speaker-wave", variant: :outline, size: 19, title: "Read aloud", data: { role: "play", transition_target: "transitionable" } %>
               <%= icon "stop-circle", variant: :outline, size: 19, title: "Stop", data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
             <% end %>
             <%= button_tag type: "button",
