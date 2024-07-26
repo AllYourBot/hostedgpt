@@ -23,12 +23,6 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     assert_equal "true", assistant_messages[1]["data-speaker-waiting-for-next-playback-value"], "The speaker waiting value should not have changed"
   end
 
-  # test "when we are speaking a conversation, the answer plays back after a MORPH rather than a stream" do
-  #   visit conversation_messages_path(@conversation)
-
-  #   enable_mic.click
-  # end
-
   test "press play on a new conversation, ask a question which loads a new page, the answer plays back after a STREAM, and again for a second question that MORPHS" do
     stub_features(voice: true) do
       visit new_assistant_message_path(assistants(:samantha))

@@ -9,7 +9,7 @@ export default class extends Controller {
   // In voice mode (i.e. the mic button was activated) then speaker controller calls into this controller.
 
   connect() {
-    this.playClicked = false // not quite a true state, it's a very short-duration flag, so not elevating this to a value
+    this.playClicked = false // not quite an actual state, it's a very short-duration flag, so not elevating this to a value
   }
 
   toggleSpeakingMessage() {
@@ -25,7 +25,8 @@ export default class extends Controller {
     this.sentencesIndexValue = 0
 
     if (this.hasTransitionOutlet) this.transitionOutlet.toggleClassOn()
-    Speaker.onBusyDone = () => this.toggleSpeakingMessage()
+    const existingBusyDone = Speaker.onBusyDone ?? (() => {})
+    Speaker.onBusyDone = () => { this.toggleSpeakingMessage(); existingBusyDone() }
     this.beginSpeakingMessage()
   }
 
@@ -36,11 +37,11 @@ export default class extends Controller {
   }
 
   clickedStop() {
-    Stop.Speaker()
-
     if (this.hasTransitionOutlet) this.transitionOutlet.toggleClassOff()
     Speaker.onBusyDone = () => { }
     this.discontinueSpeakingMessage()
+
+    Stop.Speaker() // onBusyDone must be cleared before this is stopped
   }
 
   discontinueSpeakingMessage() {
