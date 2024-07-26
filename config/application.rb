@@ -46,6 +46,8 @@ module HostedGPT
 
     # Password Reset
     if Feature.password_reset_email?
+      Feature.require_any_enabled!([:email_sender_postmark], message: "\"Password reset email\" feature requires an \"email sender\" feature to be enabled")
+
       Setting.require_keys!(:email_host)
 
       config.action_mailer.default_url_options = { host: Setting.email_host }
