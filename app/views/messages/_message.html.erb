@@ -175,19 +175,21 @@ end %>
               <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
             <% end %>
           <% elsif message.assistant? && message.assistant.not_deleted? %>
-            <%= button_tag type: "button",
-              id: "playback-control-#{message.id}",
-              class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
-              data: {
-                role: "playback",
-                controller: "transition",
-                transition_toggle_class: "hidden",
-                action: %|
-                  playback#toggleSpeakingMessage
-                |,
-            } do %>
-              <%= icon "speaker-wave", variant: :outline, size: 19, title: "Read aloud", data: { role: "play", transition_target: "transitionable" } %>
-              <%= icon "stop-circle", variant: :outline, size: 19, title: "Stop", data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
+            <% if Feature.voice? %>
+              <%= button_tag type: "button",
+                id: "playback-control-#{message.id}",
+                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
+                data: {
+                  role: "playback",
+                  controller: "transition",
+                  transition_toggle_class: "hidden",
+                  action: %|
+                    playback#toggleSpeakingMessage
+                  |,
+              } do %>
+                <%= icon "speaker-wave", variant: :outline, size: 19, title: "Read aloud", data: { role: "play", transition_target: "transitionable" } %>
+                <%= icon "stop-circle", variant: :outline, size: 19, title: "Stop", data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
+              <% end %>
             <% end %>
             <%= button_tag type: "button",
               class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
