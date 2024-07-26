@@ -70,7 +70,7 @@
           target: "_blank"
         %>).</li>
       <li>Verify your phone number.</li>
-      <li>Click "Create new secret key", name it something like "HostedGPT" and paste it below.</li>
+      <li>Click "Create new secret key", name it something like "<%= Setting.product_name %>" and paste it below.</li>
       <li>Ensure you have billing set up by clicking "Settings" and "Billing" (or
         <%= link_to "take me to Billing", "https://platform.openai.com/account/billing/overview",
           class: "underline text-blue-600",
@@ -100,7 +100,7 @@
           target: "_blank"
         %>).
       </li>
-      <li>Click "Create Key" and name it somethign like "HostedGPT."</li>
+      <li>Click "Create Key" and name it something like "<%= Setting.product_name %>".</li>
       <li>Click "Copy key" and paste it below.</li>
       <li>Then, click your profile and select "Plans & Billing" (or
         <%= link_to "take me to Plans", "https://console.anthropic.com/settings/plans",
@@ -133,7 +133,7 @@
           class: "underline text-blue-600",
           target: "_blank"
         %>).</li>
-      <li>Click "Create API Key", name it something like "HostedGPT" and paste it below.</li>
+      <li>Click "Create API Key", name it something like "<%= Setting.product_name %>" and paste it below.</li>
     </ol>
     <%= form.text_field :token, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
