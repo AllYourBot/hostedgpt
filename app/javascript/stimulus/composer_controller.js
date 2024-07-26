@@ -99,6 +99,12 @@ export default class extends Controller {
     this.disableComposer()
     this.inputTarget.placeholder = "Speak aloud..."
     if (Listener.disabled) {
+      let micApproved = await Approve.Transcriber.access()
+      if (!micApproved) {
+        alert("You must enable browser microphone access to use this feature. If you are unsure how to do this, try searching: 'change microphone permission for a single website'")
+        this.disableMicrophone()
+        return
+      }
       await Invoke.Listener()
       Play.Speaker.sound("pop")
       this.speakerOutlet.micActivated()
