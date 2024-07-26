@@ -19,6 +19,22 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @user, assigns(:user)
   end
 
+  test "should redirect with invalid signature" do
+    get edit_password_url, params: { token: "invalid" }
+
+    assert_response :redirect
+    assert_redirected_to login_path
+  end
+
+  test "should return 404 with not_found_user" do
+    token = get_test_user_token(@user)
+    @user.destroy # make sure the user doesn't exist when we try to find it
+
+    get edit_password_url, params: { token: token }
+
+    assert_response :not_found
+  end
+
   test "should patch update" do
     token = get_test_user_token(@user)
 
