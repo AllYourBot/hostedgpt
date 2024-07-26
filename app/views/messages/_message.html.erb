@@ -20,6 +20,13 @@ end %>
   class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !debug_tool_messages && "hidden" %>"
   data-role="message"
   data-subrole="<%= message.role %>-message"
+
+  data-controller="<%= message.assistant? && !message.only_tool_response? && "playback" %>"
+  data-playback-id-value="<%= message.id %>"
+  data-playback-sentences-index-value="0"
+  data-playback-done-prompting-value="false"
+  data-playback-transition-outlet="#playback-control-<%= message.id %>"
+  data-action="turbo:before-morph-attribute->playback#preserveStimulusValues"
 > <!-- this outer div persists throughout streaming updates -->
 
   <div
@@ -54,15 +61,14 @@ end %>
       </div>
 
       <turbo-frame id="message-text-<%= message.id %>">
-
         <div
           class="hidden"
           data-clipboard-target="text"
         ><%= format_for_copying message.content_text %></div>
         <div
           class="hidden"
-          data-speaker-target="text <%= message.assistant? ? "assistantText" : "userText" %>"
-          data-thinking="<%= thinking ? "true" : "false" %>"
+          data-playback-target="<%= message.assistant? && "assistantText" %>"
+          data-thinking="<%= !!thinking %>"
         ><%= format_for_speaking message.content_text %></div>
 
         <div
@@ -169,6 +175,22 @@ end %>
               <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
             <% end %>
           <% elsif message.assistant? && message.assistant.not_deleted? %>
+            <% if Feature.voice? %>
+              <%= button_tag type: "button",
+                id: "playback-control-#{message.id}",
+                class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
+                data: {
+                  role: "playback",
+                  controller: "transition",
+                  transition_toggle_class: "hidden",
+                  action: %|
+                    playback#toggleSpeakingMessage
+                  |,
+              } do %>
+                <%= icon "speaker-wave", variant: :outline, size: 19, title: "Read aloud", data: { role: "play", transition_target: "transitionable" } %>
+                <%= icon "stop-circle", variant: :outline, size: 19, title: "Stop", data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
+              <% end %>
+            <% end %>
             <%= button_tag type: "button",
               class: "cursor-pointer hover:text-gray-900 dark:hover:text-white",
               data: {

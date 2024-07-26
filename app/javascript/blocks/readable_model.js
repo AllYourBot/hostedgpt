@@ -180,7 +180,7 @@ export default class {
     // else
       logLevel = this._declarationsFor('logLevel').first() || 'error'
     if (this.logLevels[level] >= this.logLevels[logLevel]) {
-      if (blocks.env.isTest)
+      if (blocks.env.isTest && blocks.mode == 'node')
         process.stdout.write(`${this.$['class']?.to_s}: ${str}\n`)
       else {
         let c = this.$['class']?.to_s ?? ''

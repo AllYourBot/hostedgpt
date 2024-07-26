@@ -1,7 +1,7 @@
 require "application_system_test_case"
 
 class MessagesComposerEditPreviousTest < ApplicationSystemTestCase
-  include MorphingHelper
+  include NavigationHelper
 
   setup do
     login_as users(:keith)

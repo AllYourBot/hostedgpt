@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+import('../app/javascript/blocks/test_mocks.js')
 
 const debug = false
 
@@ -46,75 +47,14 @@ beforeAll(async () => {
     })
   }
 })
-
-// Mock AudioContext
-
-global.window = {
-  mock: true,
-  AudioContext: jest.fn().mockImplementation(() => ({
-    close: jest.fn(),
-    destination: {},
-
-    // $.audioListener
-    createMediaStreamSource: jest.fn().mockReturnValue({
-      connect: jest.fn(),
-      disconnect: jest.fn(),
-    }),
-
-    // $.audioProcessor
-    createScriptProcessor: jest.fn().mockReturnValue({
-      connect: jest.fn(),
-      disconnect: jest.fn(),
-      onaudioprocess: null,
-    }),
-  })),
-}
-
-global.navigator = {
-  mediaDevices: {
-    getUserMedia: jest.fn().mockResolvedValue({
-      getTracks: jest.fn().mockReturnValue([]),
-    }),
-  },
-}
-
-global.AudioProcessingEvent = jest.fn().mockImplementation(() => ({
-  inputBuffer: {
-    getChannelData: jest.fn().mockReturnValue(new Float32Array(2048).fill(0.04)),
-  },
-}))
-
-global.Audio = jest.fn().mockImplementation(() => ({
-  onended: () => {},
-  pause: () => {},
-  volume: null,
-  src: null,
-  play: () => {},
-}))
-
-global.SpeechRecognition = jest.fn().mockImplementation(() => ({
-  continuous: null,
-  lang: null,
-  onstart: () => {},
-  onend: () => {},
-  onerror: () => {},
-  onresult: () => {},
-  onsoundstart: () => {},
-  onspeechstart: () => {},
-  onsoundend: () => {},
-  onspeechend: () => {},
-  start: () => {},
-  abort: () => {},
-}))
-
 global.allMethodsCall = (actionFunction) => {
   const handler = {
-      get: function(target, prop, receiver) {
-          return new Proxy(actionFunction, handler)
-      },
-      apply: function(target, thisArg, args) {
-          return actionFunction(...args)
-      }
+    get: function (target, prop, receiver) {
+      return new Proxy(actionFunction, handler)
+    },
+    apply: function (target, thisArg, args) {
+      return actionFunction(...args)
+    }
   }
   return new Proxy(actionFunction, handler)
 }

@@ -2,8 +2,8 @@ import Service from "../service.js"
 
 export default class extends Service {
   logLevel_info
-  attrAccessor_onTextReceived
   attrReader_listening
+  attrAccessor_onSound
 
   new() {
     $.intendedState = 'ended'
@@ -20,23 +20,24 @@ export default class extends Service {
   }
 
   _initSpeechRecognizer() {
-    if ('webkitSpeechRecognition' in window)
-      $.recognizer = new webkitSpeechRecognition()
-    else if ('SpeechRecognition' in window)
-      $.recognizer = new SpeechRecognition()
+    if ('webkitSpeechRecognition' in w)
+      $.recognizer = new w.webkitSpeechRecognition()
+    else if ('SpeechRecognition' in w)
+      $.recognizer = new w.SpeechRecognition()
 
     if ($.recognizer) {
       $.recognizer.continuous = true
       // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
       $.recognizer.lang = "" // blank uses system's default language
+      $.recognizer.interimResults = true
     }
   }
 
   async start()   { $.intendedState = 'started';  return await _executeStart() }
-  restart()       { $.intendedState = 'started';  _executeRestart() }
+  async restart() { $.intendedState = 'started';  return await _executeRestart() }
   end()           { $.intendedState = 'ended';    _executeEnd() }
-  get listening()  { $.state == 'started' }
-  get ended()      { $.state == 'ended' }
+  get listening() { $.state == 'started' }
+  get ended()     { $.state == 'ended' }
 
 
   // Exeuctors
@@ -73,6 +74,8 @@ export default class extends Service {
 
     if ($.state == 'started')
       _executeEnd() // will eventually trigger _onStart() b/c of intendedState
+    else if ($.state == 'ended')
+      _executeStart()
     else
       _onStart()
   }
@@ -115,11 +118,12 @@ export default class extends Service {
     let transcript = ""
     for (let i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) transcript += event.results[i][0].transcript
+      else if ($.onSound) $.onSound()
     }
     transcript = transcript.trim()
 
     if (transcript.length <= 1) return
 
-    $.onTextReceived(transcript)
+    SpeakTo.Transcriber.with.words(transcript)
   }
 }
