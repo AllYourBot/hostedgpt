@@ -71,7 +71,7 @@ export default class extends Interface {
   }
 
   _shortWaitThenTell()  { if (!$.tellPoller?.handler) $.tellPoller = runEvery(0.2, () => {
-                            if ($.silenceService.msOfSilence <= 1000) return
+                            if ($.silenceService.msOfSilence <= 2000) return
                             log('enough silence to start processing...')
 
                             if (! $.covered) Cover.Transcriber()

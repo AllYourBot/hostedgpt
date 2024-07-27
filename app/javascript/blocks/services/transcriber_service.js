@@ -9,6 +9,8 @@ export default class extends Service {
     $.intendedState = 'ended'
     $.state = 'ended'
     $.recognizer = null
+    $.previousWords = ""
+    $.waitForNewThought = false
 
     _initSpeechRecognizer()
     if ($.recognizer) {
@@ -69,8 +71,10 @@ export default class extends Service {
       _onStart()
   }
 
+  log_executeRestart
   _executeRestart() {
     if (!$.recognizer) return
+    $.waitForNewThought = true
 
     if ($.state == 'started')
       _executeEnd() // will eventually trigger _onStart() b/c of intendedState
@@ -116,14 +120,34 @@ export default class extends Service {
 
   _onResult(event) {
     let transcript = ""
+    if (_isNewThought(event)) { $.previousWords = ""; $.waitForNewThought = false }
+    if ($.waitForNewThought) return
+
     for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) transcript += event.results[i][0].transcript
-      else if ($.onSound) $.onSound()
+      if (event.results[i].isFinal) {
+        transcript += _adjustedTranscript(event.results[i][0].transcript)
+        $.previousWords = event.results[i][0].transcript
+      }
+      if ($.onSound) $.onSound()
     }
     transcript = transcript.trim()
 
     if (transcript.length <= 1) return
 
     SpeakTo.Transcriber.with.words(transcript)
+  }
+
+  _adjustedTranscript(transcript) {
+    // A bug in the speech recognition library on Pixel Chrome causes it to keep repeating all of
+    // what it has heard with each addition rather than just returning the additional words it heard.
+    // Strip those repeated words off.
+    if (transcript.startsWith($.previousWords))
+      return transcript.slice($.previousWords.length)
+    else
+      return transcript
+  }
+
+  _isNewThought(event) {
+    return event.resultIndex == 0
   }
 }
