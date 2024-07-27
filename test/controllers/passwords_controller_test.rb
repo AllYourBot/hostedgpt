@@ -49,7 +49,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
   def get_test_user_token(user)
     user.signed_id(
       purpose: Rails.application.config.password_reset_token_purpose,
-      expires_in: Rails.application.config.password_reset_token_ttl_minutes.minutes
+      expires_in: Rails.application.config.password_reset_token_ttl
     )
   end
 end

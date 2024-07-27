@@ -51,7 +51,7 @@ module HostedGPT
       Setting.require_keys!(:email_host)
 
       config.action_mailer.default_url_options = { host: Setting.email_host }
-      config.password_reset_token_ttl_minutes = 30
+      config.password_reset_token_ttl = 30.minutes
       config.password_reset_token_purpose = "password_reset"
 
       if Feature.email_sender_postmark?

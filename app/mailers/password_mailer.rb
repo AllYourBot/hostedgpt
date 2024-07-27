@@ -1,34 +1,24 @@
-require "postmark-rails/templated_mailer"
-
-class PasswordMailer < PostmarkRails::TemplatedMailer
+class PasswordMailer < ApplicationMailer
   def reset
     person = params[:person]
-    user = person.user
+    @user = person.user
+    @os = params[:os]
+    @browser = params[:browser]
 
-    ttl_minutes = Rails.application.config.password_reset_token_ttl_minutes
+    token_ttl = Rails.application.config.password_reset_token_ttl
 
-    token = user.signed_id(
+    @ttl_sentence = token_ttl.as_sentence
+
+    token = @user.signed_id(
       purpose: Rails.application.config.password_reset_token_purpose,
-      expires_in: ttl_minutes.minutes
+      expires_in: token_ttl
     )
-    change_password_url = edit_password_url(token: token)
-
-    ttl_sentence = ActiveSupport::Duration.build(ttl_minutes * 60).as_sentence
-
-    self.template_model = {
-      product_url: Setting.email_host,
-      product_name: Setting.product_name,
-      name: user.first_name,
-      token_ttl: ttl_sentence,
-      action_url: change_password_url,
-      operating_system: params[:os],
-      browser_name: params[:browser],
-    }
+    @change_password_url = edit_password_url(token: token)
 
     mail(
       from: Setting.postmark_from_email,
       to: person.email,
-      postmark_template_alias: Setting.postmark_password_reset_template_alias
+      subject: "Set up a new password for #{Setting.product_name}",
     )
   end
 end
