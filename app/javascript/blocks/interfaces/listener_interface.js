@@ -44,6 +44,8 @@ export default class extends Interface {
                         }
                       }
 
+  Reset()             { $.consideration = '' }
+
   attr_consideration  = ''
   attr_attachment     = null
 

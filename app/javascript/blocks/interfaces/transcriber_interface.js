@@ -85,7 +85,7 @@ export default class extends Interface {
   _longWaitThenDismis() { $.silenceService.restartCounter()
 
                           if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
-                            if ($.silenceService.msOfSilence <= 30000) return
+                            if ($.silenceService.msOfSilence <= 3000) return
                             log('enough silence to dismiss...')
 
                             Dismiss.Listener()

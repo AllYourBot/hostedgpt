@@ -16,7 +16,10 @@ export default class extends Controller {
     this.determineSubmitButton()
 
     Listener.onConsiderationChanged = async () => {
-      this.inputTarget.value = Listener.consideration
+      if (Listener.consideration == '') return
+
+        this.inputTarget.value = Listener.consideration
+        Reset.Listener()
       if (Listener.attachment) await this.addAttachment()
       this.submitForm()
     }
