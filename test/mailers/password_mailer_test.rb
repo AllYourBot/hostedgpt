@@ -1,7 +1,6 @@
 require "test_helper"
 
 class PasswordMailerTest < ActionMailer::TestCase
-
   setup do
     @person = people(:keith_registered)
     @user = users(:keith)
@@ -25,6 +24,8 @@ class PasswordMailerTest < ActionMailer::TestCase
       assert_equal [@person.email], mail.to
       assert_equal [from_email], mail.from
       assert_match "reset your password", mail.body.encoded
+      assert_match os, mail.body.encoded
+      assert_match browser, mail.body.encoded
     end
   end
 end
