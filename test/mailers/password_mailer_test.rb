@@ -1,11 +1,30 @@
 require "test_helper"
 
 class PasswordMailerTest < ActionMailer::TestCase
-  # test "reset" do
-  #   mail = PasswordMailer.reset
-  #   assert_equal "Reset", mail.subject
-  #   assert_equal ["to@example.org"], mail.to
-  #   assert_equal ["from@example.com"], mail.from
-  #   assert_match "Hi", mail.body.encoded
-  # end
+
+  setup do
+    @person = people(:keith_registered)
+    @user = users(:keith)
+    credentials(:keith_password)
+  end
+
+  test "reset" do
+    os = "Windows"
+    browser = "Chrome"
+    product_name = "Product Name"
+    from_email = "teampeople@example.com"
+    setting_stub = Proc.new do |setting|
+      return product_name if setting == :product_name
+      return from_email if setting == :postmark_from_email
+    end
+
+    Setting.stub :method_missing, setting_stub do
+      mail = PasswordMailer.with(person: @person, os: os, browser: browser).reset
+
+      assert_equal "Set up a new password for #{product_name}", mail.subject
+      assert_equal [@person.email], mail.to
+      assert_equal [from_email], mail.from
+      assert_match "reset your password", mail.body.encoded
+    end
+  end
 end
