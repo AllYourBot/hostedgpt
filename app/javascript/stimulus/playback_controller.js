@@ -32,6 +32,7 @@ export default class extends Controller {
 
   beginSpeakingMessage() {
     console.log(`${this.idValue}: beginSpeakingMessage()`)
+    this.observer?.disconnect()
     this.observer = this.connectMessageObserver(() => this.messageTextUpdated('observer'))
     this.messageTextUpdated('initial')
   }
@@ -76,6 +77,11 @@ export default class extends Controller {
     console.log(`${this.idValue}:      sentenceIndex set to ${this.sentencesIndexValue} (${toIndex} was passed in)`)
     if (isThinkingDone && !this.playClicked) this.speaker?.playbackFinishedPrompting(this.idValue)
     if (blocks.env.isTest && Speaker.onBusyDone) runAfter(1, () => Speaker.onBusyDone())
+  }
+
+  disconnect() {
+    this.observer?.disconnect()
+    this.observer = undefined
   }
 
   // Utilities
