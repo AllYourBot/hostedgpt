@@ -27,6 +27,5 @@ shared:
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
     postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] %>
     postmark_from_email: <%= ENV["POSTMARK_FROM_EMAIL"] || Rails.application.credentials[:postmark_from_email] %>
-    postmark_password_reset_template_alias: <%= ENV["POSTMARK_PASSWORD_RESET_TEMPLATE_ALIAS"] || Rails.application.credentials[:postmark_password_reset_template_alias] %>
     email_host: <%= ENV["EMAIL_HOST"] %>
     product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>

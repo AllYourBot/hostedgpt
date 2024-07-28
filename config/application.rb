@@ -58,7 +58,6 @@ module HostedGPT
         Setting.require_keys!(
           :postmark_server_api_token,
           :postmark_from_email,
-          :postmark_password_reset_template_alias
         )
 
         config.action_mailer.delivery_method = :postmark
