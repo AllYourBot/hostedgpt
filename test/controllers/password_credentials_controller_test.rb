@@ -7,16 +7,27 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
     people(:keith_registered)
     @user = users(:keith)
     credentials(:keith_password)
+
+    @settings = {
+      postmark_from_email: "teampeople@example.com",
+      product_name: "Product Name"
+    }
+    @features = {
+      password_reset_email: true,
+      email_sender_postmark: true
+    }
   end
 
   test "should get edit" do
     token = get_test_user_token(@user)
 
-    get edit_password_credential_url, params: { token: token }
+    stub_settings_and_features do
+      get edit_password_credential_url, params: { token: token }
 
-    assert_response :success
-    assert assigns(:user).is_a?(User)
-    assert_equal @user, assigns(:user)
+      assert_response :success
+      assert assigns(:user).is_a?(User)
+      assert_equal @user, assigns(:user)
+    end
   end
 
   test "should redirect with invalid signature" do

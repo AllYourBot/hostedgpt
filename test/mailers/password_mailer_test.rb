@@ -5,24 +5,27 @@ class PasswordMailerTest < ActionMailer::TestCase
     @person = people(:keith_registered)
     @user = users(:keith)
     credentials(:keith_password)
+
+    @settings = {
+      postmark_from_email: "teampeople@example.com",
+      product_name: "Product Name"
+    }
+    @features = {
+      password_reset_email: true,
+      email_sender_postmark: true
+    }
   end
 
   test "reset" do
     os = "Windows"
     browser = "Chrome"
-    product_name = "Product Name"
-    from_email = "teampeople@example.com"
-    setting_stub = Proc.new do |setting|
-      return product_name if setting == :product_name
-      return from_email if setting == :postmark_from_email
-    end
 
-    Setting.stub :method_missing, setting_stub do
+    stub_settings_and_features do
       mail = PasswordMailer.with(person: @person, os: os, browser: browser).reset
 
-      assert_equal "Set up a new password for #{product_name}", mail.subject
+      assert_equal "Set up a new password for #{@settings[:product_name]}", mail.subject
       assert_equal [@person.email], mail.to
-      assert_equal [from_email], mail.from
+      assert_equal [@settings[:postmark_from_email]], mail.from
       assert_match "reset your password", mail.body.encoded
       assert_match os, mail.body.encoded
       assert_match browser, mail.body.encoded
