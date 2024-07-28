@@ -13,6 +13,7 @@ shared:
     email_sender_postmark: <%= ENV.fetch("EMAIL_SENDER_POSTMARK_FEATURE", false) %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
+    product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>
     default_openai_key: <%= ENV["DEFAULT_OPENAI_KEY"] %>
     default_anthropic_key: <%= ENV["DEFAULT_ANTHROPIC_KEY"] %>
     default_groq_key: <%= ENV["DEFAULT_GROQ_KEY"] %>
@@ -26,6 +27,5 @@ shared:
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
     postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] %>
-    postmark_from_email: <%= ENV["POSTMARK_FROM_EMAIL"] || Rails.application.credentials[:postmark_from_email] %>
+    email_from: <%= ENV["EMAIL_FROM"] || Rails.application.credentials[:email_from] %>
     email_host: <%= ENV["EMAIL_HOST"] %>
-    product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>

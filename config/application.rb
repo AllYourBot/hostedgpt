@@ -46,19 +46,16 @@ module HostedGPT
 
     # Password Reset
     if Feature.password_reset_email?
-      Feature.require_any_enabled!([:email_sender_postmark], message: "\"Password reset email\" feature requires an \"email sender\" feature to be enabled")
+      Feature.require_any_enabled!([:email_sender_postmark], message: "\"PASSWORD_RESET_EMAIL_FEATURE\" requires an \"EMAIL_SENDER_*_FEATURE\" feature to be enabled")
 
-      Setting.require_keys!(:email_host)
+      Setting.require_keys!(:email_from, :email_host)
 
       config.action_mailer.default_url_options = { host: Setting.email_host }
       config.password_reset_token_ttl = 30.minutes
-      config.password_reset_token_purpose = "password_reset"
+      config.password_reset_token_purpose = :password_reset
 
       if Feature.email_sender_postmark?
-        Setting.require_keys!(
-          :postmark_server_api_token,
-          :postmark_from_email,
-        )
+        Setting.require_keys!(:postmark_server_api_token)
 
         config.action_mailer.delivery_method = :postmark
         config.action_mailer.postmark_settings = { api_token: Setting.postmark_server_api_token }

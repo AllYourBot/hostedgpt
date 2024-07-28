@@ -37,6 +37,7 @@ services:
       - DEFAULT_TO_VOICE_FEATURE
       - PASSWORD_RESET_EMAIL_FEATURE
       - EMAIL_SENDER_POSTMARK_FEATURE
+      - PRODUCT_NAME
       - DEFAULT_OPENAI_KEY
       - DEFAULT_ANTHROPIC_KEY
       - DEFAULT_GROQ_KEY
@@ -50,9 +51,8 @@ services:
       - HTTP_HEADER_AUTH_NAME
       - HTTP_HEADER_AUTH_UID
       - POSTMARK_SERVER_API_TOKEN
-      - POSTMARK_FROM_EMAIL
+      - EMAIL_FROM
       - EMAIL_HOST
-      - PRODUCT_NAME
     ports: ["3000:3000"]
     volumes:
       - .:/rails
