@@ -14,7 +14,7 @@ class PasswordMailerTest < ActionMailer::TestCase
     from_email = "teampeople@example.com"
     setting_stub = Proc.new do |setting|
       return product_name if setting == :product_name
-      return from_email if setting == :postmark_from_email
+      return from_email if setting == :email_from
     end
 
     Setting.stub :method_missing, setting_stub do
