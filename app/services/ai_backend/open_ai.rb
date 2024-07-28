@@ -95,13 +95,13 @@ class AIBackend::OpenAI < AIBackend
 
         {
           role: message.role,
-          name: message.name,
+          name: message.name_for_api,
           content: content_with_images,
         }.compact
       else
         {
           role: message.role,
-          name: message.name,
+          name: message.name_for_api,
           content: message.content_text,
           tool_calls: message.content_tool_calls, # only for some assistant messages
           tool_call_id: message.tool_call_id,     # only for tool messages

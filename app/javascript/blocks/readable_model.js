@@ -80,7 +80,7 @@ export default class {
         {
           const $ = this.attributes;
           ${this._callableMethodsExceptUppercase.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
-          ${this._getterMethods.map(func => 'const '+func+' = (v) => { return (typeof v == "undefined") ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").get() : Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").set(v); };').join("\n")}
+          ${this._getterMethods.map(func => 'const '+func+' = (v) => { return (typeof v == "undefined") ? this.'+func+' : this.'+func+' = v };').join("\n")}
           this._methodLog('${func}', arguments, this.${func}.length);
 
           ${methodBody}
@@ -103,7 +103,7 @@ export default class {
           {
             const $ = this.attributes;
             ${this._callableMethodsExceptUppercase.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
-            ${this._getterMethods.map(func => 'const '+func+' = (v) => { return (typeof v == "undefined") ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").get() : Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").set(v); };').join("\n")}
+            ${this._getterMethods.map(func => 'const '+func+' = (v) => { return (typeof v == "undefined") ? this.'+func+' : this.'+func+' = v };').join("\n")}
             this._methodLog('${func}', [], 0)
 
             ${methodBody}
@@ -125,7 +125,7 @@ export default class {
           {
             const $ = this.attributes;
             ${this._callableMethodsExceptUppercase.map(func => 'const '+func+' = this.'+func+'.bind(this);').join("\n")}
-            ${this._getterMethods.map(func => 'const '+func+' = (v) => { return (typeof v == "undefined") ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").get() : Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "'+func+'").set(v); };').join("\n")}
+            ${this._getterMethods.map(func => 'const ' + func + ' = (v) => { return (typeof v == "undefined") ? this.'+func+' : this.'+func+' = v };').join("\n")}
             this._methodLog('${func}', [${arg}], 1);
 
             ${methodBody}
@@ -175,12 +175,12 @@ export default class {
 
   log(str, level = 'info') {
     let logLevel
-    // if (node.env.isTest)
+    // if (blocks.env.isTest)
     //   logLevel = 'error'
     // else
       logLevel = this._declarationsFor('logLevel').first() || 'error'
     if (this.logLevels[level] >= this.logLevels[logLevel]) {
-      if (node.env.isTest)
+      if (blocks.env.isTest && blocks.mode == 'node')
         process.stdout.write(`${this.$['class']?.to_s}: ${str}\n`)
       else {
         let c = this.$['class']?.to_s ?? ''

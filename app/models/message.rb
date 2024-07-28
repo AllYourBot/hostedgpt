@@ -26,7 +26,8 @@ class Message < ApplicationRecord
 
   scope :ordered, -> { latest_version_for_conversation }
 
-  def name
+  def name_for_api
+    # TODO: We should sanitize name within the database since we don't need to support crazy characters
     case role
     when "user" then user.first_name[/\A[a-zA-Z0-9_-]+/]
     when "assistant" then assistant.name[/\A[a-zA-Z0-9_-]+/]

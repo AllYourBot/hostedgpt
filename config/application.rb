@@ -61,5 +61,9 @@ module HostedGPT
         config.action_mailer.postmark_settings = { api_token: Setting.postmark_server_api_token }
       end
     end
+
+    config.to_prepare do # FIXME: Remove this hack after Rails PR merges in: https://github.com/rails/rails/pull/52421
+      ActionCable::Channel::Base.include ActionCableBasePatch
+    end
   end
 end

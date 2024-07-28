@@ -44,18 +44,20 @@ class ConversationsTest < ApplicationSystemTestCase
   end
 
   test "clicking conversation edits it and pressing Esc aborts the edit and does not save" do
-    convo = hover_conversation conversations(:greeting)
-    edit = convo.find_role("edit")
+    convo_dom_elem = hover_conversation conversations(:greeting)
+    old_text = conversations(:greeting).title # "Meeting Samantha"
+    edit = convo_dom_elem.find_role("edit")
 
-    convo.find_role("options").click
+    convo_dom_elem.find_role("options").click
     assert_true { edit.visible? }
     edit.click
 
-    fill_in "edit-conversation", with: "Meeting Samantha Jones"
+    fill_in "edit-conversation", with: "Meeting Linda"
     send_keys "esc"
-    sleep 0.2
 
-    assert_equal "Meeting Samantha", convo.text
+    assert_true "UI never reverted back to the old title '#{old_text}'" do
+      convo_dom_elem.text == old_text
+    end
     assert_equal "Meeting Samantha", conversations(:greeting).reload.title
   end
 

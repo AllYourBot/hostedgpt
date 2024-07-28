@@ -40,6 +40,24 @@ class MessagesComposerStopStreamingTest < ApplicationSystemTestCase
     assert_no_selector "#composer #cancel"
   end
 
+  test "stop keyboard shortcut stops it" do
+    send_keys "You there?"
+    send_keys "enter"
+
+    assert_composer_blank
+    assert_selector "#composer #cancel"
+
+    reply = @conversation.messages.ordered.last
+    reply.update!(content_text: "Foo bar")
+    stream_ai_message(reply)
+
+    refute reply.reload.cancelled?
+    send_keys "meta+esc"
+    assert_true { reply.reload.cancelled? }
+
+    assert_no_selector "#composer #cancel"
+  end
+
   private
 
   def stream_ai_message(msg)
