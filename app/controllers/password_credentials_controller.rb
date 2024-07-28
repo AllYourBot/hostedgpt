@@ -1,4 +1,4 @@
-class PasswordsController < ApplicationController
+class PasswordCredentialsController < ApplicationController
   require_unauthenticated_access
   before_action :ensure_manual_login_allowed
 
@@ -11,7 +11,7 @@ class PasswordsController < ApplicationController
   def update
     user = find_signed_user(params[:token])
 
-    if user.password_credential&.update(password_params)
+    if user.password_credential&.update(update_params)
       redirect_to login_path, notice: "Your password was reset succesfully. Please sign in."
     else
       render "edit", alert: "There was an error resetting your password"
@@ -26,7 +26,7 @@ class PasswordsController < ApplicationController
     redirect_to login_path, alert: "Your token has expired. Please try again"
   end
 
-  def password_params
+  def update_params
     params.permit(:password)
   end
 end

@@ -13,7 +13,7 @@ class PasswordMailer < ApplicationMailer
       purpose: Rails.application.config.password_reset_token_purpose,
       expires_in: token_ttl
     )
-    @change_password_url = edit_password_url(token: token)
+    @edit_url = edit_password_credential_url(token: token)
 
     mail(
       from: Setting.postmark_from_email,

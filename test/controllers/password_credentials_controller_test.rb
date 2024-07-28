@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PasswordsControllerTest < ActionDispatch::IntegrationTest
+class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
   include ActionDispatch::TestProcess::FixtureFile
 
   setup do
@@ -12,7 +12,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
   test "should get edit" do
     token = get_test_user_token(@user)
 
-    get edit_password_url, params: { token: token }
+    get edit_password_credential_url, params: { token: token }
 
     assert_response :success
     assert assigns(:user).is_a?(User)
@@ -20,7 +20,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should redirect with invalid signature" do
-    get edit_password_url, params: { token: "invalid" }
+    get edit_password_credential_url, params: { token: "invalid" }
 
     assert_response :redirect
     assert_redirected_to login_path
@@ -30,7 +30,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     token = get_test_user_token(@user)
     @user.destroy # make sure the user doesn't exist when we try to find it
 
-    get edit_password_url, params: { token: token }
+    get edit_password_credential_url, params: { token: token }
 
     assert_response :not_found
   end
@@ -38,7 +38,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
   test "should patch update" do
     token = get_test_user_token(@user)
 
-    patch password_url, params: { token: token, password: "new_password" }
+    patch password_credential_url, params: { token: token, password: "new_password" }
 
     assert_response :redirect
     assert_redirected_to login_path

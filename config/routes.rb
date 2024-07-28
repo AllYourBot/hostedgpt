@@ -30,7 +30,7 @@ Rails.application.routes.draw do
 
   if Feature.password_reset_email?
     resources :password_resets, only: [:new, :create]
-    resource :password, only: [:edit, :update]
+    resource :password_credential, only: [:edit, :update]
   end
 
   get "/auth/:provider/callback" => "authentications/google_oauth#create", as: :google_oauth

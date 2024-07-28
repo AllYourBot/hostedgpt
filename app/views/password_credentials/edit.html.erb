@@ -1,6 +1,6 @@
 <% content_for :heading, "Reset your password" %>
 
-<%= form_with url: password_path(token: params[:token]), method: :patch, class: "flex flex-col space-y-4 w-80" do |f| %>
+<%= form_with url: password_credential_path(token: params[:token]), method: :patch, class: "flex flex-col space-y-4 w-80" do |f| %>
   <%= f.label :password, class: "input input-bordered flex items-center justify-between" do %>
     <span>Password <span class="">*</span></span>
     <%= f.password_field :password,
