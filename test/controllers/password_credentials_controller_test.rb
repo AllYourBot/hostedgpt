@@ -9,7 +9,7 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
     credentials(:keith_password)
 
     @settings = {
-      postmark_from_email: "teampeople@example.com",
+      email_from: "teampeople@example.com",
       product_name: "Product Name"
     }
     @features = {

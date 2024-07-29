@@ -7,7 +7,7 @@ class PasswordMailerTest < ActionMailer::TestCase
     credentials(:keith_password)
 
     @settings = {
-      postmark_from_email: "teampeople@example.com",
+      email_from: "teampeople@example.com",
       product_name: "Product Name"
     }
     @features = {
@@ -25,7 +25,7 @@ class PasswordMailerTest < ActionMailer::TestCase
 
       assert_equal "Set up a new password for #{@settings[:product_name]}", mail.subject
       assert_equal [@person.email], mail.to
-      assert_equal [@settings[:postmark_from_email]], mail.from
+      assert_equal [@settings[:email_from]], mail.from
       assert_match "reset your password", mail.body.encoded
       assert_match os, mail.body.encoded
       assert_match browser, mail.body.encoded
