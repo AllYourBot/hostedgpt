@@ -16,7 +16,6 @@ class PasswordMailer < ApplicationMailer
     @edit_url = edit_password_credential_url(token: token)
 
     mail(
-      from: Setting.email_from,
       to: person.email,
       subject: "Set up a new password for #{Setting.product_name}",
     )
