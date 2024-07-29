@@ -346,7 +346,6 @@ Minitest/UnreachableAssertion:
 
 # Check quotes usage according to lint rule below.
 Style/StringLiterals:
-  # Enabled: false
   EnforcedStyle: double_quotes
   Severity: info
 
