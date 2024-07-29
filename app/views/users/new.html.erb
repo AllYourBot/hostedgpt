@@ -32,14 +32,14 @@
 
 <% if Feature.password_authentication? %>
   <%= form_with method: :post,
-        model: @person,
-        url: users_path,
-        class: "flex flex-col space-y-4 w-80",
-        data: {
-          controller: "transition",
-          transition_toggle_class: "max-h-0 max-h-40"
-        } do
-  |f| %>
+    model: @person,
+    url: users_path,
+    class: "flex flex-col space-y-4 w-80",
+    data: {
+      controller: "transition",
+      transition_toggle_class: "max-h-0 max-h-40"
+    } do |f|
+  %>
     <%= f.hidden_field :personable_type, id: "personable_type", value: "User" %>
 
     <%= f.label :email, class: "input input-bordered flex items-center justify-between" do %>

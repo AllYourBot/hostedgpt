@@ -19,17 +19,17 @@
   <div class="my-5">
     <%= form.label :driver %>
     <%= form.select :driver,
-        APIService.drivers.keys,
-        {},
-        class: %|
-          block
-          border border-gray-200 outline-none
-          shadow rounded-md
-          px-3 py-2 mt-2
-          w-full
-          dark:text-black
-        |
-      %>
+      APIService.drivers.keys,
+      {},
+      class: %|
+        block
+        border border-gray-200 outline-none
+        shadow rounded-md
+        px-3 py-2 mt-2
+        w-full
+        dark:text-black
+      |
+    %>
   </div>
 
   <div class="my-5">
@@ -78,7 +78,7 @@
         %>).</li>
       <li>Add a "Payment method."</li>
     </ol>
-     <ol id="anthropic-instructions"
+    <ol id="anthropic-instructions"
       data-transition-target="<%= anthropic?(api_service) && 'transitionable' %>"
       class="
         list-decimal
@@ -87,7 +87,7 @@
         bg-gray-50 dark:bg-transparent
         hidden
       "
-     >
+    >
       <li>Sign up for Anthropic's web
         <%= link_to "Console", "https://console.anthropic.com/",
           class: "underline text-blue-600",
@@ -113,14 +113,14 @@
       </li>
     </ol>
     <ol id="openai-instructions"
-        data-transition-target="<%= groq?(api_service) && 'transitionable' %>"
-        class="
-          list-decimal
-          my-3 p-2 pl-8
-          border border-gray-200
-          bg-gray-50 dark:bg-transparent
-          hidden
-        "
+      data-transition-target="<%= groq?(api_service) && 'transitionable' %>"
+      class="
+        list-decimal
+        my-3 p-2 pl-8
+        border border-gray-200
+        bg-gray-50 dark:bg-transparent
+        hidden
+      "
     >
       <li>Create an account on
         <%= link_to "Groq Cloud Console", "https://console.groq.com/",

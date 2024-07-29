@@ -5,7 +5,7 @@ class SendResetPasswordEmailJob < ApplicationJob
     person = Person.find_by_email(email)
 
     if person&.user&.password_credential
-      PasswordMailer.with(person: person, os: os, browser: browser).reset.deliver_later
+      PasswordMailer.with(person: person, os: os, browser: browser).reset.deliver_now
     end
   end
 end
