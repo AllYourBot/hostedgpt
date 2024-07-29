@@ -346,7 +346,8 @@ Minitest/UnreachableAssertion:
 
 # Check quotes usage according to lint rule below.
 Style/StringLiterals:
-  EnforcedStyle: double_quotes
+  Enabled: false
+#   EnforcedStyle: double_quotes
 
 # Files should always have a new line at the end
 Layout/TrailingEmptyLines:

@@ -28,6 +28,11 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
+      PASSWORD_RESET_EMAIL_FEATURE: true
+      EMAIL_SENDER_POSTMARK_FEATURE: true
+      EMAIL_FROM: support@the.bot
+      EMAIL_HOST: localhost:3000
+      POSTMARK_SERVER_API_TOKEN: test-token
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
