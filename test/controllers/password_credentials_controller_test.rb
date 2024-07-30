@@ -52,7 +52,7 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
     patch password_credential_url, params: { token: token, password: "new_password" }
 
     assert_response :redirect
-    assert_redirected_to login_path
+    assert_redirected_to root_path
   end
 
   private

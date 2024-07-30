@@ -48,8 +48,8 @@ class SendResetPasswordEmailJobTest < ActiveJob::TestCase
     assert_mock with_mock # expecting no calls
   end
 
-  test "does not call deliver_later if person is found for email but has no password" do
-    person = people(:taylor_registered) # has no password
+  test "does not call deliver_later if person is found for email but has no user" do
+    person = people(:ali_invited) # has no user
 
     with_mock = Minitest::Mock.new
 

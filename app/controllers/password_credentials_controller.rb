@@ -15,7 +15,8 @@ class PasswordCredentialsController < ApplicationController
     credential.password = update_params[:password]
 
     if credential.save
-      redirect_to login_path, notice: "Your password was reset succesfully. Please sign in."
+      login_as user.person, credential: user.password_credential
+      redirect_to root_path, notice: "Your password was reset successfully."
     else
       render "edit", alert: "There was an error resetting your password"
     end
