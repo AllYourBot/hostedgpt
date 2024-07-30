@@ -49,8 +49,8 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
 
   test "should allow language_model selection" do
     get edit_settings_assistant_url(@assistant)
-    assert_select 'label', 'Language model'
-    assert_select 'select#assistant_language_model_id'
+    assert_select "label", "Language model"
+    assert_select "select#assistant_language_model_id"
   end
 
   test "should update language_model" do

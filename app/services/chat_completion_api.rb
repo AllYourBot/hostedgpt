@@ -9,12 +9,12 @@ class ChatCompletionAPI
     # docs for this format:  https://platform.openai.com/docs/api-reference/chat
 
     message_payload = [{
-      role: 'system',
+      role: "system",
       content: system_message
     }]
 
     chat_messages.each_with_index do |msg, i|
-      role = (i % 2).zero? ? 'user' : 'assistant'
+      role = (i % 2).zero? ? "user" : "assistant"
 
       message_payload << {
         role: role,
@@ -111,20 +111,20 @@ class ChatCompletionAPI
     # Docs for available models:  https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
 
     {
-      'gpt-4-turbo-2024-04-09' => 128000,
-      'gpt-4-0125-preview' => 128000,
-      'gpt-4-1106-preview' => 128000,
-      'gpt-4-vision-preview' => 128000,
-      'gpt-4-1106-vision-preview' => 128000,
-      'gpt-4' => 8192,
-      'gpt-4-32k' => 32768,
-      'gpt-4-0613' => 8192,
-      'gpt-4-32k-0613' => 32768,
-      'gpt-3.5-turbo-0125' => 16385,
-      'gpt-3.5-turbo-1106' => 16385,
-      'gpt-3.5-turbo' => 4096,
-      'gpt-3.5-turbo-16k' => 16385,
-      'gpt-3.5-turbo-instruct' => 4096
+      "gpt-4-turbo-2024-04-09" => 128000,
+      "gpt-4-0125-preview" => 128000,
+      "gpt-4-1106-preview" => 128000,
+      "gpt-4-vision-preview" => 128000,
+      "gpt-4-1106-vision-preview" => 128000,
+      "gpt-4" => 8192,
+      "gpt-4-32k" => 32768,
+      "gpt-4-0613" => 8192,
+      "gpt-4-32k-0613" => 32768,
+      "gpt-3.5-turbo-0125" => 16385,
+      "gpt-3.5-turbo-1106" => 16385,
+      "gpt-3.5-turbo" => 4096,
+      "gpt-3.5-turbo-16k" => 16385,
+      "gpt-3.5-turbo-instruct" => 4096
     }[name]
   end
 end

@@ -17,7 +17,7 @@ class ActiveStorage::PostgresqlController < ActiveStorage::BaseController
       response.headers["Content-Disposition"] = key[:disposition] || DEFAULT_SEND_FILE_DISPOSITION
       size = ActiveStorage::Postgresql::File.open(key[:key], &:size)
 
-      ranges = Rack::Utils.get_byte_ranges(request.get_header('HTTP_RANGE'), size)
+      ranges = Rack::Utils.get_byte_ranges(request.get_header("HTTP_RANGE"), size)
 
       if ranges.nil? || ranges.length > 1
         # No ranges, or multiple ranges (which we don't support):

@@ -87,11 +87,11 @@ class Toolbox < SDK
   end
 
   def self.formatted_param_properties(param)
-    raise "The param '#{param}' is not properly named for the type to be inferred (e.g. is_child, age_num, name_str)" if param.to_s.exclude?('_')
+    raise "The param '#{param}' is not properly named for the type to be inferred (e.g. is_child, age_num, name_str)" if param.to_s.exclude?("_")
 
-    case param.to_s.split('_')
+    case param.to_s.split("_")
     in first, *name  if first == "is"
-      [ name.join('_'), { type: "boolean" } ]
+      [ name.join("_"), { type: "boolean" } ]
     in name, "enum", *values
       if values.first.to_i.to_s == values.first
         type = "number"
@@ -102,11 +102,11 @@ class Toolbox < SDK
 
       [ name, { type: type, enum: values } ]
     in *name, last  if last == "s"
-      [ name.join('_'), { type: "string" } ]
+      [ name.join("_"), { type: "string" } ]
     in *name, last  if last == "i"
-      [ name.join('_'), { type: "integer" } ]
+      [ name.join("_"), { type: "integer" } ]
     in *name, last  if last == "f"
-      [ name.join('_'), { type: "number" } ]
+      [ name.join("_"), { type: "number" } ]
     else
       raise "Unable to infer type for parameter '#{param}'"
     end

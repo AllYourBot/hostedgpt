@@ -15,14 +15,14 @@ module Authenticate::ByBearerToken
   end
 
   def parse_double_token(double_token)
-    client_id, client_token = double_token.split(':')
+    client_id, client_token = double_token.split(":")
     client = Client.authenticated.api.find_by(id: client_id)
 
     [client, client_token]
   end
 
   def render_unauthorized
-    self.headers['WWW-Authenticate'] = 'Token realm="Application"'
+    self.headers["WWW-Authenticate"] = 'Token realm="Application"'
     render json: { error: "Authentication Bearer token was invalid" }, status: :unauthorized
     nil
   end

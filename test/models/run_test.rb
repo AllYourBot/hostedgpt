@@ -37,7 +37,7 @@ class RunTest < ActiveSupport::TestCase
         status: "queued",
         expired_at: 1.minute.from_now
       )
-      assert_equal 'claude-3-opus-20240229', r.model
+      assert_equal "claude-3-opus-20240229", r.model
   end
 
   test "associations are deleted upon destroy" do
