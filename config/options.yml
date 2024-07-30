@@ -28,4 +28,4 @@ shared:
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
     postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] %>
     email_from: <%= ENV["EMAIL_FROM"] || Rails.application.credentials[:email_from] %>
-    email_host: <%= ENV["EMAIL_HOST"] %>
+    email_host: <%= ENV["EMAIL_HOST"] || Rails.application.credentials[:email_host] %>
