@@ -11,7 +11,10 @@ class PasswordCredentialsController < ApplicationController
   def update
     user = find_signed_user(params[:token])
 
-    if user.password_credential&.update(update_params)
+    credential = user.credentials.find_or_initialize_by(type: "PasswordCredential")
+    credential.password = update_params[:password]
+
+    if credential.save
       redirect_to login_path, notice: "Your password was reset succesfully. Please sign in."
     else
       render "edit", alert: "There was an error resetting your password"
