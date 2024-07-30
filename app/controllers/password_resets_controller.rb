@@ -12,6 +12,6 @@ class PasswordResetsController < ApplicationController
     browser = request.browser
     SendResetPasswordEmailJob.perform_later(params[:email], os, browser) # queue as a job to avoid timing attacks
 
-    redirect_to login_path, notice: "If an account with that email was found, we have sent a link to reset the password"
+    redirect_to login_path, notice: "If that email is valid, we just sent password reset email."
   end
 end
