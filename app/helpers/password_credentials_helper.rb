@@ -1,2 +1,2 @@
-module PasswordsHelper
+module PasswordCredentialsHelper
 end
