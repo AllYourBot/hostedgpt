@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class Authenticate::ByBearerTokenTest < ActionDispatch::IntegrationTest
   test "simple get request should auth user with a bearer token and returns proper JSON" do

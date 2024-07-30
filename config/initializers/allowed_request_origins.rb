@@ -3,7 +3,7 @@
 #
 #   export ALLOWED_REQUEST_ORIGINS=https://myhost.com,https://myotherhost.com
 #
-if (allowed_request_origins = ENV["ALLOWED_REQUEST_ORIGINS"].to_s.split(',')).any?
+if (allowed_request_origins = ENV["ALLOWED_REQUEST_ORIGINS"].to_s.split(",")).any?
   Rails.application.configure do
     config.action_cable.allowed_request_origins = allowed_request_origins
 

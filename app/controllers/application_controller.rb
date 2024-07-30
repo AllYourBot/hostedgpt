@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
   end
 
   def public_ivars
-    instance_variables.select { |i| !i.to_s.starts_with?('@_') }
+    instance_variables.select { |i| !i.to_s.starts_with?("@_") }
   end
 
   def api_request?
