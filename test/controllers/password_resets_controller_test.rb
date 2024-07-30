@@ -14,7 +14,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     }
     @features = {
       password_reset_email: true,
-      email_sender_postmark: true
+      email_postmark: true
     }
   end
 

@@ -10,7 +10,7 @@ shared:
     voice: <%= ENV.fetch("VOICE_FEATURE", false) %>
     default_to_voice: <%= ENV.fetch("DEFAULT_TO_VOICE_FEATURE", false) %>
     password_reset_email: <%= ENV.fetch("PASSWORD_RESET_EMAIL_FEATURE", false) %>
-    email_sender_postmark: <%= ENV.fetch("EMAIL_SENDER_POSTMARK_FEATURE", false) %>
+    email_postmark: <%= ENV.fetch("EMAIL_POSTMARK_FEATURE", false) %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>
