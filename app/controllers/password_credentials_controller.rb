@@ -23,7 +23,7 @@ class PasswordCredentialsController < ApplicationController
   def find_signed_user(token)
     User.find_signed!(token, purpose: Rails.application.config.password_reset_token_purpose)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    redirect_to login_path, alert: "Your token has expired. Please try again"
+    redirect_to login_path, alert: "Your token has expired. Please try again."
   end
 
   def update_params
