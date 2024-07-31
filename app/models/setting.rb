@@ -23,11 +23,5 @@ class Setting
         end
       end
     end
-
-    def require_value_in!(key, values)
-      if values.exclude?(send(key))
-        abort "ERROR: The value of #{key.upcase} must be one of: #{values.join(", ")}"
-      end
-    end
   end
 end

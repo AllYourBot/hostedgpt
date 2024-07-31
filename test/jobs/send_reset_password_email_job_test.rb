@@ -9,14 +9,14 @@ class SendResetPasswordEmailJobTest < ActiveJob::TestCase
     @os = "Windows"
     @browser = "Chrome"
 
-    @settings = {
-      email_from: "teampeople@example.com",
-      product_name: "Product Name"
-    }
-    @features = {
+    stub_features(
       password_reset_email: true,
       email_postmark: true
-    }
+    )
+    stub_settings(
+      email_from: "teampeople@example.com",
+      product_name: "Product Name"
+    )
   end
 
   test "calls deliver_later if person with password is found for email" do

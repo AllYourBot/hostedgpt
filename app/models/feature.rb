@@ -44,13 +44,6 @@ class Feature
       !enabled?(feature)
     end
 
-    def require_any_enabled!(features, message: nil)
-      if features.none? { |feature| enabled?(feature) }
-        message ||= "At least one of the following features must be enabled: #{features.join(', ')}"
-        abort "ERROR: #{message}"
-      end
-    end
-
     def method_missing(method_name, *arguments, &block)
       if method_name.to_s.end_with?("?")
         enabled?(method_name.to_s.chomp("?"))

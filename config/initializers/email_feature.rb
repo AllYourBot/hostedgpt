@@ -12,7 +12,10 @@ EmailProviders.freeze
 if Feature.email?
   Rails.application.configure do
     Setting.require_keys!(:email_provider, :email_from, :email_host)
-    Setting.require_value_in!(:email_provider, EmailProviders.all)
+
+    if EmailProviders.all.exclude?(Setting.email_provider)
+      abort "ERROR: The value of EMAIL_PROVIDER must be one of: #{EmailProviders.all.join(", ")}"
+    end
 
     config.action_mailer.default_url_options = { host: Setting.email_host }
 
