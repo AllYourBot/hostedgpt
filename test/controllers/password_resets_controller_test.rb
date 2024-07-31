@@ -8,22 +8,20 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     users(:keith)
     credentials(:keith_password)
 
-    @settings = {
+    stub_features(
+      password_reset_email: true,
+      email_postmark: true
+    )
+    stub_settings(
       email_from: "teampeople@example.com",
       product_name: "Product Name"
-    }
-    @features = {
-      password_reset_email: true,
-      email_sender_postmark: true
-    }
+    )
   end
 
   test "should get new" do
-    stub_settings_and_features do
       get new_password_reset_url
 
       assert_response :success
-    end
   end
 
   test "should post create" do
@@ -33,16 +31,14 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
     email = @person.email
 
-    stub_settings_and_features do
       # set the user agent in the request headers
-      ActionDispatch::Request.stub_any_instance(:user_agent, "#{browser} on #{operating_system}") do
-        post password_resets_url, params: { email: email }
-      end
-
-      assert_enqueued_jobs 1
-      assert_enqueued_with(job: SendResetPasswordEmailJob, args: [email, operating_system, browser])
-      assert_response :redirect
-      assert_redirected_to login_path
+    ActionDispatch::Request.stub_any_instance(:user_agent, "#{browser} on #{operating_system}") do
+      post password_resets_url, params: { email: email }
     end
+
+    assert_enqueued_jobs 1
+    assert_enqueued_with(job: SendResetPasswordEmailJob, args: [email, operating_system, browser])
+    assert_response :redirect
+    assert_redirected_to login_path
   end
 end

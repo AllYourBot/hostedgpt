@@ -1,5 +1,5 @@
 class PasswordCredentialsController < ApplicationController
-  require_unauthenticated_access
+  allow_unauthenticated_access
   before_action :ensure_manual_login_allowed
 
   layout "public"
@@ -11,8 +11,12 @@ class PasswordCredentialsController < ApplicationController
   def update
     user = find_signed_user(params[:token])
 
-    if user.password_credential&.update(update_params)
-      redirect_to login_path, notice: "Your password was reset succesfully. Please sign in."
+    credential = user.credentials.find_or_initialize_by(type: "PasswordCredential")
+    credential.password = update_params[:password]
+
+    if credential.save
+      login_as user.person, credential: user.password_credential
+      redirect_to root_path, notice: "Your password was reset successfully."
     else
       render "edit", alert: "There was an error resetting your password"
     end
@@ -23,7 +27,7 @@ class PasswordCredentialsController < ApplicationController
   def find_signed_user(token)
     User.find_signed!(token, purpose: Rails.application.config.password_reset_token_purpose)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    redirect_to login_path, alert: "Your token has expired. Please try again"
+    redirect_to login_path, alert: "Your token has expired. Please try again."
   end
 
   def update_params

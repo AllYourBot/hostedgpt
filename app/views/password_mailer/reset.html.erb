@@ -116,7 +116,7 @@
       border-bottom: 10px solid #3869D4;
       border-left: 18px solid #3869D4;
       display: inline-block;
-      color: #FFF;
+      color: #FFF !important;
       text-decoration: none;
       border-radius: 3px;
       box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
@@ -325,7 +325,7 @@
     .email-masthead_name {
       font-size: 16px;
       font-weight: bold;
-      color: #A8AAAF;
+      color: #A8AAAF !important;
       text-decoration: none;
       text-shadow: 0 1px 0 white;
     }
@@ -457,7 +457,7 @@
                     <td class="content-cell">
                       <div class="f-fallback">
                         <h1>Hi <%= @user.first_name %>,</h1>
-                        <p>You recently requested to reset your password for your <%= Setting.product_name %> account. Use the button below to reset it. <strong>This password reset is only valid for the next <%= @ttl_sentence %>.</strong></p>
+                        <p>You recently requested to reset your password for your <%= Setting.product_name %> account. Use the button below to reset it. <strong>This password reset is only valid for the next <%= @token_ttl.as_sentence %>.</strong></p>
                         <!-- Action -->
                         <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                           <tr>
@@ -468,7 +468,7 @@
                                 <tr>
                                   <td align="center">
                                     <%= link_to @edit_url, class: "f-fallback button button--green", target: "_blank" do %>
-                                      Reset your password
+                                      Reset Your Password
                                     <% end %>
                                   </td>
                                 </tr>

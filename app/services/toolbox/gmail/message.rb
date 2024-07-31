@@ -44,12 +44,12 @@ class Toolbox::Gmail::Message
   end
 
   def body
-    str = @message.payload.parts.find { |p| p.mimeType == "text/plain" }&.body&.data&.gsub(/-/, '+')&.gsub(/_/, '/')
+    str = @message.payload.parts.find { |p| p.mimeType == "text/plain" }&.body&.data&.gsub(/-/, "+")&.gsub(/_/, "/")
     str && Base64.decode64(str)
   end
 
   def body_html
-    str = @message.payload.parts.find { |p| p.mimeType == "text/html" }&.body&.data&.gsub(/-/, '+')&.gsub(/_/, '/')
+    str = @message.payload.parts.find { |p| p.mimeType == "text/html" }&.body&.data&.gsub(/-/, "+")&.gsub(/_/, "/")
     str && Base64.decode64(str)
   end
 

@@ -93,7 +93,7 @@ class GetNextAIMessageJob < ApplicationJob
     puts "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     raise WaitForPrevious
   rescue => e
-    msg = e.inspect.gsub(/(sk-)[\w\-]{40}/, '\1' + '*' * 40)
+    msg = e.inspect.gsub(/(sk-)[\w\-]{40}/, '\1' + "*" * 40)
 
     unless Rails.env.test?
       puts "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
@@ -116,7 +116,7 @@ class GetNextAIMessageJob < ApplicationJob
 
   def self.broadcast_updated_message(message, locals = {})
     html = ApplicationController.render(
-      partial: 'messages/message',
+      partial: "messages/message",
       locals: {
         message: message,
         only_scroll_down_if_was_bottom: true,
@@ -164,8 +164,8 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def set_billing_error
-    service = ai_backend.to_s.split('::').second
-    url = service == 'OpenAI' ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
+    service = ai_backend.to_s.split("::").second
+    url = service == "OpenAI" ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
 
     @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
       "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"

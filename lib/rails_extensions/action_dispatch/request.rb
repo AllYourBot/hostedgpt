@@ -4,21 +4,11 @@ module ActionDispatch
     KNOWN_BROWSERS = ["Chrome", "Safari", "Firefox", "Edge", "Opera"].freeze
 
     def operating_system
-      get_item_in_str(user_agent, KNOWN_OPERATING_SYSTEMS) || "unknown operating system"
+      KNOWN_OPERATING_SYSTEMS.detect { |os| user_agent.include?(os) } || "unknown operating system"
     end
 
     def browser
-      get_item_in_str(user_agent, KNOWN_BROWSERS) || "unknown browser"
-    end
-
-    private
-
-    def get_item_in_str(str, items)
-      items.each do |item|
-        if str.include?(item)
-          return item
-        end
-      end
+      KNOWN_BROWSERS.detect { |browser| user_agent.include?(browser) } || "unknown browser"
     end
   end
 end

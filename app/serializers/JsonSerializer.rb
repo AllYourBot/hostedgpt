@@ -28,9 +28,9 @@ class JsonSerializer
 
   def self.convert_value(value)
     case value
-    when 'true'
+    when "true"
       true
-    when 'false'
+    when "false"
       false
     else
       value

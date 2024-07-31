@@ -8,26 +8,24 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
     @user = users(:keith)
     credentials(:keith_password)
 
-    @settings = {
+    stub_features(
+      password_reset_email: true,
+      email_postmark: true
+    )
+    stub_settings(
       email_from: "teampeople@example.com",
       product_name: "Product Name"
-    }
-    @features = {
-      password_reset_email: true,
-      email_sender_postmark: true
-    }
+    )
   end
 
   test "should get edit" do
     token = get_test_user_token(@user)
 
-    stub_settings_and_features do
-      get edit_password_credential_url, params: { token: token }
+    get edit_password_credential_url, params: { token: token }
 
-      assert_response :success
-      assert assigns(:user).is_a?(User)
-      assert_equal @user, assigns(:user)
-    end
+    assert_response :success
+    assert assigns(:user).is_a?(User)
+    assert_equal @user, assigns(:user)
   end
 
   test "should redirect with invalid signature" do
@@ -52,7 +50,7 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
     patch password_credential_url, params: { token: token, password: "new_password" }
 
     assert_response :redirect
-    assert_redirected_to login_path
+    assert_redirected_to root_path
   end
 
   private

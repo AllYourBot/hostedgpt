@@ -39,6 +39,6 @@ class ConversationMessagesNewConversationTest < ApplicationSystemTestCase
   private
 
   def conversation_selected_in_nav(conversation)
-    find("#conversation-#{conversation.id}").find(:xpath, '..').matches_css?(".relationship", wait: 0)
+    find("#conversation-#{conversation.id}").find(:xpath, "..").matches_css?(".relationship", wait: 0)
   end
 end

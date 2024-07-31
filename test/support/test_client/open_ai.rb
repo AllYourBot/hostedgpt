@@ -66,7 +66,7 @@ module TestClient
                     "arguments"=>arguments
                   }
                 }
-              }.map.with_index.map { |h, i| h['index'] = i; h }
+              }.map.with_index.map { |h, i| h["index"] = i; h }
             }
           }
         ]
