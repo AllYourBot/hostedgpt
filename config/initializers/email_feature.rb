@@ -1,4 +1,4 @@
-class EmailSenders
+class EmailProviders
   POSTMARK = "postmark".freeze
 
   class << self
@@ -7,16 +7,16 @@ class EmailSenders
     end
   end
 end
-EmailSenders.freeze
+EmailProviders.freeze
 
 if Feature.email?
   Rails.application.configure do
-    Setting.require_keys!(:email_sender, :email_from, :email_host)
-    Setting.require_value_in!(:email_sender, EmailSenders.all)
+    Setting.require_keys!(:email_provider, :email_from, :email_host)
+    Setting.require_value_in!(:email_provider, EmailProviders.all)
 
     config.action_mailer.default_url_options = { host: Setting.email_host }
 
-    if Setting.email_sender == EmailSenders::POSTMARK
+    if Setting.email_provider == EmailProviders::POSTMARK
       Setting.require_keys!(:postmark_server_api_token)
 
       config.action_mailer.delivery_method = :postmark
