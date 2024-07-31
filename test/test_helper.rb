@@ -3,7 +3,7 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "minitest/autorun"
 require "pry"
-Dir[Rails.root.join('test/support/**/*.rb')].sort.each { |file| require file }
+Dir[Rails.root.join("test/support/**/*.rb")].sort.each { |file| require file }
 
 Dir[File.join(Rails.root, "lib", "rails_extensions", "**/*.rb")].each do |path|
   require path
@@ -11,7 +11,7 @@ end
 
 class Capybara::Node::Element
   def obsolete?
-    inspect.include?('Obsolete')
+    inspect.include?("Obsolete")
   end
 
   def exists?
