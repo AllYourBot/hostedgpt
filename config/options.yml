@@ -34,10 +34,10 @@ shared:
     default_openai_key: <%= ENV["DEFAULT_OPENAI_KEY"] %>
     default_anthropic_key: <%= ENV["DEFAULT_ANTHROPIC_KEY"] %>
     default_groq_key: <%= ENV["DEFAULT_GROQ_KEY"] %>
-    cloudflare_account_id: <%= ENV["CLOUDFLARE_ACCOUNT_ID"] || default_to(:cloudflare, :account_id) %>
-    cloudflare_access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || default_to(:cloudflare, :access_key_id) %>
-    cloudflare_secret_access_key: <%= ENV["CLOUDFLARE_SECRET_ACCESS_KEY"] || default_to(:cloudflare, :secret_access_key) %>
-    cloudflare_bucket: <%= ENV["CLOUDFLARE_BUCKET"] || default_to(:cloudflare, :bucket) %>
+    cloudflare_account_id: <%= ENV["CLOUDFLARE_ACCOUNT_ID"] || default_to(cloudflare: :account_id) %>
+    cloudflare_access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || default_to(cloudflare: :access_key_id) %>
+    cloudflare_secret_access_key: <%= ENV["CLOUDFLARE_SECRET_ACCESS_KEY"] || default_to(cloudflare: :secret_access_key) %>
+    cloudflare_bucket: <%= ENV["CLOUDFLARE_BUCKET"] || default_to(cloudflare: :bucket) %>
     google_auth_client_id: <%= ENV["GOOGLE_AUTH_CLIENT_ID"] || default_to(:google_auth_client_id) %>
     google_auth_client_secret: <%= ENV["GOOGLE_AUTH_CLIENT_SECRET"] || default_to(:google_auth_client_secret) %>
     http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
