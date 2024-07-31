@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
   test "should login user via header" do
@@ -59,7 +59,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
       get root_url
     end
     assert_response :unauthorized
-    assert_equal response.body, 'Unauthorized'
+    assert_equal response.body, "Unauthorized"
   end
 
   test "should render UN-AUTHORIZED if REGISTRATION DISABLED and NO HEADERS are provided and MANUAL AUTH IS DISABLED" do
@@ -69,7 +69,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
       get root_url
     end
     assert_response :unauthorized
-    assert_equal response.body, 'Unauthorized'
+    assert_equal response.body, "Unauthorized"
   end
 
   test "should render UN-AUTHORIZED if REGISTRATION DISABLED and NEW uid" do
@@ -83,7 +83,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
       get root_url, headers: headers
     end
     assert_response :unauthorized
-    assert_equal response.body, 'Unauthorized'
+    assert_equal response.body, "Unauthorized"
   end
 
   test "should render AUTHORIZED if REGISTRATION DISABLED and EXISTING uid" do
