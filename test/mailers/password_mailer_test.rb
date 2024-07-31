@@ -7,8 +7,8 @@ class PasswordMailerTest < ActionMailer::TestCase
     credentials(:keith_password)
 
     stub_features(
+      email: true,
       password_reset_email: true,
-      email_postmark: true
     )
     @settings = {
       email_from: "teampeople@example.com",

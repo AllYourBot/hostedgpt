@@ -9,8 +9,8 @@ shared:
     http_header_authentication: <%= ENV.fetch("HTTP_HEADER_AUTHENTICATION_FEATURE", false) %>
     voice: <%= ENV.fetch("VOICE_FEATURE", false) %>
     default_to_voice: <%= ENV.fetch("DEFAULT_TO_VOICE_FEATURE", false) %>
+    email: <%= ENV.fetch("EMAIL_FEATURE", false) %>
     password_reset_email: <%= ENV.fetch("PASSWORD_RESET_EMAIL_FEATURE", false) %>
-    email_postmark: <%= ENV.fetch("EMAIL_POSTMARK_FEATURE", false) %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>
@@ -26,6 +26,7 @@ shared:
     http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
-    postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] %>
+    email_provider: <%= ENV["EMAIL_PROVIDER"] || Rails.application.credentials[:email_provider] %>
     email_from: <%= ENV["EMAIL_FROM"] || Rails.application.credentials[:email_from] %>
     email_host: <%= ENV["EMAIL_HOST"] || Rails.application.credentials[:email_host] %>
+    postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] %>
