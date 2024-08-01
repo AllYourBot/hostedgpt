@@ -245,3 +245,4 @@ guanaco:
   api_service: keith_other_service
   api_name: guanaco:large
   supports_images: true
+  supports_tools: false
