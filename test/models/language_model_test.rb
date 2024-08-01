@@ -38,13 +38,13 @@ class LanguageModelTest < ActiveSupport::TestCase
   end
 
   test "validates api_name" do
-    record = LanguageModel.new(api_name: '')
+    record = LanguageModel.new(api_name: "")
     refute record.valid?
     assert_equal ["can't be blank"], record.errors[:api_name]
   end
 
   test "validates name" do
-    record = LanguageModel.new(name: '')
+    record = LanguageModel.new(name: "")
     refute record.valid?
     assert_equal ["can't be blank"], record.errors[:name]
   end
@@ -87,13 +87,13 @@ class LanguageModelTest < ActiveSupport::TestCase
 
   test "for_user scope" do
     list = LanguageModel.for_user(users(:keith)).all.pluck(:api_name)
-    assert list.include?('camel')
-    assert list.include?('gpt-best')
-    refute list.include?('alpaca')
+    assert list.include?("camel")
+    assert list.include?("gpt-best")
+    refute list.include?("alpaca")
 
     list = LanguageModel.for_user(users(:taylor)).all.pluck(:api_name)
-    refute list.include?('camel')
-    assert list.include?('alpaca:medium')
+    refute list.include?("camel")
+    assert list.include?("alpaca:medium")
   end
 
   private

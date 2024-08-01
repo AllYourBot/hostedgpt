@@ -1,32 +1,18 @@
 namespace :db do
-  desc "Change fly VM"
-  task :fly, [:app_name, :command, :detail] => :environment do |t, args|
-    if args[:app_name].nil? || args[:command].nil? || args[:detail].nil?
-      puts "Missing arguments. Call with bin/rails fly[APP_NAME,COMMAND,DETAIL]"
-      return
-    end
-
-    if args[:command] == "swap"
-      Fly.new.change_db_swap(app: args[:app_name], swap: args[:detail].to_i)
-    else
-      puts "Unrecognized command #{args[:command]}"
-    end
-  end
-
   desc "Setup database encryption and update credentials"
   task :setup_encryption, [:send_to_fly] => :environment do |t, args|
     args.with_defaults(send_to_fly: false)
 
-    ensure_master_key unless ENV['RAILS_MASTER_KEY'].present?
+    ensure_master_key unless ENV["RAILS_MASTER_KEY"].present?
 
     old_config = Rails.application.credentials.config
     config = old_config.deep_dup
 
-    if config[:secret_key_base].nil? && ENV['SECRET_KEY_BASE'].nil?
+    if config[:secret_key_base].nil? && ENV["SECRET_KEY_BASE"].nil?
       config = add_secret_key_base(config)
     end
 
-    if config[:active_record_encryption].nil? && ENV['CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV'] != 'true'
+    if config[:active_record_encryption].nil? && ENV["CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV"] != "true"
       config = add_active_record_encryption(config)
     end
 
@@ -94,7 +80,7 @@ def ensure_master_key
 end
 
 def master_key_path
-  Rails.root.join('config', 'master.key')
+  Rails.root.join("config", "master.key")
 end
 
 def master_key_exception

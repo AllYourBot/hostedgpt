@@ -341,7 +341,7 @@ claude_replying:
 claude_age:
   assistant: keith_claude3
   conversation: hello_claude
-  role: assistant
+  role: user
   content_text: How old are you?
   content_document:
   run:

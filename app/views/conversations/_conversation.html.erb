@@ -26,31 +26,12 @@
     %>
 
     <div class="items-center hidden gap-2 pl-2 relationship:flex group-hover:flex">
-      <%= link_to edit_conversation_path(conversation),
-        data: {
-          controller: "nested-pointer",
-          action: "nested-pointer#addParentClickable",
-          role: "edit"
-        },
-        class: %|
-          cursor-pointer
-          invisible group-hover:visible
-          hover:text-gray-600 dark:hover:text-gray-300
-      | do %>
-        <%= icon "pencil",
-          variant: :outline,
-          size: 16,
-          title: "Rename",
-          tooltip: :top
-        %>
-      <% end %>
-
       <div class="dropdown !inline-flex dropdown-end outline-none pr-2">
-        <%= icon "x-mark",
+        <%= icon "ellipsis-horizontal",
           tabindex: 0,
           role: :button,
-          variant: :outline,
-          size: 22,
+          variant: :micro,
+          size: 18,
           class: %|
             outline-none cursor-pointer group-hover:visible
             hover:text-gray-600 dark:hover:text-gray-300
@@ -58,18 +39,34 @@
           |,
           data: {
             controller: "nested-pointer",
-            role: "delete"
+            role: "options"
           },
-          title: "Delete",
+          title: "Options",
           tooltip: :top
         %>
 
         <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 mt-7 dark:text-white dark:!bg-gray-700" data-controller="nested-pointer">
           <li>
+            <%= link_to edit_conversation_path(conversation),
+              data: {
+                role: "edit",
+              },
+              class: "flex gap-2 w-full py-2 px-4" do
+            %>
+              <%= icon "pencil",
+                variant: :outline,
+                size: 16,
+                title: "Rename",
+                tooltip: :top,
+                class: "mx-[1px]"
+              %>Rename
+            <% end %>
+          </li>
+          <li>
             <%= button_to conversation_path(conversation),
               method: :delete,
               data: {
-                role: "confirm-delete",
+                role: "delete",
               },
               form: {
                 class: "inline-block p-0",
@@ -80,6 +77,22 @@
               <%= icon "trash", variant: :outline, size: 18 %>Delete
             <% end %>
           </li>
+          <footer class="hidden py-3 px-4 mt-1 border-t-2 border-gray-100 dark:border-gray-600 gap-2 flex flex-col">
+            <table class="w-full text-left">
+              <tr>
+                <td class="pb-2 whitespace-nowrap">Conversation</td>
+                <td class="pb-2">$444.44</td>
+              </tr>
+              <tr>
+                <td class="pb-2">Input Tokens</td>
+                <td class="pb-2">100</td>
+              </tr>
+              <tr>
+                <td>Output Tokens</td>
+                <td>100</td>
+              </tr>
+            </table>
+          </footer>
         </menu>
       </div>
 

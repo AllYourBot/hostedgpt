@@ -35,7 +35,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     else
       find(selector_or_element, wait: wait)
     end
-    assert_equal element, page.active_element, error_msg || "Expected element to be the active element, but it is not"
+    assert_true(error_msg || "Expected element to be the active element, but it is not") do
+      page.active_element == element
+    end
   end
 
   def assert_visible(selector, error_msg = nil, wait: Capybara.default_max_wait_time)
@@ -64,7 +66,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
 
     unless element.matches_css?(".tooltip", wait: 0) # sometimes we're checking the tooltip on a link but within the link is an icon, check that instead
-      element = element.find(:xpath, './*', match: :first, wait: wait)
+      element = element.find(:xpath, "./*", match: :first, wait: wait)
     end
 
     assert element.matches_css?(".tooltip", wait: 0)
@@ -74,21 +76,21 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def send_keys(keys)
     element = page.active_element
 
-    key_array = keys.split('+').collect do |key|
+    key_array = keys.split("+").collect do |key|
       case key
-      when 'up'
+      when "up"
         :arrow_up
-      when 'meta'
+      when "meta"
         :command
-      when 'esc'
+      when "esc"
         :escape
-      when 'backspace'
+      when "backspace"
         :backspace
-      when 'slash'
-        '/'
-      when 'period'
-        '.'
-      when 'enter', 'shift'
+      when "slash"
+        "/"
+      when "period"
+        "."
+      when "enter", "shift"
         key.to_sym
       else
         key
@@ -229,31 +231,39 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def clipboard
-    page.evaluate_script('window.clipboardForSystemTestsToCheck')
+    page.evaluate_script("window.clipboardForSystemTestsToCheck")
   end
 
   def assert_true(msg = nil, opts = {}, &block)
     timeout = opts[:wait] || Capybara.default_max_wait_time
+    prev_default_wait = Capybara.default_max_wait_time
 
+    Capybara.default_max_wait_time = 0
     Timeout.timeout(timeout) do
       sleep 0.25 until block.call
     end
   rescue Timeout::Error
     assert false, msg || "Expected block to return true, but it did not"
+  ensure
+    Capybara.default_max_wait_time = prev_default_wait
   end
 
   def assert_false(msg = nil, opts = {}, &block)
     timeout = opts[:wait] || Capybara.default_max_wait_time
+    prev_default_wait = Capybara.default_max_wait_time
 
+    Capybara.default_max_wait_time = 0
     Timeout.timeout(timeout) do
       sleep 0.25 until !block.call
     end
   rescue Timeout::Error
     refute true, msg || "Expected block to return false, but it did not"
+  ensure
+    Capybara.default_max_wait_time = prev_default_wait
   end
 
   def wait_for_images_to_load
-    assert_false "all the image loaders should have disappeared", wait: 10 do
+    assert_false "all the image loaders should have disappeared" do
       all("[data-role='image-loader']", visible: :all).map(&:visible?).include?(true)
     end
 
@@ -264,7 +274,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def wait_for_initial_scroll_down
     assert_true "waiting for scroll down after initial page load" do
-      page.evaluate_script('window.scrolledDownForSystemTestsToCheck')
+      page.evaluate_script("window.scrolledDownForSystemTestsToCheck")
     end
   end
 
@@ -309,8 +319,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_equal text, toast[:innerText]
   end
 
-  def visit_and_scroll_wait(path)
+  def visit_and_scroll_wait(path, debug: false)
     visit path
+
+    path_without_query = URI.parse(path).path # ignore_query only ignores it from the current_path so strip ourselves
+    assert_current_path path_without_query, ignore_query: true
+
     wait_for_initial_scroll_down
   end
 end
@@ -318,5 +332,9 @@ end
 class Capybara::Node::Element
   def find_role(label)
     find("[data-role='#{label}']", visible: :all)
+  end
+
+  def find_target(label, controller:)
+    find("[data-#{controller}-target='#{label}']", visible: :all)
   end
 end

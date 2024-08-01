@@ -9,11 +9,11 @@ export default class extends Service {
   async start() {
     if ($.started) return
 
-    const canIRun = 'getDisplayMedia' in navigator.mediaDevices
+    const canIRun = 'getDisplayMedia' in n.mediaDevices
     if (!canIRun || $.declined) return false
 
     try {
-      $.media = await navigator.mediaDevices.getDisplayMedia({
+      $.media = await n.mediaDevices.getDisplayMedia({
         video: { mediaSource: 'screen' }
       })
       $.started = true

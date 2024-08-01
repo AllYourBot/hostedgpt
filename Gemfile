@@ -10,7 +10,7 @@ gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 gem "importmap-rails" # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "turbo-rails", "~> 2.0.5"
-gem "stimulus-rails"
+gem "stimulus-rails", "~> 1.3.3"
 gem "tailwindcss-rails", "~> 2.6.0"
 gem "rack-cors"
 
@@ -44,6 +44,7 @@ gem "tiktoken_ruby", "~> 0.0.6"
 gem "solid_queue", "~> 0.2.1"
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable
+gem "aws-sdk-s3", require: false
 
 gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2", "~> 1.1"

@@ -1,20 +1,45 @@
+<%
+  def default_to(*args)
+    if args.length == 1 && args.first.is_a?(Hash)
+      value, options = args.first.to_a
+    else
+      value, options = args
+    end
+    options = options.to_a.flatten.each_slice(2).to_h # force all cases into a hash
+
+    default = options.dig(:"#{Rails.env}_override")
+    default ||= case value
+    when String, Integer, TrueClass, FalseClass
+      value
+    when Symbol
+      Rails.application.credentials.dig(value)
+    when Array
+      Rails.application.credentials.dig(*value)
+    end
+  end
+%>
 shared:
   features:
-    default_llm_keys: <%= ENV.fetch("DEFAULT_LLM_KEYS_FEATURE", false) %>
-    google_tools: <%= ENV.fetch("GOOGLE_TOOLS_FEATURE", false) %>
-    registration: <%= ENV.fetch("REGISTRATION_FEATURE", true) %>
-    password_authentication: <%= ENV.fetch("PASSWORD_AUTHENTICATION_FEATURE", true) %>
-    google_authentication: <%= ENV.fetch("GOOGLE_AUTHENTICATION_FEATURE", false) %>
-    http_header_authentication: <%= ENV.fetch("HTTP_HEADER_AUTHENTICATION_FEATURE", false) %>
-    voice: <%= ENV.fetch("VOICE_FEATURE", false) %>
-    default_to_voice: <%= ENV.fetch("DEFAULT_TO_VOICE_FEATURE", false) %>
+    registration: <%= ENV["REGISTRATION_FEATURE"] || true %>
+    default_llm_keys: <%= ENV["DEFAULT_LLM_KEYS_FEATURE"] || false %>
+    cloudflare_storage: <%= ENV["CLOUDFLARE_STORAGE_FEATURE"] || false %>
+    google_tools: <%= ENV["GOOGLE_TOOLS_FEATURE"] || false %>
+    password_authentication: <%= ENV["PASSWORD_AUTHENTICATION_FEATURE"] || true %>
+    google_authentication: <%= ENV["GOOGLE_AUTHENTICATION_FEATURE"] || false %>
+    http_header_authentication: <%= ENV["HTTP_HEADER_AUTHENTICATION_FEATURE"] || false %>
+    voice: <%= ENV["VOICE_FEATURE"] || false %>
+    default_to_voice: <%= ENV["DEFAULT_TO_VOICE_FEATURE"] || false %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     default_openai_key: <%= ENV["DEFAULT_OPENAI_KEY"] %>
     default_anthropic_key: <%= ENV["DEFAULT_ANTHROPIC_KEY"] %>
     default_groq_key: <%= ENV["DEFAULT_GROQ_KEY"] %>
-    google_auth_client_id: <%= ENV["GOOGLE_AUTH_CLIENT_ID"] || Rails.application.credentials[:google_auth_client_id] %>
-    google_auth_client_secret: <%= ENV["GOOGLE_AUTH_CLIENT_SECRET"] || Rails.application.credentials[:google_auth_client_secret] %>
+    cloudflare_account_id: <%= ENV["CLOUDFLARE_ACCOUNT_ID"] || default_to(cloudflare: :account_id) %>
+    cloudflare_access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || default_to(cloudflare: :access_key_id) %>
+    cloudflare_secret_access_key: <%= ENV["CLOUDFLARE_SECRET_ACCESS_KEY"] || default_to(cloudflare: :secret_access_key) %>
+    cloudflare_bucket: <%= ENV["CLOUDFLARE_BUCKET"] || default_to(cloudflare: :bucket) %>
+    google_auth_client_id: <%= ENV["GOOGLE_AUTH_CLIENT_ID"] || default_to(:google_auth_client_id) %>
+    google_auth_client_secret: <%= ENV["GOOGLE_AUTH_CLIENT_SECRET"] || default_to(:google_auth_client_secret) %>
     http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>

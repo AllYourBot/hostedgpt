@@ -12,15 +12,17 @@ test('new creates a MicrophoneService', () => {
   expect(Microphone.$.microphoneService.class).toBe(MicrophoneService)
 })
 
-test('enable and disable changes active, on, and off', () => {
+test('enable and disable changes active, on, and off', async() => {
   expect(Microphone.active).toBe(false)
   expect(Microphone.on).toBe(false)
   expect(Microphone.off).toBe(true)
-  Flip.Microphone.on()
+  await Flip.Microphone.on()
+  debugger
   expect(Microphone.active).toBe(true)
   expect(Microphone.on).toBe(true)
   expect(Microphone.off).toBe(false)
-  Flip.Microphone.off()
+  await Flip.Microphone.off()
+  debugger
   expect(Microphone.active).toBe(false)
   expect(Microphone.on).toBe(false)
   expect(Microphone.off).toBe(true)

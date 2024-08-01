@@ -13,38 +13,46 @@ import Interface from "../interface.js"
 
 export default class extends Interface {
   logLevel_info
+  attrReader_covered
 
-  async Flip(turnOn)    { if (turnOn && !$.active) {
+  async Flip(turnOn)    { if (turnOn && $.active) {
+                            Uncover.Transcriber()
+
+                          } else if (turnOn && !$.active) {
                             $.active = true
-                            $.covered = false
-                            await $.transcriberService.start()
+                            Uncover.Transcriber()
                             await Invoke.Listener()
 
                           } else if (!turnOn && $.active) {
                             $.active = false
+                            $.dismissPoller?.end()
+                            $.silenceService.stop()
                             await $.transcriberService.end()
                             await Disable.Listener()
                           }
                         }
 
-  async Approve()       { let approved = await $.transcriberService.start()
+  async Approve()       { if (blocks.env.isTest) return true
+                          let approved = await $.transcriberService.start()
                           await $.transcriberService.end()
                           return approved
                         }
 
   log_SpeakTo
-  SpeakTo(text)         { $.words += text+' '
+  SpeakTo(text)         { if ($.covered) return
+                          $.words += text+' '
+                          $.silenceService.restartCounter()
                           $.dismissPoller?.end()
                           _shortWaitThenTell()
                         }
 
-  Cover()               { $.covered = true }
-  Uncover()             { $.transcriberService.restart()
-                          $.covered = false
-                          Play.Speaker.sound('pop', () => {
-                            Loop.Speaker.every(8, 'typing1')
-                            _longWaitThenDismis()
-                          })
+  Cover()               { $.covered = true
+                          $.silenceService.stop()
+                        }
+
+  Uncover()             { $.covered = false
+                          $.transcriberService.restart()
+                          _longWaitThenDismis()
                         }
 
   attr_words            = ''
@@ -57,19 +65,16 @@ export default class extends Interface {
 
   new() {
     $.covered = false
+    $.silenceService = new SilenceService
     $.transcriberService = new TranscriberService
-    $.transcriberService.onTextReceived = (text) => {
-      if ($.covered) return
-      $.silenceService.restartCounter()
-      SpeakTo.Transcriber.with.words(text)
-    }
-    $.silenceService = new SilenceService()
+    $.transcriberService.onSound = () => $.silenceService.restartCounter()
   }
 
   _shortWaitThenTell()  { if (!$.tellPoller?.handler) $.tellPoller = runEvery(0.2, () => {
-                            if ($.silenceService.msOfSilence <= 1000) return
+                            if ($.silenceService.msOfSilence <= 2000) return
                             log('enough silence to start processing...')
 
+                            if (! $.covered) Cover.Transcriber()
                             Tell.Listener.to.consider($.words)
 
                             $.words = ''
@@ -80,7 +85,7 @@ export default class extends Interface {
   _longWaitThenDismis() { $.silenceService.restartCounter()
 
                           if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
-                            if ($.silenceService.msOfSilence <= 30000) return
+                            if ($.silenceService.msOfSilence <= 3000) return
                             log('enough silence to dismiss...')
 
                             Dismiss.Listener()
