@@ -47,6 +47,6 @@ shared:
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
     email_provider: <%= ENV["EMAIL_PROVIDER"] || Rails.application.credentials[:email_provider] || default_to(nil, test_override: "postmark") %>
-    email_from: <%= ENV["EMAIL_FROM"] || Rails.application.credentials[:email_from] %>
-    email_host: <%= ENV["EMAIL_HOST"] || Rails.application.credentials[:email_host] %>
+    email_from: <%= ENV["EMAIL_FROM"] || Rails.application.credentials[:email_from] || default_to(nil, test_override: "support@example.com") %>
+    email_host: <%= ENV["EMAIL_HOST"] || Rails.application.credentials[:email_host] || default_to(nil, test_override: "example.com")  %>
     postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] %>
