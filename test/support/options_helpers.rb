@@ -23,7 +23,7 @@ module OptionsHelpers
     else
       @original_features = Feature.method(:raw_features)
       Feature.define_singleton_method(:raw_features) { Rails.application.config.options.features.merge(hash) }
-      Rails.application.reload_routes!
+      Rails.application.reloader.reload!
     end
     Feature.features_hash = nil
   end
@@ -36,7 +36,7 @@ module OptionsHelpers
     else
       @original_settings = Setting.method(:settings)
       Setting.define_singleton_method(:settings) { Rails.application.config.options.settings.merge(hash) }
-      Rails.application.reload_routes!
+      Rails.application.reloader.reload!
     end
   end
 
@@ -44,14 +44,14 @@ module OptionsHelpers
     Feature.singleton_class.send(:remove_method, :raw_features)
     Feature.define_singleton_method(:raw_features, @original_features)
     Feature.features_hash = nil
-    Rails.application.reload_routes!
+    Rails.application.reloader.reload!
     @original_features = nil
   end
 
   def unstub_settings
     Setting.singleton_class.send(:remove_method, :settings)
     Setting.define_singleton_method(:settings, @original_settings)
-    Rails.application.reload_routes!
+    Rails.application.reloader.reload!
     @original_settings = nil
   end
 end

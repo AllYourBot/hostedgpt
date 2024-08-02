@@ -25,7 +25,7 @@ class PasswordCredentialsController < ApplicationController
   private
 
   def find_signed_user(token)
-    User.find_signed!(token, purpose: Rails.application.config.password_reset_token_purpose)
+    User.find_signed!(token, purpose: Email::PasswordReset::TOKEN_PURPOSE)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     redirect_to login_path, alert: "Your token has expired. Please try again."
   end

@@ -5,10 +5,10 @@ class PasswordMailer < ApplicationMailer
     @os = params[:os]
     @browser = params[:browser]
 
-    @token_ttl = Rails.application.config.password_reset_token_ttl
+    @token_ttl = Email::PasswordReset::TOKEN_TTL
 
     token = @user.signed_id(
-      purpose: Rails.application.config.password_reset_token_purpose,
+      purpose: Email::PasswordReset::TOKEN_PURPOSE,
       expires_in: @token_ttl
     )
     @edit_url = edit_password_credential_url(token: token)

@@ -29,8 +29,8 @@ shared:
     http_header_authentication: <%= ENV["HTTP_HEADER_AUTHENTICATION_FEATURE"] || false %>
     voice: <%= ENV["VOICE_FEATURE"] || false %>
     default_to_voice: <%= ENV["DEFAULT_TO_VOICE_FEATURE"] || false %>
-    email: <%= ENV["EMAIL_FEATURE"] || false %>
-    password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || false %>
+    email: <%= ENV["EMAIL_FEATURE"] || default_to(false, test_override: true) %>
+    password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || default_to(false, test_override: true) %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>
