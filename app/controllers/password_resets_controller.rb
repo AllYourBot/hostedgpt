@@ -1,5 +1,5 @@
 class PasswordResetsController < ApplicationController
-  require_unauthenticated_access
+  allow_unauthenticated_access
   before_action :ensure_manual_login_allowed
 
   layout "public"
