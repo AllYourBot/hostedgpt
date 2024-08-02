@@ -49,4 +49,4 @@ shared:
     email_provider: <%= ENV["EMAIL_PROVIDER"] || Rails.application.credentials[:email_provider] || default_to(nil, test_override: "postmark") %>
     email_from: <%= ENV["EMAIL_FROM"] || Rails.application.credentials[:email_from] || default_to(nil, test_override: "support@example.com") %>
     email_host: <%= ENV["EMAIL_HOST"] || Rails.application.credentials[:email_host] || default_to(nil, test_override: "example.com")  %>
-    postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] %>
+    postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] || default_to(nil, test_override: "test-token") %>
