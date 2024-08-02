@@ -4,9 +4,7 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
   include ActionDispatch::TestProcess::FixtureFile
 
   setup do
-    people(:keith_registered)
     @user = users(:keith)
-    credentials(:keith_password)
 
     stub_features(
       password_reset_email: true,
@@ -46,11 +44,31 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
 
   test "should patch update" do
     token = get_test_user_token(@user)
+    new_password = "new_password"
 
-    patch password_credential_url, params: { token: token, password: "new_password" }
+    patch password_credential_url, params: { token: token, password: new_password }
 
     assert_response :redirect
     assert_redirected_to root_path
+
+    credential = @user.credentials.find_by(type: "PasswordCredential")
+    assert credential.authenticate(new_password)
+  end
+
+  test "should allow password reset as any user with token" do
+    other_user = users(:rob)
+    login_as other_user
+    token = get_test_user_token(@user)
+    new_password = "new_password"
+
+    patch password_credential_url, params: { token: token, password: new_password }
+
+    assert_response :redirect
+    assert_redirected_to root_path
+    assert_logged_in @user
+
+    credential = @user.credentials.find_by(type: "PasswordCredential")
+    assert credential.authenticate(new_password)
   end
 
   private

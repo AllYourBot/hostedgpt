@@ -4,7 +4,6 @@ class PasswordMailerTest < ActionMailer::TestCase
   setup do
     @person = people(:keith_registered)
     @user = users(:keith)
-    credentials(:keith_password)
 
     stub_features(
       email: true,
