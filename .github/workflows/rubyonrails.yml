@@ -1,9 +1,9 @@
 name: Ruby on Rails CI
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -70,12 +70,10 @@ jobs:
       DISPLAY: "=:99"
 
     steps:
-      - uses: nanasess/setup-chromedriver@v2
-      - name: Start chromedriver
-        run: |
-          set -x
-          chromedriver --url-base=/wd/hub &
-          # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1.7.2
+        with:
+          install-dependencies: true
 
       - name: Checkout code
         uses: actions/checkout@v4
