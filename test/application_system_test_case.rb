@@ -311,12 +311,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_selector "#messages > :last-child [data-role='content-text']", text: message.content_text
   end
 
-  def assert_toast(text)
-    toast = nil
-    assert_true "the toast element could not be found" do
-      toast = find("#toasts .alert span", visible: :all, wait: 0) rescue nil
+  def assert_alert(text)
+    alert = nil
+    assert_true "the alert element could not be found" do
+      alert = find("#alerts .alert span", visible: :all, wait: 0) rescue nil
     end
-    assert_equal text, toast[:innerText]
+    assert_equal text, alert[:innerText]
   end
 
   def visit_and_scroll_wait(path, debug: false)
