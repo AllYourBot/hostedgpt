@@ -18,10 +18,9 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static classes = [ "toggle", "secondToggleAfterDelay" ]
   static targets = [ "transitionable" ]
-  static values = { afterTimeout: Number, secondToggleAfterDelay: Number }
+  static values = { afterTimeout: Number, secondToggleAfterDelay: Number, on: { type: Boolean, default: false } }
 
   connect() {
-    this.on = false
   }
 
   transitionableTargetConnected() {
@@ -56,7 +55,7 @@ export default class extends Controller {
   }
 
   toggleClass() {
-    this.on = !this.on
+    this.onValue = !this.onValue
 
     this.transitionableTargets.forEach(element => {
       this.toggleClasses.forEach(className => {
@@ -82,12 +81,13 @@ export default class extends Controller {
   }
 
   toggleClassOn() {
-    if (this.on) return
+    console.log(`toggling and curently on? ${this.onValue}`)
+    if (this.onValue) return
     this.toggleClass()
   }
 
   toggleClassOff() {
-    if (!this.on) return
+    if (!this.onValue) return
     this.toggleClass()
   }
 }
