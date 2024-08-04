@@ -314,7 +314,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def assert_alert(text)
     alert = nil
     assert_true "the alert element could not be found" do
-      alert = find("#alerts .alert span", visible: :all, wait: 0) rescue nil
+      alert = find("#alerts .alert > span", visible: :all, wait: 0) rescue nil
     end
     assert_equal text, alert[:innerText]
   end
