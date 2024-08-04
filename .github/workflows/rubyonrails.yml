@@ -80,6 +80,9 @@ jobs:
         #   install-chromedriver: true
         #   install-dependencies: true
 
+      - name: Print ChromeDriver Version
+        run: chromedriver --version
+
       - name: Print Chrome Version Again
         run: google-chrome --version
 
