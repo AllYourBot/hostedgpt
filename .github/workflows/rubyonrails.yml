@@ -73,6 +73,7 @@ jobs:
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1.7.2
         with:
+          install-chromedriver: true
           install-dependencies: true
 
       - name: Checkout code
