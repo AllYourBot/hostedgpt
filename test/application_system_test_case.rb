@@ -8,28 +8,20 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   fixtures :all
 
   def login_as(user_or_person, password = "secret")
-    retries = 3
-    begin
-      user = if user_or_person.is_a?(Person)
-        user_or_person.user
-      else
-        user_or_person
-      end
-
-      assistant = user.assistants.ordered.first
-
-      visit logout_path
-      assert_current_path login_path
-      fill_in "email", with: user.email
-      fill_in "password", with: password
-      click_text "Log In"
-      assert_current_path new_assistant_message_path(assistant)
-    rescue Net::ReadTimeout => e
-      puts "### Another Net::ReadTimeout, retrying..."
-      retries -= 1
-      retry if retries > 0
-      raise e
+    user = if user_or_person.is_a?(Person)
+      user_or_person.user
+    else
+      user_or_person
     end
+
+    assistant = user.assistants.ordered.first
+
+    visit logout_path
+    assert_current_path login_path
+    fill_in "email", with: user.email
+    fill_in "password", with: password
+    click_text "Log In"
+    assert_current_path new_assistant_message_path(assistant)
   end
 
   def logout
