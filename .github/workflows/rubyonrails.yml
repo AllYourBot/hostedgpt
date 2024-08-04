@@ -71,7 +71,7 @@ jobs:
 
     steps:
       - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1.7.2
+        uses: browser-actions/setup-chrome@v1
         with:
           install-chromedriver: true
           install-dependencies: true
