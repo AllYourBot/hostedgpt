@@ -25,7 +25,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       click_text "Log In"
       assert_current_path new_assistant_message_path(assistant)
     rescue Net::ReadTimeout => e
-    retries -= 1
+      puts "### Another Net::ReadTimeout, retrying..."
+      retries -= 1
       retry if retries > 0
       raise e
     end
