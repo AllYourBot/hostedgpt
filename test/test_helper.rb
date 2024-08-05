@@ -18,7 +18,17 @@ end
 class ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers
 
-  Capybara.default_max_wait_time = 60
+  Capybara.default_max_wait_time = 10
+
+  Capybara.register_driver :headless_chrome do |app|
+    # increase timeout for slow CI
+    client = Selenium::WebDriver::Remote::Http::Default.new
+    client.read_timeout = 120
+
+    # options = Selenium::WebDriver::Chrome::Options.new(args: %w[headless disable-gpu no-sandbox])
+    # Capybara::Selenium::Driver.new(app, browser: :chrome, options: options, http_client: client)
+    Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client)
+  end
 
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
