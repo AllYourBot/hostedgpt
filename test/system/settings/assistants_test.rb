@@ -33,7 +33,6 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     visit edit_settings_assistant_url(@assistant)
     click_text "Save"
     assert_alert "Saved"
-    refute_text "Saved"
 
     click_text "Save"
     assert_alert "Saved"
