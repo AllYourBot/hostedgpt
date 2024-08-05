@@ -29,7 +29,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     assert_alert "Saved"
   end
 
-  test "a second save to the Assistant update page should show the notification again and it should properly dismiss itself" do
+  test "a second save to the Assistant update page should show the notification again and it should properly dismiss itself when X is clicked" do
     visit edit_settings_assistant_url(@assistant)
     click_text "Save"
     assert_alert "Saved"
@@ -37,6 +37,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
 
     click_text "Save"
     assert_alert "Saved"
+    find("#alerts .alert button").click
     refute_text "Saved"
   end
 
