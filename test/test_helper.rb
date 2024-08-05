@@ -20,7 +20,8 @@ class ActionDispatch::IntegrationTest
 
   Capybara.default_max_wait_time = 10
 
-  Capybara.register_driver :headless_chrome do |app|
+  # Capybara.register_driver :headless_chrome do |app|
+  Capybara.register_driver :chrome do |app|
     # increase timeout for slow CI
     client = Selenium::WebDriver::Remote::Http::Default.new
     client.read_timeout = 120
