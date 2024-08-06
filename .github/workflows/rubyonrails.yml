@@ -46,7 +46,6 @@ jobs:
         run: bin/rails test
 
   system_tests:
-    if: github.repository == 'AllYourBot/hostedgpt'
     runs-on: large-runner
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref }}-system
