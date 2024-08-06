@@ -93,7 +93,6 @@ jobs:
       - name: Run system tests
         run: |
           sed -i 's/hoverOnlyWhenSupported: true/hoverOnlyWhenSupported: false/' config/tailwind.config.js
-          RAILS_ENV=test bin/rails assets:precompile
           bin/rails test:system
 
       - name: Upload screenshots
