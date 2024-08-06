@@ -93,7 +93,7 @@ jobs:
 
       - name: Run system tests
         run: |
-          echo "### NOTICE: If these tests fail because of Net::ReadTimeout then re-run the test suite. I can't figure out this sporadic failure. ###"
+          echo -e "###\n###\n###\n### NOTICE: If these tests fail because of Net::ReadTimeout then re-run the test suite. I can't figure out this sporadic failure.\n###\n###\n###"
           sed -i 's/hoverOnlyWhenSupported: true/hoverOnlyWhenSupported: false/' config/tailwind.config.js
           PARALLEL_WORKERS=2 bin/rails test:system
 
