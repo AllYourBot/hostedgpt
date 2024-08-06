@@ -46,7 +46,7 @@ jobs:
         run: bin/rails test
 
   system_tests:
-    runs-on: ubuntu-latest
+    runs-on: large-runner
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref }}-system
       cancel-in-progress: true
@@ -93,7 +93,7 @@ jobs:
       - name: Run system tests
         run: |
           sed -i 's/hoverOnlyWhenSupported: true/hoverOnlyWhenSupported: false/' config/tailwind.config.js
-          PARALLEL_WORKERS=1 bin/rails test:system
+          bin/rails test:system
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
