@@ -463,7 +463,7 @@ DEPENDENCIES
   rubocop-rails
   ruby-lsp
   ruby-openai (~> 7.0.1)
-  selenium-webdriver (>= 4.11.0)
+  selenium-webdriver (~> 4.23.0)
   solid_queue (~> 0.2.1)
   sprockets-rails
   standard
