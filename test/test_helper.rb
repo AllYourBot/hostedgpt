@@ -56,22 +56,23 @@ class ActionDispatch::IntegrationTest
 
     # capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
     options = Selenium::WebDriver::Chrome::Options.new(
-      args: %w[lksdjfskdf headless=new no-sandbox disable-dev-shm-usage remote-debugging-pipe log-path=/tmp/chrome.log]
+      args: %w[headless=new no-sandbox disable-dev-shm-usage remote-debugging-pipe log-path=/tmp/chrome.log]
     )
 
     client = Selenium::WebDriver::Remote::Http::Default.new
     client.read_timeout = 120
 
-    Capybara::Selenium::Driver.new(
+    Capybara::Selenium::WebDriver.new(
       app,
       browser: :chrome,
       # desired_capabilities: capabilities
       options: options,
     )
+    # Capybara::Selenium::WebDriver.for(:chrome, options: options)
   end
 
-  Capybara.javascript_driver = :headless_chrome
-  Capybara.current_driver = :headless_chrome
+  # Capybara.javascript_driver = :headless_chrome
+  # Capybara.current_driver = :headless_chrome
 
 
 
