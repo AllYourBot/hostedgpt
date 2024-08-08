@@ -165,7 +165,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_203803) do
     t.datetime "deleted_at", precision: nil
     t.bigint "user_id", null: false
     t.bigint "api_service_id"
-    t.boolean "supports_tools", default: true
+    t.boolean "supports_tools", default: false
     t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_language_models_on_user_id"

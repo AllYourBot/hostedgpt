@@ -41,15 +41,16 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form"
   end
 
-  test "create should have supports_tools checkbox" do
+  test "create should not have supports_tools checkbox" do
     get new_settings_language_model_url
     assert_response :success
     assert_select "form" do
-      assert_select 'input[name="language_model[supports_tools]"][checked="checked"]' # Checked by default, from schema
+      assert_select 'input[name="language_model[supports_tools]"]'
+      assert_select 'input[name="language_model[supports_tools]"][checked="checked"]', false # Not checked by default, from schema
     end
   end
 
-  test "edit should have supports_tools checkbox" do
+  test "edit should have supports_tools checkbox checked" do
     get edit_settings_language_model_url(@language_model)
     assert_response :success
     assert_select "form" do
