@@ -43,8 +43,10 @@ module User::Registerable
       ["claude-2.0", "Claude 2.0", false, anthropic_api_service],
       ["claude-instant-1.2", "Claude Instant 1.2", false, anthropic_api_service],
 
-      ["gemma-7b-it", "Google Gemma 7b", false, groq_api_service],
+      ["llama3-70b-8192", "Meta Llama 3 70b", false, groq_api_service],
+      ["llama3-8b-8192", "Meta Llama 3 8b", false, groq_api_service],
       ["mixtral-8x7b-32768", "Mistral 8 7b", false, groq_api_service],
+      ["gemma-7b-it", "Google Gemma 7b", false, groq_api_service],
     ].each do |api_name, name, supports_images, api_service|
       language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: true, supports_images: supports_images)
     end
@@ -53,8 +55,6 @@ module User::Registerable
     [
       ["gpt-3.5-turbo-instruct", "GPT-3.5 Turbo Instruct", false, open_ai_api_service],
       ["gpt-3.5-turbo-16k-0613", "GPT-3.5 Turbo (2022-06-13)", false, open_ai_api_service],
-      ["llama3-70b-8192", "Meta Llama 3 70b", false, groq_api_service],
-      ["llama3-8b-8192", "Meta Llama 3 8b", false, groq_api_service],
     ].each do |api_name, name, supports_images, api_service|
       language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: false, supports_images: supports_images)
     end
