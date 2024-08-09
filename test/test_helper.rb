@@ -52,27 +52,65 @@ class ActionDispatch::IntegrationTest
   # Webdrivers::Chromedriver.update
 
 
-  Capybara.register_driver :headless_chrome  do |app|
+  # Capybara.register_driver :headless_chrome  do |app|
 
-    # capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
-    options = Selenium::WebDriver::Chrome::Options.new(
-      args: %w[headless=new no-sandbox disable-dev-shm-usage remote-debugging-pipe log-path=/tmp/chrome.log]
-    )
+  #   # capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+  #   options = Selenium::WebDriver::Chrome::Options.new(
+  #     args: %w[headless=new no-sandbox disable-dev-shm-usage remote-debugging-pipe log-path=/tmp/chrome.log],
+  #     timeout: 120
+  #   )
 
-    client = Selenium::WebDriver::Remote::Http::Default.new
-    client.read_timeout = 120
+  #   client = Selenium::WebDriver::Remote::Http::Default.new
+  #   client.read_timeout = 120
 
-    Capybara::Selenium::WebDriver.new(
-      app,
-      browser: :chrome,
-      # desired_capabilities: capabilities
-      options: options,
-    )
-    # Capybara::Selenium::WebDriver.for(:chrome, options: options)
-  end
+  #   Capybara::Selenium::WebDriver.new(
+  #     app,
+  #     browser: :chrome,
+  #     # desired_capabilities: capabilities
+  #     options: options,
+  #   )
+  #   # Capybara::Selenium::WebDriver.for(:chrome, options: options)
+  # end
 
   # Capybara.javascript_driver = :headless_chrome
   # Capybara.current_driver = :headless_chrome
+
+  Capybara.register_driver :headless_chrome do |app|
+    version = Capybara::Selenium::Driver.load_selenium
+    options_key = Capybara::Selenium::Driver::CAPS_VERSION.satisfied_by?(version) ? :capabilities : :options
+    browser_options = ::Selenium::WebDriver::Chrome::Options.new.tap do |opts|
+      opts.add_argument("--headless=new")
+      opts.add_argument("--disable-gpu")
+      opts.add_argument("--no-sandbox")
+      opts.add_argument("--disable-dev-shm-usage")
+      opts.add_argument("--remote-debugging-pipe")
+      opts.add_argument("--remote-debugging-port=9222")
+      opts.add_argument("--window-size=1920,1080")
+      opts.add_argument("--disable-features=VizDisplayCompositor")
+      opts.add_argument("--disable-site-isolation-trials")
+      opts.add_argument("--disable-popup-blocking")
+      opts.add_argument("--disable-extensions")
+      opts.add_argument("--disable-infobars")
+      opts.add_argument("--disable-notifications")
+      opts.add_argument("--disable-offer-store-unmasked-wallet-cards")
+      opts.add_argument("--disable-offer-upload-credit-cards")
+      opts.add_argument("--disable-features=site-per-process")
+      opts.add_argument("--disable-features=NetworkService")
+      opts.add_argument("--disable-features=NetworkServiceInProcess")
+      opts.add_argument("--disable-features=VizDisplayCompositor")
+      opts.add_argument("--disable-features=IsolateOrigins")
+      # set log path
+      opts.add_argument("--log-file=#{Rails.root.join('log', 'chrome.log')}")
+      opts.add_argument("--log-level=0")
+
+      # Workaround https://bugs.chromium.org/p/chromedriver/issues/detail?id=2650&q=load&sort=-id&colspec=ID%20Status%20Pri%20Owner%20Summary
+      opts.add_argument("--disable-site-isolation-trials")
+      opts.add_preference("download.default_directory", Capybara.save_path)
+      opts.add_preference(:download, default_directory: Capybara.save_path)
+    end
+
+    Capybara::Selenium::Driver.new(app, **{ browser: :chrome, options_key => browser_options })
+  end
 
 
 
