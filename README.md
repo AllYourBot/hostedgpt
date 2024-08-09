@@ -205,10 +205,6 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
      - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID
      - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret
 
-##### Google OAuth Troubleshooting
-
-If you encounter an error when signing in with google on the app (potentially after deleting data from your database) related to "oauth refresh token cannot be blank ... until you remove this website as a third party connection", you can fix this by going to the [Google Third-Party Apps and Services](https://myaccount.google.com/connections) and removing the app from the list of third-party apps with access to your account.
-
 #### HTTP header authentication
 
 Note: Enabling this automatically disables Password-based and Google-auth based authentication.
