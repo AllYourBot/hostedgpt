@@ -7,7 +7,9 @@ class SettingTest < ActiveSupport::TestCase
     end
   end
 
-  test "should default to nil when feature not found" do
-    assert_nil Setting.fake
+  test "should raise when feature not found" do
+    assert_raises SystemExit do
+      Setting.fake
+    end
   end
 end

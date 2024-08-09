@@ -8,6 +8,7 @@ require_relative "../lib/false_class"
 require_relative "../lib/true_class"
 require_relative "../lib/nil_class"
 require_relative "../app/models/feature"
+require_relative "../app/models/setting"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
