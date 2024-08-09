@@ -1,5 +1,4 @@
 # Taylor's Language Models
-
 alpaca:
   position: 1
   user: taylor
@@ -7,6 +6,7 @@ alpaca:
   api_service: taylor_anthropic_service
   api_name: alpaca:medium
   supports_images: true
+  supports_tools: true
 
 pacos:
   position: 2
@@ -15,10 +15,9 @@ pacos:
   api_service: taylor_openai_service
   api_name: pacos-imagine
   supports_images: true
-
+  supports_tools: true
 
 # Rob's Language Models
-
 gpt_4_turbo:
   position: 1
   user: rob
@@ -26,6 +25,7 @@ gpt_4_turbo:
   api_name: gpt-4-turbo
   api_service: rob_openai_service
   supports_images: true
+  supports_tools: true
 
 gpt_4_turbo_2024_04_09:
   position: 2
@@ -34,6 +34,7 @@ gpt_4_turbo_2024_04_09:
   api_name: gpt-4-turbo-2024-04-09
   api_service: rob_openai_service
   supports_images: true
+  supports_tools: true
 
 gpt_4_turbo_preview:
   position: 3
@@ -42,6 +43,7 @@ gpt_4_turbo_preview:
   api_name: gpt-4-turbo-preview
   api_service: rob_openai_service
   supports_images: false
+  supports_tools: true
 
 gpt_4_0125_preview:
   position: 4
@@ -50,6 +52,7 @@ gpt_4_0125_preview:
   api_name: gpt-4-0125-preview
   api_service: rob_openai_service
   supports_images: false
+  supports_tools: true
 
 gpt_3_5_turbo_0125:
   position: 5
@@ -58,6 +61,7 @@ gpt_3_5_turbo_0125:
   api_name: gpt-3.5-turbo-0125
   api_service: rob_openai_service
   supports_images: false
+  supports_tools: true
 
 gpt_3_5_turbo_1106:
   position: 6
@@ -66,6 +70,7 @@ gpt_3_5_turbo_1106:
   api_name: gpt-3.5-turbo-1106
   api_service: rob_openai_service
   supports_images: false
+  supports_tools: true
 
 gpt_3_5_turbo_instruct:
   position: 7
@@ -74,6 +79,7 @@ gpt_3_5_turbo_instruct:
   api_name: gpt-3.5-turbo-instruct
   api_service: rob_openai_service
   supports_images: false
+  supports_tools: true
 
 claude_2_0:
   position: 8
@@ -82,6 +88,7 @@ claude_2_0:
   api_name: claude-2.0
   api_service: rob_anthropic_service
   supports_images: false
+  supports_tools: true
 
 claude_instant_1_2:
   position: 9
@@ -90,6 +97,7 @@ claude_instant_1_2:
   api_name: claude-instant-1.2
   api_service: rob_anthropic_service
   supports_images: false
+  supports_tools: true
 
 rob_gpt:
   position: 10
@@ -98,10 +106,9 @@ rob_gpt:
   api_name: gpt-4o
   api_service: rob_openai_service
   supports_images: true
-
+  supports_tools: true
 
 # Keith's Language Models
-
 gpt_best:
   position: 1
   user: keith
@@ -109,6 +116,7 @@ gpt_best:
   api_name: gpt-best
   api_service: keith_openai_service
   supports_images: true
+  supports_tools: true
 
 claude_best:
   position: 2
@@ -117,6 +125,7 @@ claude_best:
   api_service: keith_anthropic_service
   api_name: claude-best
   supports_images: true
+  supports_tools: true
 
 gpt_4o:
   position: 3
@@ -125,7 +134,8 @@ gpt_4o:
   api_name: gpt-4o
   api_service: keith_openai_service
   supports_images: true
-
+  supports_tools: true
+  
 gpt_4o_2024_05_13:
   position: 4
   user: keith
@@ -133,6 +143,7 @@ gpt_4o_2024_05_13:
   api_name: gpt-4o-2024-05-13
   api_service: keith_openai_service
   supports_images: true
+  supports_tools: true
 
 gpt_4_1106_preview:
   position: 9
@@ -141,6 +152,7 @@ gpt_4_1106_preview:
   api_name: gpt-4-1106-preview
   api_service: keith_openai_service
   supports_images: false
+  supports_tools: true
 
 gpt_4_vision_preview:
   position: 10
@@ -149,6 +161,7 @@ gpt_4_vision_preview:
   api_name: gpt-4-vision-preview
   api_service: keith_openai_service
   supports_images: true
+  supports_tools: true
 
 gpt_4_1106_vision_preview:
   position: 11
@@ -157,6 +170,7 @@ gpt_4_1106_vision_preview:
   api_name: gpt-4-1106-vision-preview
   api_service: keith_openai_service
   supports_images: true
+  supports_tools: true
 
 gpt_4:
   position: 12
@@ -165,6 +179,7 @@ gpt_4:
   api_name: gpt-4
   api_service: keith_openai_service
   supports_images: false
+  supports_tools: true
 
 gpt_4_0613:
   position: 13
@@ -173,6 +188,7 @@ gpt_4_0613:
   api_name: gpt-4-0613
   api_service: keith_openai_service
   supports_images: false
+  supports_tools: true
 
 gpt_3_5_turbo:
   position: 14
@@ -181,6 +197,7 @@ gpt_3_5_turbo:
   api_name: gpt-3.5-turbo
   api_service: keith_openai_service
   supports_images: false
+  supports_tools: true
 
 gpt_3_5_turbo_16k_0613:
   position: 15
@@ -189,6 +206,7 @@ gpt_3_5_turbo_16k_0613:
   api_name: gpt-3.5-turbo-16k-0613
   api_service: keith_openai_service
   supports_images: false
+  supports_tools: false
 
 claude_3_5_sonnet_20240620:
   position: 16
@@ -197,6 +215,7 @@ claude_3_5_sonnet_20240620:
   api_name: claude-3-5-sonnet-20240620
   api_service: keith_anthropic_service
   supports_images: true
+  supports_tools: true
 
 claude_3_opus_20240229:
   position: 17
@@ -205,6 +224,7 @@ claude_3_opus_20240229:
   api_name: claude-3-opus-20240229
   api_service: keith_anthropic_service
   supports_images: true
+  supports_tools: true
 
 claude_3_sonnet_20240229:
   position: 18
@@ -213,6 +233,7 @@ claude_3_sonnet_20240229:
   api_name: claude-3-sonnet-20240229
   api_service: keith_anthropic_service
   supports_images: true
+  supports_tools: true
 
 claude_3_haiku_20240307:
   position: 19
@@ -221,6 +242,7 @@ claude_3_haiku_20240307:
   api_name: claude-3-haiku-20240307
   api_service: keith_anthropic_service
   supports_images: true
+  supports_tools: true
 
 claude_2_1:
   position: 20
@@ -229,6 +251,7 @@ claude_2_1:
   api_name: claude-2.1
   api_service: keith_anthropic_service
   supports_images: false
+  supports_tools: true
 
 camel:
   position: 21
@@ -237,6 +260,7 @@ camel:
   api_service: keith_other_service
   api_name: camel
   supports_images: false
+  supports_tools: true
 
 guanaco:
   position: 22
@@ -245,3 +269,4 @@ guanaco:
   api_service: keith_other_service
   api_name: guanaco:large
   supports_images: true
+  supports_tools: false

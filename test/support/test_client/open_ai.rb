@@ -13,6 +13,10 @@ module TestClient
       raise "When using the OpenAI test client for api_text_response you need to stub the .text method"
     end
 
+    def self.parameters
+      @@parameters
+    end
+
     def self.default_text
       "Hello this is model #{@@model} with instruction #{@@instruction.inspect}! How can I assist you today?"
     end
@@ -76,6 +80,7 @@ module TestClient
     def chat(**args)
       @@model = args.dig(:parameters, :model) || "no model"
       @@instruction = args.dig(:parameters, :messages).first[:content]
+      @@parameters = args.dig(:parameters)
 
       proc = args.dig(:parameters, :stream)
       raise "No stream proc provided. When calling get_next_chat_message in tests be sure to include a block" if proc.nil?

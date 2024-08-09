@@ -53,6 +53,6 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   end
 
   def language_model_params
-    params.require(:language_model).permit(:api_name, :name, :supports_images, :api_service_id)
+    params.require(:language_model).permit(:api_name, :name, :supports_images, :supports_tools, :api_service_id)
   end
 end
