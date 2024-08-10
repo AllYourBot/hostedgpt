@@ -29,13 +29,16 @@ class AIBackend::OpenAI < AIBackend
     response_handler = block_given? ? stream_handler(&chunk_handler) : nil
 
     begin
-      response = @client.chat(parameters: {
+      parameters = {
         model: @assistant.language_model.provider_name,
         messages: system_message + preceding_messages,
-        tools: Toolbox.tools,
         stream: response_handler,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
-      })
+      }
+      if @assistant.language_model.supports_tools?
+        parameters[:tools] = Toolbox.tools
+      end
+      response = @client.chat(parameters: parameters)
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
     end
