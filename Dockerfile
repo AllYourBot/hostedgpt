@@ -104,6 +104,7 @@ RUN --mount=type=cache,id=gems,target=/tmp/bundle \
   bundle install
 
 RUN apk add --no-cache postgresql-client
+RUN echo "last"
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 CMD ["./bin/dev"]
