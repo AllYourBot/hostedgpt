@@ -7,7 +7,7 @@
     end
     options = options.to_a.flatten.each_slice(2).to_h # force all cases into a hash
 
-    default = options.dig(:"#{Rails.env}_override")
+    default = options.dig(:"except_env_#{Rails.env}")
     default ||= case value
     when String, Integer, TrueClass, FalseClass
       value
@@ -18,6 +18,20 @@
     end
   end
 %>
+
+#
+# <%= ENV["FEATURE_NAME"] || default_to(false, except_env_test: true) %>
+#
+# options FEATURES are configured with ENV keys
+# options SETTINGS are configured with ENV keys or bin/rails credentials:edit
+#
+# default_to
+#   first parameter is a value or a symbol
+#     if it's a symbol the value is obtained from Rails.application.credentials
+#   second parameter is optional, it's only used if you need the default to be different for the test environment
+#     except_env_test: "some value"
+#
+
 shared:
   features:
     registration: <%= ENV["REGISTRATION_FEATURE"] || true %>
@@ -29,8 +43,8 @@ shared:
     http_header_authentication: <%= ENV["HTTP_HEADER_AUTHENTICATION_FEATURE"] || false %>
     voice: <%= ENV["VOICE_FEATURE"] || false %>
     default_to_voice: <%= ENV["DEFAULT_TO_VOICE_FEATURE"] || false %>
-    email: <%= ENV["EMAIL_FEATURE"] || default_to(false, test_override: true) %>
-    password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || default_to(false, test_override: true) %>
+    email: <%= ENV["EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
+    password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>
@@ -46,7 +60,7 @@ shared:
     http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
-    email_provider: <%= ENV["EMAIL_PROVIDER"] || Rails.application.credentials[:email_provider] || default_to(nil, test_override: "postmark") %>
-    email_from: <%= ENV["EMAIL_FROM"] || Rails.application.credentials[:email_from] || default_to(nil, test_override: "support@example.com") %>
-    email_host: <%= ENV["EMAIL_HOST"] || Rails.application.credentials[:email_host] || default_to(nil, test_override: "example.com")  %>
-    postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || Rails.application.credentials[:postmark_server_api_token] || default_to(nil, test_override: "test-token") %>
+    email_provider: <%= ENV["EMAIL_PROVIDER"] || default_to(:email_provider, except_env_test: "postmark") %>
+    email_from: <%= ENV["EMAIL_FROM"] || default_to(:email_from, except_env_test: "support@example.com") %>
+    email_host: <%= ENV["EMAIL_HOST"] || default_to(:email_host, except_env_test: "example.com")  %>
+    postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || default_to(:postmark_server_api_token, except_env_test: "test-token") %>
