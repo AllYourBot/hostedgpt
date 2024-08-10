@@ -8,7 +8,11 @@ class Setting
 
     def method_missing(method_name, *arguments, &block)
       if settings.keys.exclude?(method_name.to_sym)
-        abort "ERROR: no setting found for #{method_name}. Please check settings in options.yml"
+        if ENV["RAILS_ENV"] == "test"
+          abort
+        else
+          abort "ERROR: no setting found for #{method_name}. Please check settings in options.yml"
+        end
       end
 
       ActiveRecord::Type::ImmutableString.new.cast(
