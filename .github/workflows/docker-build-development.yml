@@ -20,3 +20,4 @@ jobs:
         with:
           push: false
           target: development
+          platforms: linux/amd64,linux/arm64
