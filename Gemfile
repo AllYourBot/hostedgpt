@@ -45,6 +45,7 @@ gem "solid_queue", "~> 0.2.1"
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable
 gem "aws-sdk-s3", require: false
+gem "postmark-rails"
 
 gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2", "~> 1.1"
@@ -81,4 +82,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver", "~> 4.23.0"
   gem "minitest-stub_any_instance"
+  gem "rails-controller-testing"
 end
