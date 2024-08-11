@@ -11,7 +11,7 @@ class MessagesComposerAttachmentTest < ApplicationSystemTestCase
 
   test "attaching an image to the composer shows a preview, keeps submit hidden, and refocuses input" do
     assert_hidden "#document-previews"
-    attach_file "message_documents_attributes_0_file", Rails.root.join("test", "assets", "cat-image-for-attaching.png"), make_visible: true
+    attach_file "message_documents_attributes_0_file", Rails.root.join('test', 'assets', 'cat-image-for-attaching.png'), make_visible: true
 
     assert find_previews.first.visible?
     assert find("#document-previews img")[:src].starts_with?("data:image")
@@ -20,7 +20,7 @@ class MessagesComposerAttachmentTest < ApplicationSystemTestCase
   end
 
   test "attaching an image and clicking X removes the image" do
-    attach_file "message_documents_attributes_0_file", Rails.root.join("test", "assets", "cat-image-for-attaching.png"), make_visible: true
+    attach_file "message_documents_attributes_0_file", Rails.root.join('test', 'assets', 'cat-image-for-attaching.png'), make_visible: true
 
     assert find_previews.first.visible?
     assert find("#document-previews img")[:src].starts_with?("data:image")

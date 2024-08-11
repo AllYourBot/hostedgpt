@@ -6,7 +6,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     @user = @conversation.user
     @conversation.messages.create! role: :user, content_text: "Are you still there?", assistant: @conversation.assistant
     @message = @conversation.latest_message_for_version(:latest)
-    @test_client = TestClient::OpenAI.new(access_token: "abc")
+    @test_client = TestClient::OpenAI.new(access_token: 'abc')
   end
 
   test "if a new message is created BEFORE job starts, it does not process" do

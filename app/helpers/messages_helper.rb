@@ -48,7 +48,7 @@ module MessagesHelper
       ml-1
       #{!thinking && 'hidden'}
     |) +
-    span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && "hidden") +
+    span_tag(" ...", class: (message.content_text.blank? || message.not_cancelled?) && 'hidden') +
     icon("stop",
       variant: :solid,
       size: 17,

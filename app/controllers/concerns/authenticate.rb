@@ -41,7 +41,7 @@ module Authenticate
     if manual_login_allowed?
       redirect_to login_url
     else
-      render plain: "Unauthorized", status: :unauthorized
+      render plain: 'Unauthorized', status: :unauthorized
     end
   end
 

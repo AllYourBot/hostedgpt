@@ -99,8 +99,8 @@ module Message::Version
   end
 
   def branched_and_version_both_set
-    errors.add(:branched, "must be set when branched_from_version is specified") if not_branched?
-    errors.add(:branched_from_version, "must be set when branched is true") if branched_from_version.nil?
+    errors.add(:branched, 'must be set when branched_from_version is specified') if not_branched?
+    errors.add(:branched_from_version, 'must be set when branched is true') if branched_from_version.nil?
   end
 
   def set_branched_on_other_message

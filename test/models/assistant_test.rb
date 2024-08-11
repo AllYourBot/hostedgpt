@@ -44,7 +44,7 @@ class AssistantTest < ActiveSupport::TestCase
       a = Assistant.create!(
         user: users(:keith),
         language_model: language_models(:gpt_4o),
-        name: "abc"
+        name: 'abc'
       )
     end
   end

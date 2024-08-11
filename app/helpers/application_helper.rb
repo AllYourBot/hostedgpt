@@ -29,7 +29,7 @@ module ApplicationHelper
     title = opts.delete(:title)
 
     if title
-      direction = opts.delete(:tooltip) || "bottom"
+      direction = opts.delete(:tooltip) || 'bottom'
       data = opts.delete(:data) || {}
 
       content_tag(:span,
@@ -90,7 +90,7 @@ module ApplicationHelper
   end
 
   def viewport_tag(content)
-    tag.meta(name: "viewport", content: content)
+    tag.meta(name: 'viewport', content: content)
   end
 
   def n_a_if_blank(value, n_a = "Not Available")

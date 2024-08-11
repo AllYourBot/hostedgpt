@@ -6,7 +6,7 @@ pin "@hotwired/stimulus", to: "stimulus.min.js", preload: true
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
 
 Dir["app/javascript/**/*"].select do |dir|
-  File.directory?(dir) && !dir.include?("/blocks")
+  File.directory?(dir) && !dir.include?('/blocks')
 end.each do |dir|
   pin_all_from dir, under: dir.remove("app/javascript/") # don't preload: true for stimulus
 end
@@ -15,15 +15,15 @@ pin "blocks", to: "blocks/index.js", preload: true
 
 Dir["app/javascript/blocks/**/*"].select do |file|
   !File.directory?(file) &&
-    !["package.json"].any? { |f| file.include?(f) }
+    !['package.json'].any? { |f| file.include?(f) }
 end.each do |file|
   file = file.remove("app/javascript/")
   name = file.remove("blocks/")
-  if name.include?("/")
+  if name.include?('/')
     # Interface and Service models are imported as normal importmap names:
     #   "blocks/interfaces/listener_interface"
     # These are autoimported within blocks/index.js by string parsing the importmap
-    pin file.remove(".js"), to: file, preload: true
+    pin file.remove('.js'), to: file, preload: true
   else
     # The other JS files within blocks (e.g. readable_model.js) need special importmap names.
     # These files are referenced with explicit 'import' directives at the top of blocks models.

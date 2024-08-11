@@ -57,7 +57,7 @@ class OpenData
   end
 
   def inspect
-    @data.inspect.gsub("<data", "<OpenData")
+    @data.inspect.gsub('<data', '<OpenData')
   end
 
   private

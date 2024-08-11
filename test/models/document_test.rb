@@ -25,8 +25,8 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "simple create works" do
-    file_path = File.join(File.dirname(__FILE__), "../assets/cat-image-for-attaching.png")
-    file = Rack::Test::UploadedFile.new(file_path, "image/png")
+    file_path = File.join(File.dirname(__FILE__), '../assets/cat-image-for-attaching.png')
+    file = Rack::Test::UploadedFile.new(file_path, 'image/png')
 
     document = nil
     assert_nothing_raised do
@@ -55,15 +55,15 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "fully_processed_url" do
-    assert documents(:cat_photo).fully_processed_url(:small).starts_with?("http")
-    assert documents(:cat_photo).fully_processed_url(:small).include?("rails/active_storage/postgresql")
-    assert documents(:cat_photo).fully_processed_url(:small).exclude?("/redirect")
+    assert documents(:cat_photo).fully_processed_url(:small).starts_with?('http')
+    assert documents(:cat_photo).fully_processed_url(:small).include?('rails/active_storage/postgresql')
+    assert documents(:cat_photo).fully_processed_url(:small).exclude?('/redirect')
   end
 
   test "redirect_to_processed_path" do
-    assert documents(:cat_photo).redirect_to_processed_path(:small).starts_with?("/rails")
-    assert documents(:cat_photo).redirect_to_processed_path(:small).include?("representations/redirect")
-    assert documents(:cat_photo).redirect_to_processed_path(:small).exclude?("rails/active_storage/postgresql")
+    assert documents(:cat_photo).redirect_to_processed_path(:small).starts_with?('/rails')
+    assert documents(:cat_photo).redirect_to_processed_path(:small).include?('representations/redirect')
+    assert documents(:cat_photo).redirect_to_processed_path(:small).exclude?('rails/active_storage/postgresql')
   end
 
   test "associations are deleted upon destroy" do

@@ -25,7 +25,7 @@ class MessageTest < ActiveSupport::TestCase
     message = Message.create(assistant: assistants(:samantha), documents_attributes: {"0": {file: test_file}}, content_text: "Nice file")
     assert_equal 1, message.documents.length
     document = message.documents.first
-    assert_equal "cat.png", document.filename
+    assert_equal 'cat.png', document.filename
   end
 
   test "has an associated run" do

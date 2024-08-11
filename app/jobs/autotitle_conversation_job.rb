@@ -21,8 +21,8 @@ class AutotitleConversationJob < ApplicationJob
   private
 
   def generate_title_for(text)
-    json_response = ChatCompletionAPI.get_next_response(system_message, [text], response_format: {type: "json_object"})
-    json_response["topic"]
+    json_response = ChatCompletionAPI.get_next_response(system_message, [text], response_format: {type: 'json_object'})
+    json_response['topic']
   end
 
   def system_message

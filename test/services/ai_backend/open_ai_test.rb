@@ -10,7 +10,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       @conversation,
       @conversation.latest_message_for_version(:latest)
     )
-    @test_client = TestClient::OpenAI.new(access_token: "abc")
+    @test_client = TestClient::OpenAI.new(access_token: 'abc')
   end
 
   test "initializing client works" do
@@ -84,8 +84,8 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
         function_calls = @openai.get_next_chat_message { |chunk| streamed_text += chunk }
 
         assert_equal 2, function_calls.length
-        assert_equal [0,1], function_calls.map { |f| f["index"] }
-        assert_equal [function, function], function_calls.map { |f| f["function"]["name"] }
+        assert_equal [0,1], function_calls.map { |f| f['index'] }
+        assert_equal [function, function], function_calls.map { |f| f['function']['name'] }
       end
     end
   end
@@ -102,7 +102,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
             assert_equal 2, function_calls.length
             assert_equal [0,1], function_calls.map { |f| f[:index] }
-            assert_equal ["call_abc", "call_def"], function_calls.map { |f| f[:id] }
+            assert_equal ['call_abc', 'call_def'], function_calls.map { |f| f[:id] }
             assert_equal [function, function], function_calls.map { |f| f[:function][:name] }
           end
         end

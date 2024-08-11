@@ -7,6 +7,6 @@ class AddClaudeAssistants < ActiveRecord::Migration[7.1]
   end
 
   def down
-    Assistant.name_like("Claude").destroy_all
+    Assistant.name_like('Claude').destroy_all
   end
 end

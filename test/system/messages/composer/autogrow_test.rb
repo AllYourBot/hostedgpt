@@ -12,53 +12,53 @@ class MessagesComposerAutogrowTest < ApplicationSystemTestCase
 
     send_keys "1"
 
-    height = composer.native.property("clientHeight")
+    height = composer.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys "shift+enter"
       sleep 0.3
     end
-    assert composer.native.property("clientHeight") > height, "Input should have grown taller"
+    assert composer.native.property('clientHeight') > height, "Input should have grown taller"
 
-    height = composer.native.property("clientHeight")
+    height = composer.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys "2"
       send_keys "shift+enter"
       sleep 0.3
     end
-    assert composer.native.property("clientHeight") > height, "Input should have grown taller"
+    assert composer.native.property('clientHeight') > height, "Input should have grown taller"
 
-    height = composer.native.property("clientHeight")
+    height = composer.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys "backspace"
       sleep 0.3
     end
-    assert composer.native.property("clientHeight") < height, "Input should have gotten shorter"
+    assert composer.native.property('clientHeight') < height, "Input should have gotten shorter"
 
-    height = composer.native.property("clientHeight")
+    height = composer.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys "backspace+backspace"
       sleep 0.3
     end
-    assert composer.native.property("clientHeight") < height, "Input should have gotten shorter"
+    assert composer.native.property('clientHeight') < height, "Input should have gotten shorter"
 
-    height = composer.native.property("clientHeight")
+    height = composer.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys "backspace+backspace"
       sleep 0.3
     end
-    assert composer.native.property("clientHeight") == height, "Input should not have changed height"
+    assert composer.native.property('clientHeight') == height, "Input should not have changed height"
   end
 
   test "when large block of text is pasted, textarea grows in height and auto-scrolls to stay at the bottom" do
     click_text @long_conversation.title
     wait_for_images_to_load
 
-    height = composer.native.property("clientHeight")
+    height = composer.native.property('clientHeight')
     assert_stays_at_bottom do
       send_keys long_input_text
 
       assert_true "Input should have grown taller" do
-        composer.native.property("clientHeight") > height
+        composer.native.property('clientHeight') > height
       end
     end
   end
@@ -70,12 +70,12 @@ class MessagesComposerAutogrowTest < ApplicationSystemTestCase
     assert_at_bottom
     assert_scrolled_up { scroll_to find_messages.second }
 
-    height = composer.native.property("clientHeight")
+    height = composer.native.property('clientHeight')
     assert_did_not_scroll do
       send_keys long_input_text
 
       assert_true "Input should have grown taller" do
-        composer.native.property("clientHeight") > height
+        composer.native.property('clientHeight') > height
       end
     end
   end
@@ -96,6 +96,6 @@ class MessagesComposerAutogrowTest < ApplicationSystemTestCase
       The quick brown fox jumped over the lazy dog.
       The quick brown fox jumped over the lazy dog.
     END
-    text.gsub(/\n/, " ")
+    text.gsub(/\n/, ' ')
   end
 end

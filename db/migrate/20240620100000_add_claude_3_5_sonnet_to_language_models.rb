@@ -6,8 +6,8 @@ class AddClaude35SonnetToLanguageModels < ActiveRecord::Migration[7.0]
     # Insert 'claude-3-5-sonnet-20240620' with position 20
     create_without_validation!(
       position: 19,
-      api_name: "claude-3-5-sonnet-20240620",
-      name: "Claude 3.5 Sonnet (2024-06-20)",
+      api_name: 'claude-3-5-sonnet-20240620',
+      name: 'Claude 3.5 Sonnet (2024-06-20)',
       supports_images: true
     )
 
@@ -18,7 +18,7 @@ class AddClaude35SonnetToLanguageModels < ActiveRecord::Migration[7.0]
     end
 
     # Increment the position of existing Language Models where position >= 19
-    LanguageModel.where("position >= 19").where.not(api_name: "claude-3-5-sonnet-20240620").find_each do |model|
+    LanguageModel.where('position >= 19').where.not(api_name: 'claude-3-5-sonnet-20240620').find_each do |model|
       model.update(position: model.position + 1)
     end
 

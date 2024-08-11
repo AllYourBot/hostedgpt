@@ -66,7 +66,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
 
     unless element.matches_css?(".tooltip", wait: 0) # sometimes we're checking the tooltip on a link but within the link is an icon, check that instead
-      element = element.find(:xpath, "./*", match: :first, wait: wait)
+      element = element.find(:xpath, './*', match: :first, wait: wait)
     end
 
     assert element.matches_css?(".tooltip", wait: 0)
@@ -76,21 +76,21 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def send_keys(keys)
     element = page.active_element
 
-    key_array = keys.split("+").collect do |key|
+    key_array = keys.split('+').collect do |key|
       case key
-      when "up"
+      when 'up'
         :arrow_up
-      when "meta"
+      when 'meta'
         :command
-      when "esc"
+      when 'esc'
         :escape
-      when "backspace"
+      when 'backspace'
         :backspace
-      when "slash"
-        "/"
-      when "period"
-        "."
-      when "enter", "shift"
+      when 'slash'
+        '/'
+      when 'period'
+        '.'
+      when 'enter', 'shift'
         key.to_sym
       else
         key
@@ -231,7 +231,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def clipboard
-    page.evaluate_script("window.clipboardForSystemTestsToCheck")
+    page.evaluate_script('window.clipboardForSystemTestsToCheck')
   end
 
   def assert_true(msg = nil, opts = {}, &block)
@@ -274,7 +274,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def wait_for_initial_scroll_down
     assert_true "waiting for scroll down after initial page load" do
-      page.evaluate_script("window.scrolledDownForSystemTestsToCheck")
+      page.evaluate_script('window.scrolledDownForSystemTestsToCheck')
     end
   end
 

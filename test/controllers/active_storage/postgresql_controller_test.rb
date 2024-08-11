@@ -70,7 +70,7 @@ class ActiveStorage::PostgresqlControllerTest < ActionDispatch::IntegrationTest
   test "not allowing to set content-type from params" do
     blob = create_blob(filename: "hello.jpg", content_type: "image/jpeg")
 
-    get blob.send(url_method), params: { content_type: "text/html" }
+    get blob.send(url_method), params: { content_type: 'text/html' }
     assert_response :ok
     assert_equal "image/jpeg", response.headers["Content-Type"]
   end

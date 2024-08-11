@@ -1,4 +1,4 @@
-require "test_helper"
+require 'test_helper'
 
 class CurrentTest < ActiveSupport::TestCase
 end

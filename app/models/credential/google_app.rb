@@ -13,7 +13,7 @@ module Credential::GoogleApp
   end
 
   def permissions
-    properties.dig(:scope)&.split&.map { |p| p.split("/").last } || []
+    properties.dig(:scope)&.split&.map { |p| p.split('/').last } || []
   end
 
   def has_permission?(perm)

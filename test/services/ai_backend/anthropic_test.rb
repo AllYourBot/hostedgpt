@@ -8,7 +8,7 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
       @conversation,
       @conversation.latest_message_for_version(:latest)
     )
-    @test_client = TestClient::Anthropic.new(access_token: "abc")
+    @test_client = TestClient::Anthropic.new(access_token: 'abc')
   end
 
   test "initializing client works" do

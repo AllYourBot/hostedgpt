@@ -10,23 +10,23 @@ class APIServiceTest < ActiveSupport::TestCase
   end
 
   test "name present validated" do
-    record = APIService.new(name: "")
+    record = APIService.new(name: '')
     refute record.valid?
     assert_equal ["can't be blank"], record.errors[:name]
   end
 
   test "url present validated" do
-    record = APIService.new(url: " ")
+    record = APIService.new(url: ' ')
     refute record.valid?
     assert_equal ["can't be blank"], record.errors[:url]
 
-    record = APIService.new(url: "")
+    record = APIService.new(url: '')
     refute record.valid?
     assert_equal ["can't be blank"], record.errors[:url]
   end
 
   test "validates URL format validated" do
-    record = APIService.new(url: "oh")
+    record = APIService.new(url: 'oh')
     refute record.valid?
     assert_equal ["is invalid"], record.errors[:url]
   end
