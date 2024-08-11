@@ -28,11 +28,6 @@ Rails.application.routes.draw do
   get "/register", to: "users#new"
   get "/logout", to: "authentications#destroy"
 
-  if Feature.password_reset_email?
-    resources :password_resets, only: [:new, :create]
-    resource :password_credential, only: [:edit, :update]
-  end
-
   get "/auth/:provider/callback" => "authentications/google_oauth#create", as: :google_oauth
   get "/auth/failure" => "authentications/google_oauth#failure" # connected in omniauth.rb
 
