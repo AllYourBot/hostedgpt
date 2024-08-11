@@ -32,8 +32,10 @@ module User::Registerable
       ["gpt-4-0613", "GPT-4 Snapshot improved function calling (2023-06-13)", false, open_ai_api_service],
 
       ["gpt-3.5-turbo", "GPT-3.5 Turbo (latest)", false, open_ai_api_service],
+      ["gpt-3.5-turbo-16k-0613", "GPT-3.5 Turbo (2022-06-13)", false, open_ai_api_service],
       ["gpt-3.5-turbo-0125", "GPT-3.5 Turbo (2022-01-25)", false, open_ai_api_service],
       ["gpt-3.5-turbo-1106", "GPT-3.5 Turbo (2022-11-06)", false, open_ai_api_service],
+      ["gpt-3.5-turbo-instruct", "GPT-3.5 Turbo Instruct", false, open_ai_api_service],
 
       ["claude-3-5-sonnet-20240620", "Claude 3.5 Sonnet (2024-06-20)", true, anthropic_api_service],
       ["claude-3-opus-20240229", "Claude 3 Opus (2024-02-29)", true, anthropic_api_service],
@@ -47,16 +49,9 @@ module User::Registerable
       ["llama3-8b-8192", "Meta Llama 3 8b", false, groq_api_service],
       ["mixtral-8x7b-32768", "Mistral 8 7b", false, groq_api_service],
       ["gemma-7b-it", "Google Gemma 7b", false, groq_api_service],
-    ].each do |api_name, name, supports_images, api_service|
-      language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: true, supports_images: supports_images)
-    end
 
-    # Only these don't support tools:
-    [
-      ["gpt-3.5-turbo-instruct", "GPT-3.5 Turbo Instruct", false, open_ai_api_service],
-      ["gpt-3.5-turbo-16k-0613", "GPT-3.5 Turbo (2022-06-13)", false, open_ai_api_service],
     ].each do |api_name, name, supports_images, api_service|
-      language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: false, supports_images: supports_images)
+      language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_images: supports_images)
     end
 
     assistants.create! name: "GPT-4o", language_model: language_models.find_by(api_name: LanguageModel::BEST_GPT)

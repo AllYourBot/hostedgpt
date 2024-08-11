@@ -43,28 +43,6 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     assert_equal [tool_message], AIBackend::OpenAI.get_tool_messages_by_calling(messages(:weather_tool_call).content_tool_calls)
   end
 
-  test "tools_passed_when_supported_by_the_language_model" do
-    streamed_text = ""
-    TestClient::OpenAI.stub :text, nil do
-      TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response } do
-        @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal [:model, :messages, :stream, :max_tokens, :tools], TestClient::OpenAI.parameters.keys
-      end
-    end
-  end
-
-  test "tools_not_passed_when_not_supported_by_the_language_model" do
-    language_models(:gpt_4o).update!(supports_tools: false)
-    @assistant.reload
-    streamed_text = ""
-    TestClient::OpenAI.stub :text, nil do
-      TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response } do
-        @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal [:model, :messages, :stream, :max_tokens], TestClient::OpenAI.parameters.keys
-      end
-    end
-  end
-
   test "get_tool_messages_by_calling gracefully handles a failure within a function call" do
     tool_calls = messages(:weather_tool_call).content_tool_calls
     tool_calls[0][:function][:name] = "helloworld_bad"
