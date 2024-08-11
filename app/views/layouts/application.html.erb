@@ -69,6 +69,6 @@
     <main id="main-container" class="flex flex-1 h-full w-full bg-white dark:bg-gray-800 text-gray-950 dark:text-gray-100 px-safe">
       <%= content_for?(:main) ? yield(:main) : yield %>
     </main>
-    <%= render "layouts/alerts" %>
+    <%= render "layouts/toast" %>
   </body>
 </html>

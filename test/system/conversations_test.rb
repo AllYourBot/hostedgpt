@@ -69,7 +69,7 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_true { delete.visible? }
     delete.click
 
-    assert_alert "Deleted conversation"
+    assert_toast "Deleted conversation"
     assert_current_path(@starting_path)
   end
 
@@ -83,7 +83,7 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_true { delete.visible? }
     delete.click
 
-    assert_alert "Deleted conversation"
+    assert_toast "Deleted conversation"
     assert_current_path new_assistant_message_path(users(:keith).assistants.ordered.first)
   end
 
