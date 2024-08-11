@@ -5,12 +5,7 @@ if [ "$FLY_APP_NAME" != "" ] && [ "$RAILS_ENV" = "production" ]; then
 else
   if echo "${1}" && [ "${1}" = "./bin/dev" ]; then
     rm -f ./tmp/pids/server.pid 2>/dev/null
-    if [ -S "./tmp/pids/server.pid" ]; then
-      rm -f "./tmp/pids/server.pid" 2>&1
-    fi
-    if [ -S "./.overmind.sock" ]; then
-      rm -f "./.overmind.sock" 2>&1
-    fi
+    rm -f ./.overmind.sock 2>/dev/null
   elif echo "${1}" | grep -q "rails$" && [ "${2}" = "test" ]; then
     export RAILS_ENV=test
     echo "Running db:prepare"
