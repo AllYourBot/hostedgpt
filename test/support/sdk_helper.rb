@@ -2,14 +2,6 @@ module SDKHelpers
 
   private
 
-  def allow_request(verb, method)
-    stubbed_method = "allow_#{verb}_#{method}"
-    SDK::Verb.define_singleton_method(stubbed_method) { {} }
-    SDK::Verb.stub stubbed_method, true do
-      yield
-    end
-  end
-
   def stub_response(verb, method, status:, response: {}, &block)
     stubbed_method = "mocked_response_#{verb}_#{method}"
 

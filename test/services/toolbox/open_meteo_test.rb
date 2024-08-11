@@ -26,20 +26,12 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
   end
 
   test "get_current_and_todays_weather hits the API and doesn't fail" do
-    allow_request(:get, :get_location) do
-      allow_request(:get, :get_current_and_todays_weather) do
-        result = @open_meteo.get_current_and_todays_weather(city_s: "Austin", state_province_or_region_s: "Texas")
-        assert result.values.all? { |value| value.present? }
-      end
-    end
+    result = @open_meteo.get_current_and_todays_weather(city_s: "Austin", state_province_or_region_s: "Texas")
+    assert result.values.all? { |value| value.present? }
   end
 
   test "get_current_and_todays_weather works as a tool call" do
-    allow_request(:get, :get_location) do
-      allow_request(:get, :get_current_and_todays_weather) do
-        result = Toolbox.call("openmeteo_get_current_and_todays_weather", city: "Austin", state_province_or_region: "Texas")
-        assert result.values.all? { |value| value.present? }
-      end
-    end
+    result = Toolbox.call("openmeteo_get_current_and_todays_weather", city: "Austin", state_province_or_region: "Texas")
+    assert result.values.all? { |value| value.present? }
   end
 end
