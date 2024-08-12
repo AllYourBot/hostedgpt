@@ -24,7 +24,7 @@ class Settings::PeopleTest < ApplicationSystemTestCase
 
     click_text "Save"
 
-    assert_toast "Saved"
+    assert_alert "Saved"
     assert_current_path edit_settings_person_url
 
     assert_equal attr[:email], @person.reload.email
@@ -47,7 +47,7 @@ class Settings::PeopleTest < ApplicationSystemTestCase
 
     click_text "Save"
 
-    assert_toast "Saved"
+    assert_alert "Saved"
     assert_current_path edit_settings_person_url
 
     assert_equal attr[:email], @person.reload.email

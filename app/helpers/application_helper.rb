@@ -51,18 +51,6 @@ module ApplicationHelper
     end
   end
 
-  def flash_tag(type, text)
-    alert_class = case type
-      when "alert"
-        "error"
-      else
-        "info"
-      end
-    tag.div class: "alert alert-#{alert_class}" do
-      tag.span text
-    end
-  end
-
   def span_tag(content_or_options_with_block = nil, options = nil, &block)
     if block_given?
       options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)

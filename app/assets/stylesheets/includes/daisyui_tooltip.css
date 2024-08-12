@@ -148,18 +148,16 @@
   }
 }
 
-/* If we were using the full version of tailwind, then we could use tailwind.config to customize the Daisy theme. */
-/* Colors from: https://oklch.com */
 
-.alert-info {
-  --in: 85% 0 19;
-  --inc: 0 0 0;
-}
+/* Alert overrides */
 
-.alert-error {
-  --er: 0% 0 0;
-  --erc: 100% 0 0;
-  border: 1px solid white;
+/* this undoes the min-width special styling within daisy */
+
+.alert {
+  grid-auto-flow: column;
+  grid-template-columns: auto minmax(auto, 1fr);
+  justify-items: start;
+  text-align: start;
 }
 
 /* Form overrides */

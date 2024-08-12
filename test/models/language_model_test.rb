@@ -13,6 +13,11 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_instance_of APIService, language_models(:gpt_best).api_service
   end
 
+  test "has tools_supported" do
+    assert language_models(:gpt_4o).supports_tools?
+    refute language_models(:guanaco).supports_tools?
+  end
+
   test "ai_backend works as a delegated attribute" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
   end
