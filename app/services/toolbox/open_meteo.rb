@@ -147,8 +147,8 @@ class Toolbox::OpenMeteo < Toolbox
       right_now_snowfall: format(d.curr_snowfall, d.qty_unit),
       right_now_cloud_cover: format(d.curr_cloud_cover, "%"),
 
-      right_now_relative_humidity: d.relative_humidity_2m,
-      right_now_surface_pressure: d.surface_pressure,
+      right_now_relative_humidity: format(d.curr_relative_humidity, "%"),
+      right_now_surface_pressure: format(d.curr_surface_pressure, d.pressure_unit),
 
       today_high: format(d.today_high.round, d.degrees_unit),
       today_high_feels_like: format(d.today_high_feel.round, d.degrees_unit),
@@ -288,6 +288,8 @@ class Toolbox::OpenMeteo < Toolbox
     OpenData.new({
       degrees_unit: unit(response.current_units.temperature_2m),
       qty_unit: unit(response.current_units.precipitation),
+      pressure_unit: unit(response.current_units.surface_pressure),
+
       yest_high: response.daily.temperature_2m_max[0],
       yest_high_feel: response.daily.apparent_temperature_max[0],
       yest_low: response.daily.temperature_2m_min[0],
@@ -307,6 +309,8 @@ class Toolbox::OpenMeteo < Toolbox
       curr_snowfall: response.current.snowfall,
 
       curr_cloud_cover: response.current.cloud_cover,
+      curr_relative_humidity: response.current.relative_humidity_2m,
+      curr_surface_pressure: response.current.surface_pressure,
 
       today_precip: response.daily.precipitation_sum[1],
       today_precip_prob: response.daily.precipitation_probability_max[1],
@@ -321,7 +325,7 @@ class Toolbox::OpenMeteo < Toolbox
   end
 
   def unit(u)
-    u.gsub("°", "degrees ").gsub("F", "fahrenheit").gsub("C", "celcius")
+    u.gsub("°", "degrees ").gsub("F", "fahrenheit").gsub("C", "celcius").gsub("hPa", "hectopascals")
   end
 
   def weather_code_to_description(code)

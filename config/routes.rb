@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root to: "assistants#index"
+  get "/openmeteo", to: "test#openmeteo"
 
   resources :users, only: [:new, :create, :update]
 

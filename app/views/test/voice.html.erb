@@ -1,0 +1,19 @@
+<% content_for :head do %>
+  <script src="https://cdn.jsdelivr.net/npm/@alexanderolsen/libsamplerate-js"></script>
+  <script>
+    window.tools = <%= raw Toolbox.millis_tools.to_json %>;
+    window.N = LibSampleRate.ConverterType
+    window.x = LibSampleRate.create
+  </script>
+  <script src="https://unpkg.com/eventemitter3@latest/dist/eventemitter3.umd.min.js"></script>
+  <script>
+    const { EventEmitter: U } = EventEmitter3
+    const R = EventEmitter3
+  </script>
+<% end %>
+
+<div data-controller="millis">
+<button id="start" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="button" data-action="millis#start">
+  Start
+</button>
+</div>

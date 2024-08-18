@@ -55,6 +55,14 @@ class Toolbox < SDK
     end
   end
 
+  def self.millis_tools
+    if self == Toolbox
+      descendants.map(&:millis_function_tools).flatten
+    else
+      millis_function_tools
+    end
+  end
+
   private
 
   def self.function_tools
@@ -74,6 +82,19 @@ class Toolbox < SDK
     end
   end
 
+  def self.millis_function_tools
+    klass = name.split('::').second.downcase
+    functions.map do |name|
+      {
+        name: "#{self.to_s.downcase.remove('toolbox::')}_#{name}",
+        description: description(name),
+        webhook: "http://local.the.bot/#{klass}?key=4706&command=#{name}",
+        header: { "Content-Type": "application/json" },
+        params: millis_formatted_function_parameters(name),
+      }
+    end
+  end
+
   def self.functions
     self.instance_methods(false) - Toolbox.instance_methods
   end
@@ -84,6 +105,14 @@ class Toolbox < SDK
 
   def self.formatted_function_parameters_with_types(name)
     function_parameters(name).map { |param| formatted_param_properties(param) }.to_h
+  end
+
+  def self.millis_formatted_function_parameters(name)
+    required = formatted_function_required_parameters(name)
+    function_parameters(name).map do |param|
+      details = formatted_param_properties(param)
+      details.second.reverse_merge(name: details.first).merge(description: "", required: required.include?(details.first))
+    end
   end
 
   def self.formatted_param_properties(param)
