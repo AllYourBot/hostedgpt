@@ -1,10 +1,76 @@
 class Toolbox::OpenMeteo < Toolbox
   # Followed this guide: https://open-meteo.com/en/docs
 
+  # add a nice sentence to the daily forecastresponse
+  # add the two new measurements to the response
+
+  describe :get_16_day_weather_forecast, <<~S
+    Query the 16 day weather forecast for a given location. The location must be specified with a valid city
+    and a valid state_province_or_region. The city SHOULD NEVER BE INFERRED; meaning, you should ask the user to clarify
+    their city unless you're previously been told, and you may also need to clarify their state_province_or_region if you
+    cannot infer it from the city.
+  S
+
+  def get_16_day_weather_forecast(city_s:, state_province_or_region_s:, country_s: nil)
+    location = get_location(city_s, state_province_or_region_s, country_s)
+
+    data = get("https://api.open-meteo.com/v1/forecast").param(
+      forecast_days: 16,
+
+      latitude: location.latitude,
+      longitude: location.longitude,
+      timezone: location.timezone,
+
+      temperature_unit: "fahrenheit",
+      wind_speed_unit: "mph",
+      precipitation_unit: "inch",
+
+      daily: "weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_probability_max",
+    )
+
+    degrees_unit = unit(data.daily_units.temperature_2m_max)
+    qty_unit = unit(data.daily_units.precipitation_sum)
+    dailies = data.daily
+
+    dailies.time.map.with_index do |date, i|
+      day = dailies.to_h.transform_values { |v| v[i] }
+
+      summary = "There " + weather_code_to_description(day[:weather_code]).join(" ") + " forecasted with a "
+      summary += "low of #{day[:temperature_2m_min].round} degrees and a "
+      summary += "high of #{day[:temperature_2m_max].round} degrees."
+
+      {
+        date: day[:time],
+        in: "#{location.name}, #{location.admin1}, #{location.country}",
+
+        temp_high: day[:temperature_2m_max],
+        temp_high_feels_like: day[:apparent_temperature_max],
+        temp_low: day[:temperature_2m_max],
+        temp_low_feels_like: day[:apparent_temperature_min],
+
+        temp_high_formatted: format(day[:temperature_2m_max], degrees_unit),
+        temp_high_feels_like_formatted: format(day[:apparent_temperature_max], degrees_unit),
+        temp_low_formatted: format(day[:temperature_2m_max], degrees_unit),
+        temp_low_feels_like_formatted: format(day[:apparent_temperature_min], degrees_unit),
+
+        precipitation: day[:precipitation_sum],
+        rain: day[:rain_sum],
+        snowfall: day[:snowfall_sum],
+
+        precipitation_formatted: format(day[:precipitation_sum], qty_unit),
+        rain_formatted: format(day[:rain_sum], qty_unit),
+        snowfall_formatted: format(day[:snowfall_sum], qty_unit),
+
+        summary: summary,
+      }
+    end
+  end
+
   describe :get_current_and_todays_weather, <<~S
     Query the current weather and today's forecast for a given location. The location must be specified with a valid city
-    and a valid state_province_or_region. The city and state_province_or_region SHOULD NEVER BE INFERRED; meaning, you should
-    ask the user to clarify their city or clarify their state_province_or_region if you have not been instructed with those.
+    and a valid state_province_or_region. The city SHOULD NEVER BE INFERRED; meaning, you should ask the user to clarify
+    their city unless you're previously been told, and you may also need to clarify their state_province_or_region if you
+    cannot infer it from the city.
   S
 
   def get_current_and_todays_weather(city_s:, state_province_or_region_s:, country_s: nil)
@@ -22,7 +88,7 @@ class Toolbox::OpenMeteo < Toolbox
       wind_speed_unit: "mph",
       precipitation_unit: "inch",
 
-      current: "weather_code,temperature_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover",
+      current: "weather_code,temperature_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover,relative_humidity_2m,surface_pressure",
       #hourly:  "weather_code,temperature_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,cloud_cover",
       daily:   "weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_probability_max",
     )
@@ -80,6 +146,9 @@ class Toolbox::OpenMeteo < Toolbox
       right_now_showers: format(d.curr_showers, d.qty_unit),
       right_now_snowfall: format(d.curr_snowfall, d.qty_unit),
       right_now_cloud_cover: format(d.curr_cloud_cover, "%"),
+
+      right_now_relative_humidity: d.relative_humidity_2m,
+      right_now_surface_pressure: d.surface_pressure,
 
       today_high: format(d.today_high.round, d.degrees_unit),
       today_high_feels_like: format(d.today_high_feel.round, d.degrees_unit),
