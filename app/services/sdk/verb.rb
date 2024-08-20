@@ -128,6 +128,9 @@ class SDK::Verb
   end
 
   def possible_test_warning(verb)
-    puts "WARNING: live API call in test. USE: stub_#{verb}_response(:#{@calling_method}, status: ___, response: _______) do; ...; end" if Rails.env.test?
+    return if !Rails.env.test?
+    return if self.class.send("allow_#{verb}_#{@calling_method}") rescue false
+
+    puts "WARNING: live API call in test. USE: stub_#{verb}_response(:#{@calling_method}, status: ___, response: _______) do; ...; end"
   end
 end

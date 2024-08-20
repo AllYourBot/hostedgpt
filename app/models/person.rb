@@ -25,7 +25,7 @@ class Person < ApplicationRecord
 
   def proper_personable_id
     if personable_id.present? && personable.id.blank?
-      errors.add(:personable_id, 'must be provided on update')
+      errors.add(:personable_id, "must be provided on update")
     end
   end
 end

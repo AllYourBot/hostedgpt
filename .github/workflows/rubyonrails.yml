@@ -46,7 +46,8 @@ jobs:
         run: bin/rails test
 
   system_tests:
-    runs-on: ubuntu-latest
+    if: github.repository == 'AllYourBot/hostedgpt'
+    runs-on: large-runner
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref }}-system
       cancel-in-progress: true
@@ -92,8 +93,9 @@ jobs:
 
       - name: Run system tests
         run: |
+          echo -e "###\n###\n###\n### NOTICE: If these tests fail because of Net::ReadTimeout then re-run the test suite. I can't figure out this sporadic failure.\n###\n###\n###"
           sed -i 's/hoverOnlyWhenSupported: true/hoverOnlyWhenSupported: false/' config/tailwind.config.js
-          bin/rails test:system
+          PARALLEL_WORKERS=2 bin/rails test:system
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4

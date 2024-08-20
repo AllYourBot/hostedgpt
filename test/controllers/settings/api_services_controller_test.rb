@@ -19,7 +19,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     @user.api_services.each { |r| r.deleted! }
     get settings_api_services_url
     assert_response :success
-    assert_select 'table', count: 0
+    assert_select "table", count: 0
     assert_select "p a", "Add New"
     assert_select "p#no-api-services", "You have no API services configured."
   end

@@ -1,5 +1,3 @@
-version: '3.1'
-
 services:
   postgres:
     image: postgres:16
@@ -9,7 +7,7 @@ services:
       POSTGRES_DB: app_development
       POSTGRES_PASSWORD: secret
     volumes:
-    - hostedgpt_pgdata:/var/lib/postgresql/data
+      - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "app", "-d", "app_development"]
       interval: 1s
@@ -27,21 +25,35 @@ services:
       - DATABASE_URL=postgres://app:secret@postgres/app_development
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
       - OVERMIND_COLORS=2,3,5
-      - VOICE_FEATURE
+      - ALLOWED_REQUEST_ORIGINS
       - REGISTRATION_FEATURE
+      - DEFAULT_LLM_KEYS_FEATURE
+      - CLOUDFLARE_STORAGE_FEATURE
+      - GOOGLE_TOOLS_FEATURE
       - PASSWORD_AUTHENTICATION_FEATURE
       - GOOGLE_AUTHENTICATION_FEATURE
       - HTTP_HEADER_AUTHENTICATION_FEATURE
-      - ALLOWED_REQUEST_ORIGINS
-      - DEFAULT_LLM_KEYS_FEATURE
+      - VOICE_FEATURE
+      - DEFAULT_TO_VOICE_FEATURE
+      - EMAIL_FEATURE
+      - PASSWORD_RESET_EMAIL_FEATURE
+      - PRODUCT_NAME
       - DEFAULT_OPENAI_KEY
       - DEFAULT_ANTHROPIC_KEY
       - DEFAULT_GROQ_KEY
+      - CLOUDFLARE_ACCOUNT_ID
+      - CLOUDFLARE_ACCESS_KEY_ID
+      - CLOUDFLARE_SECRET_ACCESS_KEY
+      - CLOUDFLARE_BUCKET
       - GOOGLE_AUTH_CLIENT_ID
       - GOOGLE_AUTH_CLIENT_SECRET
       - HTTP_HEADER_AUTH_EMAIL
       - HTTP_HEADER_AUTH_NAME
       - HTTP_HEADER_AUTH_UID
+      - EMAIL_PROVIDER
+      - EMAIL_FROM
+      - EMAIL_HOST
+      - POSTMARK_SERVER_API_TOKEN
     ports: ["3000:3000"]
     volumes:
       - .:/rails

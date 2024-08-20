@@ -68,7 +68,7 @@ class PersonTest < ActiveSupport::TestCase
         first_name: "John",
         last_name: "Doe",
         credentials_attributes: {
-          '0' => {
+          "0" => {
             type: "PasswordCredential",
             password: "password",
           }
@@ -92,7 +92,7 @@ class PersonTest < ActiveSupport::TestCase
         first_name: "John",
         last_name: nil,
         credentials_attributes: {
-          '0' => {
+          "0" => {
             type: "PasswordCredential",
             password: "password",
           }
@@ -112,7 +112,7 @@ class PersonTest < ActiveSupport::TestCase
         first_name: "John",
         last_name: nil,
         credentials_attributes: {
-          '0' => {
+          "0" => {
             type: "GoogleCredential",
             oauth_id: "123",
             oauth_token: "abc-123",

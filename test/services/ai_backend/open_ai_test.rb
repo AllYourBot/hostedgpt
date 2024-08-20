@@ -10,7 +10,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       @conversation,
       @conversation.latest_message_for_version(:latest)
     )
-    @test_client = TestClient::OpenAI.new(access_token: 'abc')
+    @test_client = TestClient::OpenAI.new(access_token: "abc")
   end
 
   test "initializing client works" do
@@ -41,6 +41,28 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       tool_call_id: "abc123",
     }
     assert_equal [tool_message], AIBackend::OpenAI.get_tool_messages_by_calling(messages(:weather_tool_call).content_tool_calls)
+  end
+
+  test "tools_passed_when_supported_by_the_language_model" do
+    streamed_text = ""
+    TestClient::OpenAI.stub :text, nil do
+      TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response } do
+        @openai.get_next_chat_message { |chunk| streamed_text += chunk }
+        assert_equal [:model, :messages, :stream, :max_tokens, :tools], TestClient::OpenAI.parameters.keys
+      end
+    end
+  end
+
+  test "tools_not_passed_when_not_supported_by_the_language_model" do
+    language_models(:gpt_4o).update!(supports_tools: false)
+    @assistant.reload
+    streamed_text = ""
+    TestClient::OpenAI.stub :text, nil do
+      TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response } do
+        @openai.get_next_chat_message { |chunk| streamed_text += chunk }
+        assert_equal [:model, :messages, :stream, :max_tokens], TestClient::OpenAI.parameters.keys
+      end
+    end
   end
 
   test "get_tool_messages_by_calling gracefully handles a failure within a function call" do
@@ -84,8 +106,8 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
         function_calls = @openai.get_next_chat_message { |chunk| streamed_text += chunk }
 
         assert_equal 2, function_calls.length
-        assert_equal [0,1], function_calls.map { |f| f['index'] }
-        assert_equal [function, function], function_calls.map { |f| f['function']['name'] }
+        assert_equal [0,1], function_calls.map { |f| f["index"] }
+        assert_equal [function, function], function_calls.map { |f| f["function"]["name"] }
       end
     end
   end
@@ -102,7 +124,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
             assert_equal 2, function_calls.length
             assert_equal [0,1], function_calls.map { |f| f[:index] }
-            assert_equal ['call_abc', 'call_def'], function_calls.map { |f| f[:id] }
+            assert_equal ["call_abc", "call_def"], function_calls.map { |f| f[:id] }
             assert_equal [function, function], function_calls.map { |f| f[:function][:name] }
           end
         end

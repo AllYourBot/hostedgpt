@@ -14,7 +14,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     fill_in "Instructions", with: @assistant.instructions
 
     click_text "Save"
-    assert_toast "Saved"
+    assert_alert "Saved"
   end
 
   test "should update Assistant" do
@@ -26,17 +26,17 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
 
     click_text "Save"
 
-    assert_toast "Saved"
+    assert_alert "Saved"
   end
 
-  test "a second save to the Assistant update page should show the notification again and it should properly dismiss itself" do
+  test "a second save to the Assistant update page should show the notification again and it should properly dismiss itself when X is clicked" do
     visit edit_settings_assistant_url(@assistant)
     click_text "Save"
-    assert_toast "Saved"
-    refute_text "Saved"
+    assert_alert "Saved"
 
     click_text "Save"
-    assert_toast "Saved"
+    assert_alert "Saved"
+    find("#alerts .alert button").click
     refute_text "Saved"
   end
 
@@ -45,7 +45,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
   #   accept_confirm do
   #     click_text "Delete", match: :first
   #   end
-  #   assert_toast "Deleted"
+  #   assert_alert "Deleted"
 
   #   refute Assistant.exists?(id: @assistant.id)
   # end

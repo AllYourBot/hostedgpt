@@ -8,7 +8,7 @@ class AddGroq < ActiveRecord::Migration[7.0]
     User.all.find_each do |user|
       groq_api_service = user.api_services.create!(url: APIService::URL_GROQ, driver: :openai, name: "Groq")
       language_model = user.language_models.create!(position: 3, api_name: LanguageModel::BEST_GROQ, api_service: groq_api_service, name: "Best Open-Source Model", supports_images: false)
-      user.language_models.where('position >= 3').where.not(id: language_model.id).find_each do |model|
+      user.language_models.where("position >= 3").where.not(id: language_model.id).find_each do |model|
         model.update(position: model.position + 1)
       end
 

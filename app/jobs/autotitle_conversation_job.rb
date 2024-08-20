@@ -12,16 +12,17 @@ class AutotitleConversationJob < ApplicationJob
     messages = conversation.messages.ordered.limit(4)
     raise ConversationNotReady  if messages.empty?
 
-    new_title = generate_title_for(messages.map(&:content_text).join("\n"))
+    new_title = Current.set(user: conversation.user) do
+      generate_title_for(messages.map(&:content_text).join("\n"))
+    end
     conversation.update!(title: new_title)
   end
-
 
   private
 
   def generate_title_for(text)
-    json_response = ChatCompletionAPI.get_next_response(system_message, [text], response_format: {type: 'json_object'})
-    json_response['topic']
+    json_response = ChatCompletionAPI.get_next_response(system_message, [text], response_format: {type: "json_object"})
+    json_response["topic"]
   end
 
   def system_message

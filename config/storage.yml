@@ -1,9 +1,14 @@
-test:
+database:
   service: Postgresql
 
-local:
-  service: Postgresql
-
-local_public:
+database_public:
   service: Postgresql
   public: true # the generated URLs will not expire
+
+cloudflare:
+  service: S3
+  endpoint: https://<%= Setting.cloudflare_account_id %>.r2.cloudflarestorage.com
+  access_key_id: <%= Setting.cloudflare_access_key_id %>
+  secret_access_key: <%= Setting.cloudflare_secret_access_key %>
+  region: auto
+  bucket: <%= Setting.cloudflare_bucket %>

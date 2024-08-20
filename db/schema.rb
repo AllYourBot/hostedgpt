@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_13_130357) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_01_203803) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -165,6 +165,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_13_130357) do
     t.datetime "deleted_at", precision: nil
     t.bigint "user_id", null: false
     t.bigint "api_service_id"
+    t.boolean "supports_tools", default: false
     t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_language_models_on_user_id"

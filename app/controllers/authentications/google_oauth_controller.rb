@@ -35,8 +35,11 @@ class Authentications::GoogleOauthController < ApplicationController
       redirect_to root_path
     else
       @person&.errors&.delete :personable
-      msg = @person.errors.full_messages.map { |m| m.gsub(/Personable |credentials /, '') }.to_sentence.capitalize
-      msg += " Cannot try again until you remove this website as a \"Google third-party connection\"." if msg.downcase.include?("oauth refresh token can't be blank")
+      msg = @person.errors.full_messages.map { |m| m.gsub(/Personable |credentials /, "") }.to_sentence.capitalize
+      if msg.downcase.include?("oauth refresh token can't be blank")
+        msg += " " + helpers.link_to("Google third-party connections", "https://myaccount.google.com/connections", class: "underline") + " search for website, and delete all it's connections. Then try again."
+      end
+
       redirect_to new_user_path, alert: msg
     end
   rescue => e

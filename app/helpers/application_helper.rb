@@ -29,7 +29,7 @@ module ApplicationHelper
     title = opts.delete(:title)
 
     if title
-      direction = opts.delete(:tooltip) || 'bottom'
+      direction = opts.delete(:tooltip) || "bottom"
       data = opts.delete(:data) || {}
 
       content_tag(:span,
@@ -48,18 +48,6 @@ module ApplicationHelper
       ) do
         heroicon name, **opts.merge(opts[:svg] || {})
       end
-    end
-  end
-
-  def flash_tag(type, text)
-    alert_class = case type
-      when "alert"
-        "error"
-      else
-        "info"
-      end
-    tag.div class: "alert alert-#{alert_class}" do
-      tag.span text
     end
   end
 
@@ -90,7 +78,7 @@ module ApplicationHelper
   end
 
   def viewport_tag(content)
-    tag.meta(name: 'viewport', content: content)
+    tag.meta(name: "viewport", content: content)
   end
 
   def n_a_if_blank(value, n_a = "Not Available")

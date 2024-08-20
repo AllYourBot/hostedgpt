@@ -25,7 +25,7 @@ class MessageTest < ActiveSupport::TestCase
     message = Message.create(assistant: assistants(:samantha), documents_attributes: {"0": {file: test_file}}, content_text: "Nice file")
     assert_equal 1, message.documents.length
     document = message.documents.first
-    assert_equal 'cat.png', document.filename
+    assert_equal "cat.png", document.filename
   end
 
   test "has an associated run" do
@@ -50,11 +50,11 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal h, Message.new.content_tool_calls
   end
 
-  test "name returns a properly formatted string" do
-    assert_equal users(:keith).first_name, messages(:hear_me).name
-    assert_equal "Samantha", messages(:yes_i_do).name
-    assert_equal "OpenAI", messages(:popstate_event).name # strips off non-alphanumeric
-    assert_nil messages(:weather_tool_result).name
+  test "name_for_api returns a properly formatted string" do
+    assert_equal users(:keith).first_name, messages(:hear_me).name_for_api
+    assert_equal "Samantha", messages(:yes_i_do).name_for_api
+    assert_equal "OpenAI", messages(:popstate_event).name_for_api # strips off non-alphanumeric
+    assert_nil messages(:weather_tool_result).name_for_api
   end
 
   test "finished? returns true if processed and missing either content_text or content_tool_calls" do

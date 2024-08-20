@@ -41,6 +41,32 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form"
   end
 
+  test "create should not have supports_tools checkbox" do
+    get new_settings_language_model_url
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_tools]"]'
+      assert_select 'input[name="language_model[supports_tools]"][checked="checked"]', false # Not checked by default, from schema
+    end
+  end
+
+  test "edit should have supports_tools checkbox checked" do
+    get edit_settings_language_model_url(@language_model)
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_tools]"][checked="checked"]'
+    end
+  end
+
+  test "edit should have supports_tools checkbox unchecked" do
+    get edit_settings_language_model_url(language_models(:guanaco))
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_tools]"]'
+      assert_select 'input[name="language_model[supports_tools]"][checked="checked"]', false
+    end
+  end
+
   test "should not allow viewing other user's records" do
     get edit_settings_language_model_url(language_models(:pacos))
     assert_response :see_other
@@ -72,6 +98,17 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_language_model_url(@language_model)
     assert_response :success
     assert_contains_text "main", "Delete"
+  end
+
+  test "should update supports_tools" do
+    assert @language_model.supports_tools?
+    patch settings_language_model_url(@language_model), params: { language_model: {supports_tools: false }}
+    refute @language_model.reload.supports_tools?
+
+    language_model = language_models(:guanaco)
+    refute language_model.supports_tools?
+    patch settings_language_model_url(language_model), params: { language_model: {supports_tools: true }}
+    assert language_model.reload.supports_tools?
   end
 
   test "should not update other user's language_model" do
