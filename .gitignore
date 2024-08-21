@@ -48,9 +48,9 @@
 /.ruby-version
 .issues
 
-# Mac
-
+# Other Mac programs
 .DS_Store
+.serenade
 
 # JetBrains
 /.idea/*
