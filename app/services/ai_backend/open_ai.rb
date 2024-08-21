@@ -34,6 +34,7 @@ class AIBackend::OpenAI < AIBackend
         messages: system_message + preceding_messages,
         stream: response_handler,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
+        stream_options: { include_usage: true }
       }
       if @assistant.language_model.supports_tools?
         parameters[:tools] = Toolbox.tools
@@ -56,6 +57,12 @@ class AIBackend::OpenAI < AIBackend
     proc do |intermediate_response, bytesize|
       content_chunk = intermediate_response.dig("choices", 0, "delta", "content")
       tool_calls_chunk = intermediate_response.dig("choices", 0, "delta", "tool_calls")
+
+      if (input_tokens, output_tokens = intermediate_response["usage"]&.values_at("prompt_tokens", "completion_tokens"))
+        # https://platform.openai.com/docs/api-reference/chat/streaming
+        @message.input_token_count = input_tokens
+        @message.output_token_count = output_tokens
+      end
 
       print content_chunk if Rails.env.development?
       if content_chunk

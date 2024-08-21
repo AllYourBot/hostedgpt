@@ -48,7 +48,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     TestClient::OpenAI.stub :text, nil do
       TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response } do
         @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal [:model, :messages, :stream, :max_tokens, :tools], TestClient::OpenAI.parameters.keys
+        assert_equal [:model, :messages, :stream, :max_tokens, :stream_options, :tools], TestClient::OpenAI.parameters.keys
       end
     end
   end
@@ -60,7 +60,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     TestClient::OpenAI.stub :text, nil do
       TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response } do
         @openai.get_next_chat_message { |chunk| streamed_text += chunk }
-        assert_equal [:model, :messages, :stream, :max_tokens], TestClient::OpenAI.parameters.keys
+        assert_equal [:model, :messages, :stream, :max_tokens, :stream_options], TestClient::OpenAI.parameters.keys
       end
     end
   end
