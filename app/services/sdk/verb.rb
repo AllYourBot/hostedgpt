@@ -31,10 +31,25 @@ class SDK::Verb
     raise ResponseError.new(response) if !response.status.in? @expected_statuses
 
     if response.status.between?(200, 299)
-      response.body.presence && OpenData.for(JSON.parse(response.body))
+      body = possible_gunzip(response)
+      body.presence && OpenData.for(JSON.parse(body))
     else
       response
     end
+  end
+
+  def possible_gunzip(response)
+    return response.body if !gzip?(response)
+
+    sio = StringIO.new(response.body)
+    gz = Zlib::GzipReader.new(sio)
+    decompressed_body = gz.read
+    gz.close
+    decompressed_body
+  end
+
+  def gzip?(response)
+    response.headers["Content-Encoding"] == "gzip" && response.body.force_encoding('ASCII-8BIT').start_with?("\x1F\x8B".b)
   end
 
   def json_content
