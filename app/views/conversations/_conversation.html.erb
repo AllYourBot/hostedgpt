@@ -77,19 +77,19 @@
               <%= icon "trash", variant: :outline, size: 18 %>Delete
             <% end %>
           </li>
-          <footer class="hidden py-3 px-4 mt-1 border-t-2 border-gray-100 dark:border-gray-600 gap-2 flex flex-col">
+          <footer class="py-3 px-4 mt-1 border-t-2 border-gray-100 dark:border-gray-600 gap-2 flex flex-col">
             <table class="w-full text-left">
               <tr>
                 <td class="pb-2 whitespace-nowrap">Conversation</td>
-                <td class="pb-2">$444.44</td>
+                <td class="pb-2">$???</td>
               </tr>
               <tr>
                 <td class="pb-2">Input Tokens</td>
-                <td class="pb-2">100</td>
+                <td class="pb-2"><%= conversation.messages.sum(:input_token_count) %></td>
               </tr>
               <tr>
                 <td>Output Tokens</td>
-                <td>100</td>
+                <td><%= conversation.messages.sum(:output_token_count) %></td>
               </tr>
             </table>
           </footer>
