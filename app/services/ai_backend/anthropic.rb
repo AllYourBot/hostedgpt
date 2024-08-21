@@ -29,12 +29,12 @@ class AIBackend::Anthropic < AIBackend
     response_handler = proc do |intermediate_response, bytesize|
       chunk = intermediate_response.dig("delta", "text")
 
-      # input and output tokens are sent in different responses
       if (input_tokens = intermediate_response.dig("message", "usage", "input_tokens"))
-        @message.input_token_count += input_tokens
+        # https://docs.anthropic.com/en/api/messages-streaming
+        @message.input_token_count = input_tokens
       end
       if (output_tokens = intermediate_response.dig("message", "usage", "output_tokens"))
-        @message.output_token_count += output_tokens
+        @message.output_token_count = output_tokens # no += because an early token count is partial, but the final one is the total
       end
 
       print chunk if Rails.env.development?

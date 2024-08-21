@@ -58,10 +58,10 @@ class AIBackend::OpenAI < AIBackend
       content_chunk = intermediate_response.dig("choices", 0, "delta", "content")
       tool_calls_chunk = intermediate_response.dig("choices", 0, "delta", "tool_calls")
 
-      # input and output tokens are sent in the same response
       if (input_tokens, output_tokens = intermediate_response["usage"]&.values_at("prompt_tokens", "completion_tokens"))
-        @message.input_token_count += input_tokens
-        @message.output_token_count += output_tokens
+        # https://platform.openai.com/docs/api-reference/chat/streaming
+        @message.input_token_count = input_tokens
+        @message.output_token_count = output_tokens
       end
 
       print content_chunk if Rails.env.development?
