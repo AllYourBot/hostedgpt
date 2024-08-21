@@ -17,7 +17,10 @@ class Google < SDK
 
       return true
     rescue => e
-      credential.destroy if e.status == 400 && e.body.dig("error_description")&.include?("Token has been expired")
+      credential.destroy if e.status == 400 && (
+        e.body.dig("error_description")&.include?("Token has been expired") ||
+        e.body.dig("error") == "invalid_grant"
+      )
       return false
     end
   end

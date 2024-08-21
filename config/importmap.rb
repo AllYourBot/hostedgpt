@@ -4,6 +4,7 @@ pin "application", preload: true
 pin "@hotwired/turbo-rails", to: "turbo.min.js", preload: true
 pin "@hotwired/stimulus", to: "stimulus.min.js", preload: true
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
+pin_all_from "app/javascript/channels", under: "channels"
 
 Dir["app/javascript/**/*"].select do |dir|
   File.directory?(dir) && !dir.include?("/blocks")
@@ -36,3 +37,6 @@ end.each do |file|
 end
 pin "tailwindcss-safe-area" # @0.5.1
 pin "tailwindcss/plugin", to: "tailwindcss--plugin.js" # @3.4.4
+pin "@millisai/web-sdk", to: "@millisai--web-sdk.full.js"
+#pin "eventemitter3", to: "eventemitter3.js" # @5.0.1
+pin "@rails/actioncable", to: "actioncable.esm.js"

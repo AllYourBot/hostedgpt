@@ -33,10 +33,42 @@ class TestController < ApplicationController
     render json: response
   end
 
+  def googletasks
+    response = Toolbox.call("googletasks_"+params[:command], params.slice(
+      :title,
+      :notes,
+      :due_date,
+      :list,
+      :task_id_or_position,
+      :is_deleted,
+      :is_completed,
+    ))
+    render json: response
+  end
+
+  def gmail
+    response = Toolbox.call("gmail_"+params[:command], params.slice(
+      :email_address,
+      :subject,
+      :message,
+    ))
+    render json: response
+  end
+
+  def memory
+    response = Toolbox.call("memory_"+params[:command], params.slice(
+      :detail,
+    ))
+    render json: response
+  end
+
   private
+
   def verify_key
     if params[:key] != "4706"
       head :not_found
+    else
+      Current.user = User.find(721687369)
     end
   end
 end

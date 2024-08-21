@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
   root to: "assistants#index"
+
+  get "/voice", to: "test#voice"
+  get "/serenade", to: "test#serenade"
   get "/openmeteo", to: "test#openmeteo"
+  get "/googletasks", to: "test#googletasks"
+  get "/gmail", to: "test#gmail"
+  get "/memory", to: "test#memory"
 
   resources :users, only: [:new, :create, :update]
 

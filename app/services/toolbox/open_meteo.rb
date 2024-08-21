@@ -8,7 +8,7 @@ class Toolbox::OpenMeteo < Toolbox
     Query the 16 day weather forecast for a given location. The location must be specified with a valid city
     and a valid state_province_or_region. The city SHOULD NEVER BE INFERRED; meaning, you should ask the user to clarify
     their city unless you're previously been told, and you may also need to clarify their state_province_or_region if you
-    cannot infer it from the city.
+    cannot infer it from the city. ALSO, always WRITE OUT fahrenheit and DO NOT abbreviate.
   S
 
   def get_16_day_weather_forecast(city_s:, state_province_or_region_s:, country_s: nil)
@@ -70,7 +70,7 @@ class Toolbox::OpenMeteo < Toolbox
     Query the current weather and today's forecast for a given location. The location must be specified with a valid city
     and a valid state_province_or_region. The city SHOULD NEVER BE INFERRED; meaning, you should ask the user to clarify
     their city unless you're previously been told, and you may also need to clarify their state_province_or_region if you
-    cannot infer it from the city.
+    cannot infer it from the city. ALSO, always WRITE OUT fahrenheit and DO NOT abbreviate.
   S
 
   def get_current_and_todays_weather(city_s:, state_province_or_region_s:, country_s: nil)
@@ -179,7 +179,8 @@ class Toolbox::OpenMeteo < Toolbox
     state_province_or_region. The city and state_province_or_region SHOULD NEVER BE INFERRED; meaning, you should
     ask the user to clarify their city or clarify their state_province_or_region if you have not been instructed with those. You CAN INFER
     dates based on the conversation. However, the query date range should NEVER span more than 12 months (or 52 weeks). If you need to
-    query data spanning a longer period, do multiple queries for the SPECIFIC narrow ranges you want to consider.
+    query data spanning a longer period, do multiple queries for the SPECIFIC narrow ranges you want to consider. ALSO, always WRITE OUT
+    fahrenheit and DO NOT abbreviate.
   S
 
   def get_historical_weather(city_s:, state_province_or_region_s:, country_s:  nil, date_span_begin_s:, date_span_end_s:)

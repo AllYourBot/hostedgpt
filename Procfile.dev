@@ -1,3 +1,4 @@
 web: env RUBY_DEBUG_OPEN=true USING_PROCFILE=true bin/rails server -p ${PORT:-3000} -b 0.0.0.0
 worker: bin/rake solid_queue:start
 tailwind: bin/rails tailwindcss:watch
+tunnel: cloudflared tunnel run krschacht  # configure local.your.domain for your tunnel: https://aien.me/i-switched-to-cloudflare-tunnel
