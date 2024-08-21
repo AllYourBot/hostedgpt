@@ -33,7 +33,7 @@ class AIBackend::Anthropic < AIBackend
         # https://docs.anthropic.com/en/api/messages-streaming
         @message.input_token_count = input_tokens
       end
-      if (output_tokens = intermediate_response.dig("message", "usage", "output_tokens"))
+      if (output_tokens = intermediate_response.dig("usage", "output_tokens"))
         @message.output_token_count = output_tokens # no += because an early token count is partial, but the final one is the total
       end
 
