@@ -51,6 +51,9 @@ jobs:
       - name: Build CSS
         run: bin/rails tailwindcss:build
 
+      - name: Setup ssh session
+        uses: Warpbuilds/action-debugger@v1.3
+
       - name: Run system tests
         run: |
           echo -e "###\n###\n###\n### NOTICE: If these tests fail because of Net::ReadTimeout then re-run the test suite. I can't figure out this sporadic failure.\n###\n###\n###"
