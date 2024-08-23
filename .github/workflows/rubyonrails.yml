@@ -32,16 +32,17 @@ jobs:
       DEBUG: true
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - uses: nanasess/setup-chromedriver@v2
       - name: Start chromedriver
         run: |
           set -x
           touch ~/chromedriver.log
           chromedriver --url-base=/wd/hub | sudo tee -a ~/chromedriver.log &
+          bin/lib/wait-for-it.sh localhost:9515 -- echo "Chromedriver is up!"
           # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - uses: ruby/setup-ruby@v1
         with:
