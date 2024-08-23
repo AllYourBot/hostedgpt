@@ -10,6 +10,16 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   parallelize workers: 1
 
+  def self.test(name, &block)
+    retry_count = 0
+    begin
+      super(name, &block)
+    rescue Net::ReadTimeout => e
+      puts "Net::ReadTimeout: #{e}"
+      debugger
+    end
+  end
+
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
       user_or_person.user
