@@ -1,5 +1,5 @@
 class Toolbox::Gmail < Toolbox
-  include GoogleApp
+  include GoogleApp # uid is defined in here
 
   describe :email_myself, <<~S
     Send an email to yourself with the indicated message
@@ -57,6 +57,19 @@ class Toolbox::Gmail < Toolbox
       read_messages_in_inbox: inbox.length - unread_inbox.length,
       most_recent_message: latest_message.to_h,
       last_sent_message: latest_sent_message.to_h,
+    }
+  end
+
+  describe :check_inbox_for_message_with, <<~S
+    Check the users gmail inbox to find a specific message. A word or phrased will be mentioned and this will be checked for in the from, subject, and body of the message.
+  S
+
+  def check_inbox_for_message_with(phrase_s:)
+    messages = find_messages_in_inbox(phrase_s)
+
+    {
+      search_result_count: messages.length,
+      messages: messages.map(&:to_h)
     }
   end
 
@@ -128,7 +141,7 @@ class Toolbox::Gmail < Toolbox
   def get_messages(h = {})
     refresh_token_if_needed do
       get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages").param(h)
-    end&.messages
+    end.try(:messages)
   end
 
   def get_message(id)
@@ -145,6 +158,19 @@ class Toolbox::Gmail < Toolbox
       )
     end
     Message.new(data)
+  end
+
+  def find_messages_in_inbox(phrase)
+    ids = get_messages(q: "#{phrase} in:inbox", maxResults: 5)&.map(&:id) || []
+
+    ids.collect do |id|
+      data = refresh_token_if_needed do
+        get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages/#{id}").param(
+          format: :full
+        )
+      end
+      Message.new(data)
+    end
   end
 
   # These API calls work but we are not using them yet.

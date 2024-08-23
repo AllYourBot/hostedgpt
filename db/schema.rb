@@ -198,6 +198,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_203803) do
     t.integer "branched_from_version"
     t.jsonb "content_tool_calls"
     t.string "tool_call_id"
+    t.integer "input_token_count", default: 0, null: false
+    t.integer "output_token_count", default: 0, null: false
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
     t.index ["conversation_id", "index", "version"], name: "index_messages_on_conversation_id_and_index_and_version", unique: true

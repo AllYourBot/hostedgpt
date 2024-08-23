@@ -40,8 +40,8 @@ class TestController < ApplicationController
       :due_date,
       :list,
       :task_id_or_position,
-      :is_deleted,
-      :is_completed,
+      :deleted,
+      :completed,
     ))
     render json: response
   end
@@ -51,6 +51,7 @@ class TestController < ApplicationController
       :email_address,
       :subject,
       :message,
+      :phrase
     ))
     render json: response
   end
