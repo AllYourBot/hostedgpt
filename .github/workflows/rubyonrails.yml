@@ -29,6 +29,7 @@ jobs:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
       DISPLAY: "=:99"
+      DEBUG: true
 
     steps:
       - uses: nanasess/setup-chromedriver@v2
