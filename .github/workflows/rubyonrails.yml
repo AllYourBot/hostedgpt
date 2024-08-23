@@ -53,8 +53,8 @@ jobs:
       - name: Build CSS
         run: bin/rails tailwindcss:build
 
-      # - name: Setup ssh session
-      #   uses: Warpbuilds/action-debugger@v1.3
+      - name: Setup ssh session
+        uses: Warpbuilds/action-debugger@v1.3
 
       - name: Run system tests
         run: |
