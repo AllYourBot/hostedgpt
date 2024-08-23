@@ -35,7 +35,8 @@ jobs:
       - name: Start chromedriver
         run: |
           set -x
-          chromedriver --url-base=/wd/hub &
+          touch ~/chromedriver.log
+          chromedriver --url-base=/wd/hub | sudo tee -a ~/chromedriver.log &
           # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
 
       - name: Checkout code
