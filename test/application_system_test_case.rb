@@ -8,6 +8,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   fixtures :all
 
+  parallelize workers: 1
+
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
       user_or_person.user
