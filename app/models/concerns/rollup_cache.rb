@@ -23,53 +23,52 @@ module RollupCache
   # book.reset_published_books_count!
 
   class_methods do
-      def rollup_cache(name, opts = {})
-          @_rollup_cache ||= []
-          raise "#{self} defines a rollup_cache #{name} but it's missing a 'belongs_to'" if opts[:belongs_to].nil?
+    def rollup_cache(name, opts = {})
+      @_rollup_cache ||= []
+      raise "#{self} defines a rollup_cache #{name} but it's missing a 'belongs_to'" if opts[:belongs_to].nil?
 
-          multiple_belongs_to_models = Array(opts[:belongs_to])
-          multiple_belongs_to_models.each do |model|
-              @_rollup_cache << [ name.to_sym, opts.except(:belongs_to).merge(belongs_to: model) ]
+      multiple_belongs_to_models = Array(opts[:belongs_to])
+      multiple_belongs_to_models.each do |model|
+        @_rollup_cache << [ name.to_sym, opts.except(:belongs_to).merge(belongs_to: model) ]
 
-              cache_onto_association = self.reflect_on_all_associations.find { |a| a.name == model }
-              binding.pry if cache_onto_association.nil?
-              raise "#{self} defines a rollup_cache #{name} which references #{model} but that association cannot be found" if cache_onto_association.nil?
+        cache_onto_association = self.reflect_on_all_associations.find { |a| a.name == model }
+        raise "#{self} defines a rollup_cache #{name} which references #{model} but that association cannot be found" if cache_onto_association.nil?
 
-              cache_onto_obj = cache_onto_association.klass
+        cache_onto_obj = cache_onto_association.klass
 
-              if opts[:sum] && self.columns.find { |c| c.name == opts[:sum].to_s }.nil?
-                raise "#{self} defines a rollup_cache #{name} which references #{opts[:sum]} but that column does not exist on #{self}"
+        if opts[:sum] && self.columns.find { |c| c.name == opts[:sum].to_s }.nil?
+          raise "#{self} defines a rollup_cache #{name} which references #{opts[:sum]} but that column does not exist on #{self}"
+        end
+
+        # If we don't have an inverse_of, should we raise or simply not create a reset method? For now, let's just not create a reset method.
+        next  if cache_onto_association.inverse_of.nil?
+        # raise "#{self.to_s} has a rollup_cache :#{name} to :#{model} but the inverse_of :#{model} could not be determined, add inverse_of to :#{model}" if cache_onto_association.inverse_of.nil?
+
+        cache_onto_obj.module_eval <<-STR
+          def reset_#{name}!
+            if #{opts[:sum].present?}
+              if #{opts[:if].present?}
+                new_value = self.send(:#{cache_onto_association.inverse_of.name}).select { |record| record.send(:#{opts[:if] || "object_id"}) }.sum
+              else
+                new_value = self.send(:#{cache_onto_association.inverse_of.name}).sum(:#{opts[:sum]})
               end
+            else
+              if #{opts[:if].present?}
+                new_value = self.send(:#{cache_onto_association.inverse_of.name}).select { |record| record.send(:#{opts[:if] || "object_id"}) }.length
+              else
+                new_value = self.send(:#{cache_onto_association.inverse_of.name}).count
+              end
+            end
 
-              # If we don't have an inverse_of, should we raise or simply not create a reset method? For now, let's just not create a reset method.
-              next  if cache_onto_association.inverse_of.nil?
-              # raise "#{self.to_s} has a rollup_cache :#{name} to :#{model} but the inverse_of :#{model} could not be determined, add inverse_of to :#{model}" if cache_onto_association.inverse_of.nil?
-
-              cache_onto_obj.module_eval <<-STR
-                def reset_#{name}!
-                  if #{opts[:sum].present?}
-                    if #{opts[:if].present?}
-                      new_value = self.send(:#{cache_onto_association.inverse_of.name}).select { |record| record.send(:#{opts[:if] || "object_id"}) }.sum
-                    else
-                      new_value = self.send(:#{cache_onto_association.inverse_of.name}).sum(:#{opts[:sum]})
-                    end
-                  else
-                    if #{opts[:if].present?}
-                      new_value = self.send(:#{cache_onto_association.inverse_of.name}).select { |record| record.send(:#{opts[:if] || "object_id"}) }.length
-                    else
-                      new_value = self.send(:#{cache_onto_association.inverse_of.name}).count
-                    end
-                  end
-
-                  self.update_column(:#{name}, new_value)
-                end
-              STR
+            self.update_column(:#{name}, new_value)
           end
+        STR
       end
+    end
 
-      def _rollup_cache
-          @_rollup_cache
-      end
+    def _rollup_cache
+      @_rollup_cache
+    end
   end
 
   included do
