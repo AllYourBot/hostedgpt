@@ -76,6 +76,12 @@ weather:
   title: Weather
   last_assistant_message: weather_explained
 
+image_generation:
+  user: christoph
+  assistant: samantha
+  title: Generating an image
+  last_assistant_message: image_generation_explained
+
 trees:
   user: keith
   assistant: keith_gpt3

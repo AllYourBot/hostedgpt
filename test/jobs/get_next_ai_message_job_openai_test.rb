@@ -3,9 +3,18 @@ require "test_helper"
 class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   setup do
     @conversation = conversations(:greeting)
-    @user = @conversation.user
     @conversation.messages.create! role: :user, content_text: "Still there?", assistant: @conversation.assistant
     @message = @conversation.latest_message_for_version(:latest)
+
+    p "#########"
+    @image_generation = conversations(:image_generation)
+    p @image_generation
+    p @image_generation.messages.create! role: :user, content_text: "Generate an image", assistant: @image_generation.assistant
+    p @image_generation.messages.length
+    @image_generation_message = @image_generation.latest_message_for_version(:latest)
+    p @image_generation_message
+    
+    @user = @conversation.user
     @test_client = TestClient::OpenAI.new(access_token: 'abc')
   end
 
@@ -54,6 +63,52 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     assert second_new_message.tool_call_id.nil?
     assert second_new_message.content_tool_calls.blank?
     refute second_new_message.finished?, "This message SHOULD NOT be considered finished yet"
+  end
+
+  test "properly handles a tool response call from the assistant when images are included" do
+    assert_difference "@image_generation.messages.reload.length", 2 do
+      TestClient::OpenAI.stub :function, "generate_an_image" do
+        TestClient::OpenAI.stub :arguments, { image_generation_prompt_s:  "Kitten" } do
+          TestClient::OpenAI.stub :api_response, TestClient::OpenAI.api_function_response do
+            assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @image_generation.assistant.id)
+          end
+        end
+      end
+    end
+
+    p "###### Message:"
+    p @image_generation_message
+
+    @image_generation_message.reload
+    assert @image_generation_message.content_text.blank?
+    assert @image_generation_message.tool_call_id.nil?
+    assert @image_generation_message.content_tool_calls.present?, "Assistant should have decided to call a tool"
+
+    @new_messages = @image_generation.messages.where("id > ?", @message.id).order(:created_at)
+
+    p "###### Image generation:"
+    p @image_generation
+    @new_messages.messages.each_with_index do |message, index|
+      p "######## #{index}:"
+      p message
+    end
+
+    # first
+    first_new_message = @new_messages.first
+    assert first_new_message.tool?
+    # assert_equal "Hello, Keith!".to_json, first_new_message.content_text, "First new message should have the result of calling the tool"
+    # assert first_new_message.tool_call_id.present?
+    # assert first_new_message.content_tool_calls.blank?
+    # assert_equal @message.content_tool_calls.dig(0, :id), first_new_message.tool_call_id, "ID of tool execution should have matched decision to call the tool"
+    # assert first_new_message.finished?, "This message SHOULD HAVE been considered finished"
+
+    # second
+    # second_new_message = @new_messages.second
+    # assert second_new_message.assistant?, "Second new message should be queued up for the assistant to reply"
+    # assert second_new_message.content_text.nil?, "The content should be nil to indicate that it hasn't even started processing"
+    # assert second_new_message.tool_call_id.nil?
+    # assert second_new_message.content_tool_calls.blank?
+    # refute second_new_message.finished?, "This message SHOULD NOT be considered finished yet"
   end
 
   test "returns early if the message id was invalid" do

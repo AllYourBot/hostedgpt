@@ -14,3 +14,8 @@ taylor:
   first_name: Taylor
   registered_at: 2024-05-31 08:40:05
   preferences: {}
+
+christoph:
+  first_name: Christoph
+  registered_at: 2024-08-25 08:08:08
+  preferences: {}

@@ -660,6 +660,45 @@ weather_explained:
   version: 1
 
 
+image_generation_tool_call:
+  assistant: samantha
+  conversation: image_generation
+  role: assistant
+  tool_call_id:
+  content_text:
+  content_tool_calls: '[{"index": 0, "id": "def456", "type": "function", "function": {"name": "generate_an_image", "arguments": {"image_generation_prompt_s": "World"}}}]'
+  content_document:
+  created_at: 2024-08-25 1:01:00
+  processed_at: 2024-08-25 1:01:00
+  index: 1
+  version: 1
+
+image_generation_tool_result:
+  assistant: samantha
+  conversation: image_generation
+  role: tool
+  tool_call_id: def456
+  content_text: weather is
+  content_tool_calls:
+  content_document:
+  created_at: 2024-08-25 1:02:00
+  processed_at: 2024-08-25 1:02:00
+  index: 2
+  version: 1
+
+image_generation_explained:
+  assistant: samantha
+  conversation: image_generation
+  role: assistant
+  tool_call_id:
+  content_text: The weather in Austin is
+  content_tool_calls:
+  content_document:
+  created_at: 2024-08-25 1:03:00
+  processed_at: 2024-08-25 1:03:00
+  index: 3
+  version: 1 
+
 # Next conversation
 
 trees_explained:
