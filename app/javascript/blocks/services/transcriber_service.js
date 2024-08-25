@@ -1,14 +1,16 @@
 import Service from "../service.js"
 
 export default class extends Service {
-  logLevel_debug
-  attrAccessor_onTextReceived
+  logLevel_info
   attrReader_listening
+  attrAccessor_onSound
 
   new() {
     $.intendedState = 'ended'
     $.state = 'ended'
     $.recognizer = null
+    $.previousWords = ""
+    $.waitForNewThought = false
 
     _initSpeechRecognizer()
     if ($.recognizer) {
@@ -20,23 +22,24 @@ export default class extends Service {
   }
 
   _initSpeechRecognizer() {
-    if ('webkitSpeechRecognition' in window)
-      $.recognizer = new webkitSpeechRecognition()
-    else if ('SpeechRecognition' in window)
-      $.recognizer = new SpeechRecognition()
+    if ('webkitSpeechRecognition' in w)
+      $.recognizer = new w.webkitSpeechRecognition()
+    else if ('SpeechRecognition' in w)
+      $.recognizer = new w.SpeechRecognition()
 
     if ($.recognizer) {
       $.recognizer.continuous = true
       // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition
       $.recognizer.lang = "" // blank uses system's default language
+      $.recognizer.interimResults = true
     }
   }
 
   async start()   { $.intendedState = 'started';  return await _executeStart() }
-  restart()       { $.intendedState = 'started';  _executeRestart() }
+  async restart() { $.intendedState = 'started';  return await _executeRestart() }
   end()           { $.intendedState = 'ended';    _executeEnd() }
-  get listening()  { $.state == 'started' }
-  get ended()      { $.state == 'ended' }
+  get listening() { $.state == 'started' }
+  get ended()     { $.state == 'ended' }
 
 
   // Exeuctors
@@ -68,11 +71,15 @@ export default class extends Service {
       _onStart()
   }
 
+  log_executeRestart
   _executeRestart() {
     if (!$.recognizer) return
+    $.waitForNewThought = true
 
     if ($.state == 'started')
       _executeEnd() // will eventually trigger _onStart() b/c of intendedState
+    else if ($.state == 'ended')
+      _executeStart()
     else
       _onStart()
   }
@@ -89,13 +96,11 @@ export default class extends Service {
 
   // After state change
 
-  log_onStart
   _onStart() {
     $.state = 'started' // we may not intend this but we're here
     if ($.intendedState != 'started') _executeIntendedState()
   }
 
-  log_onEnd
   _onEnd() {
     if ($.state == 'rejected') return
 
@@ -103,7 +108,6 @@ export default class extends Service {
     if ($.intendedState != 'ended') _executeIntendedState()
   }
 
-  log_onError
   _onError(e) {
     if (e.error == 'not-allowed') {
       $.state = 'rejected'
@@ -116,13 +120,34 @@ export default class extends Service {
 
   _onResult(event) {
     let transcript = ""
+    if (_isNewThought(event)) { $.previousWords = ""; $.waitForNewThought = false }
+    if ($.waitForNewThought) return
+
     for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) transcript += event.results[i][0].transcript
+      if (event.results[i].isFinal) {
+        transcript += _adjustedTranscript(event.results[i][0].transcript)
+        $.previousWords = event.results[i][0].transcript
+      }
+      if ($.onSound) $.onSound()
     }
     transcript = transcript.trim()
 
     if (transcript.length <= 1) return
 
-    $.onTextReceived(transcript)
+    SpeakTo.Transcriber.with.words(transcript)
+  }
+
+  _adjustedTranscript(transcript) {
+    // A bug in the speech recognition library on Pixel Chrome causes it to keep repeating all of
+    // what it has heard with each addition rather than just returning the additional words it heard.
+    // Strip those repeated words off.
+    if (transcript.startsWith($.previousWords))
+      return transcript.slice($.previousWords.length)
+    else
+      return transcript
+  }
+
+  _isNewThought(event) {
+    return event.resultIndex == 0
   }
 }

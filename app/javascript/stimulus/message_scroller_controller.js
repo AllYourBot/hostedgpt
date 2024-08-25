@@ -20,10 +20,11 @@ export default class extends Controller {
     if (window.lastMessageControllerInstance) window.lastMessageControllerInstance.disconnect()
     window.lastMessageControllerInstance = this
 
-    this.scrollableTarget = document.getElementById('messages')  // Could not reference this as a target
-                                                                      // because it's higher in DOM than messages.
+    this.scrollableTarget = document.getElementById('messages') // Could not reference this as a target
+                                                                // because it's higher in DOM than messages.
     window.addEventListener('resize', this.throttledScrollDownIfScrolledToBottom)
     window.addEventListener('main-column-changed', this.throttledScrollDownIfScrolledToBottom)
+    document.addEventListener('turbo:morph', this.throttledScrollDownIfScrolledToBottom)
 
     this.considerScroll()
   }
@@ -31,7 +32,7 @@ export default class extends Controller {
   disconnect() {
     window.removeEventListener('resize', this.throttledScrollDownIfScrolledToBottom)
     window.removeEventListener('main-column-changed', this.throttledScrollDownIfScrolledToBottom)
-    window.removeEventListener('load', this.throttledScrollDownIfScrolledToBottom)
+    document.removeEventListener('turbo:morph', this.throttledScrollDownIfScrolledToBottom)
   }
 
   considerScroll() {

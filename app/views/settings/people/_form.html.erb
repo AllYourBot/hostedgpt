@@ -61,13 +61,13 @@
 
         <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
           <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            Enable <span class="font-semibold">Gmail</span><br>
-            Trouble? <%= link_to "Delete app connection", "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
+            Gmail:<br>
+            Trouble? Try <%= link_to "Deleting connection", "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
           </div>
           <% if Current.user.gmail_credential %>
             <div class="text-green-700 font-bold">Enabled</div>
           <% else %>
-            <%= form.label :authorize_gmail, "Authorized Gmail",
+            <%= form.label :authorize_gmail, "Enable Gmail",
               class: %|
                 inline-block font-medium
                 bg-gray-100 dark:bg-gray-900 dark:text-white
@@ -81,13 +81,13 @@
 
         <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
           <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            Enable <span class="font-semibold">Google Tasks</span><br>
-            Trouble? <%= link_to "Delete connection", "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
+            Google Tasks:<br>
+            Trouble? Try <%= link_to "Deleting connection", "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
           </div>
           <% if Current.user.google_tasks_credential %>
             <div class="text-green-700 font-bold">Enabled</div>
           <% else %>
-            <%= form.label :authorize_google_tasks, "Authorized Google Tasks",
+            <%= form.label :authorize_google_tasks, "Enable Google Tasks",
               class: %|
                 inline-block font-medium
                 bg-gray-100 dark:bg-gray-900 dark:text-white

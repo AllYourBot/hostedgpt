@@ -1,5 +1,5 @@
 class Message < ApplicationRecord
-  include DocumentImage, Version, Cancellable, Toolable
+  include DocumentImage, Version, Cancellable, Toolable, TokenCount
 
   belongs_to :assistant
   belongs_to :conversation
@@ -26,7 +26,8 @@ class Message < ApplicationRecord
 
   scope :ordered, -> { latest_version_for_conversation }
 
-  def name
+  def name_for_api
+    # TODO: We should sanitize name within the database since we don't need to support crazy characters
     case role
     when "user" then user.first_name[/\A[a-zA-Z0-9_-]+/]
     when "assistant" then assistant.name[/\A[a-zA-Z0-9_-]+/]
@@ -49,11 +50,11 @@ class Message < ApplicationRecord
   end
 
   def validate_conversation
-    errors.add(:conversation, 'is invalid') unless conversation.user == Current.user
+    errors.add(:conversation, "is invalid") unless conversation.user == Current.user
   end
 
   def validate_assistant
-    errors.add(:assistant, 'is invalid') unless assistant.user == Current.user
+    errors.add(:assistant, "is invalid") unless assistant.user == Current.user
   end
 
   def start_assistant_reply

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class AuthenticateTest < ActionDispatch::IntegrationTest
   # The user-initiated login flows (e.g. password and google oauth)

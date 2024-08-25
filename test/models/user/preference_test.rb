@@ -26,7 +26,7 @@ class User::PreferenceTest < ActiveSupport::TestCase
   end
 
   test "dark_mode preference defaults to system and it can update user dark_mode preference" do
-    new_user = User.create!(first_name: 'First', last_name: 'Last')
+    new_user = User.create!(first_name: "First", last_name: "Last")
     assert_equal "system", new_user.preferences[:dark_mode]
 
     new_user.update!(preferences: { dark_mode: "light" })

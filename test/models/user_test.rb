@@ -10,7 +10,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "has associated credentials" do
-    assert_instance_of PasswordCredential, users(:keith).credentials.type_is('PasswordCredential').first
+    assert_instance_of PasswordCredential, users(:keith).credentials.type_is("PasswordCredential").first
   end
 
   test "has an associated password_credential" do
@@ -85,4 +85,6 @@ class UserTest < ActiveSupport::TestCase
       users(:keith).update!(last_name: nil)
     end
   end
+
+  # Tests for creating_google_credential? are in person_test
 end

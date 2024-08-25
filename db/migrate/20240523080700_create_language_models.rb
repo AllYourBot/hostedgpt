@@ -11,35 +11,35 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
 
     # Initially supported models
     [
-      [1, 'gpt-best', 'Best OpenAI Model', true],
-      [2, 'claude-best', 'Best Anthropic Model', true],
+      [1, "gpt-best", "Best OpenAI Model", true],
+      [2, "claude-best", "Best Anthropic Model", true],
 
-      [3, 'gpt-4o', 'GPT-4o (latest)', true],
-      [4, 'gpt-4o-2024-05-13', 'GPT-4o Omni Multimodal (2024-05-13)', true],
+      [3, "gpt-4o", "GPT-4o (latest)", true],
+      [4, "gpt-4o-2024-05-13", "GPT-4o Omni Multimodal (2024-05-13)", true],
 
-      [5, 'gpt-4-turbo', 'GPT-4 Turbo with Vision (latest)', true],
-      [6, 'gpt-4-turbo-2024-04-09', 'GPT-4 Turbo with Vision (2024-04-09)', true],
-      [7, 'gpt-4-turbo-preview', 'GPT-4 Turbo Preview', false],
-      [8, 'gpt-4-0125-preview', 'GPT-4 Turbo Preview (2024-01-25)', false],
-      [9, 'gpt-4-1106-preview', 'GPT-4 Turbo Preview (2023-11-06)', false],
-      [10, 'gpt-4-vision-preview', 'GPT-4 Turbo with Vision Preview (2023-11-06)', true],
-      [11, 'gpt-4-1106-vision-preview', 'GPT-4 Turbo with Vision Preview (2023-11-06)', true],
+      [5, "gpt-4-turbo", "GPT-4 Turbo with Vision (latest)", true],
+      [6, "gpt-4-turbo-2024-04-09", "GPT-4 Turbo with Vision (2024-04-09)", true],
+      [7, "gpt-4-turbo-preview", "GPT-4 Turbo Preview", false],
+      [8, "gpt-4-0125-preview", "GPT-4 Turbo Preview (2024-01-25)", false],
+      [9, "gpt-4-1106-preview", "GPT-4 Turbo Preview (2023-11-06)", false],
+      [10, "gpt-4-vision-preview", "GPT-4 Turbo with Vision Preview (2023-11-06)", true],
+      [11, "gpt-4-1106-vision-preview", "GPT-4 Turbo with Vision Preview (2023-11-06)", true],
 
-      [12, 'gpt-4', 'GPT-4 (latest)', false],
-      [13, 'gpt-4-0613', 'GPT-4 Snapshot improved function calling (2023-06-13)', false],
+      [12, "gpt-4", "GPT-4 (latest)", false],
+      [13, "gpt-4-0613", "GPT-4 Snapshot improved function calling (2023-06-13)", false],
 
-      [14, 'gpt-3.5-turbo', 'GPT-3.5 Turbo (latest)', false],
-      [15, 'gpt-3.5-turbo-16k-0613', 'GPT-3.5 Turbo (2022-06-13)', false],
-      [16, 'gpt-3.5-turbo-0125', 'GPT-3.5 Turbo (2022-01-25)', false],
-      [17, 'gpt-3.5-turbo-1106', 'GPT-3.5 Turbo (2022-11-06)', false],
-      [18, 'gpt-3.5-turbo-instruct', 'GPT-3.5 Turbo Instruct', false],
+      [14, "gpt-3.5-turbo", "GPT-3.5 Turbo (latest)", false],
+      [15, "gpt-3.5-turbo-16k-0613", "GPT-3.5 Turbo (2022-06-13)", false],
+      [16, "gpt-3.5-turbo-0125", "GPT-3.5 Turbo (2022-01-25)", false],
+      [17, "gpt-3.5-turbo-1106", "GPT-3.5 Turbo (2022-11-06)", false],
+      [18, "gpt-3.5-turbo-instruct", "GPT-3.5 Turbo Instruct", false],
 
-      [19, 'claude-3-opus-20240229', 'Claude 3 Opus (2024-02-29)', true],
-      [20, 'claude-3-sonnet-20240229', 'Claude 3 Sonnet (2024-02-29)', true],
-      [21, 'claude-3-haiku-20240307', 'Claude 3 Haiku (2024-03-07)', true],
-      [22, 'claude-2.1', 'Claude 2.1', false],
-      [23, 'claude-2.0', 'Claude 2.0', false],
-      [24, 'claude-instant-1.2', 'Claude Instant 1.2', false]
+      [19, "claude-3-opus-20240229", "Claude 3 Opus (2024-02-29)", true],
+      [20, "claude-3-sonnet-20240229", "Claude 3 Sonnet (2024-02-29)", true],
+      [21, "claude-3-haiku-20240307", "Claude 3 Haiku (2024-03-07)", true],
+      [22, "claude-2.1", "Claude 2.1", false],
+      [23, "claude-2.0", "Claude 2.0", false],
+      [24, "claude-instant-1.2", "Claude Instant 1.2", false]
     ].each do |position, name, description, supports_images|
       create_without_validation!(position: position, name: name, description: description, supports_images: supports_images)
     end

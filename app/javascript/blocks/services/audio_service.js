@@ -5,8 +5,9 @@ export default class extends Service {
   attrReader_player
 
   new() {
-    $.player = new Audio()
-    $.queue = []
+    $.player = new (w.AudioContext || w.webkitAudioContext)()
+    $.playerSource = null
+    $.queue = new QueueService()
     $.playing = false
     $.speaking = false
     $.busy = false
@@ -16,47 +17,67 @@ export default class extends Service {
     $.loopHandler = runEvery(interval, () => _doThePlaying(audio))
   }
 
-  play(audio, onEnd) {
+  async play(audioUrlOrName, onEnd) {
     if (!$.player) return
     $.loopHandler?.end()
 
-    _doThePlaying(audio, onEnd)
+    await _doThePlaying(audioUrlOrName, onEnd)
   }
 
-  async _doThePlaying(audio, onEnd) {
+  async _doThePlaying(audioUrlOrName, onEnd) {
     $.playing = true
     try {
-      $.player.onended = null
-      $.player.pause()
+      if ($.playerSource) {
+        $.playerSource.onended = null
+        $.playerSource.stop()
+      }
     } catch(e) { log(`audio play failed ${e}`) }
 
-    $.player.onended = () => {
-      $.playing = false
-      if (onEnd) onEnd()
-    }
-    $.player.volume = 1
-    $.player.src = audio.length >= 30 ? audio : _files(audio)
-
     try {
-      await $.player.play()
+      if (audioUrlOrName.length >= 30)
+        audioBuffer = await _loadAudioUrl(audioUrlOrName)
+      else
+        audioBuffer = await _loadBase64Audio(audioUrlOrName)
+
+      $.playerSource = $.player.createBufferSource()
+      $.playerSource.buffer = audioBuffer
+      $.playerSource.connect($.player.destination)
+
+      gainNode = $.player.createGain()
+      gainNode.gain.value = 1
+      $.playerSource.connect(gainNode)
+      gainNode.connect($.player.destination)
+
+      $.playerSource.onended = () => {
+        $.playing = false
+        if (onEnd) onEnd()
+      }
+
+      $.playerSource.start()
     } catch(e) {
+      console.log(e)
       // one cause of exception is if we pause immediately after calling play
     }
   }
 
   stop() {
-    $.player.pause()
-    $.queue = []
+    if ($.playerSource) {
+      $.playerSource.onended = null
+      $.playerSource.stop()
+    }
+    _resetQueue()
+    $.speaking = false
     $.playing = false
     $.busy = false
   }
 
   async speakNow(text, onEnd) {
-    const audio = await SpeechService.audioFromOpenAI(text)
-    play(audio, onEnd)
+    request = new SpeechService()
+    audioUrl = await request.audioFromOpenAI(text)
+    play(audioUrl, onEnd)
   }
 
-  sayNext(words) {
+  speakNext(words) {
     if (words == undefined) return
 
     const index = $.queue.length
@@ -64,6 +85,7 @@ export default class extends Service {
     $.queue.push({
       index: index,
       words: words,
+      request: null,
       audioUrl: null,
       generated: false,
       played: false,
@@ -74,35 +96,21 @@ export default class extends Service {
   }
 
   async _queueWordsToSay(index) {
-    const text = $.queue[index].words
+    const text = $.queue.at(index).words
     let audioUrl
     $.busy = true
 
-    for (let i = 1; i <= 3; i++) {
-      try {
-        // log(`  generating job ${index} attempt ${i} (${text.slice(0, 20)}...)`)
-        audioUrl = await SpeechService.audioFromOpenAI(text)
-      } catch(error) {
-        log(`  error fetching job ${index} attempt ${i}${i == 3 ? ' - giving up' : ''}`)
-        await sleep(500)
-      }
-
-      if (audioUrl != undefined) break
-    }
-    if (audioUrl == undefined) $.queue[index].errored = true
-
-    $.queue[index].audioUrl = audioUrl
-    $.queue[index].generated = true
+    await $.queue.queueRequest(index, text)
 
     void _speakingLoop('generation')
   }
 
   async _speakingLoop(trigger) {
-    const jobsToPlay = $.queue.filter((job) => !job.spoken)
-    // if (trigger) {
-    //   log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`)
-    //   jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`))
-    // }
+    const jobsToPlay = $.queue.all.filter((job) => !job.spoken)
+    if (trigger) {
+      log(`speakingLoop with ${jobsToPlay.length} jobs remaining - "${trigger}" finished & speaking = ${$.speaking} & playing = ${$.playing}`, 'debug')
+      jobsToPlay.forEach((job) => log(`  job #${job.index}: ${job.generated ? 'generated' : 'not generated'} : ${job.spoken ? 'spoken' : 'not spoken'} : ${job.errored ? 'errored' : 'no error'} : ${job.words}...`, 'debug'))
+    }
 
     if (jobsToPlay.length > 0) {
       const job = jobsToPlay[0]
@@ -117,8 +125,8 @@ export default class extends Service {
         _speakThenLoop(job.index, job.words, job.audioUrl)
         return
       } else {
-        await sleep(250)
-        _speakingLoop()
+        await sleep(0.25)
+        _speakingLoop('waiting')
         return
       }
     } else if (!$.speaking) _doneSpeaking()
@@ -139,7 +147,7 @@ export default class extends Service {
     play(audioUrl, () => {
       $.speaking = false
       // f (._plabackSoundTimeoutHandler) clearTimeout(._plabackSoundTimeoutHandler)
-      // log(`  done #${index} - ${words.slice(0,10)}...`)
+      log(`  done #${index} - ${words.slice(0,10)}...`, 'debug')
       _speakingLoop('playback')
     }, words)
   }
@@ -148,7 +156,33 @@ export default class extends Service {
   _doneSpeaking() {
     $.playing = false
     $.busy = false
-    $.queue = []
+    _resetQueue()
+  }
+
+  _resetQueue() {
+    $.queue.reset()
+    $.queue = new QueueService()
+  }
+
+  async _loadAudioUrl(url) {
+    dataBuffer = await fetch(url).then(resp => resp.arrayBuffer())
+    audioBuffer = await $.player.decodeAudioData(dataBuffer)
+    return audioBuffer
+  }
+
+  async _loadBase64Audio(name) {
+    base64String = _files(name).split(',')[1]
+    binaryString = atob(base64String)
+    len = binaryString.length
+    bytes = new Uint8Array(len)
+
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i)
+    }
+
+    dataBuffer = bytes.buffer
+    audioBuffer = await $.player.decodeAudioData(dataBuffer)
+    return audioBuffer
   }
 
   _files(name) {

@@ -1,0 +1,62 @@
+<% if flash.any? %>
+  <div
+    id="alerts"
+    class="
+      fixed top-0 left-0 right-0
+      mx-auto w-[calc(100%-1rem)] md:w-full md:max-w-[750px]
+      z-50
+      transform -translate-y-full transition-transform duration-100 ease-in transition-none
+    "
+    data-controller="transition"
+    data-transition-toggle-class="-translate-y-full transition-none"
+    data-transition-target="transitionable"
+    data-transition-after-timeout-value="200"
+  >
+    <div
+      id="alerts-inner"
+      data-controller="transition"
+      data-transition-toggle-class="hidden"
+      data-transition-target="transitionable"
+    >
+      <% flash.each do |type, text| %>
+        <div
+          role="alert"
+          class="
+            alert <%= type == "alert" ? "alert-error bg-red-300" : "bg-green-300" %>
+            flex items-start
+            pl-5 mt-4 border-1
+            text-gray-800 border-gray-200
+            dark:border-gray-600
+          "
+          data-controller="transition"
+          data-transition-toggle-class="hidden"
+          data-transition-target="transitionable"
+        >
+          <span><%= raw text %></span>
+
+          <%= button_tag type: "button",
+            data: {
+              controller: "keyboard",
+              action: %|
+                transition#toggleClassOn
+              |
+            },
+            class: %|
+              block cursor-pointer group ml-auto
+            | do %>
+            <%= icon "x-mark",
+              variant: :outline,
+              size: 22,
+              class: %|
+                stroke-2
+                text-zinc-600 group-hover:text-zinc-900
+              |,
+              title: "Hide",
+              tooltip: :left
+            %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

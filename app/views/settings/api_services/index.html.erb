@@ -17,9 +17,9 @@
 </p>
 
 <% if @api_services.present? %>
-  <table id="api-services" class="w-full table-auto border-b border-gray-300">
+  <table id="api-services" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
     <thead>
-      <tr class="bg-gray-200">
+      <tr class="bg-gray-200 dark:bg-gray-900">
         <th>Name</th>
         <th>URL</th>
         <th>Driver</th>
@@ -29,7 +29,7 @@
     <tbody>
       <% @api_services.each do |api_service| %>
         <%= turbo_frame_tag dom_id(api_service) do %>
-          <tr class="<%= cycle('bg-gray-100', 'bg-white') %> cursor-pointer" data-href="<%= edit_settings_api_service_path(api_service) %>">
+          <tr class="<%= cycle('bg-gray-100 dark:bg-gray-600', 'bg-white dark:bg-gray-900') %> cursor-pointer" data-href="<%= edit_settings_api_service_path(api_service) %>">
             <td class="underline"><%= api_service.name %></td>
             <td><%= api_service.url %></td>
             <td><%= api_service.driver %></td>

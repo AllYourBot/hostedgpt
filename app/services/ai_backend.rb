@@ -54,7 +54,7 @@ class AIBackend
       s += @user.memories.pluck(:detail).join("\n")
     end
 
-    s += "\n\nThe current time & date for the user is {{ " + DateTime.current.strftime("%-l:%M%P on %A, %B %-d, %Y") + " }}"
+    s += "\n\nFor the user, the current time is #{DateTime.current.strftime("%-l:%M%P")}; the current date is #{DateTime.current.strftime("%A, %B %-d, %Y")}"
     s.strip
   end
 
