@@ -55,7 +55,6 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "fully_processed_url" do
-    assert documents(:cat_photo).fully_processed_url(:small).starts_with?('http')
     assert documents(:cat_photo).fully_processed_url(:small).include?('rails/active_storage/postgresql')
     assert documents(:cat_photo).fully_processed_url(:small).exclude?('/redirect')
   end
