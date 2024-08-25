@@ -193,10 +193,10 @@ class GetNextAIMessageJob < ApplicationJob
         processed_at: Time.current,
       )
 
-      content_hash = JSON.parse(tool_message[:content])
+      parsed = JSON.parse(tool_message[:content]) rescue nil
 
-      if content_hash.has_key?('url_of_dalle_generated_image')
-        url_of_dalle_generated_image = content_hash['url_of_dalle_generated_image']
+      if parsed.is_a?(Hash) && parsed.has_key?("url_of_dalle_generated_image")
+        url_of_dalle_generated_image = parsed["url_of_dalle_generated_image"]
       end
 
     end
