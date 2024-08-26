@@ -6,7 +6,7 @@ module RollupCache
   # Book.rb
   #   belongs_to :author, counter_cache: true
   #
-  # And this keeps author.books_count updatd each time a new author is created, updated, or destroyed.
+  # And this keeps author.books_count updated each time a new author is created, updated, or destroyed.
   # However, this option on belongs_to does not support conditional counter caches. For example,
   # if we only want to cache the published books. rollup_cache was created for this purpose and also
   # to support other rollups such as sums.
