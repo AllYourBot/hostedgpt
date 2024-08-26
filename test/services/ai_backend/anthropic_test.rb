@@ -15,36 +15,36 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     assert @anthropic.client.present?
   end
 
-  test "get_next_chat_message works" do
+  test "stream_next_conversation_message works" do
     assert_equal "https://api.anthropic.com/", @anthropic.client.uri_base
     streamed_text = @test_client.messages(model: "claude_3_opus_20240229", system: "You are a helpful assistant")
 
     assert_equal "Hello this is model claude_3_opus_20240229 with instruction \"You are a helpful assistant\"! How can I assist you today?", streamed_text
   end
 
-  test "preceding_messages constructs a proper response and pivots on images" do
-    preceding_messages = @anthropic.send(:preceding_messages)
+  test "preceding_conversation_messages constructs a proper response and pivots on images" do
+    preceding_conversation_messages = @anthropic.send(:preceding_conversation_messages)
 
-    assert_equal @conversation.messages.length-1, preceding_messages.length
+    assert_equal @conversation.messages.length-1, preceding_conversation_messages.length
 
     @conversation.messages.ordered.each_with_index do |message, i|
       next if @conversation.messages.length == i+1
 
       if message.documents.present?
-        assert_instance_of Array, preceding_messages[i][:content]
-        assert_equal message.documents.length+1, preceding_messages[i][:content].length
+        assert_instance_of Array, preceding_conversation_messages[i][:content]
+        assert_equal message.documents.length+1, preceding_conversation_messages[i][:content].length
       else
-        assert_equal preceding_messages[i][:content], message.content_text
+        assert_equal preceding_conversation_messages[i][:content], message.content_text
       end
     end
   end
 
-  test "preceding_messages only considers messages up to the assistant message being generated" do
+  test "preceding_conversation_messages only considers messages up to the assistant message being generated" do
     @anthropic = AIBackend::Anthropic.new(users(:keith), assistants(:samantha), @conversation, messages(:yes_i_can))
 
-    preceding_messages = @anthropic.send(:preceding_messages)
+    preceding_conversation_messages = @anthropic.send(:preceding_conversation_messages)
 
-    assert_equal 1, preceding_messages.length
-    assert_equal preceding_messages[0][:content], messages(:can_you_hear).content_text
+    assert_equal 1, preceding_conversation_messages.length
+    assert_equal preceding_conversation_messages[0][:content], messages(:can_you_hear).content_text
   end
 end
