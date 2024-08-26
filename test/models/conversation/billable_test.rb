@@ -89,4 +89,15 @@ class Conversation::BillableTest < ActiveSupport::TestCase
     assert_equal adjusted[:input_token_total_count], originals[:input_token_total_count] + adjustments[:input_token_count]
     assert_equal adjusted[:output_token_total_count], originals[:output_token_total_count] + adjustments[:output_token_count]
   end
+
+  test "updating values updates the rollups" do
+    assert_difference "conversations(:debugging).reload.input_token_total_count", 3 do
+      assert_difference "conversations(:debugging).reload.input_token_total_cost", 0.03 do
+        messages(:filter_map).update!(
+          input_token_count: 8,
+          input_token_cost: 0.08,
+        )
+      end
+    end
+  end
 end

@@ -139,18 +139,18 @@ module RollupCache
         updated_record_to_now_pass_if       = is_updating && !passes_if_before_update && passes_if_now
         updated_record_to_no_longer_pass_if = is_updating && passes_if_before_update && !passes_if_now
 
-        if newly_created_record_that_passes_if || updated_record_to_now_pass_if
-          if opts[:sum]
+        if opts[:sum].blank? && (newly_created_record_that_passes_if || updated_record_to_now_pass_if)
+          if opts[:callbacks]
             record = obj.find(obj_id)
-            record.update!(name => record.send(name) + self.send(opts[:sum]))
+            record.update!(name => record.send(name) + 1)
           else
-            if opts[:callbacks]
-              record = obj.find(obj_id)
-              record.update!(name => record.send(name) + 1)
-            else
-              obj.increment_counter(name, obj_id, touch: true)
-            end
+            obj.increment_counter(name, obj_id, touch: true)
           end
+        end
+
+        if (value_was, value_is = saved_changes[opts[:sum]])
+          record = obj.find(obj_id)
+          record.update!(name => record.send(name) + (value_is - value_was))
         end
 
         if destroying_a_record_that_passes_if || updated_record_to_no_longer_pass_if
