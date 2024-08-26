@@ -1,11 +1,13 @@
 class Message < ApplicationRecord
-  include DocumentImage, Version, Cancellable, Toolable, TokenCount
+  include DocumentImage, Version, Cancellable, Toolable
 
   belongs_to :assistant
-  belongs_to :conversation
+  belongs_to :conversation, inverse_of: :messages
   belongs_to :content_document, class_name: "Document", inverse_of: :message, optional: true
   belongs_to :run, optional: true
   has_one :latest_assistant_message_for, class_name: "Conversation", inverse_of: :last_assistant_message, dependent: :nullify
+
+  include Billable
 
   enum role: %w[user assistant tool].index_by(&:to_sym)
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_01_203803) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_23_210939) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -116,6 +116,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_203803) do
     t.datetime "updated_at", null: false
     t.bigint "last_assistant_message_id"
     t.text "external_id", comment: "The Backend AI system (e.g OpenAI) Thread Id"
+    t.decimal "input_token_total_cost", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "output_token_total_cost", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "input_token_total_count", default: 0, null: false
+    t.integer "output_token_total_count", default: 0, null: false
     t.index ["assistant_id"], name: "index_conversations_on_assistant_id"
     t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
@@ -200,6 +204,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_203803) do
     t.string "tool_call_id"
     t.integer "input_token_count", default: 0, null: false
     t.integer "output_token_count", default: 0, null: false
+    t.decimal "input_token_cost", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "output_token_cost", precision: 10, scale: 2, default: "0.0", null: false
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
     t.index ["conversation_id", "index", "version"], name: "index_messages_on_conversation_id_and_index_and_version", unique: true
