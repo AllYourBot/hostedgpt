@@ -1,4 +1,6 @@
 class AIBackend::Anthropic < AIBackend
+  include Tools
+
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
   #
@@ -100,9 +102,5 @@ class AIBackend::Anthropic < AIBackend
         }
       end
     end
-  end
-
-  def format_parallel_tool_calls(content_tool_calls)
-    []
   end
 end

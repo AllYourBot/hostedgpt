@@ -1,4 +1,6 @@
 class AIBackend::OpenAI < AIBackend
+  include Tools
+
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
   #
@@ -114,29 +116,6 @@ class AIBackend::OpenAI < AIBackend
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
       end
     end
-  end
-
-  def format_parallel_tool_calls(content_tool_calls)
-    if content_tool_calls.length > 1 || (calls = content_tool_calls.dig(0, "id"))&.scan("call_").length == 1
-      return content_tool_calls
-    end
-
-    names = find_repeats_and_split(content_tool_calls.dig(0, "function", "name"))
-    args = content_tool_calls.dig(0, "function", "arguments").split(/(?<=})(?={)/)
-
-    calls.split(/(?=call_)/).map.with_index do |id, i|
-      {
-        index: i,
-        type: "function",
-        id: id[0...40],
-        function: {
-          name: names.fetch(i),
-          arguments: args.fetch(i),
-        }
-      }
-    end
-  rescue
-    []
   end
 
   def find_repeats_and_split(str)
