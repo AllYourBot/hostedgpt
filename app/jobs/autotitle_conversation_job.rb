@@ -22,7 +22,11 @@ class AutotitleConversationJob < ApplicationJob
 
   def generate_title_for(text)
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
-    response = ai_backend.get_oneoff_message(system_message, [text], response_format: { type: "json_object" })
+    response = ai_backend.get_oneoff_message(
+      system_message,
+      [text],
+      # response_format: { type: "json_object" })  this causes problems for Groq even though it's supported: https://console.groq.com/docs/api-reference#chat-create
+    )
     JSON.parse(response).dig("topic")
   end
 
@@ -44,7 +48,7 @@ class AutotitleConversationJob < ApplicationJob
 
       Your reply (always do JSON):
       ```
-      { topic: "Rails collection counter" }
+      { "topic": "Rails collection counter" }
       ```
     END
   end
