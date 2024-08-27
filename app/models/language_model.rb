@@ -35,6 +35,11 @@ class LanguageModel < ApplicationRecord
     user == Current.user
   end
 
+  def supports_tools?
+    attributes["supports_tools"] &&
+      api_service.name != "Groq" # TODO: Remove this short circuit once I can debug tool use with Groq
+  end
+
   private
 
   def populate_position

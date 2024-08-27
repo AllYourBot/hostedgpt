@@ -6,23 +6,28 @@ class AutotitleConversationJob < ApplicationJob
   queue_as :default
 
   def perform(conversation_id)
-    conversation = Conversation.find(conversation_id)
-    return false if conversation.assistant.api_service.effective_token.blank? # should we use anthropic key if that's all the user has?
+    @conversation = Conversation.find(conversation_id)
+    return false if @conversation.assistant.api_service.effective_token.blank? # should we use anthropic key if that's all the user has?
 
-    messages = conversation.messages.ordered.limit(4)
+    messages = @conversation.messages.ordered.limit(4)
     raise ConversationNotReady  if messages.empty?
 
-    new_title = Current.set(user: conversation.user) do
+    new_title = Current.set(user: @conversation.user) do
       generate_title_for(messages.map(&:content_text).join("\n"))
     end
-    conversation.update!(title: new_title)
+    @conversation.update!(title: new_title)
   end
 
   private
 
   def generate_title_for(text)
-    json_response = ChatCompletionAPI.get_next_response(system_message, [text], response_format: {type: "json_object"})
-    json_response["topic"]
+    ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
+    response = ai_backend.get_oneoff_message(
+      system_message,
+      [text],
+      # response_format: { type: "json_object" })  this causes problems for Groq even though it's supported: https://console.groq.com/docs/api-reference#chat-create
+    )
+    JSON.parse(response).dig("topic")
   end
 
   def system_message
@@ -43,7 +48,7 @@ class AutotitleConversationJob < ApplicationJob
 
       Your reply (always do JSON):
       ```
-      { topic: "Rails collection counter" }
+      { "topic": "Rails collection counter" }
       ```
     END
   end

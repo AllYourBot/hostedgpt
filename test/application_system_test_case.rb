@@ -145,7 +145,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     yield
 
     new_scroll = nil
-    assert_true "The #{selector} should not have scrolled but position is #{new_scroll} rather than #{scroll_position_first_element_relative_viewport}" do
+    assert_true "The #{selector} should not have scrolled but position changed from #{scroll_position_first_element_relative_viewport}" do
       new_scroll = page.evaluate_script("document.querySelector('#{selector}').children[1].getBoundingClientRect().top")
       scroll_position_first_element_relative_viewport == new_scroll
     end
