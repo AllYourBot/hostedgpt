@@ -27,7 +27,7 @@ class AutotitleConversationJob < ApplicationJob
       [text],
       # response_format: { type: "json_object" })  this causes problems for Groq even though it's supported: https://console.groq.com/docs/api-reference#chat-create
     )
-    JSON.parse(response).dig("topic")
+    response.scan(/(?<=:).+"(.+?)"/).flatten.first.strip
   end
 
   def system_message
