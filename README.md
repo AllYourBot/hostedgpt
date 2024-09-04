@@ -34,8 +34,8 @@ This project is led by an experienced rails developer, but I'm actively looking 
     - [Google OAuth authentication](#google-oauth-authentication)
     - [HTTP header authentication](#http-header-authentication)
 - [Contribute as a developer](#contribute-as-a-developer)
-  - [Setting up development](#setting-up-development)
-    - [Alternatively, you can set up your development environment locally:](#alternatively-you-can-set-up-your-development-environment-locally)
+  - [Running locally](#Running-locally)
+    - [Alternatively, you can skip Docker:](#alternatively-you-can-set-skip-docker)
   - [Running tests](#running-tests)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
@@ -232,9 +232,9 @@ HTTP header authentication is an alternative method to authenticate users based 
 
 We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently wrapping up v0.7 and starting 0.8 [View 0.8 Milestone](https://github.com/allyourbot/hostedgpt/milestone/8). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
-### Setting up development
+### Running locally
 
-The easiest way to get up and running is to use the provided docker compose workflow. The only things you need installed on your computer are Docker and Git.
+The easiest way to get up and running is to use the provided Docker compose workflow. The only things you need installed on your computer are Docker and Git.
 
 1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running
 1. Clone your fork `git clone [repository url]`
@@ -250,7 +250,7 @@ The easiest way to get up and running is to use the provided docker compose work
 Every time you pull new changes down, kill docker (if it's running) and re-run:
 `docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
 
-#### Alternatively, you can set up your development environment locally:
+#### Alternatively, you can skip Docker
 
 HostedGPT requires these services to be running:
 
