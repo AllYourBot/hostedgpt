@@ -65,10 +65,14 @@ module User::Registerable
 
     # Only these don't support tools:
     [
-      ["gpt-3.5-turbo-instruct", "GPT-3.5 Turbo Instruct", false, open_ai_api_service],
-      ["gpt-3.5-turbo-16k-0613", "GPT-3.5 Turbo (2022-06-13)", false, open_ai_api_service],
-    ].each do |api_name, name, supports_images, api_service|
-      language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: false, supports_images: supports_images)
+      ["gpt-3.5-turbo-instruct", "GPT-3.5 Turbo Instruct", false, open_ai_api_service, 150, 200],
+      ["gpt-3.5-turbo-16k-0613", "GPT-3.5 Turbo (2022-06-13)", false, open_ai_api_service, 300, 400],
+    ].each do |api_name, name, supports_images, api_service, input_token_cost_per_million, output_token_cost_per_million|
+      million = BigDecimal(1_000_000)
+      input_token_cost_cents = input_token_cost_per_million/million
+      output_token_cost_cents = output_token_cost_per_million/million
+
+      language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: false, supports_images: supports_images, input_token_cost_cents: input_token_cost_cents, output_token_cost_cents: output_token_cost_cents)
     end
 
     assistants.create! name: "GPT-4o", language_model: language_models.find_by(api_name: LanguageModel::BEST_GPT)
