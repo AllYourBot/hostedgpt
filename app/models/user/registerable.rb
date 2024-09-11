@@ -48,14 +48,18 @@ module User::Registerable
       ["mixtral-8x7b-32768", "Mistral 8 7b", false, groq_api_service, 24, 24],
       ["gemma-7b-it", "Google Gemma 7b", false, groq_api_service, 7, 7],
     ].each do |api_name, name, supports_images, api_service, input_token_cost_per_million, output_token_cost_per_million|
+      million = BigDecimal(1_000_000)
+      input_token_cost_cents = input_token_cost_per_million/million
+      output_token_cost_cents = output_token_cost_per_million/million
+
       language_models.create!(
         api_name: api_name,
         api_service: api_service,
         name: name,
         supports_tools: true,
         supports_images: supports_images,
-        input_token_cost_per_million: input_token_cost_per_million,
-        output_token_cost_per_million: output_token_cost_per_million,
+        input_token_cost_cents: input_token_cost_cents,
+        output_token_cost_cents: output_token_cost_cents,
       )
     end
 
