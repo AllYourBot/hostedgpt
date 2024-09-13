@@ -10,6 +10,18 @@ class LanguageModel < ApplicationRecord
     BEST_GROQ => "llama3-70b-8192",
   }
 
+  BEST_MODEL_INPUT_PRICES = {
+    BEST_GPT => 500,
+    BEST_CLAUDE => 300,
+    BEST_GROQ => 59,
+  }
+
+  BEST_MODEL_OUTPUT_PRICES = {
+    BEST_GPT => 1500,
+    BEST_CLAUDE => 1500,
+    BEST_GROQ => 79,
+  }
+
   belongs_to :user
   belongs_to :api_service
 
