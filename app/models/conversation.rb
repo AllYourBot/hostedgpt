@@ -1,5 +1,6 @@
 class Conversation < ApplicationRecord
-  include Version, Billable
+  # include Version, Billable
+  include Version
 
   belongs_to :user
   belongs_to :assistant
