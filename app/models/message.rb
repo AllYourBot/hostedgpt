@@ -45,6 +45,16 @@ class Message < ApplicationRecord
     !finished?
   end
 
+  def input_token_count=(count)
+    self[:input_token_cost] = assistant.language_model.input_token_cost_cents * count
+    super(count)
+  end
+
+  def output_token_count=(count)
+    self[:output_token_cost] = assistant.language_model.output_token_cost_cents * count
+    super(count)
+  end
+
   private
 
   def create_conversation

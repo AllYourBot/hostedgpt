@@ -26,5 +26,5 @@ Rails.application.config.filter_parameters += [
   :certificate,
   :otp,
   :ssn,
-  filter_regexp(:token, [:token_count, :token_cost]),
+  filter_regexp(:token, [:token_count, :token_cost, :token_total_count, :token_total_cost]),
 ]
