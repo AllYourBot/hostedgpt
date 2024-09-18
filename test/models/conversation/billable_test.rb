@@ -72,8 +72,8 @@ class Conversation::BillableTest < ActiveSupport::TestCase
       content_text: "What is your name?",
       input_token_count: 1,
       output_token_count: 2,
-      input_token_cost: 0.1,
-      output_token_cost: 0.2
+      # input_token_cost: 0.1,
+      # output_token_cost: 0.2
     )
     adjustments = message.attributes.symbolize_keys.slice(:input_token_cost, :output_token_cost, :input_token_count, :output_token_count)
 
@@ -91,13 +91,31 @@ class Conversation::BillableTest < ActiveSupport::TestCase
   end
 
   test "updating values updates the rollups" do
-    assert_difference "conversations(:debugging).reload.input_token_total_count", 3 do
-      assert_difference "conversations(:debugging).reload.input_token_total_cost", 0.03 do
-        messages(:filter_map).update!(
-          input_token_count: 8,
-          input_token_cost: 0.08,
-        )
-      end
-    end
+    conversation_og = conversations(:debugging).attributes.symbolize_keys.slice(
+      :input_token_total_cost,
+      :output_token_total_cost,
+      :input_token_total_count,
+      :output_token_total_count
+    )
+    message_og = messages(:filter_map).attributes.symbolize_keys.slice(:input_token_cost, :input_token_count, :output_token_cost, :output_token_count)
+
+    messages(:filter_map).update!(
+      input_token_count: 8,
+      output_token_count: 90,
+    )
+
+    message_adjusted = messages(:filter_map).reload.attributes.symbolize_keys.slice(:input_token_cost, :input_token_count, :output_token_cost, :output_token_count)
+
+    conversation_adjusted = conversations(:debugging).reload.attributes.symbolize_keys.slice(
+      :input_token_total_cost,
+      :output_token_total_cost,
+      :input_token_total_count,
+      :output_token_total_count
+    )
+
+    assert_equal conversation_adjusted[:input_token_total_cost], conversation_og[:input_token_total_cost] + (message_adjusted[:input_token_cost] - message_og[:input_token_cost])
+    assert_equal conversation_adjusted[:output_token_total_cost], conversation_og[:output_token_total_cost] + (message_adjusted[:output_token_cost] - message_og[:output_token_cost])
+    assert_equal conversation_adjusted[:input_token_total_count], conversation_og[:input_token_total_count] + (message_adjusted[:input_token_count] - message_og[:input_token_count])
+    assert_equal conversation_adjusted[:output_token_total_count], conversation_og[:output_token_total_count] + (message_adjusted[:output_token_count] - message_og[:output_token_count])
   end
 end
