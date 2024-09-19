@@ -57,6 +57,10 @@ class Conversation < ApplicationRecord
       .delete_if { |_, v| v.empty? }
   end
 
+  def total_cost
+    input_token_total_cost + output_token_total_cost
+  end
+
   private
 
   def set_title_async
