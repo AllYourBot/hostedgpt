@@ -85,7 +85,7 @@ module ApplicationHelper
     value.blank? ? n_a : value.to_s
   end
 
-  def to_dollars(cents, precision = 2)
+  def to_dollars(cents, precision: 2)
     number_to_currency(cents / 100.0, precision: precision)
   end
 end

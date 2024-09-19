@@ -92,7 +92,7 @@
               </tr>
               <tr>
                 <td class="pb-2">Cost</td>
-                <td class="pb-2"><%= to_dollars(conversation.input_token_total_cost, 5) %></td>
+                <td class="pb-2"><%= to_dollars(conversation.input_token_total_cost, precision: 5) %></td>
               </tr>
               <tr>
                 <td class="pb-2 font-bold" colspan="2">Output</td>
@@ -103,7 +103,7 @@
               </tr>
               <tr>
                 <td>Cost</td>
-                <td><%= to_dollars(conversation.output_token_total_cost, 5) %></td>
+                <td><%= to_dollars(conversation.output_token_total_cost, precision: 5) %></td>
               </tr>
             </table>
           </footer>
