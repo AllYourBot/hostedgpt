@@ -1,9 +1,9 @@
 name: Ruby on Rails CI
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -71,12 +71,30 @@ jobs:
       DISPLAY: "=:99"
 
     steps:
-      - uses: nanasess/setup-chromedriver@v2
-      - name: Start chromedriver
-        run: |
-          set -x
-          chromedriver --url-base=/wd/hub &
-          # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+      # TODO: use npm not yarn
+      - name: Cache Playwright Chromium browser
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          # key: playwright-browsers-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          # export PLAYWRIGHT_CLI_VERSION=$(bundle exec ruby -e 'require "playwright"; puts Playwright::COMPATIBLE_PLAYWRIGHT_VERSION.strip')
+          key: playwright-browsers-${{ runner.os }}-${{ PLAYWRIGHT_CLI_VERSION }}
+
+      - name: Install Playwright Chromium browser (with deps)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright Chromium browser deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # - uses: nanasess/setup-chromedriver@v2
+      # - name: Start chromedriver
+      #   run: |
+      #     set -x
+      #     chromedriver --url-base=/wd/hub &
+      #     # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
 
       - name: Checkout code
         uses: actions/checkout@v4
