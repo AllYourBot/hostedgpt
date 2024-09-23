@@ -145,7 +145,11 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
-    ffi (1.17.0)
+    ffi (1.17.0-aarch64-linux-musl)
+    ffi (1.17.0-arm64-darwin)
+    ffi (1.17.0-x86_64-darwin)
+    ffi (1.17.0-x86_64-linux-gnu)
+    ffi (1.17.0-x86_64-linux-musl)
     globalid (1.2.1)
       activesupport (>= 6.1)
     hashie (5.0.0)
@@ -410,6 +414,7 @@ GEM
     tiktoken_ruby (0.0.6-arm64-darwin)
     tiktoken_ruby (0.0.6-x86_64-darwin)
     tiktoken_ruby (0.0.6-x86_64-linux)
+    tiktoken_ruby (0.0.6-x86_64-linux-musl)
     timecop (0.9.8)
     timeout (0.4.1)
     tins (1.33.0)
@@ -442,7 +447,8 @@ PLATFORMS
   arm64-darwin-22
   arm64-darwin-23
   x86_64-darwin-23
-  x86_64-linux
+  x86_64-linux-gnu
+  x86_64-linux-musl
 
 DEPENDENCIES
   actioncable-enhanced-postgresql-adapter
