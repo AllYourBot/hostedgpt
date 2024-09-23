@@ -71,7 +71,10 @@ jobs:
       DISPLAY: "=:99"
 
     steps:
-      # TODO: use npm not yarn
+      # print the PLAYWRIGHT_CLI_VERSION env var
+      - name: Print Playwright version (DEBUG)
+        run: echo "PLAYWRIGHT_CLI_VERSION=$PLAYWRIGHT_CLI_VERSION"
+
       - name: Cache Playwright Chromium browser
         id: playwright-cache
         uses: actions/cache@v4
@@ -83,11 +86,11 @@ jobs:
 
       - name: Install Playwright Chromium browser (with deps)
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright@{{ PLAYWRIGHT_CLI_VERSION }} install --with-deps chromium
 
       - name: Install Playwright Chromium browser deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright@{{ PLAYWRIGHT_CLI_VERSION }} install-deps chromium
 
       # - uses: nanasess/setup-chromedriver@v2
       # - name: Start chromedriver
