@@ -85,6 +85,9 @@ jobs:
       - name: Print Playwright version (DEBUG)
         run: echo 'playwright version:'; echo $PLAYWRIGHT_CLI_VERSION
 
+      - name: Print CI and Playwright env vars
+        run: echo 'env vars:'; echo $CI; echo $PLAYWRIGHT_HEADLESS
+
       - name: Install playwright
         run: npx playwright@${{ env.PLAYWRIGHT_CLI_VERSION }} install
 
