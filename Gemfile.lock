@@ -446,6 +446,8 @@ PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
   arm64-darwin-23
+  x86-linux-gnu
+  x86-linux-musl
   x86_64-darwin-23
   x86_64-linux-gnu
   x86_64-linux-musl
