@@ -71,7 +71,20 @@ jobs:
       DISPLAY: "=:99"
 
     steps:
-      # print the PLAYWRIGHT_CLI_VERSION env var
+      # - uses: nanasess/setup-chromedriver@v2
+      # - name: Start chromedriver
+      #   run: |
+      #     set -x
+      #     chromedriver --url-base=/wd/hub &
+      #     # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
       - name: Print Playwright version (DEBUG)
         run: echo "PLAYWRIGHT_CLI_VERSION=$PLAYWRIGHT_CLI_VERSION"
 
@@ -91,20 +104,6 @@ jobs:
       - name: Install Playwright Chromium browser deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright@{{ PLAYWRIGHT_CLI_VERSION }} install-deps chromium
-
-      # - uses: nanasess/setup-chromedriver@v2
-      # - name: Start chromedriver
-      #   run: |
-      #     set -x
-      #     chromedriver --url-base=/wd/hub &
-      #     # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
 
       - name: Set up database schema
         run: bin/rails db:prepare
