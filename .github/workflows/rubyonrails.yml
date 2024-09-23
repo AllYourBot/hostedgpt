@@ -46,8 +46,7 @@ jobs:
         run: bin/rails test
 
   system_tests:
-    if: github.repository == 'AllYourBot/hostedgpt'
-    runs-on: large-runner
+    runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref }}-system
       cancel-in-progress: true
@@ -71,13 +70,6 @@ jobs:
       DISPLAY: "=:99"
 
     steps:
-      # - uses: nanasess/setup-chromedriver@v2
-      # - name: Start chromedriver
-      #   run: |
-      #     set -x
-      #     chromedriver --url-base=/wd/hub &
-      #     # sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -85,25 +77,31 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Set Playwright version env var
+        run: |
+          PLAYWRIGHT_CLI_VERSION=$(bundle exec ruby -e 'require "playwright"; puts Playwright::COMPATIBLE_PLAYWRIGHT_VERSION.strip')
+          echo "PLAYWRIGHT_CLI_VERSION=$PLAYWRIGHT_CLI_VERSION" >> $GITHUB_ENV
+
       - name: Print Playwright version (DEBUG)
-        run: echo "PLAYWRIGHT_CLI_VERSION=$PLAYWRIGHT_CLI_VERSION"
+        run: echo 'playwright version:'; echo $PLAYWRIGHT_CLI_VERSION
+
+      - name: Install playwright
+        run: npx playwright@${{ env.PLAYWRIGHT_CLI_VERSION }} install
 
       - name: Cache Playwright Chromium browser
         id: playwright-cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          # key: playwright-browsers-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          # export PLAYWRIGHT_CLI_VERSION=$(bundle exec ruby -e 'require "playwright"; puts Playwright::COMPATIBLE_PLAYWRIGHT_VERSION.strip')
-          key: playwright-browsers-${{ runner.os }}-${{ PLAYWRIGHT_CLI_VERSION }}
+          key: playwright-browsers-${{ runner.os }}-${{ env.PLAYWRIGHT_CLI_VERSION }}
 
       - name: Install Playwright Chromium browser (with deps)
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright@{{ PLAYWRIGHT_CLI_VERSION }} install --with-deps chromium
+        run: npx playwright@${{ env.PLAYWRIGHT_CLI_VERSION }} install --with-deps chromium
 
       - name: Install Playwright Chromium browser deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright@{{ PLAYWRIGHT_CLI_VERSION }} install-deps chromium
+        run: npx playwright@${{ env.PLAYWRIGHT_CLI_VERSION }} install-deps chromium
 
       - name: Set up database schema
         run: bin/rails db:prepare
@@ -115,7 +113,7 @@ jobs:
         run: |
           echo -e "###\n###\n###\n### NOTICE: If these tests fail because of Net::ReadTimeout then re-run the test suite. I can't figure out this sporadic failure.\n###\n###\n###"
           sed -i 's/hoverOnlyWhenSupported: true/hoverOnlyWhenSupported: false/' config/tailwind.config.js
-          PARALLEL_WORKERS=2 bin/rails test:system
+          bin/rails test:system
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
