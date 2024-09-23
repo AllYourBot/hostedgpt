@@ -141,7 +141,10 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
-    ffi (1.17.0)
+    ffi (1.17.0-aarch64-linux-musl)
+    ffi (1.17.0-arm64-darwin)
+    ffi (1.17.0-x86_64-darwin)
+    ffi (1.17.0-x86_64-linux-gnu)
     globalid (1.2.1)
       activesupport (>= 6.1)
     hashie (5.0.0)
@@ -304,6 +307,7 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.1.0)
+    rb_sys (0.9.102)
     rdoc (6.6.2)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
@@ -403,10 +407,8 @@ GEM
     tailwindcss-rails (2.7.2-x86_64-linux)
       railties (>= 7.0.0)
     thor (1.3.1)
-    tiktoken_ruby (0.0.6-aarch64-linux)
-    tiktoken_ruby (0.0.6-arm64-darwin)
-    tiktoken_ruby (0.0.6-x86_64-darwin)
-    tiktoken_ruby (0.0.6-x86_64-linux)
+    tiktoken_ruby (0.0.6)
+      rb_sys (~> 0.9.68)
     timecop (0.9.8)
     timeout (0.4.1)
     tins (1.33.0)
@@ -488,7 +490,7 @@ DEPENDENCIES
   web-console
 
 RUBY VERSION
-   ruby 3.2.3p157
+   ruby 3.3.5p100
 
 BUNDLED WITH
    2.5.1
