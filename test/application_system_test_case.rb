@@ -85,8 +85,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     key_array = keys.split("+").collect do |key|
       case key
-      when "up"
-        :arrow_up
+      # when "up"
+      #   :arrow_up
       when "meta"
         :command
       when "esc"
@@ -104,7 +104,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       end
     end
 
-    element.send_keys key_array
+    element.send_keys key_array.first
   end
 
   def click_text(text, params = {})
