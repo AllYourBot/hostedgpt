@@ -36,8 +36,8 @@ fi
 bundle install
 bin/rails db:prepare
 
-export PLAYWRIGHT_CLI_VERSION=$(bundle exec ruby -e 'require "playwright"; puts Playwright::COMPATIBLE_PLAYWRIGHT_VERSION.strip')
-npx playwright@${PLAYWRIGHT_CLI_VERSION} install
+# export PLAYWRIGHT_CLI_VERSION=$(bundle exec ruby -e 'require "playwright"; puts Playwright::COMPATIBLE_PLAYWRIGHT_VERSION.strip')
+# npx playwright@${PLAYWRIGHT_CLI_VERSION} install
 
 # Trap SIGTERM and SIGINT and forward them to Overmind
 trap 'kill -TERM $PID' TERM INT

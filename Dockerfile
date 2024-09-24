@@ -105,6 +105,9 @@ RUN --mount=type=cache,id=gems,target=/tmp/bundle \
 
 RUN apk add --no-cache postgresql-client
 
+# # install nodejs
+# RUN apk add --no-cache nodejs npm
+
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 CMD ["./bin/dev"]
 
