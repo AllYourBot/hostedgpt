@@ -4,9 +4,21 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium,
     using: :headless_chrome,
     screen_size: [1400, 800], # this is a short height (800 px) so the viewport scrolls so we can test some scroll interactions
-    options: { timeout: 120 }
+    options: { timeout: 20 }
 
   fixtures :all
+
+  parallelize workers: 1
+
+  # def self.test(name, &block)
+  #   retry_count = 0
+  #   begin
+  #     super(name, &block)
+  #   rescue Net::ReadTimeout => e
+  #     puts "(caught) Net::ReadTimeout: #{e}"
+  #     # debugger
+  #   end
+  # end
 
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
