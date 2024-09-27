@@ -121,6 +121,10 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
+    capybara-playwright-driver (0.5.2)
+      addressable
+      capybara
+      playwright-ruby-client (>= 1.16.0)
     coderay (1.1.3)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
@@ -141,7 +145,11 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
-    ffi (1.17.0)
+    ffi (1.17.0-aarch64-linux-musl)
+    ffi (1.17.0-arm64-darwin)
+    ffi (1.17.0-x86_64-darwin)
+    ffi (1.17.0-x86_64-linux-gnu)
+    ffi (1.17.0-x86_64-linux-musl)
     globalid (1.2.1)
       activesupport (>= 6.1)
     hashie (5.0.0)
@@ -176,6 +184,9 @@ GEM
     marcel (1.0.4)
     matrix (0.4.2)
     method_source (1.0.0)
+    mime-types (3.5.2)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2024.0903)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.22.3)
@@ -234,6 +245,9 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.6)
+    playwright-ruby-client (1.47.0)
+      concurrent-ruby (>= 1.1.6)
+      mime-types (>= 3.0)
     postmark (1.25.1)
       json
     postmark-rails (0.22.1)
@@ -357,13 +371,6 @@ GEM
     ruby_parser (3.21.0)
       racc (~> 1.5)
       sexp_processor (~> 4.16)
-    rubyzip (2.3.2)
-    selenium-webdriver (4.23.0)
-      base64 (~> 0.2)
-      logger (~> 1.4)
-      rexml (~> 3.2, >= 3.2.5)
-      rubyzip (>= 1.2.2, < 3.0)
-      websocket (~> 1.0)
     sexp_processor (4.17.1)
     snaky_hash (2.0.1)
       hashie
@@ -407,6 +414,7 @@ GEM
     tiktoken_ruby (0.0.6-arm64-darwin)
     tiktoken_ruby (0.0.6-x86_64-darwin)
     tiktoken_ruby (0.0.6-x86_64-linux)
+    tiktoken_ruby (0.0.6-x86_64-linux-musl)
     timecop (0.9.8)
     timeout (0.4.1)
     tins (1.33.0)
@@ -426,7 +434,6 @@ GEM
       bindex (>= 0.4.0)
       railties (>= 6.0.0)
     webrick (1.8.1)
-    websocket (1.2.11)
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -439,8 +446,11 @@ PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
   arm64-darwin-23
+  x86-linux-gnu
+  x86-linux-musl
   x86_64-darwin-23
-  x86_64-linux
+  x86_64-linux-gnu
+  x86_64-linux-musl
 
 DEPENDENCIES
   actioncable-enhanced-postgresql-adapter
@@ -451,6 +461,7 @@ DEPENDENCIES
   bootsnap
   byebug
   capybara
+  capybara-playwright-driver
   debug
   dockerfile-rails (>= 1.6)
   image_processing (~> 1.13.0)
@@ -475,7 +486,6 @@ DEPENDENCIES
   rubocop-rails
   ruby-lsp
   ruby-openai (~> 7.0.1)
-  selenium-webdriver (~> 4.23.0)
   solid_queue (~> 0.2.1)
   sprockets-rails
   standard

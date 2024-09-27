@@ -80,7 +80,7 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
-  gem "selenium-webdriver", "~> 4.23.0"
+  gem "capybara-playwright-driver"
   gem "minitest-stub_any_instance"
   gem "rails-controller-testing"
 end

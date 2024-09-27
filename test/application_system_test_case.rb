@@ -1,8 +1,14 @@
 require "test_helper"
 
+Capybara.register_driver :my_playwright do |app|
+  Capybara::Playwright::Driver.new(app,
+    browser_type: ENV["PLAYWRIGHT_BROWSER"]&.to_sym || :chromium,
+    headless: (false unless ENV["CI"] || ENV["PLAYWRIGHT_HEADLESS"]))
+end
+
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium,
-    using: :headless_chrome,
+  driven_by :my_playwright,
+    # using: :headless_chrome,
     screen_size: [1400, 800], # this is a short height (800 px) so the viewport scrolls so we can test some scroll interactions
     options: { timeout: 120 }
 
@@ -79,8 +85,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     key_array = keys.split("+").collect do |key|
       case key
-      when "up"
-        :arrow_up
+      # when "up"
+      #   :arrow_up
       when "meta"
         :command
       when "esc"
@@ -98,7 +104,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       end
     end
 
-    element.send_keys key_array
+    element.send_keys key_array.first
   end
 
   def click_text(text, params = {})
