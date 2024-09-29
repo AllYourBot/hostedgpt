@@ -141,7 +141,10 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
-    ffi (1.17.0)
+    ffi (1.17.0-aarch64-linux-musl)
+    ffi (1.17.0-arm64-darwin)
+    ffi (1.17.0-x86_64-darwin)
+    ffi (1.17.0-x86_64-linux-gnu)
     globalid (1.2.1)
       activesupport (>= 6.1)
     hashie (5.0.0)
@@ -164,7 +167,7 @@ GEM
       base64
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
-    logger (1.6.0)
+    logger (1.6.1)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -314,7 +317,7 @@ GEM
     regexp_parser (2.8.3)
     reline (0.4.3)
       io-console (~> 0.5)
-    rexml (3.2.6)
+    rexml (3.3.8)
     rubocop (1.57.2)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -358,7 +361,7 @@ GEM
       racc (~> 1.5)
       sexp_processor (~> 4.16)
     rubyzip (2.3.2)
-    selenium-webdriver (4.23.0)
+    selenium-webdriver (4.25.0)
       base64 (~> 0.2)
       logger (~> 1.4)
       rexml (~> 3.2, >= 3.2.5)
@@ -475,7 +478,7 @@ DEPENDENCIES
   rubocop-rails
   ruby-lsp
   ruby-openai (~> 7.0.1)
-  selenium-webdriver (~> 4.23.0)
+  selenium-webdriver
   solid_queue (~> 0.2.1)
   sprockets-rails
   standard
