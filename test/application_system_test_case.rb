@@ -8,6 +8,9 @@ Capybara.register_driver :selenium_chrome_headless do |app|
     # opts.add_argument("--disable-site-isolation-trials")
     # opts.add_argument("--window-size=1920,1080")
     # opts.add_argument("--disable-search-engine-choice-screen")
+    opts.add_argument("--disable-dev-shm-usage")
+    opts.add_argument("--window-size=1400,800") # your desired window size
+
     opts.browser_version = "127"
   end
 
