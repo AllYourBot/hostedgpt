@@ -3,6 +3,9 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "minitest/autorun"
 require "pry"
+require "capybara/rails"
+require "capybara/minitest"
+
 Dir[Rails.root.join("test/support/**/*.rb")].sort.each { |file| require file }
 
 Dir[File.join(Rails.root, "lib", "rails_extensions", "**/*.rb")].each do |path|
