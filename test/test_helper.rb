@@ -24,6 +24,23 @@ class ActionDispatch::IntegrationTest
 
   Capybara.default_max_wait_time = 10
 
+  Capybara.register_driver :selenium_chrome_headless do |app|
+    options = ::Selenium::WebDriver::Chrome::Options.new.tap do |opts|
+      opts.add_argument("--headless")
+      # opts.add_argument("--disable-gpu") if Gem.win_platform?
+      # Workaround https://bugs.chromium.org/p/chromedriver/issues/detail?id=2650&q=load&sort=-id&colspec=ID%20Status%20Pri%20Owner%20Summary
+      # opts.add_argument("--disable-site-isolation-trials")
+      # opts.add_argument("--window-size=1920,1080")
+      # opts.add_argument("--disable-search-engine-choice-screen")
+      opts.add_argument("--disable-dev-shm-usage")
+      opts.add_argument("--window-size=1400,800") # your desired window size
+
+      opts.browser_version = "127"
+    end
+
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  end
+
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
       user_or_person.user
