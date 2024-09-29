@@ -22,7 +22,7 @@ class Capybara::Node::Element
   end
 end
 
-Capybara.register_driver :selenium_chrome_headless do |app|
+Capybara.register_driver :headless_chrome do |app|
   options = ::Selenium::WebDriver::Chrome::Options.new.tap do |opts|
     opts.add_argument("--headless")
     # opts.add_argument("--disable-gpu") if Gem.win_platform?
@@ -34,9 +34,9 @@ Capybara.register_driver :selenium_chrome_headless do |app|
     opts.add_argument("--window-size=1400,800") # your desired window size
     # opts.add_argument("--no-sandbox")
     # pin browser version to 127
-    opts.add_argument("--browser-version=127")
+    # opts.add_argument("--browser-version=127")
 
-    # opts.browser_version = "127"
+    opts.browser_version = "127"
   end
 
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
