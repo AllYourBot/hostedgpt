@@ -69,8 +69,24 @@ jobs:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
       DISPLAY: "=:99"
+      CHROME_VERSION=127.0.6533.119
 
     steps:
+      - name: Install Chrome
+        run: |
+          # Download specific Chrome version
+          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
+          # Install Chrome
+          sudo apt-get install -y --allow-downgrades ./google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
+
+      # - name: Install ChromeDriver
+      #   run: |
+      #     wget "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip"
+      #     unzip chromedriver-linux64.zip
+      #     sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
+      #     rm chromedriver-linux64.zip
+      #     rm -rf chromedriver-linux64
+
       - uses: nanasess/setup-chromedriver@v2
       - name: Start chromedriver
         run: |
