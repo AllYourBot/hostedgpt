@@ -79,14 +79,6 @@ jobs:
           # Install Chrome
           sudo apt-get install -y --allow-downgrades ./google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
 
-      # - name: Install ChromeDriver
-      #   run: |
-      #     wget "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip"
-      #     unzip chromedriver-linux64.zip
-      #     sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
-      #     rm chromedriver-linux64.zip
-      #     rm -rf chromedriver-linux64
-
       - uses: nanasess/setup-chromedriver@v2
       - name: Start chromedriver
         run: |
