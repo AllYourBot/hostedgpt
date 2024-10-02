@@ -15,3 +15,10 @@ window.blocks_env = document.getElementsByTagName('html')[0].getAttribute('data-
 // document.addEventListener('turbo:before-morph-element', (e) => { if (document.getElementById('composer').contains(e.target)) console.log('Document: before-morph', e.target) })
 // document.addEventListener('turbo:frame-render', () => console.log('Document: frame render'))
 // document.addEventListener('turbo:before-stream-render', (event) => console.log(`Document: stream render (${event.target.getAttribute('action')} event)`, event.target))
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof MathJax !== 'undefined') {
+    MathJax.typeset();
+  }
+});
