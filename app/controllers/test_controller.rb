@@ -69,7 +69,7 @@ class TestController < ApplicationController
     if params[:key] != "4706"
       head :not_found
     else
-      Current.user = User.find(721687369)
+      Current.user = User.find(1)
     end
   end
 end
