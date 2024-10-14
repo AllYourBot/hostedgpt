@@ -47,5 +47,13 @@ module HostedGPT
     config.to_prepare do # FIXME: Remove this hack after Rails PR merges in: https://github.com/rails/rails/pull/52421
       ActionCable::Channel::Base.include ActionCableBasePatch
     end
+
+
+    # config.web_console.permissions = '172.18.0.0'
+    config.web_console.whitelisted_ips = "172.18.0.0/16"
+
+
+
+    config.log_level = :debug
   end
 end

@@ -1,6 +1,10 @@
 require "active_support/core_ext/integer/time"
+# require "solid_queue"
+
 
 Rails.application.configure do
+
+  puts "Loading development environment"
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time
@@ -60,7 +64,8 @@ Rails.application.configure do
   config.active_job.verbose_enqueue_logs = true
 
   # Suppress logger output for asset requests.
-  config.assets.quiet = true
+  # config.assets.quiet = true
+  config.assets.quiet = false
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
@@ -75,9 +80,38 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   # Since most people will not set the variable, polling will not be logged
-  config.solid_queue.silence_polling = ENV["SOLID_QUEUE_LOG_POLLING_ON"] != "false"
+  # anything but explicitly false
+  log_polling = ENV["SOLID_QUEUE_LOG_POLLING_ON"] != "false"
+  config.solid_queue.silence_polling = log_polling # NOTE: this is backwards, true means silence
+  # config.solid_queue.process_heartbeat_interval = 3.seconds
 
-  config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16"]
+  config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16", "172.18.0.0/16"]
 
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
+
+
+  config.log_level = :debug
+
+  # config.log_tags  = [:subdomain, :uuid]
+  # config.logger    = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+  # config.logger    = Logger.new(STDOUT)
+  # stdout_logger = ActiveSupport::Logger.new(STDOUT)
+
+  stdout_logger = ActiveSupport::Logger.new(STDOUT)
+  # custom_logger = CustomLogger.new(STDOUT)
+  tagged_logger = ActiveSupport::TaggedLogging.new(stdout_logger)
+
+  # class CustomLogger < ActiveSupport::TaggedLogging
+  #   def add(severity, message = nil, progname = nil)
+  #     super unless message.include?("UPDATE \"solid_queue_processes\" SET \"last_heartbeat_at\"")
+  #   end
+  # end
+
+
+  config.log_tags = [ :request_id ]
+  config.logger = tagged_logger
+
+  # config.logger = ActiveSupport::Logger.new(STDOUT)
+
+
 end
