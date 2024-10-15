@@ -90,6 +90,4 @@ Rails.application.configure do
 
   config.log_tags = [ :request_id ]
   config.logger = tagged_logger
-
-
 end
