@@ -9,8 +9,6 @@ require_relative "../lib/true_class"
 require_relative "../lib/nil_class"
 require_relative "../app/models/feature"
 require_relative "../app/models/setting"
-require "solid_queue"
-require_relative "../lib/solid_queue/process"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.

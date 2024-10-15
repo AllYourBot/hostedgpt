@@ -89,29 +89,12 @@ Rails.application.configure do
 
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
 
-
   config.log_level = :debug
-
-  # config.log_tags  = [:subdomain, :uuid]
-  # config.logger    = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
-  # config.logger    = Logger.new(STDOUT)
-  # stdout_logger = ActiveSupport::Logger.new(STDOUT)
-
   stdout_logger = ActiveSupport::Logger.new(STDOUT)
-  # custom_logger = CustomLogger.new(STDOUT)
   tagged_logger = ActiveSupport::TaggedLogging.new(stdout_logger)
-
-  # class CustomLogger < ActiveSupport::TaggedLogging
-  #   def add(severity, message = nil, progname = nil)
-  #     super unless message.include?("UPDATE \"solid_queue_processes\" SET \"last_heartbeat_at\"")
-  #   end
-  # end
-
 
   config.log_tags = [ :request_id ]
   config.logger = tagged_logger
-
-  # config.logger = ActiveSupport::Logger.new(STDOUT)
 
 
 end
