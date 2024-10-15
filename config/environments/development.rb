@@ -1,10 +1,6 @@
 require "active_support/core_ext/integer/time"
-# require "solid_queue"
-
 
 Rails.application.configure do
-
-  puts "Loading development environment"
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time
@@ -64,8 +60,7 @@ Rails.application.configure do
   config.active_job.verbose_enqueue_logs = true
 
   # Suppress logger output for asset requests.
-  # config.assets.quiet = true
-  config.assets.quiet = false
+  config.assets.quiet = true
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
@@ -85,7 +80,7 @@ Rails.application.configure do
   config.solid_queue.silence_polling = log_polling # NOTE: this is backwards, true means silence
   # config.solid_queue.process_heartbeat_interval = 3.seconds
 
-  config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16", "172.18.0.0/16"]
+  config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16"]
 
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
 
