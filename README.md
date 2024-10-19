@@ -27,16 +27,17 @@ This project is led by an experienced rails developer, but I'm actively looking 
   - [Troubleshooting Render](#troubleshooting-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
+- [Deploy to own servers with Kamal2](#deploy-to-own-servers-with-kamal2)
 - [Deploy on your own server](#deploy-on-your-own-server)
 - [Configure optional features](#configure-optional-features)
-  - [Give assistant access to your Google apps](#configuring-google-tools)
+  - [Configuring Google Tools](#configuring-google-tools)
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
     - [Google OAuth authentication](#google-oauth-authentication)
     - [HTTP header authentication](#http-header-authentication)
 - [Contribute as a developer](#contribute-as-a-developer)
-  - [Running locally](#Running-locally)
-    - [Alternatively, you can skip Docker:](#alternatively-you-can-set-skip-docker)
+  - [Running locally](#running-locally)
+    - [Alternatively, you can skip Docker](#alternatively-you-can-skip-docker)
   - [Running tests](#running-tests)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
@@ -110,6 +111,45 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
    [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy)
 
 You may want to read about [configuring optional features](#configure-optional-features).
+
+## Deploy to own servers with Kamal
+
+[Kamal](https://kamal-deploy.org/) offers zero-downtime deploys, rolling restarts, asset bridging, remote builds, accessory service management, and everything else you need to deploy and manage your web app in production with Docker. Originally built for Rails apps, Kamal will work with any type of web app that can be containerized.
+
+First, create your production credentials file.
+
+```plain
+bin/rails credentials:edit --environment production
+```
+
+Next, uncomment the `database:` section
+
+```yaml
+database:
+  password: some-long-string
+```
+
+Second, create a Docker Hub access token and store it as local env var `KAMAL_REGISTRY_PASSWORD`.
+
+Next, edit `config/deploy.yml`:
+
+1. Change `my-docker-user` to your Docker Hub username
+2. Change `168.192.0.1` to the IP or hostname of your target Linux server
+3. If you need to `ssh` into that server as anything other than `root` user, then uncomment `ssh:` section and edit your ssh username.
+4. Change `hostedgpt.example.com` to the public CNAME or A record that points to your server IP address.
+
+Next, commit all the changes to git so Kamal picks them up.
+
+```plain
+git add .
+git commit -m "Add production credentials and Kamal config"
+```
+
+Now, run the command to setup the Postgres database, build HostedGPT using docker buildx, and deploy it to your server:
+
+```plain
+kamal setup
+```
 
 ## Deploy on your own server
 
