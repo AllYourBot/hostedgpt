@@ -21,13 +21,23 @@ class AutotitleConversationJob < ApplicationJob
   private
 
   def generate_title_for(text)
+
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
-    response = ai_backend.get_oneoff_message(
-      system_message,
-      [text],
-      # response_format: { type: "json_object" })  this causes problems for Groq even though it's supported: https://console.groq.com/docs/api-reference#chat-create
-    )
-    response.scan(/(?<=:)"(.+?)"/)&.flatten&.first&.strip
+
+    if ai_backend.class == AIBackend::OpenAI || ai_backend.class == AIBackend::Anthropic
+      response = ai_backend.get_oneoff_message(
+        system_message,
+        [text],
+        response_format: { type: "json_object" }  # this causes problems for Groq even though it's supported: https://console.groq.com/docs/api-reference#chat-create
+      )
+      return JSON.parse(response)["topic"]
+    else
+      response = ai_backend.get_oneoff_message(
+        system_message,
+        [text]
+      )
+      return response.scan(/(?<=:)"(.+?)"/)&.flatten&.first&.strip
+    end
   end
 
   def system_message

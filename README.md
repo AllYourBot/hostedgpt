@@ -27,6 +27,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
   - [Troubleshooting Render](#troubleshooting-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
+- [Deploy on your own server](#deploy-on-your-own-server)
 - [Configure optional features](#configure-optional-features)
   - [Give assistant access to your Google apps](#configuring-google-tools)
   - [Authentication](#authentication)
@@ -109,6 +110,47 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
    [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy)
 
 You may want to read about [configuring optional features](#configure-optional-features).
+
+## Deploy on your own server
+
+There are only two services that need to be running for this app to work: the Puma web server and a Postgres database.
+
+First, ensure your Postgres server is running and verify your connection string using `psql`, for example:
+
+Example:
+```
+psql postgres://app:secret@postgres/hostedgpt_production
+```
+
+Take this DB connection string and start your rails server like this:
+
+```
+RAILS_ENV=production RUN_SOLID_QUEUE_IN_PUMA=true DATABASE_URL=postgres://string-you-verified-above rails s -p 8081
+```
+
+**Note:** You can change the port 8081 to anything you want.
+
+If you are running a proxy such as nginx, be aware that the app is running http and websockets (ws). Here is an example of what your configuration might look like in order to proxy both of those:
+
+```
+<VirtualHost *:443>
+  ServerName chat.${maindomain}
+  ServerAlias chat.${secondarydomain}
+  ProxyPreserveHost On
+  ProxyPass / http://localhost:8081/
+  ProxyPassReverse / http://localhost:8081/
+  RequestHeader set X-Forwarded-Proto "https"
+  <Location /cable>
+    ProxyPreserveHost On
+    ProxyPass ws://localhost:8081/cable
+    ProxyPassReverse ws://localhost:8081/cable
+  </Location>
+
+  Include /etc/letsencrypt/options-ssl-apache.conf
+  SSLCertificateFile /etc/letsencrypt/live/chat.${maindomain}/fullchain.pem
+  SSLCertificateKeyFile /etc/letsencrypt/live/chat.${maindomain}/privkey.pem
+</VirtualHost>
+```
 
 ## Configure optional features
 
