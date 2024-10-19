@@ -26,16 +26,14 @@ module MessagesHelper
   end
 
   def format_for_display(text, append_inside_tag: nil)
-    escaped_text = html_escape(text)
+    html = ::MarkdownRenderer.render_for_display(text, block_code: block_code)
 
-    html = ::MarkdownRenderer.render_for_display(
-      escaped_text,
-      block_code: block_code
-    )
+    # Replace custom math delimiters with LaTeX delimiters
+    html = html.gsub(/\[\[math\]\](.*?)\[\[\/math\]\]/m, '$$\1$$')
 
     html = "<p></p>" if html.blank?
     html = append(html, append_inside_tag) if append_inside_tag
-    return html.html_safe
+    html.html_safe
   end
 
   def thinking_html(message, thinking)
