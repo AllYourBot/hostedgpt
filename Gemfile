@@ -40,7 +40,7 @@ gem "amatch", "~> 0.4.1" # enables fuzzy comparison of strings, a tool uses this
 gem "rails_heroicon", "~> 2.2.0"
 gem "ruby-openai", "~> 7.0.1"
 gem "anthropic", "~> 0.1.0"
-gem "tiktoken_ruby", "~> 0.0.6"
+gem "tiktoken_ruby", "~> 0.0.9"
 gem "solid_queue", "~> 0.2.1"
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable
