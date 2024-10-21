@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 ruby file: ".ruby-version"
 
-gem "rails", "~> 7.1.4"
+gem "rails", "~> 7.2.0"
 gem "sprockets-rails" # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
