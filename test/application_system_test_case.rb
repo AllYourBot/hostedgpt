@@ -9,6 +9,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   fixtures :all
 
   def login_as(user_or_person, password = "secret")
+    puts "application system test case login_as"
+
     user = if user_or_person.is_a?(Person)
       user_or_person.user
     else
