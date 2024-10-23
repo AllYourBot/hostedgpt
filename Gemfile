@@ -7,7 +7,7 @@ ruby file: ".ruby-version"
 gem "rails", "~> 7.1.3"
 gem "sprockets-rails" # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "pg", "~> 1.1"
-gem "puma", ">= 5.0"
+gem "puma", ">= 6.0"
 gem "importmap-rails" # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "turbo-rails", "~> 2.0.5"
 gem "stimulus-rails", "~> 1.3.3"
@@ -42,7 +42,7 @@ gem "rails_heroicon", "~> 2.2.0"
 gem "ruby-openai", "~> 7.0.1"
 gem "anthropic", "~> 0.1.0"
 gem "tiktoken_ruby", "~> 0.0.9"
-gem "solid_queue", "~> 0.2.1"
+gem "solid_queue", "~> 1.0.0"
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable
 gem "aws-sdk-s3", require: false

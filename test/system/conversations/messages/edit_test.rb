@@ -23,8 +23,10 @@ class ConversationMessagesEditTest < ApplicationSystemTestCase
     third.hover
     assert_no_selector "##{third[:id]} [data-role='message-edit']"
 
-    first_message.hover
-    assert_selector "##{first_message[:id]} [data-role='message-edit']"
+    assert_true "First message has an edit icon" do
+      first_message.hover
+      page.all("##{first_message[:id]} [data-role='message-edit']").count == 1
+    end # Hitting a race condition when we do this one as an assert_selector, not sure why
   end
 
   test "edit icon shows a tooltip" do
