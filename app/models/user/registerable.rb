@@ -17,19 +17,20 @@ module User::Registerable
       [LanguageModel::BEST_CLAUDE, "Best Anthropic Model", true, anthropic_api_service, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_CLAUDE], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_CLAUDE]],
       [LanguageModel::BEST_GROQ, "Best Open-Source Model", true, groq_api_service, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GROQ], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GROQ]],
 
-      ["gpt-4o", "GPT-4o (latest)", true, open_ai_api_service, 500, 1500],
+      ["gpt-4o", "GPT-4o (latest)", true, open_ai_api_service, 250, 1000],
+      ["gpt-4o-2024-08-06", "GPT-4o Omni Multimodal (2024-08-06)", true, open_ai_api_service, 250, 1000],
       ["gpt-4o-2024-05-13", "GPT-4o Omni Multimodal (2024-05-13)", true, open_ai_api_service, 500, 1500],
 
       ["gpt-4-turbo", "GPT-4 Turbo with Vision (latest)", true, open_ai_api_service, 1000, 3000],
       ["gpt-4-turbo-2024-04-09", "GPT-4 Turbo with Vision (2024-04-09)", true, open_ai_api_service, 1000, 3000],
-      ["gpt-4-turbo-preview", "GPT-4 Turbo Preview", false, open_ai_api_service, 1000, 3000], # not sure on price
+      ["gpt-4-turbo-preview", "GPT-4 Turbo Preview", false, open_ai_api_service, 1000, 3000],
       ["gpt-4-0125-preview", "GPT-4 Turbo Preview (2024-01-25)", false, open_ai_api_service, 1000, 3000],
       ["gpt-4-1106-preview", "GPT-4 Turbo Preview (2023-11-06)", false, open_ai_api_service, 1000, 3000],
       ["gpt-4-vision-preview", "GPT-4 Turbo with Vision Preview (2023-11-06)", true, open_ai_api_service, 1000, 3000],
-      ["gpt-4-1106-vision-preview", "GPT-4 Turbo with Vision Preview (2023-11-06)", true, open_ai_api_service, 1000, 3000], # not sure on price
+      ["gpt-4-1106-vision-preview", "GPT-4 Turbo with Vision Preview (2023-11-06)", true, open_ai_api_service, 1000, 3000],
 
       ["gpt-4", "GPT-4 (latest)", false, open_ai_api_service, 3000, 6000],
-      ["gpt-4-0613", "GPT-4 Snapshot improved function calling (2023-06-13)", false, open_ai_api_service, 1000, 3000], # not sure on price
+      ["gpt-4-0613", "GPT-4 Snapshot improved function calling (2023-06-13)", false, open_ai_api_service, 1000, 3000],
 
       ["gpt-3.5-turbo", "GPT-3.5 Turbo (latest)", false, open_ai_api_service, 300, 600],
       ["gpt-3.5-turbo-0125", "GPT-3.5 Turbo (2022-01-25)", false, open_ai_api_service, 50, 150],
