@@ -22,6 +22,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     visit logout_path
 
     puts "current path: #{current_path}"
+    # sleep for 500ms to allow the logout to complete
+    sleep 0.5
 
     assert_current_path login_path
     fill_in "email", with: user.email
