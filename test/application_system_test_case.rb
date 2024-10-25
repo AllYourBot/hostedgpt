@@ -9,8 +9,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   fixtures :all
 
   def login_as(user_or_person, password = "secret")
-    puts "application system test case login_as"
-
     user = if user_or_person.is_a?(Person)
       user_or_person.user
     else
@@ -21,9 +19,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     visit logout_path
 
-    puts "current path: #{current_path}"
+    # puts "current path: #{current_path}"
     # sleep for 500ms to allow the logout to complete
-    sleep 0.5
+    # sleep 0.5
 
     assert_current_path login_path
     fill_in "email", with: user.email

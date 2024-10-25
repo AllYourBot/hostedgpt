@@ -26,8 +26,6 @@ class ActionDispatch::IntegrationTest
   Capybara.default_max_wait_time = 10
 
   def login_as(user_or_person, password = "secret")
-    puts "integration test login_as"
-
     user = if user_or_person.is_a?(Person)
       user_or_person.user
     else
