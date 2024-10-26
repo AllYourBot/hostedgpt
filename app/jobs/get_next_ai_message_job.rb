@@ -9,7 +9,8 @@ class GetNextAIMessageJob < ApplicationJob
   retry_on WaitForPrevious, wait: ->(run) { (2**run - 1).seconds }, attempts: 3
 
   def ai_backend
-    @assistant.language_model.ai_backend
+    AIBackend::Gemini
+    #@assistant.language_model.ai_backend
   end
 
   def perform(user_id, message_id, assistant_id, attempt = 1)
@@ -33,7 +34,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     response = Current.set(user: @user, message: @message) do
       ai_backend.new(@conversation.user, @assistant, @conversation, @message)
-      .stream_next_conversation_message do |content_chunk|
+      .stream_next_conversation_message.each do |content_chunk|
         @message.content_text += content_chunk
 
         if Time.current.to_f - last_sent_at.to_f >= 0.1
@@ -47,13 +48,13 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
     end
-    @message.content_tool_calls = response # Typically, stream_next_conversation_message will simply return nil because it executes
+    @message.content_tool_calls = nil # response # Typically, stream_next_conversation_message will simply return nil because it executes
                                            # the content_chunk block to return it's response incrementally. However, tool_call
                                            # responses don't make sense to stream because they can't be executed incrementally
                                            # so we just return the full tool response message at once. The only time we return
                                            # like this is for tool_calls so we know we can simply assign it here.
 
-    raise Faraday::ParsingError if @message.not_finished?
+    #raise Faraday::ParsingError if @message.not_finished?
 
     wrap_up_the_message
     return true

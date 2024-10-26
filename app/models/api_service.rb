@@ -2,6 +2,7 @@ class APIService < ApplicationRecord
   URL_OPEN_AI = "https://api.openai.com/"
   URL_ANTHROPIC = "https://api.anthropic.com/"
   URL_GROQ = "https://api.groq.com/openai/v1/"
+  URL_GEMINI = "https://api.gemini.com/v1/"
 
   belongs_to :user
 
@@ -20,7 +21,7 @@ class APIService < ApplicationRecord
   scope :ordered, -> { order(:name) }
 
   def ai_backend
-    openai? ? AIBackend::OpenAI : AIBackend::Anthropic
+    gemini? ? AIBackend::Gemini : (openai? ? AIBackend::OpenAI : AIBackend::Anthropic)
   end
 
   def requires_token?
