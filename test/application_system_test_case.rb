@@ -18,7 +18,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assistant = user.assistants.ordered.first
 
     visit logout_path
-
     assert_current_path login_path
     fill_in "email", with: user.email
     fill_in "password", with: password

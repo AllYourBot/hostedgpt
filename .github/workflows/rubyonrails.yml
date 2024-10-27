@@ -107,7 +107,7 @@ jobs:
       - name: Run system tests
         run: |
           sed -i 's/hoverOnlyWhenSupported: true/hoverOnlyWhenSupported: false/' config/tailwind.config.js
-          PARALLEL_WORKERS=1 bin/rails test:system
+          PARALLEL_WORKERS=2 bin/rails test:system
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4

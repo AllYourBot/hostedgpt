@@ -47,11 +47,6 @@ class Message < ApplicationRecord
     !finished?
   end
 
-  def max_index_for_version(conversation_version)
-    rel = conversation.messages.for_conversation_version(conversation_version)
-    rel.unscoped.from("(#{rel.reorder(nil).to_sql}) AS subq").select("count(*)").to_a.first["count"].to_i - 1
-  end
-
   private
 
   def create_conversation
