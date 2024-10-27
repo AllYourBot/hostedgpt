@@ -1,14 +1,14 @@
 module ExtendActiveRecord
-  def last(*args)
-    if to_sql.include?("DISTINCT ON")
-      limit = args.first
-      result = unscoped.from("(#{to_sql}) AS subq").select("subq.*").order("subq.index DESC").limit(limit)
+  # def last(*args)
+  #   if to_sql.include?("DISTINCT ON")
+  #     limit = args.first
+  #     result = unscoped.from("(#{to_sql}) AS subq").select("subq.*").order("subq.index DESC").limit(limit)
 
-      limit ? result.reverse : result.first
-    else
-      super(*args)
-    end
-  end
+  #     limit ? result.reverse : result.first
+  #   else
+  #     super(*args)
+  #   end
+  # end
 
   # def count(*args)
   #   if to_sql.include?("DISTINCT ON")
@@ -26,4 +26,4 @@ module ExtendActiveRecord
   # end
 end
 
-ActiveRecord::Relation.prepend(ExtendActiveRecord)
+# ActiveRecord::Relation.prepend(ExtendActiveRecord)
