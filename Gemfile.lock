@@ -1,5 +1,5 @@
 GIT
-  remote: git@github.com:jlvallelonga/rails.git
+  remote: https://github.com/jlvallelonga/rails.git
   revision: 199d7bf99d1bde2547889bcf421c92aaea93994e
   ref: 7-2-stable
   specs:
