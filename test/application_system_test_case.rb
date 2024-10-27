@@ -331,7 +331,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     path_without_query = URI.parse(path).path # ignore_query only ignores it from the current_path so strip ourselves
     assert_current_path path_without_query, ignore_query: true
 
-    # wait_for_initial_scroll_down
+    wait_for_initial_scroll_down
   end
 end
 
