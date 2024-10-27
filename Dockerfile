@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1
 
-### START of FLY ####
+######################## START of FLY #########################
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
 ARG RUBY_VERSION=3.3.5
@@ -84,9 +84,9 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
 
-#### END of FLY ####
+######################### END of FLY ###########################
 
-#### START of DEV ####
+######################### START of DEV #########################
 
 # RUBY_VERSION is the only thing used from anything above
 FROM ruby:${RUBY_VERSION}-alpine AS development
@@ -108,9 +108,9 @@ RUN apk add --no-cache postgresql-client
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 CMD ["./bin/dev"]
 
-#### END of DEV ####
+######################### END of DEV ##############################
 
-#### START of RENDER ####
+######################### START of RENDER #########################
 # Render must be last because render.yml cannot specify a build target so it default to the last one
 # RUBY_VERSION is the only thing used from anything above
 FROM ruby:${RUBY_VERSION}-alpine AS render-production
@@ -147,4 +147,4 @@ USER rails:rails
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
 
-#### END of RENDER ####
+######################### END of RENDER #########################
