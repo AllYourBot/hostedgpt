@@ -72,17 +72,12 @@ jobs:
       CHROME_VERSION: "127.0.6533.119"
 
     steps:
-      - name: Install Chrome deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libcups2 libdrm2 libgbm1 libgtk-4-1 libnspr4 libnss3 libu2f-udev libvulkan1 libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 xdg-utils libappindicator1 libx11-xcb1 xdg-utils libxss1 libappindicator3-1 libindicator3-7
-
       - name: Install Chrome
         run: |
           # Download specific Chrome version
           wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
           # Install Chrome
-          sudo dpkg -i ./google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
+          sudo apt-get install -y --allow-downgrades ./google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
 
       - uses: nanasess/setup-chromedriver@v2
       - name: Start chromedriver
