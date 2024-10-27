@@ -7,7 +7,7 @@ class APIService < ApplicationRecord
 
   has_many :language_models, -> { not_deleted }
 
-  enum driver: %w[ openai anthropic ].index_by(&:to_sym)
+  enum :driver, [:openai, :anthropic]
 
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
   validates :name, :url, presence: true

@@ -1,29 +1,7 @@
 GIT
-  remote: https://github.com/rails/rails
+  remote: https://github.com/rails/rails.git
   revision: 400c620132157125932e564b11d69061784bc597
   branch: 7-2-stable
-  specs:
-    activemodel (7.2.1.2)
-      activesupport (= 7.2.1.2)
-    activerecord (7.2.1.2)
-      activemodel (= 7.2.1.2)
-      activesupport (= 7.2.1.2)
-      timeout (>= 0.4.0)
-    activesupport (7.2.1.2)
-      base64
-      benchmark (>= 0.3)
-      bigdecimal
-      concurrent-ruby (~> 1.0, >= 1.3.1)
-      connection_pool (>= 2.2.5)
-      drb
-      i18n (>= 1.6, < 2)
-      logger (>= 1.4.2)
-      minitest (>= 5.1)
-      securerandom (>= 0.3)
-      tzinfo (~> 2.0, >= 2.0.5)
-
-GEM
-  remote: https://rubygems.org/
   specs:
     actioncable (7.2.1.2)
       actionpack (= 7.2.1.2)
@@ -31,10 +9,6 @@ GEM
       nio4r (~> 2.0)
       websocket-driver (>= 0.6.1)
       zeitwerk (~> 2.6)
-    actioncable-enhanced-postgresql-adapter (1.0.1)
-      actioncable (>= 6.0)
-      connection_pool (>= 2.2.5)
-      pg (~> 1.5)
     actionmailbox (7.2.1.2)
       actionpack (= 7.2.1.2)
       activejob (= 7.2.1.2)
@@ -76,12 +50,60 @@ GEM
     activejob (7.2.1.2)
       activesupport (= 7.2.1.2)
       globalid (>= 0.3.6)
+    activemodel (7.2.1.2)
+      activesupport (= 7.2.1.2)
+    activerecord (7.2.1.2)
+      activemodel (= 7.2.1.2)
+      activesupport (= 7.2.1.2)
+      timeout (>= 0.4.0)
     activestorage (7.2.1.2)
       actionpack (= 7.2.1.2)
       activejob (= 7.2.1.2)
       activerecord (= 7.2.1.2)
       activesupport (= 7.2.1.2)
       marcel (~> 1.0)
+    activesupport (7.2.1.2)
+      base64
+      benchmark (>= 0.3)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.3.1)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      logger (>= 1.4.2)
+      minitest (>= 5.1)
+      securerandom (>= 0.3)
+      tzinfo (~> 2.0, >= 2.0.5)
+    rails (7.2.1.2)
+      actioncable (= 7.2.1.2)
+      actionmailbox (= 7.2.1.2)
+      actionmailer (= 7.2.1.2)
+      actionpack (= 7.2.1.2)
+      actiontext (= 7.2.1.2)
+      actionview (= 7.2.1.2)
+      activejob (= 7.2.1.2)
+      activemodel (= 7.2.1.2)
+      activerecord (= 7.2.1.2)
+      activestorage (= 7.2.1.2)
+      activesupport (= 7.2.1.2)
+      bundler (>= 1.15.0)
+      railties (= 7.2.1.2)
+    railties (7.2.1.2)
+      actionpack (= 7.2.1.2)
+      activesupport (= 7.2.1.2)
+      irb (~> 1.13)
+      rackup (>= 1.0.0)
+      rake (>= 12.2)
+      thor (~> 1.0, >= 1.2.2)
+      zeitwerk (~> 2.6)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actioncable-enhanced-postgresql-adapter (1.0.1)
+      actioncable (>= 6.0)
+      connection_pool (>= 2.2.5)
+      pg (~> 1.5)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     amatch (0.4.1)
@@ -270,20 +292,6 @@ GEM
     rackup (2.1.0)
       rack (>= 3)
       webrick (~> 1.8)
-    rails (7.2.1.2)
-      actioncable (= 7.2.1.2)
-      actionmailbox (= 7.2.1.2)
-      actionmailer (= 7.2.1.2)
-      actionpack (= 7.2.1.2)
-      actiontext (= 7.2.1.2)
-      actionview (= 7.2.1.2)
-      activejob (= 7.2.1.2)
-      activemodel (= 7.2.1.2)
-      activerecord (= 7.2.1.2)
-      activestorage (= 7.2.1.2)
-      activesupport (= 7.2.1.2)
-      bundler (>= 1.15.0)
-      railties (= 7.2.1.2)
     rails-controller-testing (1.0.5)
       actionpack (>= 5.0.1.rc1)
       actionview (>= 5.0.1.rc1)
@@ -298,14 +306,6 @@ GEM
     rails_heroicon (2.2.0)
       actionview
       railties
-    railties (7.2.1.2)
-      actionpack (= 7.2.1.2)
-      activesupport (= 7.2.1.2)
-      irb (~> 1.13)
-      rackup (>= 1.0.0)
-      rake (>= 12.2)
-      thor (~> 1.0, >= 1.2.2)
-      zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.2.1)
     rdoc (6.7.0)
@@ -441,7 +441,7 @@ PLATFORMS
 
 DEPENDENCIES
   actioncable-enhanced-postgresql-adapter
-  activerecord!
+  activesupport!
   amatch (~> 0.4.1)
   anthropic (~> 0.1.0)
   aws-sdk-s3
@@ -465,9 +465,10 @@ DEPENDENCIES
   pry-rails
   puma (>= 6.0)
   rack-cors
-  rails (~> 7.2.0)
+  rails!
   rails-controller-testing
   rails_heroicon (~> 2.2.0)
+  railties!
   redcarpet (~> 3.6.0)
   redis (>= 4.0.1)
   rubocop-capybara

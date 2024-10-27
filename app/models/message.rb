@@ -9,7 +9,7 @@ class Message < ApplicationRecord
 
   include Billable
 
-  enum role: %w[user assistant tool].index_by(&:to_sym)
+  enum :role, [:user, :assistant, :tool]
 
   delegate :user, to: :conversation
 
