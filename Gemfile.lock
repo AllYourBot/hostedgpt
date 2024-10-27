@@ -441,7 +441,6 @@ PLATFORMS
 
 DEPENDENCIES
   actioncable-enhanced-postgresql-adapter
-  activesupport!
   amatch (~> 0.4.1)
   anthropic (~> 0.1.0)
   aws-sdk-s3
@@ -468,7 +467,6 @@ DEPENDENCIES
   rails!
   rails-controller-testing
   rails_heroicon (~> 2.2.0)
-  railties!
   redcarpet (~> 3.6.0)
   redis (>= 4.0.1)
   rubocop-capybara
