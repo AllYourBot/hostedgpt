@@ -72,10 +72,6 @@ jobs:
       CHROME_VERSION: "127.0.6533.119"
 
     steps:
-      - name: Print Environment Variables
-        run: |
-          printenv
-
       - name: Install Chrome deps
         run: |
           sudo apt-get update
