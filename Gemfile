@@ -4,10 +4,10 @@ source "https://rubygems.org"
 
 ruby file: ".ruby-version"
 
-# gem "rails", "~> 7.2.0"
+gem "rails", "~> 7.2.0"
 # gem "rails", "~> 7.2.0", git: "https://github.com/jlvallelonga/rails.git", ref: "7-2-stable"
-gem "rails", git: "https://github.com/rails/rails.git", branch: "7-2-stable"
-# gem "activesupport", git: "https://github.com/rails/rails.git", branch: "7-2-stable"
+# gem "rails", git: "https://github.com/rails/rails.git", branch: "7-2-stable"
+gem "activerecord", git: "https://github.com/rails/rails.git", branch: "7-2-stable"
 # gem "railties", git: "https://github.com/rails/rails.git", branch: "7-2-stable"
 gem "sprockets-rails" # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "pg", "~> 1.1"

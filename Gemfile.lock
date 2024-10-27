@@ -74,20 +74,6 @@ GIT
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
-    rails (7.2.1.2)
-      actioncable (= 7.2.1.2)
-      actionmailbox (= 7.2.1.2)
-      actionmailer (= 7.2.1.2)
-      actionpack (= 7.2.1.2)
-      actiontext (= 7.2.1.2)
-      actionview (= 7.2.1.2)
-      activejob (= 7.2.1.2)
-      activemodel (= 7.2.1.2)
-      activerecord (= 7.2.1.2)
-      activestorage (= 7.2.1.2)
-      activesupport (= 7.2.1.2)
-      bundler (>= 1.15.0)
-      railties (= 7.2.1.2)
     railties (7.2.1.2)
       actionpack (= 7.2.1.2)
       activesupport (= 7.2.1.2)
@@ -292,6 +278,20 @@ GEM
     rackup (2.1.0)
       rack (>= 3)
       webrick (~> 1.8)
+    rails (7.2.1.2)
+      actioncable (= 7.2.1.2)
+      actionmailbox (= 7.2.1.2)
+      actionmailer (= 7.2.1.2)
+      actionpack (= 7.2.1.2)
+      actiontext (= 7.2.1.2)
+      actionview (= 7.2.1.2)
+      activejob (= 7.2.1.2)
+      activemodel (= 7.2.1.2)
+      activerecord (= 7.2.1.2)
+      activestorage (= 7.2.1.2)
+      activesupport (= 7.2.1.2)
+      bundler (>= 1.15.0)
+      railties (= 7.2.1.2)
     rails-controller-testing (1.0.5)
       actionpack (>= 5.0.1.rc1)
       actionview (>= 5.0.1.rc1)
@@ -441,6 +441,7 @@ PLATFORMS
 
 DEPENDENCIES
   actioncable-enhanced-postgresql-adapter
+  activerecord!
   amatch (~> 0.4.1)
   anthropic (~> 0.1.0)
   aws-sdk-s3
@@ -464,7 +465,7 @@ DEPENDENCIES
   pry-rails
   puma (>= 6.0)
   rack-cors
-  rails!
+  rails (~> 7.2.0)
   rails-controller-testing
   rails_heroicon (~> 2.2.0)
   redcarpet (~> 3.6.0)
