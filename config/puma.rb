@@ -23,7 +23,8 @@
 threads_count = ENV.fetch("RAILS_MAX_THREADS") {
   ENV.fetch("RAILS_ENV", "development") == "development" ? 1 : 5
 }
-threads threads_count, threads_count
+# threads threads_count, threads_count
+threads 1, 1
 
 # Specifies that the worker count should equal the number of processors in production.
 if ENV["RAILS_ENV"] == "production"
