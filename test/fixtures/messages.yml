@@ -3,7 +3,7 @@
 hear_me:
   assistant: samantha
   conversation: greeting
-  role: :user
+  role: user
   content_text: Can you hear <b>me</b>? I live in Austin, Texas
   content_document:
   run:
