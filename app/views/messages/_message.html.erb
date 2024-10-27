@@ -7,7 +7,8 @@
   previous_version  = message.versions.push(nil)[ message.versions.index(message.version)-1 ]
   next_version      = message.versions.push(nil)[ message.versions.index(message.version)+1 ]
 end %>
-<% max_index = conversation.messages.for_conversation_version(conversation_version).count - 1 %>
+<%# <% max_index = conversation.messages.for_conversation_version(conversation_version).count - 1 > %>
+<% max_index = message.max_index_for_version(conversation_version) %>
 <% last_message = message_counter == max_index %>
 <% initial_page_load = last_message && !scroll_down # this value is only accurate when rendering last_message %>
 <% scroll_down = scroll_down || initial_page_load %>
