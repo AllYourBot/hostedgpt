@@ -20,11 +20,11 @@ class Document < ApplicationRecord
   validate :file_present
 
   def has_image?(variant = nil)
-    if file.attached? && variant
-      !!has_file_variant_processed?(variant)
-    else
-      false
+    if variant.present?
+      return has_file_variant_processed?(variant)
     end
+
+    file.attached?
   end
 
   def image_path(variant, fallback: nil)

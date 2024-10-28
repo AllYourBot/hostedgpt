@@ -14,6 +14,6 @@ module Message::DocumentImage
   def document_image_path(variant, fallback: nil)
     return nil unless has_document_image?
 
-    documents.first.image_path(variant, fallback)
+    documents.first.image_path(variant, fallback: fallback)
   end
 end
