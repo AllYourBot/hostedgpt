@@ -102,8 +102,10 @@ module ActiveStorage
           purpose: :blob_key
         )
 
+        url_opts = url_options
+        puts "url_opts: #{url_opts}"
         generated_url = url_helpers.rails_postgresql_service_url(verified_key_with_expiration,
-          **url_options,
+          **url_opts,
           disposition: content_disposition,
           content_type: content_type,
           filename: filename,
@@ -147,11 +149,15 @@ module ActiveStorage
     end
 
     def url_options
+      opts = { protocol: Rails.application.config.app_url_protocol, host: Rails.application.config.app_url_host, port: Rails.application.config.app_url_port }
+
       if ActiveStorage::Current.respond_to?(:url_options)
-        ActiveStorage::Current.url_options
-      else
-        { host: ActiveStorage::Current.host }
+        # url_opts = ActiveStorage::Current.url_options
+        # opts = url_opts if url_opts.is_a?(Hash)
+        opts = ActiveStorage::Current.url_options
       end
+
+      return opts
     end
   end
 end
