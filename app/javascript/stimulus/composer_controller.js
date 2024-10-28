@@ -4,6 +4,7 @@ import viewport from "stimulus/utils/viewport"
 export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
     "disabledSubmit", "microphoneEnable", "microphoneDisable" ]
+  static outlets = [ "speaker" ]
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -15,7 +16,10 @@ export default class extends Controller {
     this.determineSubmitButton()
 
     Listener.onConsiderationChanged = async () => {
-      this.inputTarget.value = Listener.consideration
+      if (Listener.consideration == '') return
+
+        this.inputTarget.value = Listener.consideration
+        Reset.Listener()
       if (Listener.attachment) await this.addAttachment()
       this.submitForm()
     }
@@ -56,6 +60,8 @@ export default class extends Controller {
   }
 
   editPrevious() {
+    if (this.inputTarget.value != "") return
+
     const messageEdits = document.querySelectorAll("[data-role='message-edit']")
     const lastEdit = messageEdits[messageEdits.length - 1]
     if (lastEdit) lastEdit.click()
@@ -66,11 +72,10 @@ export default class extends Controller {
 
     event.preventDefault()
 
-    if (Listener.engaged) {
+    if (Listener.engaged)
       this.disableMicrophone()
-    } else if (Microphone.off) {
+    else if (Listener.disabled)
       this.enableMicrophone()
-    }
   }
 
   boundDetermineMicButton = (event) => { this.determineMicButton(event) }
@@ -86,7 +91,7 @@ export default class extends Controller {
       this.enableMicrophone()
     else if (Listener.dismissed)
       this.blinkingMicrophone() // mic still on
-    else if (Microphone.off)
+    else if (Listener.disabled)
       this.disableMicrophone()
   }
 
@@ -97,8 +102,15 @@ export default class extends Controller {
     this.disableComposer()
     this.inputTarget.placeholder = "Speak aloud..."
     if (Listener.disabled) {
+      let micApproved = await Approve.Transcriber.access()
+      if (!micApproved) {
+        alert("You must enable browser microphone access to use this feature. If you are unsure how to do this, try searching: 'change microphone permission for a single website'")
+        this.disableMicrophone()
+        return
+      }
       await Invoke.Listener()
       Play.Speaker.sound("pop")
+      this.speakerOutlet.micActivated()
     }
   }
 
@@ -107,11 +119,16 @@ export default class extends Controller {
     Dismiss.Listener()
   }
 
-  disableMicrophone() {
+  userDisableMicrophone() {
+    this.disableMicrophone(true)
+  }
+
+  disableMicrophone(userClicked = false) {
     this.microphoneEnableTarget.classList.remove('hidden')
     this.microphoneDisableTarget.classList.add('hidden')
     this.enableComposer()
     Disable.Listener()
+    if (userClicked) this.speakerOutlet?.micDisabled()
     this.determineSubmitButton()
   }
 

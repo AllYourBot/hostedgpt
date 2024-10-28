@@ -10,9 +10,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
 
 ## Top features of HostedGPT
 
-- **Your private conversations are not being used for training!**
-  ChatGPT uses your private conversations history to train its models. [OpenAI disclosed this in this article](https://help.openai.com/en/articles/7730893-data-controls-faq), and if you disable it then you lose all your conversation history!
-- **Use GPT-4 and Claude 3 without two $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. HostedGPT costs nothing so you just pay for your GPT-4 and Claude 3 API usage.
+- **Use GPT-4 and Claude 3 without two $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your GPT-4 and Claude 3 API usage.
 - **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
 - **You will never hit the '_You've reached the current usage cap_' errors**.
 
@@ -29,14 +27,16 @@ This project is led by an experienced rails developer, but I'm actively looking 
   - [Troubleshooting Render](#troubleshooting-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
+- [Deploy on your own server](#deploy-on-your-own-server)
 - [Configure optional features](#configure-optional-features)
+  - [Give assistant access to your Google apps](#configuring-google-tools)
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
     - [Google OAuth authentication](#google-oauth-authentication)
     - [HTTP header authentication](#http-header-authentication)
 - [Contribute as a developer](#contribute-as-a-developer)
-  - [Setting up development](#setting-up-development)
-    - [Alternatively, you can set up your development environment locally:](#alternatively-you-can-set-up-your-development-environment-locally)
+  - [Running locally](#Running-locally)
+    - [Alternatively, you can skip Docker:](#alternatively-you-can-set-skip-docker)
   - [Running tests](#running-tests)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
@@ -84,7 +84,9 @@ Deploying to Fly.io is another great option. It's not quite one-click like Rende
 1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
 1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise `curl -L https://fly.io/install.sh | sh` ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
 1. Think of an internal Fly name for your app, it has to be unique to all of Fly, and then in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME_YOU_CHOSE`
-  * Say "Yes" when it asks if you want to tweak these settings
+
+   - Say "Yes" when it asks if you want to tweak these settings
+
 1. When it opens your browser, change the Database to `Fly Postgres` with a unique name such as `[APP_NAME]-db` and you can set the configuration to `Development`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
 1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
@@ -109,18 +111,88 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
 
 You may want to read about [configuring optional features](#configure-optional-features).
 
+## Deploy on your own server
+
+There are only two services that need to be running for this app to work: the Puma web server and a Postgres database.
+
+First, ensure your Postgres server is running and verify your connection string using `psql`, for example:
+
+Example:
+```
+psql postgres://app:secret@postgres/hostedgpt_production
+```
+
+Take this DB connection string and start your rails server like this:
+
+```
+RAILS_ENV=production RUN_SOLID_QUEUE_IN_PUMA=true DATABASE_URL=postgres://string-you-verified-above rails s -p 8081
+```
+
+**Note:** You can change the port 8081 to anything you want.
+
+If you are running a proxy such as nginx, be aware that the app is running http and websockets (ws). Here is an example of what your configuration might look like in order to proxy both of those:
+
+```
+<VirtualHost *:443>
+  ServerName chat.${maindomain}
+  ServerAlias chat.${secondarydomain}
+  ProxyPreserveHost On
+  ProxyPass / http://localhost:8081/
+  ProxyPassReverse / http://localhost:8081/
+  RequestHeader set X-Forwarded-Proto "https"
+  <Location /cable>
+    ProxyPreserveHost On
+    ProxyPass ws://localhost:8081/cable
+    ProxyPassReverse ws://localhost:8081/cable
+  </Location>
+
+  Include /etc/letsencrypt/options-ssl-apache.conf
+  SSLCertificateFile /etc/letsencrypt/live/chat.${maindomain}/fullchain.pem
+  SSLCertificateKeyFile /etc/letsencrypt/live/chat.${maindomain}/privkey.pem
+</VirtualHost>
+```
+
 ## Configure optional features
 
-The file `options.yml` contains a number of Features and Settings you can configure. Simple flags are:
+There are a number of optional feature flags that can be set and settings that can be configured. All of these can be seen in the file `options.yml`, however each is explained below and can be activated by setting environment variables.
 
-- `REGISTRATON_FEATURE` is `true` by default but you can set to `false` to prevent any new people from creating an account.
-- `VOICE_FEATURE` - This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
+- `PRODUCTION_HOST` is blank but you should ideally set this if you are deploying the app with a public domain to protect against host header attacks. For example, set it to `example.com` (leave off https). You may add multiple host names separated by comma, `example.fly.dev, example.com` (whitespace is ignored).
+- `REGISTRATON_FEATURE` is `true` by default, but you can set to `false` to prevent any new people from creating an account.
+- `DEFAULT_LLM_KEYS` is `false` by default so each user is expected to add LLM API keys to their user settings. Set this to `true` if you want to configure LLM API keys that will be shared by all users. Set one or more of the additional variables in order to use this feature. The app will still check if the user has added their own API keys for any services and will use those instead of the default ones.
+  - `DEFAULT_OPENAI_KEY` will be used by the pre-configured OpenAI API Service
+  - `DEFAULT_ANTHROPIC_KEY` will be used by the pre-configured Anthropic API Service
+  - `DEFAULT_GROQ_KEY` will be used by the pre-configured Groq API Service
+- `CLOUDFLARE_STORAGE_FEATURE` is `false` by default so any files that are uploaded while chatting with your assistant will be stored in postgres. This is recommended for small deployments. Set this to `true` if you would like to store message attachments in Cloudflare's R2 storage (this mimics AWS S3). You must also sign up for Cloudflare. The free tier allows 10 GB of storage. After you sign up, you need to create a new bucket and an API token. The API token should have "Object Read and Write" access to your bucket. Take note of your Access Key ID and your Secret Access Key along with your Account ID. Set the following environment variables:
+  - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare Account ID
+  - `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
+  - `CLOUDFLARE_SECRET_ACCESS_KEY` - Your Cloudflare Secret Access Key
+  - `CLOUDFLARE_BUCKET` - The name of the bucket you created
+- `GOOGLE_TOOLS_FEATURE` is `false` by default because this feature is still in development. Set this to `true` if you would like to try the experimental feature where your assistant can access your Gmail, Google Tasks, and soon Google Calendar. After enabling, you need to set up Google OAuth and include the apps as part of the consent flow. See [Configure Google Tools](#configuring-google-tools). After this is done, when each user goes to Settings within the app, there will be a button to explicitly connect their account to Gmail, Google Tasks, and/or Google Calendar. Review `gmail.rb` and `google_tasks.rb` in the directory `app/services/toolbox/` to see what capabilities have currently been built.
+- `VOICE_FEATURE` is `false` by default. This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
+- `PASSWORD_AUTHENTICATION_FEATURE` is `true` by default, see the [Authentication](#authentication) section for more details.
+- `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
+- `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
+
+### Configuring Google Tools
+
+You first need to follow all the steps in the [Google OAuth instructions](#google-oauth-authentication). The only step that is optional is that you can leave `GOOGLE_AUTHENTICATION_FEATURE` set to false, which means you don't have to enable new users to register with Google. However, following all the steps will also set up Google Auth so you can connect Google Tools to your assistants. After, you complete those steps, here is the additional configuration you need to do in order to enable the Google tools:
+
+1. **Go back to the OAuth Consent Screen:**
+
+   - In the navigation menu, go to "APIs & Services" > "OAuth consent screen" > click Edit App
+   - It starts you on "OAuth consent screen" which is already done, at the bottom click "Save and Continue" to advance to "Scopes"
+   - Click "Add or Remove Scopes", check "userinfo.email" and then in "Manually add scopes" paste these URLs, one at a time:
+     - https://www.googleapis.com/auth/gmail.modify (then click "Add To Table")
+     - https://www.googleapis.com/auth/tasks (then click "Add To Table")
+
+2. **Finally, set `GOOGLE_TOOLS_FEATURE` to true**
 
 ### Authentication
 
 HostedGPT supports multiple authentication methods:
 
 <!-- no toc -->
+
 - [Password authentication](#password-authentication)
 - [Google OAuth authentication](#google-oauth-authentication)
 
@@ -134,52 +206,61 @@ Google OAuth authentication is disabled by default. You can enable it by setting
 
 To enable Google OAuth authentication, you need to set up Google OAuth in the Google Cloud Console. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
 
-- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID (alternatively, you can add `google_auth_client_id` to your Rails credentials file)
-- `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret (alternatively, you can add `google_auth_client_secret` to your Rails credentials file)
+- `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret
 
 **Steps to set up:**
 
 1. **Go to the Google Cloud Console and Create a New Project:**
+
    - Open your web browser and navigate to [Google Cloud Console](https://console.cloud.google.com/).
    - Click on the project drop-down menu at the top of the page.
    - Select "New Project"
    - Enter a name for your project and click "Create"
 
 2. **Create OAuth Consent Screen:**
+
    - In the navigation menu, go to "APIs & Services" > "OAuth consent screen"
-   - Select "Internal" and click "Create"
+   - If you want to restrict this to users in your Google Workspace, select "Internal". If you want to let people use any Google account, select "External", and then click "Create"
    - Fill out the required fields (App name, User support email, etc.).
-   - Add your domain (if applicable) and authorized domains.
+   - Add your domain and authorized domains.
    - Click "Save and Continue"
+   - Leaves Scopes blank and click "Save and Continue"
+   - On the "Test Users" screen you can enter a few email address that you want to test with, then "Save and Continue"
 
 3. **Create OAuth Credentials:**
+
    - In the navigation menu, go to "APIs & Services" > "Credentials"
    - Click on "Create Credentials" and select "OAuth client ID"
    - Choose "Web application" as the application type.
    - Fill out the required fields:
      - **Name:** A descriptive name for your client ID, e.g. "HostedGPT"
-     - **Authorized JavaScript origins:** Your application's base URL, e.g., `https://hostedgpt.example.com`
+     - **Authorized JavaScript origins:** Your application's base URL, e.g., `https://example.com`
      - **Authorized Redirect URIs:** Add these paths but replace the base URL with yours:
-       - `https://hostedgpt.example.com/auth/google/callback`
-       - `https://hostedgpt.example.com/auth/gmail/callback`
+       - `https://example.com/auth/google/callback`
+       - `https://example.com/auth/gmail/callback`
    - Click "Create"
 
 4. **Set Environment Variables:**
    - After creating the credentials, you will see a dialog with your Client ID and Client Secret.
    - Set the Client ID and Client Secret as environment variables in your application:
-     - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID ENV or `google_auth_client_id` in your Rails credentials file
-     - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret ENV or `google_auth_client_secret` in your Rails credentials file
+     - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID
+     - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret
 
 #### HTTP header authentication
+
+Note: Enabling this automatically disables Password-based and Google-auth based authentication.
 
 HTTP header authentication is an alternative method to authenticate users based on custom HTTP request headers. This method is useful when you have an existing authentication system, and you want to direct users to HostedGPT and have them skip all authentication steps. They'll be taken right into the app and a HostedGPT user account will be created on the fly. This works by having your existing system set custom headers for authenticated users. This may be a Reverse Proxy (e.g., [Traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/) or [Caddy](https://caddyserver.com/docs/caddyfile/directives/forward_auth)) or a Zero Trust Network (e.g., [Tailscale](https://tailscale.com/kb/1312/serve#identity-headers)).
 
 **Steps to set up:**
 
 1. **Enable the feature:**
+
    - Since HTTP header authentication is disabled by default set the environment variable `HTTP_HEADER_AUTHENTICATION_FEATURE` to `true`. This will automatically disable password and Google OAuth authentication methods.
 
 2. **Configure the request headers:**
+
    - Beware: enabling HTTP header authentication will allow anyone with direct access to the application to impersonate any user by setting the custom headers, if not properly secured. You must ensure that the custom headers are set by a trusted source and are not easily spoofed.
    - Configure your authentication system to set the following request headers when directing users to the HostedGPT app:
    - `HTTP_HEADER_AUTH_EMAIL` - Set this environment variable to the name of the HTTP request header which will contain the user's email address. This defaults to a check for a request header of `X-WEBAUTH-EMAIL` to find the user's email.
@@ -191,11 +272,11 @@ HTTP header authentication is an alternative method to authenticate users based 
 
 ## Contribute as a developer
 
-We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently working on v0.7. [View 0.7 Milestone](https://github.com/allyourbot/hostedgpt/milestone/6). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
+We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently wrapping up v0.7 and starting 0.8 [View 0.8 Milestone](https://github.com/allyourbot/hostedgpt/milestone/8). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
-### Setting up development
+### Running locally
 
-The easiest way to get up and running is to use the provided docker compose workflow. The only things you need installed on your computer are Docker and Git.
+The easiest way to get up and running is to use the provided Docker compose workflow. The only things you need installed on your computer are Docker and Git.
 
 1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running
 1. Clone your fork `git clone [repository url]`
@@ -205,12 +286,13 @@ The easiest way to get up and running is to use the provided docker compose work
 1. Run tests: `docker compose run base rails test` The app has comprehensive test coverage but note that system tests currently do not work in docker.
 1. Open the rails console: `docker compose run base rails console`
 1. Run a psql console: `docker compose run base psql`
+1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `docker compose run base rails db:fixtures:load`
 1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
 
 Every time you pull new changes down, kill docker (if it's running) and re-run:
 `docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
 
-#### Alternatively, you can set up your development environment locally:
+#### Alternatively, you can skip Docker
 
 HostedGPT requires these services to be running:
 
@@ -224,6 +306,7 @@ HostedGPT requires these services to be running:
 1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
 1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
 1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
+1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `bin/rails db:fixtures:load`
 
 Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
 

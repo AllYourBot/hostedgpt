@@ -2,23 +2,28 @@ class Authentications::GoogleOauthController < ApplicationController
   allow_unauthenticated_access
 
   def create
-    if    auth[:provider] == "gmail"       && Current.user
+    if    auth[:provider] == "gmail"           && Current.user
       Current.user.gmail_credential&.destroy
       _, cred = add_person_credentials("GmailCredential")
       raise "You did not check all the permission boxes. Try again." unless cred.has_permission? %w(userinfo.email gmail.modify)
-      cred.save!
-      redirect_to(edit_settings_person_path, notice: "Saved") && return
+      cred.save! && redirect_to(edit_settings_person_path, notice: "Saved") && return
 
-    elsif auth[:provider] == "google"      && credential = GoogleCredential.find_by(oauth_id: auth[:uid])
+    elsif auth[:provider] == "google_tasks"    && Current.user
+      Current.user.google_tasks_credential&.destroy
+      _, cred = add_person_credentials("GoogleTasksCredential")
+      raise "You did not check all the permission boxes. Try again." unless cred.has_permission? %w(userinfo.email tasks)
+      cred.save! && redirect_to(edit_settings_person_path, notice: "Saved") && return
+
+    elsif auth[:provider] == "google"          && credential = GoogleCredential.find_by(oauth_id: auth[:uid])
       @person = credential.user.person
 
     elsif Feature.disabled?(:registration)
       redirect_to(root_path, alert: "Registration is disabled") && return
 
-    elsif auth[:provider] == "google"      && user = Person.find_by(email: auth_email)&.user
+    elsif auth[:provider] == "google"          && user = Person.find_by(email: auth_email)&.user
       @person = init_for_user(user)
 
-    elsif auth[:provider] == "google"      && @person = Person.find_by(email: auth_email)
+    elsif auth[:provider] == "google"          && @person = Person.find_by(email: auth_email)
       @person = init_for_person(@person)
 
     elsif auth[:provider] == "google"
@@ -30,7 +35,12 @@ class Authentications::GoogleOauthController < ApplicationController
       redirect_to root_path
     else
       @person&.errors&.delete :personable
-      redirect_to new_user_path, errors: @person&.errors&.full_messages
+      msg = @person.errors.full_messages.map { |m| m.gsub(/Personable |credentials /, "") }.to_sentence.capitalize
+      if msg.downcase.include?("oauth refresh token can't be blank")
+        msg += " " + helpers.link_to("Google third-party connections", "https://myaccount.google.com/connections", class: "underline") + " search for website, and delete all it's connections. Then try again."
+      end
+
+      redirect_to new_user_path, alert: msg
     end
   rescue => e
     redirect_to edit_settings_person_path, alert: "Error. #{e.message}", status: :see_other

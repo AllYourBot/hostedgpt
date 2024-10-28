@@ -14,9 +14,7 @@
       keydown.ctrl+shift+c@document->keyboard#click:prevent
     "
   >
-    <turbo-frame id="messages">  <%# development works w/o this frame but test does not %>
-      <%= render @messages %>
-    </turbo-frame>
+    <%= render @messages %>
   </div>
 
 <% end %>

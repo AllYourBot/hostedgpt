@@ -53,6 +53,13 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal "example@gmail.com", person.email
   end
 
+  test "person cannot have an invalid email" do
+    person = Person.new(email: "invalid_email")
+    refute person.valid?
+    assert_includes person.errors[:email], "is invalid"
+    refute person.save, "Person with invalid email was saved"
+  end
+
   test "it can create a nested user" do
     person = Person.new({
       email: "example@gmail.com",
@@ -61,7 +68,7 @@ class PersonTest < ActiveSupport::TestCase
         first_name: "John",
         last_name: "Doe",
         credentials_attributes: {
-          '0' => {
+          "0" => {
             type: "PasswordCredential",
             password: "password",
           }
@@ -77,10 +84,51 @@ class PersonTest < ActiveSupport::TestCase
     assert_instance_of PasswordCredential, person.user.credentials.first
   end
 
-  test "person with invalid email format validation" do
-    person = Person.new(email: "invalid_email")
-    refute person.valid?
-    assert_includes person.errors[:email], "is invalid"
-    refute person.save, "Person with invalid email was saved"
+  test "the nested user errors without a last name" do
+    person = Person.new({
+      email: "example@gmail.com",
+      personable_type: "User",
+      personable_attributes: {
+        first_name: "John",
+        last_name: nil,
+        credentials_attributes: {
+          "0" => {
+            type: "PasswordCredential",
+            password: "password",
+          }
+        }
+      }
+    })
+    refute person.save
+    assert person.user.errors[:last_name].present?
+  end
+
+  test "the nested user CAN save without a last name when creating a GoogleCredential" do
+    # This test is in person_test rather than user_test because the oauth controller creates it through person
+    person = Person.new({
+      email: "example@gmail.com",
+      personable_type: "User",
+      personable_attributes: {
+        first_name: "John",
+        last_name: nil,
+        credentials_attributes: {
+          "0" => {
+            type: "GoogleCredential",
+            oauth_id: "123",
+            oauth_token: "abc-123",
+            oauth_refresh_token: "def-456",
+            oauth_email: "other-rob-email@gmail.com",
+            properties: {}
+          }
+        }
+      }
+    })
+    assert_difference "User.count", 1 do
+      assert_difference "Credential.count", 1 do
+        assert person.save
+      end
+    end
+    assert_instance_of User, person.personable
+    assert_instance_of GoogleCredential, person.user.credentials.first
   end
 end

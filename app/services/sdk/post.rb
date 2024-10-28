@@ -7,7 +7,7 @@ class SDK::Post < SDK::Verb
       body = hash.to_json
     end
 
-    response = Faraday.post(@url) do |req|
+    response = post(@url) do |req|
       req.headers = @headers
       req.body = body
     end

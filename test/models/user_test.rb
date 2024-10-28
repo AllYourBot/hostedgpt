@@ -5,8 +5,12 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Person, users(:keith).person
   end
 
+  test "has associated language_models" do
+    assert_instance_of LanguageModel, users(:keith).language_models.first
+  end
+
   test "has associated credentials" do
-    assert_instance_of PasswordCredential, users(:keith).credentials.type_is('PasswordCredential').first
+    assert_instance_of PasswordCredential, users(:keith).credentials.type_is("PasswordCredential").first
   end
 
   test "has an associated password_credential" do
@@ -19,6 +23,10 @@ class UserTest < ActiveSupport::TestCase
 
   test "has an associated gmail_credential" do
     assert_instance_of GmailCredential, users(:keith).gmail_credential
+  end
+
+  test "has an associated google_tasks_credential" do
+    assert_instance_of GoogleTasksCredential, users(:keith).google_tasks_credential
   end
 
   test "has an associated http_header_credential" do
@@ -44,35 +52,19 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "associations are deleted upon destroy" do
-    assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
-      assert_difference "Conversation.count", -users(:keith).conversations.count do
-        assert_difference "Credential.count", -users(:keith).credentials.count do
-          assert_difference "Memory.count", -users(:keith).memories.count do
-            users(:keith).destroy
+    assert_difference "APIService.count", -users(:keith).api_services_including_deleted.count do
+      assert_difference "LanguageModel.count", -users(:keith).language_models_including_deleted.count do
+        assert_difference "Assistant.count", -users(:keith).assistants_including_deleted.count do
+          assert_difference "Conversation.count", -users(:keith).conversations.count do
+            assert_difference "Credential.count", -users(:keith).credentials.count do
+              assert_difference "Memory.count", -users(:keith).memories.count do
+                users(:keith).destroy
+              end
+            end
           end
         end
       end
     end
-  end
-
-  test "encrypts openai_key" do
-    user = users(:keith)
-    old_openai_key = user.openai_key
-    old_cipher_text = user.ciphertext_for(:openai_key)
-    user.update!(openai_key: "new one")
-    assert user.reload
-    refute_equal old_cipher_text, user.ciphertext_for(:openai_key)
-    assert_equal "new one", user.openai_key
-  end
-
-  test "encrypts anthropic_key" do
-    user = users(:keith)
-    old_anthropic_key = user.anthropic_key
-    old_cipher_text = user.ciphertext_for(:anthropic_key)
-    user.update!(anthropic_key: "new one")
-    assert user.reload
-    refute_equal old_cipher_text, user.ciphertext_for(:anthropic_key)
-    assert_equal "new one", user.anthropic_key
   end
 
   test "should validate a user with minimum information" do
@@ -94,27 +86,5 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "when default_llm_keys is enabled but left blank then user keys will be used" do
-    user = users(:keith)
-    user.update!(openai_key: "GPT321", anthropic_key: "CLAUDE123")
-
-    stub_features(default_llm_keys: true) do
-      stub_settings(default_openai_key: " ", default_anthropic_key: "") do
-        assert_equal "GPT321", user.preferred_openai_key
-        assert_equal "CLAUDE123", user.preferred_anthropic_key
-      end
-    end
-  end
-
-  test "when default_llm_keys is enabled then empty user keys will fall back to default keys" do
-    user = users(:keith)
-    user.update!(openai_key: " ", anthropic_key: nil)
-
-    stub_features(default_llm_keys: true) do
-      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123") do
-        assert_equal "gpt321", user.preferred_openai_key
-        assert_equal "claude123", user.preferred_anthropic_key
-      end
-    end
-  end
+  # Tests for creating_google_credential? are in person_test
 end

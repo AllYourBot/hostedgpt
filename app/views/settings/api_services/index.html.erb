@@ -1,0 +1,51 @@
+<h1 class="text-3xl">API Services</h1>
+
+<% if @api_services.empty? %>
+  <p id="no-api-services" class="my-8">
+    You have no API services configured.
+  </p>
+<% end %>
+
+<p class="my-8">
+  <%= link_to "Add New", new_settings_api_service_path,
+    class: %| inline-block font-bold
+      bg-gray-200 dark:bg-gray-900
+      border border-gray-400
+      rounded-lg py-3 px-5
+      cursor-pointer
+    | %>
+</p>
+
+<% if @api_services.present? %>
+  <table id="api-services" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
+    <thead>
+      <tr class="bg-gray-200 dark:bg-gray-900">
+        <th>Name</th>
+        <th>URL</th>
+        <th>Driver</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @api_services.each do |api_service| %>
+        <%= turbo_frame_tag dom_id(api_service) do %>
+          <tr class="<%= cycle('bg-gray-100 dark:bg-gray-600', 'bg-white dark:bg-gray-900') %> cursor-pointer" data-href="<%= edit_settings_api_service_path(api_service) %>">
+            <td class="underline"><%= api_service.name %></td>
+            <td><%= api_service.url %></td>
+            <td><%= api_service.driver %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+
+  <script>
+    document.addEventListener("turbo:load", () => {
+      document.querySelectorAll("table#api-services tr[data-href]").forEach(row => {
+        row.addEventListener("click", () => {
+          window.location.href = row.dataset.href;
+        });
+      });
+    });
+  </script>
+<% end %>

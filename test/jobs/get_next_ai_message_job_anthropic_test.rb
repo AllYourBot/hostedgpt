@@ -6,7 +6,7 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
     @user = @conversation.user
     @conversation.messages.create! role: :user, content_text: "Still there?", assistant: @conversation.assistant
     @message = @conversation.latest_message_for_version(:latest)
-    @test_client = TestClient::Anthropic.new(access_token: 'abc')
+    @test_client = TestClient::Anthropic.new(access_token: "abc")
   end
 
   test "populates the latest message from the assistant" do
@@ -37,8 +37,8 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
   end
 
   test "when anthropic key is blank, a nice error message is displayed" do
-    user = conversations(:greeting).user
-    user.update!(anthropic_key: "")
+    api_service = @conversation.assistant.language_model.api_service
+    api_service.update!(token: "")
 
     assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
     assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for Anthropic"

@@ -33,11 +33,11 @@ class Conversation < ApplicationRecord
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
     values = [
       nil,
-      Date.today.beginning_of_day,
-      (Date.today - 1.day).beginning_of_day,
-      (Date.today - 1.week).beginning_of_day,
-      (Date.today - 1.month).beginning_of_day,
-      (Date.today - 2.months).beginning_of_day,
+      Date.current.beginning_of_day,
+      (Date.current - 1.day).beginning_of_day,
+      (Date.current - 1.week).beginning_of_day,
+      (Date.current - 1.month).beginning_of_day,
+      (Date.current - 2.months).beginning_of_day,
       nil
     ].each_cons(2).map do |range_start, range_end|
       range = case
@@ -55,6 +55,10 @@ class Conversation < ApplicationRecord
     keys.zip(values)
       .to_h
       .delete_if { |_, v| v.empty? }
+  end
+
+  def total_cost
+    input_token_total_cost + output_token_total_cost
   end
 
   private

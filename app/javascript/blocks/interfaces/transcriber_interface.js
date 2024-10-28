@@ -13,39 +13,46 @@ import Interface from "../interface.js"
 
 export default class extends Interface {
   logLevel_info
+  attrReader_covered
 
-  async Flip(turnOn)    { if (turnOn && !$.active) {
+  async Flip(turnOn)    { if (turnOn && $.active) {
+                            Uncover.Transcriber()
+
+                          } else if (turnOn && !$.active) {
                             $.active = true
-                            await $.transcriberService.start()
-                            await Flip.Microphone.on()
+                            Uncover.Transcriber()
                             await Invoke.Listener()
 
                           } else if (!turnOn && $.active) {
                             $.active = false
-                            $.transcriberService.end()
-
-                            await Flip.Microphone.off()
+                            $.dismissPoller?.end()
+                            $.silenceService.stop()
+                            await $.transcriberService.end()
                             await Disable.Listener()
                           }
                         }
 
-  async Approve()       { let approved = await $.transcriberService.start()
-                          $.transcriberService.end()
+  async Approve()       { if (blocks.env.isTest) return true
+                          let approved = await $.transcriberService.start()
+                          await $.transcriberService.end()
                           return approved
                         }
 
   log_SpeakTo
-  SpeakTo(text)         { $.words += text+' '
+  SpeakTo(text)         { if ($.covered) return
+                          $.words += text+' '
+                          $.silenceService.restartCounter()
+                          $.dismissPoller?.end()
                           _shortWaitThenTell()
                         }
 
-  Cover()               { $.covered = true }
-  Uncover()             { $.transcriberService.restart()
-                          $.covered = false
-                          Play.Speaker.sound('pop', () => {
-                            Loop.Speaker.every(8, 'typing1')
-                            _longWaitThenDismis()
-                          })
+  Cover()               { $.covered = true
+                          $.silenceService.stop()
+                        }
+
+  Uncover()             { $.covered = false
+                          $.transcriberService.restart()
+                          _longWaitThenDismis()
                         }
 
   attr_words            = ''
@@ -58,17 +65,16 @@ export default class extends Interface {
 
   new() {
     $.covered = false
+    $.silenceService = new SilenceService
     $.transcriberService = new TranscriberService
-    $.transcriberService.onTextReceived = (text) => {
-      if ($.covered) return
-      SpeakTo.Transcriber.with.words(text)
-    }
+    $.transcriberService.onSound = () => $.silenceService.restartCounter()
   }
 
   _shortWaitThenTell()  { if (!$.tellPoller?.handler) $.tellPoller = runEvery(0.2, () => {
-                            if (Microphone.msOfSilence <= 1800) return // what if there is background noise?
+                            if ($.silenceService.msOfSilence <= 2000) return
                             log('enough silence to start processing...')
 
+                            if (! $.covered) Cover.Transcriber()
                             Tell.Listener.to.consider($.words)
 
                             $.words = ''
@@ -76,8 +82,10 @@ export default class extends Interface {
                           })
                         }
 
-  _longWaitThenDismis() { if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
-                            if (Microphone.msOfSilence <= 30000) return // what if there is background noise?
+  _longWaitThenDismis() { $.silenceService.restartCounter()
+
+                          if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
+                            if ($.silenceService.msOfSilence <= 3000) return
                             log('enough silence to dismiss...')
 
                             Dismiss.Listener()

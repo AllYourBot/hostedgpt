@@ -42,7 +42,7 @@ class Toolbox::OpenMeteo < Toolbox
     end
 
     summary = "Currently in #{location.name} there "
-    summary += weather_code_to_description(d.curr_code).join(' ') # "are scattered showers"
+    summary += weather_code_to_description(d.curr_code).join(" ") # "are scattered showers"
     summary += " and it's #{phrase}#{d.curr.round} degrees"
 
     if d.curr_feel - d.curr >= 5
@@ -53,7 +53,7 @@ class Toolbox::OpenMeteo < Toolbox
 
     if d.today_code != d.curr_code
       summary += "Today "
-      summary += weather_code_to_description(d.today_code).reverse.join(' ') + " forecasted with a "
+      summary += weather_code_to_description(d.today_code).reverse.join(" ") + " forecasted with a "
     else
       summary += "Today there's a forecasted "
     end
@@ -79,7 +79,7 @@ class Toolbox::OpenMeteo < Toolbox
       right_now_rain: format(d.curr_rain, d.qty_unit),
       right_now_showers: format(d.curr_showers, d.qty_unit),
       right_now_snowfall: format(d.curr_snowfall, d.qty_unit),
-      right_now_cloud_cover: format(d.curr_cloud_cover, '%'),
+      right_now_cloud_cover: format(d.curr_cloud_cover, "%"),
 
       today_high: format(d.today_high.round, d.degrees_unit),
       today_high_feels_like: format(d.today_high_feel.round, d.degrees_unit),
@@ -92,7 +92,7 @@ class Toolbox::OpenMeteo < Toolbox
       today_low_feels_like_change_from_yesterday: "#{d.today_low_feel > d.yest_low_feel ? "+" :''}#{(d.today_low_feel - d.yest_low_feel).round(1)} #{d.degrees_unit}",
 
       today_precipitation: format(d.today_precip, d.qty_unit),
-      today_precipitation_probability: format(d.today_precip_prob, '%'),
+      today_precipitation_probability: format(d.today_precip_prob, "%"),
       today_rain: format(d.today_rain, d.qty_unit),
       today_showers: format(d.today_showers, d.qty_unit),
       today_snowfall: format(d.today_snowfall, d.qty_unit),
@@ -120,7 +120,7 @@ class Toolbox::OpenMeteo < Toolbox
     date_end = Date.parse(date_span_end_s).beginning_of_day
 
     if date_begin == date_end &&
-      date_begin.in?([ Date.today.beginning_of_day, (Date.today - 1.day).beginning_of_day ])
+      date_begin.in?([ Date.current.beginning_of_day, (Date.current - 1.day).beginning_of_day ])
 
       return get_current_and_todays_weather(city_s: city_s, state_province_or_region_s: state_province_or_region_s, country_s: country_s)
     end
@@ -252,7 +252,7 @@ class Toolbox::OpenMeteo < Toolbox
   end
 
   def unit(u)
-    u.gsub('°', 'degrees ').gsub('F', 'fahrenheit').gsub('C', 'celcius')
+    u.gsub("°", "degrees ").gsub("F", "fahrenheit").gsub("C", "celcius")
   end
 
   def weather_code_to_description(code)
@@ -290,15 +290,15 @@ class Toolbox::OpenMeteo < Toolbox
   end
 
   def format(num, unit)
-    if unit.include?('celcius')
+    if unit.include?("celcius")
       (num * 2).round / 2.0
-    elsif unit.include?('fahrenheit')
+    elsif unit.include?("fahrenheit")
       num.round
-    elsif unit.include?('in')
+    elsif unit.include?("in")
       (num.round * 4).round / 4.0
-    elsif unit.include?('cm')
+    elsif unit.include?("cm")
       num.round
-    elsif unit.include?('%')
+    elsif unit.include?("%")
       num
     else
       num.round

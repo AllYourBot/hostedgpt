@@ -14,7 +14,8 @@ class SDK::Verb
     url:,
     bearer_token: nil,
     header: nil, # not using default value b/c we want to support nil being passed in to trigger default
-    expected_status: nil
+    expected_status: nil,
+    calling_method: nil
   )
     header ||= {}
     expected_status ||= [200]
@@ -23,13 +24,17 @@ class SDK::Verb
     header.merge!({ Authorization: "Bearer #{bearer_token}" }) if bearer_token
     @headers = fix_keys(header)
     @expected_statuses = Array(expected_status)
+    @calling_method = calling_method
   end
 
   def handle(response)
     raise ResponseError.new(response) if !response.status.in? @expected_statuses
-    return response if response.status != 200
 
-    OpenData.new JSON.parse(response.body)
+    if response.status.between?(200, 299)
+      response.body.presence && OpenData.for(JSON.parse(response.body))
+    else
+      response
+    end
   end
 
   def json_content
@@ -84,5 +89,48 @@ class SDK::Verb
       end
     end
     merged_hash
+  end
+
+  def get(url, &block)
+    if self.class.respond_to?("mocked_response_get_#{@calling_method}")
+      self.class.send("mocked_response_get_#{@calling_method}")
+    else
+      possible_test_warning(:get)
+      Faraday.get(url, &block)
+    end
+  end
+
+  def post(url, &block)
+    if self.class.respond_to?("mocked_response_post_#{@calling_method}")
+      self.class.send("mocked_response_post_#{@calling_method}")
+    else
+      possible_test_warning(:post)
+      Faraday.post(url, &block)
+    end
+  end
+
+  def patch(url, &block)
+    if self.class.respond_to?("mocked_response_patch_#{@calling_method}")
+      self.class.send("mocked_response_patch_#{@calling_method}")
+    else
+      possible_test_warning(:patch)
+      Faraday.patch(url, &block)
+    end
+  end
+
+  def delete(url, &block)
+    if self.class.respond_to?("mocked_response_delete_#{@calling_method}")
+      self.class.send("mocked_response_delete_#{@calling_method}")
+    else
+      possible_test_warning(:delete)
+      Faraday.delete(url, &block)
+    end
+  end
+
+  def possible_test_warning(verb)
+    return if !Rails.env.test?
+    return if self.class.send("allow_#{verb}_#{@calling_method}") rescue false
+
+    puts "WARNING: live API call in test. USE: stub_#{verb}_response(:#{@calling_method}, status: ___, response: _______) do; ...; end"
   end
 end

@@ -37,10 +37,10 @@ module Authenticate::ByHttpHeader
   end
 
   def fallback_name_from(email)
-    first_part = email.split('@').first
-    return first_part unless first_part.include?('.')
+    first_part = email.split("@").first
+    return first_part unless first_part.include?(".")
 
-    pieces = first_part.split('.')
+    pieces = first_part.split(".")
     pieces.first + " " + pieces.last
   end
 end

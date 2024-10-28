@@ -6,10 +6,16 @@ class Toolbox::GmailTest < ActiveSupport::TestCase
   end
 
   test "email_myself" do
-    # Not sure if it's worth stubbing out API responses for these methods.
-    #
-    # Current.set(user: users(:keith)) do
-    #   @gmail.email_myself(message_s: "Pick up some milk")
-    # end
+    stub_get_response(:get_user_profile, status: 200, response: user_profile_data) do
+      Current.set(user: users(:keith)) do
+        assert_equal user_profile_data, @gmail.send(:get_user_profile).to_h
+      end
+    end
+  end
+
+  private
+
+  def user_profile_data
+    { emailAddress: "krschacht@gmail.com", messagesTotal: 876831, threadsTotal: 537585, historyId: 74273500 }
   end
 end

@@ -3,11 +3,16 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "minitest/autorun"
 require "pry"
-Dir[Rails.root.join('test/support/**/*.rb')].sort.each { |file| require file }
+
+Dir[Rails.root.join("test/support/**/*.rb")].sort.each { |file| require file }
+
+Dir[File.join(Rails.root, "lib", "rails_extensions", "**/*.rb")].each do |path|
+  require path
+end
 
 class Capybara::Node::Element
   def obsolete?
-    inspect.include?('Obsolete')
+    inspect.include?("Obsolete")
   end
 
   def exists?
@@ -18,7 +23,7 @@ end
 class ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers
 
-  Capybara.default_max_wait_time = 8
+  Capybara.default_max_wait_time = 10
 
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
@@ -47,9 +52,7 @@ module ActiveSupport
   class TestCase
     include Turbo::Broadcastable::TestHelper
     include ActiveJob::TestHelper
-    include OptionsHelpers
-    include PostgresqlHelper
-    include ViewHelpers
+    include OptionsHelpers, PostgresqlHelper, ViewHelpers, SDKHelpers
 
     parallelize(workers: :number_of_processors)
     fixtures :all

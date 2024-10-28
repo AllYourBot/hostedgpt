@@ -5,7 +5,7 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
     @asst_instructions = assistants(:samantha).instructions
   end
 
-  test "full_instructions is nil when nothing is provided" do
+  test "full_instructions simply shows date & time when nothing is provided" do
     users(:keith).memories.delete_all
     assistants(:samantha).update!(instructions: nil)
 
@@ -16,7 +16,9 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
       messages(:hear_me)
     )
 
-    assert_nil backend.send(:full_instructions)
+    instructions = backend.send(:full_instructions)
+    assert instructions.starts_with?("For the user, the current time")
+    refute instructions.include?("remembered")
   end
 
   test "full_instructions INCLUDES memories and DOES INCLUDE assistant instructions when both are provided" do

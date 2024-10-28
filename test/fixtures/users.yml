@@ -2,14 +2,15 @@ keith:
   first_name: Keith
   last_name: Schacht
   registered_at: 2023-12-19 08:40:05
-  openai_key: abc123
-  anthropic_key: def789
   last_cancelled_message: dont_know_day
   preferences: {}
 
 rob:
   first_name: Rob
   registered_at: 2023-12-26 08:40:05
-  openai_key: abc123
-  anthropic_key: def789
+  preferences: {}
+
+taylor:
+  first_name: Taylor
+  registered_at: 2024-05-31 08:40:05
   preferences: {}

@@ -34,8 +34,6 @@ Rails.application.configure do
     config.cache_store = :null_store
   end
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
   config.active_storage.variant_processor = :mini_magick # vips is better but does not work on Mac Apple Silicon so using this in dev & test
 
   # Don't care if the mailer can't send.
@@ -76,7 +74,18 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
 
+  # Since most people will not set the variable, polling will not be logged
+  # anything but explicitly false
+  log_polling = ENV["SOLID_QUEUE_LOG_POLLING_ON"] != "false"
+  config.solid_queue.silence_polling = log_polling # NOTE: this is backwards, true means silence
+
   config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16"]
 
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
+
+  stdout_logger = ActiveSupport::Logger.new(STDOUT)
+  tagged_logger = ActiveSupport::TaggedLogging.new(stdout_logger)
+
+  config.log_tags = [ :request_id ]
+  config.logger = tagged_logger
 end

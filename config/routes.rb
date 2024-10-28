@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   namespace :settings do
     resources :assistants, except: [:index, :show]
     resource :person, only: [:edit, :update]
+    resources :language_models
+    resources :api_services, except: [:show]
     resources :memories, only: [:index] do
       delete :destroy, on: :collection
     end
@@ -25,6 +27,11 @@ Rails.application.routes.draw do
   post "/login", to: "authentications#create"
   get "/register", to: "users#new"
   get "/logout", to: "authentications#destroy"
+
+  if Feature.password_reset_email?
+    resources :password_resets, only: [:new, :create]
+    resource :password_credential, only: [:edit, :update]
+  end
 
   get "/auth/:provider/callback" => "authentications/google_oauth#create", as: :google_oauth
   get "/auth/failure" => "authentications/google_oauth#failure" # connected in omniauth.rb

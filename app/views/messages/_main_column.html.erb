@@ -104,9 +104,11 @@
   <section
     class="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-gray-800 overflow-x-clip scrollbar-hide"
     data-controller="scrollable speaker"
+    data-action="turbo:before-morph-attribute->speaker#preserveStimulusValues"
+    data-speaker-playback-outlet="[data-subrole='assistant-message']"
     data-scrollable-not-bottom-class="!block"
   >
-    <div id="messages" class="relative flex-grow overflow-y-auto overflow-x-clip scrollbar-hide overscroll-contain" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
+    <div id="messages" class="relative flex-grow overflow-y-auto overscroll-contain" data-scrollable-target="scrollable" data-action="scroll->scrollable#scrolled">
       <div id="messages-container" class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2">
         <%= yield :messages %>
       </div>
@@ -130,8 +132,16 @@
       </div>
 
       <div id="composer"
-            class="<%= @assistant.deleted? && 'hidden' %> flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed <%= !@assistant.supports_images? && 'relationship' %>"
-            data-controller="composer image-upload"
+        class="
+          <%= @assistant.deleted? && 'hidden' %>
+          <%= !@assistant.supports_images? && 'relationship' %>
+          flex-1 relative
+          leading-relaxed
+          pl-6 pr-6 mx-auto mb-6
+          w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px]
+        "
+        data-controller="composer image-upload"
+        data-composer-speaker-outlet="[data-controller~='speaker']"
       >
         <%= button_tag type: "button",
               id: "attach-button",
@@ -233,7 +243,6 @@
           data: {
             composer_target: "form",
             turbo_frame: "_top", # this causes the page to morph, without this it does a frame substitution
-            turbo_action: "replace",
         }) do |form| %>
           <%= form.hidden_field :conversation_id %>
           <%= form.hidden_field :index, value: @messages&.length %>
@@ -244,12 +253,11 @@
 
           <%= form.text_area :content_text,
             id: "composer-input",
-            placeholder: "RETURN to submit   ↑ to edit last message",
             data: {
               composer_target: "input",
               image_upload_target: "content",
               application_target: "newMessageField",
-              controller: "textarea-autogrow",
+              controller: "textarea-autogrow permanent-value",
               action: %|
                 composer#determineSubmitButton
 
@@ -299,7 +307,7 @@
             <%= form.button type: "button",
               data: {
                 composer_target: "microphoneDisable",
-                action: "composer#disableMicrophone"
+                action: "composer#userDisableMicrophone"
               },
               id: "microphone-disable",
               class: %w|
@@ -393,16 +401,11 @@
           <div
             id="composer-overlay"
             data-composer-target="overlay"
-            data-action="click->composer#disableMicrophone"
+            data-action="click->composer#userDisableMicrophone"
             class="absolute inset-0 bg-white dark:bg-gray-800 !bg-opacity-65 hidden">
           </div>
 
         <% end %>
-      </div>
-
-      <div class="w-full mb-2 text-xs text-center text-gray-400 dark:text-gray-300">
-        <span id="connection-status" class="" data-turbo-permanent>HostedGPT can make mistakes. Double check information.</span>
-        <span>&nbsp;</span> <!-- the data-turbo-permanent causes height of page to be calculated incorrectly, adding this span fixes it -->
       </div>
   </footer>
 </turbo-frame>

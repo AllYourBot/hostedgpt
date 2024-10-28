@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
+ActiveRecord::Schema[7.1].define(version: 2024_10_22_053212) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -46,6 +46,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "api_services", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.string "driver", null: false, comment: "What API spec does this service conform to, e.g. OpenAI or Anthropic"
+    t.string "url", null: false
+    t.string "token"
+    t.datetime "deleted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "deleted_at"], name: "index_api_services_on_user_id_and_deleted_at"
+    t.index ["user_id"], name: "index_api_services_on_user_id"
   end
 
   create_table "assistants", force: :cascade do |t|
@@ -103,6 +116,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
     t.datetime "updated_at", null: false
     t.bigint "last_assistant_message_id"
     t.text "external_id", comment: "The Backend AI system (e.g OpenAI) Thread Id"
+    t.decimal "input_token_total_cost", precision: 30, scale: 15, default: "0.0", null: false
+    t.decimal "output_token_total_cost", precision: 30, scale: 15, default: "0.0", null: false
+    t.integer "input_token_total_count", default: 0, null: false
+    t.integer "output_token_total_count", default: 0, null: false
     t.index ["assistant_id"], name: "index_conversations_on_assistant_id"
     t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
@@ -144,11 +161,20 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
 
   create_table "language_models", force: :cascade do |t|
     t.integer "position", null: false
+    t.string "api_name", null: false, comment: "This is the name that API calls are expecting."
     t.string "name", null: false
-    t.text "description", null: false
     t.boolean "supports_images", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
+    t.bigint "user_id", null: false
+    t.bigint "api_service_id"
+    t.boolean "supports_tools", default: false
+    t.decimal "input_token_cost_cents", precision: 30, scale: 15
+    t.decimal "output_token_cost_cents", precision: 30, scale: 15
+    t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
+    t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
+    t.index ["user_id"], name: "index_language_models_on_user_id"
   end
 
   create_table "memories", force: :cascade do |t|
@@ -178,6 +204,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
     t.integer "branched_from_version"
     t.jsonb "content_tool_calls"
     t.string "tool_call_id"
+    t.integer "input_token_count", default: 0, null: false
+    t.integer "output_token_count", default: 0, null: false
+    t.decimal "input_token_cost", precision: 30, scale: 15, default: "0.0", null: false
+    t.decimal "output_token_cost", precision: 30, scale: 15, default: "0.0", null: false
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
     t.index ["conversation_id", "index", "version"], name: "index_messages_on_conversation_id_and_index_and_version", unique: true
@@ -246,6 +276,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
     t.string "concurrency_key", null: false
     t.datetime "expires_at", null: false
     t.datetime "created_at", null: false
+    t.index ["concurrency_key", "priority", "job_id"], name: "index_solid_queue_blocked_executions_for_release"
     t.index ["expires_at", "concurrency_key"], name: "index_solid_queue_blocked_executions_for_maintenance"
     t.index ["job_id"], name: "index_solid_queue_blocked_executions_on_job_id", unique: true
   end
@@ -297,7 +328,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
     t.string "hostname"
     t.text "metadata"
     t.datetime "created_at", null: false
+    t.string "name", null: false
     t.index ["last_heartbeat_at"], name: "index_solid_queue_processes_on_last_heartbeat_at"
+    t.index ["name", "supervisor_id"], name: "index_solid_queue_processes_on_name_and_supervisor_id", unique: true
     t.index ["supervisor_id"], name: "index_solid_queue_processes_on_supervisor_id"
   end
 
@@ -309,6 +342,31 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
     t.index ["job_id"], name: "index_solid_queue_ready_executions_on_job_id", unique: true
     t.index ["priority", "job_id"], name: "index_solid_queue_poll_all"
     t.index ["queue_name", "priority", "job_id"], name: "index_solid_queue_poll_by_queue"
+  end
+
+  create_table "solid_queue_recurring_executions", force: :cascade do |t|
+    t.bigint "job_id", null: false
+    t.string "task_key", null: false
+    t.datetime "run_at", null: false
+    t.datetime "created_at", null: false
+    t.index ["job_id"], name: "index_solid_queue_recurring_executions_on_job_id", unique: true
+    t.index ["task_key", "run_at"], name: "index_solid_queue_recurring_executions_on_task_key_and_run_at", unique: true
+  end
+
+  create_table "solid_queue_recurring_tasks", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "schedule", null: false
+    t.string "command", limit: 2048
+    t.string "class_name"
+    t.text "arguments"
+    t.string "queue_name"
+    t.integer "priority", default: 0
+    t.boolean "static", default: true, null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_solid_queue_recurring_tasks_on_key", unique: true
+    t.index ["static"], name: "index_solid_queue_recurring_tasks_on_static"
   end
 
   create_table "solid_queue_scheduled_executions", force: :cascade do |t|
@@ -360,8 +418,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
     t.datetime "registered_at", default: -> { "CURRENT_TIMESTAMP" }
     t.string "first_name", null: false
     t.string "last_name"
-    t.string "openai_key"
-    t.string "anthropic_key"
     t.jsonb "preferences"
     t.bigint "last_cancelled_message_id"
     t.index ["last_cancelled_message_id"], name: "index_users_on_last_cancelled_message_id"
@@ -369,6 +425,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "api_services", "users"
   add_foreign_key "assistants", "language_models"
   add_foreign_key "assistants", "users"
   add_foreign_key "authentications", "clients"
@@ -382,6 +439,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
   add_foreign_key "documents", "assistants"
   add_foreign_key "documents", "messages"
   add_foreign_key "documents", "users"
+  add_foreign_key "language_models", "api_services"
+  add_foreign_key "language_models", "users"
   add_foreign_key "memories", "messages"
   add_foreign_key "memories", "users"
   add_foreign_key "messages", "assistants"
@@ -396,6 +455,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_18_154045) do
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "steps", "assistants"
   add_foreign_key "steps", "conversations"

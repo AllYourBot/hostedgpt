@@ -1,4 +1,8 @@
+include ActionView::RecordIdentifier
+require "nokogiri/xml/node"
+
 class GetNextAIMessageJob < ApplicationJob
+  include ActionView::Helpers::RenderingHelper
   class ResponseCancelled < StandardError; end
   class WaitForPrevious < StandardError; end
 
@@ -16,18 +20,20 @@ class GetNextAIMessageJob < ApplicationJob
     @conversation = @message.conversation
     @assistant    = Assistant.find(assistant_id)
     @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index-1)
+    @attempt      = attempt
 
     return false          if generation_was_cancelled? || message_is_populated?
     raise WaitForPrevious if @prev_message&.not_finished?
 
     last_sent_at = Time.current
     @message.update!(processed_at: Time.current, content_text: "")
-    GetNextAIMessageJob.broadcast_updated_message(@message, thinking: true) # signal to user that we're waiting on API
+    GetNextAIMessageJob.broadcast_updated_message(@message, thinking: true) # thinking shows dot, signaling to user that we're waiting now on ai_backend
 
     puts "\n### Wait for reply" unless Rails.env.test?
 
-    response = ai_backend.new(@conversation.user, @assistant, @conversation, @message)
-      .get_next_chat_message do |content_chunk|
+    response = Current.set(user: @user, message: @message) do
+      ai_backend.new(@conversation.user, @assistant, @conversation, @message)
+      .stream_next_conversation_message do |content_chunk|
         @message.content_text += content_chunk
 
         if Time.current.to_f - last_sent_at.to_f >= 0.1
@@ -40,8 +46,8 @@ class GetNextAIMessageJob < ApplicationJob
           raise ResponseCancelled
         end
       end
-
-    @message.content_tool_calls = response # Typically, get_next_chat_message will simply return nil because it executes
+    end
+    @message.content_tool_calls = response # Typically, stream_next_conversation_message will simply return nil because it executes
                                            # the content_chunk block to return it's response incrementally. However, tool_call
                                            # responses don't make sense to stream because they can't be executed incrementally
                                            # so we just return the full tool response message at once. The only time we return
@@ -57,7 +63,14 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_message
     return true
   rescue OpenAI::ConfigurationError => e
-    set_openai_error
+    name = @assistant.language_model.api_service.name
+    if name == "OpenAI"
+      set_openai_error
+    elsif name == "Groq"
+      set_groq_error
+    else
+      set_generic_error(name)
+    end
     wrap_up_the_message
     return true
   rescue Anthropic::ConfigurationError => e
@@ -80,7 +93,7 @@ class GetNextAIMessageJob < ApplicationJob
     puts "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     raise WaitForPrevious
   rescue => e
-    msg = e.inspect.gsub(/(sk-)[\w\-]{40}/, '\1' + '*' * 40)
+    msg = e.inspect.gsub(/(sk-)[\w\-]{40}/, '\1' + "*" * 40)
 
     unless Rails.env.test?
       puts "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
@@ -102,23 +115,40 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def self.broadcast_updated_message(message, locals = {})
-    message.broadcast_replace_to message.conversation, locals: {
-      only_scroll_down_if_was_bottom: true,
-      timestamp: (Time.current.to_f*1000).to_i,
-      streamed: true,
-    }.merge(locals)
+    html = ApplicationController.render(
+      partial: "messages/message",
+      locals: {
+        message: message,
+        only_scroll_down_if_was_bottom: true,
+        streamed: true,
+        message_counter: message.index
+      }.merge(locals)
+    )
+    dom = Nokogiri::HTML.fragment(html)
+    html = dom.at_id(dom_id message).inner_html
+    message.broadcast_update_to message.conversation, target: message, html: html
   end
 
   private
 
   def set_openai_error
-    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT-3.5 or GPT-4. Click your Profile in the bottom " +
-      "left and then Settings. You will find OpenAI Key instructions.)"
+    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)"
+  end
+
+  def set_groq_error
+    @message.content_text = "(You need to enter a valid API key for Groq to use Llama. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find Groq Key instructions.)"
+  end
+
+  def set_generic_error(name)
+    @message.content_text = "(There is a configuration error with the #{name} API Service. Maybe you have an invalid API key? Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find #{name} there.)"
   end
 
   def set_anthropic_error
     @message.content_text = "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
-      "left and then Settings. You will find Anthropic Key instructions.)"
+      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
   end
 
   def set_response_error
@@ -134,10 +164,10 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def set_billing_error
-    service = ai_backend.to_s.split('::').second
-    url = service == 'OpenAI' ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
+    service = ai_backend.to_s.split("::").second
+    url = service == "OpenAI" ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
 
-    @message.content_text = "(I received a quota error. Your API key is probably valid but you may need to adding billing details. You are using " +
+    @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
       "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
   end
 
@@ -148,7 +178,7 @@ class GetNextAIMessageJob < ApplicationJob
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
-    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id})" unless Rails.env.test?
+    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id}, #{@attempt})" unless Rails.env.test?
   end
 
   def call_tools_before_wrapping_up

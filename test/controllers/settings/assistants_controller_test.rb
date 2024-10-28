@@ -39,8 +39,9 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "form should NOT display a DELETE button if this is your last assistant" do
-    @user.assistants.where.not(id: @assistant.id).map(&:destroy)
-    assert @user.assistants.length == 1, "User needs to have more than one assistant"
+    @user.assistants.where.not(id: @assistant.id).map(&:destroy!)
+    @user.reload
+    assert @user.assistants.length == 1, "Test user needs to have more than one assistant"
     get edit_settings_assistant_url(@user.assistants.first)
     assert_response :success
     assert_contains_text "main", "Delete"
@@ -48,8 +49,8 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
 
   test "should allow language_model selection" do
     get edit_settings_assistant_url(@assistant)
-    assert_select 'label', 'Language model'
-    assert_select 'select#assistant_language_model_id'
+    assert_select "label", "Language model"
+    assert_select "select#assistant_language_model_id"
   end
 
   test "should update language_model" do

@@ -76,38 +76,35 @@ class ConversationTest < ActiveSupport::TestCase
   end
 
   test "the title of a conversation is automatically set when the second message is created by the job" do
+    assistants(:samantha).language_model.update!(supports_tools: false)
+
     perform_enqueued_jobs do
-      ChatCompletionAPI.stub :get_next_response, {"topic" => "Hear me"} do
-        TestClient::OpenAI.stub :text, "Hello" do
-          TestClient::OpenAI.stub :api_response, -> { TestClient::OpenAI.api_text_response } do
+      TestClient::OpenAI.stub :text, "{\"topic\":\"Hear me\"}" do
+        conversation = users(:keith).conversations.create!(assistant: assistants(:samantha))
+        assert_nil conversation.title
 
-            conversation = users(:keith).conversations.create!(assistant: assistants(:samantha))
-            assert_nil conversation.title
+        conversation.messages.create!(assistant: conversation.assistant, role: :user, content_text: "Can you hear me?")
 
-            conversation.messages.create!(assistant: conversation.assistant, role: :user, content_text: "Can you hear me?")
+        latest_message = conversation.latest_message_for_version(:latest)
+        assert latest_message.assistant?
 
-            latest_message = conversation.latest_message_for_version(:latest)
-            assert latest_message.assistant?
+        GetNextAIMessageJob.perform_now(users(:keith).id, latest_message.id, assistants(:samantha).id)
 
-            GetNextAIMessageJob.perform_now(users(:keith).id, latest_message.id, assistants(:samantha).id)
-
-            assert_equal "Hear me", conversation.reload.title
-          end
-        end
+        assert_equal "Hear me", conversation.reload.title
       end
     end
   end
 
   test "#grouped_by_increasing_time_interval_for_user" do
-    Timecop.freeze do
+    Timecop.freeze(Time.current.beginning_of_day + 12.hours) do
       user = User.create!(first_name: "John", last_name: "Doe")
 
       # Create 3 conversations in each of these intervals
       [
-        Date.today,
-        1.week.ago,
-        1.month.ago,
-        1.year.ago
+        Time.zone.today,
+        1.week.ago.in_time_zone,
+        1.month.ago.in_time_zone,
+        1.year.ago.in_time_zone
       ].each do |timestamp|
         3.times do
           Conversation.create!(

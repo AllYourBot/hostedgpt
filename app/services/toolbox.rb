@@ -1,10 +1,15 @@
 class Toolbox < SDK
   def self.descendants
-    ([
+    gmail_active = Feature.google_tools? && Current.user&.gmail_credential || nil
+    tasks_active = Feature.google_tools? && Current.user&.google_tasks_credential || nil
+    test_env = Rails.env.test? || nil
+    [
+      test_env && Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
       Toolbox::Memory,
-      Feature.google_tools? && Current.user&.gmail_credential ? Toolbox::Gmail : nil,
-    ] + (Rails.env.test? ? [Toolbox::HelloWorld] : [])).compact
+      gmail_active && Toolbox::Gmail,
+      tasks_active && Toolbox::GoogleTasks,
+    ].compact
   end
 
   def self.call(name, args)
@@ -82,11 +87,11 @@ class Toolbox < SDK
   end
 
   def self.formatted_param_properties(param)
-    raise "The param '#{param}' is not properly named for the type to be inferred (e.g. is_child, age_num, name_str)" if param.to_s.exclude?('_')
+    raise "The param '#{param}' is not properly named for the type to be inferred (e.g. is_child, age_num, name_str)" if param.to_s.exclude?("_")
 
-    case param.to_s.split('_')
+    case param.to_s.split("_")
     in first, *name  if first == "is"
-      [ name.join('_'), { type: "boolean" } ]
+      [ name.join("_"), { type: "boolean" } ]
     in name, "enum", *values
       if values.first.to_i.to_s == values.first
         type = "number"
@@ -97,11 +102,11 @@ class Toolbox < SDK
 
       [ name, { type: type, enum: values } ]
     in *name, last  if last == "s"
-      [ name.join('_'), { type: "string" } ]
+      [ name.join("_"), { type: "string" } ]
     in *name, last  if last == "i"
-      [ name.join('_'), { type: "integer" } ]
+      [ name.join("_"), { type: "integer" } ]
     in *name, last  if last == "f"
-      [ name.join('_'), { type: "number" } ]
+      [ name.join("_"), { type: "number" } ]
     else
       raise "Unable to infer type for parameter '#{param}'"
     end
