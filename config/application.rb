@@ -47,7 +47,6 @@ module HostedGPT
     if Feature.cloudflare_storage?
       config.active_storage.service = :cloudflare
     else
-      puts "using database service"
       config.active_storage.service = :database
     end
 
