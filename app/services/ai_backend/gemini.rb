@@ -55,7 +55,6 @@ class AIBackend::Gemini < AIBackend
   end
 
   def stream_next_conversation_message(&chunk_handler)
-
     set_client_config(
       messages: preceding_conversation_messages,
       #instructions: full_instructions,
@@ -65,12 +64,14 @@ class AIBackend::Gemini < AIBackend
       # Systeem instruction is not working well on gem 'gemini-ai'
       #response = @client.stream_generate_content({contents: preceding_conversation_messages,system_instruction: system_message})
       #response = @client.stream_generate_content({contents: preceding_conversation_messages})
-      response = @client.send(client_method_name, @client_config)
+      response = @client.send(client_method_name, @client_config) do |event, parsed, raw|
+        yield event["candidates"][0]["content"]["parts"][0]["text"]
+      end
     rescue ::Faraday::UnauthorizedError => e
       puts e.message
       raise OpenAI::ConfigurationError
     end
-    return response.map { |h| h["candidates"][0]["content"]["parts"][0]["text"] }
+    return nil
   end
 
   private

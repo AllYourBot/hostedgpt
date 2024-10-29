@@ -84,3 +84,5 @@ group :test do
   gem "minitest-stub_any_instance"
   gem "rails-controller-testing"
 end
+
+gem 'gemini-ai', '~> 4.2.0'
