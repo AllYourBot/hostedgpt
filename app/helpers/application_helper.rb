@@ -84,4 +84,8 @@ module ApplicationHelper
   def n_a_if_blank(value, n_a = "Not Available")
     value.blank? ? n_a : value.to_s
   end
+
+  def to_dollars(cents, precision: 2)
+    number_to_currency(cents / 100.0, precision: precision)
+  end
 end

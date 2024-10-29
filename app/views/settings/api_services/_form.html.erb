@@ -135,7 +135,7 @@
         %>).</li>
       <li>Click "Create API Key", name it something like "<%= Setting.product_name %>" and paste it below.</li>
     </ol>
-    <%= form.text_field :token, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+    <%= form.text_field :token, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black", autocomplete: "off" %>
   </div>
 
   <%= form.submit "Save",

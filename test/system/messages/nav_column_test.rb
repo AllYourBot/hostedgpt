@@ -11,7 +11,7 @@ class NavColumnTest < ApplicationSystemTestCase
     page.execute_script("document.querySelector('#nav-scrollable').scrollTop = 100") # scroll the nav column down slightly
 
     assert_did_not_scroll "#nav-scrollable" do
-      click_text conversations(:hello_claude).title
+      click_text conversations(:attachment).title
     end
   end
 

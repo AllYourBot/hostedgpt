@@ -34,7 +34,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     response = Current.set(user: @user, message: @message) do
       ai_backend.new(@conversation.user, @assistant, @conversation, @message)
-      .get_next_chat_message do |content_chunk|
+      .stream_next_conversation_message do |content_chunk|
         @message.content_text += content_chunk
 
         if Time.current.to_f - last_sent_at.to_f >= 0.1
@@ -48,7 +48,7 @@ class GetNextAIMessageJob < ApplicationJob
         end
       end
     end
-    @message.content_tool_calls = response # Typically, get_next_chat_message will simply return nil because it executes
+    @message.content_tool_calls = response # Typically, stream_next_conversation_message will simply return nil because it executes
                                            # the content_chunk block to return it's response incrementally. However, tool_call
                                            # responses don't make sense to stream because they can't be executed incrementally
                                            # so we just return the full tool response message at once. The only time we return

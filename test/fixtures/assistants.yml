@@ -22,6 +22,14 @@ keith_claude3:
   instructions:
   tools: []
 
+keith_claude35:
+  user: keith
+  language_model: claude_3_5_sonnet_20240620
+  name: Claude 3.5 Sonnet
+  description: Claude 3.5, Sonnet version
+  instructions:
+  tools: []
+
 keith_gpt3:
   user: keith
   language_model: gpt_3_5_turbo

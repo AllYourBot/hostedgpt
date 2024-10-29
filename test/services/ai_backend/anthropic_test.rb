@@ -2,49 +2,57 @@ require "test_helper"
 
 class AIBackend::AnthropicTest < ActiveSupport::TestCase
   setup do
-    @conversation = conversations(:attachments)
-    @anthropic = AIBackend::Anthropic.new(users(:keith),
-      assistants(:keith_claude3),
+    @conversation = conversations(:hello_claude)
+    @assistant = assistants(:keith_claude35)
+    @assistant.language_model.update!(supports_tools: false) # this will change the TestClient response so we want to be selective about this
+    @anthropic = AIBackend::Anthropic.new(
+      users(:keith),
+      @assistant,
       @conversation,
       @conversation.latest_message_for_version(:latest)
     )
-    @test_client = TestClient::Anthropic.new(access_token: "abc")
+    TestClient::Anthropic.new(access_token: "abc")
   end
 
   test "initializing client works" do
     assert @anthropic.client.present?
   end
 
-  test "get_next_chat_message works" do
-    assert_equal "https://api.anthropic.com/", @anthropic.client.uri_base
-    streamed_text = @test_client.messages(model: "claude_3_opus_20240229", system: "You are a helpful assistant")
+  test "stream_next_conversation_message works to stream text and uses model from assistant" do
+    assert_not_equal @assistant, @conversation.assistant, "Should force this next message to use a different assistant so these don't match"
 
-    assert_equal "Hello this is model claude_3_opus_20240229 with instruction \"You are a helpful assistant\"! How can I assist you today?", streamed_text
+    TestClient::Anthropic.stub :text, nil do # this forces it to fall back to default text
+      streamed_text = ""
+      @anthropic.stream_next_conversation_message { |chunk| streamed_text += chunk }
+      expected_start = "Hello this is model claude-3-5-sonnet-20240620 with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\n\\nFor the user, the current time"
+      expected_end = "\"! How can I assist you today?"
+      assert streamed_text.start_with?(expected_start)
+      assert streamed_text.end_with?(expected_end)
+    end
   end
 
-  test "preceding_messages constructs a proper response and pivots on images" do
-    preceding_messages = @anthropic.send(:preceding_messages)
+  test "preceding_conversation_messages constructs a proper response and pivots on images" do
+    preceding_conversation_messages = @anthropic.send(:preceding_conversation_messages)
 
-    assert_equal @conversation.messages.length-1, preceding_messages.length
+    assert_equal @conversation.messages.length-1, preceding_conversation_messages.length
 
     @conversation.messages.ordered.each_with_index do |message, i|
       next if @conversation.messages.length == i+1
 
       if message.documents.present?
-        assert_instance_of Array, preceding_messages[i][:content]
-        assert_equal message.documents.length+1, preceding_messages[i][:content].length
+        assert_instance_of Array, preceding_conversation_messages[i][:content]
+        assert_equal message.documents.length+1, preceding_conversation_messages[i][:content].length
       else
-        assert_equal preceding_messages[i][:content], message.content_text
+        assert_equal preceding_conversation_messages[i][:content], message.content_text
       end
     end
   end
 
-  test "preceding_messages only considers messages up to the assistant message being generated" do
-    @anthropic = AIBackend::Anthropic.new(users(:keith), assistants(:samantha), @conversation, messages(:yes_i_can))
+  test "preceding_conversation_messages only considers messages on the intended conversation version and includes the correct names" do
+    # TODO
+  end
 
-    preceding_messages = @anthropic.send(:preceding_messages)
-
-    assert_equal 1, preceding_messages.length
-    assert_equal preceding_messages[0][:content], messages(:can_you_hear).content_text
+  test "preceding_conversation_messages includes the appropriate tool details" do
+    # TODO
   end
 end

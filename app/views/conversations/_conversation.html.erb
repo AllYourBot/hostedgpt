@@ -80,16 +80,30 @@
           <footer class="py-3 px-4 mt-1 border-t-2 border-gray-100 dark:border-gray-600 gap-2 flex flex-col">
             <table class="w-full text-left">
               <tr>
-                <td class="pb-2 whitespace-nowrap">Conversation</td>
-                <td class="pb-2">$</td>
+                <td class="pb-2 whitespace-nowrap">Conversation ~</td>
+                <td class="pb-2"><%= to_dollars(conversation.total_cost)%></td>
               </tr>
               <tr>
-                <td class="pb-2">Input Tokens</td>
-                <td class="pb-2"><%= conversation.messages.sum(:input_token_count) %></td>
+                <td class="pb-2 font-bold" colspan="2">Input</td>
               </tr>
               <tr>
-                <td>Output Tokens</td>
-                <td><%= conversation.messages.sum(:output_token_count) %></td>
+                <td class="pb-2">Tokens</td>
+                <td class="pb-2"><%= conversation.input_token_total_count %></td>
+              </tr>
+              <tr>
+                <td class="pb-2">Cost</td>
+                <td class="pb-2"><%= to_dollars(conversation.input_token_total_cost, precision: 5) %></td>
+              </tr>
+              <tr>
+                <td class="pb-2 font-bold" colspan="2">Output</td>
+              </tr>
+              <tr>
+                <td>Tokens</td>
+                <td><%= conversation.output_token_total_count %></td>
+              </tr>
+              <tr>
+                <td>Cost</td>
+                <td><%= to_dollars(conversation.output_token_total_cost, precision: 5) %></td>
               </tr>
             </table>
           </footer>

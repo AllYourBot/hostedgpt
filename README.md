@@ -27,6 +27,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
   - [Troubleshooting Render](#troubleshooting-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
+- [Deploy on your own server](#deploy-on-your-own-server)
 - [Configure optional features](#configure-optional-features)
   - [Give assistant access to your Google apps](#configuring-google-tools)
   - [Authentication](#authentication)
@@ -34,8 +35,8 @@ This project is led by an experienced rails developer, but I'm actively looking 
     - [Google OAuth authentication](#google-oauth-authentication)
     - [HTTP header authentication](#http-header-authentication)
 - [Contribute as a developer](#contribute-as-a-developer)
-  - [Setting up development](#setting-up-development)
-    - [Alternatively, you can set up your development environment locally:](#alternatively-you-can-set-up-your-development-environment-locally)
+  - [Running locally](#Running-locally)
+    - [Alternatively, you can skip Docker:](#alternatively-you-can-set-skip-docker)
   - [Running tests](#running-tests)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
@@ -109,6 +110,47 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
    [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy)
 
 You may want to read about [configuring optional features](#configure-optional-features).
+
+## Deploy on your own server
+
+There are only two services that need to be running for this app to work: the Puma web server and a Postgres database.
+
+First, ensure your Postgres server is running and verify your connection string using `psql`, for example:
+
+Example:
+```
+psql postgres://app:secret@postgres/hostedgpt_production
+```
+
+Take this DB connection string and start your rails server like this:
+
+```
+RAILS_ENV=production RUN_SOLID_QUEUE_IN_PUMA=true DATABASE_URL=postgres://string-you-verified-above rails s -p 8081
+```
+
+**Note:** You can change the port 8081 to anything you want.
+
+If you are running a proxy such as nginx, be aware that the app is running http and websockets (ws). Here is an example of what your configuration might look like in order to proxy both of those:
+
+```
+<VirtualHost *:443>
+  ServerName chat.${maindomain}
+  ServerAlias chat.${secondarydomain}
+  ProxyPreserveHost On
+  ProxyPass / http://localhost:8081/
+  ProxyPassReverse / http://localhost:8081/
+  RequestHeader set X-Forwarded-Proto "https"
+  <Location /cable>
+    ProxyPreserveHost On
+    ProxyPass ws://localhost:8081/cable
+    ProxyPassReverse ws://localhost:8081/cable
+  </Location>
+
+  Include /etc/letsencrypt/options-ssl-apache.conf
+  SSLCertificateFile /etc/letsencrypt/live/chat.${maindomain}/fullchain.pem
+  SSLCertificateKeyFile /etc/letsencrypt/live/chat.${maindomain}/privkey.pem
+</VirtualHost>
+```
 
 ## Configure optional features
 
@@ -232,9 +274,9 @@ HTTP header authentication is an alternative method to authenticate users based 
 
 We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently wrapping up v0.7 and starting 0.8 [View 0.8 Milestone](https://github.com/allyourbot/hostedgpt/milestone/8). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
-### Setting up development
+### Running locally
 
-The easiest way to get up and running is to use the provided docker compose workflow. The only things you need installed on your computer are Docker and Git.
+The easiest way to get up and running is to use the provided Docker compose workflow. The only things you need installed on your computer are Docker and Git.
 
 1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running
 1. Clone your fork `git clone [repository url]`
@@ -250,7 +292,7 @@ The easiest way to get up and running is to use the provided docker compose work
 Every time you pull new changes down, kill docker (if it's running) and re-run:
 `docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
 
-#### Alternatively, you can set up your development environment locally:
+#### Alternatively, you can skip Docker
 
 HostedGPT requires these services to be running:
 

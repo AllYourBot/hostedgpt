@@ -75,9 +75,17 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   # Since most people will not set the variable, polling will not be logged
-  config.solid_queue.silence_polling = ENV["SOLID_QUEUE_LOG_POLLING_ON"] != "false"
+  # anything but explicitly false
+  log_polling = ENV["SOLID_QUEUE_LOG_POLLING_ON"] != "false"
+  config.solid_queue.silence_polling = log_polling # NOTE: this is backwards, true means silence
 
   config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16"]
 
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
+
+  stdout_logger = ActiveSupport::Logger.new(STDOUT)
+  tagged_logger = ActiveSupport::TaggedLogging.new(stdout_logger)
+
+  config.log_tags = [ :request_id ]
+  config.logger = tagged_logger
 end
