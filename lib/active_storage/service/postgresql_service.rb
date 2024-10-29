@@ -102,10 +102,8 @@ module ActiveStorage
           purpose: :blob_key
         )
 
-        url_opts = url_options
-        puts "url_opts: #{url_opts}"
         generated_url = url_helpers.rails_postgresql_service_url(verified_key_with_expiration,
-          **url_opts,
+          **url_options,
           disposition: content_disposition,
           content_type: content_type,
           filename: filename,

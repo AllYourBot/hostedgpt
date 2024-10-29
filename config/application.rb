@@ -43,8 +43,6 @@ module HostedGPT
     config.app_url_port = Setting.app_url_port
     config.app_url = "#{Setting.app_url_protocol}://#{Setting.app_url_host}:#{Setting.app_url_port}"
 
-    config.hosts << Setting.app_url_host
-
     # Active Storage
     if Feature.cloudflare_storage?
       config.active_storage.service = :cloudflare

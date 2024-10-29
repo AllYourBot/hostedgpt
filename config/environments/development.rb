@@ -81,6 +81,7 @@ Rails.application.configure do
 
   config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16", "172.18.0.0/16"]
 
+  config.hosts << Setting.app_url_host
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
 
   stdout_logger = ActiveSupport::Logger.new(STDOUT)
