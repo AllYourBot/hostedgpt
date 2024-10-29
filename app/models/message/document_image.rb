@@ -11,9 +11,9 @@ module Message::DocumentImage
     documents.present? && documents.first.has_image?(variant)
   end
 
-  def document_image_path(variant, fallback: nil)
+  def document_image_url(variant, fallback: nil)
     return nil unless has_document_image?
 
-    documents.first.image_path(variant, fallback: fallback)
+    documents.first.image_url(variant, fallback: fallback)
   end
 end

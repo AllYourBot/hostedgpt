@@ -27,7 +27,7 @@ class Document < ApplicationRecord
     file.attached?
   end
 
-  def image_path(variant, fallback: nil)
+  def image_url(variant, fallback: nil)
     return nil unless has_image?
 
     if has_file_variant_processed?(variant)
