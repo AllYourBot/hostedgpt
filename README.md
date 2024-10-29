@@ -122,13 +122,6 @@ First, create your production credentials file.
 bin/rails credentials:edit --environment production
 ```
 
-Next, uncomment the `database:` section
-
-```yaml
-database:
-  password: some-long-string
-```
-
 Second, create a Docker Hub access token and store it as local env var `KAMAL_REGISTRY_PASSWORD`.
 
 Next, edit `config/deploy.yml`:
