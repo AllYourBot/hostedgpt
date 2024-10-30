@@ -8,7 +8,7 @@ class AIBackend::Gemini < AIBackend
   # what you want instead.
   def self.client
     if Rails.env.test?
-      TestClients::Gemini
+      TestClient::Gemini
     else
       ::Gemini
     end
@@ -64,8 +64,9 @@ class AIBackend::Gemini < AIBackend
       # Systeem instruction is not working well on gem 'gemini-ai'
       #response = @client.stream_generate_content({contents: preceding_conversation_messages,system_instruction: system_message})
       #response = @client.stream_generate_content({contents: preceding_conversation_messages})
-      response = @client.send(client_method_name, @client_config) do |event, parsed, raw|
-        yield event["candidates"][0]["content"]["parts"][0]["text"]
+      response = @client.send(client_method_name, @client_config) do |intermediate_response, parsed, raw|
+        content_chunk = intermediate_response.dig("candidates",0,"content","parts",0,"text")
+        yield content_chunk if content_chunk != nil
       end
     rescue ::Faraday::UnauthorizedError => e
       puts e.message
