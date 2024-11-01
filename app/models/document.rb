@@ -8,7 +8,7 @@ class Document < ApplicationRecord
     file.variant :large, resize_to_limit: [1200, 900], preprocessed: true
   end
 
-  enum purpose: %w[fine-tune fine-tune-results assistants assistants_output].index_by(&:to_sym)
+  enum :purpose, %w[fine-tune fine-tune-results assistants assistants_output].index_by(&:to_sym)
 
   attribute :purpose, default: :assistants
 

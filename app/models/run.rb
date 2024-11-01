@@ -5,7 +5,7 @@ class Run < ApplicationRecord
   has_many :steps, dependent: :destroy
   has_one :message, dependent: :nullify
 
-  enum status: %w[queued in_progress requires_action cancelling cancelled failed completed expired].index_by(&:to_sym)
+  enum :status, %w[queued in_progress requires_action cancelling cancelled failed completed expired].index_by(&:to_sym)
 
   before_validation :set_model, on: :create
   validates :status, :expired_at, :model, :instructions, presence: true
