@@ -37,7 +37,9 @@ module HostedGPT
     config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("lib")
 
-    Setting.require_keys!(:app_url_protocol, :app_url_host, :app_url_port)
+    unless Setting.validate_env_vars == "false"
+      Setting.require_keys!(:app_url_protocol, :app_url_host, :app_url_port)
+    end
     config.app_url_protocol = Setting.app_url_protocol
     config.app_url_host = Setting.app_url_host
     config.app_url_port = Setting.app_url_port
