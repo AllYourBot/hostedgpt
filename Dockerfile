@@ -134,7 +134,7 @@ COPY . .
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN bundle exec bootsnap precompile --gemfile app/ lib/
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+RUN SECRET_KEY_BASE_DUMMY=1 VALIDATE_ENV_VARS=false ./bin/rails assets:precompile
 
 RUN mkdir -p log tmp bin
 
