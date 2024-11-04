@@ -1,4 +1,4 @@
-require 'open-uri'
+require "open-uri"
 include ActionView::RecordIdentifier
 require "nokogiri/xml/node"
 
@@ -221,7 +221,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     unless url_of_dalle_generated_image.nil?
       d = Document.new
-      d.file.attach(io: URI.open(url_of_dalle_generated_image), filename: 'image.png')
+      d.file.attach(io: URI.open(url_of_dalle_generated_image), filename: "image.png")
       assistant_reply.documents << d
     end
 

@@ -4,8 +4,7 @@ class Toolbox::Dalle < Toolbox
     Generate an image based on what the user asks you to generate. You will pass the user's prompt and will get back a URL to an image.
   S
 
-  def self.generate_an_image(image_generation_prompt_s:)
-
+  def generate_an_image(image_generation_prompt_s:)
     response = client.images.generate(
       parameters: {
         prompt: image_generation_prompt_s,
@@ -24,13 +23,11 @@ class Toolbox::Dalle < Toolbox
     }
   end
 
-  class << self
-    private
+  private
 
-    def client
-      OpenAI::Client.new(
-        access_token: Current.user.openai_key,
-      )
-    end
+  def client
+    OpenAI::Client.new(
+      access_token: Current.message.assistant.api_service.effective_token
+    )
   end
 end
