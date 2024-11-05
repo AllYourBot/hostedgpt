@@ -148,15 +148,10 @@ module ActiveStorage
 
     def url_options
       if ActiveStorage::Current.respond_to?(:url_options)
-        url_opts = ActiveStorage::Current.url_options
-        return url_opts if url_opts.is_a?(Hash)
+        ActiveStorage::Current.url_options
+      else
+        { host: ActiveStorage::Current.host }
       end
-
-      return {
-        protocol: Rails.application.config.app_url_protocol,
-        host: Rails.application.config.app_url_host,
-        port: Rails.application.config.app_url_port,
-      }
     end
   end
 end

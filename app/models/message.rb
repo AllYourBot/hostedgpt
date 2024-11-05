@@ -43,7 +43,9 @@ class Message < ApplicationRecord
       (content_text.present? || content_tool_calls.present?)
   end
 
-  def not_finished? = !finished?
+  def not_finished?
+    !finished?
+  end
 
   private
 
