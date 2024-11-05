@@ -297,14 +297,14 @@ Every time you pull new changes down, kill docker (if it's running) and re-run:
 HostedGPT requires these services to be running:
 
 - Postgres (`brew install postgresql@16` or other [install instructions](https://www.postgresql.org/download/))
-  - By default postgres will create a default user and following the instructions below to run the app should just work without any additional config, but if you want to set a specific username and password for your database then set the environment variable `DATABASE_URL=postgres://username:password@localhost/hostedgpt_development` (replacing `username`, `password`, and `hostedgpt_development` (database name) as appropriate
 - rbenv ([installation instructions](https://github.com/rbenv/rbenv))
 - ImageMagick (`brew install imagemagick` should work on Mac )
 
 1. `cd` into your local repository clone
 1. `rbenv install` to install the correct ruby version (it reads the .ruby-version in the repo)
-1. `bin/dev` starts up all the services, installs gems, and inits database (don't run **db:setup** as it will not configure encryption properly)
-1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
+1. Do NOT run db:setup as it will not configure encryption properly. Proceed to the next step and it will automatically configure the database.
+1. `bin/dev` starts up all the services, installs gems, and handles db. Note: The app should automatically configure a database, but if you get any database errors or want to change the default configuration, set the environment variable `DATABASE_URL=postgres://username:password@localhost:5432/hostedgpt_development` (replacing `username`, `password`, `hostedgpt_development` with your database name, and 5432 with your database port number).
+1. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
 1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
 1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
 1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `bin/rails db:fixtures:load`
