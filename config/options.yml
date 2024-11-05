@@ -47,9 +47,9 @@ shared:
     password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
-    app_url_protocol: <%= ENV["APP_URL_PROTOCOL"] %>
-    app_url_host: <%= ENV["APP_URL_HOST"] %>
-    app_url_port: <%= ENV["APP_URL_PORT"] %>
+    app_url_protocol: <%= ENV["APP_URL_PROTOCOL"] || default_to(app_url: :protocol) %>
+    app_url_host: <%= ENV["APP_URL_HOST"] || default_to(app_url: :host) %>
+    app_url_port: <%= ENV["APP_URL_PORT"] || default_to(app_url: :port) %>
     validate_env_vars: <%= ENV["VALIDATE_ENV_VARS"] || "1" %>
     product_name: <%= ENV["PRODUCT_NAME"] || "HostedGPT" %>
     default_openai_key: <%= ENV["DEFAULT_OPENAI_KEY"] %>
