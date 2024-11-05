@@ -16,12 +16,12 @@ class Message::DocumentImageTest < ActiveSupport::TestCase
     refute messages(:examine_this).has_document_image?(:small)
   end
 
-  test "document_image_path" do
-    assert messages(:examine_this).document_image_path(:small).is_a?(String)
-    assert messages(:examine_this).document_image_path(:small).starts_with?("/rails/active_storage/representations/redirect")
+  test "document_image_url" do
+    assert messages(:examine_this).document_image_url(:small).is_a?(String)
+    assert messages(:examine_this).document_image_url(:small).starts_with?("/rails/active_storage/representations/redirect")
   end
 
-  test "document_image_path with fallback" do
-    assert_equal "", messages(:examine_this).document_image_path(:small, fallback: "")
+  test "document_image_url with fallback" do
+    assert_equal "", messages(:examine_this).document_image_url(:small, fallback: "")
   end
 end
