@@ -8,7 +8,7 @@ class Document < ApplicationRecord
     file.variant :large, resize_to_limit: [1200, 900], preprocessed: true
   end
 
-  enum purpose: %w[fine-tune fine-tune-results assistants assistants_output].index_by(&:to_sym)
+  enum :purpose, %w[fine-tune fine-tune-results assistants assistants_output].index_by(&:to_sym)
 
   attribute :purpose, default: :assistants
 
@@ -18,6 +18,26 @@ class Document < ApplicationRecord
 
   validates :purpose, :filename, :bytes, presence: true
   validate :file_present
+
+  def has_image?(variant = nil)
+    if variant.present?
+      return has_file_variant_processed?(variant)
+    end
+
+    file.attached?
+  end
+
+  def image_url(variant, fallback: nil)
+    return nil unless has_image?
+
+    if has_file_variant_processed?(variant)
+      fully_processed_url(variant)
+    elsif fallback.nil?
+      redirect_to_processed_path(variant)
+    else
+      fallback
+    end
+  end
 
   def file_data_url(variant = :large)
     return nil if !file.attached?

@@ -9,7 +9,7 @@ class Message < ApplicationRecord
 
   include Billable
 
-  enum role: %w[user assistant tool].index_by(&:to_sym)
+  enum :role, %w[user assistant tool].index_by(&:to_sym)
 
   delegate :user, to: :conversation
 
@@ -43,9 +43,7 @@ class Message < ApplicationRecord
       (content_text.present? || content_tool_calls.present?)
   end
 
-  def not_finished?
-    !finished?
-  end
+  def not_finished? = !finished?
 
   private
 

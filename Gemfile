@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 ruby file: ".ruby-version"
 
-gem "rails", "~> 7.1.3"
+gem "rails", "~> 7.2.2"
 gem "sprockets-rails" # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "pg", "~> 1.1"
 gem "puma", ">= 6.0"
@@ -13,6 +13,7 @@ gem "turbo-rails", "~> 2.0.5"
 gem "stimulus-rails", "~> 1.3.3"
 gem "tailwindcss-rails", "~> 2.7.2"
 gem "rack-cors"
+gem "ostruct"
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
@@ -40,13 +41,14 @@ gem "ffi", "~> 1.15.5" # explicitly requiring 15.5 until this is resolved: https
 gem "amatch", "~> 0.4.1" # enables fuzzy comparison of strings, a tool uses this
 gem "rails_heroicon", "~> 2.2.0"
 gem "ruby-openai", "~> 7.0.1"
-gem "anthropic", "~> 0.1.0"
+gem "anthropic", "~> 0.1.0" # TODO update to the latest version
 gem "tiktoken_ruby", "~> 0.0.9"
 gem "solid_queue", "~> 1.0.0"
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable
 gem "aws-sdk-s3", require: false
 gem "postmark-rails"
+gem "ostruct"
 
 gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2", "~> 1.1"

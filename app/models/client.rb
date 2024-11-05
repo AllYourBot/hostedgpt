@@ -5,7 +5,7 @@ class Client < ApplicationRecord
   has_many :authentications_including_deleted, class_name: "Authentication", inverse_of: :client, dependent: :destroy
   scope :authenticated, -> { joins(:authentication).merge(Authentication.not_deleted) }
 
-  enum platform: %w[ ios android web api ].index_by(&:to_sym)
+  enum :platform, %w[ ios android web api ].index_by(&:to_sym)
 
   has_secure_token
 

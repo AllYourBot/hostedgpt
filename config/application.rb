@@ -19,7 +19,7 @@ module HostedGPT
     config.options = config_for(:options)
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 7.2
 
     # To remove in 2025. This allows migration db/migrate/20240415134849_encrypt_keys.rb to encrypt existing plaintext keys
     config.active_record.encryption.support_unencrypted_data = true
@@ -36,6 +36,14 @@ module HostedGPT
     #
     config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("lib")
+
+    if Setting.validate_env_vars == "1"
+      Setting.require_keys!(:app_url_protocol, :app_url_host, :app_url_port)
+    end
+    config.app_url_protocol = Setting.app_url_protocol
+    config.app_url_host = Setting.app_url_host
+    config.app_url_port = Setting.app_url_port
+    config.app_url = "#{Setting.app_url_protocol}://#{Setting.app_url_host}:#{Setting.app_url_port}"
 
     # Active Storage
     if Feature.cloudflare_storage?

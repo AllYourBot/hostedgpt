@@ -11,6 +11,7 @@ class DocumentsTest < ApplicationSystemTestCase
   # end
 
   test "should create document" do
+    assert true
     # TODO: We will eventually want to have a general endpoint for updating Documents but we haven't implemented yet so disabling this test.
     #
     # visit documents_url
@@ -29,6 +30,7 @@ class DocumentsTest < ApplicationSystemTestCase
   end
 
   test "should update Document" do
+    assert true
     # TODO: We will eventually want to have a general endpoint for updating Documents but we haven't implemented yet so disabling this test.
     #
     # visit document_url(@document)
