@@ -103,7 +103,7 @@ module ActiveStorage
         )
 
         generated_url = url_helpers.rails_postgresql_service_url(verified_key_with_expiration,
-          only_path: true,  # This fixes an exception with attachment URL generation from a worker: https://github.com/AllYourBot/hostedgpt/pull/398#issuecomment-2168135853
+          **url_options,
           disposition: content_disposition,
           content_type: content_type,
           filename: filename,
