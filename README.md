@@ -296,7 +296,8 @@ Every time you pull new changes down, kill docker (if it's running) and re-run:
 
 HostedGPT requires these services to be running:
 
-- Postgres ([installation instructions](https://www.postgresql.org/download/))
+- Postgres (`brew install postgresql@16` or other [install instructions](https://www.postgresql.org/download/))
+  - By default postgres will create a default user and following the instructions below to run the app should just work without any additional config, but if you want to set a specific username and password for your database then set the environment variable `DATABASE_URL=postgres://username:password@localhost/hostedgpt_development` (replacing `username`, `password`, and `hostedgpt_development` (database name) as appropriate
 - rbenv ([installation instructions](https://github.com/rbenv/rbenv))
 - ImageMagick (`brew install imagemagick` should work on Mac )
 
