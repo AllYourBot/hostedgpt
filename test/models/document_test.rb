@@ -1,6 +1,13 @@
 require "test_helper"
 
 class DocumentTest < ActiveSupport::TestCase
+  setup do
+    Rails.application.config.app_url_protocol = "http"
+    Rails.application.config.app_url_host = "localhost"
+    Rails.application.config.app_url_port = 3000
+    Rails.application.config.app_url = "http://localhost:3000"
+  end
+
   test "has an associated user" do
     assert_instance_of User, documents(:cat_photo).user
   end
@@ -39,15 +46,19 @@ class DocumentTest < ActiveSupport::TestCase
     assert document.file.attached?
   end
 
-  test "file_data_url returns for a file" do
-    prefix = "data:image/png;base64,"
-    assert documents(:cat_photo).file_data_url
-    assert documents(:cat_photo).file_data_url.starts_with?(prefix)
-    assert documents(:cat_photo).file_data_url.length > 40000
+  test "image_url returns data url when app_url is not set" do
+    Rails.application.config.app_url = nil
+
+    url = documents(:cat_photo).image_url(:small)
+
+    assert url.starts_with?("data:image/png;base64,")
+    assert url.length > 40000
   end
 
-  test "file_base64 returns a long string" do
-    assert documents(:cat_photo).file_base64.length > 40000
+  test "image_url returns fully processed url when app_url is set" do
+    url = documents(:cat_photo).image_url(:small)
+
+    assert url.starts_with?("http://localhost:3000/rails/active_storage/postgresql")
   end
 
   test "has_file_variant_processed?" do
