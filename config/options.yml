@@ -51,6 +51,7 @@ shared:
     default_openai_key: <%= ENV["DEFAULT_OPENAI_KEY"] %>
     default_anthropic_key: <%= ENV["DEFAULT_ANTHROPIC_KEY"] %>
     default_groq_key: <%= ENV["DEFAULT_GROQ_KEY"] %>
+    lang_models_url: <%= ENV.fetch("LANG_MODELS_URL", "https://raw.githubusercontent.com/AllYourBot/hostedgpt/refs/heads/main/models.json") %>
     cloudflare_account_id: <%= ENV["CLOUDFLARE_ACCOUNT_ID"] || default_to(cloudflare: :account_id) %>
     cloudflare_access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || default_to(cloudflare: :access_key_id) %>
     cloudflare_secret_access_key: <%= ENV["CLOUDFLARE_SECRET_ACCESS_KEY"] || default_to(cloudflare: :secret_access_key) %>

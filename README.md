@@ -29,14 +29,14 @@ This project is led by an experienced rails developer, but I'm actively looking 
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
 - [Deploy on your own server](#deploy-on-your-own-server)
 - [Configure optional features](#configure-optional-features)
-  - [Give assistant access to your Google apps](#configuring-google-tools)
+  - [Configuring Google Tools](#configuring-google-tools)
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
     - [Google OAuth authentication](#google-oauth-authentication)
     - [HTTP header authentication](#http-header-authentication)
 - [Contribute as a developer](#contribute-as-a-developer)
-  - [Running locally](#Running-locally)
-    - [Alternatively, you can skip Docker:](#alternatively-you-can-set-skip-docker)
+  - [Running locally](#running-locally)
+    - [Alternatively, you can skip Docker](#alternatively-you-can-skip-docker)
   - [Running tests](#running-tests)
 - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
@@ -173,6 +173,7 @@ There are a number of optional feature flags that can be set and settings that c
 - `PASSWORD_AUTHENTICATION_FEATURE` is `true` by default, see the [Authentication](#authentication) section for more details.
 - `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
 - `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
+- `LANG_MODELS_URL` overrides the URL for fetching the latest LLM models and pricing.
 
 ### Configuring Google Tools
 
