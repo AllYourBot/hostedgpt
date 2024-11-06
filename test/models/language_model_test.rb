@@ -105,16 +105,18 @@ class LanguageModelTest < ActiveSupport::TestCase
     path = Rails.root.join("tmp/models.json")
     LanguageModel.export_to_file(path:, models: users(:rob).language_models.not_deleted)
     assert File.exist?(path)
-    json = JSON.load_file(path)
-    assert_equal json.first.keys, %w[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents api_service_name]
+    storage = JSON.load_file(path)
+    models = storage["models"]
+    assert_equal models.first.keys, %w[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents api_service_name]
   end
 
   test "export_to_file yaml" do
     path = Rails.root.join("tmp/models.yaml")
     LanguageModel.export_to_file(path:, models: users(:rob).language_models.not_deleted)
     assert File.exist?(path)
-    yaml = YAML.load_file(path)
-    assert_equal yaml.first.keys, %w[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents api_service_name]
+    storage = YAML.load_file(path)
+    models = storage["models"]
+    assert_equal models.first.keys, %w[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents api_service_name]
   end
 
   test "import_from_file with only new models" do
@@ -127,8 +129,11 @@ class LanguageModelTest < ActiveSupport::TestCase
       input_token_cost_cents: 1,
       output_token_cost_cents: 1
     }]
+    storage = {
+      "models" => models
+    }
     path = Rails.root.join("tmp/newmodels.yaml")
-    File.write(path, models.to_yaml)
+    File.write(path, storage.to_yaml)
     assert_difference "LanguageModel.count", 1 do
       LanguageModel.import_from_file(path:, users: users(:rob))
     end
@@ -145,8 +150,11 @@ class LanguageModelTest < ActiveSupport::TestCase
       input_token_cost_cents: 0.0001,
       output_token_cost_cents: 0.0001
     }]
+    storage = {
+      "models" => models
+    }
     path = Rails.root.join("tmp/newmodels.yaml")
-    File.write(path, models.to_yaml)
+    File.write(path, storage.to_yaml)
     assert_no_difference "LanguageModel.count" do
       LanguageModel.import_from_file(path:, users: users(:rob))
     end

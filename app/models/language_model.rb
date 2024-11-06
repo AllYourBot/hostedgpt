@@ -67,16 +67,20 @@ class LanguageModel < ApplicationRecord
 
   def self.export_to_file(path:, models:, only: %i[api_name name api_service_name supports_images supports_tools input_token_cost_cents output_token_cost_cents])
     path = path.to_s
+    storage = {
+      "models" => models.as_json(only:)
+    }
     if path.ends_with?(".json")
-      File.write(path, models.to_json(only: only))
+      File.write(path, storage.to_json)
     else
-      File.write(path, models.as_json(only: only).to_yaml)
+      File.write(path, storage.to_yaml)
     end
   end
 
   def self.import_from_file(path:, users: User.all)
     users = Array.wrap(users)
-    models = YAML.load_file(path)
+    storage = YAML.load_file(path)
+    models = storage["models"]
     models.each do |model|
       model = model.with_indifferent_access
       users.each do |user|
