@@ -52,6 +52,16 @@ class LanguageModel < ApplicationRecord
       api_service.name != "Groq" # TODO: Remove this short circuit once I can debug tool use with Groq
   end
 
+  # Invoke upon an ActiveRecord::Relation, e.g. LanguageModel.not_deleted.export_to_file(path:)
+  def self.export_to_file(path:, models: not_deleted, only: %i[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents])
+    path = path.to_s
+    if path.ends_with?(".json")
+      File.write(path, models.to_json(only: only))
+    else
+      File.write(path, models.as_json(only: only).to_yaml)
+    end
+  end
+
   private
 
   def populate_position

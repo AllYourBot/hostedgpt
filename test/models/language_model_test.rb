@@ -101,6 +101,22 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert list.include?("alpaca:medium")
   end
 
+  test "export_to_file json" do
+    path = Rails.root.join("tmp/models.json")
+    LanguageModel.export_to_file(path:)
+    assert File.exist?(path)
+    json = JSON.load_file(path)
+    assert_equal json.first.keys, %w[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents]
+  end
+
+  test "export_to_file yaml" do
+    path = Rails.root.join("tmp/models.yaml")
+    LanguageModel.export_to_file(path:)
+    assert File.exist?(path)
+    yaml = YAML.load_file(path)
+    assert_equal yaml.first.keys, %w[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents]
+  end
+
   private
 
   def create_params
