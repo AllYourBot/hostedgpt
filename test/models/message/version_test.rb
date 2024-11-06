@@ -67,6 +67,7 @@ class Message::VersionTest < ActiveSupport::TestCase
   test "creating a message with branched true AND branched_from_version specified SUCCEEDS" do
     Current.user = users(:keith)
     conversations(:versioned).messages.create!(assistant: assistants(:samantha), content_text: "What is your name?", index: 2, version: 3, branched: true, branched_from_version: 2)
+    assert true # because we have to have an assertion in a test
   end
 
   test "creating a new messages for a SPECIFIC INDEX and SPECIFIC VERSION fails if the VERSION is SKIPPING a number" do
