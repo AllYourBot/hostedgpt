@@ -1,0 +1,187 @@
+---
+- api_name: claude-best
+  name: Best Anthropic Model
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.0003'
+  output_token_cost_cents: '0.0015'
+- api_name: groq-best
+  name: Best Open-Source Model
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.000059'
+  output_token_cost_cents: '0.000079'
+- api_name: gpt-4o-2024-05-13
+  name: GPT-4o Omni Multimodal (2024-05-13)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.0005'
+  output_token_cost_cents: '0.0015'
+- api_name: gpt-4-turbo
+  name: GPT-4 Turbo with Vision (latest)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.001'
+  output_token_cost_cents: '0.003'
+- api_name: gpt-4-turbo-2024-04-09
+  name: GPT-4 Turbo with Vision (2024-04-09)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.001'
+  output_token_cost_cents: '0.003'
+- api_name: gpt-4-turbo-preview
+  name: GPT-4 Turbo Preview
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.001'
+  output_token_cost_cents: '0.003'
+- api_name: gpt-4-0125-preview
+  name: GPT-4 Turbo Preview (2024-01-25)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.001'
+  output_token_cost_cents: '0.003'
+- api_name: gpt-4-1106-preview
+  name: GPT-4 Turbo Preview (2023-11-06)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.001'
+  output_token_cost_cents: '0.003'
+- api_name: gpt-4-vision-preview
+  name: GPT-4 Turbo with Vision Preview (2023-11-06)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.001'
+  output_token_cost_cents: '0.003'
+- api_name: gpt-4-1106-vision-preview
+  name: GPT-4 Turbo with Vision Preview (2023-11-06)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.001'
+  output_token_cost_cents: '0.003'
+- api_name: gpt-4
+  name: GPT-4 (latest)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.003'
+  output_token_cost_cents: '0.006'
+- api_name: gpt-4-0613
+  name: GPT-4 Snapshot improved function calling (2023-06-13)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.001'
+  output_token_cost_cents: '0.003'
+- api_name: gpt-3.5-turbo
+  name: GPT-3.5 Turbo (latest)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.0003'
+  output_token_cost_cents: '0.0006'
+- api_name: gpt-3.5-turbo-0125
+  name: GPT-3.5 Turbo (2022-01-25)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.00005'
+  output_token_cost_cents: '0.00015'
+- api_name: gpt-3.5-turbo-1106
+  name: GPT-3.5 Turbo (2022-11-06)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.0001'
+  output_token_cost_cents: '0.0002'
+- api_name: claude-3-5-sonnet-20240620
+  name: Claude 3.5 Sonnet (2024-06-20)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.0003'
+  output_token_cost_cents: '0.0015'
+- api_name: claude-3-opus-20240229
+  name: Claude 3 Opus (2024-02-29)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.0015'
+  output_token_cost_cents: '0.0075'
+- api_name: claude-3-sonnet-20240229
+  name: Claude 3 Sonnet (2024-02-29)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.0003'
+  output_token_cost_cents: '0.0015'
+- api_name: claude-3-haiku-20240307
+  name: Claude 3 Haiku (2024-03-07)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.000025'
+  output_token_cost_cents: '0.000125'
+- api_name: claude-2.1
+  name: Claude 2.1
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.0008'
+  output_token_cost_cents: '0.0024'
+- api_name: claude-2.0
+  name: Claude 2.0
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.0008'
+  output_token_cost_cents: '0.0024'
+- api_name: claude-instant-1.2
+  name: Claude Instant 1.2
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.00008'
+  output_token_cost_cents: '0.00024'
+- api_name: llama3-70b-8192
+  name: Meta Llama 3 70b
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.000059'
+  output_token_cost_cents: '0.000079'
+- api_name: llama3-8b-8192
+  name: Meta Llama 3 8b
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.000005'
+  output_token_cost_cents: '0.000008'
+- api_name: mixtral-8x7b-32768
+  name: Mistral 8 7b
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.000024'
+  output_token_cost_cents: '0.000024'
+- api_name: gemma-7b-it
+  name: Google Gemma 7b
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.000007'
+  output_token_cost_cents: '0.000007'
+- api_name: gpt-3.5-turbo-instruct
+  name: GPT-3.5 Turbo Instruct
+  supports_images: false
+  supports_tools: false
+  input_token_cost_cents: '0.00015'
+  output_token_cost_cents: '0.0002'
+- api_name: gpt-3.5-turbo-16k-0613
+  name: GPT-3.5 Turbo (2022-06-13)
+  supports_images: false
+  supports_tools: false
+  input_token_cost_cents: '0.0003'
+  output_token_cost_cents: '0.0004'
+- api_name: gpt-best
+  name: Best OpenAI Model
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.00025'
+  output_token_cost_cents: '0.001'
+- api_name: gpt-4o
+  name: GPT-4o (latest)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.00025'
+  output_token_cost_cents: '0.001'
+- api_name: gpt-4o-2024-08-06
+  name: GPT-4o Omni Multimodal (2024-08-06)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.00025'
+  output_token_cost_cents: '0.001'
