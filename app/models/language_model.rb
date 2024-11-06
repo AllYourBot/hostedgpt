@@ -11,6 +11,7 @@ class LanguageModel < ApplicationRecord
   validates :api_name, :name, :position, presence: true
 
   before_save :soft_delete_assistants, if: -> { has_attribute?(:deleted_at) && deleted_at && deleted_at_changed? && deleted_at_was.nil? }
+  after_save :update_best_language_model_for_api_service
 
   scope :ordered, -> { order(:position) }
   scope :for_user, ->(user) { where(user_id: user.id).not_deleted }
@@ -35,5 +36,13 @@ class LanguageModel < ApplicationRecord
 
   def soft_delete_assistants
     assistants.update_all(deleted_at: Time.current)
+  end
+
+  # Only one best language model per API service
+  def update_best_language_model_for_api_service
+    if best?
+      api_service.language_models.update_all(best: false)
+      update_column(:best, true)
+    end
   end
 end
