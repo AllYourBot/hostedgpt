@@ -1,27 +1,5 @@
 # We don"t care about large or not
 class LanguageModel < ApplicationRecord
-  BEST_GPT = "gpt-best"
-  BEST_CLAUDE = "claude-best"
-  BEST_GROQ = "groq-best"
-
-  BEST_MODELS = {
-    BEST_GPT => "gpt-4o-2024-08-06",
-    BEST_CLAUDE => "claude-3-5-sonnet-20240620",
-    BEST_GROQ => "llama3-70b-8192",
-  }
-
-  BEST_MODEL_INPUT_PRICES = {
-    BEST_GPT => 250,
-    BEST_CLAUDE => 300,
-    BEST_GROQ => 59,
-  }
-
-  BEST_MODEL_OUTPUT_PRICES = {
-    BEST_GPT => 1000,
-    BEST_CLAUDE => 1500,
-    BEST_GROQ => 79,
-  }
-
   belongs_to :user
   belongs_to :api_service
 
@@ -36,12 +14,9 @@ class LanguageModel < ApplicationRecord
 
   scope :ordered, -> { order(:position) }
   scope :for_user, ->(user) { where(user_id: user.id).not_deleted }
+  scope :best_for_api_service, ->(api_service) { where(best: true, api_service: api_service) }
 
   delegate :ai_backend, to: :api_service
-
-  def provider_name
-    BEST_MODELS[api_name] || api_name
-  end
 
   def created_by_current_user?
     user == Current.user

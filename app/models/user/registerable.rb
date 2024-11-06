@@ -12,11 +12,8 @@ module User::Registerable
     anthropic_api_service = api_services.create!(url: APIService::URL_ANTHROPIC, driver: :anthropic, name: "Anthropic")
     groq_api_service = api_services.create!(url: APIService::URL_GROQ, driver: :openai, name: "Groq")
 
+    best_models = %w[gpt-4o claude-3-5-sonnet-20240620 llama3-70b-8192]
     [
-      [LanguageModel::BEST_GPT, "Best OpenAI Model", true, open_ai_api_service, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GPT], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GPT]],
-      [LanguageModel::BEST_CLAUDE, "Best Anthropic Model", true, anthropic_api_service, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_CLAUDE], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_CLAUDE]],
-      [LanguageModel::BEST_GROQ, "Best Open-Source Model", true, groq_api_service, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GROQ], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GROQ]],
-
       ["gpt-4o", "GPT-4o (latest)", true, open_ai_api_service, 250, 1000],
       ["gpt-4o-2024-08-06", "GPT-4o Omni Multimodal (2024-08-06)", true, open_ai_api_service, 250, 1000],
       ["gpt-4o-2024-05-13", "GPT-4o Omni Multimodal (2024-05-13)", true, open_ai_api_service, 500, 1500],
@@ -57,6 +54,7 @@ module User::Registerable
         api_name:,
         api_service:,
         name:,
+        best: best_models.include?(api_name),
         supports_tools: true,
         supports_images:,
         input_token_cost_cents:,
@@ -76,8 +74,8 @@ module User::Registerable
       language_models.create!(api_name:, api_service:, name:, supports_tools: false, supports_images:, input_token_cost_cents:, output_token_cost_cents:)
     end
 
-    assistants.create! name: "GPT-4o", language_model: language_models.find_by(api_name: LanguageModel::BEST_GPT)
-    assistants.create! name: "Claude 3.5 Sonnet", language_model: language_models.find_by(api_name: LanguageModel::BEST_CLAUDE)
-    assistants.create! name: "Meta Llama 3 70b", language_model: language_models.find_by(api_name: LanguageModel::BEST_GROQ)
+    assistants.create! name: "GPT-4o", language_model: language_models.best_for_api_service(open_ai_api_service).first
+    assistants.create! name: "Claude 3.5 Sonnet", language_model: language_models.best_for_api_service(anthropic_api_service).first
+    assistants.create! name: "Meta Llama 3 70b", language_model: language_models.best_for_api_service(groq_api_service).first
   end
 end
