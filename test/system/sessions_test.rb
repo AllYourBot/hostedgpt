@@ -43,4 +43,18 @@ class SessionsTest < ApplicationSystemTestCase
       assert_text "Log In with Google"
     end
   end
+
+  test "should SHOW the Microsoft button when the feature is ENABLED" do
+    stub_features(microsoft_authentication: true) do
+      visit root_url
+      assert_text "Log In with Microsoft"
+    end
+  end
+
+  test "should NOT display a Microsoft button when the feature is DISABLED" do
+    stub_features(microsoft_authentication: false) do
+      visit root_url
+      assert_no_text "Log In with Microsoft"
+    end
+  end
 end

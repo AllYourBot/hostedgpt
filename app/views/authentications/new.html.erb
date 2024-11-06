@@ -26,6 +26,27 @@
   </span>
 <% end %>
 
+<% if Feature.microsoft_authentication? %>
+  <%= button_to "Log In with Microsoft", "/auth/microsoft",
+    method: "post",
+    class: %|
+      text-white font-medium
+      bg-brand-blue dark:bg-gray-900
+      border border-white dark:border-gray-400
+      rounded-lg p-4 text-center
+      cursor-pointer
+      hover:opacity-95
+    |,
+    form_class: "flex flex-col space-y-4 w-80",
+    data: {
+      turbo: false,
+    }
+  %>
+  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && 'hidden' %>">
+    - Or -
+  </span>
+<% end %>
+
 <% if Feature.password_authentication? %>
   <%= form_with(url: login_path, method: :post, class: "flex flex-col space-y-4 w-80") do |f| %>
     <%= f.email_field :email,

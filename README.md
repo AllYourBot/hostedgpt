@@ -20,26 +20,28 @@ This project is led by an experienced rails developer, but I'm actively looking 
 
 ## Table of Contents
 
-- [Top features of HostedGPT](#top-features-of-hostedgpt)
-  - [Watch a short demo](#watch-a-short-demo)
-- [Table of Contents](#table-of-contents)
-- [Deploy the app on Render](#deploy-the-app-on-render)
-  - [Troubleshooting Render](#troubleshooting-render)
-- [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
-- [Deploy the app on Heroku](#deploy-the-app-on-heroku)
-- [Deploy on your own server](#deploy-on-your-own-server)
-- [Configure optional features](#configure-optional-features)
-  - [Give assistant access to your Google apps](#configuring-google-tools)
-  - [Authentication](#authentication)
-    - [Password authentication](#password-authentication)
-    - [Google OAuth authentication](#google-oauth-authentication)
-    - [HTTP header authentication](#http-header-authentication)
-- [Contribute as a developer](#contribute-as-a-developer)
-  - [Running locally](#Running-locally)
-    - [Alternatively, you can skip Docker:](#alternatively-you-can-set-skip-docker)
-  - [Running tests](#running-tests)
-- [Understanding the Docker configuration](#understanding-the-docker-configuration)
-- [Changelog](#changelog)
+- [HostedGPT v0.6](#hostedgpt-v06)
+  - [Top features of HostedGPT](#top-features-of-hostedgpt)
+    - [Watch a short demo](#watch-a-short-demo)
+  - [Table of Contents](#table-of-contents)
+  - [Deploy the app on Render](#deploy-the-app-on-render)
+    - [Troubleshooting Render](#troubleshooting-render)
+  - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
+  - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
+  - [Deploy on your own server](#deploy-on-your-own-server)
+  - [Configure optional features](#configure-optional-features)
+    - [Configuring Google Tools](#configuring-google-tools)
+    - [Authentication](#authentication)
+      - [Password authentication](#password-authentication)
+      - [Google OAuth authentication](#google-oauth-authentication)
+      - [Microsoft OAuth authentication](#microsoft-oauth-authentication)
+      - [HTTP header authentication](#http-header-authentication)
+  - [Contribute as a developer](#contribute-as-a-developer)
+    - [Running locally](#running-locally)
+      - [Alternatively, you can skip Docker](#alternatively-you-can-skip-docker)
+    - [Running tests](#running-tests)
+  - [Understanding the Docker configuration](#understanding-the-docker-configuration)
+  - [Changelog](#changelog)
 
 ## Deploy the app on Render
 
@@ -196,6 +198,7 @@ HostedGPT supports multiple authentication methods:
 
 - [Password authentication](#password-authentication)
 - [Google OAuth authentication](#google-oauth-authentication)
+- [Microsoft OAuth authentication](#microsoft-oauth-authentication)
 
 #### Password authentication
 
@@ -247,6 +250,37 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
    - Set the Client ID and Client Secret as environment variables in your application:
      - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID
      - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret
+
+#### Microsoft OAuth authentication
+
+Microsoft OAuth authentication is disabled by default. You can enable it by setting `MICROSOFT_AUTHENTICATION_FEATURE` to `true`.
+
+To enable Microsoft OAuth authentication, you need to set up Microsoft OAuth in the Microsoft Azure portal. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
+
+- `MICROSOFT_AUTH_CLIENT_ID` - Microsoft OAuth client ID
+- `MICROSOFT_AUTH_CLIENT_SECRET` - Microsoft OAuth client secret
+
+**Steps to set up:**
+
+1. **Go to the Microsoft Azure portal and create a new application:**
+
+   - Navigate to [Register an application](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType)
+   - Give it a name
+   - Select the Supported account types
+   - Select the Redirect URI for "Web" (e.g., `https://example.com/auth/microsoft/callback` or `http://localhost:3000/auth/microsoft/callback`)
+   - Click Register
+
+2. **Create OAuth Credentials:**
+
+   - The client ID ("Application (client) ID") is displayed on the Overview page
+   - To generate a client secret, click on "Add a certificate or secret" > "New client secret"
+   - Give it a name and pick an expiration date
+   - Back on the "Certificates & secrets" page, the new client secret will be listed under "Value"
+
+3. **Set Environment Variables:**
+   - Set the Client ID and Client Secret as environment variables in your application:
+     - `MICROSOFT_AUTH_CLIENT_ID`: Your Client ID
+     - `MICROSOFT_AUTH_CLIENT_SECRET`: Your Client Secret
 
 #### HTTP header authentication
 

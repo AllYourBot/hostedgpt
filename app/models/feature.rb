@@ -21,6 +21,7 @@ class Feature
       if @@features_hash[:http_header_authentication]
         @@features_hash[:password_authentication] = false
         @@features_hash[:google_authentication] = false
+        @@features_hash[:microsoft_authentication] = false
       end
 
       @@features_hash

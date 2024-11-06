@@ -54,7 +54,8 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
     stub_features(
       http_header_authentication: true,
       password_authentication: false,
-      google_authentication: false
+      google_authentication: false,
+      microsoft_authentication: false
     ) do
       get root_url
     end
