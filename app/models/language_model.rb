@@ -4,12 +4,14 @@ class LanguageModel < ApplicationRecord
   BEST_CLAUDE = "claude-best"
   BEST_GROQ = "groq-best"
 
+  # TODO: infer these from models.yaml
   BEST_MODELS = {
     BEST_GPT => "gpt-4o-2024-08-06",
     BEST_CLAUDE => "claude-3-5-sonnet-20240620",
     BEST_GROQ => "llama3-70b-8192",
   }
 
+  # TODO: what are these for?
   BEST_MODEL_INPUT_PRICES = {
     BEST_GPT => 250,
     BEST_CLAUDE => 300,
@@ -47,18 +49,44 @@ class LanguageModel < ApplicationRecord
     user == Current.user
   end
 
+  def api_service_name
+    api_service.name
+  end
+
+  def as_json(options = {})
+    options = options.with_indifferent_access
+    attrs = super(options)
+    attrs["api_service_name"] = api_service_name if options[:only].include?(:api_service_name)
+    attrs
+  end
+
   def supports_tools?
     attributes["supports_tools"] &&
       api_service.name != "Groq" # TODO: Remove this short circuit once I can debug tool use with Groq
   end
 
-  # Invoke upon an ActiveRecord::Relation, e.g. LanguageModel.not_deleted.export_to_file(path:)
-  def self.export_to_file(path:, models: not_deleted, only: %i[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents])
+  def self.export_to_file(path:, models:, only: %i[api_name name api_service_name supports_images supports_tools input_token_cost_cents output_token_cost_cents])
     path = path.to_s
     if path.ends_with?(".json")
       File.write(path, models.to_json(only: only))
     else
       File.write(path, models.as_json(only: only).to_yaml)
+    end
+  end
+
+  def self.import_from_file(path:, users: User.all)
+    users = Array.wrap(users)
+    models = YAML.load_file(path)
+    models.each do |model|
+      model = model.with_indifferent_access
+      users.each do |user|
+        lm = user.language_models.find_or_initialize_by(api_name: model[:api_name])
+        lm.api_service = user.api_services.find_by(name: model[:api_service_name]) if model[:api_service_name]
+        lm.attributes = model.except(:api_service_name)
+        lm.save!
+      rescue ActiveRecord::RecordInvalid => e
+        warn "Failed to import '#{model[:api_name]}': #{e.message} for #{model.inspect}"
+      end
     end
   end
 

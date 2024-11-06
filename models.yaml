@@ -1,4 +1,10 @@
 ---
+- api_name: gpt-best
+  name: Best OpenAI Model
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.00025'
+  output_token_cost_cents: '0.001'
 - api_name: claude-best
   name: Best Anthropic Model
   supports_images: true
@@ -11,6 +17,12 @@
   supports_tools: true
   input_token_cost_cents: '0.000059'
   output_token_cost_cents: '0.000079'
+- api_name: gpt-4o
+  name: GPT-4o (latest)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.00025'
+  output_token_cost_cents: '0.001'
 - api_name: gpt-4o-2024-05-13
   name: GPT-4o Omni Multimodal (2024-05-13)
   supports_images: true
@@ -167,18 +179,6 @@
   supports_tools: false
   input_token_cost_cents: '0.0003'
   output_token_cost_cents: '0.0004'
-- api_name: gpt-best
-  name: Best OpenAI Model
-  supports_images: true
-  supports_tools: true
-  input_token_cost_cents: '0.00025'
-  output_token_cost_cents: '0.001'
-- api_name: gpt-4o
-  name: GPT-4o (latest)
-  supports_images: true
-  supports_tools: true
-  input_token_cost_cents: '0.00025'
-  output_token_cost_cents: '0.001'
 - api_name: gpt-4o-2024-08-06
   name: GPT-4o Omni Multimodal (2024-08-06)
   supports_images: true
