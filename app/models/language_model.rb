@@ -13,7 +13,7 @@ class LanguageModel < ApplicationRecord
   before_save :soft_delete_assistants, if: -> { has_attribute?(:deleted_at) && deleted_at && deleted_at_changed? && deleted_at_was.nil? }
   after_save :update_best_language_model_for_api_service
 
-  scope :ordered, -> { order(:position) }
+  scope :ordered, -> { order(Arel.sql("CASE WHEN best THEN 0 ELSE position END")).order(:position) }
   scope :for_user, ->(user) { where(user_id: user.id).not_deleted }
   scope :best_for_api_service, ->(api_service) { where(best: true, api_service: api_service) }
 

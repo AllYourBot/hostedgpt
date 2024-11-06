@@ -3,7 +3,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   before_action :set_system_language_model, only: [:show]
 
   def index
-    @language_models = LanguageModel.for_user(Current.user).order(updated_at: :desc)
+    @language_models = LanguageModel.for_user(Current.user).ordered
   end
 
   def edit
