@@ -25,7 +25,7 @@ services:
       - APP_URL_PROTOCOL
       - APP_URL_HOST
       - APP_URL_PORT
-      - DATABASE_URL
+      - DATABASE_URL=postgres://app:secret@postgres/app_development
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
       - OVERMIND_COLORS=2,3,5
       - ALLOWED_REQUEST_ORIGINS
