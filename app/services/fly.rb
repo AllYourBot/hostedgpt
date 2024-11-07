@@ -7,9 +7,11 @@ class Fly < SDK
     end
     swap = swap.to_i
 
-    app_id = get_apps.find { |m| m.name == app_name }&.id
+    apps = get_apps
+    app_id = apps.find { |m| m.name == app_name }&.id
     if app_id.nil?
       puts "Could not find the app named #{app_name}. Aborting."
+      puts "These are all the app names on your Fly account: #{apps.map(&:name).join(", ")}"
       return
     end
 
@@ -38,13 +40,13 @@ class Fly < SDK
   end
 
   def patch_machine(app_name, id, config)
-    patch("https://api.machines.dev/v1/apps/#{app_name}/machines/#{id}").param(config: config)
+    post("https://api.machines.dev/v1/apps/#{app_name}/machines/#{id}").param(config: config)
   end
 
   private
 
   def bearer_token
-    `fly auth token`.chop
+    @bearer_token ||= `fly auth token`.chop.split.last
   end
 
   def header
