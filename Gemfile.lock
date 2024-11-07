@@ -141,8 +141,7 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
-    ffi (1.17.0-arm64-darwin)
-    ffi (1.17.0-x86_64-linux-gnu)
+    ffi (1.15.5)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
@@ -451,7 +450,7 @@ DEPENDENCIES
   capybara
   debug
   dockerfile-rails (>= 1.6)
-  ffi
+  ffi (~> 1.15.5)
   image_processing (~> 1.13.0)
   importmap-rails
   minitest-stub_any_instance
