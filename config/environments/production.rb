@@ -99,6 +99,7 @@ Rails.application.configure do
   # ]
   # TODO should we combine this with APP_URL_HOST?
   config.hosts << ENV["PRODUCTION_HOST"].split(",").map(&:strip) if ENV["PRODUCTION_HOST"]
+  config.hosts << Setting.app_url_host if Setting.key_set?(:app_url_host)
 
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }

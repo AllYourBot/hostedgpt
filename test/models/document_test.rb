@@ -40,10 +40,12 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "image_url returns data url when app_url is not set" do
-    url = documents(:cat_photo).image_url(:small)
+    stub_config_app_url("") do
+      url = documents(:cat_photo).image_url(:small)
 
-    assert url.starts_with?("data:image/png;base64,")
-    assert url.length > 40000
+      assert url.starts_with?("data:image/png;base64,")
+      assert url.length > 40000
+    end
   end
 
   test "has_file_variant_processed?" do

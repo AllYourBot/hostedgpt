@@ -7,6 +7,8 @@ default: &default
 <% if RUBY_PLATFORM =~ /darwin/ %>
   gssencmode: disable
 <% end %>
+  # url: <%= ENV['DATABASE_URL'] %>
+  # url format: postgres://username:password@localhost:5432/database_name
 
 development:
   <<: *default
@@ -21,4 +23,3 @@ production:
   database: hostedgpt_production
   username: hostedgpt
   password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] %>
-  
