@@ -7,7 +7,7 @@ class APIService < ApplicationRecord
   belongs_to :user
 
   has_many :language_models, -> { not_deleted }
-  
+
   enum :driver, %w[ openai anthropic gemini].index_by(&:to_sym)
 
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
