@@ -56,11 +56,11 @@ shared:
     cloudflare_access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || default_to(cloudflare: :access_key_id) %>
     cloudflare_secret_access_key: <%= ENV["CLOUDFLARE_SECRET_ACCESS_KEY"] || default_to(cloudflare: :secret_access_key) %>
     cloudflare_bucket: <%= ENV["CLOUDFLARE_BUCKET"] || default_to(cloudflare: :bucket) %>
-    google_auth_client_id: <%= ENV["GOOGLE_AUTH_CLIENT_ID"] || default_to(:google_auth_client_id) %>
-    google_auth_client_secret: <%= ENV["GOOGLE_AUTH_CLIENT_SECRET"] || default_to(:google_auth_client_secret) %>
-    microsoft_graph_auth_client_id: <%= ENV["MICROSOFT_GRAPH_AUTH_CLIENT_ID"] || default_to(:microsoft_graph_auth_client_id) %>
-    microsoft_graph_auth_client_secret: <%= ENV["MICROSOFT_GRAPH_AUTH_CLIENT_SECRET"] || default_to(:microsoft_graph_auth_client_secret) %>
-    microsoft_graph_scope: <%= ENV["MICROSOFT_GRAPH_SCOPE"] || default_to(:microsoft_graph_scope) %>
+    google_auth_client_id: <%= ENV["GOOGLE_AUTH_CLIENT_ID"] || default_to(google: :auth_client_id) || default_to(:google_auth_client_id) %>
+    google_auth_client_secret: <%= ENV["GOOGLE_AUTH_CLIENT_SECRET"] || default_to(google: :auth_client_secret) || default_to(:google_auth_client_secret) %>
+    microsoft_graph_auth_client_id: <%= ENV["MICROSOFT_GRAPH_AUTH_CLIENT_ID"] || default_to(microsoft_graph: :auth_client_id) %>
+    microsoft_graph_auth_client_secret: <%= ENV["MICROSOFT_GRAPH_AUTH_CLIENT_SECRET"] || default_to(microsoft_graph: :auth_client_secret) %>
+    microsoft_graph_scope: <%= ENV["MICROSOFT_GRAPH_SCOPE"] || default_to(microsoft_graph: :scope) %>
     http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
