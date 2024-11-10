@@ -42,6 +42,7 @@ gem "amatch", "~> 0.4.1" # enables fuzzy comparison of strings, a tool uses this
 gem "rails_heroicon", "~> 2.2.0"
 gem "ruby-openai", "~> 7.0.1"
 gem "anthropic", "~> 0.1.0"
+gem "gemini-ai", "~> 4.2.0"
 gem "tiktoken_ruby", "~> 0.0.9"
 gem "solid_queue", "~> 1.0.0"
 gem "name_of_person"
@@ -86,5 +87,3 @@ group :test do
   gem "minitest-stub_any_instance"
   gem "rails-controller-testing"
 end
-
-gem 'gemini-ai', '~> 4.2.0'
