@@ -259,7 +259,11 @@ To enable Microsoft Graph OAuth authentication, you need to set up Microsoft Gra
 
 - `MICROSOFT_GRAPH_AUTH_CLIENT_ID` - Microsoft Graph OAuth client ID
 - `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET` - Microsoft Graph OAuth client secret
-- `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read`.
+- `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read mailboxsettings.read`.
+
+Users will need to have setup their full name in their Microsoft account before they can use this authentication method, via <https://profile.live.com/>, otherwise they will see a login/registration error like "First name can't be blank and last name can't be blank".
+
+Users can remotely remove the connection between their Microsoft account and HostedGPT by going to <https://account.microsoft.com/privacy/app-access> and clicking "Don't Allow" on the corresponding application. However, this will not sign out the user from HostedGPT until the session expires.
 
 **Steps to set up:**
 
@@ -282,7 +286,7 @@ To enable Microsoft Graph OAuth authentication, you need to set up Microsoft Gra
    - Set the Client ID and Client Secret as environment variables in your application:
      - `MICROSOFT_GRAPH_AUTH_CLIENT_ID`: Your Client ID
      - `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET`: Your Client Secret
-     - `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read`.
+     - `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read mailboxsettings.read`.
 
 #### HTTP header authentication
 
