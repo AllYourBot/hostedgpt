@@ -212,6 +212,14 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
 - `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret
 
+Alternately, add the following to your encrypted credentials file:
+
+```yaml
+google:
+  auth_client_id: <your client id>
+  auth_client_secret: <your client secret>
+```
+
 **Steps to set up:**
 
 1. **Go to the Google Cloud Console and Create a New Project:**
@@ -259,6 +267,15 @@ To enable Microsoft Graph OAuth authentication, you need to set up Microsoft Gra
 - `MICROSOFT_GRAPH_AUTH_CLIENT_ID` - Microsoft Graph OAuth client ID
 - `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET` - Microsoft Graph OAuth client secret
 - `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read mailboxsettings.read`.
+
+Alternately, add the following to your encrypted credentials file:
+
+```yaml
+microsoft_graph:
+  auth_client_id: <your client id>
+  auth_client_secret: <your client secret>
+  scope: openid profile email offline_access user.read mailboxsettings.read
+```
 
 Users will need to have setup their full name in their Microsoft account before they can use this authentication method, via <https://profile.live.com/>, otherwise they will see a login/registration error like "First name can't be blank and last name can't be blank".
 
