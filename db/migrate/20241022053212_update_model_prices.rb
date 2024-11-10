@@ -1,7 +1,8 @@
 class UpdateModelPrices < ActiveRecord::Migration[7.1]
   def up
     [
-      [LanguageModel::BEST_GPT, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GPT], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GPT]],
+      # Constant was removed in a later PR
+      # [LanguageModel::BEST_GPT, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GPT], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GPT]],
 
       ["gpt-4o", 250, 1000],
     ].each do |api_name, input_token_cost_per_million, output_token_cost_per_million|
@@ -27,16 +28,21 @@ class UpdateModelPrices < ActiveRecord::Migration[7.1]
           input_token_cost_cents = input_token_cost_per_million/million
           output_token_cost_cents = output_token_cost_per_million/million
 
+          LanguageModel.skip_callback(:save, :after, :update_best_language_model_for_api_service)
 
-          user.language_models.create!(
-            api_name: api_name,
-            name: name,
-            supports_images: supports_images,
-            api_service: api_service,
-            supports_tools: true,
-            input_token_cost_cents: input_token_cost_cents,
-            output_token_cost_cents: output_token_cost_cents,
-          )
+          begin
+            user.language_models.create!(
+              api_name: api_name,
+              name: name,
+              supports_images: supports_images,
+              api_service: api_service,
+              supports_tools: true,
+              input_token_cost_cents: input_token_cost_cents,
+              output_token_cost_cents: output_token_cost_cents,
+            )
+          ensure
+            LanguageModel.set_callback(:save, :after, :update_best_language_model_for_api_service)
+          end
         end
       end
     end

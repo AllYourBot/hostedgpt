@@ -1,9 +1,11 @@
 class UpdateExistingLanguageModelsWithPrices < ActiveRecord::Migration[7.1]
   def up
     [
-      [LanguageModel::BEST_GPT, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GPT], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GPT]],
-      [LanguageModel::BEST_CLAUDE, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_CLAUDE], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_CLAUDE]],
-      [LanguageModel::BEST_GROQ, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GROQ], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GROQ]],
+      # Constant was removed in a later PR
+      #
+      # [LanguageModel::BEST_GPT, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GPT], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GPT]],
+      # [LanguageModel::BEST_CLAUDE, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_CLAUDE], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_CLAUDE]],
+      # [LanguageModel::BEST_GROQ, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GROQ], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GROQ]],
 
       ["gpt-4o", 500, 1500],
       ["gpt-4o-2024-05-13", 500, 1500],
