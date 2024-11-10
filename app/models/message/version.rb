@@ -81,9 +81,9 @@ module Message::Version
       else
         if version.negative? || version > max_version
           errors.add(:version, "#{version} is invalid for this index")
-        elsif conversation.messages.exists?(index: index, version: version)
+        elsif conversation.messages.exists?(index:, version:)
           errors.add(:version, "#{version} already exists for this index")
-        elsif versions.present? && version < versions.max && !conversation.messages.exists?(index: index-1, version: version)
+        elsif versions.present? && version < versions.max && !conversation.messages.exists?(index: index-1, version:)
           errors.add(:version, "#{version} is invalid for this index")
         end
       end

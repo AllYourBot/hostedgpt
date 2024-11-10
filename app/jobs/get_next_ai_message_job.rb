@@ -118,7 +118,7 @@ class GetNextAIMessageJob < ApplicationJob
     html = ApplicationController.render(
       partial: "messages/message",
       locals: {
-        message: message,
+        message:,
         only_scroll_down_if_was_bottom: true,
         streamed: true,
         message_counter: message.index

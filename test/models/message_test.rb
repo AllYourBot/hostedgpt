@@ -123,7 +123,7 @@ class MessageTest < ActiveSupport::TestCase
 
     assert_raises ActiveRecord::RecordInvalid do
       Message.create!(
-        assistant: assistant,
+        assistant:,
         conversation: conversation_owned_by_someone_else,
         content_text: "This should fail"
       )
@@ -137,8 +137,8 @@ class MessageTest < ActiveSupport::TestCase
 
     assert_nothing_raised do
       message = Message.create!(
-        assistant: assistant,
-        conversation: conversation,
+        assistant:,
+        conversation:,
         content_text: "This works since Conversation is owned by Current.user"
       )
       assert_equal Current.user, message.conversation.user
@@ -154,8 +154,8 @@ class MessageTest < ActiveSupport::TestCase
 
     assert_nothing_raised do
       message = Message.create!(
-        assistant: assistant,
-        conversation: conversation,
+        assistant:,
+        conversation:,
         content_text: "This works since Current.user not set"
       )
     end
