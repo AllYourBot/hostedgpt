@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     resource :password_credential, only: [:edit, :update]
   end
 
+  get "/auth/microsoft_graph/callback" => "authentications/microsoft_graph_oauth#create", as: :microsoft_graph_oauth, provider: "microsoft_graph"
   get "/auth/:provider/callback" => "authentications/google_oauth#create", as: :google_oauth
   get "/auth/failure" => "authentications/google_oauth#failure" # connected in omniauth.rb
 

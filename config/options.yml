@@ -40,7 +40,7 @@ shared:
     google_tools: <%= ENV["GOOGLE_TOOLS_FEATURE"] || false %>
     password_authentication: <%= ENV["PASSWORD_AUTHENTICATION_FEATURE"] || true %>
     google_authentication: <%= ENV["GOOGLE_AUTHENTICATION_FEATURE"] || false %>
-    microsoft_authentication: <%= ENV["MICROSOFT_AUTHENTICATION_FEATURE"] || false %>
+    microsoft_graph_authentication: <%= ENV["MICROSOFT_AUTHENTICATION_FEATURE"] || false %>
     http_header_authentication: <%= ENV["HTTP_HEADER_AUTHENTICATION_FEATURE"] || false %>
     voice: <%= ENV["VOICE_FEATURE"] || false %>
     default_to_voice: <%= ENV["DEFAULT_TO_VOICE_FEATURE"] || false %>
