@@ -52,6 +52,7 @@ class ActiveStorage::PostgresqlControllerTest < ActionDispatch::IntegrationTest
     blob.delete
 
     get blob.send(url_method)
+    assert_response :not_found
   end
 
   test "showing blob with invalid key" do
