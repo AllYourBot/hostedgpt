@@ -31,12 +31,12 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
     }
     OmniAuth.config.add_mock(:microsoft_graph, details)
 
-    refute user.microsoft_credential.present?
+    refute user.microsoft_graph_credential.present?
     get microsoft_graph_oauth_path
 
     assert_redirected_to edit_settings_person_path
     assert_equal "Saved", flash[:notice]
-    assert_credential_matches_details(user.reload.microsoft_credential, details)
+    assert_credential_matches_details(user.reload.microsoft_graph_credential, details)
   end
 
   test "should log you in for a user that exists" do
@@ -67,7 +67,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
     user = users(:rob)
 
     assert user.password_credential.present?
-    refute user.microsoft_credential.present?
+    refute user.microsoft_graph_credential.present?
     assert_not_equal "John", user.first_name
     assert_not_equal "Doe", user.last_name
 
@@ -91,7 +91,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
 
     assert_redirected_to root_path
     assert_logged_in(user)
-    assert_credential_matches_details(user.microsoft_credential, details)
+    assert_credential_matches_details(user.microsoft_graph_credential, details)
     assert_equal details[:info][:email], user.email
     assert user.clients.ordered.last.authenticated?
   end
@@ -121,7 +121,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
 
     assert_redirected_to root_path
     assert_logged_in(user)
-    assert_credential_matches_details(user.microsoft_credential, details)
+    assert_credential_matches_details(user.microsoft_graph_credential, details)
     assert_equal details[:info][:email], user.email
     assert user.clients.ordered.last.authenticated?
   end
@@ -147,7 +147,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
 
     assert_redirected_to root_path
     assert_logged_in(user)
-    assert_credential_matches_details(user.microsoft_credential, details)
+    assert_credential_matches_details(user.microsoft_graph_credential, details)
     assert_equal details[:info][:email], user.email
     assert user.clients.ordered.last.authenticated?
   end

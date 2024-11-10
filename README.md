@@ -34,7 +34,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
     - [Authentication](#authentication)
       - [Password authentication](#password-authentication)
       - [Google OAuth authentication](#google-oauth-authentication)
-      - [Microsoft OAuth authentication](#microsoft-oauth-authentication)
+      - [Microsoft Graph OAuth authentication](#microsoft-graph-oauth-authentication)
       - [HTTP header authentication](#http-header-authentication)
   - [Contribute as a developer](#contribute-as-a-developer)
     - [Running locally](#running-locally)
@@ -251,14 +251,15 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
      - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID
      - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret
 
-#### Microsoft OAuth authentication
+#### Microsoft Graph OAuth authentication
 
-Microsoft OAuth authentication is disabled by default. You can enable it by setting `MICROSOFT_AUTHENTICATION_FEATURE` to `true`.
+Microsoft Graph OAuth authentication is disabled by default. You can enable it by setting `MICROSOFT_GRAPH_AUTHENTICATION_FEATURE` to `true`.
 
-To enable Microsoft OAuth authentication, you need to set up Microsoft OAuth in the Microsoft Azure portal. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
+To enable Microsoft Graph OAuth authentication, you need to set up Microsoft Graph OAuth in the Microsoft Azure portal. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
 
-- `MICROSOFT_AUTH_CLIENT_ID` - Microsoft OAuth client ID
-- `MICROSOFT_AUTH_CLIENT_SECRET` - Microsoft OAuth client secret
+- `MICROSOFT_GRAPH_AUTH_CLIENT_ID` - Microsoft Graph OAuth client ID
+- `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET` - Microsoft Graph OAuth client secret
+- `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read`.
 
 **Steps to set up:**
 
@@ -279,8 +280,9 @@ To enable Microsoft OAuth authentication, you need to set up Microsoft OAuth in 
 
 3. **Set Environment Variables:**
    - Set the Client ID and Client Secret as environment variables in your application:
-     - `MICROSOFT_AUTH_CLIENT_ID`: Your Client ID
-     - `MICROSOFT_AUTH_CLIENT_SECRET`: Your Client Secret
+     - `MICROSOFT_GRAPH_AUTH_CLIENT_ID`: Your Client ID
+     - `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET`: Your Client Secret
+     - `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read`.
 
 #### HTTP header authentication
 

@@ -3,7 +3,7 @@ class Authentications::MicrosoftGraphOauthController < ApplicationController
 
   def create
     if Current.user
-      Current.user.microsoft_credential&.destroy
+      Current.user.microsoft_graph_credential&.destroy
       _, cred = add_person_credentials("MicrosoftGraphCredential")
       cred.save! && redirect_to(edit_settings_person_path, notice: "Saved") && return
 
@@ -24,7 +24,7 @@ class Authentications::MicrosoftGraphOauthController < ApplicationController
     end
 
     if @person&.save
-      login_as(@person, credential: @person.user.reload.microsoft_credential)
+      login_as(@person, credential: @person.user.reload.microsoft_graph_credential)
       redirect_to root_path
     else
       @person&.errors&.delete :personable
@@ -52,7 +52,7 @@ class Authentications::MicrosoftGraphOauthController < ApplicationController
   end
 
   def init_for_user(user)
-    user.microsoft_credential.destroy if user.microsoft_credential
+    user.microsoft_graph_credential&.destroy
 
     user.first_name = auth[:info][:first_name]
     user.last_name = auth[:info][:last_name]

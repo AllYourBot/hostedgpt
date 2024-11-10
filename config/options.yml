@@ -40,7 +40,7 @@ shared:
     google_tools: <%= ENV["GOOGLE_TOOLS_FEATURE"] || false %>
     password_authentication: <%= ENV["PASSWORD_AUTHENTICATION_FEATURE"] || true %>
     google_authentication: <%= ENV["GOOGLE_AUTHENTICATION_FEATURE"] || false %>
-    microsoft_graph_authentication: <%= ENV["MICROSOFT_AUTHENTICATION_FEATURE"] || false %>
+    microsoft_graph_authentication: <%= ENV["MICROSOFT_GRAPH_AUTHENTICATION_FEATURE"] || false %>
     http_header_authentication: <%= ENV["HTTP_HEADER_AUTHENTICATION_FEATURE"] || false %>
     voice: <%= ENV["VOICE_FEATURE"] || false %>
     default_to_voice: <%= ENV["DEFAULT_TO_VOICE_FEATURE"] || false %>
@@ -58,8 +58,9 @@ shared:
     cloudflare_bucket: <%= ENV["CLOUDFLARE_BUCKET"] || default_to(cloudflare: :bucket) %>
     google_auth_client_id: <%= ENV["GOOGLE_AUTH_CLIENT_ID"] || default_to(:google_auth_client_id) %>
     google_auth_client_secret: <%= ENV["GOOGLE_AUTH_CLIENT_SECRET"] || default_to(:google_auth_client_secret) %>
-    microsoft_auth_client_id: <%= ENV["MICROSOFT_AUTH_CLIENT_ID"] || default_to(:microsoft_auth_client_id) %>
-    microsoft_auth_client_secret: <%= ENV["MICROSOFT_AUTH_CLIENT_SECRET"] || default_to(:microsoft_auth_client_secret) %>
+    microsoft_graph_auth_client_id: <%= ENV["MICROSOFT_GRAPH_AUTH_CLIENT_ID"] || default_to(:microsoft_graph_auth_client_id) %>
+    microsoft_graph_auth_client_secret: <%= ENV["MICROSOFT_GRAPH_AUTH_CLIENT_SECRET"] || default_to(:microsoft_graph_auth_client_secret) %>
+    microsoft_graph_scope: <%= ENV["MICROSOFT_GRAPH_SCOPE"] || default_to(:microsoft_graph_scope) %>
     http_header_auth_email: <%= ENV["HTTP_HEADER_AUTH_EMAIL"] || "X-WEBAUTH-EMAIL" %>
     http_header_auth_name: <%= ENV["HTTP_HEADER_AUTH_NAME"] || "X-WEBAUTH-NAME" %>
     http_header_auth_uid: <%= ENV["HTTP_HEADER_AUTH_UID"] || "X-WEBAUTH-USER" %>
