@@ -39,7 +39,7 @@ class AIBackend::Anthropic < AIBackend
     super(config)
 
     @client_config = {
-      model: @assistant.language_model.provider_name,
+      model: @assistant.language_model.api_name,
       system: config[:instructions],
       messages: config[:messages],
       parameters: {

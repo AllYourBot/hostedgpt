@@ -33,6 +33,28 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @user, LanguageModel.last.user
   end
 
+  test "create new best language model replaces existing best" do
+    api_service = api_services(:keith_anthropic_service)
+    assert_equal api_service.language_models.best.pluck(:api_name), ["claude-best"]
+
+    params = {
+      api_name: "new-claude-service",
+      api_service_id: api_service.id,
+      name: "new best service",
+      best: true,
+      supports_images: false,
+      supports_tools: false
+    }
+
+    assert_difference("LanguageModel.count") do
+      post settings_language_models_url, params: { language_model: params }
+    end
+
+    assert_redirected_to settings_language_models_url
+
+    assert_equal api_service.language_models.best.pluck(:api_name), ["new-claude-service"]
+  end
+
   test "should get edit" do
     get edit_settings_language_model_url(@language_model)
     assert_response :success
@@ -128,6 +150,17 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to settings_language_models_url
     assert_equal "Saved", flash[:notice]
     assert_equal params, @language_model.reload.slice(:api_name, :name, :supports_images)
+  end
+
+  test "update should update best language model" do
+    api_service = api_services(:keith_anthropic_service)
+    assert_equal api_service.language_models.best.pluck(:api_name), ["claude-best"]
+
+    another_language_model = language_models(:claude_3_opus_20240229)
+
+    patch settings_language_model_url(another_language_model), params: { language_model: {best: true}}
+    assert_redirected_to settings_language_models_url
+    assert_equal api_service.language_models.best.pluck(:api_name), ["claude-3-opus-20240229"]
   end
 
   test "destroy should soft-delete language_model" do
