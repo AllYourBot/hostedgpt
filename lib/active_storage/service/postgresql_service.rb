@@ -7,14 +7,14 @@ module ActiveStorage
     end
 
     def upload(key, io, checksum: nil, **)
-      instrument :upload, key: key, checksum: checksum do
-        ActiveStorage::Postgresql::File.create!(key: key, io: io, checksum: checksum)
+      instrument :upload, key:, checksum: do
+        ActiveStorage::Postgresql::File.create!(key:, io:, checksum:)
       end
     end
 
     def download(key)
       if block_given?
-        instrument :streaming_download, key: key do
+        instrument :streaming_download, key: do
           ActiveStorage::Postgresql::File.open(key) do |file|
             while data = file.read(5.megabytes)
               yield data
@@ -22,7 +22,7 @@ module ActiveStorage
           end
         end
       else
-        instrument :download, key: key do
+        instrument :download, key: do
           ActiveStorage::Postgresql::File.open(key) do |file|
             file.read
           end
@@ -31,7 +31,7 @@ module ActiveStorage
     end
 
     def download_chunk(key, range)
-      instrument :download_chunk, key: key, range: range do
+      instrument :download_chunk, key:, range: do
         ActiveStorage::Postgresql::File.open(key) do |file|
           file.seek(range.first)
           file.read(range.size)
@@ -40,14 +40,14 @@ module ActiveStorage
     end
 
     def delete(key)
-      instrument :delete, key: key do
-        ActiveStorage::Postgresql::File.find_by(key: key).try(&:destroy)
+      instrument :delete, key: do
+        ActiveStorage::Postgresql::File.find_by(key:).try(&:destroy)
       end
     end
 
     def exist?(key)
-      instrument :exist, key: key do |payload|
-        answer = ActiveStorage::Postgresql::File.where(key: key).exists?
+      instrument :exist, key: do |payload|
+        answer = ActiveStorage::Postgresql::File.where(key:).exists?
         payload[:exist] = answer
         answer
       end
@@ -60,11 +60,11 @@ module ActiveStorage
     end
 
     def private_url(key, expires_in:, filename:, content_type:, disposition:, **)
-      generate_url(key, expires_in: expires_in, filename: filename, content_type: content_type, disposition: disposition)
+      generate_url(key, expires_in:, filename:, content_type:, disposition:)
     end
 
     def public_url(key, filename:, content_type: nil, disposition: :attachment, **)
-      generate_url(key, expires_in: nil, filename: filename, content_type: content_type, disposition: disposition)
+      generate_url(key, expires_in: nil, filename:, content_type:, disposition:)
     end
 
     def url(key, **options)
@@ -90,23 +90,23 @@ module ActiveStorage
       counter = counter.to_i
       # End hack
 
-      instrument :url, key: key do |payload|
-        content_disposition = content_disposition_with(type: disposition, filename: filename)
+      instrument :url, key: do |payload|
+        content_disposition = content_disposition_with(type: disposition, filename:)
         verified_key_with_expiration = ActiveStorage.verifier.generate(
           {
-            key: key,
+            key:,
             disposition: content_disposition,
-            content_type: content_type
+            content_type:
           },
-          expires_in: expires_in,
+          expires_in:,
           purpose: :blob_key
         )
 
         generated_url = url_helpers.rails_postgresql_service_url(verified_key_with_expiration,
           **url_options,
           disposition: content_disposition,
-          content_type: content_type,
-          filename: filename,
+          content_type:,
+          filename:,
           retry_count: counter
         )
         payload[:url] = generated_url
@@ -116,15 +116,15 @@ module ActiveStorage
     end
 
     def url_for_direct_upload(key, expires_in:, content_type:, content_length:, checksum:, custom_metadata: {})
-      instrument :url, key: key do |payload|
+      instrument :url, key: do |payload|
         verified_token_with_expiration = ActiveStorage.verifier.generate(
           {
-            key: key,
-            content_type: content_type,
+            key:,
+            content_type:,
             content_length: content_length,
-            checksum: checksum
+            checksum:
           },
-          expires_in: expires_in,
+          expires_in:,
           purpose: :blob_token
         )
 

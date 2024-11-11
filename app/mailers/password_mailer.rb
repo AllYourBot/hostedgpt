@@ -11,7 +11,7 @@ class PasswordMailer < ApplicationMailer
       purpose: Email::PasswordReset::TOKEN_PURPOSE,
       expires_in: @token_ttl
     )
-    @edit_url = edit_password_credential_url(token: token)
+    @edit_url = edit_password_credential_url(token:)
 
     mail(
       to: person.email,

@@ -88,7 +88,7 @@ class AIBackend::OpenAI < AIBackend
   def system_message(content)
     [{
       role: "system",
-      content: content,
+      content:,
     }]
   end
 

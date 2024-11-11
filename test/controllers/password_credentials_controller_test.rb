@@ -19,7 +19,7 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
   test "should get edit" do
     token = get_test_user_token(@user)
 
-    get edit_password_credential_url, params: { token: token }
+    get edit_password_credential_url, params: { token: }
 
     assert_response :success
     assert assigns(:user).is_a?(User)
@@ -37,7 +37,7 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
     token = get_test_user_token(@user)
     @user.destroy # make sure the user doesn't exist when we try to find it
 
-    get edit_password_credential_url, params: { token: token }
+    get edit_password_credential_url, params: { token: }
 
     assert_response :not_found
   end
@@ -46,7 +46,7 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
     token = get_test_user_token(@user)
     new_password = "new_password"
 
-    patch password_credential_url, params: { token: token, password: new_password }
+    patch password_credential_url, params: { token:, password: new_password }
 
     assert_response :redirect
     assert_redirected_to root_path
@@ -61,7 +61,7 @@ class PasswordCredentialsControllerTest < ActionDispatch::IntegrationTest
     token = get_test_user_token(@user)
     new_password = "new_password"
 
-    patch password_credential_url, params: { token: token, password: new_password }
+    patch password_credential_url, params: { token:, password: new_password }
 
     assert_response :redirect
     assert_redirected_to root_path
