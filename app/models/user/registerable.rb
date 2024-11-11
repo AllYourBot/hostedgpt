@@ -57,6 +57,7 @@ module User::Registerable
         api_service: api_service,
         name: name,
         supports_tools: true,
+        supports_system_message: true,
         supports_images: supports_images,
         input_token_cost_cents: input_token_cost_cents,
         output_token_cost_cents: output_token_cost_cents,
@@ -72,7 +73,7 @@ module User::Registerable
       input_token_cost_cents = input_token_cost_per_million/million
       output_token_cost_cents = output_token_cost_per_million/million
 
-      language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: false, supports_images: supports_images, input_token_cost_cents: input_token_cost_cents, output_token_cost_cents: output_token_cost_cents)
+      language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: false, supports_system_message: false, supports_images: supports_images, input_token_cost_cents: input_token_cost_cents, output_token_cost_cents: output_token_cost_cents)
     end
 
     assistants.create! name: "GPT-4o", language_model: language_models.find_by(api_name: LanguageModel::BEST_GPT)

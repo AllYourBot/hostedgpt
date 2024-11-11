@@ -47,6 +47,10 @@
     <%= form.check_box :supports_tools %>
     <%= form.label :supports_tools, "Supports Tools (Function Calling)?" %>
   </div>
+  <div class="my-5">
+    <%= form.check_box :supports_system_message %>
+    <%= form.label :supports_system_message, "Supports System Message?" %>
+  </div>
 
   <%= form.submit "Save",
     class: %|
