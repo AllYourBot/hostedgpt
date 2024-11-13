@@ -22,26 +22,6 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
   end
 
-  test "provider_name for Anthropic models" do
-    assert_equal "claude-3-sonnet-20240229", language_models(:claude_3_sonnet_20240229).provider_name
-    assert_equal "claude-3-opus-20240229", language_models(:claude_3_opus_20240229).provider_name
-  end
-
-  test "provider_name for OpenAI models" do
-    assert_equal "gpt-3.5-turbo-0125", language_models(:gpt_3_5_turbo_0125).provider_name
-    assert_equal "gpt-4o", language_models(:gpt_4o).provider_name
-  end
-
-  test "provider_name for best models" do
-    assert_equal "gpt-4o-2024-05-13", language_models(:gpt_best).provider_name
-    assert_equal "claude-3-5-sonnet-20240620", language_models(:claude_best).provider_name
-  end
-
-  test "provider_name for non-best models" do
-    assert_equal "gpt-4o", language_models(:gpt_4o).provider_name
-    assert_equal "claude-3-opus-20240229", language_models(:claude_3_opus_20240229).provider_name
-  end
-
   test "validates api_name" do
     record = LanguageModel.new(api_name: "")
     refute record.valid?

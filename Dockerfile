@@ -3,7 +3,7 @@
 ### START of FLY ####
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=3.2.3
+ARG RUBY_VERSION=3.3.5
 FROM quay.io/evl.ms/fullstaq-ruby:${RUBY_VERSION}-jemalloc-slim as base-for-fly
 
 LABEL fly_launch_runtime="rails"
@@ -29,7 +29,7 @@ FROM base-for-fly as build
 RUN --mount=type=cache,id=dev-apt-cache,sharing=locked,target=/var/cache/apt \
     --mount=type=cache,id=dev-apt-lib,sharing=locked,target=/var/lib/apt \
     apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential libpq-dev libvips libyaml-dev
+    apt-get install --no-install-recommends -y git build-essential libpq-dev libvips libyaml-dev
 
 # Install application gems
 COPY --link Gemfile Gemfile.lock .ruby-version ./

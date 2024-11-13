@@ -1,24 +1,27 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  host: localhost
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   port: <%= ENV['HOSTEDGPT_DATABASE_PORT'] || 5432 %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
   gssencmode: disable
 <% end %>
+  url: <%= ENV['DATABASE_URL'] %>
+  # url format: postgres://username:password@localhost:5432/database_name
 
 development:
   <<: *default
   database: <%= ENV['HOSTEDGPT_DEV_DB'] || "hostedgpt_development" %>
+  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name. Note: Docker sets DATABASE_URL inside docker-compose.yml
 
 test:
   <<: *default
   database: <%= ENV['HOSTEDGPT_TEST_DB'] || "hostedgpt_test" %>
+  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
 
 production:
   <<: *default
   database: hostedgpt_production
   username: hostedgpt
   password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] %>
-  
+  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.

@@ -3,7 +3,7 @@
 <% selected = selected && params[:id] == item.try(:id)&.to_s if controller.to_s == "assistants" %>
 <div class="
             flex justify-between items-center
-            mb-1 p-1 pl-2
+            mb-1
             hover:bg-gray-100 dark:hover:bg-gray-700
             group
             text-sm rounded-s-lg
@@ -14,9 +14,10 @@
   <%= link_to link,
         class: %|
           flex-1 flex
+          p-1 pl-2
           items-center
           truncate
-          h-7
+          h-9
           #{selected && "cursor-default" }
         |,
         data: { role: "name" } do

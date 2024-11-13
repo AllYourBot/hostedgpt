@@ -20,24 +20,24 @@ module SDKHelpers
   end
 
   def stub_get_response(method, status:, response: {}, &block)
-    stub_response(:get, method, status: status, response: response, &block)
+    stub_response(:get, method, status:, response:, &block)
   end
 
   def stub_post_response(method, status:, response: {}, &block)
-    stub_response(:post, method, status: status, response: response, &block)
+    stub_response(:post, method, status:, response:, &block)
   end
 
   def stub_patch_response(method, status:, response: {}, &block)
-    stub_response(:patch, method, status: status, response: response, &block)
+    stub_response(:patch, method, status:, response:, &block)
   end
 
   def stub_delete_response(method, status:, response: {}, &block)
-    stub_response(:delete, method, status: status, response: response, &block)
+    stub_response(:delete, method, status:, response:, &block)
   end
 
   def response_for(status, hash)
     OpenData.new(
-      status: status,
+      status:,
       body: hash.to_json,
     )
   end

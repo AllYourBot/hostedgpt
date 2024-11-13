@@ -14,9 +14,9 @@ class AIBackend
 
   def get_oneoff_message(instructions, messages, params = {})
     set_client_config(
-      instructions: instructions,
+      instructions:,
       messages: preceding_messages(messages),
-      params: params,
+      params:,
     )
     response = @client.send(client_method_name, ** @client_config)
 
@@ -77,7 +77,7 @@ class AIBackend
       role = (i % 2).zero? ? "user" : "assistant"
 
       {
-        role: role,
+        role:,
         content: msg
       }
     end

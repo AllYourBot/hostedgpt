@@ -12,24 +12,22 @@ module User::Registerable
     anthropic_api_service = api_services.create!(url: APIService::URL_ANTHROPIC, driver: :anthropic, name: "Anthropic")
     groq_api_service = api_services.create!(url: APIService::URL_GROQ, driver: :openai, name: "Groq")
 
+    best_models = %w[gpt-4o claude-3-5-sonnet-20240620 llama3-70b-8192]
     [
-      [LanguageModel::BEST_GPT, "Best OpenAI Model", true, open_ai_api_service, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GPT], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GPT]],
-      [LanguageModel::BEST_CLAUDE, "Best Anthropic Model", true, anthropic_api_service, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_CLAUDE], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_CLAUDE]],
-      [LanguageModel::BEST_GROQ, "Best Open-Source Model", true, groq_api_service, LanguageModel::BEST_MODEL_INPUT_PRICES[LanguageModel::BEST_GROQ], LanguageModel::BEST_MODEL_OUTPUT_PRICES[LanguageModel::BEST_GROQ]],
-
-      ["gpt-4o", "GPT-4o (latest)", true, open_ai_api_service, 500, 1500],
+      ["gpt-4o", "GPT-4o (latest)", true, open_ai_api_service, 250, 1000],
+      ["gpt-4o-2024-08-06", "GPT-4o Omni Multimodal (2024-08-06)", true, open_ai_api_service, 250, 1000],
       ["gpt-4o-2024-05-13", "GPT-4o Omni Multimodal (2024-05-13)", true, open_ai_api_service, 500, 1500],
 
       ["gpt-4-turbo", "GPT-4 Turbo with Vision (latest)", true, open_ai_api_service, 1000, 3000],
       ["gpt-4-turbo-2024-04-09", "GPT-4 Turbo with Vision (2024-04-09)", true, open_ai_api_service, 1000, 3000],
-      ["gpt-4-turbo-preview", "GPT-4 Turbo Preview", false, open_ai_api_service, 1000, 3000], # not sure on price
+      ["gpt-4-turbo-preview", "GPT-4 Turbo Preview", false, open_ai_api_service, 1000, 3000],
       ["gpt-4-0125-preview", "GPT-4 Turbo Preview (2024-01-25)", false, open_ai_api_service, 1000, 3000],
       ["gpt-4-1106-preview", "GPT-4 Turbo Preview (2023-11-06)", false, open_ai_api_service, 1000, 3000],
       ["gpt-4-vision-preview", "GPT-4 Turbo with Vision Preview (2023-11-06)", true, open_ai_api_service, 1000, 3000],
-      ["gpt-4-1106-vision-preview", "GPT-4 Turbo with Vision Preview (2023-11-06)", true, open_ai_api_service, 1000, 3000], # not sure on price
+      ["gpt-4-1106-vision-preview", "GPT-4 Turbo with Vision Preview (2023-11-06)", true, open_ai_api_service, 1000, 3000],
 
       ["gpt-4", "GPT-4 (latest)", false, open_ai_api_service, 3000, 6000],
-      ["gpt-4-0613", "GPT-4 Snapshot improved function calling (2023-06-13)", false, open_ai_api_service, 1000, 3000], # not sure on price
+      ["gpt-4-0613", "GPT-4 Snapshot improved function calling (2023-06-13)", false, open_ai_api_service, 1000, 3000],
 
       ["gpt-3.5-turbo", "GPT-3.5 Turbo (latest)", false, open_ai_api_service, 300, 600],
       ["gpt-3.5-turbo-0125", "GPT-3.5 Turbo (2022-01-25)", false, open_ai_api_service, 50, 150],
@@ -53,14 +51,15 @@ module User::Registerable
       output_token_cost_cents = output_token_cost_per_million/million
 
       language_models.create!(
-        api_name: api_name,
-        api_service: api_service,
-        name: name,
+        api_name:,
+        api_service:,
+        name:,
+        best: best_models.include?(api_name),
         supports_tools: true,
         supports_system_message: true,
-        supports_images: supports_images,
-        input_token_cost_cents: input_token_cost_cents,
-        output_token_cost_cents: output_token_cost_cents,
+        supports_images:,
+        input_token_cost_cents:,
+        output_token_cost_cents:,
       )
     end
 
@@ -73,11 +72,11 @@ module User::Registerable
       input_token_cost_cents = input_token_cost_per_million/million
       output_token_cost_cents = output_token_cost_per_million/million
 
-      language_models.create!(api_name: api_name, api_service: api_service, name: name, supports_tools: false, supports_system_message: false, supports_images: supports_images, input_token_cost_cents: input_token_cost_cents, output_token_cost_cents: output_token_cost_cents)
+      language_models.create!(api_name:, api_service:, name:, supports_tools: false, supports_system_message: false, supports_images:, input_token_cost_cents:, output_token_cost_cents:)
     end
 
-    assistants.create! name: "GPT-4o", language_model: language_models.find_by(api_name: LanguageModel::BEST_GPT)
-    assistants.create! name: "Claude 3.5 Sonnet", language_model: language_models.find_by(api_name: LanguageModel::BEST_CLAUDE)
-    assistants.create! name: "Meta Llama 3 70b", language_model: language_models.find_by(api_name: LanguageModel::BEST_GROQ)
+    assistants.create! name: "GPT-4o", language_model: language_models.best_for_api_service(open_ai_api_service).first
+    assistants.create! name: "Claude 3.5 Sonnet", language_model: language_models.best_for_api_service(anthropic_api_service).first
+    assistants.create! name: "Meta Llama 3 70b", language_model: language_models.best_for_api_service(groq_api_service).first
   end
 end

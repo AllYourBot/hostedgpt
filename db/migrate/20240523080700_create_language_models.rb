@@ -75,9 +75,14 @@ class CreateLanguageModels < ActiveRecord::Migration[7.1]
   end
 
   def create_without_validation!(attributes)
-    record = LanguageModel.new(attributes)
-    if !record.save(validate: false)
-      raise "Could not create LanguageModel record for #{attributes.inspect}"
+    LanguageModel.skip_callback(:save, :after, :update_best_language_model_for_api_service)
+    begin
+      record = LanguageModel.new(attributes)
+      if !record.save(validate: false)
+        raise "Could not create LanguageModel record for #{attributes.inspect}"
+      end
+    ensure
+      LanguageModel.set_callback(:save, :after, :update_best_language_model_for_api_service)
     end
     record
   end

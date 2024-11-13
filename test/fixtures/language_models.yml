@@ -135,6 +135,7 @@ gpt_best:
   position: 1
   user: keith
   name: Best OpenAI Model
+  best: true
   api_name: gpt-best
   api_service: keith_openai_service
   supports_images: true
@@ -146,6 +147,7 @@ claude_best:
   position: 2
   user: keith
   name: Best Anthropic Model
+  best: true
   api_service: keith_anthropic_service
   api_name: claude-best
   supports_images: true

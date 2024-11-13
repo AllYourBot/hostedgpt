@@ -81,18 +81,19 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free service so Fly is actually less expensive over the long term.
 
-1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
+1. Click Fork > Create New Fork at the top of this repository. **Pull your forked repository down to your computer (the usual git clone ...)**.
+1. Go into the directory you just created with your git clone and run `bundle`
 1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise `curl -L https://fly.io/install.sh | sh` ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
-1. Think of an internal Fly name for your app, it has to be unique to all of Fly, and then in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME_YOU_CHOSE`
+1. Think of an internal Fly name for your app, it has to be unique to all of Fly. You'll use this **APP_NAME** three times in the steps below. First, in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME`
 
    - Say "Yes" when it asks if you want to tweak these settings
 
-1. When it opens your browser, change the Database to `Fly Postgres` with a unique name such as `[APP_NAME]-db` and you can set the configuration to `Development`.
+1. When it opens your browser, (i) change the Database to `Fly Automated Postgres`, (ii) set the name to be `[APP_NAME]-db`, (iii) and you can set the configuration to `Development`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
-1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
-1. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly.
+1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and **save the Postgres username & password somewhere as you'll never be able to see those again**.
+1. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly. (If you get an error you may have forgotten to run `bundle`).
 1. Run `fly deploy --ha=false`
-1. Assuming you chose `Development` as the DB size in the step above, now you should run `bin/rails db:fly[APP_NAME_FROM_EARLIER,swap,512]` This will increase the swap on your database machine so that it doesn't crash.
+1. Assuming you chose `Development` as the DB size in the step above, now you should run `bin/rails db:fly[APP_NAME,swap,512]` This will increase the swap on your database machine so that it doesn't crash since the Development database has less ram.
 
 You may want to read about [configuring optional features](#configure-optional-features).
 
@@ -296,14 +297,15 @@ Every time you pull new changes down, kill docker (if it's running) and re-run:
 
 HostedGPT requires these services to be running:
 
-- Postgres ([installation instructions](https://www.postgresql.org/download/))
+- Postgres (`brew install postgresql@16` or other [install instructions](https://www.postgresql.org/download/))
 - rbenv ([installation instructions](https://github.com/rbenv/rbenv))
 - ImageMagick (`brew install imagemagick` should work on Mac )
 
 1. `cd` into your local repository clone
 1. `rbenv install` to install the correct ruby version (it reads the .ruby-version in the repo)
-1. `bin/dev` starts up all the services, installs gems, and inits database (don't run **db:setup** as it will not configure encryption properly)
-1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
+1. Do NOT run db:setup as it will not configure encryption properly. Proceed to the next step and it will automatically configure the database.
+1. `bin/dev` starts up all the services, installs gems, and handles db. Note: The app should automatically configure a database, but if you get any database errors or want to change the default configuration, set the environment variable DATABASE_URL=postgres://username:password@localhost:5432/hostedgpt_development (replacing username, password, hostedgpt_development with your database name, and 5432 with your database port number).
+1. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
 1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
 1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
 1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `bin/rails db:fixtures:load`
