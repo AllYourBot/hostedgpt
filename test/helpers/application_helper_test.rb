@@ -3,25 +3,29 @@ require "test_helper"
 class ApplicationHelperTest < ActionView::TestCase
   
 test "only at most 2 initials with default limit" do
-    assert_equal "jz", only_user_initials("jdz")
-    assert_equal "pl", only_user_initials("Plllll")
+    assert_equal "jz", only_two_initials("jdz")
   end
   
 
   test "single initials allowed" do
-    assert_equal "q", only_user_initials("q")
+    assert_equal "q", only_two_initials("q")
   end  
 
-  test "should down case" do
-    assert_equal "q", only_user_initials("Q")
-  end    
+
+  test "nil returns nil" do
+    assert_nil only_two_initials(nil)
+  end   
 
   test "can have numbers" do
-    assert_equal "p2", only_user_initials("Pvv2")
+    assert_equal "P2", only_two_initials("PV2")
+  end  
+
+  test "does not change case" do
+    assert_equal "p2", only_two_initials("pV2")
   end  
 
   test "can have spaces" do
-    assert_equal "pq", only_user_initials("P vv qQ")
+    assert_equal "pQ", only_two_initials("p v Q")
   end  
 
 end 

@@ -1,19 +1,8 @@
 module ApplicationHelper
 
-  def only_user_initials(initials, limit: 2)
-    letters = initials.to_s.downcase.strip.split("")
-    case letters.length
-    when 0
-      ""
-    when 1
-      letters.first
-    else
-      if letters.length <= limit
-        letters.map(&:first).join
-      else
-        [letters.first, letters.last].join
-      end
-    end
+  def only_two_initials(initials)
+    return initials if initials.nil? || initials.length <= 2
+    initials[0] + initials[-1]  
   end
 
   def spinner(opts = {})
