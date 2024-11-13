@@ -1,6 +1,7 @@
 class Authentications::MicrosoftGraphOauthController < ApplicationController
   allow_unauthenticated_access
 
+  # GET /auth/microsoft_graph/callback
   def create
     if Current.user
       Current.user.microsoft_graph_credential&.destroy
@@ -30,7 +31,7 @@ class Authentications::MicrosoftGraphOauthController < ApplicationController
       @person&.errors&.delete :personable
       msg = @person.errors.full_messages.map { |m| m.gsub(/Personable |credentials /, "") }.to_sentence.capitalize
       if msg.downcase.include?("oauth refresh token can't be blank")
-        msg += " " + helpers.link_to("Microsoft third-party connections", "https://microsoft.com/consent", class: "underline") + " search for website, and delete all it's connections. Then try again."
+        msg += " " + helpers.link_to("Microsoft third-party connections", "https://account.microsoft.com/privacy/app-access", class: "underline") + " search for website, and delete all it's connections. Then try again."
       end
 
       redirect_to new_user_path, alert: msg

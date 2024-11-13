@@ -40,7 +40,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
   end
 
   test "should log you in for a user that exists" do
-    OmniAuth.config.add_mock(:microsoft_graph, { uid: credentials(:keith_microsoft_graph).oauth_id }) #, info: { email: "gmail@address.com", first_name: "John", last_name: "Doe" }})
+    OmniAuth.config.add_mock(:microsoft_graph, { uid: credentials(:keith_microsoft_graph).oauth_id })
     assert_no_difference "Credential.count" do
       assert_difference "Authentication.count", 1 do
         assert_difference "Client.count", 1 do
