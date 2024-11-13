@@ -20,7 +20,7 @@ test "only at most 2 initials with default limit" do
     assert_equal "p2", only_user_initials("Pvv2")
   end  
 
-  test "can gave spaces" do
+  test "can have spaces" do
     assert_equal "pq", only_user_initials("P vv qQ")
   end  
 
