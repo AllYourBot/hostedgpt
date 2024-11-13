@@ -52,10 +52,6 @@ class LanguageModel < ApplicationRecord
       api_service.name != "Groq" # TODO: Remove this short circuit once I can debug tool use with Groq
   end
 
-  def supports_system_message?
-    attributes["supports_system_message"]
-  end
-
   private
 
   def populate_position

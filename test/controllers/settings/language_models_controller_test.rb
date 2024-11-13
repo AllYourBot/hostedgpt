@@ -140,4 +140,30 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert flash[:notice].present?, "There should have been a success message"
     refute flash[:alert].present?, "There should NOT have been an error message"
   end
+
+  test "create should not have supports_system_message checkbox" do
+    get new_settings_language_model_url
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_system_message]"]'
+      assert_select 'input[name="language_model[supports_system_message]"][checked="checked"]', false # Not checked by default, from schema
+    end
+  end
+
+  test "edit should have supports_system_message checkbox checked" do
+    get edit_settings_language_model_url(@language_model)
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_system_message]"][checked="checked"]'
+    end
+  end
+
+  test "edit should have supports_system_message checkbox unchecked" do
+    get edit_settings_language_model_url(language_models(:guanaco))
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_system_message]"]'
+      assert_select 'input[name="language_model[supports_system_message]"][checked="checked"]', false
+    end
+  end
 end
