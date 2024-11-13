@@ -1,27 +1,35 @@
 default: &default
   adapter: postgresql
+  username: <%= ENV["HOSTEDGPT_DB_USERNAME"] || "hostedgpt_user" %>
+  password: <%= ENV["HOSTEDGPT_DB_PASSWORD"] %>
+  host: <%= ENV["HOSTEDGPT_DB_HOST"] %>
+  port: <%= ENV["HOSTEDGPT_DB_PORT"] || 5432 %>
+  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
+  database: <%= ENV["HOSTEDGPT_DB_NAME"] || "hostedgpt" %>
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  port: <%= ENV['HOSTEDGPT_DATABASE_PORT'] || 5432 %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
   gssencmode: disable
 <% end %>
-  url: <%= ENV['DATABASE_URL'] %>
-  # url format: postgres://username:password@localhost:5432/database_name
+# NOTE: DATABASE_URL is a special env var that is automatically used for "url" if it's set
+#  "url" will be merged into (and take precedence over) the other values for the connection
+# url format: postgres://username:password@localhost:5432/database_name
+# best practice (https://guides.rubyonrails.org/v7.1/configuring.html#connection-preference)
+url: <%= ENV["DATABASE_URL"] %>
 
 development:
   <<: *default
-  database: <%= ENV['HOSTEDGPT_DEV_DB'] || "hostedgpt_development" %>
-  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name. Note: Docker sets DATABASE_URL inside docker-compose.yml
 
 test:
   <<: *default
-  database: <%= ENV['HOSTEDGPT_TEST_DB'] || "hostedgpt_test" %>
   # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
+  database: <%= ENV["HOSTEDGPT_TEST_DB_NAME"] || "hostedgpt_test" %>
+  <% url_with_db_regex = /(.*\/\/[^\/]+\/)([^?]+)(\??.*)/ %>
+  url: <%= (ENV["DATABASE_URL"] || "").gsub(url_with_db_regex, '\1\2_test\3') %> # add "_test" to the database name
 
 production:
   <<: *default
+  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
   database: hostedgpt_production
   username: hostedgpt
-  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] %>
-  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
+  password: <%= ENV["HOSTEDGPT_DB_PASSWORD"] %>
