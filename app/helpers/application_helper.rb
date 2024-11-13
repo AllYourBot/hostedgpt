@@ -1,17 +1,17 @@
 module ApplicationHelper
 
   def only_user_initials(initials, limit: 2)
-    letters = initials.to_s.strip.split("")
+    letters = initials.to_s.downcase.strip.split("")
     case letters.length
     when 0
       ""
     when 1
-      letters.first.to_s.upcase
+      letters.first
     else
       if letters.length <= limit
-        words.map(&:first).join.upcase
+        letters.map(&:first).join
       else
-        [letters.first, letters.last].join.upcase
+        [letters.first, letters.last].join
       end
     end
   end
