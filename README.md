@@ -197,7 +197,7 @@ HostedGPT supports multiple authentication methods:
 
 - [Password authentication](#password-authentication)
 - [Google OAuth authentication](#google-oauth-authentication)
-- [Microsoft OAuth authentication](#microsoft-oauth-authentication)
+- [Microsoft Graph OAuth authentication](#microsoft-graph-oauth-authentication)
 
 #### Password authentication
 
