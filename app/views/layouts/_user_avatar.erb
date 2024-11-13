@@ -11,5 +11,5 @@
         <%= classes %>
         "
 >
-  <%= user.name.initials&.upcase %>
+  <%= only_user_initials(user.name.initials) %>
 </picture>
