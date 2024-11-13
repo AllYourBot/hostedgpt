@@ -3,7 +3,7 @@
 ### START of FLY ####
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=3.3.5
+ARG RUBY_VERSION=3.3.6
 FROM quay.io/evl.ms/fullstaq-ruby:${RUBY_VERSION}-jemalloc-slim as base-for-fly
 
 LABEL fly_launch_runtime="rails"
