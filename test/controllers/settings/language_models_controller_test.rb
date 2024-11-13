@@ -68,7 +68,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "form" do
       assert_select 'input[name="language_model[supports_tools]"]'
-      assert_select 'input[name="language_model[supports_tools]"][checked="checked"]', false # Not checked by default, from schema
+      assert_select 'input[name="language_model[supports_tools]"][checked="checked"]', false, "Checkbox should default to false within DB"
     end
   end
 
