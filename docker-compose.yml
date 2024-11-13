@@ -1,17 +1,18 @@
 services:
   postgres:
     image: postgres:16
+    container_name: hostedgpt_postgres
     restart: always
     environment:
-      # NOTE: If you use DATABASE_URL, you need to make it match these env vars
-      #  so you can either have the url match these default values
-      #  or you can set these env vars to match the url user and password
+      # NOTE: If you use DATABASE_URL, it needs to match these env vars
+      #  so you can either have it match the default values for these env vars
+      #  or you can set these env vars to match the user and password from the url
       - POSTGRES_USER=${HOSTEDGPT_DB_USERNAME:-hostedgpt_user}
       - POSTGRES_PASSWORD=${HOSTEDGPT_DB_PASSWORD:-secret}
     volumes:
       - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${HOSTEDGPT_DB_USERNAME:-hostedgpt_user}"]
+      test: pg_isready -U $$POSTGRES_USER
       interval: 1s
       retries: 5
 
@@ -30,7 +31,6 @@ services:
       - HOSTEDGPT_DB_PORT=${HOSTEDGPT_DB_PORT:-5432}
       - HOSTEDGPT_DB_NAME=${HOSTEDGPT_DB_NAME:-hostedgpt}
       - DATABASE_URL
-      - HOSTEDGPT_TEST_DB_NAME
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
       - OVERMIND_COLORS=2,3,5
       - ALLOWED_REQUEST_ORIGINS
