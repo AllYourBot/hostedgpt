@@ -16,23 +16,19 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
     assert_redirected_to login_path
   end
 
-  test "should add a MicrosoftGraphCredential and redirect to edit_settings" do
+  test "existing user can add a MicrosoftGraphCredential and redirect to edit_settings" do
     # rob has no microsoft credential
     user = users(:rob)
     login_as user
-    details = {
-      uid: "rob-abc123",
-      credentials: {
-        token: "abc123",
-        refresh_token: "xyz789",
-        scope: "openid profile email offline_access user.read mailboxsettings.read files.read.all"
-      },
-      info: { email: "rob.personal@gmail.com" }
-    }
+    details = details_for_email(email: user.email, first_name: "Rob", last_name: nil)
     OmniAuth.config.add_mock(:microsoft_graph, details)
 
     refute user.microsoft_graph_credential.present?
-    get microsoft_graph_oauth_path
+    assert_difference "Credential.count", 1 do
+      assert_no_difference "User.count" do
+        get microsoft_graph_oauth_path
+      end
+    end
 
     assert_redirected_to edit_settings_person_path
     assert_equal "Saved", flash[:notice]
@@ -53,8 +49,8 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
     assert_logged_in(users(:keith))
   end
 
-  test "returns when registration is disabled" do
-    OmniAuth.config.add_mock(:microsoft_graph, details_for_email("john@gmail.com"))
+  test "registration is disabled" do
+    OmniAuth.config.add_mock(:microsoft_graph, details_for_email(email: "john@gmail.com"))
 
     stub_features(microsoft_graph_authentication: true, registration: false) do
       get microsoft_graph_oauth_path
@@ -71,7 +67,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
     assert_not_equal "John", user.first_name
     assert_not_equal "Doe", user.last_name
 
-    details = details_for_email user.email
+    details = details_for_email(email: user.email)
     OmniAuth.config.add_mock(:microsoft_graph, details)
 
     stub_features(microsoft_graph_authentication: true, registration: true) do
@@ -100,7 +96,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
     assert people(:ali_invited).email.present?
     assert_nil people(:ali_invited).user
 
-    details = details_for_email people(:ali_invited).email
+    details = details_for_email(email: people(:ali_invited).email)
     OmniAuth.config.add_mock(:microsoft_graph, details)
 
     stub_features(microsoft_graph_authentication: true, registration: true) do
@@ -127,7 +123,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
   end
 
   test "should CREATE A USER when google authing and NOTHING EXISTS" do
-    details = details_for_email "john@gmail.com"
+    details = details_for_email(email: "john@gmail.com")
     OmniAuth.config.add_mock(:microsoft_graph, details)
 
     stub_features(microsoft_graph_authentication: true, registration: true) do
@@ -154,17 +150,18 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
 
   private
 
-  def details_for_email(email)
+  def details_for_email(email:, first_name: "John", last_name: "Doe")
     {
       uid: "new_abc123",
       info: {
         email: email,
-        first_name: "John",
-        last_name: "Doe"
+        first_name:,
+        last_name:
       },
       credentials: {
         token: "new_token",
-        refresh_token: "new_refresh_token"
+        refresh_token: "new_refresh_token",
+        scope: "openid profile email offline_access user.read mailboxsettings.read"
       }
     }
   end
