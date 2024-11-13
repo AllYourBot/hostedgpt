@@ -3,6 +3,15 @@ class Authentications::MicrosoftGraphOauthController < ApplicationController
 
   # GET /auth/microsoft_graph/callback
   def create
+    if params[:error]
+      if Current.user
+        redirect_to(edit_settings_person_path, alert: params[:error_description])
+      else
+        redirect_to(login_path, alert: params[:error_description])
+      end
+      return
+    end
+
     if Current.user
       Current.user.microsoft_graph_credential&.destroy
       _, cred = add_person_credentials("MicrosoftGraphCredential")

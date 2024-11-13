@@ -7,12 +7,12 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
 
   test "cancelling a microsoft oauth flow redirects to the settings page" do
     login_as users(:keith)
-    get "/auth/failure"
+    get "/auth/microsoft_graph/callback?error=access_denied&error_description=The%20user%20has%20denied%20access%20to%20the%20scope%20requested%20by%20the%20client%20application"
     assert_redirected_to edit_settings_person_path
   end
 
   test "cancelling a microsoft oauth flow redirects to the login" do
-    get "/auth/failure"
+    get "/auth/microsoft_graph/callback?error=access_denied&error_description=The%20user%20has%20denied%20access%20to%20the%20scope%20requested%20by%20the%20client%20application"
     assert_redirected_to login_path
   end
 
