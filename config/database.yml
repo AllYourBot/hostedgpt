@@ -2,7 +2,7 @@ default: &default
   adapter: postgresql
   # url format: postgres://username:password@localhost:5432/database_name
   url: <%= ENV["DATABASE_URL"] %>
-  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
+  # It's best to set DATABASE_URL to configure database details. That overrides the following settings
   username: <%= ENV["HOSTEDGPT_DB_USERNAME"] || "hostedgpt_user" %>
   password: <%= ENV["HOSTEDGPT_DB_PASSWORD"] %>
   host: <%= ENV["HOSTEDGPT_DB_HOST"] %>
