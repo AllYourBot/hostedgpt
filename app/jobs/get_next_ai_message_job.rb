@@ -97,7 +97,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     unless Rails.env.test?
       Rails.logger.info "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
-      puts e.backtrace.join("\n") if Rails.env.development?
+      Rails.logger.info e.backtrace.join("\n") if Rails.env.development?
 
       if attempt < 3
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
