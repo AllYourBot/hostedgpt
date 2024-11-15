@@ -1,6 +1,6 @@
 module ApplicationHelper
 
-  def only_two_initials(initials)
+  def at_most_two_initials(initials)
     return initials if initials.nil? || initials.length <= 2
     initials[0] + initials[-1]  
   end
