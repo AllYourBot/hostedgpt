@@ -19,8 +19,8 @@ development:
 
 test:
   <<: *default
-  <% url_with_db_regex = /(.*\/\/[^\/]+\/)([^?]+)(\??.*)/ %>
-  url: <%= "#{ENV['DATABASE_URL']}".gsub(url_with_db_regex, '\1\2_test\3') %> # add "_test" to the database name if it's specified
+  # regex to match groups in the url: /(before db name)(db name)(after db name)/
+  url: <%= "#{ENV['DATABASE_URL']}".gsub(/(.*\/\/[^\/]+\/)([^?]+)(\??.*)/, '\1\2_test\3') %> # add "_test" to the database name if it's specified
   # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
   database: <%= "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_test" %>
 
