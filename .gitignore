@@ -9,7 +9,7 @@
 /node_modules
 
 # Docker Compose override file
-**/*compose.override.y*ml
+*compose.override.y*ml
 
 # Ignore all environment files (except templates).
 /.env*
