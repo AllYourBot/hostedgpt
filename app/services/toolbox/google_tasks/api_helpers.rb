@@ -41,8 +41,8 @@ module Toolbox::GoogleTasks::APIHelpers
   def create_task_for_list(list, title:, notes: nil, due: nil)
     refresh_token_if_needed do
       post("https://tasks.googleapis.com/tasks/v1/lists/#{list.id}/tasks").param(
-        title: title,
-        notes: notes,
+        title:,
+        notes:,
         due: format_time(due),
         status: "needsAction",
       )
@@ -58,7 +58,7 @@ module Toolbox::GoogleTasks::APIHelpers
     delete_task(task)
     create_task_for_list(list,
       title: task.title,
-      notes: notes,
+      notes:,
       due: keep_due.presence && task.try(:due),
     )
   end
@@ -73,12 +73,12 @@ module Toolbox::GoogleTasks::APIHelpers
     refresh_token_if_needed do
       patch("https://tasks.googleapis.com/tasks/v1/lists/#{list_id_of(task)}/tasks/#{task.id}").param( {
         id: task.id,
-        title: title,
-        notes: notes,
+        title:,
+        notes:,
         due: format_time(due),
         status: !!completed ? "completed" : "needsAction",
         completed: completed.presence && format_time(completed),
-        deleted: deleted,
+        deleted:,
       }.compact) # w/o this it updates values to nil
     end
   end

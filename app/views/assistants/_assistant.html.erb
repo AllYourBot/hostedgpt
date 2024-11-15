@@ -6,7 +6,7 @@
   <%# This extra div ^ is needed because of the absolute positioning. It doesn't lay out properly if added to the div below. %>
   <div class="
               flex justify-between items-center
-              mb-1 p-1 pl-2 pr-2 mr-5
+              mb-1 pl-2 pr-2 mr-5
               hover:bg-gray-100 dark:hover:bg-gray-700
               bg-gray-50 dark:bg-transparent
               dark:bg-gray-700
@@ -21,7 +21,7 @@
     data-radio-behavior-id-param="<%= assistant.id %>"
     data-transition-target="<%= !visible && 'transitionable' %>"
     >
-    <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex items-center text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
+    <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex py-1 items-center text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
       <%= render partial: "layouts/assistant_avatar", locals: { assistant: assistant, size: 7, classes: "mr-2" } %>
       <%= assistant.name %>
     <% end %>

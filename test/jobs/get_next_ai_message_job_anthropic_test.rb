@@ -37,11 +37,13 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
   end
 
   test "when anthropic key is blank, a nice error message is displayed" do
-    api_service = @conversation.assistant.language_model.api_service
-    api_service.update!(token: "")
+    stub_features(default_llm_keys: false) do
+      api_service = @conversation.assistant.language_model.api_service
+      api_service.update!(token: "")
 
-    assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
-    assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for Anthropic"
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
+      assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for Anthropic"
+    end
   end
 
   test "when API response key is, a nice error message is displayed" do

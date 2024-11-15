@@ -48,11 +48,11 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     end
   end
 
+  # TODO
   # test "preceding_conversation_messages only considers messages on the intended conversation version and includes the correct names" do
-  #   # TODO
   # end
 
+  # TODO
   # test "preceding_conversation_messages includes the appropriate tool details" do
-  #   # TODO
   # end
 end
