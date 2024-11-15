@@ -1,13 +1,34 @@
+<%
+  # first env with a value
+  def first_of(*envs)
+    envs.map { |env| ENV[env] }.compact.first
+  end
+
+  def puts_red(msg)
+    puts "\e[31m#{msg}\e[0m"
+  end
+
+  def deprecated(env, message)
+    puts_red "DEPRECATED: #{env} is deprecated, #{message}" if ENV[env]
+  end
+
+
+  deprecated("HOSTEDGPT_DATABASE_PORT", "use HOSTEDGPT_DB_PORT instead")
+  deprecated("HOSTEDGPT_DEV_DB", "use HOSTEDGPT_DB_NAME instead")
+  deprecated("HOSTEDGPT_TEST_DB", "provide HOSTEDGPT_DB_NAME and test database name is generated")
+  deprecated("HOSTEDGPT_DATABASE_PASSWORD", "use HOSTEDGPT_DB_PASSWORD instead")
+%>
+
 default: &default
   adapter: postgresql
   # url format: postgres://username:password@localhost:5432/database_name
   url: <%= ENV["DATABASE_URL"] %>
   # It's best to set DATABASE_URL to configure database details. That overrides the following settings
   username: <%= ENV["HOSTEDGPT_DB_USERNAME"] || "hostedgpt_user" %>
-  password: <%= ENV["HOSTEDGPT_DB_PASSWORD"] %>
+  password: <%= first_of("HOSTEDGPT_DATABASE_PASSWORD", "HOSTEDGPT_DB_PASSWORD") %>
   host: <%= ENV["HOSTEDGPT_DB_HOST"] %>
-  port: <%= ENV["HOSTEDGPT_DB_PORT"] %>
-  database: <%= ENV["HOSTEDGPT_DB_NAME"] || "hostedgpt" %>
+  port: <%= first_of("HOSTEDGPT_DATABASE_PORT", "HOSTEDGPT_DB_PORT") || 5432 %>
+  database: <%= first_of("HOSTEDGPT_DEV_DB", "HOSTEDGPT_DB_NAME") || "hostedgpt" %>
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
@@ -22,11 +43,11 @@ test:
   # regex to match groups in the url: /(before db name)(db name)(after db name)/
   url: <%= "#{ENV['DATABASE_URL']}".gsub(/(.*\/\/[^\/]+\/)([^?]+)(\??.*)/, '\1\2_test\3') %> # add "_test" to the database name if it's specified
   # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
-  database: <%= "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_test" %>
+  database: <%= ENV["HOSTEDGPT_TEST_DB"] || "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_test" %>
 
 production:
   <<: *default
   # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
   database: hostedgpt_production
   username: hostedgpt
-  password: <%= ENV["HOSTEDGPT_DB_PASSWORD"] %>
+  password: <%= first_of("HOSTEDGPT_DATABASE_PASSWORD", "HOSTEDGPT_DB_PASSWORD") %>
