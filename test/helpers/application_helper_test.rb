@@ -38,4 +38,8 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "John D. Doe", truncate_long_name("John D. Doe")
   end
 
+  test "handles nil" do
+    assert_nil truncate_long_name(nil)
+  end
+
 end
