@@ -1,7 +1,5 @@
 module ApplicationHelper
 
-  # If the name on the nav-container is long truncate it to 20 characters
-  # So it does not grow the left menu
   def truncate_long_name(name)
     truncate(name, length: 20)
   end
