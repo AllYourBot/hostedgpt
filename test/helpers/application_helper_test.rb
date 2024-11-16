@@ -29,4 +29,4 @@ class ApplicationHelperTest < ActionView::TestCase
   test "can have spaces" do
     assert_equal "pQ", at_most_two_initials("p v Q")
   end
-end 
+end
