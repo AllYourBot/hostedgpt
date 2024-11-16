@@ -140,6 +140,7 @@ gpt_best:
   api_service: keith_openai_service
   supports_images: true
   supports_tools: true
+  supports_system_message: true
   input_token_cost_cents: 0.0001
   output_token_cost_cents: 0.0001
 
