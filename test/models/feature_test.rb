@@ -60,6 +60,7 @@ class FeatureTest < ActiveSupport::TestCase
       http_header_authentication: true,
       password_authentication: true,
       google_authentication: true,
+      microsoft_graph_authentication: true
     ) do
       assert Feature.enabled?(:http_header_authentication)
       assert Feature.http_header_authentication?
@@ -67,6 +68,8 @@ class FeatureTest < ActiveSupport::TestCase
       refute Feature.password_authentication?
       refute Feature.enabled?(:google_authentication)
       refute Feature.google_authentication?
+      refute Feature.enabled?(:microsoft_graph_authentication)
+      refute Feature.microsoft_graph_authentication?
     end
   end
 
@@ -76,13 +79,16 @@ class FeatureTest < ActiveSupport::TestCase
       http_header_authentication: false,
       password_authentication: true,
       google_authentication: false,
-     ) do
+      microsoft_graph_authentication: false
+    ) do
       refute Feature.enabled?(:http_header_authentication)
       refute Feature.http_header_authentication?
       assert Feature.enabled?(:password_authentication)
       assert Feature.password_authentication?
       refute Feature.enabled?(:google_authentication)
       refute Feature.google_authentication?
+      refute Feature.enabled?(:microsoft_graph_authentication)
+      refute Feature.microsoft_graph_authentication?
     end
   end
 

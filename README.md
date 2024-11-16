@@ -33,6 +33,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
     - [Google OAuth authentication](#google-oauth-authentication)
+    - [Microsoft Graph OAuth authentication](#microsoft-graph-oauth-authentication)
     - [HTTP header authentication](#http-header-authentication)
 - [Contribute as a developer](#contribute-as-a-developer)
   - [Running locally](#Running-locally)
@@ -196,6 +197,7 @@ HostedGPT supports multiple authentication methods:
 
 - [Password authentication](#password-authentication)
 - [Google OAuth authentication](#google-oauth-authentication)
+- [Microsoft Graph OAuth authentication](#microsoft-graph-oauth-authentication)
 
 #### Password authentication
 
@@ -209,6 +211,14 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
 
 - `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret
+
+Alternately, add the following to your encrypted credentials file:
+
+```yaml
+google:
+  auth_client_id: <your client id>
+  auth_client_secret: <your client secret>
+```
 
 **Steps to set up:**
 
@@ -247,6 +257,52 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
    - Set the Client ID and Client Secret as environment variables in your application:
      - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID
      - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret
+
+#### Microsoft Graph OAuth authentication
+
+Microsoft Graph OAuth authentication is disabled by default. You can enable it by setting `MICROSOFT_GRAPH_AUTHENTICATION_FEATURE` to `true`.
+
+To enable Microsoft Graph OAuth authentication, you need to set up Microsoft Graph OAuth in the Microsoft Azure portal. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
+
+- `MICROSOFT_GRAPH_AUTH_CLIENT_ID` - Microsoft Graph OAuth client ID
+- `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET` - Microsoft Graph OAuth client secret
+- `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read mailboxsettings.read`.
+
+Alternately, add the following to your encrypted credentials file:
+
+```yaml
+microsoft_graph:
+  auth_client_id: <your client id>
+  auth_client_secret: <your client secret>
+  scope: openid profile email offline_access user.read mailboxsettings.read
+```
+
+Users will need to have setup their full name in their Microsoft account before they can use this authentication method, via <https://profile.live.com/>, otherwise they will see a login/registration error like "First name can't be blank and last name can't be blank".
+
+Users can remotely remove the connection between their Microsoft account and HostedGPT by going to <https://account.microsoft.com/privacy/app-access> and clicking "Don't Allow" on the corresponding application. However, this will not sign out the user from HostedGPT until the session expires.
+
+**Steps to set up:**
+
+1. **Go to the Microsoft Azure portal and create a new application:**
+
+   - Navigate to [Register an application](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType)
+   - Give it a name
+   - Select the Supported account types
+   - Select the Redirect URI for "Web" (e.g., `https://example.com/auth/microsoft/callback` or `http://localhost:3000/auth/microsoft/callback`)
+   - Click Register
+
+2. **Create OAuth Credentials:**
+
+   - The client ID ("Application (client) ID") is displayed on the Overview page
+   - To generate a client secret, click on "Add a certificate or secret" > "New client secret"
+   - Give it a name and pick an expiration date
+   - Back on the "Certificates & secrets" page, the new client secret will be listed under "Value"
+
+3. **Set Environment Variables:**
+   - Set the Client ID and Client Secret as environment variables in your application:
+     - `MICROSOFT_GRAPH_AUTH_CLIENT_ID`: Your Client ID
+     - `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET`: Your Client Secret
+     - `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read mailboxsettings.read`.
 
 #### HTTP header authentication
 
