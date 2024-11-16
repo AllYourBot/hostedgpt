@@ -22,6 +22,10 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "p2", at_most_two_initials("p2")
   end
 
+  test "returns the correct two initials when there are more than two" do
+    assert_equal "kS", at_most_two_initials("kRxS")
+  end
+
   test "can have spaces" do
     assert_equal "pQ", at_most_two_initials("p v Q")
   end
