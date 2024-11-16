@@ -71,8 +71,8 @@ class AIBackend::Anthropic < AIBackend
     rescue ::Faraday::UnauthorizedError => e
       raise ::Anthropic::ConfigurationError
     rescue => e
-      puts "\nUnhandled error in AIBackend::Anthropic response handler: #{e.message}"
-      puts e.backtrace
+      Rails.logger.info "\nUnhandled error in AIBackend::Anthropic response handler: #{e.message}"
+      Rails.logger.info e.backtrace
     end
   end
 
