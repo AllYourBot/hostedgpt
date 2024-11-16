@@ -36,7 +36,7 @@
               <div tabindex="0" role="button" class="flex items-center justify-between w-full h-10 pr-2 mb-1 rounded-lg cursor-pointer scale-down hover:bg-gray-100 dark:hover:bg-gray-700 group !outline-0">
                 <%= render partial: "layouts/user_avatar", locals: { user: Current.user, size: 7, classes: "ml-2 mr-2" } %>
                 <div class="flex-1 text-sm truncate text-gray-950 dark:text-gray-100">
-                  <%= Current.user.name.full || "Profile" %>
+                 <%= truncate_long_name(Current.user.name.full || "Profile") %>
                 </div>
                 <%= icon "chevron-up", variant: :mini, class: 'text-gray-500 ml-[2px]' %>
               </div>
