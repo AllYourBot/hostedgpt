@@ -2,7 +2,7 @@ module ApplicationHelper
 
   def at_most_two_initials(initials)
     return initials if initials.nil? || initials.length <= 2
-    initials[0] + initials[-1]  
+    initials[0] + initials[-1]
   end
 
   def spinner(opts = {})
