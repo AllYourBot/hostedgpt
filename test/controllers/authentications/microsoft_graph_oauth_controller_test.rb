@@ -161,6 +161,7 @@ class Authentications::MicrosoftGraphOauthControllerTest < ActionDispatch::Integ
       credentials: {
         token: "new_token",
         refresh_token: "new_refresh_token",
+        expires_at: 30.minutes.from_now.to_i,
         scope: "openid profile email offline_access user.read mailboxsettings.read"
       }
     }
