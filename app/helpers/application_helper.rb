@@ -1,9 +1,5 @@
 module ApplicationHelper
 
-  def truncate_long_name(name)
-    truncate(name, length: 20)
-  end
-
   def at_most_two_initials(initials)
     return initials if initials.nil? || initials.length <= 2
     initials[0] + initials[-1]
