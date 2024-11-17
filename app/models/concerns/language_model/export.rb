@@ -8,8 +8,19 @@ module LanguageModel::Export
     attrs
   end
 
+  DEFAULT_EXPORT_ONLY = %i[
+    api_name
+    name
+    api_service_name
+    supports_images
+    supports_tools
+    supports_system_message
+    input_token_cost_cents
+    output_token_cost_cents
+  ]
+
   class_methods do
-    def export_to_file(path:, models:, only: %i[api_name name api_service_name supports_images supports_tools input_token_cost_cents output_token_cost_cents])
+    def export_to_file(path:, models:, only: DEFAULT_EXPORT_ONLY)
       path = path.to_s
       storage = {
         "models" => models.as_json(only:)
