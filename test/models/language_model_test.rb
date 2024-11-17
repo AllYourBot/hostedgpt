@@ -88,7 +88,7 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert File.exist?(path)
     storage = JSON.load_file(path)
     models = storage["models"]
-    assert_equal models.first.keys, %w[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents api_service_name]
+    assert_equal models.first.keys.sort, %w[api_name name best supports_images supports_tools supports_system_message input_token_cost_cents output_token_cost_cents api_service_name].sort
   end
 
   test "export_to_file yaml" do
@@ -97,7 +97,7 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert File.exist?(path)
     storage = YAML.load_file(path)
     models = storage["models"]
-    assert_equal models.first.keys, %w[api_name name supports_images supports_tools input_token_cost_cents output_token_cost_cents api_service_name]
+    assert_equal models.first.keys.sort, %w[api_name name best supports_images supports_tools supports_system_message input_token_cost_cents output_token_cost_cents api_service_name].sort
   end
 
   test "import_from_file with only new models" do
