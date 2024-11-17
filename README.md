@@ -384,13 +384,13 @@ rails models:import
 
 The `models.yaml` file in the root of the project is used by HostedGPT applications to refresh their local list of models.
 
-To refresh this file using the models in local DB, run:
+To refresh the `models.yaml` file using the models in local DB, run:
 
 ```plain
 rails models:export
 ```
 
-To export the models to another file, either json or yaml, pass in an argument:
+If you want to export the models in the local DB to another file, either `.json` or `.yaml`, pass in an argument:
 
 ```plain
 rails models:export[tmp/models.json]
