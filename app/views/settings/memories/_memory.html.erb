@@ -1,7 +1,7 @@
 <tr class="py-1 <%= cycle('bg-gray-100 dark:bg-gray-600', 'bg-white dark:bg-gray-900') %>">
   <td>
     <%= memory.detail %>
-    <%= link_to_source(memory).html_safe %>
+    <%= link_to_source(memory).html_safe if memory.message.present? %>
   </td>
   <td>
     <%= button_to settings_memory_path(memory), method: :delete, class: "inline-block cursor-pointer py-1 pt-0 align-middle" do %>
