@@ -372,6 +372,10 @@ Every time you pull new changes down, kill `bin/dev` and then re-run it. This wi
 
 Each User has their own list of Language Models they can use.
 
+When a new User is created (when a person registers for the first time), they are initialized with a long list of models. This list is loaded from `models.yaml`.
+
+When an administrator upgrades their deployment of HostedGPT, they can update the available models for all users with a task `rails models:import`.
+
 ### Refreshing language models
 
 There is a shared list of known LLM models for OpenAI, Anthropic, and Groq in `models.yaml` and a Rake task to import them into all users:
@@ -390,10 +394,18 @@ To refresh the `models.yaml` file using the models in local DB, run:
 rails models:export
 ```
 
+### Alternate export file
+
 If you want to export the models in the local DB to another file, either `.json` or `.yaml`, pass in an argument:
 
 ```plain
 rails models:export[tmp/models.json]
+```
+
+To import from another file, similarly provide the path as an argument:
+
+```plain
+rails models:import[tmp/models.json]
 ```
 
 ### Running tests
