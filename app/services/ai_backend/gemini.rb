@@ -21,8 +21,8 @@ class AIBackend::Gemini < AIBackend
       Rails.logger.info "Connecting to Gemini API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
       @client = self.class.client.new(credentials: {service: "generative-language-api",
                                                     api_key: assistant.api_service.effective_token,
-                                                    version: "v1beta"}, 
-                                      options: { model: assistant.language_model.api_name, 
+                                                    version: "v1beta"},
+                                      options: { model: assistant.language_model.api_name,
                                       server_sent_events: true })
     rescue ::Faraday::UnauthorizedError => e
       raise OpenAI::ConfigurationError
@@ -42,7 +42,7 @@ class AIBackend::Gemini < AIBackend
 
     @client_config = {
       contents: config[:messages],
-      system_instruction: ( system_message(config[:instructions]) if @assistant.language_model.supports_system_message?)     
+      system_instruction: ( system_message(config[:instructions]) if @assistant.language_model.supports_system_message?)
     }.compact
   end
 
