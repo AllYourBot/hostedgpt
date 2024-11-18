@@ -80,8 +80,8 @@ class AIBackend::OpenAI < AIBackend
     rescue ::Faraday::UnauthorizedError => e
       raise OpenAI::ConfigurationError
     rescue => e
-      puts "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
-      puts e.backtrace.join("\n")
+      Rails.logger.info "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
+      Rails.logger.info e.backtrace.join("\n")
     end
   end
 

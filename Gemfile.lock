@@ -221,6 +221,10 @@ GEM
       oauth2 (~> 2.0)
       omniauth (~> 2.0)
       omniauth-oauth2 (~> 1.8)
+    omniauth-microsoft_graph (2.0.1)
+      jwt (~> 2.0)
+      omniauth (~> 2.0)
+      omniauth-oauth2 (~> 1.8.0)
     omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
       omniauth (~> 2.0)
@@ -437,6 +441,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-23
+  arm64-darwin-24
   x86_64-linux
 
 DEPENDENCIES
@@ -457,6 +462,7 @@ DEPENDENCIES
   name_of_person
   omniauth (~> 2.1)
   omniauth-google-oauth2 (~> 1.1)
+  omniauth-microsoft_graph (~> 2.0)
   omniauth-rails_csrf_protection (~> 1.0.2)
   ostruct
   pg (~> 1.1)
@@ -487,7 +493,7 @@ DEPENDENCIES
   web-console
 
 RUBY VERSION
-   ruby 3.3.5p100
+   ruby 3.3.6p108
 
 BUNDLED WITH
-   2.5.1
+   2.5.22

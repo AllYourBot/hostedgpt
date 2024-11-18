@@ -1,4 +1,14 @@
 module ApplicationHelper
+
+  def truncate_long_name(name)
+    truncate(name, length: 20)
+  end
+
+  def at_most_two_initials(initials)
+    return initials if initials.nil? || initials.length <= 2
+    initials[0] + initials[-1]
+  end
+
   def spinner(opts = {})
     html = <<~HTML
       <svg class="animate-spin -ml-1 mr-3 h-#{opts[:size]} w-#{opts[:size]} #{opts[:class]}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
