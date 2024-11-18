@@ -20,8 +20,10 @@ module LanguageModel::Export
     output_token_cost_cents
   ]
 
+  DEFAULT_MODEL_FILE = "models.yaml"
+
   class_methods do
-    def export_to_file(path:, models:, only: DEFAULT_EXPORT_ONLY)
+    def export_to_file(path: Rails.root.join(LanguageModel::Export::DEFAULT_MODEL_FILE), models:, only: DEFAULT_EXPORT_ONLY)
       path = path.to_s
       storage = {
         "models" => models.as_json(only:)
@@ -33,7 +35,7 @@ module LanguageModel::Export
       end
     end
 
-    def import_from_file(path:, users: User.all)
+    def import_from_file(path: Rails.root.join(LanguageModel::Export::DEFAULT_MODEL_FILE), users: User.all)
       users = Array.wrap(users)
       storage = YAML.load_file(path)
       models = storage["models"]
