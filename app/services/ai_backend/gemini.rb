@@ -42,8 +42,8 @@ class AIBackend::Gemini < AIBackend
 
     @client_config = {
       contents: config[:messages],
-      system_instruction: system_message(config[:instructions])      
-    }
+      system_instruction: ( system_message(config[:instructions]) if @assistant.language_model.supports_system_message?)     
+    }.compact
   end
 
   def get_oneoff_message(instructions, messages, params = {})
