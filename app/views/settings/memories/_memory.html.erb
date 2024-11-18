@@ -1,4 +1,20 @@
-<li class="list-disc py-1">
-  <%= memory.detail %>
-  <%= link_to_source(memory).html_safe %>
-</li>
+<tr class="py-1 <%= cycle('bg-gray-100 dark:bg-gray-600', 'bg-white dark:bg-gray-900') %>">
+  <td>
+    <%= memory.detail %>
+    <%= link_to_source(memory).html_safe %>
+  </td>
+  <td>
+    <%= button_to settings_memory_path(memory), method: :delete, class: "inline-block cursor-pointer py-1 pt-0 align-middle" do %>
+      <%= icon "trash",
+        variant: :outline,
+        size: 22,
+        class: %|
+          stroke-2
+          text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white
+          |,
+          title: "Forget",
+          tooltip: :bottom
+      %>
+    <% end %>
+  </td>
+</tr>
