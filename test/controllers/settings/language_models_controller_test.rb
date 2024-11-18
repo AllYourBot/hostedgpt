@@ -10,7 +10,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
   test "should get index for user" do
     get settings_language_models_url
     assert_response :success
-    assert_select "table#language-models tbody tr", count: 18
+    assert_select "table#language-models tbody tr", count: 19
     assert_select "p a", "Add New"
   end
 

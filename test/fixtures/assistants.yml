@@ -74,3 +74,11 @@ pacos_asst:
   instructions: Point out flower-related local items, also historical events involving flowers
   tools:  []
   external_id:
+
+keith_gemini:
+  user: keith
+  language_model: gemini_flash_1_5
+  name: Gemini Flash 1.5
+  description: Gemini Flash 1.5
+  instructions:
+  tools: []

@@ -34,6 +34,13 @@ rob_openai_service:
   token: rob-secret
   driver: openai
 
+keith_gemini_service:
+  name: Gemini
+  user: keith
+  url: https://api.gemini.com/v1/
+  token: keith-secret
+  driver: gemini
+
 rob_anthropic_service:
   name: Anthropic
   user: rob
