@@ -16,11 +16,14 @@ class AIBackend::Gemini < AIBackend
 
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
-    #raise Gemini::ConfigurationError if user.ollama.blank?
     begin
-      #raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
+      raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to Gemini API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
-      @client = self.class.client.new(credentials: {service: "generative-language-api",api_key: assistant.api_service.effective_token}, options: { model: assistant.language_model.provider_name, server_sent_events: true })
+      @client = self.class.client.new(credentials: {service: "generative-language-api",
+                                                    api_key: assistant.api_service.effective_token,
+                                                    version: "v1beta"}, 
+                                      options: { model: assistant.language_model.api_name, 
+                                      server_sent_events: true })
     rescue ::Faraday::UnauthorizedError => e
       raise OpenAI::ConfigurationError
     end
@@ -38,16 +41,15 @@ class AIBackend::Gemini < AIBackend
     super(config)
 
     @client_config = {
-      contents: config[:messages] #,
-      # Systeem instruction is not working well on gem 'gemini-ai'
-      #system_instruction: system_message(config[:instructions])      
+      contents: config[:messages],
+      system_instruction: system_message(config[:instructions])      
     }
   end
 
   def get_oneoff_message(instructions, messages, params = {})
     set_client_config(
       messages: preceding_conversation_messages,
-      #instructions: full_instructions,
+      instructions: full_instructions,
     )
 
     response = @client.send(client_method_name, @client_config)
@@ -57,13 +59,10 @@ class AIBackend::Gemini < AIBackend
   def stream_next_conversation_message(&chunk_handler)
     set_client_config(
       messages: preceding_conversation_messages,
-      #instructions: full_instructions,
+      instructions: full_instructions,
     )
 
     begin
-      # Systeem instruction is not working well on gem 'gemini-ai'
-      #response = @client.stream_generate_content({contents: preceding_conversation_messages,system_instruction: system_message})
-      #response = @client.stream_generate_content({contents: preceding_conversation_messages})
       response = @client.send(client_method_name, @client_config) do |intermediate_response, parsed, raw|
         content_chunk = intermediate_response.dig("candidates",0,"content","parts",0,"text")
         yield content_chunk if content_chunk != nil
@@ -77,10 +76,10 @@ class AIBackend::Gemini < AIBackend
 
   private
 
-  def system_message
-    return [] if @assistant.instructions.blank?
+  def system_message(content)
+    return [] if content.blank?
     {
-      role: "user", parts: { text: @assistant.instructions }
+      role: "user", parts: { text: content }
     }
   end
 
@@ -88,9 +87,13 @@ class AIBackend::Gemini < AIBackend
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
       if @assistant.supports_images? && message.documents.present?
 
-        content = [{ type: "text", text: message.content_text }]
+        content = [{ text: message.content_text }]
         content += message.documents.collect do |document|
-          { type: "image_url", image_url: { url: document.file_data_url(:large) }}
+          { inline_data: {
+              mime_type: document.file.blob.content_type,
+              data: document.file_base64(:large),
+            }
+          }
         end
 
         {
