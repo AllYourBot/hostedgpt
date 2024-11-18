@@ -32,7 +32,7 @@ class APIService < ApplicationRecord
   end
 
   def requires_token?
-    [URL_OPEN_AI, URL_ANTHROPIC].include?(url) # other services may require it but we don't always know
+    [URL_OPEN_AI, URL_ANTHROPIC,URL_GEMINI].include?(url) # other services may require it but we don't always know
   end
 
   def effective_token

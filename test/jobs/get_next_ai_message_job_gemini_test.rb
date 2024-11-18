@@ -44,7 +44,7 @@ class GetNextAIMessageJobGeminiTest < ActiveJob::TestCase
     api_service.update!(token: "")
 
     assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-    assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for Gemini"
+    assert_includes @conversation.latest_message_for_version(:latest).content_text, "There is a configuration error with the Gemini API Service"
   end
 
   test "when API response key is missing, a nice error message is displayed" do

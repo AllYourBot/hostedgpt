@@ -8,7 +8,7 @@ class AIBackend::Gemini < AIBackend
   # what you want instead.
   def self.client
     if Rails.env.test?
-      TestClient::Gemini
+      ::TestClient::Gemini
     else
       ::Gemini
     end
@@ -63,9 +63,16 @@ class AIBackend::Gemini < AIBackend
     )
 
     begin
-      response = @client.send(client_method_name, @client_config) do |intermediate_response, parsed, raw|
-        content_chunk = intermediate_response.dig("candidates",0,"content","parts",0,"text")
-        yield content_chunk if content_chunk != nil
+      if Rails.env.test?
+        @client.send(client_method_name, @client_config).each do |intermediate_response|
+          content_chunk = intermediate_response.dig("candidates",0,"content","parts",0,"text")
+          yield content_chunk if content_chunk != nil
+        end
+      else
+        response = @client.send(client_method_name, @client_config) do |intermediate_response, parsed, raw|
+          content_chunk = intermediate_response.dig("candidates",0,"content","parts",0,"text")
+          yield content_chunk if content_chunk != nil
+        end
       end
     rescue ::Faraday::UnauthorizedError => e
       puts e.message
