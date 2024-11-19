@@ -1,6 +1,20 @@
 require "test_helper"
 
 class LanguageModel::ExportTest < ActiveSupport::TestCase
+  test "as_json includes api_service_name" do
+    language_model = LanguageModel.new(api_service: api_services(:rob_openai_service))
+    assert language_model.as_json.key?("api_service_name")
+  end
+
+  test "api_service can be nil" do
+    assert_nil LanguageModel.new(api_service: nil).as_json["api_service_name"]
+  end
+
+  test "except api_service_name" do
+    language_model = LanguageModel.new(api_service: api_services(:rob_openai_service))
+    assert_nil language_model.as_json(except: ["api_service_name"])["api_service_name"]
+  end
+
   test "export_to_file json" do
     path = Rails.root.join("tmp/models.json")
     LanguageModel.export_to_file(path:, models: users(:rob).language_models.not_deleted)

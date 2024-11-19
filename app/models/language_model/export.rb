@@ -1,13 +1,6 @@
 module LanguageModel::Export
   extend ActiveSupport::Concern
 
-  def as_json(options = {})
-    options = options.with_indifferent_access
-    attrs = super(options)
-    attrs["api_service_name"] = api_service_name if options[:only].include?(:api_service_name)
-    attrs
-  end
-
   DEFAULT_EXPORT_ONLY = %i[
     api_name
     name
@@ -21,6 +14,16 @@ module LanguageModel::Export
   ]
 
   DEFAULT_MODEL_FILE = "models.yaml"
+
+  def attributes
+    super.merge("api_service_name" => api_service_name)
+  end
+
+  # Unsure why this needs to re-defined, but the original ActiveModel::Serialization
+  # implementation is ignoring the #attributes method above.
+  def attribute_names_for_serialization
+    attributes.keys
+  end
 
   class_methods do
     def export_to_file(path: Rails.root.join(LanguageModel::Export::DEFAULT_MODEL_FILE), models:, only: DEFAULT_EXPORT_ONLY)
