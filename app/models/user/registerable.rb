@@ -16,6 +16,6 @@ module User::Registerable
 
     assistants.create! name: "GPT-4o", language_model: language_models.best_for_api_service(open_ai_api_service).first
     assistants.create! name: "Claude 3.5 Sonnet", language_model: language_models.best_for_api_service(anthropic_api_service).first
-    assistants.create! name: "Meta Llama 3 70b", language_model: language_models.best_for_api_service(groq_api_service).first
+    assistants.create! name: "Meta Llama", language_model: language_models.best_for_api_service(groq_api_service).first
   end
 end
