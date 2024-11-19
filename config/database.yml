@@ -12,7 +12,6 @@
     puts_red "DEPRECATED: #{env} is deprecated, #{message}" if ENV[env]
   end
 
-
   deprecated("HOSTEDGPT_DATABASE_PORT", "use HOSTEDGPT_DB_PORT instead")
   deprecated("HOSTEDGPT_DEV_DB", "use HOSTEDGPT_DB_NAME instead")
   deprecated("HOSTEDGPT_TEST_DB", "provide HOSTEDGPT_DB_NAME and test database name is generated")

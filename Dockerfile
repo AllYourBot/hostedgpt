@@ -86,6 +86,34 @@ EXPOSE 3000
 
 #### END of FLY ####
 
+#### START of POSTGRES ####
+FROM postgres:16 as postgres-development
+
+RUN mkdir -p /docker-entrypoint-initdb.d
+WORKDIR /docker-entrypoint-initdb.d
+
+RUN touch 01-create-rails-user.sh
+RUN echo "#!/bin/bash" >> 01-create-rails-user.sh
+RUN echo "set -e" >> 01-create-rails-user.sh
+# the script uses the DATABASE_URL env var (if set)
+# to extract the username and password and set HOSTEDGPT_DB_USERNAME and HOSTEDGPT_DB_PASSWORD
+# if DATABASE_URL is not set, it uses the existing HOSTEDGPT_DB_USERNAME and HOSTEDGPT_DB_PASSWORD
+# to create the rails user
+RUN echo "if [ -n \"\$DATABASE_URL\" ]; then" >> 01-create-rails-user.sh
+RUN echo "	echo \"DATABASE_URL is set, using it to extract username and password\"" >> 01-create-rails-user.sh
+RUN echo "	HOSTEDGPT_DB_USERNAME=\"\$(echo \$DATABASE_URL | sed -n 's|.*://\([^:]*\):.*|\\\\1|p')\"" >> 01-create-rails-user.sh
+RUN echo "	HOSTEDGPT_DB_PASSWORD=\"\$(echo \$DATABASE_URL | sed -n 's|.*://[^:]*:\([^@]*\)@.*|\\\\1|p')\"" >> 01-create-rails-user.sh
+RUN echo "fi" >> 01-create-rails-user.sh
+
+RUN echo "echo \"creating user \$HOSTEDGPT_DB_USERNAME\"" >> 01-create-rails-user.sh
+RUN echo "psql -v ON_ERROR_STOP=1 --username \"\$POSTGRES_USER\" <<-EOSQL" >> 01-create-rails-user.sh
+RUN echo "	CREATE USER \$HOSTEDGPT_DB_USERNAME WITH SUPERUSER PASSWORD '\$HOSTEDGPT_DB_PASSWORD';" >> 01-create-rails-user.sh
+RUN echo "EOSQL" >> 01-create-rails-user.sh
+
+WORKDIR /
+
+#### END of POSTGRES ####
+
 #### START of DEV ####
 
 # RUBY_VERSION is the only thing used from anything above

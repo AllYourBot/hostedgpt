@@ -1,14 +1,16 @@
 services:
   postgres:
-    image: postgres:16
     container_name: hostedgpt_postgres
+    build:
+      context: .
+      target: postgres-development
     restart: always
     environment:
-      # NOTE: If you use DATABASE_URL, it needs to match these env vars
-      #  so you can either have it match the default values for these env vars
-      #  or you can set these env vars to match the user and password from the url
-      - POSTGRES_USER=${HOSTEDGPT_DB_USERNAME:-hostedgpt_user}
-      - POSTGRES_PASSWORD=${HOSTEDGPT_DB_PASSWORD:-secret}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      # NOTE: If DATABASE_URL will override values set in HOSTEDGPT_DB_USERNAME and HOSTEDGPT_DB_PASSWORD
+      - DATABASE_URL
+      - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-hostedgpt_user}
+      - HOSTEDGPT_DB_PASSWORD=${HOSTEDGPT_DB_PASSWORD:-secret}
     volumes:
       - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
