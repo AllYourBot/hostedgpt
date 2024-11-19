@@ -17,5 +17,7 @@ namespace :models do
 
 end
 
-Rake::Task["db:prepare"].enhance ["models:import"]
+Rake::Task["db:prepare"].enhance do
+  Rake::Task["models:import"].invoke
+end
 
