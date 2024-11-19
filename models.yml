@@ -9,8 +9,8 @@ models:
   best: true
   supports_system_message: true
   api_service_name: OpenAI
-- api_name: claude-3-5-sonnet-20240620
-  name: Claude 3.5 Sonnet (2024-06-20)
+- api_name: claude-3-5-sonnet-20241022
+  name: Claude 3.5 Sonnet (latest)
   supports_images: true
   supports_tools: true
   input_token_cost_cents: '0.0003'
@@ -18,8 +18,8 @@ models:
   best: true
   supports_system_message: true
   api_service_name: Anthropic
-- api_name: llama3-70b-8192
-  name: Meta Llama 3 70b
+- api_name: llama-3.1-70b-versatile
+  name: Meta Llama 3.1 70b Versatile
   supports_images: false
   supports_tools: true
   input_token_cost_cents: '0.000059'
@@ -27,6 +27,42 @@ models:
   best: true
   supports_system_message: true
   api_service_name: Groq
+- api_name: gpt-4o-mini
+  name: GPT-4o Mini (latest)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.000015'
+  output_token_cost_cents: '0.00006'
+  best: false
+  supports_system_message: true
+  api_service_name: OpenAI
+- api_name: o1-preview
+  name: OpenAI o1 (preview)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.015'
+  output_token_cost_cents: '0.06'
+  best: false
+  supports_system_message: true
+  api_service_name: OpenAI
+- api_name: claude-3-5-haiku-20241022
+  name: Claude 3.5 Haiku (latest)
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.0001'
+  output_token_cost_cents: '0.0005'
+  best: false
+  supports_system_message: true
+  api_service_name: Anthropic
+- api_name: claude-3-5-sonnet-20240620
+  name: Claude 3.5 Sonnet (2024-06-20)
+  supports_images: true
+  supports_tools: true
+  input_token_cost_cents: '0.0003'
+  output_token_cost_cents: '0.0015'
+  best: false
+  supports_system_message: true
+  api_service_name: Anthropic
 - api_name: gpt-4o-2024-08-06
   name: GPT-4o Omni Multimodal (2024-08-06)
   supports_images: true
@@ -45,6 +81,15 @@ models:
   best: false
   supports_system_message: true
   api_service_name: OpenAI
+- api_name: llama3-70b-8192
+  name: Meta Llama 3 70b
+  supports_images: false
+  supports_tools: true
+  input_token_cost_cents: '0.000059'
+  output_token_cost_cents: '0.000079'
+  best: false
+  supports_system_message: true
+  api_service_name: Groq
 - api_name: gpt-4-turbo
   name: GPT-4 Turbo with Vision (latest)
   supports_images: true
