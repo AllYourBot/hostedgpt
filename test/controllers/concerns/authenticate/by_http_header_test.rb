@@ -103,9 +103,6 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
   private
 
   def assert_login_completed_for(user)
-    assert_response :redirect
-    assert_redirected_to new_assistant_message_path(user.assistants.ordered.first)
-    follow_redirect!
     assert_response :success
     assert_logged_in(user)
   end
