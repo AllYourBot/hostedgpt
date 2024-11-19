@@ -121,6 +121,27 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert users(:rob).language_models.find_by(api_name: "new-model")
   end
 
+  test "import_from_file json with only new models" do
+    models = [{
+      api_name: "new-model",
+      name: "new model",
+      api_service_name: api_services(:rob_openai_service).name,
+      supports_images: true,
+      supports_tools: true,
+      input_token_cost_cents: 1,
+      output_token_cost_cents: 1
+    }]
+    storage = {
+      "models" => models
+    }
+    path = Rails.root.join("tmp/newmodels.json")
+    File.write(path, storage.to_json)
+    assert_difference "LanguageModel.count", 1 do
+      LanguageModel.import_from_file(path:, users: users(:rob))
+    end
+    assert users(:rob).language_models.find_by(api_name: "new-model")
+  end
+
   test "import_from_file with existing models by api_name" do
     model = users(:rob).language_models.not_deleted.first
     models = [{
