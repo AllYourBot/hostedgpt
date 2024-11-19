@@ -1,6 +1,6 @@
 # We don"t care about large or not
 class LanguageModel < ApplicationRecord
-  include LanguageModel::Export
+  include Export
 
   belongs_to :user
   belongs_to :api_service
