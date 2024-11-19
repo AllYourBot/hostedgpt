@@ -25,7 +25,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
   end
 
   test "export_to_file yaml" do
-    path = Rails.root.join("tmp/models.yaml")
+    path = Rails.root.join("tmp/models.yml")
     LanguageModel.export_to_file(path:, models: users(:rob).language_models.not_deleted)
     assert File.exist?(path)
     storage = YAML.load_file(path)
@@ -46,7 +46,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     storage = {
       "models" => models
     }
-    path = Rails.root.join("tmp/newmodels.yaml")
+    path = Rails.root.join("tmp/newmodels.yml")
     File.write(path, storage.to_yaml)
     assert_difference "LanguageModel.count", 1 do
       LanguageModel.import_from_file(path:, users: users(:rob))
@@ -88,7 +88,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     storage = {
       "models" => models
     }
-    path = Rails.root.join("tmp/newmodels.yaml")
+    path = Rails.root.join("tmp/newmodels.yml")
     File.write(path, storage.to_yaml)
     assert_no_difference "LanguageModel.count" do
       LanguageModel.import_from_file(path:, users: users(:rob))

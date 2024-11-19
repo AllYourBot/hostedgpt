@@ -13,7 +13,7 @@ module LanguageModel::Export
     output_token_cost_cents
   ]
 
-  DEFAULT_MODEL_FILE = "models.yaml"
+  DEFAULT_MODEL_FILE = "models.yml"
 
   def attributes
     super.merge("api_service_name" => api_service_name)
