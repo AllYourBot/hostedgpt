@@ -25,7 +25,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     post users_url, params: { person: { personable_type: "User", email: "azbshiri@gmail.com", personable_attributes: user_attr } }
     assert_response :redirect
     follow_redirect!
-    follow_redirect! # intentionally two redirects
     assert_response :success
   end
 
@@ -51,7 +50,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match "Email can&#39;t be blank", response.body
   end
 
-  test "after create, an account should be bootstrapped and taken to a conversation" do
+  test "after create, an account should be bootstrapped and shown assistants" do
     email = "fake_email#{rand(1000)}@example.com"
     post users_url, params: { person: { personable_type: "User", email: email, personable_attributes: user_attr } }
 
@@ -60,10 +59,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Doe", user.last_name
     assert_equal 3, user.assistants.count, "This new user did not get the expected number of assistants"
 
-    assistant = user.assistants.ordered.first
-
+    assert_redirected_to root_path
     follow_redirect!
-    assert_redirected_to new_assistant_message_path(assistant)
+    assert_response :success
+    assert_select "h1", "Assistants"
   end
 
   test "updates user preferences" do

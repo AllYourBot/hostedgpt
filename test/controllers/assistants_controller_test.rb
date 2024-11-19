@@ -7,8 +7,8 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
     login_as @user
   end
 
-  test "should get index" do
+  test "index shows assistants" do
     get assistants_url
-    assert_redirected_to new_assistant_message_path(@assistant)
+    assert_response :success
   end
 end
