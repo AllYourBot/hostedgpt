@@ -3,11 +3,11 @@ services:
     container_name: hostedgpt_postgres
     build:
       context: .
-      target: postgres-development
+      dockerfile: docker/Dockerfile.postgres
     restart: always
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
-      # NOTE: If DATABASE_URL will override values set in HOSTEDGPT_DB_USERNAME and HOSTEDGPT_DB_PASSWORD
+      # NOTE: If DATABASE_URL is set it will override values set in HOSTEDGPT_DB_USERNAME and HOSTEDGPT_DB_PASSWORD
       - DATABASE_URL
       - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-hostedgpt_user}
       - HOSTEDGPT_DB_PASSWORD=${HOSTEDGPT_DB_PASSWORD:-secret}
