@@ -6,15 +6,17 @@ services:
       dockerfile: docker/Dockerfile.postgres
     restart: always
     environment:
+      - POSTGRES_USER=${POSTGRES_USER:-app}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      - POSTGRES_DB=${POSTGRES_DB:-app_development}
       # NOTE: If DATABASE_URL is set it will override values set in HOSTEDGPT_DB_USERNAME and HOSTEDGPT_DB_PASSWORD
       - DATABASE_URL
-      - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-hostedgpt_user}
+      - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-app}
       - HOSTEDGPT_DB_PASSWORD=${HOSTEDGPT_DB_PASSWORD:-secret}
     volumes:
       - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: pg_isready -U $$POSTGRES_USER
+      test: ["CMD", "pg_isready", "-U", "app", "-d", "app_development"]
       interval: 1s
       retries: 5
 
@@ -27,11 +29,11 @@ services:
       target: development
     environment:
       # Be sure to add environment variables to config/options.yml
-      - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-hostedgpt_user}
+      - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-app}
       - HOSTEDGPT_DB_PASSWORD=${HOSTEDGPT_DB_PASSWORD:-secret}
       - HOSTEDGPT_DB_HOST=${HOSTEDGPT_DB_HOST:-postgres}
       - HOSTEDGPT_DB_PORT=${HOSTEDGPT_DB_PORT:-5432}
-      - HOSTEDGPT_DB_NAME=${HOSTEDGPT_DB_NAME:-hostedgpt}
+      - HOSTEDGPT_DB_NAME=${HOSTEDGPT_DB_NAME:-app_development}
       - DATABASE_URL
       - HOSTEDGPT_DATABASE_PORT # DEPRECATED: use HOSTEDGPT_DB_PORT
       - HOSTEDGPT_DEV_DB # DEPRECATED: use HOSTEDGPT_DB_NAME

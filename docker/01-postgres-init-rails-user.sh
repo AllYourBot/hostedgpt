@@ -7,7 +7,7 @@ set -e
 # to create the rails user
 
 if [ -n "$DATABASE_URL" ]; then
-  echo "DATABASE_URL is set, using it to extract username and password"
+  echo "DATABASE_URL is set. Extracting username and password"
   HOSTEDGPT_DB_USERNAME="$(echo $DATABASE_URL | sed -n 's|.*://\([^:]*\):.*|\1|p')"
   HOSTEDGPT_DB_PASSWORD="$(echo $DATABASE_URL | sed -n 's|.*://[^:]*:\([^@]*\)@.*|\1|p')"
 fi
