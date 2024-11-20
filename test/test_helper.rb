@@ -34,6 +34,9 @@ class ActionDispatch::IntegrationTest
     post login_path, params: { email: user.email, password: password }
     assert_response :redirect
     follow_redirect! # root
+    unless Feature.assistants_page?
+      follow_redirect! # conversation
+    end
     assert_response :success
   end
 
