@@ -28,7 +28,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
   end
 
   test "should create and login new user when NAME IS OMITTED" do
-    stub_features(http_header_authentication: true, registration: true) do
+    stub_features(http_header_authentication: true, registration: true, assistants_page: false) do
       assert_difference "User.count", 1 do
         assert_difference "Person.count", 1 do
           get root_url, headers: new_http_auth_user.except(Setting.http_header_auth_name)
@@ -96,7 +96,8 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
 
     stub_features(
       http_header_authentication: true,
-      registration: false
+      registration: false,
+      assistants_page: false
     ) do
       get root_url, headers: headers
     end
