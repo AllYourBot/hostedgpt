@@ -1,0 +1,14 @@
+---
+assistants:
+- name: GPT-4o
+  tools: []
+  language_model_api_name: gpt-4o
+- name: GPT-4o Mini
+  tools: []
+  language_model_api_name: gpt-4o-mini
+- name: Claude 3.5 Sonnet
+  tools: []
+  language_model_api_name: claude-3-5-sonnet-20241022
+- name: Meta Llama
+  tools: []
+  language_model_api_name: llama-3.1-70b-versatile

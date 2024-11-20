@@ -8,14 +8,11 @@ module User::Registerable
   private
 
   def create_initial_assistants_etc
-    open_ai_api_service = api_services.create!(url: APIService::URL_OPEN_AI, driver: :openai, name: "OpenAI")
-    anthropic_api_service = api_services.create!(url: APIService::URL_ANTHROPIC, driver: :anthropic, name: "Anthropic")
-    groq_api_service = api_services.create!(url: APIService::URL_GROQ, driver: :openai, name: "Groq")
+    api_services.create!(url: APIService::URL_OPEN_AI, driver: :openai, name: "OpenAI")
+    api_services.create!(url: APIService::URL_ANTHROPIC, driver: :anthropic, name: "Anthropic")
+    api_services.create!(url: APIService::URL_GROQ, driver: :openai, name: "Groq")
 
     LanguageModel.import_from_file(users: [self])
-
-    assistants.create! name: "GPT-4o", language_model: language_models.best_for_api_service(open_ai_api_service).first
-    assistants.create! name: "Claude 3.5 Sonnet", language_model: language_models.best_for_api_service(anthropic_api_service).first
-    assistants.create! name: "Meta Llama", language_model: language_models.best_for_api_service(groq_api_service).first
+    Assistant.import_from_file(users: [self])
   end
 end
