@@ -13,7 +13,7 @@ if [ -n "$DATABASE_URL" ]; then
 fi
 
 echo "creating user $HOSTEDGPT_DB_USERNAME"
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOS
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOS
   DO
   \$do\$
   BEGIN

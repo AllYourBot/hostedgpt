@@ -8,6 +8,7 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-app}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      - POSTGRES_DB=${POSTGRES_DB:-app_development}
       # NOTE: If DATABASE_URL is set it will override values set in HOSTEDGPT_DB_USERNAME and HOSTEDGPT_DB_PASSWORD
       - DATABASE_URL
       - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-app}
@@ -15,7 +16,7 @@ services:
     volumes:
       - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: pg_isready -U $$POSTGRES_USER
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
       interval: 1s
       retries: 5
 
