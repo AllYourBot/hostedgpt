@@ -16,11 +16,20 @@ end %>
 
 <% if from_name_for(message) == "Tool" && message.content_text.match(/"This has been remembered/) %>
   <div class="flex mb-5 ml-9 sm:ml-3 md:ml-8">
-    <%= formatted_text = format_for_display message.content_text %>
-    &nbsp;
+    <%= icon "archive-box",
+      variant: :outline,
+      size: 22,
+      class: %|
+        ml-1
+        mr-1
+        |
+    %>
+    <div class="ml-1">
+      <%= format_for_display(message.content_text) %>
+    </div>
     <%= link_to "(memories)\n", settings_memories_path,
       data: { turbo_frame: "_top" },
-      class: "text-gray-600 dark:text-gray-300"
+      class: "ml-1 text-gray-600 dark:text-gray-300"
     %>
   </div>
 <% end %>
