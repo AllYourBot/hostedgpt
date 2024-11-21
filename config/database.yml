@@ -1,9 +1,4 @@
 <%
-  # first env with a value
-  def first_of(*envs)
-    envs.map { |env| ENV[env] }.compact.first
-  end
-
   def puts_red(msg)
     puts "\e[31m#{msg}\e[0m"
   end
@@ -24,10 +19,10 @@ default: &default
   url: <%= ENV["DATABASE_URL"] %>
   # It's best to set DATABASE_URL to configure database details. That overrides the following settings
   username: <%= ENV["HOSTEDGPT_DB_USERNAME"] || "app" %>
-  password: <%= first_of("HOSTEDGPT_DATABASE_PASSWORD", "HOSTEDGPT_DB_PASSWORD") %>
+  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] || ENV["HOSTEDGPT_DB_PASSWORD"] %>
   host: <%= ENV["HOSTEDGPT_DB_HOST"] %>
-  port: <%= first_of("HOSTEDGPT_DATABASE_PORT", "HOSTEDGPT_DB_PORT") || 5432 %>
-  database: <%= first_of("HOSTEDGPT_DEV_DB", "HOSTEDGPT_DB_NAME") || "app_development" %>
+  port: <%= ENV["HOSTEDGPT_DATABASE_PORT"] || ENV["HOSTEDGPT_DB_PORT"] || 5432 %>
+  database: <%= ENV["HOSTEDGPT_DEV_DB"] || ENV["HOSTEDGPT_DB_NAME"] || "app_development" %>
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
@@ -49,4 +44,4 @@ production:
   # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
   database: hostedgpt_production
   username: hostedgpt
-  password: <%= first_of("HOSTEDGPT_DATABASE_PASSWORD", "HOSTEDGPT_DB_PASSWORD") %>
+  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] || ENV["HOSTEDGPT_DB_PASSWORD"] %>
