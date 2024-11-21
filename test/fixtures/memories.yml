@@ -2,3 +2,8 @@ location:
   user: keith
   message: hear_me
   detail: He lives in Austin, Texas
+
+pet:
+  user: keith
+  message: identify_photo
+  detail: He owns a cat
