@@ -38,7 +38,6 @@ module HostedGPT
     config.eager_load_paths << Rails.root.join("lib")
 
     url_settings = [:app_url_protocol, :app_url_host, :app_url_port]
-    # if !Rails.env.test? && url_settings.any?{|k| Setting.key_set?(k)}
     if url_settings.any?{|k| Setting.key_set?(k)}
       Setting.require_keys!(*url_settings)
 
