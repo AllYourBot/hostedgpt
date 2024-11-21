@@ -17,6 +17,7 @@ jobs:
         ports:
           - "5432:5432"
         env:
+          POSTGRES_DB: hostedgpt_test
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
         options: >-
@@ -26,7 +27,7 @@ jobs:
           --health-retries 5
     env:
       RAILS_ENV: test
-      DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt"
+      DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,6 +57,7 @@ jobs:
         ports:
           - "5432:5432"
         env:
+          POSTGRES_DB: hostedgpt_test
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
         options: >-
@@ -65,7 +67,7 @@ jobs:
           --health-retries 5
     env:
       RAILS_ENV: test
-      DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt"
+      DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
       DISPLAY: "=:99"
       CHROME_VERSION: "127.0.6533.119"
 
