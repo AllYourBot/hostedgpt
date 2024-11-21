@@ -17,7 +17,7 @@ end %>
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !debug_tool_messages && "hidden" %>"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= !message.content_tool_calls.blank? && "hidden" %>"
   data-role="message"
   data-subrole="<%= message.role %>-message"
 
@@ -108,6 +108,10 @@ end %>
             <% end %>
           <% end %>
           <%= formatted_text = format_for_display message.content_text, append_inside_tag: thinking_html(message, thinking) %>
+          <%= link_to "(memories)", settings_memories_path,
+            data: { turbo_frame: "_top" },
+            class: "text-gray-600 dark:text-gray-300" if from_name_for(message) == "Tool"  && message.content_text.match(/"This has been remembered/)
+          %>
         </div>
 
         <% if debug_tool_messages && message.content_tool_calls.present? %>
