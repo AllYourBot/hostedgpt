@@ -368,6 +368,46 @@ HostedGPT requires these services to be running:
 
 Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
 
+## Language models
+
+Each User has their own list of Language Models they can use.
+
+When a new User is created (when a person registers for the first time), they are initialized with a long list of models. This list is loaded from `models.yml`.
+
+When an administrator upgrades their deployment of HostedGPT, they can update the available models for all users with a task `rails models:import`.
+
+### Refreshing language models
+
+There is a shared list of known LLM models for OpenAI, Anthropic, and Groq in `models.yml` and a Rake task to import them into all users:
+
+```plain
+rails models:import
+```
+
+### Update models.yml
+
+The `models.yml` file in the root of the project is used by HostedGPT applications to refresh their local list of models.
+
+To refresh the `models.yml` file using the models in local DB, run:
+
+```plain
+rails models:export
+```
+
+### Alternate export file
+
+If you want to export the models in the local DB to another file, either `.json` or `.yaml`, pass in an argument:
+
+```plain
+rails models:export[tmp/models.json]
+```
+
+To import from another file, similarly provide the path as an argument:
+
+```plain
+rails models:import[tmp/models.json]
+```
+
 ### Running tests
 
 If you're set up with Docker you run `docker compose run base rails test`. Note that the system tests, which use a headless browser, are not able to run in Docker. They will be run automatically for you if you create a Pull Request against the project.
