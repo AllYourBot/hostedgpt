@@ -410,3 +410,4 @@ v0.5 - Released on 2/14/2024
 - Conversations are automatically titled
 - Sidebar can be closed
 - AI responses stream in
+.
