@@ -14,9 +14,19 @@ end %>
 <% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
 <% done_thinking = !thinking && message.content_text.present? %>
 
+<% if from_name_for(message) == "Tool" && message.content_text.match(/"This has been remembered/) %>
+  <div>
+    <%= formatted_text = format_for_display message.content_text, append_inside_tag: thinking_html(message, thinking) %>
+    <%= link_to "(memories)\n", settings_memories_path,
+      data: { turbo_frame: "_top" },
+      class: "text-gray-600 dark:text-gray-300"
+    %>
+  </div>
+<% end %>
+
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && "hidden" %>"
   data-role="message"
   data-subrole="<%= message.role %>-message"
 
@@ -27,7 +37,6 @@ end %>
   data-playback-transition-outlet="#playback-control-<%= message.id %>"
   data-action="turbo:before-morph-attribute->playback#preserveStimulusValues"
 > <!-- this outer div persists throughout streaming updates -->
-
   <div
     class="flex"
     data-role="inner-message"
@@ -107,14 +116,6 @@ end %>
             <% end %>
           <% end %>
           <%= formatted_text = format_for_display message.content_text, append_inside_tag: thinking_html(message, thinking) %>
-          <% if from_name_for(message) == "Tool" && message.content_text.match(/"This has been remembered/) %>
-            <%= link_to "(memories)", settings_memories_path,
-              data: { turbo_frame: "_top" },
-              class: "text-gray-600 dark:text-gray-300" if from_name_for(message) == "Tool"  && message.content_text.match(/"This has been remembered/) 
-            %>
-          <% elsif message.only_tool_response? && message.content_tool_calls[0] %>
-            Calling: <%= message.content_tool_calls[0].dig(:function, :name) %>
-          <% end %>
         </div>
 
         <div class="
