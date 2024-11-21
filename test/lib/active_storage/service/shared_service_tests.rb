@@ -11,9 +11,10 @@ module ActiveStorage::Service::SharedServiceTests
 
   included do
     setup do
-      stub_config_value(:app_url_protocol, "https")
-      stub_config_value(:app_url_host, "example.com")
-      stub_config_value(:app_url_port, nil)
+      stub_custom_config_value(:app_url_protocol, "https")
+      stub_custom_config_value(:app_url_host, "example.com")
+      stub_custom_config_value(:app_url_port, nil)
+      stub_custom_config_value(:app_url, "https://example.com")
 
       unless self.class.const_defined?(:SERVICE)
         self.class.const_set(:SERVICE, ActiveStorage::Service.configure(:tmp_public, { tmp_public: { service: "Postgresql", public: true } }))

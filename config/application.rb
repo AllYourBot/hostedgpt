@@ -37,16 +37,24 @@ module HostedGPT
     config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("lib")
 
-    url_settings = [:app_url_protocol, :app_url_host, :app_url_port]
+    url_settings = [:app_url_protocol, :app_url_host]
     if url_settings.any?{|k| Setting.key_set?(k)}
       Setting.require_keys!(*url_settings)
 
-      config.app_url_protocol = Setting.app_url_protocol
-      config.app_url_host = Setting.app_url_host
-      config.app_url_port = Setting.app_url_port
-      config.app_url = "#{Setting.app_url_protocol}://#{Setting.app_url_host}:#{Setting.app_url_port}"
+      config.x.app_url_protocol = Setting.app_url_protocol
+      config.x.app_url_host = Setting.app_url_host
+
+      port = Setting.app_url_port.to_s
+      if port.blank? || port == "80"
+        config.x.app_url_port = nil
+      else
+        config.x.app_url_port = Setting.app_url_port
+      end
+
+      port_str = config.x.app_url_port.present? ? ":#{port}" : ""
+      config.x.app_url = "#{Setting.app_url_protocol}://#{Setting.app_url_host}#{port_str}"
     else
-      config.app_url = nil
+      config.x.app_url = nil
     end
 
     # Active Storage

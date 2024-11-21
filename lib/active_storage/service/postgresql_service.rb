@@ -152,11 +152,11 @@ module ActiveStorage
         return url_opts if url_opts.is_a?(Hash)
       end
 
-      if Rails.application.config.app_url.present?
+      if Rails.application.config.x.app_url.present?
         {
-          protocol: Rails.application.config.app_url_protocol,
-          host: Rails.application.config.app_url_host,
-          port: Rails.application.config.app_url_port,
+          protocol: Rails.application.config.x.app_url_protocol,
+          host: Rails.application.config.x.app_url_host,
+          port: Rails.application.config.x.app_url_port,
         }
       else
         {

@@ -30,7 +30,7 @@ class Document < ApplicationRecord
   def image_url(variant, fallback: nil)
     return nil unless has_image?
 
-    if Rails.application.config.app_url.blank?
+    if Rails.application.config.x.app_url.blank?
       file_data_url(variant)
     elsif has_file_variant_processed?(variant)
       fully_processed_url(variant)

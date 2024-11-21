@@ -17,7 +17,7 @@ class Message::DocumentImageTest < ActiveSupport::TestCase
   end
 
   test "document_image_url with data url" do
-    stub_config_app_url("") do
+    stub_custom_config_value(:app_url, "") do
       url = messages(:examine_this).document_image_url(:small)
       assert url.is_a?(String)
       assert url.starts_with?("data:image/png;base64,")
