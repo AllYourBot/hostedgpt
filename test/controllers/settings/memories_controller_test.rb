@@ -18,10 +18,20 @@ class Settings::MemoriesControllerTest < ActionDispatch::IntegrationTest
     assert_match "Clear All Memories", response.body
   end
 
-  test "destroy should soft-delete assistant" do
+  test "delete all the user's memories" do
     login_as users(:keith)
     assert_difference "Memory.count", -users(:keith).memories.count do
       delete settings_memories_url
+    end
+
+    assert_redirected_to settings_memories_url
+    assert flash[:notice].present?
+  end
+
+  test "delete a single user's memory" do
+    login_as users(:keith)
+    assert_difference "Memory.count", -1 do
+      delete settings_memory_url(memories(:pet))
     end
 
     assert_redirected_to settings_memories_url
