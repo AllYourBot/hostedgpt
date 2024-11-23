@@ -13,9 +13,9 @@ end %>
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
 <% done_thinking = !thinking && message.content_text.present? %>
-<% memory_created = from_name_for(message) == "Tool" && message.content_text.match(/"This has been remembered/) %>
+<% memory_updated = from_name_for(message) == "Tool" && message.content_tool_calls.dig(:function, :name) == "memory_remember_detail_about_user" %>
 
-<% if memory_created %>
+<% if memory_updated %>
   <div class="flex mb-5 ml-9 sm:ml-3 md:ml-8">
     <%= icon "archive-box",
       variant: :outline,
@@ -28,7 +28,7 @@ end %>
     <div class="ml-1">
       <%= format_for_display(message.content_text) %>
     </div>
-    <%= link_to "(memories)\n", settings_memories_path,
+    <%= link_to "(manage memories)\n", settings_memories_path,
       data: { turbo_frame: "_top" },
       class: "ml-1 text-gray-600 dark:text-gray-300"
     %>
