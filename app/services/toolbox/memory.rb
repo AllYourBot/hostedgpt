@@ -15,6 +15,6 @@ class Toolbox::Memory < Toolbox
     conversation_messages = Current.message.conversation.messages.for_conversation_version(Current.message.version)
     related_message = conversation_messages.where("messages.id < ?", Current.message.id).last
     Current.user.memories.create!(detail: detail_s, message: related_message)
-    "This has been remembered"
+    "Memory updated"
   end
 end

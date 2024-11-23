@@ -105,7 +105,7 @@ class GetNextAIMessageJob < ApplicationJob
       else
         error_text = nil
         begin
-          error_text = e&.response&.dig(:body, "error", "message")
+          error_text = e&.response&.dig(:body, "error", "message") rescue e&.response&.dig(:body)
         end
         set_unexpected_error(msg&.slice(0...1500), error_text)
         wrap_up_the_message
@@ -196,6 +196,7 @@ class GetNextAIMessageJob < ApplicationJob
         role: tool_message[:role],
         content_text: tool_message[:content],
         tool_call_id: tool_message[:tool_call_id],
+        content_tool_calls: tool_message[:content_tool_calls],
         version: @message.version,
         index: index += 1,
         processed_at: Time.current,
