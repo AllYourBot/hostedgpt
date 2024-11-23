@@ -43,7 +43,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     assert first_new_message.tool?
     assert_equal "Hello, Keith!".to_json, first_new_message.content_text, "First new message should have the result of calling the tool"
     assert first_new_message.tool_call_id.present?
-    assert first_new_message.content_tool_calls.blank?
+    assert first_new_message.content_tool_calls.present?
     assert_equal @message.content_tool_calls.dig(0, :id), first_new_message.tool_call_id, "ID of tool execution should have matched decision to call the tool"
     assert first_new_message.finished?, "This message SHOULD HAVE been considered finished"
 
