@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     resources :language_models
     resources :api_services, except: [:show]
     resources :memories, only: [:index, :destroy] do
-      delete :destroy, to: 'memories#destroy_all', on: :collection
+      delete :destroy, to: "memories#destroy_all", on: :collection
     end
   end
 

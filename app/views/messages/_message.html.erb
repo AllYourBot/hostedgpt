@@ -13,8 +13,9 @@ end %>
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
 <% done_thinking = !thinking && message.content_text.present? %>
+<% memory_created = from_name_for(message) == "Tool" && message.content_text.match(/"This has been remembered/) %>
 
-<% if from_name_for(message) == "Tool" && message.content_text.match(/"This has been remembered/) %>
+<% if memory_created %>
   <div class="flex mb-5 ml-9 sm:ml-3 md:ml-8">
     <%= icon "archive-box",
       variant: :outline,
