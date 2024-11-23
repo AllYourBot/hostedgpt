@@ -6,7 +6,7 @@ class AIBackend::ToolsTest < ActiveSupport::TestCase
       role: "tool",
       content: "\"Hello, World!\"",
       tool_call_id: "abc123",
-      content_tool_calls: messages(:weather_tool_call).content_tool_calls.first.to_json,
+      content_tool_calls: messages(:weather_tool_call).content_tool_calls.first,
     }
     assert_equal [tool_message], AIBackend.get_tool_messages_by_calling(messages(:weather_tool_call).content_tool_calls)
   end
@@ -19,7 +19,7 @@ class AIBackend::ToolsTest < ActiveSupport::TestCase
     msg = AIBackend::OpenAI.get_tool_messages_by_calling(tool_calls).first
     assert_equal "tool", msg[:role]
     assert_equal "abc123", msg[:tool_call_id]
-    assert_equal messages(:weather_tool_call).content_tool_calls.first.to_json, msg[:content_tool_calls]
+    assert_equal messages(:weather_tool_call).content_tool_calls.first, msg[:content_tool_calls]
     assert msg[:content].starts_with?('"An unexpected error occurred')
   end
 
@@ -31,7 +31,7 @@ class AIBackend::ToolsTest < ActiveSupport::TestCase
     msg = AIBackend::OpenAI.get_tool_messages_by_calling(tool_calls).first
     assert_equal "tool", msg[:role]
     assert_equal "abc123", msg[:tool_call_id]
-    assert_equal messages(:weather_tool_call).content_tool_calls.first.to_json, msg[:content_tool_calls]
+    assert_equal messages(:weather_tool_call).content_tool_calls.first, msg[:content_tool_calls]
     assert msg[:content].starts_with?('"An unexpected error occurred')
   end
 end

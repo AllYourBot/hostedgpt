@@ -56,7 +56,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       role: "tool",
       content: "\"Hello, World!\"",
       tool_call_id: "abc123",
-      content_tool_calls: messages(:weather_tool_call).content_tool_calls.first.to_json,
+      content_tool_calls: messages(:weather_tool_call).content_tool_calls.first,
     }
     assert_equal [tool_message], AIBackend::OpenAI.get_tool_messages_by_calling(messages(:weather_tool_call).content_tool_calls)
   end
