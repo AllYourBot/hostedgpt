@@ -7,18 +7,18 @@
     puts_red "DEPRECATED: #{env} is deprecated, #{message}" if ENV[env]
   end
 
-  deprecated("HOSTEDGPT_DATABASE_PORT", "use HOSTEDGPT_DB_PORT instead")
-  deprecated("HOSTEDGPT_DEV_DB", "use HOSTEDGPT_DB_NAME instead")
-  deprecated("HOSTEDGPT_TEST_DB", "provide HOSTEDGPT_DB_NAME and test database name is generated")
-  deprecated("HOSTEDGPT_DATABASE_PASSWORD", "use HOSTEDGPT_DB_PASSWORD instead")
+  deprecated("HOSTEDGPT_DATABASE_PORT", "use HOSTED_DB_PORT instead")
+  deprecated("HOSTEDGPT_DEV_DB", "use HOSTED_DB_NAME instead")
+  deprecated("HOSTEDGPT_TEST_DB", "provide HOSTED_DB_NAME and test database name is generated")
+  deprecated("HOSTEDGPT_DATABASE_PASSWORD", "use HOSTED_DB_PASSWORD instead")
 %>
 
 default: &default
   adapter: postgresql
-  username: <%= ENV["HOSTEDGPT_DB_USERNAME"] %>
-  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] || ENV["HOSTEDGPT_DB_PASSWORD"] %>
-  host: <%= ENV["HOSTEDGPT_DB_HOST"] %>
-  port: <%= ENV["HOSTEDGPT_DATABASE_PORT"] || ENV["HOSTEDGPT_DB_PORT"] %>
+  username: <%= ENV["HOSTED_DB_USERNAME"] %>
+  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] || ENV["HOSTED_DB_PASSWORD"] %>
+  host: <%= ENV["HOSTED_DB_HOST"] %>
+  port: <%= ENV["HOSTEDGPT_DATABASE_PORT"] || ENV["HOSTED_DB_PORT"] %>
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
@@ -27,15 +27,15 @@ default: &default
 
 development:
   <<: *default
-  database: <%= ENV["HOSTEDGPT_DEV_DB"] || "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_development" %>
+  database: <%= ENV["HOSTEDGPT_DEV_DB"] || "#{ENV['HOSTED_DB_NAME'] || 'hostedgpt'}_development" %>
 
 test:
   <<: *default
-  database: <%= ENV["HOSTEDGPT_TEST_DB"] || "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_test" %>
+  database: <%= ENV["HOSTEDGPT_TEST_DB"] || "#{ENV['HOSTED_DB_NAME'] || 'hostedgpt'}_test" %>
 
 production:
   <<: *default
   # It's best to set DATABASE_URL to configure database in production. That overrides this "database" name.
   url: <%= ENV["DATABASE_URL"] %>
-  database: <%= ENV["HOSTEDGPT_DEV_DB"] || "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_production" %>
-  username: <%= ENV["HOSTEDGPT_DB_USERNAME"] || "hostedgpt" %>
+  database: <%= ENV["HOSTEDGPT_DEV_DB"] || "#{ENV['HOSTED_DB_NAME'] || 'hostedgpt'}_production" %>
+  username: <%= ENV["HOSTED_DB_USERNAME"] || "hostedgpt" %>
