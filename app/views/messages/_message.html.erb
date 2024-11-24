@@ -17,7 +17,7 @@ end %>
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !memory_updated?(message) && !debug_tool_message && "hidden" %>"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !memory_updated?(message) && !weather_fetched?(message) && !debug_tool_message && "hidden" %>"
   data-role="message"
   data-subrole="<%= message.role %>-message"
 

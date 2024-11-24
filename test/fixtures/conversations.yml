@@ -78,6 +78,7 @@ weather:
   user: keith
   assistant: samantha
   title: Weather
+  # TODO: Add weather_tool_call
   last_assistant_message: weather_explained
 
 trees:

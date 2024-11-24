@@ -32,7 +32,8 @@ module MessagesHelper
       return link_to message.content_text,
         settings_memories_path,
         {data: { turbo_frame: "_top" }, class: "ml-1 text-gray-600 dark:text-gray-300 no-underline"}
-
+    elsif weather_fetched?(message)
+      return "Good summary: #{JSON.parse(message.content_text)["good_summary"]}"
     else
       escaped_text = html_escape(message.content_text)
 
@@ -70,6 +71,10 @@ module MessagesHelper
 
   def memory_updated?(message)
     message.tool? && message.content_tool_calls.dig(:function, :name) == "memory_remember_detail_about_user"
+  end
+
+  def weather_fetched?(message)
+    message.tool? && message.content_tool_calls.dig(:function, :name) == "openmeteo_get_current_and_todays_weather"
   end
 
   private
