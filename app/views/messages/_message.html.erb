@@ -13,31 +13,11 @@ end %>
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
 <% done_thinking = !thinking && message.content_text.present? %>
-<% memory_updated = from_name_for(message) == "Tool" && message.content_tool_calls.dig(:function, :name) == "memory_remember_detail_about_user" %>
-
-<% if memory_updated %>
-  <div class="flex mb-5 ml-9 sm:ml-3 md:ml-8">
-    <%= icon "archive-box",
-      variant: :outline,
-      size: 22,
-      class: %|
-        ml-1
-        mr-1
-        |
-    %>
-    <div class="ml-1">
-      <%= format_for_display(message.content_text) %>
-    </div>
-    <%= link_to "(manage memories)\n", settings_memories_path,
-      data: { turbo_frame: "_top" },
-      class: "ml-1 text-gray-600 dark:text-gray-300"
-    %>
-  </div>
-<% end %>
+<% debug_tool_message = false %>
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && "hidden" %>"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !memory_updated?(message) && !debug_tool_message && "hidden" %>"
   data-role="message"
   data-subrole="<%= message.role %>-message"
 
@@ -126,8 +106,17 @@ end %>
               </div>
             <% end %>
           <% end %>
-          <%= formatted_text = format_for_display message.content_text, append_inside_tag: thinking_html(message, thinking) %>
+          <%= formatted_text = format_for_display message, append_inside_tag: thinking_html(message, thinking) %>
         </div>
+
+        <% if debug_tool_message && message.content_tool_calls.present? %>
+          <div
+            data-role="content-text"
+            class="prose break-words leading-normal dark:[&_*]:text-gray-100 dark:marker:text-gray-100"
+          >
+            <%= formatted_text = format "```\n#{message.content_tool_calls}\n```" %>
+          </div>
+        <% end %>
 
         <div class="
           flex justify-start
