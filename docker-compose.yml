@@ -1,26 +1,22 @@
 services:
   postgres:
+    image: postgres:16
     container_name: hostedgpt_postgres
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.postgres
     restart: always
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-app}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
-      - POSTGRES_DB=${POSTGRES_DB:-app_development}
-      # NOTE: If DATABASE_URL is set it will override values set in HOSTEDGPT_DB_USERNAME and HOSTEDGPT_DB_PASSWORD
-      - DATABASE_URL
-      - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-app}
-      - HOSTEDGPT_DB_PASSWORD=${HOSTEDGPT_DB_PASSWORD:-secret}
+      # NOTE: This Docker compose is intended for development. It does NOT support DATABASE_URL.
+      POSTGRES_USER: app
+      POSTGRES_DB: app_development      
+      POSTGRES_PASSWORD: secret
     volumes:
       - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      test: ["CMD", "pg_isready", "-U", "app", "-d", "app_development"]
       interval: 1s
       retries: 5
 
   base: &base
+    container_name: hostedgpt
     depends_on: ["postgres"]
     restart: on-failure:3
     tty: true
@@ -32,9 +28,9 @@ services:
       - HOSTEDGPT_DB_USERNAME=${HOSTEDGPT_DB_USERNAME:-app}
       - HOSTEDGPT_DB_PASSWORD=${HOSTEDGPT_DB_PASSWORD:-secret}
       - HOSTEDGPT_DB_HOST=${HOSTEDGPT_DB_HOST:-postgres}
-      - HOSTEDGPT_DB_PORT=${HOSTEDGPT_DB_PORT:-5432}
+      - HOSTEDGPT_DB_PORT=${HOSTEDGPT_DB_PORT}
       - HOSTEDGPT_DB_NAME=${HOSTEDGPT_DB_NAME:-app_development}
-      - DATABASE_URL
+      # Using DATABASE_URL to configure db is NOT supported by this Docker compose
       - HOSTEDGPT_DATABASE_PORT # DEPRECATED: use HOSTEDGPT_DB_PORT
       - HOSTEDGPT_DEV_DB # DEPRECATED: use HOSTEDGPT_DB_NAME
       - HOSTEDGPT_TEST_DB # DEPRECATED: provide HOSTEDGPT_DB_NAME and test database name is generated
