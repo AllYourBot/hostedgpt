@@ -15,14 +15,10 @@
 
 default: &default
   adapter: postgresql
-  # url format: postgres://username:password@localhost:5432/database_name
-  url: <%= ENV["DATABASE_URL"] %>
-  # It's best to set DATABASE_URL to configure database details. That overrides the following settings
-  username: <%= ENV["HOSTEDGPT_DB_USERNAME"] || "app" %>
+  username: <%= ENV["HOSTEDGPT_DB_USERNAME"] %>
   password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] || ENV["HOSTEDGPT_DB_PASSWORD"] %>
   host: <%= ENV["HOSTEDGPT_DB_HOST"] %>
-  port: <%= ENV["HOSTEDGPT_DATABASE_PORT"] || ENV["HOSTEDGPT_DB_PORT"] || 5432 %>
-  database: <%= ENV["HOSTEDGPT_DEV_DB"] || ENV["HOSTEDGPT_DB_NAME"] || "app_development" %>
+  port: <%= ENV["HOSTEDGPT_DATABASE_PORT"] || ENV["HOSTEDGPT_DB_PORT"] %>
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
@@ -31,17 +27,15 @@ default: &default
 
 development:
   <<: *default
+  database: <%= ENV["HOSTEDGPT_DEV_DB"] || "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_development" %>
 
 test:
   <<: *default
-  # regex to match groups in the url: /(before db name)(db name)(after db name)/
-  url: <%= "#{ENV['DATABASE_URL']}".gsub(/(.*\/\/[^\/]+\/)([^?]+)(\??.*)/, '\1\2_test\3') %> # add "_test" to the database name if it's specified
-  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
   database: <%= ENV["HOSTEDGPT_TEST_DB"] || "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_test" %>
 
 production:
   <<: *default
-  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
-  database: hostedgpt_production
-  username: hostedgpt
-  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] || ENV["HOSTEDGPT_DB_PASSWORD"] %>
+  # It's best to set DATABASE_URL to configure database in production. That overrides this "database" name.
+  url: <%= ENV["DATABASE_URL"] %>
+  database: <%= ENV["HOSTEDGPT_DEV_DB"] || "#{ENV['HOSTEDGPT_DB_NAME'] || 'hostedgpt'}_production" %>
+  username: <%= ENV["HOSTEDGPT_DB_USERNAME"] || "hostedgpt" %>
