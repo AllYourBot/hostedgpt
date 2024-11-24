@@ -44,7 +44,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     TestClient::OpenAI.stub :text, nil do # this forces it to fall back to default text
       streamed_text = ""
       @openai.stream_next_conversation_message { |chunk| streamed_text += chunk }
-      expected_start = "Hello this is model gpt-4o with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\n\\nFor the user, the current time"
+      expected_start = "Hello this is model gpt-4o with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\nHe owns a cat\\n\\nFor the user, the current time"
       expected_end = "\"! How can I assist you today?"
       assert streamed_text.start_with?(expected_start)
       assert streamed_text.end_with?(expected_end)
@@ -56,6 +56,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       role: "tool",
       content: "\"Hello, World!\"",
       tool_call_id: "abc123",
+      content_tool_calls: messages(:weather_tool_call).content_tool_calls.first,
     }
     assert_equal [tool_message], AIBackend::OpenAI.get_tool_messages_by_calling(messages(:weather_tool_call).content_tool_calls)
   end

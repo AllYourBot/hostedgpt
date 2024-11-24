@@ -1,5 +1,7 @@
 # We don"t care about large or not
 class LanguageModel < ApplicationRecord
+  include Export
+
   belongs_to :user
   belongs_to :api_service
 
@@ -18,6 +20,7 @@ class LanguageModel < ApplicationRecord
   scope :best_for_api_service, ->(api_service) { where(best: true, api_service: api_service) }
 
   delegate :ai_backend, to: :api_service
+  delegate :name, to: :api_service, prefix: true, allow_nil: true
 
   def created_by_current_user?
     user == Current.user

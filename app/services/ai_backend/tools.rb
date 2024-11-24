@@ -29,6 +29,7 @@ module AIBackend::Tools
         {
           role: "tool",
           content: function_response.to_json,
+          content_tool_calls: tool_call,
           tool_call_id: id,
         }
       end

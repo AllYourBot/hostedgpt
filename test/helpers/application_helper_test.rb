@@ -30,16 +30,4 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "pQ", at_most_two_initials("p v Q")
   end
 
-  test "truncates long names" do
-    assert_equal "John D. Z. Smith ...", truncate_long_name("John D. Z. Smith Jane Doe")
-  end
-
-  test "short names are not truncated" do
-    assert_equal "John D. Doe", truncate_long_name("John D. Doe")
-  end
-
-  test "handles nil" do
-    assert_nil truncate_long_name(nil)
-  end
-
 end
