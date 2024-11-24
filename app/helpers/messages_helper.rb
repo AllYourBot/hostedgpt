@@ -29,9 +29,9 @@ module MessagesHelper
 
   def format_for_display(message, append_inside_tag: nil)
     if memory_updated?(message)
-     return link_to message.content_text, 
-       settings_memories_path, 
-       {data: { turbo_frame: "_top" }, class: "ml-1 text-gray-600 dark:text-gray-300 no-underline"}
+      return link_to message.content_text,
+        settings_memories_path,
+        {data: { turbo_frame: "_top" }, class: "ml-1 text-gray-600 dark:text-gray-300 no-underline"}
 
     else
       escaped_text = html_escape(message.content_text)
