@@ -77,8 +77,8 @@ pacos_asst:
 
 keith_gemini:
   user: keith
-  language_model: gemini_flash_1_5
-  name: Gemini Flash 1.5
-  description: Gemini Flash 1.5
+  language_model: gemini-1.5-pro-002
+  name: Gemini Pro 1.5
+  description: Gemini Pro 1.5
   instructions:
   tools: []

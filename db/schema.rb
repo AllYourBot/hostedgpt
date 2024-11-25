@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_11_131751) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_25_102229) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -172,8 +172,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_131751) do
     t.boolean "supports_tools", default: false
     t.decimal "input_token_cost_cents", precision: 30, scale: 15
     t.decimal "output_token_cost_cents", precision: 30, scale: 15
-    t.boolean "best", default: false
     t.boolean "supports_system_message", default: false
+    t.boolean "best", default: false
     t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_language_models_on_user_id"
@@ -238,6 +238,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_131751) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_people_on_email", unique: true
     t.index ["personable_type", "personable_id"], name: "index_people_on_personable"
+  end
+
+  create_table "prompts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "instructions"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_prompts_on_user_id"
   end
 
   create_table "replies", force: :cascade do |t|
@@ -450,6 +460,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_131751) do
   add_foreign_key "messages", "documents", column: "content_document_id"
   add_foreign_key "messages", "runs"
   add_foreign_key "notes", "chats"
+  add_foreign_key "prompts", "users"
   add_foreign_key "replies", "notes"
   add_foreign_key "runs", "assistants"
   add_foreign_key "runs", "conversations"

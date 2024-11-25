@@ -2,7 +2,7 @@ class APIService < ApplicationRecord
   URL_OPEN_AI = "https://api.openai.com/"
   URL_ANTHROPIC = "https://api.anthropic.com/"
   URL_GROQ = "https://api.groq.com/openai/v1/"
-  URL_GEMINI = "https://api.gemini.com/v1/"
+  URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/"
 
   belongs_to :user
 

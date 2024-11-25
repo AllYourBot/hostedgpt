@@ -1,4 +1,17 @@
 # Taylor's Language Models
+gemini-1.5-pro-002:
+  position: 0
+  user: keith
+  name: Google Gemini 1.5 Pro (latest)
+  api_service: keith_gemini_service
+  api_name: gemini-1.5-pro-002
+  best: true
+  supports_images: true
+  supports_tools: false
+  supports_system_message: true
+  input_token_cost_cents: 0.0001
+  output_token_cost_cents: 0.0001
+  
 alpaca:
   position: 1
   user: taylor

@@ -1,5 +1,6 @@
 class AIBackend::Gemini < AIBackend
   include Tools
+  class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
 
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
@@ -17,7 +18,7 @@ class AIBackend::Gemini < AIBackend
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin
-      raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
+      raise configuration_error if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to Gemini API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
       @client = self.class.client.new(credentials: {service: "generative-language-api",
                                                     api_key: assistant.api_service.effective_token,
@@ -25,7 +26,7 @@ class AIBackend::Gemini < AIBackend
                                       options: { model: assistant.language_model.api_name,
                                       server_sent_events: true })
     rescue ::Faraday::UnauthorizedError => e
-      raise OpenAI::ConfigurationError
+      raise configuration_error
     end
   end
 
@@ -34,7 +35,7 @@ class AIBackend::Gemini < AIBackend
   end
 
   def configuration_error
-    ::OpenAI::ConfigurationError
+    ::Gemini::Errors::ConfigurationError
   end
 
   def set_client_config(config)
@@ -44,16 +45,6 @@ class AIBackend::Gemini < AIBackend
       contents: config[:messages],
       system_instruction: ( system_message(config[:instructions]) if @assistant.language_model.supports_system_message?)
     }.compact
-  end
-
-  def get_oneoff_message(instructions, messages, params = {})
-    set_client_config(
-      messages: preceding_conversation_messages,
-      instructions: full_instructions,
-    )
-
-    response = @client.send(client_method_name, @client_config)
-    response.dig("candidates",0,"content","parts",0,"text")
   end
 
   def stream_next_conversation_message(&chunk_handler)
@@ -76,7 +67,7 @@ class AIBackend::Gemini < AIBackend
       end
     rescue ::Faraday::UnauthorizedError => e
       puts e.message
-      raise OpenAI::ConfigurationError
+      raise configuration_error
     end
     return nil
   end

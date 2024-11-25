@@ -37,7 +37,7 @@ rob_openai_service:
 keith_gemini_service:
   name: Gemini
   user: keith
-  url: https://api.gemini.com/v1/
+  url: https://generativelanguage.googleapis.com/v1beta/
   token: keith-secret
   driver: gemini
 

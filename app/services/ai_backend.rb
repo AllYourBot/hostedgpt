@@ -21,7 +21,8 @@ class AIBackend
     response = @client.send(client_method_name, ** @client_config)
 
     response.dig("content", 0, "text") ||
-      response.dig("choices", 0, "message", "content")
+      response.dig("choices", 0, "message", "content") ||
+        response.dig("candidates",0,"content","parts",0,"text")
   end
 
   def stream_next_conversation_message(&chunk_handler)

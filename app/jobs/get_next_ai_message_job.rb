@@ -1,5 +1,6 @@
 include ActionView::RecordIdentifier
 require "nokogiri/xml/node"
+class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
 
 class GetNextAIMessageJob < ApplicationJob
   include ActionView::Helpers::RenderingHelper
@@ -75,6 +76,10 @@ class GetNextAIMessageJob < ApplicationJob
     return true
   rescue Anthropic::ConfigurationError => e
     set_anthropic_error
+    wrap_up_the_message
+    return true
+  rescue Gemini::Errors::ConfigurationError => e
+    set_generic_error("Gemini")
     wrap_up_the_message
     return true
   rescue Faraday::ParsingError => e
