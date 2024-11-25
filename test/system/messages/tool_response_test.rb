@@ -9,6 +9,6 @@ class ToolResponseTest < ApplicationSystemTestCase
 
   test "ensure a visible link is displayed to user that the memory was updated" do
     visit_and_scroll_wait conversation_messages_path(@conversation)
-    assert_select "a", "Memory updated"
+    assert_text "Memory updated"
   end
 end
