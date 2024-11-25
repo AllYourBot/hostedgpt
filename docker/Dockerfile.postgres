@@ -1,4 +1,0 @@
-FROM postgres:16
-
-RUN mkdir -p /docker-entrypoint-initdb.d
-COPY /docker/01-postgres-init-rails-user.sh /docker-entrypoint-initdb.d
