@@ -6,7 +6,7 @@ services:
     environment:
       # NOTE: This Docker compose is intended for development. It does NOT support DATABASE_URL.
       POSTGRES_USER: app
-      POSTGRES_DB: app_development      
+      POSTGRES_DB: app_development
       POSTGRES_PASSWORD: secret
     volumes:
       - hostedgpt_pgdata:/var/lib/postgresql/data
@@ -25,12 +25,12 @@ services:
       target: development
     environment:
       # Be sure to add environment variables to config/options.yml
-      - HOSTEDGPT_DB_USERNAME=${HOSTED_DB_USERNAME:-app}
-      - HOSTEDGPT_DB_PASSWORD=${HOSTED_DB_PASSWORD:-secret}
-      - HOSTEDGPT_DB_HOST=${HOSTED_DB_HOST:-postgres}
-      - HOSTEDGPT_DB_PORT=${HOSTED_DB_PORT}
-      - HOSTEDGPT_DB_NAME=${HOSTED_DB_NAME:-app_development}
-      # Using DATABASE_URL to configure db is NOT supported by this Docker compose
+      - HOSTED_DB_USERNAME=${HOSTED_DB_USERNAME:-app}
+      - HOSTED_DB_PASSWORD=${HOSTED_DB_PASSWORD:-secret}
+      - HOSTED_DB_HOST=${HOSTED_DB_HOST:-postgres}
+      - HOSTED_DB_PORT
+      - HOSTED_DB_NAME=${HOSTED_DB_NAME:-app_development}
+      # NOTE: Using DATABASE_URL to configure db is NOT supported by this Docker compose
       - HOSTEDGPT_DATABASE_PORT # DEPRECATED: use HOSTED_DB_PORT
       - HOSTEDGPT_DEV_DB # DEPRECATED: use HOSTED_DB_NAME
       - HOSTEDGPT_TEST_DB # DEPRECATED: provide HOSTED_DB_NAME and test database name is generated
