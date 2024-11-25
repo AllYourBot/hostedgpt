@@ -16,8 +16,8 @@ module AIBackend::Tools
         function_response = begin
           Toolbox.call(function_name, function_arguments)
         rescue => e
-          puts "## Handled error calling tools: #{e.message}" unless Rails.env.test?
-          puts e.backtrace.join("\n") unless Rails.env.test?
+          Rails.logger.info "## Handled error calling tools: #{e.message}" unless Rails.env.test?
+          Rails.logger.info e.backtrace.join("\n") unless Rails.env.test?
 
           <<~STR.gsub("\n", " ")
             An unexpected error occurred (#{e.message}). You were querying information to help you answer a users question. Because this information
@@ -29,12 +29,13 @@ module AIBackend::Tools
         {
           role: "tool",
           content: function_response.to_json,
+          content_tool_calls: tool_call,
           tool_call_id: id,
         }
       end
     rescue => e
-      puts "## UNHANDLED error calling tools: #{e.message}"
-      puts e.backtrace.join("\n")
+      Rails.logger.info "## UNHANDLED error calling tools: #{e.message}"
+      Rails.logger.info e.backtrace.join("\n")
       raise ::Faraday::ParsingError
     end
   end

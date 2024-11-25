@@ -80,8 +80,8 @@ class AIBackend::OpenAI < AIBackend
     rescue ::Faraday::UnauthorizedError => e
       raise OpenAI::ConfigurationError
     rescue => e
-      puts "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
-      puts e.backtrace.join("\n")
+      Rails.logger.info "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
+      Rails.logger.info e.backtrace.join("\n")
     end
   end
 
@@ -98,7 +98,7 @@ class AIBackend::OpenAI < AIBackend
 
         content_with_images = [{ type: "text", text: message.content_text }]
         content_with_images += message.documents.collect do |document|
-          { type: "image_url", image_url: { url: document.file_data_url(:large) }}
+          { type: "image_url", image_url: { url: document.image_url(:large) }}
         end
 
         {
@@ -111,7 +111,7 @@ class AIBackend::OpenAI < AIBackend
           role: message.role,
           name: message.name_for_api,
           content: message.content_text,
-          tool_calls: message.content_tool_calls, # only for some assistant messages
+          tool_calls: message.assistant? ? message.content_tool_calls : nil, # only for some assistant messages
           tool_call_id: message.tool_call_id,     # only for tool messages
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
       end

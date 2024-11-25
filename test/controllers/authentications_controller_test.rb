@@ -56,7 +56,7 @@ class AuthenticationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should return not_found when all auth schemes are disabled" do
-    stub_features(password_authentication: false, google_authentication: false) do
+    stub_features(password_authentication: false, google_authentication: false, microsoft_graph_authentication: false) do
       get login_path
       assert_response :not_found
     end

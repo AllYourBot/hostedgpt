@@ -35,6 +35,9 @@ services:
       - HOSTEDGPT_DEV_DB # DEPRECATED: use HOSTED_DB_NAME
       - HOSTEDGPT_TEST_DB # DEPRECATED: provide HOSTED_DB_NAME and test database name is generated
       - HOSTEDGPT_DATABASE_PASSWORD # DEPRECATED: use HOSTED_DB_PASSWORD
+      - APP_URL_PROTOCOL
+      - APP_URL_HOST
+      - APP_URL_PORT
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
       - OVERMIND_COLORS=2,3,5
       - ALLOWED_REQUEST_ORIGINS

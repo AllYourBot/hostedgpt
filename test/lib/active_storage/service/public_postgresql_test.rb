@@ -2,7 +2,6 @@ require "test_helper"
 require "./test/lib/active_storage/service/shared_service_tests"
 
 class ActiveStorage::Service::PublicPostgresqlTest < ActiveSupport::TestCase
-  SERVICE = ActiveStorage::Service.configure(:tmp_public, { tmp_public: { service: "Postgresql", public: true }})
   include ActiveStorage::Service::SharedServiceTests
 
   test "public URL generation" do

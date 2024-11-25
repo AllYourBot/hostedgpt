@@ -18,8 +18,8 @@ Rails.application.routes.draw do
     resource :person, only: [:edit, :update]
     resources :language_models
     resources :api_services, except: [:show]
-    resources :memories, only: [:index] do
-      delete :destroy, on: :collection
+    resources :memories, only: [:index, :destroy] do
+      delete :destroy, to: 'memories#destroy_all', on: :collection
     end
   end
 
@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     resource :password_credential, only: [:edit, :update]
   end
 
+  get "/auth/microsoft_graph/callback" => "authentications/microsoft_graph_oauth#create", as: :microsoft_graph_oauth, provider: "microsoft_graph"
   get "/auth/:provider/callback" => "authentications/google_oauth#create", as: :google_oauth
   get "/auth/failure" => "authentications/google_oauth#failure" # connected in omniauth.rb
 

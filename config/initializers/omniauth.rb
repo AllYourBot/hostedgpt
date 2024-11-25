@@ -26,4 +26,10 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     include_granted_scopes: true
   }
 
+  provider :microsoft_graph, Setting.microsoft_graph_auth_client_id, Setting.microsoft_graph_auth_client_secret, {
+    name: "microsoft_graph",
+    scope: Setting.microsoft_graph_scope.presence || %|
+      openid profile email offline_access user.read mailboxsettings.read
+    |
+  }
 end

@@ -40,7 +40,7 @@ end %>
   > <!-- this inner div is replaced during streaming updates (inner_html of dom_id message) -->
 
     <!-- Left Column -->
-    <div class="w-6 ml-1 flex">
+    <div class="w-7 ml-1 flex">
       <%= render_avatar_for(message) %>
     </div>
 
@@ -82,10 +82,10 @@ end %>
                 role: "image-preview",
                 controller: "image-loader",
                 image_loader_message_scroller_outlet: "[data-role='inner-message']",
-                image_loader_url_value: message.document_image_path(:small),
+                image_loader_url_value: message.document_image_url(:small),
                 action: "modal#open",
             } do %>
-              <%= image_tag message.document_image_path(:small, fallback: ""),
+              <%= image_tag message.document_image_url(:small, fallback: ""),
                 class: %|
                   my-0
                   mx-auto
@@ -254,10 +254,10 @@ end %>
               class="flex flex-col md:flex-row justify-center"
               data-controller="image-loader"
               data-image-loader-message-scroller-outlet="[data-role='inner-message']"
-              data-image-loader-url-value="<%= message.document_image_path(:large) %>"
+              data-image-loader-url-value="<%= message.document_image_url(:large) %>"
               data-turbo-permanent
             >
-              <%= image_tag message.document_image_path(:large, fallback: ""),
+              <%= image_tag message.document_image_url(:large, fallback: ""),
                 class: "w-full h-auto",
                 data: {
                   image_loader_target: "image",

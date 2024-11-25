@@ -13,7 +13,7 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def perform(user_id, message_id, assistant_id, attempt = 1)
-    puts "\n### GetNextAIMessageJob.perform(#{user_id}, #{message_id}, #{assistant_id}, #{attempt})" unless Rails.env.test?
+    Rails.logger.info "### GetNextAIMessageJob.perform(#{user_id}, #{message_id}, #{assistant_id}, #{attempt})" unless Rails.env.test?
 
     @user         = User.find(user_id)
     @message      = Message.find(message_id)
@@ -29,7 +29,7 @@ class GetNextAIMessageJob < ApplicationJob
     @message.update!(processed_at: Time.current, content_text: "")
     GetNextAIMessageJob.broadcast_updated_message(@message, thinking: true) # thinking shows dot, signaling to user that we're waiting now on ai_backend
 
-    puts "\n### Wait for reply" unless Rails.env.test?
+    Rails.logger.info "\n### Wait for reply" unless Rails.env.test?
 
     response = Current.set(user: @user, message: @message) do
       ai_backend.new(@conversation.user, @assistant, @conversation, @message)
@@ -59,7 +59,7 @@ class GetNextAIMessageJob < ApplicationJob
     return true
 
   rescue ResponseCancelled => e
-    puts "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
+    Rails.logger.info "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     wrap_up_the_message
     return true
   rescue OpenAI::ConfigurationError => e
@@ -90,22 +90,23 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_message
     return true
   rescue WaitForPrevious
-    puts "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
+    Rails.logger.info "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     raise WaitForPrevious
   rescue => e
     msg = e.inspect.gsub(/(sk-)[\w\-]{40}/, '\1' + "*" * 40)
 
     unless Rails.env.test?
-      puts "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
-      puts e.backtrace.join("\n") if Rails.env.development?
+      Rails.logger.info "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
+      Rails.logger.info e.backtrace.join("\n") if Rails.env.development?
 
       if attempt < 3
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
         GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(user_id, message_id, assistant_id, attempt+1)
       else
-        error_text = nil
-        begin
-          error_text = e&.response&.dig(:body, "error", "message")
+        error_text = if e.try(:response)
+          e&.response&.dig(:body, "error", "message") rescue e&.response&.dig(:body)
+        else
+          e.message
         end
         set_unexpected_error(msg&.slice(0...1500), error_text)
         wrap_up_the_message
@@ -178,11 +179,11 @@ class GetNextAIMessageJob < ApplicationJob
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
 
-    puts "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id}, #{@attempt})" unless Rails.env.test?
+    Rails.logger.info "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id}, #{@attempt})" unless Rails.env.test?
   end
 
   def call_tools_before_wrapping_up
-    puts "\n### Calling tools" unless Rails.env.test?
+    Rails.logger.info "\n### Calling tools" unless Rails.env.test?
 
     msgs = []
     Current.set(user: @user, message: @message) do
@@ -196,6 +197,7 @@ class GetNextAIMessageJob < ApplicationJob
         role: tool_message[:role],
         content_text: tool_message[:content],
         tool_call_id: tool_message[:tool_call_id],
+        content_tool_calls: tool_message[:content_tool_calls],
         version: @message.version,
         index: index += 1,
         processed_at: Time.current,
