@@ -98,7 +98,7 @@ class AIBackend::OpenAI < AIBackend
 
         content_with_images = [{ type: "text", text: message.content_text }]
         content_with_images += message.documents.collect do |document|
-          { type: "image_url", image_url: { url: document.file_data_url(:large) }}
+          { type: "image_url", image_url: { url: document.image_url(:large) }}
         end
 
         {

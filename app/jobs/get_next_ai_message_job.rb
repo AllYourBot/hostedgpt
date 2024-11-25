@@ -103,9 +103,10 @@ class GetNextAIMessageJob < ApplicationJob
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
         GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(user_id, message_id, assistant_id, attempt+1)
       else
-        error_text = nil
-        begin
-          error_text = e&.response&.dig(:body, "error", "message") rescue e&.response&.dig(:body)
+        error_text = if e.try(:response)
+          e&.response&.dig(:body, "error", "message") rescue e&.response&.dig(:body)
+        else
+          e.message
         end
         set_unexpected_error(msg&.slice(0...1500), error_text)
         wrap_up_the_message
