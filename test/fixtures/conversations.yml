@@ -80,6 +80,12 @@ weather:
   title: Weather
   last_assistant_message: weather_explained
 
+memorize:
+  user: keith
+  assistant: samantha
+  title: Memorize
+  last_assistant_message: keep_memory_explained
+
 trees:
   user: keith
   assistant: keith_gpt3
