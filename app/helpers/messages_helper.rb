@@ -15,8 +15,7 @@ module MessagesHelper
     case message.role
       when "user" then "You"
       when "assistant" then message.assistant.name
-      when "tool" then "Tool"
-    end
+      end
   end
 
   def format_for_copying(text)
