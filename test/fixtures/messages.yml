@@ -705,7 +705,7 @@ keep_memory_tool_call:
   role: assistant
   tool_call_id:
   content_text:
-  content_tool_calls: '[{"index": 0, "id": "abc123", "type": "function", "function": {"name": "memory_remember_detail_about_user", "arguments": {"detail": "Users favorite color is green."}}}]'
+  content_tool_calls: '[{"index": 0, "id": "abc123", "type": "function", "function": {"name": "memory_remember_detail_about_user", "arguments": "{\"detail\":\"Users favorite color is green.\"}"}}]'
   content_document:
   created_at: 2024-01-30 1:01:00
   processed_at: 2024-01-30 1:01:00
@@ -717,8 +717,8 @@ keep_memory_tool_result:
   conversation: memorize
   role: tool
   tool_call_id: xyz123
-  content_text: {message_to_user: "Memory updated"}
-  content_tool_calls: '{"index": 0, "id": "xyz123", "type": "function", "function": {"name": "memory_remember_detail_about_user", "arguments": {"detail": "Users favorite color is green."}}}'
+  content_text: '{"message_to_user": "Memory updated"}'
+  content_tool_calls: '{"index": 0, "id": "xyz123", "type": "function", "function": {"name": "memory_remember_detail_about_user", "arguments": "{\"detail\":\"Users favorite color is green.\"}"}}'
   content_document:
   created_at: 2024-01-30 1:02:00
   processed_at: 2024-01-30 1:02:00
