@@ -69,6 +69,7 @@ class Toolbox::OpenMeteo < Toolbox
     end
 
     {
+      message_to_user: "Good summary: #{summary}",
       date: Date.current.strftime("%Y-%m-%d"),
       in: "#{location.name}, #{location.admin1}, #{location.country}",
 

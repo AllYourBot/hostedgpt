@@ -29,11 +29,11 @@ module MessagesHelper
 
   def format_for_display(message, append_inside_tag: nil)
     if memory_updated?(message)
-      return link_to message.content_text,
+      return link_to JSON.parse(message.content_text)["message_to_user"],
         settings_memories_path,
         {data: { turbo_frame: "_top" }, class: "ml-1 text-gray-600 dark:text-gray-300 no-underline"}
-    elsif weather_fetched?(message)
-      return "Good summary: #{JSON.parse(message.content_text)["good_summary"]}"
+    elsif message_to_user_from_tool_call?(message)
+      return JSON.parse(message.content_text)["message_to_user"]
     else
       escaped_text = html_escape(message.content_text)
 
@@ -69,12 +69,14 @@ module MessagesHelper
     )
   end
 
-  def memory_updated?(message)
-    message.tool? && message.content_tool_calls.dig(:function, :name) == "memory_remember_detail_about_user"
+  def message_to_user_from_tool_call?(message)
+    JSON.parse(message.content_text)["message_to_user"].present? if message.content_text.present?
+  rescue JSON::ParserError
+    false
   end
 
-  def weather_fetched?(message)
-    message.tool? && message.content_tool_calls.dig(:function, :name) == "openmeteo_get_current_and_todays_weather"
+  def memory_updated?(message)
+    message.tool? && message.content_tool_calls.dig(:function, :name) == "memory_remember_detail_about_user"
   end
 
   private
