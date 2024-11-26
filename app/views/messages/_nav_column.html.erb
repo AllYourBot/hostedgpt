@@ -1,13 +1,12 @@
 <% if Feature.assistants_page? %>
-    <div class="mt-2">
-      <%= link_to assistants_path, class: %|
-        flex
-      text-sm
-      rounded-lg
-      mb-1 p-1 pl-2 pr-2 mr-5
-      hover:bg-gray-100 dark:hover:bg-gray-700
-      pointer
-    | do %>
+  <div class="sticky top-0 pt-2 z-40 bg-gray-50 dark:bg-gray-900">
+    <%= link_to assistants_path, class: %|
+          flex
+          mb-1 p-1 pl-2 pr-2 mr-5
+          rounded-lg
+          text-sm
+          hover:bg-gray-100 dark:hover:bg-gray-700
+        | do %>
       <%= icon "sparkles", variant: :outline %>
       <span class="ml-2 font-semibold">Assistants</span>
     <% end %>
@@ -21,6 +20,7 @@
   data-transition-toggle-class="hidden"
   class="flex flex-col"
 >
+
   <%= render @nav_assistants %>
 
   <%= button_tag type: "button",
