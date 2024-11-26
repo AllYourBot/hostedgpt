@@ -171,8 +171,16 @@ class GetNextAIMessageJob < ApplicationJob
 
   def set_billing_error
     service = ai_backend.to_s.split("::").second
-    url = service == "OpenAI" ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
-
+    url = case service
+    when "OpenAI"
+      "https://platform.openai.com/account/billing/overview"
+    when "Anthropic"
+      "https://console.anthropic.com/settings/plans"
+    when "Gemini"
+      "https://aistudio.google.com/app/apikey"
+    else
+      "https://platform.openai.com/account/billing/overview"
+    end
     @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
       "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
   end
