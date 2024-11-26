@@ -49,6 +49,7 @@ class Assistant < ApplicationRecord
   # If the slug is not unique for the user, append "-2", "-3", etc.
   def set_default_slug
     return if slug.present?
+    return if name.blank?
 
     base_slug = name.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/-$/, "")
 
