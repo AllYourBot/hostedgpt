@@ -4,15 +4,26 @@ class AssistantTest < ActiveSupport::TestCase
   test "has default slug" do
     samantha = assistants(:samantha)
     assert_equal "samantha", samantha.slug
-    samantha.slug = nil
-    samantha.save!
-    assert_equal "samantha", samantha.slug
 
     keith_gpt4 = assistants(:keith_gpt4)
     assert_equal "gpt-4o", keith_gpt4.slug
     keith_gpt4.slug = nil
     keith_gpt4.save!
     assert_equal "openai-gpt-4o", keith_gpt4.slug
+
+    lm = language_models(:gpt_best)
+    user = users(:keith)
+    same_name1 = user.assistants.create!(language_model: lm, name: "Best OpenAI Model")
+    assert_equal "best-openai-model", same_name1.slug
+    same_name2 = user.assistants.create!(language_model: lm, name: "Best OpenAI Model")
+    assert_equal "best-openai-model--1", same_name2.slug
+    same_name3 = user.assistants.create!(language_model: lm, name: "Best OpenAI Model")
+    assert_equal "best-openai-model--2", same_name3.slug
+
+    similar_name = user.assistants.create!(language_model: lm, name: "Best OpenAI Model 2")
+    assert_equal "best-openai-model-2", similar_name.slug
+    similar_name2 = user.assistants.create!(language_model: lm, name: "Best OpenAI Model 2")
+    assert_equal "best-openai-model-2--1", similar_name2.slug
   end
 
   test "has an associated user" do
