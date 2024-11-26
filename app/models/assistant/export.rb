@@ -42,8 +42,8 @@ module Assistant::Export
       assistants.each do |assistant|
         assistant = assistant.with_indifferent_access
         users.each do |user|
-          asst = user.assistants.find_or_create_by(name: assistant["name"])
-          asst.assign_attributes(assistant.except("name"))
+          asst = user.assistants.find_or_create_by(slug: assistant["slug"])
+          asst.assign_attributes(assistant.except("slug"))
           asst.save!
         end
       end

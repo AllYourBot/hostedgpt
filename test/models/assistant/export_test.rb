@@ -21,7 +21,7 @@ class Assistant::ExportTest < ActiveSupport::TestCase
     assert File.exist?(path)
     storage = JSON.load_file(path)
     assistants = storage["assistants"]
-    assert_equal assistants.first.keys.sort, %w[name description instructions tools language_model_api_name].sort
+    assert_equal assistants.first.keys.sort, %w[name description instructions slug language_model_api_name].sort
   end
 
   test "export_to_file yaml" do
@@ -30,7 +30,7 @@ class Assistant::ExportTest < ActiveSupport::TestCase
     assert File.exist?(path)
     storage = YAML.load_file(path)
     assistants = storage["assistants"]
-    assert_equal assistants.first.keys.sort, %w[name description instructions tools language_model_api_name].sort
+    assert_equal assistants.first.keys.sort, %w[name description instructions slug language_model_api_name].sort
   end
 
   test "import_from_file with only new models" do
@@ -60,10 +60,9 @@ class Assistant::ExportTest < ActiveSupport::TestCase
     user.assistants.destroy_all
     assistants = [{
       name: "new assistant",
+      slug: "new-assistant",
       description: "new description",
       instructions: "new instructions",
-      tools: "new tools",
-      external_id: "new external_id",
       language_model_api_name: language_models(:gpt_4o).api_name
     }]
     storage = {
@@ -74,18 +73,17 @@ class Assistant::ExportTest < ActiveSupport::TestCase
     assert_difference "Assistant.count", 1 do
       Assistant.import_from_file(path:, users: [user])
     end
-    assert user.assistants.find_by(external_id: "new external_id")
+    assert user.assistants.find_by(name: "new assistant")
   end
 
-  test "import_from_file with existing models by name" do
+  test "import_from_file with existing models by slug" do
     user = users(:keith)
     assistant = user.assistants.not_deleted.first
     assistants = [{
-      name: assistant.name,
+      name: "new name",
+      slug: assistant.slug,
       description: "new description",
       instructions: "new instructions",
-      tools: "new tools",
-      external_id: "new external_id",
       language_model_api_name: language_models(:gpt_4o).api_name
     }]
     storage = {
@@ -97,10 +95,9 @@ class Assistant::ExportTest < ActiveSupport::TestCase
       Assistant.import_from_file(path:, users: [user])
     end
     assistant.reload
+    assert_equal "new name", assistant.name
     assert_equal "new description", assistant.description
     assert_equal "new instructions", assistant.instructions
-    assert_equal "new tools", assistant.tools
-    assert_equal "new external_id", assistant.external_id
     assert_equal language_models(:gpt_4o).api_name, assistant.language_model_api_name
   end
 end
