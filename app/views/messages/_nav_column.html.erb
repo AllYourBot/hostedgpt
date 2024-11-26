@@ -21,7 +21,7 @@
   data-transition-toggle-class="hidden"
   class="flex flex-col"
 >
-  <%= render partial: "assistants/assistant_sidebar", collection: @nav_assistants, as: :assistant %>
+  <%= render @nav_assistants %>
 
   <%= button_tag type: "button",
     class: %|
