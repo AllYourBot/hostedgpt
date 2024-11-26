@@ -22,11 +22,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create user" do
-    post users_url, params: { person: { personable_type: "User", email: "azbshiri@gmail.com", personable_attributes: user_attr } }
-    assert_response :redirect
-    follow_redirect!
-    follow_redirect! # intentionally two redirects
-    assert_response :success
+    stub_features(assistants_page: true) do
+      post users_url, params: { person: { personable_type: "User", email: "azbshiri@gmail.com", personable_attributes: user_attr } }
+      assert_response :redirect
+      follow_redirect!
+      assert_response :success
+    end
   end
 
   test "should redirect back when the email address is already in use" do
@@ -51,19 +52,38 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match "Email can&#39;t be blank", response.body
   end
 
-  test "after create, an account should be bootstrapped and taken to a conversation" do
-    email = "fake_email#{rand(1000)}@example.com"
-    post users_url, params: { person: { personable_type: "User", email: email, personable_attributes: user_attr } }
+  test "after create, an account should be bootstrapped and redirect to new conversation if assistants_page is disabled" do
+    stub_features(assistants_page: false) do
+      email = "fake_email#{rand(1000)}@example.com"
+      post users_url, params: { person: { personable_type: "User", email: email, personable_attributes: user_attr } }
 
-    user = Person.find_by(email: email).user
-    assert_equal "John", user.first_name
-    assert_equal "Doe", user.last_name
-    assert_equal 3, user.assistants.count, "This new user did not get the expected number of assistants"
+      user = Person.find_by(email: email).user
+      assert_equal "John", user.first_name
+      assert_equal "Doe", user.last_name
+      assert_equal 3, user.assistants.count, "This new user did not get the expected number of assistants"
 
-    assistant = user.assistants.ordered.first
+      assert_redirected_to root_path
+      follow_redirect!
+      assistant = user.assistants.ordered.first
+      assert_redirected_to new_assistant_message_path(assistant)
+    end
+  end
 
-    follow_redirect!
-    assert_redirected_to new_assistant_message_path(assistant)
+  test "after create, an account should be bootstrapped and shown assistants if assistants_page is enabled" do
+    stub_features(assistants_page: true) do
+      email = "fake_email#{rand(1000)}@example.com"
+      post users_url, params: { person: { personable_type: "User", email: email, personable_attributes: user_attr } }
+
+      user = Person.find_by(email: email).user
+      assert_equal "John", user.first_name
+      assert_equal "Doe", user.last_name
+      assert_equal 3, user.assistants.count, "This new user did not get the expected number of assistants"
+
+      assert_redirected_to root_path
+      follow_redirect!
+      assert_response :success
+      assert_select "h1", "Assistants"
+    end
   end
 
   test "updates user preferences" do

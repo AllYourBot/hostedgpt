@@ -76,14 +76,16 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
   end
 
   test "import_from_file with existing models by api_name" do
-    model = users(:rob).language_models.not_deleted.first
+    user = users(:rob)
+    api_name = "gpt-4o"
+    model = user.language_models.find_by(api_name:)
     models = [{
-      api_name: model.api_name,
-      name: "new name",
+      api_name:,
+      name: "new model name",
       supports_images: false,
       supports_tools: true,
-      input_token_cost_cents: 0.0001,
-      output_token_cost_cents: 0.0001
+      input_token_cost_cents: 0.1234,
+      output_token_cost_cents: 0.5678
     }]
     storage = {
       "models" => models
@@ -91,13 +93,13 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     path = Rails.root.join("tmp/newmodels.yml")
     File.write(path, storage.to_yaml)
     assert_no_difference "LanguageModel.count" do
-      LanguageModel.import_from_file(path:, users: users(:rob))
+      LanguageModel.import_from_file(path:, users: [user])
     end
     model.reload
-    assert_equal "new name", model.name
+    assert_equal "new model name", model.name
     assert_equal false, model.supports_images
     assert_equal true, model.supports_tools
-    assert_equal 0.0001, model.input_token_cost_cents
-    assert_equal 0.0001, model.output_token_cost_cents
+    assert_equal 0.1234, model.input_token_cost_cents
+    assert_equal 0.5678, model.output_token_cost_cents
   end
 end

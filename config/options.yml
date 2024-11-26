@@ -46,6 +46,7 @@ shared:
     default_to_voice: <%= ENV["DEFAULT_TO_VOICE_FEATURE"] || false %>
     email: <%= ENV["EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
     password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
+    assistants_page: <%= ENV["ASSISTANTS_PAGE_FEATURE"] || false %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     app_url_protocol: <%= ENV["APP_URL_PROTOCOL"] || default_to(app_url: :protocol) %>

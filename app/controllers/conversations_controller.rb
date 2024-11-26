@@ -28,14 +28,6 @@ class ConversationsController < ApplicationController
 
   private
 
-  def set_nav_conversations
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
-  end
-
-  def set_nav_assistants
-    @nav_assistants = Current.user.assistants.ordered
-  end
-
   def set_conversation
     @conversation = Current.user.conversations.find(params[:id])
   end

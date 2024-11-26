@@ -2,14 +2,14 @@ require "test_helper"
 
 class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
   test "should login user via header" do
-    stub_features(http_header_authentication: true) do
+    stub_features(http_header_authentication: true, assistants_page: false) do
       get root_url, headers: existing_http_auth_user
       assert_login_completed_for users(:rob)
     end
   end
 
   test "should create and login new user" do
-    stub_features(http_header_authentication: true, registration: true) do
+    stub_features(http_header_authentication: true, registration: true, assistants_page: false) do
       assert_difference "User.count", 1 do
         assert_difference "Person.count", 1 do
           get root_url, headers: new_http_auth_user
@@ -28,7 +28,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
   end
 
   test "should create and login new user when NAME IS OMITTED" do
-    stub_features(http_header_authentication: true, registration: true) do
+    stub_features(http_header_authentication: true, registration: true, assistants_page: false) do
       assert_difference "User.count", 1 do
         assert_difference "Person.count", 1 do
           get root_url, headers: new_http_auth_user.except(Setting.http_header_auth_name)
@@ -53,6 +53,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
   test "should render unauthorized if no HTTP header present and no other auth is allowed" do
     stub_features(
       http_header_authentication: true,
+      assistants_page: false,
       password_authentication: false,
       google_authentication: false,
       microsoft_graph_authentication: false
@@ -66,6 +67,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
   test "should render UN-AUTHORIZED if REGISTRATION DISABLED and NO HEADERS are provided and MANUAL AUTH IS DISABLED" do
     stub_features(
       http_header_authentication: true,  # note: this disables manual auth (e.g. password, google)
+      assistants_page: false,
     ) do
       get root_url
     end
@@ -79,7 +81,8 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
 
     stub_features(
       http_header_authentication: true, # note: this disables manual auth (e.g. password, google)
-      registration: false
+      registration: false,
+      assistants_page: false,
     ) do
       get root_url, headers: headers
     end
@@ -93,7 +96,8 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
 
     stub_features(
       http_header_authentication: true,
-      registration: false
+      registration: false,
+      assistants_page: false
     ) do
       get root_url, headers: headers
     end
