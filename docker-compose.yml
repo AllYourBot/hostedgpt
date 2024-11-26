@@ -27,8 +27,8 @@ services:
       # Be sure to add environment variables to config/options.yml
       - HOSTED_DB_USERNAME=${HOSTED_DB_USERNAME:-app}
       - HOSTED_DB_PASSWORD=${HOSTED_DB_PASSWORD:-secret}
-      - HOSTED_DB_HOST=postgres
-      - HOSTED_DB_PORT=5432
+      - HOSTED_DB_HOST=${HOSTED_DB_HOST:-postgres}
+      - HOSTED_DB_PORT=${HOSTED_DB_PORT:-5432}
       - HOSTED_DB_NAME=${HOSTED_DB_NAME:-app}
       # NOTE: Using DATABASE_URL to configure db is NOT supported by this Docker compose
       - APP_URL_PROTOCOL
