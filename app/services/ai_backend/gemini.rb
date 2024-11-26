@@ -25,7 +25,7 @@ class AIBackend::Gemini < AIBackend
                                                     version: "v1beta"},
                                       options: { model: assistant.language_model.api_name,
                                       server_sent_events: true })
-    rescue ::Faraday::UnauthorizedError => e
+    rescue ::Faraday::UnauthorizedError, ::Faraday::BadRequestError => e
       raise configuration_error
     end
   end
@@ -41,10 +41,15 @@ class AIBackend::Gemini < AIBackend
   def set_client_config(config)
     super(config)
 
-    @client_config = {
+    @client_config =  {
       contents: config[:messages],
       system_instruction: ( system_message(config[:instructions]) if @assistant.language_model.supports_system_message?)
     }.compact
+  end
+
+  def get_oneoff_message(instructions, messages, params = {})
+    response = @client.generate_content( { system_instruction: { role: "user", parts: { text: instructions }}, contents: { role: "user", parts: { text: messages.first }}})
+    response.dig("candidates",0,"content","parts",0,"text")
   end
 
   def stream_next_conversation_message(&chunk_handler)
@@ -65,7 +70,7 @@ class AIBackend::Gemini < AIBackend
           yield content_chunk if content_chunk != nil
         end
       end
-    rescue ::Faraday::UnauthorizedError => e
+    rescue ::Faraday::UnauthorizedError, ::Faraday::BadRequestError => e
       puts e.message
       raise configuration_error
     end
