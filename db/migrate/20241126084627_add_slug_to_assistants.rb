@@ -5,12 +5,12 @@ class AddSlugToAssistants < ActiveRecord::Migration[7.2]
 
     # Update User's assistants to use the default slugs in assistants.yml
     User.find_each do |user|
-      gpt4o = LanguageModel.find_by(api_name: "gpt-4o")
-      gpt4o_mini = LanguageModel.find_by(api_name: "gpt-4o-mini")
-      claude_3_5_sonnet_20241022 = LanguageModel.find_by(api_name: "claude-3-5-sonnet-20241022")
-      claude_3_5_sonnet_20240620 = LanguageModel.find_by(api_name: "claude-3-5-sonnet-20240620")
-      llama_3_1_70b = LanguageModel.find_by(api_name: "llama-3.1-70b")
-      llama_3_70b = LanguageModel.find_by(api_name: "llama3-70b-8192")
+      gpt4o = user.language_models.find_by(api_name: "gpt-4o")
+      gpt4o_mini = user.language_models.find_by(api_name: "gpt-4o-mini")
+      claude_3_5_sonnet_20241022 = user.language_models.find_by(api_name: "claude-3-5-sonnet-20241022")
+      claude_3_5_sonnet_20240620 = user.language_models.find_by(api_name: "claude-3-5-sonnet-20240620")
+      llama_3_1_70b = user.language_models.find_by(api_name: "llama-3.1-70b-versatile")
+      llama_3_70b = user.language_models.find_by(api_name: "llama3-70b-8192")
 
       if gpt4o && (assistant = user.assistants.find_by(language_model: gpt4o))
         assistant.update(slug: "gpt-4o")
