@@ -3,10 +3,9 @@ module Assistant::Export
 
   DEFAULT_EXPORT_ONLY = %i[
     name
+    slug
     description
     instructions
-    tools
-    external_id
     language_model_api_name
   ]
 

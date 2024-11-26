@@ -1,14 +1,11 @@
 ---
 assistants:
-- slug: gpt-4o
-  name: GPT-4o
+- name: GPT-4o
+  slug: gpt-4o
   language_model_api_name: gpt-4o
-- slug: gpt-4o-mini
-  name: GPT-4o Mini
-  language_model_api_name: gpt-4o-mini
-- slug: claude-3-5-sonnet
-  name: Claude 3.5 Sonnet
+- name: Claude 3.5 Sonnet
+  slug: claude-sonnet
   language_model_api_name: claude-3-5-sonnet-20241022
-- slug: llama-3-70b
-  name: Meta Llama 70b
+- name: Meta Llama
+  slug: llama-3-70b
   language_model_api_name: llama-3.1-70b-versatile
