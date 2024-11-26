@@ -1,6 +1,20 @@
 require "test_helper"
 
 class AssistantTest < ActiveSupport::TestCase
+  test "has default slug" do
+    samantha = assistants(:samantha)
+    assert_equal "samantha", samantha.slug
+    samantha.slug = nil
+    samantha.save!
+    assert_equal "samantha", samantha.slug
+
+    keith_gpt4 = assistants(:keith_gpt4)
+    assert_equal "gpt-4o", keith_gpt4.slug
+    keith_gpt4.slug = nil
+    keith_gpt4.save!
+    assert_equal "openai-gpt-4o", keith_gpt4.slug
+  end
+
   test "has an associated user" do
     assert_instance_of User, assistants(:samantha).user
   end

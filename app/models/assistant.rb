@@ -23,6 +23,8 @@ class Assistant < ApplicationRecord
 
   delegate :api_name, to: :language_model, prefix: true, allow_nil: true
 
+  before_validation :set_default_slug
+
   def initials
     return nil if name.blank?
 
@@ -38,5 +40,11 @@ class Assistant < ApplicationRecord
 
   def language_model_api_name=(api_name)
     self.language_model = LanguageModel.find_by(api_name:)
+  end
+
+  private
+
+  def set_default_slug
+    self.slug ||= name.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/-$/, "")
   end
 end
