@@ -349,6 +349,8 @@ The easiest way to get up and running is to use the provided Docker compose work
 Every time you pull new changes down, kill docker (if it's running) and re-run:
 `docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
 
+NOTE: Please do not use DATABASE_URL when running with docker in development. The application will automatically configure the database for you. If your need to modify the database configuration for development, you can change the HOSTED_DB_* environment variables in a `.env` file.
+
 #### Alternatively, you can skip Docker
 
 HostedGPT requires these services to be running:
@@ -360,6 +362,7 @@ HostedGPT requires these services to be running:
 1. `cd` into your local repository clone
 1. `rbenv install` to install the correct ruby version (it reads the .ruby-version in the repo)
 1. Do NOT run db:setup as it will not configure encryption properly. Proceed to the next step and it will automatically configure the database.
+1. Set environment variables for: HOSTED_DB_USERNAME, HOSTED_DB_PASSWORD, HOSTED_DB_HOST, HOSTED_DB_PORT, and HOSTED_DB_NAME  to point to your postgres database.
 1. `bin/dev` starts up all the services, installs gems, and handles db. Note: The app should automatically configure a database, but if you get any database errors or want to change the default configuration, set the environment variable DATABASE_URL=postgres://username:password@localhost:5432/hostedgpt_development (replacing username, password, hostedgpt_development with your database name, and 5432 with your database port number).
 1. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
 1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
