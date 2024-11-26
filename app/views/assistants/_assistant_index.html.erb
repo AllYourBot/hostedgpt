@@ -1,0 +1,12 @@
+<div class="relative flex items-start space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
+  <div class="w-7">
+    <%= render partial: "layouts/assistant_avatar", locals: { assistant:, size: 7, classes: "border-none" } %>
+  </div>
+  <div class="min-w-0 flex-1">
+    <%= link_to new_assistant_message_path(assistant), data: { role: "name" } do %>
+      <span class="absolute inset-0" aria-hidden="true"></span>
+      <p class="text-sm font-medium text-gray-900"><%= assistant.name %></p>
+      <p class="text-sm text-gray-500"><%= assistant.description %></p>
+    <% end %>
+  </div>
+</div>
