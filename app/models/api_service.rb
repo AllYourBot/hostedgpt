@@ -31,6 +31,10 @@ class APIService < ApplicationRecord
     token.presence || default_llm_key
   end
 
+  def effective_token?
+    effective_token.present?
+  end
+
   private
 
   def default_llm_key

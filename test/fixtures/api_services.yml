@@ -26,6 +26,11 @@ keith_other_service:
   token: abc-secret
   driver: openai
 
+keith_missing_token_service:
+  name: Keith Server
+  user: keith
+  url: http://test.com/models
+  driver: openai
 
 rob_openai_service:
   name: OpenAI

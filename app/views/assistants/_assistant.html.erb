@@ -18,41 +18,55 @@
       data-role="assistant"
       data-radio-behavior-target="radio"
       data-action="radio-changed@window->radio-behavior#select"
-    data-radio-behavior-id-param="<%= assistant.id %>"
-    data-transition-target="<%= !visible && 'transitionable' %>"
+      data-radio-behavior-id-param="<%= assistant.id %>"
+      data-transition-target="<%= !visible && 'transitionable' %>"
     >
-    <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex py-1 items-center text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
-      <%= render partial: "layouts/assistant_avatar", locals: { assistant: assistant, size: 7, classes: "mr-2" } %>
-      <%= assistant.name %>
-    <% end %>
-    <div class="hidden gap-3 pl-2 relationship:flex group-hover:flex">
-      <% if settings %>
-        <div class="inline-flex outline-none dropdown dropdown-end">
-          <%= icon "ellipsis-horizontal",
-            tabindex: 0,
-            role: :button,
-            variant: :micro,
-            size: 18,
-            class: "outline-none text-gray-950 dark:text-gray-100 invisible group-hover:visible cursor-pointer",
-            'data-controller': "nested-pointer",
-            title: "More"
-          %>
-          <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-10 mt-7 dark:!bg-gray-700" data-controller="nested-pointer">
-            <li><%= link_to edit_settings_assistant_path(assistant) do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
-            <!-- <li><a><%= icon "arrow-up-tray", variant: :outline, size: 18 %>Share</a></li> -->
-          </menu>
+    <% if assistant.api_service.effective_token? %>
+      <%= link_to new_assistant_message_path(assistant), class: "flex items-center py-1 text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
+        <div class="relative inline-block w-7 h-7 mr-2">
+          <%= render partial: "layouts/assistant_avatar", locals: { assistant:, size: 7 } %>
         </div>
+        <%= assistant.name %>
       <% end %>
-      <%= link_to new_assistant_message_path(assistant), class: "inline-flex", data: { role: "new" } do %>
-        <%= icon "pencil-square",
-          variant: :outline,
-          size: 18,
-          class: "text-gray-950 dark:text-gray-100 cursor-pointer group-hover:visible invisible
-                  relationship:visible relationship:text-gray-950 dark:relationship:text-gray-100",
-          'data-controller': "nested-pointer",
-          title: "New"
-        %>
+      <div class="hidden gap-3 pl-2 relationship:flex group-hover:flex">
+        <% if settings %>
+          <div class="inline-flex outline-none dropdown dropdown-end">
+            <%= icon "ellipsis-horizontal",
+              tabindex: 0,
+              role: :button,
+              variant: :micro,
+              size: 18,
+              class: "outline-none text-gray-950 dark:text-gray-100 invisible group-hover:visible cursor-pointer",
+              data: { controller: "nested-pointer" },
+              title: "More"
+            %>
+            <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 -mr-10 mt-7 dark:!bg-gray-700" data-controller="nested-pointer">
+              <li><%= link_to edit_settings_assistant_path(assistant) do %><%= icon "cog-6-tooth", variant: :outline, size: 18 %>Settings<% end %></li>
+              <!-- <li><a><%= icon "arrow-up-tray", variant: :outline, size: 18 %>Share</a></li> -->
+            </menu>
+          </div>
+        <% end %>
+        <%= link_to new_assistant_message_path(assistant), class: "inline-flex", data: { role: "new" } do %>
+          <%= icon "pencil-square",
+            variant: :outline,
+            size: 18,
+            class: "text-gray-950 dark:text-gray-100 cursor-pointer group-hover:visible invisible
+                    relationship:visible relationship:text-gray-950 dark:relationship:text-gray-100",
+            data: { controller: "nested-pointer" },
+            title: "New"
+          %>
+        <% end %>
+      </div>
+    <% else %>
+      <%= link_to edit_settings_api_service_path(assistant.api_service), class: "flex items-center py-1 text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
+        <div class="relative inline-block w-7 h-7 mr-2">
+          <%= render partial: "layouts/assistant_avatar", locals: { assistant:, size: 7 } %>
+          <div class="absolute -bottom-1 right-0 bg-gray-50 dark:bg-gray-900 px-px py-[2px] rounded-full">
+            <%= icon "lock-closed", variant: :outline, size: 12, class: "text-gray-950 dark:text-gray-100" %>
+          </div>
+        </div>
+        <%= assistant.name %>
       <% end %>
-    </div>
+    <% end %>
   </div>
 </div>
