@@ -26,10 +26,10 @@ module LanguageModel::Export
   end
 
   class_methods do
-    def export_to_file(path: Rails.root.join(LanguageModel::Export::DEFAULT_MODEL_FILE), models:, only: DEFAULT_EXPORT_ONLY)
+    def export_to_file(path: Rails.root.join(DEFAULT_MODEL_FILE), models:, only: DEFAULT_EXPORT_ONLY)
       path = path.to_s
       storage = {
-        "models" => models.as_json(only:)
+        "models" => models.as_json(only:).map(&:compact)
       }
       if path.ends_with?(".json")
         File.write(path, storage.to_json)
@@ -38,7 +38,7 @@ module LanguageModel::Export
       end
     end
 
-    def import_from_file(path: Rails.root.join(LanguageModel::Export::DEFAULT_MODEL_FILE), users: User.all)
+    def import_from_file(path: Rails.root.join(DEFAULT_MODEL_FILE), users: User.all)
       users = Array.wrap(users)
       storage = YAML.load_file(path)
       models = storage["models"]
@@ -47,7 +47,7 @@ module LanguageModel::Export
         users.each do |user|
           lm = user.language_models.find_or_initialize_by(api_name: model[:api_name])
           lm.api_service = user.api_services.find_by(name: model[:api_service_name]) if model[:api_service_name]
-          lm.attributes = model.except(:api_service_name)
+          lm.assign_attributes(model.except(:api_service_name))
           lm.save!
         rescue ActiveRecord::RecordInvalid => e
           warn "Failed to import '#{model[:api_name]}': #{e.message} for #{model.inspect}"
