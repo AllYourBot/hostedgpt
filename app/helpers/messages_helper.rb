@@ -4,6 +4,8 @@ module MessagesHelper
   def render_avatar_for(message)
     if message.user?
       render partial: "layouts/user_avatar",      locals: { user: Current.user,           size: 7, classes: "mt-1" }
+    elsif message.tool?
+      render partial: "layouts/tool_avatar"
     else
       render partial: "layouts/assistant_avatar", locals: { assistant: message.assistant, size: 7, classes: "mt-1" }
     end
@@ -13,8 +15,7 @@ module MessagesHelper
     case message.role
       when "user" then "You"
       when "assistant" then message.assistant.name
-      when "tool" then "Tool"
-    end
+      end
   end
 
   def format_for_copying(text)
@@ -25,17 +26,25 @@ module MessagesHelper
     ::MarkdownRenderer.render_for_speaking(text)
   end
 
-  def format_for_display(text, append_inside_tag: nil)
-    escaped_text = html_escape(text)
+  def format_for_display(message, append_inside_tag: nil)
+    if memory_updated?(message)
+      return link_to JSON.parse(message.content_text)["message_to_user"],
+        settings_memories_path,
+        { data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
+    elsif message_to_user_from_tool_call?(message)
+      return content_tag(:span, JSON.parse(message.content_text)["message_to_user"], class: "text-gray-400 dark:!text-gray-500")
+    else
+      escaped_text = html_escape(message.content_text)
 
-    html = ::MarkdownRenderer.render_for_display(
-      escaped_text,
-      block_code: block_code
-    )
+      html = ::MarkdownRenderer.render_for_display(
+        escaped_text,
+        block_code: block_code
+      )
 
-    html = "<p></p>" if html.blank?
-    html = append(html, append_inside_tag) if append_inside_tag
-    return html.html_safe
+      html = "<p></p>" if html.blank?
+      html = append(html, append_inside_tag) if append_inside_tag
+      return html.html_safe
+    end
   end
 
   def thinking_html(message, thinking)
@@ -57,6 +66,16 @@ module MessagesHelper
       data: { role: "cancelled" },
       class: "inline-block pl-1 #{message.not_cancelled? && 'hidden'}"
     )
+  end
+
+  def message_to_user_from_tool_call?(message)
+    JSON.parse(message.content_text)["message_to_user"].present? if message.content_text.present?
+  rescue JSON::ParserError
+    false
+  end
+
+  def memory_updated?(message)
+    message.tool? && message.content_tool_calls.dig(:function, :name) == "memory_remember_detail_about_user"
   end
 
   private
