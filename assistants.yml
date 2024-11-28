@@ -10,5 +10,5 @@ assistants:
   slug: llama-3-70b
   language_model_api_name: llama-3.1-70b-versatile
 - name: Gemini Pro 1.5
-  slug: gemini-1.5-pro-002
-  language_model_api_name: llama-3.1-70b-versatile
+  slug: gemini-1-5-pro
+  language_model_api_name: gemini-1.5-pro-002
