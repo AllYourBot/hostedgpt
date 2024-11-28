@@ -110,7 +110,7 @@ class AIBackend::OpenAI < AIBackend
         {
           role: message.role,
           name: message.name_for_api,
-          content: message.content_text,
+          content: (JSON.parse(message.content_text).except("message_to_user").to_json rescue message.content_text),
           tool_calls: message.assistant? ? message.content_tool_calls : nil, # only for some assistant messages
           tool_call_id: message.tool_call_id,     # only for tool messages
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )

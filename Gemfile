@@ -13,7 +13,6 @@ gem "turbo-rails", "~> 2.0.5"
 gem "stimulus-rails", "~> 1.3.3"
 gem "tailwindcss-rails", "~> 2.7.2"
 gem "rack-cors"
-gem "ostruct"
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
