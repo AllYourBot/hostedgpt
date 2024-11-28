@@ -30,9 +30,9 @@ module MessagesHelper
     if memory_updated?(message)
       return link_to JSON.parse(message.content_text)["message_to_user"],
         settings_memories_path,
-        {data: { turbo_frame: "_top" }, class: "ml-1 text-gray-600 dark:text-gray-300 no-underline"}
+        { data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
     elsif message_to_user_from_tool_call?(message)
-      return JSON.parse(message.content_text)["message_to_user"]
+      return content_tag(:span, JSON.parse(message.content_text)["message_to_user"], class: "text-gray-400 dark:!text-gray-500")
     else
       escaped_text = html_escape(message.content_text)
 
