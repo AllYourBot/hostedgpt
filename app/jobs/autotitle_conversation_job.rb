@@ -24,19 +24,13 @@ class AutotitleConversationJob < ApplicationJob
 
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
 
-    if ai_backend.class == AIBackend::OpenAI || ai_backend.class == AIBackend::Anthropic
+    if ai_backend.class == AIBackend::OpenAI || ai_backend.class == AIBackend::Anthropic || ai_backend.class == AIBackend::Gemini
       response = ai_backend.get_oneoff_message(
         system_message,
         [text],
         response_format: { type: "json_object" }  # this causes problems for Groq even though it's supported: https://console.groq.com/docs/api-reference#chat-create
       )
       return JSON.parse(response)["topic"]
-    elsif ai_backend.class == AIBackend::Gemini
-      response = ai_backend.get_oneoff_message(
-        system_message,
-        [text]
-      )
-      return response.split(":")[1].split("}")[0].gsub(/"/, "").strip
     else
       response = ai_backend.get_oneoff_message(
         system_message,
