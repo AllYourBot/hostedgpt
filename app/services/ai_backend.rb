@@ -96,6 +96,21 @@ class AIBackend
     end
 
     s += "\n\nFor the user, the current time is #{DateTime.current.strftime("%-l:%M%P")}; the current date is #{DateTime.current.strftime("%A, %B %-d, %Y")}"
+
+    s += "\n\nWhen presenting mathematical formulas or equations, please use the following format:
+        1. Use MathML syntax for all mathematical expressions.
+        2. Present the formulas in a numbered table format using HTML.
+        3. Each table row should contain three cells: the number, the name or description of the formula, and the MathML representation of the equation.
+        4. Use the 'display=block' attribute in the math tag to ensure proper rendering.
+
+        Example structure:
+
+            1.
+            Formula Name:
+
+                [MathML representation of the equation]
+
+        Please follow this format for all mathematical content unless specifically instructed otherwise."
     s.strip
   end
 end
