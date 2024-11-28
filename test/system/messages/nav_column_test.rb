@@ -160,4 +160,17 @@ class NavColumnTest < ApplicationSystemTestCase
     click_element pencil_on_second_assistant
     assert_current_path new_assistant_message_path(assistant2)
   end
+
+  test "clicking the assistant name redirects to API service settings if token is missing" do
+    assistant = assistants(:keith_gpt4)
+    keith_missing_token_service = api_services(:keith_missing_token_service)
+    assistant.language_model.update! api_service: keith_missing_token_service
+
+    conversation_path = conversation_messages_path(conversations(:greeting), version: 1)
+    visit conversation_path
+
+    click_text assistant.name
+
+    assert_current_path edit_settings_api_service_path(keith_missing_token_service)
+  end
 end
