@@ -50,8 +50,7 @@ class AIBackend::Gemini < AIBackend
   def get_oneoff_message(instructions, messages, params = {})
     response = @client.generate_content( { system_instruction: system_message(instructions),
                                            contents: { role: "user", parts: { text: messages.first }},
-                                           generation_config: { response_mime_type: "application/json"}
-                                          })
+                                            ** params})
     response.dig("candidates",0,"content","parts",0,"text")
   end
 
