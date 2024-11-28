@@ -31,7 +31,10 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
     email = @person.email
 
-      # set the user agent in the request headers
+    # Test can flap on CI if we don't clear the queue
+    clear_enqueued_jobs
+
+    # set the user agent in the request headers
     ActionDispatch::Request.stub_any_instance(:user_agent, "#{browser} on #{operating_system}") do
       post password_resets_url, params: { email: email }
     end

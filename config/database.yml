@@ -1,27 +1,41 @@
+<%
+  def puts_red(msg)
+    puts "\e[31m#{msg}\e[0m"
+  end
+
+  def deprecated(env, message)
+    puts_red "DEPRECATED: #{env} is deprecated, #{message}" if ENV[env]
+  end
+
+  deprecated("HOSTEDGPT_DATABASE_PORT", "use HOSTED_DB_PORT instead")
+  deprecated("HOSTEDGPT_DEV_DB", "use HOSTED_DB_NAME instead")
+  deprecated("HOSTEDGPT_TEST_DB", "provide HOSTED_DB_NAME and test database name is generated")
+  deprecated("HOSTEDGPT_DATABASE_PASSWORD", "use HOSTED_DB_PASSWORD instead")
+%>
+
 default: &default
   adapter: postgresql
+  username: <%= ENV["HOSTED_DB_USERNAME"] %>
+  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] || ENV["HOSTED_DB_PASSWORD"] %>
+  host: <%= ENV["HOSTED_DB_HOST"] %>
+  port: <%= ENV["HOSTEDGPT_DATABASE_PORT"] || ENV["HOSTED_DB_PORT"] %>
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  port: <%= ENV['HOSTEDGPT_DATABASE_PORT'] || 5432 %>
 <% if RUBY_PLATFORM =~ /darwin/ %>
   gssencmode: disable
 <% end %>
-  url: <%= ENV['DATABASE_URL'] %>
-  # url format: postgres://username:password@localhost:5432/database_name
 
 development:
   <<: *default
-  database: <%= ENV['HOSTEDGPT_DEV_DB'] || "hostedgpt_development" %>
-  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name. Note: Docker sets DATABASE_URL inside docker-compose.yml
+  database: <%= ENV["HOSTEDGPT_DEV_DB"] || "#{ENV['HOSTED_DB_NAME'] || 'hostedgpt'}_development" %>
 
 test:
   <<: *default
-  database: <%= ENV['HOSTEDGPT_TEST_DB'] || "hostedgpt_test" %>
-  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
+  database: <%= ENV["HOSTEDGPT_TEST_DB"] || "#{ENV['HOSTED_DB_NAME'] || 'hostedgpt'}_test" %>
 
 production:
   <<: *default
-  database: hostedgpt_production
-  username: hostedgpt
-  password: <%= ENV["HOSTEDGPT_DATABASE_PASSWORD"] %>
-  # It's best to set DATABASE_URL to configure database details. That overrides this "database" name.
+  # It's best to set DATABASE_URL to configure database in production. That overrides this "database" name.
+  url: <%= ENV["DATABASE_URL"] %>
+  database: <%= ENV["HOSTEDGPT_DEV_DB"] || "#{ENV['HOSTED_DB_NAME'] || 'hostedgpt'}_production" %>
+  username: <%= ENV["HOSTED_DB_USERNAME"] || "hostedgpt" %>
