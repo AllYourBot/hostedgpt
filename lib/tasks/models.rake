@@ -18,10 +18,9 @@ namespace :models do
     users = User.all
     LanguageModel.import_from_file(path: args[:path], users:)
   end
-
 end
 
 Rake::Task["db:prepare"].enhance do
   Rake::Task["models:import"].invoke
+  Rake::Task["assistants:import"].invoke
 end
-

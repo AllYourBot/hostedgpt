@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 export PORT="${PORT:-3000}"
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES # the gemini gem throws an error without this
 
 if ! gem list overmind -i --silent; then
   echo "Installing overmind..."
