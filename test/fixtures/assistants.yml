@@ -43,6 +43,15 @@ keith_gpt3:
   instructions: Include a Zen perspective when possilbe
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
+keith_gemini:
+  user: keith
+  slug: gemini-1-5-pro
+  language_model: gemini-1.5-pro-002
+  name: Gemini Pro 1.5
+  description: Gemini Pro 1.5
+  instructions:
+  tools: []
+
 
 rob_gpt4:
   user: rob
