@@ -14,8 +14,6 @@ class SDK::Get < SDK::Verb
     response = get(@url) do |req|
       req.headers = @headers
     end
-
-    # TODO? raise ResponseError.new(response) if !response.status.in? @expected_statuses
     response.body
   end
 end
