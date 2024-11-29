@@ -14,8 +14,8 @@ class Toolbox::GoogleSearch < Toolbox
     results = doc.css('div.BNeawe').map(&:text).join("\n")
 
     {
-      message_to_user: "Web search results for #{query_s} are #{results}",
-      results: results
+      message_to_user: "Web query: #{query_s}",
+      query_results: results
     }
   end
 end
