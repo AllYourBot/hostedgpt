@@ -20,11 +20,17 @@ class AIBackend::Gemini < AIBackend
     begin
       raise configuration_error if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to Gemini API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
-      @client = self.class.client.new(credentials: {service: "generative-language-api",
-                                                    api_key: assistant.api_service.effective_token,
-                                                    version: "v1beta"},
-                                      options: { model: assistant.language_model.api_name,
-                                      server_sent_events: true })
+      @client = self.class.client.new(
+        credentials: {
+          service: "generative-language-api",
+          api_key: assistant.api_service.effective_token,
+          version: "v1beta"
+        },
+        options: {
+          model: assistant.language_model.api_name,
+          server_sent_events: true
+        }
+      )
     rescue ::Faraday::UnauthorizedError, ::Faraday::BadRequestError => e
       raise configuration_error
     end
@@ -48,10 +54,12 @@ class AIBackend::Gemini < AIBackend
   end
 
   def get_oneoff_message(instructions, messages, params = {})
-    response = @client.generate_content( { system_instruction: system_message(instructions),
-                                           contents: { role: "user", parts: { text: messages.first }},
-                                            ** params})
-    response.dig("candidates",0,"content","parts",0,"text")
+    response = @client.generate_content({
+      system_instruction: system_message(instructions),
+      contents: { role: "user", parts: { text: messages.first }}, # TODO: could implement preceding_conversation_messages and call it here
+      ** params
+    })
+    response.dig("candidates", 0, "content", "parts", 0, "text")
   end
 
   def stream_next_conversation_message(&chunk_handler)

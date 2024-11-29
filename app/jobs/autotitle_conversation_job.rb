@@ -35,7 +35,7 @@ class AutotitleConversationJob < ApplicationJob
       response = ai_backend.get_oneoff_message(
         system_message,
         [text],
-        generation_config: {response_mime_type: "application/json"}
+        generation_config: { response_mime_type: "application/json" }
       )
       return JSON.parse(response)["topic"]
     else
