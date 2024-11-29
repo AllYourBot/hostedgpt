@@ -1,5 +1,6 @@
 include ActionView::RecordIdentifier
 require "nokogiri/xml/node"
+class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
 
 class GetNextAIMessageJob < ApplicationJob
   include ActionView::Helpers::RenderingHelper
@@ -75,6 +76,10 @@ class GetNextAIMessageJob < ApplicationJob
     return true
   rescue Anthropic::ConfigurationError => e
     set_anthropic_error
+    wrap_up_the_message
+    return true
+  rescue Gemini::Errors::ConfigurationError => e
+    set_generic_error("Gemini")
     wrap_up_the_message
     return true
   rescue Faraday::ParsingError => e
@@ -166,8 +171,16 @@ class GetNextAIMessageJob < ApplicationJob
 
   def set_billing_error
     service = ai_backend.to_s.split("::").second
-    url = service == "OpenAI" ? "https://platform.openai.com/account/billing/overview" : "https://console.anthropic.com/settings/plans"
-
+    url = case service
+    when "OpenAI"
+      "https://platform.openai.com/account/billing/overview"
+    when "Anthropic"
+      "https://console.anthropic.com/settings/plans"
+    when "Gemini"
+      "https://aistudio.google.com/app/apikey"
+    else
+      "https://platform.openai.com/account/billing/overview"
+    end
     @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
       "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
   end

@@ -34,6 +34,12 @@ hello_claude:
   title: Meeting Claude
   last_assistant_message: claude_age_replying
 
+gemini_conversation:
+  user: keith
+  assistant: keith_gemini
+  title: Meeting Gemini
+  last_assistant_message: hello_gemini
+
 debugging:
   user: rob
   assistant: rob_gpt4

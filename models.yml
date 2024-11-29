@@ -297,3 +297,12 @@ models:
   best: false
   supports_system_message: true
   api_service_name: Anthropic
+- api_name: gemini-1.5-pro-002
+  name: Google Gemini Pro 1.5 (latest)
+  supports_images: true
+  supports_tools: false
+  input_token_cost_cents: '0.0000'
+  output_token_cost_cents: '0.0000'
+  best: true
+  supports_system_message: true
+  api_service_name: Google Gemini

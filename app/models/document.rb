@@ -63,15 +63,17 @@ class Document < ApplicationRecord
     )
   end
 
+  def file_base64(variant = :large)
+    return nil if !file.attached?
+    wait_for_file_variant_to_process!(variant.to_sym)
+    file_contents = file.variant(variant.to_sym).processed.download
+    base64 = Base64.strict_encode64(file_contents)
+  end
+
   private
 
   def file_data_url(variant = :large)
-    wait_for_file_variant_to_process!(variant)
-
-    file_contents = file.variant(variant.to_sym).processed.download
-    base64_data = Base64.strict_encode64(file_contents)
-
-    "data:#{file.blob.content_type};base64,#{base64_data}"
+    "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
   end
 
   def set_default_user
