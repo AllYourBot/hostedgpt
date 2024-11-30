@@ -190,7 +190,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   end
 
   def simulate_image_variant_processing(&block)
-    stub_custom_config_value(:app_url, "") do
+    stub_custom_config_value(:app_url, "not_nil") do
       Document.stub_any_instance(:has_file_variant_processed?, false) do
         ActiveStorage::PostgresqlController.stub_any_instance(:decode_verified_key, simulate_not_preprocessed) do
           yield block
