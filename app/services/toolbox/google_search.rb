@@ -11,7 +11,18 @@ class Toolbox::GoogleSearch < Toolbox
     encoded_query = URI.encode_www_form_component(query_s)
     response_body = get("https://www.google.com/search?q=#{encoded_query}").get_body
     doc = Nokogiri::HTML(response_body)
-    results = doc.css("div.BNeawe").map(&:text).join("\n")
+
+    results = doc.css("div.BNeawe").map do |div|
+      div.children.map do |node|
+        if node.name == "a"
+          anchor_text = node.text.strip
+          href = node["href"]
+          "#{anchor_text} (#{href})"
+        else
+          node.text.strip
+        end
+      end.join(" ")
+    end.join("\n")
 
     {
       message_to_user: "Web query: #{query_s}",
