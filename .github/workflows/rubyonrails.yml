@@ -28,9 +28,6 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
-      APP_URL_PROTOCOL: "http"
-      APP_URL_HOST: "localhost"
-      APP_URL_PORT: "3000"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -71,9 +68,6 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
-      APP_URL_PROTOCOL: "http"
-      APP_URL_HOST: "localhost"
-      APP_URL_PORT: "3000"
       DISPLAY: "=:99"
       CHROME_VERSION: "127.0.6533.119"
 

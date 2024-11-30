@@ -19,26 +19,18 @@ class Document < ApplicationRecord
   validates :purpose, :filename, :bytes, presence: true
   validate :file_present
 
-  def has_image?(variant = nil)
-    if variant.present?
-      return has_file_variant_processed?(variant)
-    end
+  def file_data_url(variant = :large)
+    return nil if !file.attached?
 
-    file.attached?
+    "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
   end
 
-  def image_url(variant, fallback: nil)
-    return nil unless has_image?
+  def file_base64(variant = :large)
+    return nil if !file.attached?
+    wait_for_file_variant_to_process!(variant.to_sym)
 
-    if Rails.application.config.x.app_url.blank?
-      file_data_url(variant)
-    elsif has_file_variant_processed?(variant)
-      fully_processed_url(variant)
-    elsif fallback.nil?
-      redirect_to_processed_path(variant)
-    else
-      fallback
-    end
+    file_contents = file.variant(variant.to_sym).processed.download
+    base64 = Base64.strict_encode64(file_contents)
   end
 
   def has_file_variant_processed?(variant)
