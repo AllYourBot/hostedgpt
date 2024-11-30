@@ -3,6 +3,7 @@ require "test_helper"
 class Toolbox::GoogleSearchTest < ActiveSupport::TestCase
   setup do
     @google_search = Toolbox::GoogleSearch.new
+    WebMock.enable!
   end
 
   test "google_search returns the expected result" do
