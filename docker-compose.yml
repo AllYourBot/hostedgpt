@@ -15,56 +15,56 @@ services:
       interval: 1s
       retries: 5
 
-  # base: &base
-  #   container_name: hostedgpt
-  #   depends_on: ["postgres"]
-  #   restart: on-failure:3
-  #   tty: true
-  #   build:
-  #     context: .
-  #     target: development
-  #   environment:
-  #     # Be sure to add environment variables to config/options.yml
-  #     - HOSTED_DB_USERNAME=${HOSTED_DB_USERNAME:-app}
-  #     - HOSTED_DB_PASSWORD=${HOSTED_DB_PASSWORD:-secret}
-  #     - HOSTED_DB_HOST=${HOSTED_DB_HOST:-postgres}
-  #     - HOSTED_DB_PORT=${HOSTED_DB_PORT:-5432}
-  #     - HOSTED_DB_NAME=${HOSTED_DB_NAME:-app}
-  #     # NOTE: Using DATABASE_URL to configure db is NOT supported by this Docker compose
-  #     - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
-  #     - OVERMIND_COLORS=2,3,5
-  #     - ALLOWED_REQUEST_ORIGINS
-  #     - REGISTRATION_FEATURE
-  #     - DEFAULT_LLM_KEYS_FEATURE
-  #     - CLOUDFLARE_STORAGE_FEATURE
-  #     - GOOGLE_TOOLS_FEATURE
-  #     - PASSWORD_AUTHENTICATION_FEATURE
-  #     - GOOGLE_AUTHENTICATION_FEATURE
-  #     - HTTP_HEADER_AUTHENTICATION_FEATURE
-  #     - VOICE_FEATURE
-  #     - DEFAULT_TO_VOICE_FEATURE
-  #     - EMAIL_FEATURE
-  #     - PASSWORD_RESET_EMAIL_FEATURE
-  #     - PRODUCT_NAME
-  #     - DEFAULT_OPENAI_KEY
-  #     - DEFAULT_ANTHROPIC_KEY
-  #     - DEFAULT_GROQ_KEY
-  #     - CLOUDFLARE_ACCOUNT_ID
-  #     - CLOUDFLARE_ACCESS_KEY_ID
-  #     - CLOUDFLARE_SECRET_ACCESS_KEY
-  #     - CLOUDFLARE_BUCKET
-  #     - GOOGLE_AUTH_CLIENT_ID
-  #     - GOOGLE_AUTH_CLIENT_SECRET
-  #     - HTTP_HEADER_AUTH_EMAIL
-  #     - HTTP_HEADER_AUTH_NAME
-  #     - HTTP_HEADER_AUTH_UID
-  #     - EMAIL_PROVIDER
-  #     - EMAIL_FROM
-  #     - EMAIL_HOST
-  #     - POSTMARK_SERVER_API_TOKEN
-  #   ports: ["3000:3000"]
-  #   volumes:
-  #     - .:/rails
+  base: &base
+    container_name: hostedgpt
+    depends_on: ["postgres"]
+    restart: on-failure:3
+    tty: true
+    build:
+      context: .
+      target: development
+    environment:
+      # Be sure to add environment variables to config/options.yml
+      - HOSTED_DB_USERNAME=${HOSTED_DB_USERNAME:-app}
+      - HOSTED_DB_PASSWORD=${HOSTED_DB_PASSWORD:-secret}
+      - HOSTED_DB_HOST=${HOSTED_DB_HOST:-postgres}
+      - HOSTED_DB_PORT=${HOSTED_DB_PORT:-5432}
+      - HOSTED_DB_NAME=${HOSTED_DB_NAME:-app}
+      # NOTE: Using DATABASE_URL to configure db is NOT supported by this Docker compose
+      - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
+      - OVERMIND_COLORS=2,3,5
+      - ALLOWED_REQUEST_ORIGINS
+      - REGISTRATION_FEATURE
+      - DEFAULT_LLM_KEYS_FEATURE
+      - CLOUDFLARE_STORAGE_FEATURE
+      - GOOGLE_TOOLS_FEATURE
+      - PASSWORD_AUTHENTICATION_FEATURE
+      - GOOGLE_AUTHENTICATION_FEATURE
+      - HTTP_HEADER_AUTHENTICATION_FEATURE
+      - VOICE_FEATURE
+      - DEFAULT_TO_VOICE_FEATURE
+      - EMAIL_FEATURE
+      - PASSWORD_RESET_EMAIL_FEATURE
+      - PRODUCT_NAME
+      - DEFAULT_OPENAI_KEY
+      - DEFAULT_ANTHROPIC_KEY
+      - DEFAULT_GROQ_KEY
+      - CLOUDFLARE_ACCOUNT_ID
+      - CLOUDFLARE_ACCESS_KEY_ID
+      - CLOUDFLARE_SECRET_ACCESS_KEY
+      - CLOUDFLARE_BUCKET
+      - GOOGLE_AUTH_CLIENT_ID
+      - GOOGLE_AUTH_CLIENT_SECRET
+      - HTTP_HEADER_AUTH_EMAIL
+      - HTTP_HEADER_AUTH_NAME
+      - HTTP_HEADER_AUTH_UID
+      - EMAIL_PROVIDER
+      - EMAIL_FROM
+      - EMAIL_HOST
+      - POSTMARK_SERVER_API_TOKEN
+    ports: ["3000:3000"]
+    volumes:
+      - .:/rails
 
 volumes:
   hostedgpt_pgdata:
