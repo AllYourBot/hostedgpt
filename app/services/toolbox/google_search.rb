@@ -9,7 +9,7 @@ class Toolbox::GoogleSearch < Toolbox
   S
   def google_search(query_s:)
     encoded_query = URI.encode_www_form_component(query_s)
-    response_body = get("https://www.google.com/search?q=#{encoded_query}").get_body
+    response_body = get("https://www.google.com/search").param(q: encoded_query).body
     doc = Nokogiri::HTML(response_body)
 
     results = doc.css("div.BNeawe").map do |div|

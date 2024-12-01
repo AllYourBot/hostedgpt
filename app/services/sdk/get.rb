@@ -9,11 +9,4 @@ class SDK::Get < SDK::Verb
 
     handle(response)
   end
-
-  def get_body
-    response = get(@url) do |req|
-      req.headers = @headers
-    end
-    response.body
-  end
 end
