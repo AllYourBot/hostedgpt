@@ -30,14 +30,15 @@
   class="pt-6 text-gray-950 dark:text-gray-100 select-none"
 >
 <%= form_with url: new_assistant_message_path(@assistant), method: :get do |form| %>
-    <%= form.text_field :query,
+    <%= form.search_field :query,
+      value: @query,
       placeholder: "Search conversations",
       id: "search-input",
       autofocus: true,
       class: %|
         border border-gray-400 rounded
         text-black dark:text-gray-800
-        mb-1 p-1 pl-2 pr-2
+        ml-3 w-full
       |,
       data: {
         inline_edit_target: "input",
