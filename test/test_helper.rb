@@ -2,6 +2,7 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 require "minitest/autorun"
+require "minitest/retry"
 require "pry"
 
 Dir[Rails.root.join("test/support/**/*.rb")].sort.each { |file| require file }
@@ -19,6 +20,12 @@ class Capybara::Node::Element
     !obsolete?
   end
 end
+
+Minitest::Retry.use!(
+  retry_count: 3,
+  verbose: true,
+  exceptions_to_retry: [Net::ReadTimeout]
+)
 
 class ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers

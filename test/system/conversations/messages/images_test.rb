@@ -90,28 +90,21 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       visit_and_scroll_wait conversation_messages_path(@conversation)
 
       image_msg       = find_messages.third
-      image_btn = image_msg.find_role("image-preview")
+      image_btn       = image_msg.find_role("image-preview")
       loader          = image_btn.find_role("image-loader")
       img             = image_btn.find("img", visible: :all)
       modal_container = image_msg.find_role("image-modal")
       modal_loader    = modal_container.find_role("image-loader")
       modal_img       = modal_container.find("img", visible: :all)
 
-      assert_true "image loader should be visible", wait: 0.6 do
+      assert_true "image loader should be visible", wait: 3 do
         loader.visible?
       end
       refute img.visible?
 
       image_btn.click
 
-      2.times do
-        sleep 0.1
-        sleep 0.5 if !modal_loader.visible?
-        sleep 0.1
-        image_btn.click if !modal_loader.visible?
-      end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
-
-      assert_true "modal image loader should be visible", wait: 0.6 do
+      assert_true "modal image loader should be visible", wait: 3 do
         modal_loader.visible?
       end
       refute modal_img.visible?
