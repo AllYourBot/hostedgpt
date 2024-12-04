@@ -65,3 +65,7 @@ module ActiveSupport
     fixtures :all
   end
 end
+
+class ActionDispatch::SystemTestCase
+  parallelize(workers: Etc.nprocessors/2)
+end
