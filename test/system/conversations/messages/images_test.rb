@@ -103,20 +103,12 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       refute img.visible?
 
       image_btn.click
-
-      retries = 0
-      begin
-        2.times do
-          sleep 0.1
-          sleep 0.5 if !modal_loader.visible?
-          sleep 0.1
-          image_btn.click if !modal_loader.visible?
-        end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
-      rescue Selenium::WebDriver::Error::ElementClickInterceptedError => e
-        retires += 1
-        retry if retries < 2
-        raise e
-      end
+      2.times do
+        sleep 0.1
+        sleep 0.5 if !modal_loader.visible?
+        sleep 0.1
+        image_btn.click if !modal_loader.visible?
+      end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
 
       assert_true "modal image loader should be visible", wait: 3 do
         modal_loader.visible?
