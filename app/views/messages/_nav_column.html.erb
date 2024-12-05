@@ -29,12 +29,12 @@
   id="search"
   class="pt-6 text-gray-950 dark:text-gray-100 select-none"
 >
-<%= form_with url: new_assistant_message_path(@assistant), method: :get do |form| %>
+  <%= form_with(url: new_assistant_message_path(@assistant), data: { controller: "inline-edit search" }, class: "contents", method: :get) do |form| %>
     <%= form.search_field :query,
       value: @query,
       placeholder: "Search conversations",
       id: "search-input",
-      autofocus: true,
+      autofocus: @query.blank? ? false : true,
       class: %|
         border border-gray-400 rounded
         text-black dark:text-gray-800
@@ -43,7 +43,8 @@
       data: {
         inline_edit_target: "input",
         action: %|
-          keydown.meta+enter->keyboard#submit
+          keydown.enter->inline-edit#cursorToEnd
+          input->search#search
           %|
         }
       %>
