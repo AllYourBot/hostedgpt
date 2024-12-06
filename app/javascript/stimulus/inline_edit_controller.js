@@ -26,4 +26,16 @@ export default class extends Controller {
     this.inputTarget.value = this.originalText
     this.submitForm()
   }
+
+  clear() {
+    this.inputTarget.value = ""
+    this.submitForm()
+  }
+
+  search() {
+    clearTimeout(this.timeout)
+    this.timeout = setTimeout(() => {
+      this.element.requestSubmit()
+    }, 900)
+  }
 }
