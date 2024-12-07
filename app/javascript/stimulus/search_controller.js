@@ -28,8 +28,10 @@ export default class extends Controller {
 
   setSearchClearIcon() {
     if (this.inputTarget.value.length > 0) {
+      this.clearTarget.classList.remove("hidden")
       this.clearTarget.classList.add("text-gray-800")
     } else {
+      this.clearTarget.classList.add("hidden")
       this.clearTarget.classList.remove("text-gray-800")
     }
   }
