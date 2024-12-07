@@ -29,12 +29,13 @@
   id="search"
   class="pt-6 text-gray-950 dark:text-gray-100 select-none"
 >
-  <%= form_with(url: new_assistant_message_path(@assistant), data: { controller: "inline-edit" }, class: "contents", method: :get) do |form| %>
+  <%= form_with(url: new_assistant_message_path(@assistant), data: { controller: "search" }, class: "contents", method: :get) do |form| %>
     <div class="relative ml-2 mr-5">
       <%= form.text_field :query,
         value: @query,
         placeholder: "Search",
         id: "search-input",
+        autofocus: @query.nil? ? false : true,
         class: %|
           w-full
           p-2 py-1
@@ -42,10 +43,10 @@
           text-black dark:text-gray-800
       |,
       data: {
-        inline_edit_target: "input",
+        search_target: "input",
         action: %|
-          keydown.enter->inline-edit#cursorToEnd
-          input->inline-edit#search
+          keydown.enter->search#cursorToEnd
+          input->search#search
           %|
         }
       %>
@@ -53,7 +54,7 @@
         variant: :mini,
         size: 18,
         class: "cursor-pointer absolute right-1 top-1/2 transform -translate-y-1/2",
-        data: { action: "click->inline-edit#clear" }
+        data: { action: "click->search#clear" }
       %>
     </div>
   <% end %>
