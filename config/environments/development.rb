@@ -85,11 +85,9 @@ Rails.application.configure do
   log_polling = ENV["SOLID_QUEUE_LOG_POLLING_ON"] != "false"
   config.solid_queue.silence_polling = log_polling # NOTE: this is backwards, true means silence
 
-  config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16", "172.18.0.0/16"]
+  config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16"]
 
-  # TODO should we combine this with APP_URL_HOST?
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
-  config.hosts << Setting.app_url_host if Setting.key_set?(:app_url_host)
 
   stdout_logger = ActiveSupport::Logger.new(STDOUT)
   tagged_logger = ActiveSupport::TaggedLogging.new(stdout_logger)
