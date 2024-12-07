@@ -4,6 +4,7 @@ require "rails/test_help"
 require "minitest/autorun"
 require "minitest/retry"
 require "pry"
+require "webmock/minitest"
 
 Dir[Rails.root.join("test/support/**/*.rb")].sort.each { |file| require file }
 
