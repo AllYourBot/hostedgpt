@@ -29,7 +29,15 @@
   id="search"
   class="pt-6 text-gray-950 dark:text-gray-100 select-none"
 >
-  <%= form_with(url: new_assistant_message_path(@assistant), data: { controller: "search" }, class: "contents", method: :get) do |form| %>
+  <% if @conversation.present? %>
+    <% version = @conversation.messages.order(:created_at).last&.version %>
+    <% form_url = conversation_messages_path(@conversation) %>
+  <% else %>
+    <% form_url = new_assistant_message_path(@assistant) %>
+  <% end %>
+
+  <%= form_with(url: form_url, data: { controller: "search" }, class: "contents", method: :get) do |form| %>
+    <%= form.hidden_field :version, value: version %>
     <div class="relative ml-2 mr-5">
       <%= form.text_field :query,
         value: @query,
