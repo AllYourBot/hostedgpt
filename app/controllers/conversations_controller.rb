@@ -1,7 +1,6 @@
 class ConversationsController < ApplicationController
   before_action :set_conversation, only: [:show, :edit, :update, :destroy]
   before_action :set_query, only: [:index]
-  before_action :set_assistant, only: [:index]
   before_action :set_nav_conversations
   before_action :set_nav_assistants
 
@@ -45,17 +44,8 @@ class ConversationsController < ApplicationController
     @query = params[:query]
   end
 
-
   def set_conversation
     @conversation = Current.user.conversations.find(params[:id])
-  end
-
-  def set_assistant
-    if @conversation.present?
-      @assistant = @conversation.assistant
-    else
-      @assistant = Current.user.assistants.first #find(params[:assistant_id])
-    end
   end
 
   def conversation_params
