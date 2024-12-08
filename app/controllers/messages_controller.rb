@@ -87,6 +87,7 @@ class MessagesController < ApplicationController
     redirect_to root_url, status: :unauthorized if @message.conversation.user != Current.user
   end
 
+  # TODO: Can this taken out with the turbo-frame added?
   def set_nav_conversations
     @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
   end
