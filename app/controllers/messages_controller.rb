@@ -4,7 +4,6 @@ class MessagesController < ApplicationController
 
   before_action :set_version,               only: [:index, :update]
   before_action :set_conversation,          only: [:index]
-  before_action :set_query,                 only: [:index, :new]
   before_action :set_assistant,             only: [:index, :new, :edit, :create]
   before_action :set_message,               only: [:show, :edit, :update]
   before_action :set_nav_conversations,     only: [:index, :new]
@@ -73,10 +72,6 @@ class MessagesController < ApplicationController
     @conversation = Current.user.conversations.find(params[:conversation_id])
   end
 
-  def set_query
-    @query = params[:query]
-  end
-
   def set_assistant
     @assistant = Current.user.assistants_including_deleted.find_by(slug: params[:assistant_id])
     @assistant ||= @conversation.latest_message_for_version(@version).assistant
@@ -87,9 +82,8 @@ class MessagesController < ApplicationController
     redirect_to root_url, status: :unauthorized if @message.conversation.user != Current.user
   end
 
-  # TODO: Can this taken out with the turbo-frame added?
   def set_nav_conversations
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
+    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
   end
 
   def set_nav_assistants
