@@ -17,7 +17,7 @@
       <%= form.text_area :content_text,
         id: "edit-message-#{@message.id}",
         value: @message.content_text,
-        autofocus: params[:query].blank? ? true : false,
+        autofocus: true,
         class: %|
           prose
           w-full p-0 m-0
