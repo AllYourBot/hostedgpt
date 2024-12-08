@@ -1,8 +1,9 @@
+<turbo-frame id="nav-conversations" loading="lazy">
 <section
   id="search"
   class="pt-6 text-gray-950 dark:text-gray-100 select-none"
 >
-  <%= form_with(url: conversations_path, data: { controller: "search" }, class: "contents", method: :get) do |form| %>
+  <%= form_with(url: conversations_path, data: { turbo_frame: "nav_conversations", controller: "search" }, class: "contents", method: :get) do |form| %>
     <div class="relative ml-2 mr-5">
       <%= form.text_field :query,
         value: @query,
@@ -16,7 +17,6 @@
           text-black dark:text-gray-800
       |,
       data: {
-        turbo_target: "nav-conversations",
         search_target: "input",
         action: %|
           keydown.enter->search#cursorToEnd
@@ -50,3 +50,4 @@
     <% end %>
   </turbo-frame>
 </section>
+</turbo-frame>
