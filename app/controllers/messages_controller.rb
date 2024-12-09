@@ -45,7 +45,6 @@ class MessagesController < ApplicationController
       redirect_to conversation_messages_path(@message.conversation, version: @message.version), status: :see_other
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
-      set_nav_conversations
       set_nav_assistants
       @new_message = @assistant.messages.new
 
