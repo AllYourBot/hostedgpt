@@ -25,4 +25,6 @@
   <% end %>
 </section>
 
-<%= render "conversations/nav_conversations" %>
+<turbo-frame id="nav-conversations" src="<%= conversations_path %>" loading="lazy" refresh="morph">
+  Placeholder content
+</turbo-frame>
