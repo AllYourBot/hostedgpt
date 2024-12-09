@@ -27,12 +27,23 @@ module MessagesHelper
   end
 
   def format_for_display(message, append_inside_tag: nil)
-    if memory_updated?(message)
-      return link_to JSON.parse(message.content_text)["message_to_user"],
+    if message_to_user_from_tool_call?(message)
+      function_name = message.content_tool_calls.dig(:function, :name)
+      message_to_user = JSON.parse(message.content_text)["message_to_user"]
+
+      case function_name
+      when "memory_remember_detail_about_user"
+        return link_to message_to_user,
         settings_memories_path,
         { data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
-    elsif message_to_user_from_tool_call?(message)
-      return content_tag(:span, JSON.parse(message.content_text)["message_to_user"], class: "text-gray-400 dark:!text-gray-500")
+      when "googlesearch_google_search"
+        query = message_to_user.partition(":").last
+        return link_to message_to_user,
+        "https://www.google.com/search?q=#{URI.encode_www_form_component(query)}",
+        { target: :_blank, data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
+      else
+        return content_tag(:span, message_to_user, class: "text-gray-400 dark:!text-gray-500")
+      end
     else
       escaped_text = html_escape(message.content_text)
 
@@ -72,10 +83,6 @@ module MessagesHelper
     JSON.parse(message.content_text)["message_to_user"].present? if message.content_text.present?
   rescue JSON::ParserError
     false
-  end
-
-  def memory_updated?(message)
-    message.tool? && message.content_tool_calls.dig(:function, :name) == "memory_remember_detail_about_user"
   end
 
   private
