@@ -31,7 +31,7 @@ class SDK::Verb
     raise ResponseError.new(response) if !response.status.in? @expected_statuses
 
     if response.status.between?(200, 299)
-      response.body.presence && OpenData.for(JSON.parse(response.body))
+      response.body.presence && OpenData.for(JSON.parse(response.body)) rescue response
     else
       response
     end
