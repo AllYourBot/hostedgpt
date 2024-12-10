@@ -57,7 +57,26 @@
     <%= form.check_box :supports_system_message %>
     <%= form.label :supports_system_message, "Supports System Message (Instructions)?" %>
   </div>
-
+  <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
+    <%= form.submit "Test",
+      name: "test_language_model",
+      class: %|
+        inline-block font-bold
+        bg-gray-200 dark:bg-gray-900
+        border border-gray-400
+        rounded-lg py-3 px-5
+        cursor-pointer
+      |,
+      data: { turbo_submits_with: "Testing..." }
+    %>
+    <turbo-stream action="replace" target="test_language_model_status">
+      <template>
+        <div id="test_language_model_status" class="text-green-700 font-bold">
+          (Untested).
+        </div>
+      </template>
+    </turbo-stream>
+  </div>
   <%= form.submit "Save",
     class: %|
       inline-block font-bold

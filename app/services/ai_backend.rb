@@ -2,6 +2,7 @@ class AIBackend
   include Utilities, Tools
 
   attr :client
+  attr :test_language_model
 
   def initialize(user, assistant, conversation = nil, message = nil)
     @user = user

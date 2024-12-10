@@ -25,6 +25,20 @@ class AIBackend::OpenAI < AIBackend
     end
   end
 
+  def self.test_language_model(language_model)
+    client = ::OpenAI::Client.new(
+      access_token: language_model.api_service.effective_token,
+      uri_base: language_model.api_service.url
+    )
+
+    client.chat(parameters: {
+      model: language_model.api_name,
+      messages: [{ role: "user", content: "Hello!" }],
+    }).dig("choices", 0, "message", "content")
+  rescue ::Faraday::Error => e
+    e.message
+  end
+
   private
 
   def client_method_name

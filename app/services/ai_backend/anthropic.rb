@@ -25,6 +25,18 @@ class AIBackend::Anthropic < AIBackend
     end
   end
 
+  def self.test_language_model(language_model)
+    client = ::Anthropic::Client.new(uri_base: language_model.api_service.url, access_token: language_model.api_service.effective_token)
+
+    # client.messages(parameters: {
+    #   model: language_model.api_name,
+    #   messages: [{ role: "user", content: "Hello!" }],
+    # }).dig("content", 0, "text")
+    "Not Implemented"
+  rescue ::Faraday::Error => e
+    e.message
+  end
+
   private
 
   def client_method_name
