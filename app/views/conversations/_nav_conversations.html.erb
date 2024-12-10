@@ -15,12 +15,12 @@
           p-2 py-1
           border border-gray-200 rounded-lg
           text-black dark:text-gray-800
-      |,
-      data: {
-        search_target: "input",
-        action: %|
-          keydown.enter->search#cursorToEnd
-          input->search#search
+	      |,
+	      data: {
+	        search_target: "input",
+	        action: %|
+	          keydown.enter->search#cursorToEnd
+	          input->search#search
           %|
         }
       %>
