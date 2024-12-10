@@ -1,9 +1,8 @@
 <turbo-frame data-turbo-permanent id="nav-conversations">
-  <section
-  id="search"
-  class="pt-6 text-gray-950 dark:text-gray-100 select-none"
+  <section id="search"
+    class="pt-6 text-gray-950 dark:text-gray-100 select-none"
   >
-    <%= form_with(url: conversations_path, 
+    <%= form_with(url: conversations_path,
       data: { turbo_frame: "nav_conversations", controller: "search" },
       class: "contents",
       method: :get
@@ -36,7 +35,7 @@
           data: { search_target: "clear", action: "click->search#clear" }
         %>
       </div>
-    <% end %> 
+    <% end %>
   </section>
 
   <section class="text-gray-950 dark:text-gray-100 select-none">
