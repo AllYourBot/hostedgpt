@@ -25,4 +25,8 @@
   <% end %>
 </section>
 
-<turbo-frame id="nav-conversations" src="<%= conversations_path %>" loading="lazy"/>
+<turbo-frame id="nav-conversations"
+  src="<%= conversations_path %>"
+  loading="lazy"
+  data-turbo-permanent
+/>
