@@ -226,6 +226,8 @@ GEM
     net-smtp (0.5.0)
       net-protocol
     nio4r (2.7.3)
+    nokogiri (1.16.7-aarch64-linux)
+      racc (~> 1.4)
     nokogiri (1.16.7-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.16.7-x86_64-darwin)
@@ -436,6 +438,8 @@ GEM
       railties (>= 6.0.0)
     stringio (3.1.1)
     sync (0.5.0)
+    tailwindcss-rails (2.7.2-aarch64-linux)
+      railties (>= 7.0.0)
     tailwindcss-rails (2.7.2-arm64-darwin)
       railties (>= 7.0.0)
     tailwindcss-rails (2.7.2-x86_64-darwin)
@@ -443,6 +447,7 @@ GEM
     tailwindcss-rails (2.7.2-x86_64-linux)
       railties (>= 7.0.0)
     thor (1.3.2)
+    tiktoken_ruby (0.0.9-aarch64-linux)
     tiktoken_ruby (0.0.9-arm64-darwin)
     tiktoken_ruby (0.0.9-x86_64-darwin)
     tiktoken_ruby (0.0.9-x86_64-linux)
@@ -481,6 +486,7 @@ GEM
     zeitwerk (2.7.1)
 
 PLATFORMS
+  aarch64-linux-musl
   arm64-darwin-23
   arm64-darwin-24
   x86_64-darwin-22
