@@ -125,4 +125,34 @@ class ConversationTest < ActiveSupport::TestCase
       assert_equal 3, grouped_conversations["Older"].count
     end
   end
+
+  test "#grouped_by_increasing_time_interval_for_user with a query returning a single conversation title" do
+    user = users(:keith)
+    query = "Ruby"
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query)
+
+    # From prior tests. 1 with matching title.
+    assert_equal 1, grouped_conversations.values.flatten.count
+  end
+
+  test "#grouped_by_increasing_time_interval_for_user with a query returning a single conversation message" do
+    user = users(:keith)
+    query = "alive"
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query)
+
+    # From prior tests. 1 with a matching message.
+    assert_equal 1, grouped_conversations.values.flatten.count
+  end
+
+  test "#grouped_by_increasing_time_interval_for_user with a query returning matching conversation titles and a message" do
+    user = users(:keith)
+    query = "test"
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query)
+
+    # Total conversations from all prior tests. 2 with matching titles plus 1 other with a matching message.
+    assert_equal 3, grouped_conversations.values.flatten.count
+  end
 end
