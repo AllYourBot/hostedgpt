@@ -89,7 +89,8 @@ EXPOSE 3000
 #### START of DEV ####
 
 # RUBY_VERSION is the only thing used from anything above
-FROM ruby:${RUBY_VERSION}-alpine AS development
+FROM ruby:${RUBY_VERSION}-alpine@sha256:caeab43b356463e63f87af54a03de1ae4687b36da708e6d37025c557ade450f8 AS development
+# TODO: When we bump to a new version of ruby we'll ahve to unpin from this specific sha
 
 RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
 
