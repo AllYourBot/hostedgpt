@@ -74,7 +74,7 @@ group :development do
   gem "byebug", platforms: %i[mri mingw x64_mingw]
   gem "pry-rails"
   gem "standard"
-  gem "ruby-lsp"
+  gem "ruby-lsp", "~> 0.12.3"
   gem "rubocop-rails"
   gem "rubocop-capybara"
   gem "rubocop-minitest"
