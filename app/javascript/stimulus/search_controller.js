@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [ "input", "clear" ]
 
-  connect() {
+  inputTargetConnected() {
     this.setSearchClearIcon()
   }
 
@@ -22,16 +22,16 @@ export default class extends Controller {
 
   search() {
     clearTimeout(this.timeout)
+    this.setSearchClearIcon()
     this.timeout = setTimeout(() => {
       this.element.requestSubmit()
-    }, 900)
+    }, 500)
   }
 
   setSearchClearIcon() {
-    if (this.inputTarget.value.length > 0) {
+    if (this.inputTarget.value.length > 0)
       this.clearTarget.classList.remove("hidden")
-    } else {
+    else
       this.clearTarget.classList.add("hidden")
-    }
   }
 }
