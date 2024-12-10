@@ -101,8 +101,7 @@ WORKDIR /rails
 COPY Gemfile Gemfile.lock .ruby-version ./
 
 RUN --mount=type=cache,id=gems,target=/tmp/bundle \
-  CFLAGS="-Wno-error=calloc-transposed-args" bundle install
-# CFLAGS is needed to fix https://github.com/AllYourBot/hostedgpt/pull/580
+  bundle install
 
 RUN apk add --no-cache postgresql-client
 
