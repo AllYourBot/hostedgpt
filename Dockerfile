@@ -95,7 +95,8 @@ RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdat
 
 ENV BUNDLE_CACHE=/tmp/bundle \
   BUNDLE_JOBS=2 \
-  PORT=3000
+  PORT=3000 \
+  CFLAGS="-Wno-error=calloc-transposed-args" # https://github.com/AllYourBot/hostedgpt/pull/580
 
 WORKDIR /rails
 COPY Gemfile Gemfile.lock .ruby-version ./

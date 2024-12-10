@@ -270,7 +270,7 @@ GEM
     postmark-rails (0.22.1)
       actionmailer (>= 3.0.0)
       postmark (>= 1.21.3, < 2.0)
-    prism (0.18.0)
+    prism (0.19.0)
     protocol (2.0.0)
       ruby_parser (~> 3.0)
     pry (0.14.2)
@@ -373,10 +373,10 @@ GEM
       rack (>= 1.1)
       rubocop (>= 1.33.0, < 2.0)
       rubocop-ast (>= 1.30.0, < 2.0)
-    ruby-lsp (0.13.1)
+    ruby-lsp (0.14.0)
       language_server-protocol (~> 3.17.0)
-      prism (>= 0.18.0, < 0.19)
-      sorbet-runtime (>= 0.5.5685)
+      prism (>= 0.19.0, < 0.22)
+      sorbet-runtime (>= 0.5.10782)
     ruby-openai (7.0.1)
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
@@ -510,7 +510,6 @@ DEPENDENCIES
   ostruct
   pg (~> 1.1)
   postmark-rails
-  prism (= 0.18.0)
   pry-rails
   puma (>= 6.0)
   rack-cors

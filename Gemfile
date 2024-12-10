@@ -75,7 +75,6 @@ group :development do
   gem "pry-rails"
   gem "standard"
   gem "ruby-lsp"
-  gem "prism", "0.18.0"
   gem "rubocop-rails"
   gem "rubocop-capybara"
   gem "rubocop-minitest"
