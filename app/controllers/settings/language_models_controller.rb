@@ -37,7 +37,6 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   def test
     @language_model = Current.user.language_models.find_by(id: params[:language_model_id])
     @answer = @language_model.test
-    render :edit
   end
 
   def destroy

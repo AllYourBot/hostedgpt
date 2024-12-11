@@ -67,25 +67,4 @@
     |,
     data: { turbo_submits_with: "Saving..." }
   %>
-  <% if @answer %>
-    <div class="text-green-700 font-bold">Tested <%= @answer %></div>
-  <% else %>
-    <%= form.label :test, "Test",
-      class: %|
-        inline-block font-medium
-        bg-gray-100 dark:bg-gray-900 dark:text-white
-        border border-gray-400
-        rounded-lg py-3 px-5
-        cursor-pointer
-      |
-    %>
-  <% end %>
-<% end %>
-
-<%= button_to "Test",
-  settings_language_model_test_path(@language_model),
-  id: "language_model_test",
-  method: :get,
-  data: { turbo: false },
-  class: "hidden"
-%>
+<% end%>
