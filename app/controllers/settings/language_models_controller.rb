@@ -27,17 +27,17 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   end
 
   def update
-    if params[:test_language_model]
-      answer = @language_model.test_api
-      # TODO: Remove this and add testing route and turbo stream update
-      redirect_to settings_language_models_path, notice: "Test result: #{answer}", status: :see_other
-      #flash.now[:notice] = "Test result: #{answer}"
-      #render :edit, status: :unprocessable_entity
-    elsif @language_model.update(language_model_params)
+    if @language_model.update(language_model_params)
       redirect_to settings_language_models_path, notice: "Saved", status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def test
+    @language_model = Current.user.language_models.find_by(id: params[:language_model_id])
+    @answer = @language_model.test
+    render :edit
   end
 
   def destroy

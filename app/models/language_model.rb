@@ -31,7 +31,7 @@ class LanguageModel < ApplicationRecord
       api_service.name != "Groq" # TODO: Remove this short circuit once I can debug tool use with Groq
   end
 
-  def test_api
+  def test
     ai_backend.test_language_model(self)
   end
 
