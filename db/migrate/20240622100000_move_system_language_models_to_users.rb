@@ -14,7 +14,7 @@ class MoveSystemLanguageModelsToUsers < ActiveRecord::Migration[7.1]
     Rails.logger.info "Create api_services/language_models records for all #{User.count} users records"
     User.all.find_each do |user|
       Rails.logger.info "Create api_services records for OpenAI for user #{user.id}"
-      openai_api_service = user.api_services.create!(name: "OpenAI", driver: :openai, url: "https://api.openai.com/", token: user.openai_key)
+      openai_api_service = user.api_services.create!(name: "OpenAI", driver: :openai, url: "https://api.openai.com/v1/", token: user.openai_key)
       Rails.logger.info "Create api_services records for Anthropic for user #{user.id}"
       anthropic_api_service = user.api_services.create!(name: "Anthropic", driver: :anthropic, url: "https://api.anthropic.com/", token: user.anthropic_key)
 
