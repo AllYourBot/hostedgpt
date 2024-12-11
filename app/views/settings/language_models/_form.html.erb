@@ -18,6 +18,10 @@
 
   <div class="my-5">
     <%= form.label :api_name %>
+    <%= turbo_frame_tag :language_model_test, class: "inline-block" do %>
+      <%= link_to "Test", settings_language_model_test_path(@language_model), class: "inline-block ml-5 py-3" %>
+      <%= render template: "settings/language_models/test" %>
+    <% end %>
     <%= form.text_field :api_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     <span>As specified in the API docs</span>
   </div>

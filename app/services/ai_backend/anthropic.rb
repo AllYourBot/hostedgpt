@@ -26,13 +26,18 @@ class AIBackend::Anthropic < AIBackend
   end
 
   def self.test_language_model(language_model)
-    client = ::Anthropic::Client.new(uri_base: language_model.api_service.url, access_token: language_model.api_service.effective_token)
+    client = ::Anthropic::Client.new(
+      uri_base: language_model.api_service.url,
+      access_token: language_model.api_service.effective_token
+    )
 
-    # client.messages(parameters: {
+    # TODO: Implement this. Use get_oneoff_message?
+    # client.chat(parameters: {
     #   model: language_model.api_name,
     #   messages: [{ role: "user", content: "Hello!" }],
-    # }).dig("content", 0, "text")
-    "Not Implemented"
+    # }).dig("choices", 0, "message", "content")
+
+    "Testing Not Implemented Yet"
   rescue ::Faraday::Error => e
     e.message
   end

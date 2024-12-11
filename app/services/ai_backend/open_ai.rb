@@ -35,6 +35,7 @@ class AIBackend::OpenAI < AIBackend
       model: language_model.api_name,
       messages: [{ role: "user", content: "Hello!" }],
     }).dig("choices", 0, "message", "content")
+
   rescue ::Faraday::Error => e
     e.message
   end

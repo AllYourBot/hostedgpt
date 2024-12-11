@@ -87,6 +87,10 @@ class AIBackend::Gemini < AIBackend
     return nil
   end
 
+  def self.test_language_model(language_model)
+    "Testing Not Implemented Yet"
+  end
+
   private
 
   def system_message(content)
