@@ -1,5 +1,5 @@
 class APIService < ApplicationRecord
-  URL_OPEN_AI = "https://api.openai.com/"
+  URL_OPEN_AI = "https://api.openai.com/v1/"
   URL_ANTHROPIC = "https://api.anthropic.com/"
   URL_GROQ = "https://api.groq.com/openai/v1/"
   URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/"

@@ -19,7 +19,7 @@ class AIBackend::OpenAI < AIBackend
     begin
       raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to OpenAI API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
-      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token)
+      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token, api_version: "")
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
     end
