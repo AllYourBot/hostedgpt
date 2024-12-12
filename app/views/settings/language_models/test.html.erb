@@ -1,9 +1,0 @@
-  <%= turbo_frame_tag :language_model_test do %>
-    <div data-controller="language-model-test">
-      <% if @answer %>
-        <div class="text-green-700 font-bold inline"> Result: <%= @answer %></div>
-      <% else %>
-        <div class="text-red-700 font-bold inline"></div>
-      <% end %>
-    </div>
-  <% end %>

@@ -18,10 +18,12 @@
 
   <div class="my-5">
     <%= form.label :api_name %>
-    <%= turbo_frame_tag :language_model_test, class: "inline-block" do %>
-      <%= link_to "Test", settings_language_model_test_path(@language_model), class: "inline-block ml-5 py-3" %>
-      <%= render template: "settings/language_models/test" %>
-    <% end %>
+    <div class="inline-block" id="test_language_model">
+      <% if language_model.persisted? %>
+        <%= link_url = settings_language_models_path + "/" + language_model.id.to_s + "/test" %>
+        <%= link_to "Test", link_url, data: { turbo_stream: true }, class: "inline-block ml-5 py-3" %>
+      <% end %>
+    </div>
     <%= form.text_field :api_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     <span>As specified in the API docs</span>
   </div>
@@ -61,6 +63,7 @@
     <%= form.check_box :supports_system_message %>
     <%= form.label :supports_system_message, "Supports System Message (Instructions)?" %>
   </div>
+
   <%= form.submit "Save",
     class: %|
       inline-block font-bold
@@ -71,4 +74,4 @@
     |,
     data: { turbo_submits_with: "Saving..." }
   %>
-<% end%>
+<% end %>

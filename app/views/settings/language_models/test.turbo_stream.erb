@@ -1,0 +1,11 @@
+<turbo-stream action="replace" target="test_language_model">
+  <template>
+    <div id="test_language_model" class="inline-block">
+      <% if @answer %>
+        <div class="text-green-700 font-bold inline">Result: <%= @answer %></div>
+      <% else %>
+        <div class="text-red-700 font-bold inline">No result</div>
+      <% end %>
+    </div>
+  </template>
+</turbo-stream>

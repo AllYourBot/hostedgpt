@@ -25,7 +25,7 @@ class AIBackend::Anthropic < AIBackend
     end
   end
 
-  def self.test_language_model(language_model)
+  def self.test_language_model(language_model, api_name = nil)
     client = ::Anthropic::Client.new(
       uri_base: language_model.api_service.url,
       access_token: language_model.api_service.effective_token
