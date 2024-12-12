@@ -33,6 +33,9 @@ class ActionDispatch::IntegrationTest
 
   Capybara.default_max_wait_time = 10
 
+  WebMock.disable_net_connect!(allow_localhost: true)
+
+
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
       user_or_person.user
