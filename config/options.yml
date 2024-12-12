@@ -71,3 +71,9 @@ shared:
     email_from: <%= ENV["EMAIL_FROM"] || default_to(:email_from, except_env_test: "support@example.com") %>
     email_host: <%= ENV["EMAIL_HOST"] || default_to(:email_host, except_env_test: "example.com")  %>
     postmark_server_api_token: <%= ENV["POSTMARK_SERVER_API_TOKEN"] || default_to(:postmark_server_api_token, except_env_test: "test-token") %>
+    smtp_address: <%= ENV["SMTP_ADDRESS"] || default_to(:smtp_address) %>
+    smtp_port: <%= ENV["SMTP_PORT"] || 587 %>
+    smtp_user_name: <%= ENV["SMTP_USER_NAME"] || default_to(:smtp_user_name) %>
+    smtp_password: <%= ENV["SMTP_PASSWORD"] || default_to(:smtp_password) %>
+    smtp_authentication: <%= ENV["SMTP_AUTHENTICATION"] || "plain" %>
+    smtp_enable_starttls_auto: <%= ENV["SMTP_ENABLE_STARTTLS_AUTO"] || true %>
