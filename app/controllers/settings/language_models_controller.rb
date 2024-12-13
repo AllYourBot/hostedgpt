@@ -35,11 +35,13 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   end
 
   def test
+    Rails.logger.info("TESTING LANGUAGE MODEL: #{params}")
+    Rails.logger.info("URL: #{request.fullpath}")
     @language_model = Current.user.language_models.find_by(id: params[:language_model_id])
-    @answer = @language_model.test(params[:api_name])
+    @answer = @language_model.test(params[:query])
 
     respond_to do |format|
-      format.html { redirect_to settings_language_models_path, notice: "Tested", status: :see_other }
+      format.html { redirect_to settings_language_models_path, notice: "Tested: #{@answer}", status: :see_other }
       format.turbo_stream
     end
   end
