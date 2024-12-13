@@ -27,14 +27,8 @@ class Conversation < ApplicationRecord
   #  "Last Month" => relation,
   #  "Older" => relation
   # }
-  def self.grouped_by_increasing_time_interval_for_user(user, query = nil)
-    if query.blank?
-      nav_conversations = user.conversations.ordered
-    else
-      nav_conversations = user.conversations.joins(:messages).ordered.where("messages.content_text ILIKE ?", "%#{query}%").
-        or(user.conversations.ordered.where("title ILIKE ?", "%#{query}%")).
-        select("DISTINCT conversations.*")
-    end
+  def self.grouped_by_increasing_time_interval_for_user(user)
+    nav_conversations = user.conversations.ordered
 
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
     values = [
