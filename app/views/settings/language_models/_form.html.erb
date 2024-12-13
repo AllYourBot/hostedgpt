@@ -16,7 +16,7 @@
     <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
-  <div data-controller="testing" class="my-5 inline-block">
+  <div data-controller="testing" class="my-5 inline-block w-full">
     <%= form.label :api_name %>
     <span>
       <% if language_model.persisted? %>
@@ -31,7 +31,7 @@
     <%= form.text_field :api_name,
       data: { testing_target: "input" },
       class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black"
-    %>
+      %>
     <span>As specified in the API docs</span>
   </div>
 

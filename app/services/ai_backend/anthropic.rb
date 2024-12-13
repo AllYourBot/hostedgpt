@@ -15,16 +15,23 @@ class AIBackend::Anthropic < AIBackend
   end
 
   def self.test_language_model(language_model, api_name = nil)
+    api_name ||= language_model.api_name
+
     client = ::Anthropic::Client.new(
       uri_base: language_model.api_service.url,
       access_token: language_model.api_service.effective_token
     )
 
-    # TODO: Implement this. Send: messages: [{ role: "user", content: "Hello!" }]
-    # and return the first message content.
+    response = client.messages(
+      model: api_name,
+      messages: [
+        { "role": "user", "content": "Hello!" }
+      ],
+      system: "You are a helpful assistant.",
+      parameters: { max_tokens: 1000 }
+    ).dig("content", 0, "text")
 
-    "Testing Not Implemented Yet"
-  rescue ::Faraday::Error => e
+  rescue => e
     e.message
   end
 

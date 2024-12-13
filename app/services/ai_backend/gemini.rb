@@ -30,14 +30,12 @@ class AIBackend::Gemini < AIBackend
       }
     )
 
-    # TODO: Fix this. Response is 400 currently.
-    # response = client.generate_content({
-    #   system_instruction: "Hello!",
-    #   contents: { role: "user", parts: { text: "Hello!" }}
-    # })
-    # response.dig("candidates", 0, "content", "parts", 0, "text")
+    client.generate_content({
+      contents: { role: "user", parts: { text: "Hello!" }}
+    }).dig("candidates", 0, "content", "parts", 0, "text")
 
-    "Testing Not Implemented Yet"
+  rescue ::Faraday::Error => e
+    "Error: #{e.message}"
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)
