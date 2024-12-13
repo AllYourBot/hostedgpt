@@ -28,7 +28,7 @@ class AIBackend::OpenAI < AIBackend
     }).dig("choices", 0, "message", "content")
 
   rescue ::Faraday::Error => e
-    e.message
+    "Error: #{e.message}"
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)
