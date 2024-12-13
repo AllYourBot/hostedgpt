@@ -1,16 +1,19 @@
 <turbo-stream action="replace" target="test_result">
   <template>
-    <div id="test_result" class="inline-block font-bold">
+    <div id="test_result" class="inline-block">
+      <span>
+        <%= link_to "(Test)",
+          settings_language_model_test_path(@language_model),
+          id: "test_result",
+          data: { turbo_stream: true, action: "click->testing#update_link" },
+          class: "underline text-blue-600"
+        %>
+      </span>
       <% if @answer.start_with?("Error:") %>
         <span class="text-red-700"><%= @answer %></span>
       <% else %>
         <span class="text-green-700">Result: <%= @answer %></span>
       <% end %>
-      <%= link_to "(Re-Test)",
-        settings_language_model_test_path(@language_model),
-        id: "test_result",
-        data: { turbo_stream: true, action: "click->testing#update_link" }
-      %>
     </div>
   </template>
 </turbo-stream>

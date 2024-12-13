@@ -16,18 +16,18 @@
     <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
-  <div data-controller="testing" class="my-5">
+  <div data-controller="testing" class="my-5 inline-block">
     <%= form.label :api_name %>
-    <div class="inline-block">
+    <span>
       <% if language_model.persisted? %>
         <% link_url = settings_language_models_path + "/" + language_model.id.to_s + "/test" %>
         <%= link_to "(Test)", link_url,
           id: "test_result",
           data: { turbo_stream: true, action: "click->testing#update_link" },
-          class: "inline-block ml-5"
+          class: "underline text-blue-600"
         %>
       <% end %>
-    </div>
+    </span>
     <%= form.text_field :api_name,
       data: { testing_target: "input" },
       class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black"
