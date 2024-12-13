@@ -14,17 +14,6 @@ class AIBackend::OpenAI < AIBackend
     end
   end
 
-  def initialize(user, assistant, conversation = nil, message = nil)
-    super(user, assistant, conversation, message)
-    begin
-      raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
-      Rails.logger.info "Connecting to OpenAI API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
-      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token)
-    rescue ::Faraday::UnauthorizedError => e
-      raise ::OpenAI::ConfigurationError
-    end
-  end
-
   def self.test_language_model(language_model, api_name = nil)
     api_name ||= language_model.api_name
 
@@ -40,6 +29,17 @@ class AIBackend::OpenAI < AIBackend
 
   rescue ::Faraday::Error => e
     e.message
+  end
+
+  def initialize(user, assistant, conversation = nil, message = nil)
+    super(user, assistant, conversation, message)
+    begin
+      raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
+      Rails.logger.info "Connecting to OpenAI API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
+      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token)
+    rescue ::Faraday::UnauthorizedError => e
+      raise ::OpenAI::ConfigurationError
+    end
   end
 
   private

@@ -15,6 +15,31 @@ class AIBackend::Gemini < AIBackend
     end
   end
 
+  def self.test_language_model(language_model, api_name = nil)
+    api_name ||= language_model.api_name
+
+    client = ::Gemini.new(
+      credentials: {
+        service: "generative-language-api",
+        api_key: language_model.api_service.effective_token,
+        version: "v1beta"
+      },
+      options: {
+        model: api_name,
+        server_sent_events: true
+      }
+    )
+
+    # TODO: Fix this. Response is 400 currently.
+    # response = client.generate_content({
+    #   system_instruction: "Hello!",
+    #   contents: { role: "user", parts: { text: "Hello!" }}
+    # })
+    # response.dig("candidates", 0, "content", "parts", 0, "text")
+
+    "Testing Not Implemented Yet"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin
@@ -85,10 +110,6 @@ class AIBackend::Gemini < AIBackend
       raise configuration_error
     end
     return nil
-  end
-
-  def self.test_language_model(language_model)
-    "Testing Not Implemented Yet"
   end
 
   private
