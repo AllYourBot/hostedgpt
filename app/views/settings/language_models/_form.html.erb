@@ -24,7 +24,7 @@
         <%= link_to "(Test)", link_url, id: "test_language_model", data: { turbo_stream: true, action: "click->test-language-model#update_link" }, class: "inline-block ml-5" %>
       <% end %>
     </div>
-    <%= form.text_field :api_name, data-test-language-model-target: "input", class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+    <%= form.text_field :api_name, data: { test_language_model_target: "input" }, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     <span>As specified in the API docs</span>
   </div>
 
