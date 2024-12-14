@@ -32,7 +32,7 @@ class AIBackend::Anthropic < AIBackend
     ).dig("content", 0, "text")
 
   rescue => e
-    e.message
+    "Error: #{e.message}"
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)

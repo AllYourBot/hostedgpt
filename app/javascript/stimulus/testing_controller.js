@@ -5,6 +5,6 @@ export default class extends Controller {
 
   update_link(event) {
     const link = event.currentTarget;
-    link.href = link.href + "?query=" + this.inputTarget.value
+    link.href = link.href + "?model=" + this.inputTarget.value
   }
 }

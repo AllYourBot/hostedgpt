@@ -36,7 +36,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
 
   def test
     @language_model = Current.user.language_models.find_by(id: params[:language_model_id])
-    @answer = @language_model.test(params[:query])
+    @answer = @language_model.test(params[:model])
 
     respond_to do |format|
       format.html { redirect_to settings_language_models_path, notice: "Tested: #{@answer}", status: :see_other }

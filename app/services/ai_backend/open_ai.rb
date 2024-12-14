@@ -16,17 +16,26 @@ class AIBackend::OpenAI < AIBackend
 
   def self.test_language_model(language_model, api_name = nil)
     api_name ||= language_model.api_name
-
-    client = ::OpenAI::Client.new(
-      access_token: language_model.api_service.effective_token,
-      uri_base: language_model.api_service.url
-    )
-
-    client.chat(parameters: {
+    params = {
       model: api_name,
       messages: [{ role: "user", content: "Hello!" }],
-    }).dig("choices", 0, "message", "content")
+    }
 
+    if Rails.env.test?
+      client = ::TestClient::OpenAI.new(
+        access_token: language_model.api_service.effective_token,
+        uri_base: language_model.api_service.url
+      )
+      response = client.send(:chat, ** {parameters: params})
+    else
+      client = ::OpenAI::Client.new(
+        access_token: language_model.api_service.effective_token,
+        uri_base: language_model.api_service.url
+      )
+      response = client.chat(parameters: params)
+    end
+
+    response.dig("choices", 0, "message", "content")
   rescue ::Faraday::Error => e
     "Error: #{e.message}"
   end
