@@ -1,7 +1,7 @@
 keith_openai_service:
   name: OpenAI
   user: keith
-  url: https://api.openai.com/
+  url: https://api.openai.com/v1/
   token: abc-secret
   driver: openai
 
@@ -30,7 +30,7 @@ keith_other_service:
 rob_openai_service:
   name: OpenAI
   user: rob
-  url: https://api.openai.com/
+  url: https://api.openai.com/v1/
   token: rob-secret
   driver: openai
 

@@ -2,7 +2,7 @@ module TestClient
   class OpenAI
     attr_reader :uri_base
 
-    def initialize(access_token:, uri_base:nil)
+    def initialize(access_token:, uri_base:nil, api_version: "")
       @uri_base = uri_base
     end
 

@@ -19,7 +19,7 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
   end
 
   test "openai url is properly set" do
-    assert_equal "https://api.openai.com/", @openai.client.uri_base
+    assert_equal "https://api.openai.com/v1/", @openai.client.uri_base
   end
 
   test "get_oneoff_message responds with a reply" do
