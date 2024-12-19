@@ -125,4 +125,38 @@ class ConversationTest < ActiveSupport::TestCase
       assert_equal 3, grouped_conversations["Older"].count
     end
   end
+
+  test "#grouped_by_increasing_time_interval_for_user with a query returning a single conversation title" do
+    user = users(:keith)
+    query = "Ruby"
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query).values.flatten
+
+    assert_equal 1, grouped_conversations.count
+    assert_equal conversations(:ruby_version), grouped_conversations.first, "Should have returned this conversation based on title"
+  end
+
+  test "#grouped_by_increasing_time_interval_for_user with a query returning a single conversation message" do
+    user = users(:keith)
+    query = "alive"
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query).values.flatten
+
+    assert_equal 1, grouped_conversations.count
+    assert_equal conversations(:greeting), grouped_conversations.first, "Should have returned this conversation based on message content"
+  end
+
+  test "#grouped_by_increasing_time_interval_for_user with a query returning matching conversation titles and a message" do
+    user = users(:keith)
+    query = "test"
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query).values.flatten
+
+    assert_equal 3, grouped_conversations.count
+    assert_equal [
+      conversations(:attachment).id, # matches title
+      conversations(:attachments).id, # matches title
+      conversations(:ruby_version).id # matches "latest" in messages
+    ].sort, grouped_conversations.map(&:id).sort, "Should have returned these conversations based on title and message content"
+  end
 end
