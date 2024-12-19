@@ -15,6 +15,29 @@ class AIBackend::Gemini < AIBackend
     end
   end
 
+  def self.test_language_model(language_model, api_name = nil)
+    api_name ||= language_model.api_name
+
+    client = ::Gemini.new(
+      credentials: {
+        service: "generative-language-api",
+        api_key: language_model.api_service.effective_token,
+        version: "v1beta"
+      },
+      options: {
+        model: api_name,
+        server_sent_events: true
+      }
+    )
+
+    client.generate_content({
+      contents: { role: "user", parts: { text: "Hello!" }}
+    }).dig("candidates", 0, "content", "parts", 0, "text")
+
+  rescue ::Faraday::Error => e
+    "Error: #{e.message}"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin
