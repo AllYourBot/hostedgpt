@@ -1,4 +1,4 @@
-<turbo-frame data-turbo-permanent id="nav-conversations">
+<turbo-frame id="nav-conversations">
   <section id="search"
     class="pt-6 text-gray-950 dark:text-gray-100 select-none"
   >
@@ -21,7 +21,6 @@
 	        |,
 	        data: {
 	          search_target: "input",
-            turbo_permanent: true,
 	          action: %|
 	            blur->search#unfocus
 	            input->search#search

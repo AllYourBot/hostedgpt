@@ -5,6 +5,10 @@ export default class extends Controller {
 
   inputTargetConnected() {
     this.setSearchClearIcon()
+    // Ensure the cursor is at the end of the input
+    this.inputTarget.selectionStart =
+      this.inputTarget.selectionEnd =
+        this.inputTarget.value.length
   }
 
   disconnect() {
