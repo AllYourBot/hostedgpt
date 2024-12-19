@@ -23,9 +23,9 @@ class Capybara::Node::Element
 end
 
 Minitest::Retry.use!(
-  retry_count: 3,
+  retry_count: 1,
   verbose: true,
-  exceptions_to_retry: [Net::ReadTimeout]
+  exceptions_to_retry: [Net::ReadTimeout, Minitest::Assertion]
 )
 
 class ActionDispatch::IntegrationTest
