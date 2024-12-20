@@ -17,11 +17,11 @@
   </div>
 
   <div data-controller="testing" class="my-5 inline-block w-full">
-    <%= form.label :api_name %>
+    <%= form.label :api_name, class: "mr-3" %>
     <span>
       <% if language_model.persisted? %>
         <% link_url = settings_language_models_path + "/" + language_model.id.to_s + "/test" %>
-        <%= link_to "(Test)", link_url,
+        <%= link_to "Test", link_url,
           id: "test_result",
           data: { turbo_stream: true, action: "click->testing#update_link" },
           class: "underline text-blue-600"
