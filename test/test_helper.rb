@@ -2,6 +2,7 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 require "minitest/autorun"
+require "minitest/retry"
 require "pry"
 require "webmock/minitest"
 
@@ -21,10 +22,19 @@ class Capybara::Node::Element
   end
 end
 
+Minitest::Retry.use!(
+  retry_count: 1,
+  verbose: true,
+  exceptions_to_retry: [Net::ReadTimeout, Minitest::Assertion]
+)
+
 class ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers
 
   Capybara.default_max_wait_time = 10
+
+  WebMock.disable_net_connect!(allow_localhost: true)
+
 
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
@@ -58,4 +68,8 @@ module ActiveSupport
     parallelize(workers: :number_of_processors)
     fixtures :all
   end
+end
+
+class ActionDispatch::SystemTestCase
+  parallelize(workers: Etc.nprocessors/2)
 end

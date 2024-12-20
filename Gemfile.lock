@@ -206,6 +206,8 @@ GEM
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.25.1)
+    minitest-retry (0.2.3)
+      minitest (>= 5.0)
     minitest-stub_any_instance (1.0.3)
     mize (0.4.1)
       protocol (~> 2.0)
@@ -507,6 +509,7 @@ DEPENDENCIES
   gemini-ai (~> 4.2.0)
   image_processing (~> 1.13.0)
   importmap-rails
+  minitest-retry
   minitest-stub_any_instance
   name_of_person
   omniauth (~> 2.1)
