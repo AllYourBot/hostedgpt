@@ -18,7 +18,7 @@ class AIBackend::OpenAI < AIBackend
     api_name ||= language_model.api_name
     params = {
       model: api_name,
-      messages: [{ role: "user", content: "Hello!" }],
+      messages: [{ role: "user", content: "I am testing the API. If you can see this message respond only with: API is working" }],
     }
 
     if Rails.env.test?

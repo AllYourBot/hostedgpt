@@ -31,7 +31,7 @@ class AIBackend::Gemini < AIBackend
     )
 
     client.generate_content({
-      contents: { role: "user", parts: { text: "Hello!" }}
+      contents: { role: "user", parts: { text: "I am testing the API. If you can see this message respond only with: API is working" }}
     }).dig("candidates", 0, "content", "parts", 0, "text")
 
   rescue ::Faraday::Error => e

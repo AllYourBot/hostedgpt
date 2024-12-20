@@ -25,9 +25,9 @@ class AIBackend::Anthropic < AIBackend
     response = client.messages(
       model: api_name,
       messages: [
-        { "role": "user", "content": "Hello!" }
+        { "role": "user", "content": "I am testing the API. If you can see this message respond only with: API is working" }
       ],
-      system: "You are a helpful assistant.",
+      system: "Only reply with what you are told",
       parameters: { max_tokens: 1000 }
     ).dig("content", 0, "text")
 
