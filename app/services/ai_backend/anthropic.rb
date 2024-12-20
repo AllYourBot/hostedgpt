@@ -14,6 +14,27 @@ class AIBackend::Anthropic < AIBackend
     end
   end
 
+  def self.test_language_model(language_model, api_name = nil)
+    api_name ||= language_model.api_name
+
+    client = ::Anthropic::Client.new(
+      uri_base: language_model.api_service.url,
+      access_token: language_model.api_service.effective_token
+    )
+
+    response = client.messages(
+      model: api_name,
+      messages: [
+        { "role": "user", "content": "I am testing the API. If you can see this message respond only with: API is working" }
+      ],
+      system: "Only reply with what you are told",
+      parameters: { max_tokens: 1000 }
+    ).dig("content", 0, "text")
+
+  rescue => e
+    "Error: #{e.message}"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin

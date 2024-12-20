@@ -38,7 +38,7 @@
   </div>
 
   <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-    <%= form.label :token %>
+    <%= form.label :token, class: "mr-3" %>
     <%= button_tag type: "button",
       id: "instructions",
       class: "underline text-blue-600 #{!official?(api_service) && 'hidden'}",
