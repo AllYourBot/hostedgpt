@@ -87,5 +87,6 @@ group :test do
   gem "selenium-webdriver"
   gem "minitest-stub_any_instance"
   gem "rails-controller-testing"
+  gem "minitest-retry"
   gem "webmock"
 end

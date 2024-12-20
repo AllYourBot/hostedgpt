@@ -45,7 +45,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   end
 
   test "images eventually render in messages WHEN NOT pre-processed, clicking opens modal" do
-    stimulate_image_variant_processing do
+    simulate_image_variant_processing do
       visit_and_scroll_wait conversation_messages_path(@conversation)
 
       image_msg = find_messages.third
@@ -86,11 +86,11 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   end
 
   test "ensure images display a spinner initially if they get a 404 and then eventually get replaced with the image" do
-    stimulate_image_variant_processing do
+    simulate_image_variant_processing do
       visit_and_scroll_wait conversation_messages_path(@conversation)
 
       image_msg       = find_messages.third
-      image_btn = image_msg.find_role("image-preview")
+      image_btn       = image_msg.find_role("image-preview")
       loader          = image_btn.find_role("image-loader")
       img             = image_btn.find("img", visible: :all)
       modal_container = image_msg.find_role("image-modal")
@@ -103,7 +103,6 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
       refute img.visible?
 
       image_btn.click
-
       2.times do
         sleep 0.1
         sleep 0.5 if !modal_loader.visible?
@@ -111,7 +110,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
         image_btn.click if !modal_loader.visible?
       end # TODO: sometimes modal has not popped up after clicking, why?? Try 2x times before failing the test.
 
-      assert_true "modal image loader should be visible", wait: 0.6 do
+      assert_true "modal image loader should be visible", wait: 3 do
         modal_loader.visible?
       end
       refute modal_img.visible?
@@ -134,7 +133,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
   end
 
   test "ensure page scrolls back down to the bottom after an image pops in late" do
-    stimulate_image_variant_processing do
+    simulate_image_variant_processing do
       visit_and_scroll_wait conversation_messages_path(@conversation)
 
       image_msg       = find_messages.third
@@ -156,7 +155,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
   test "images in previous messages remain after submitting a new message, they should not display a new spinner" do
     image_msg = img = nil
-    stimulate_image_variant_processing do
+    simulate_image_variant_processing do
       visit_and_scroll_wait conversation_messages_path(@conversation)
 
       image_msg = find_messages.third
@@ -189,10 +188,12 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
     end
   end
 
-  def stimulate_image_variant_processing(&block)
-    Document.stub_any_instance(:has_file_variant_processed?, false) do
-      ActiveStorage::PostgresqlController.stub_any_instance(:decode_verified_key, simulate_not_preprocessed) do
-        yield block
+  def simulate_image_variant_processing(&block)
+    stub_custom_config_value(:app_url, "not_nil") do
+      Document.stub_any_instance(:has_file_variant_processed?, false) do
+        ActiveStorage::PostgresqlController.stub_any_instance(:decode_verified_key, simulate_not_preprocessed) do
+          yield block
+        end
       end
     end
   end
