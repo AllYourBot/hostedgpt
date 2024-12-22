@@ -48,7 +48,7 @@ class Message < ApplicationRecord
   private
 
   def create_conversation
-    self.conversation = Conversation.create!(user: Current.user, assistant: assistant)
+    self.conversation = Conversation.create!(user: Current.user, assistant:)
   end
 
   def validate_conversation
@@ -60,12 +60,12 @@ class Message < ApplicationRecord
   end
 
   def start_assistant_reply
-    m = conversation.messages.create!(
-      assistant: assistant,
+    conversation.messages.create!(
+      assistant:,
       role: :assistant,
       content_text: nil,
-      version: version,
-      index: index+1
+      version:,
+      index: index + 1
     )
   end
 
@@ -75,7 +75,7 @@ class Message < ApplicationRecord
 
   def update_assistant_on_conversation
     return if conversation.assistant == assistant
-    conversation.update!(assistant: assistant)
+    conversation.update!(assistant:)
   end
 
   def update_input_token_cost

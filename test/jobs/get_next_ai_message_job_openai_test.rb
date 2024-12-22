@@ -43,7 +43,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     assert first_new_message.tool?
     assert_equal "Hello, Keith!".to_json, first_new_message.content_text, "First new message should have the result of calling the tool"
     assert first_new_message.tool_call_id.present?
-    assert first_new_message.content_tool_calls.blank?
+    assert first_new_message.content_tool_calls.present?
     assert_equal @message.content_tool_calls.dig(0, :id), first_new_message.tool_call_id, "ID of tool execution should have matched decision to call the tool"
     assert first_new_message.finished?, "This message SHOULD HAVE been considered finished"
 
@@ -135,11 +135,13 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   end
 
   test "when openai key is blank, a nice error message is displayed" do
-    api_service = @assistant.language_model.api_service
-    api_service.update!(token: "")
+    stub_features(default_llm_keys: false) do
+      api_service = @assistant.language_model.api_service
+      api_service.update!(token: "")
 
-    assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-    assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for OpenAI"
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+      assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for OpenAI"
+    end
   end
 
   test "when API response key is missing, a nice error message is displayed" do

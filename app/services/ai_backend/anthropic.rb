@@ -39,7 +39,7 @@ class AIBackend::Anthropic < AIBackend
     super(config)
 
     @client_config = {
-      model: @assistant.language_model.provider_name,
+      model: @assistant.language_model.api_name,
       system: config[:instructions],
       messages: config[:messages],
       parameters: {
@@ -71,8 +71,8 @@ class AIBackend::Anthropic < AIBackend
     rescue ::Faraday::UnauthorizedError => e
       raise ::Anthropic::ConfigurationError
     rescue => e
-      puts "\nUnhandled error in AIBackend::Anthropic response handler: #{e.message}"
-      puts e.backtrace
+      Rails.logger.info "\nUnhandled error in AIBackend::Anthropic response handler: #{e.message}"
+      Rails.logger.info e.backtrace
     end
   end
 

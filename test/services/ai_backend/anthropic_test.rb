@@ -24,7 +24,7 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     TestClient::Anthropic.stub :text, nil do # this forces it to fall back to default text
       streamed_text = ""
       @anthropic.stream_next_conversation_message { |chunk| streamed_text += chunk }
-      expected_start = "Hello this is model claude-3-5-sonnet-20240620 with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\n\\nFor the user, the current time"
+      expected_start = "Hello this is model claude-3-5-sonnet-20240620 with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\nHe owns a cat\\n\\nFor the user, the current time"
       expected_end = "\"! How can I assist you today?"
       assert streamed_text.start_with?(expected_start)
       assert streamed_text.end_with?(expected_end)
@@ -48,11 +48,11 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     end
   end
 
+  # TODO
   # test "preceding_conversation_messages only considers messages on the intended conversation version and includes the correct names" do
-  #   # TODO
   # end
 
+  # TODO
   # test "preceding_conversation_messages includes the appropriate tool details" do
-  #   # TODO
   # end
 end

@@ -6,7 +6,6 @@ class MessagesController < ApplicationController
   before_action :set_conversation,          only: [:index]
   before_action :set_assistant,             only: [:index, :new, :edit, :create]
   before_action :set_message,               only: [:show, :edit, :update]
-  before_action :set_nav_conversations,     only: [:index, :new]
   before_action :set_nav_assistants,        only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
 
@@ -46,7 +45,6 @@ class MessagesController < ApplicationController
       redirect_to conversation_messages_path(@message.conversation, version: @message.version), status: :see_other
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
-      set_nav_conversations
       set_nav_assistants
       @new_message = @assistant.messages.new
 
@@ -73,17 +71,13 @@ class MessagesController < ApplicationController
   end
 
   def set_assistant
-    @assistant = Current.user.assistants_including_deleted.find_by(id: params[:assistant_id])
+    @assistant = Current.user.assistants_including_deleted.find_by(slug: params[:assistant_id])
     @assistant ||= @conversation.latest_message_for_version(@version).assistant
   end
 
   def set_message
     @message = Message.find(params[:id])
     redirect_to root_url, status: :unauthorized if @message.conversation.user != Current.user
-  end
-
-  def set_nav_conversations
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
   end
 
   def set_nav_assistants

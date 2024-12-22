@@ -13,11 +13,11 @@ end %>
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
 <% done_thinking = !thinking && message.content_text.present? %>
-<% debug_tool_messages = false %>
+<% debug_tool_message = false %>
 
 <div
   id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !debug_tool_messages && "hidden" %>"
+  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !message_to_user_from_tool_call?(message) && !debug_tool_message && "hidden" %>"
   data-role="message"
   data-subrole="<%= message.role %>-message"
 
@@ -28,7 +28,6 @@ end %>
   data-playback-transition-outlet="#playback-control-<%= message.id %>"
   data-action="turbo:before-morph-attribute->playback#preserveStimulusValues"
 > <!-- this outer div persists throughout streaming updates -->
-
   <div
     class="flex"
     data-role="inner-message"
@@ -40,7 +39,7 @@ end %>
   > <!-- this inner div is replaced during streaming updates (inner_html of dom_id message) -->
 
     <!-- Left Column -->
-    <div class="w-6 ml-1 flex">
+    <div class="w-7 ml-1 flex">
       <%= render_avatar_for(message) %>
     </div>
 
@@ -57,7 +56,7 @@ end %>
       data-transition-toggle-class="hidden"
     >
       <div class="mt-[6px] mb-1 font-semibold" data-role="from">
-        <%= from_name_for(message) %>
+        <%= from_name_for(message) unless message.tool? %>
       </div>
 
       <turbo-frame id="message-text-<%= message.id %>">
@@ -107,10 +106,10 @@ end %>
               </div>
             <% end %>
           <% end %>
-          <%= formatted_text = format_for_display message.content_text, append_inside_tag: thinking_html(message, thinking) %>
+          <%= formatted_text = format_for_display message, append_inside_tag: thinking_html(message, thinking) %>
         </div>
 
-        <% if debug_tool_messages && message.content_tool_calls.present? %>
+        <% if debug_tool_message && message.content_tool_calls.present? %>
           <div
             data-role="content-text"
             class="prose break-words leading-normal dark:[&_*]:text-gray-100 dark:marker:text-gray-100"
@@ -123,6 +122,7 @@ end %>
           flex justify-start
           gap-2
           text-gray-600 dark:text-gray-300
+          h-[19px]
           <%= !last_message && done_thinking && 'invisible' %> group-hover:visible
         ">
           <% if message.versions.length > 1 %>

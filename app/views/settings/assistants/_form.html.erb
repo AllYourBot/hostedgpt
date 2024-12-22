@@ -24,6 +24,21 @@
       | %>
   </div>
 
+  <% unless assistant.new_record? %>
+    <div class="my-5">
+      <%= form.label :slug %>
+      <%= form.text_field :slug,
+        autofocus: assistant.new_record?,
+        class: %|
+          block w-full
+          border border-gray-200 outline-none
+          shadow rounded-md
+          px-3 py-2 mt-2
+          dark:text-black
+        | %>
+    </div>
+  <% end %>
+
   <div class="my-5">
     <%= form.label :language_model_id  %><br/>
     <%= form.select :language_model_id,

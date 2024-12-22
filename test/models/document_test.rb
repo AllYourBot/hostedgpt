@@ -1,6 +1,12 @@
 require "test_helper"
 
 class DocumentTest < ActiveSupport::TestCase
+  setup do
+    stub_custom_config_value(:app_url_protocol, "https")
+    stub_custom_config_value(:app_url_host, "example.com")
+    stub_custom_config_value(:app_url_port, nil)
+  end
+
   test "has an associated user" do
     assert_instance_of User, documents(:cat_photo).user
   end
@@ -39,15 +45,13 @@ class DocumentTest < ActiveSupport::TestCase
     assert document.file.attached?
   end
 
-  test "file_data_url returns for a file" do
-    prefix = "data:image/png;base64,"
-    assert documents(:cat_photo).file_data_url
-    assert documents(:cat_photo).file_data_url.starts_with?(prefix)
-    assert documents(:cat_photo).file_data_url.length > 40000
-  end
+  test "image_url returns data url when app_url is not set" do
+    stub_custom_config_value(:app_url, "") do
+      url = documents(:cat_photo).image_url(:small)
 
-  test "file_base64 returns a long string" do
-    assert documents(:cat_photo).file_base64.length > 40000
+      assert url.starts_with?("data:image/png;base64,")
+      assert url.length > 40000
+    end
   end
 
   test "has_file_variant_processed?" do
@@ -55,8 +59,11 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "fully_processed_url" do
-    assert documents(:cat_photo).fully_processed_url(:small).include?('rails/active_storage/postgresql')
-    assert documents(:cat_photo).fully_processed_url(:small).exclude?('/redirect')
+    stub_custom_config_value(:app_url, "https://example.com") do
+      assert documents(:cat_photo).fully_processed_url(:small).starts_with?("http")
+      assert documents(:cat_photo).fully_processed_url(:small).include?("rails/active_storage/postgresql")
+      assert documents(:cat_photo).fully_processed_url(:small).exclude?("/redirect")
+    end
   end
 
   test "redirect_to_processed_path" do

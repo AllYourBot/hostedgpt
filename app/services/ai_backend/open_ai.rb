@@ -19,7 +19,7 @@ class AIBackend::OpenAI < AIBackend
     begin
       raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to OpenAI API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
-      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token)
+      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token, api_version: "")
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
     end
@@ -40,7 +40,7 @@ class AIBackend::OpenAI < AIBackend
 
     @client_config = {
       parameters: {
-        model: @assistant.language_model.provider_name,
+        model: @assistant.language_model.api_name,
         messages: system_message(config[:instructions]) + config[:messages],
         stream: config[:streaming] && @response_handler || nil,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
@@ -80,15 +80,15 @@ class AIBackend::OpenAI < AIBackend
     rescue ::Faraday::UnauthorizedError => e
       raise OpenAI::ConfigurationError
     rescue => e
-      puts "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
-      puts e.backtrace.join("\n")
+      Rails.logger.info "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
+      Rails.logger.info e.backtrace.join("\n")
     end
   end
 
   def system_message(content)
     [{
       role: "system",
-      content: content,
+      content:,
     }]
   end
 
@@ -110,8 +110,8 @@ class AIBackend::OpenAI < AIBackend
         {
           role: message.role,
           name: message.name_for_api,
-          content: message.content_text,
-          tool_calls: message.content_tool_calls, # only for some assistant messages
+          content: (JSON.parse(message.content_text).except("message_to_user").to_json rescue message.content_text),
+          tool_calls: message.assistant? ? message.content_tool_calls : nil, # only for some assistant messages
           tool_call_id: message.tool_call_id,     # only for tool messages
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
       end

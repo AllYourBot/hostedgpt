@@ -3,7 +3,7 @@
 ### START of FLY ####
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=3.3.5
+ARG RUBY_VERSION=3.3.6
 FROM quay.io/evl.ms/fullstaq-ruby:${RUBY_VERSION}-jemalloc-slim as base-for-fly
 
 LABEL fly_launch_runtime="rails"
@@ -53,7 +53,7 @@ RUN bundle exec bootsnap precompile app/ lib/
 RUN grep -l '#!/usr/bin/env ruby' /rails/bin/* | xargs sed -i '/^#!/aDir.chdir File.expand_path("..", __dir__)'
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 VALIDATE_ENV_VARS=0 ./bin/rails assets:precompile
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
 # Final stage for app image
@@ -89,7 +89,8 @@ EXPOSE 3000
 #### START of DEV ####
 
 # RUBY_VERSION is the only thing used from anything above
-FROM ruby:${RUBY_VERSION}-alpine AS development
+FROM ruby:${RUBY_VERSION}-alpine@sha256:caeab43b356463e63f87af54a03de1ae4687b36da708e6d37025c557ade450f8 AS development
+# TODO: When we bump to a new version of ruby we'll ahve to unpin from this specific sha
 
 RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
 
@@ -134,7 +135,7 @@ COPY . .
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN bundle exec bootsnap precompile --gemfile app/ lib/
-RUN SECRET_KEY_BASE_DUMMY=1 VALIDATE_ENV_VARS=0 ./bin/rails assets:precompile
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 RUN mkdir -p log tmp bin
 

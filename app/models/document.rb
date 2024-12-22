@@ -30,27 +30,15 @@ class Document < ApplicationRecord
   def image_url(variant, fallback: nil)
     return nil unless has_image?
 
-    if has_file_variant_processed?(variant)
+    if Rails.application.config.x.app_url.blank?
+      file_data_url(variant)
+    elsif has_file_variant_processed?(variant)
       fully_processed_url(variant)
     elsif fallback.nil?
       redirect_to_processed_path(variant)
     else
       fallback
     end
-  end
-
-  def file_data_url(variant = :large)
-    return nil if !file.attached?
-
-    "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
-  end
-
-  def file_base64(variant = :large)
-    return nil if !file.attached?
-    wait_for_file_variant_to_process!(variant.to_sym)
-
-    file_contents = file.variant(variant.to_sym).processed.download
-    base64 = Base64.strict_encode64(file_contents)
   end
 
   def has_file_variant_processed?(variant)
@@ -75,7 +63,18 @@ class Document < ApplicationRecord
     )
   end
 
+  def file_base64(variant = :large)
+    return nil if !file.attached?
+    wait_for_file_variant_to_process!(variant.to_sym)
+    file_contents = file.variant(variant.to_sym).processed.download
+    base64 = Base64.strict_encode64(file_contents)
+  end
+
   private
+
+  def file_data_url(variant = :large)
+    "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
+  end
 
   def set_default_user
     self.user ||= message.conversation.user

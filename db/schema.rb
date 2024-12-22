@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_10_22_053212) do
+ActiveRecord::Schema[7.2].define(version: 2024_12_12_091318) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -72,9 +72,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_22_053212) do
     t.bigint "language_model_id"
     t.datetime "deleted_at", precision: nil
     t.text "external_id", comment: "The Backend AI's (e.g OpenAI) assistant id"
+    t.string "slug"
     t.index ["external_id"], name: "index_assistants_on_external_id", unique: true
     t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
     t.index ["user_id", "deleted_at"], name: "index_assistants_on_user_id_and_deleted_at"
+    t.index ["user_id", "slug"], name: "index_assistants_on_user_id_and_slug", unique: true, where: "(slug IS NOT NULL)"
     t.index ["user_id"], name: "index_assistants_on_user_id"
   end
 
@@ -172,6 +174,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_22_053212) do
     t.boolean "supports_tools", default: false
     t.decimal "input_token_cost_cents", precision: 30, scale: 15
     t.decimal "output_token_cost_cents", precision: 30, scale: 15
+    t.boolean "best", default: false
+    t.boolean "supports_system_message", default: false
     t.index ["api_service_id"], name: "index_language_models_on_api_service_id"
     t.index ["user_id", "deleted_at"], name: "index_language_models_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_language_models_on_user_id"

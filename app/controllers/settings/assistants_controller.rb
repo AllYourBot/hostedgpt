@@ -38,7 +38,7 @@ class Settings::AssistantsController < Settings::ApplicationController
   private
 
   def set_assistant
-    @assistant = Current.user.assistants.find_by(id: params[:id])
+    @assistant = Current.user.assistants.find_by(slug: params[:id])
     if @assistant.nil?
       redirect_to new_settings_assistant_url, notice: "The assistant was deleted", status: :see_other
     end
@@ -49,6 +49,6 @@ class Settings::AssistantsController < Settings::ApplicationController
   end
 
   def assistant_params
-    params.require(:assistant).permit(:name, :description, :instructions, :language_model_id)
+    params.require(:assistant).permit(:name, :slug, :description, :instructions, :language_model_id)
   end
 end

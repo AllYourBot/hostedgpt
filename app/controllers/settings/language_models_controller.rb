@@ -3,7 +3,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   before_action :set_system_language_model, only: [:show]
 
   def index
-    @language_models = LanguageModel.for_user(Current.user).order(updated_at: :desc)
+    @language_models = LanguageModel.for_user(Current.user).ordered
   end
 
   def edit
@@ -53,6 +53,6 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   end
 
   def language_model_params
-    params.require(:language_model).permit(:api_name, :name, :supports_images, :supports_tools, :api_service_id)
+    params.require(:language_model).permit(:api_name, :name, :best, :supports_images, :supports_tools, :api_service_id, :supports_system_message)
   end
 end

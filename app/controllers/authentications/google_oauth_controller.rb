@@ -97,7 +97,7 @@ class Authentications::GoogleOauthController < ApplicationController
   def add_person_credentials(type)
     p = Current.person || @person
     c = p.user.credentials.build(
-      type: type,
+      type:,
       oauth_id: auth[:uid],
       oauth_email: auth[:info][:email],
       oauth_token: auth[:credentials][:token],

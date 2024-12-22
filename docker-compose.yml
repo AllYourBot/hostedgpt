@@ -1,19 +1,22 @@
 services:
   postgres:
     image: postgres:16
+    container_name: hostedgpt_postgres
     restart: always
     environment:
-      POSTGRES_USER: app
-      POSTGRES_DB: app_development
-      POSTGRES_PASSWORD: secret
+      # NOTE: This Docker compose is intended for development. It does NOT support DATABASE_URL.
+      - POSTGRES_USER=${HOSTED_DB_USERNAME:-app}
+      - POSTGRES_PASSWORD=${HOSTED_DB_PASSWORD:-secret}
+      - POSTGRES_DB=${HOSTED_DB_NAME:-app}_development
     volumes:
       - hostedgpt_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "app", "-d", "app_development"]
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
       interval: 1s
       retries: 5
 
   base: &base
+    container_name: hostedgpt
     depends_on: ["postgres"]
     restart: on-failure:3
     tty: true
@@ -22,11 +25,15 @@ services:
       target: development
     environment:
       # Be sure to add environment variables to config/options.yml
+      - HOSTED_DB_USERNAME=${HOSTED_DB_USERNAME:-app}
+      - HOSTED_DB_PASSWORD=${HOSTED_DB_PASSWORD:-secret}
+      - HOSTED_DB_HOST=${HOSTED_DB_HOST:-postgres}
+      - HOSTED_DB_PORT=${HOSTED_DB_PORT:-5432}
+      - HOSTED_DB_NAME=${HOSTED_DB_NAME:-app}
+      # NOTE: Using DATABASE_URL to configure db is NOT supported by this Docker compose
       - APP_URL_PROTOCOL
       - APP_URL_HOST
       - APP_URL_PORT
-      - VALIDATE_ENV_VARS
-      - DATABASE_URL=postgres://app:secret@postgres/app_development
       - DEV_HOST=${DEV_HOST:-localhost} # Set if you want to use a different hostname
       - OVERMIND_COLORS=2,3,5
       - ALLOWED_REQUEST_ORIGINS

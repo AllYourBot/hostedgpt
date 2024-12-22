@@ -57,9 +57,7 @@ class APIServiceTest < ActiveSupport::TestCase
   end
 
   test "can create record" do
-    assert_nothing_raised do
-      APIService.create!(create_params)
-    end
+    assert APIService.create!(create_params)
   end
 
   test "soft delete also soft deletes language_models" do

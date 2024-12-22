@@ -34,6 +34,12 @@ hello_claude:
   title: Meeting Claude
   last_assistant_message: claude_age_replying
 
+gemini_conversation:
+  user: keith
+  assistant: keith_gemini
+  title: Meeting Gemini
+  last_assistant_message: hello_gemini
+
 debugging:
   user: rob
   assistant: rob_gpt4
@@ -85,6 +91,12 @@ image_generation:
   assistant: samantha
   title: Generating an image
   last_assistant_message: image_generation_explained
+
+memorize:
+  user: keith
+  assistant: samantha
+  title: Memorize
+  last_assistant_message: keep_memory_explained
 
 trees:
   user: keith

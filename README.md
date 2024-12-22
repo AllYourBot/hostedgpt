@@ -22,23 +22,23 @@ This project is led by an experienced rails developer, but I'm actively looking 
 
 - [Top features of HostedGPT](#top-features-of-hostedgpt)
   - [Watch a short demo](#watch-a-short-demo)
-- [Table of Contents](#table-of-contents)
 - [Deploy the app on Render](#deploy-the-app-on-render)
   - [Troubleshooting Render](#troubleshooting-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
 - [Deploy on your own server](#deploy-on-your-own-server)
+- [Running locally on your computer](#running-locally-on-your-computer)
+  - [Alternatively, you can run outside of Docker](#alternatively-you-can-run-outside-of-docker)]
 - [Configure optional features](#configure-optional-features)
   - [Give assistant access to your Google apps](#configuring-google-tools)
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
     - [Google OAuth authentication](#google-oauth-authentication)
+    - [Microsoft Graph OAuth authentication](#microsoft-graph-oauth-authentication)
     - [HTTP header authentication](#http-header-authentication)
 - [Contribute as a developer](#contribute-as-a-developer)
-  - [Running locally](#Running-locally)
-    - [Alternatively, you can skip Docker:](#alternatively-you-can-set-skip-docker)
-  - [Running tests](#running-tests)
-- [Understanding the Docker configuration](#understanding-the-docker-configuration)
+  - [Running the test suite](#running-the-test-suite)
+  - [Understanding the Docker configuration](#understanding-the-docker-configuration)
 - [Changelog](#changelog)
 
 ## Deploy the app on Render
@@ -81,18 +81,19 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free service so Fly is actually less expensive over the long term.
 
-1. Click Fork > Create New Fork at the top of this repository. Pull your forked repository down to your computer (the usual git clone ...).
+1. Click Fork > Create New Fork at the top of this repository. **Pull your forked repository down to your computer (the usual git clone ...)**.
+1. Go into the directory you just created with your git clone and run `bundle`
 1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise `curl -L https://fly.io/install.sh | sh` ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
-1. Think of an internal Fly name for your app, it has to be unique to all of Fly, and then in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME_YOU_CHOSE`
+1. Think of an internal Fly name for your app, it has to be unique to all of Fly. You'll use this **APP_NAME** three times in the steps below. First, in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME`
 
    - Say "Yes" when it asks if you want to tweak these settings
 
-1. When it opens your browser, change the Database to `Fly Postgres` with a unique name such as `[APP_NAME]-db` and you can set the configuration to `Development`.
+1. When it opens your browser, (i) change the Database to `Fly Automated Postgres`, (ii) set the name to be `[APP_NAME]-db`, (iii) and you can set the configuration to `Development`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
-1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and save the Postgres username & password somewhere as you'll never be able to see those again.
-1. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly.
+1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and **save the Postgres username & password somewhere as you'll never be able to see those again**.
+1. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly. (If you get an error you may have forgotten to run `bundle`).
 1. Run `fly deploy --ha=false`
-1. Assuming you chose `Development` as the DB size in the step above, now you should run `bin/rails db:fly[APP_NAME_FROM_EARLIER,swap,512]` This will increase the swap on your database machine so that it doesn't crash.
+1. Assuming you chose `Development` as the DB size in the step above, now you should run `bin/rails db:fly[APP_NAME,swap,512]` This will increase the swap on your database machine so that it doesn't crash since the Development database has less ram.
 
 You may want to read about [configuring optional features](#configure-optional-features).
 
@@ -152,16 +153,65 @@ If you are running a proxy such as nginx, be aware that the app is running http 
 </VirtualHost>
 ```
 
+## Running locally on your computer
+
+The easiest way to get up and running is to use the provided Docker compose workflow. The only things you need installed on your computer are Docker and Git.
+
+1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running
+1. Clone your fork `git clone [repository url]`
+1. `cd` into your clone
+1. Run `docker compose up --build` to start the app
+1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
+1. Run tests: `docker compose run base rails test` The app has comprehensive test coverage but note that system tests currently do not work in docker.
+1. Open the rails console: `docker compose run base rails console`
+1. Run a psql console: `docker compose run base psql`
+1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `docker compose run base rails db:fixtures:load`
+1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
+
+Every time you pull new changes down, kill docker (if it's running) and re-run:
+`docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
+
+If you are doing development see [Running the test suite](#running-the-test-suite).
+
+If you need to make changes to the Docker configuration, see the [Understanding the Docker configuration](#understanding-the-docker-configuration).
+
+If you want to run your LLM locally so the app has no online dependencies, see [Running an LLM on your computer](https://github.com/AllYourBot/hostedgpt/discussions/471).
+
+### Alternatively, you can run outside of Docker
+
+HostedGPT requires these services to be running:
+
+- Postgres (`brew install postgresql@16` or other [install instructions](https://www.postgresql.org/download/))
+- rbenv ([installation instructions](https://github.com/rbenv/rbenv))
+- ImageMagick (`brew install imagemagick` should work on Mac )
+
+1. `cd` into your local repository clone
+1. `rbenv install` to install the correct ruby version (it reads the .ruby-version in the repo)
+1. Do NOT run db:setup as it will not configure encryption properly. Proceed to the next step and it will automatically configure the database.
+1. `bin/dev` starts up all the services, installs gems, and handles db. The app will automatically configure a database, but check [Configure optional features](#configure-optional-features) if you need to change the default configuration.
+1. Open [http://localhost:3000](http://localhost:3000) and register as a new user.
+1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
+1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
+1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `bin/rails db:fixtures:load`
+
+Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
+
+If you are doing development see [Running the test suite](#running-the-test-suite).
+
+If you want to run your LLM locally so the app has no online dependencies, see [Running an LLM on your computer](https://github.com/AllYourBot/hostedgpt/discussions/471).
+
 ## Configure optional features
 
 There are a number of optional feature flags that can be set and settings that can be configured. All of these can be seen in the file `options.yml`, however each is explained below and can be activated by setting environment variables.
 
 - `PRODUCTION_HOST` is blank but you should ideally set this if you are deploying the app with a public domain to protect against host header attacks. For example, set it to `example.com` (leave off https). You may add multiple host names separated by comma, `example.fly.dev, example.com` (whitespace is ignored).
+- Database defaults can be changed with `HOSTED_DB_USERNAME`, `HOSTED_DB_PASSWORD`, `HOSTED_DB_HOST`, `HOSTED_DB_PORT`, and `HOSTED_DB_NAME` (note: _development, _test, and/or _production will be appended after DB_NAME based on the environment).
 - `REGISTRATON_FEATURE` is `true` by default, but you can set to `false` to prevent any new people from creating an account.
 - `DEFAULT_LLM_KEYS` is `false` by default so each user is expected to add LLM API keys to their user settings. Set this to `true` if you want to configure LLM API keys that will be shared by all users. Set one or more of the additional variables in order to use this feature. The app will still check if the user has added their own API keys for any services and will use those instead of the default ones.
   - `DEFAULT_OPENAI_KEY` will be used by the pre-configured OpenAI API Service
   - `DEFAULT_ANTHROPIC_KEY` will be used by the pre-configured Anthropic API Service
   - `DEFAULT_GROQ_KEY` will be used by the pre-configured Groq API Service
+- Edit `models.yml` to modify which Language Models are automatically created for new users upon signing up. Any changes to this file will be applied to existing users when `rails models:import` is run, or when `rails db:prepare` is run, or when the server is restarted. If you ever need to export your list of models you can do `rails models:export[tmp/models.json]`
 - `CLOUDFLARE_STORAGE_FEATURE` is `false` by default so any files that are uploaded while chatting with your assistant will be stored in postgres. This is recommended for small deployments. Set this to `true` if you would like to store message attachments in Cloudflare's R2 storage (this mimics AWS S3). You must also sign up for Cloudflare. The free tier allows 10 GB of storage. After you sign up, you need to create a new bucket and an API token. The API token should have "Object Read and Write" access to your bucket. Take note of your Access Key ID and your Secret Access Key along with your Account ID. Set the following environment variables:
   - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare Account ID
   - `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
@@ -195,6 +245,7 @@ HostedGPT supports multiple authentication methods:
 
 - [Password authentication](#password-authentication)
 - [Google OAuth authentication](#google-oauth-authentication)
+- [Microsoft Graph OAuth authentication](#microsoft-graph-oauth-authentication)
 
 #### Password authentication
 
@@ -208,6 +259,14 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
 
 - `GOOGLE_AUTH_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_AUTH_CLIENT_SECRET` - Google OAuth client secret
+
+Alternately, add the following to your encrypted credentials file:
+
+```yaml
+google:
+  auth_client_id: <your client id>
+  auth_client_secret: <your client secret>
+```
 
 **Steps to set up:**
 
@@ -247,6 +306,52 @@ To enable Google OAuth authentication, you need to set up Google OAuth in the Go
      - `GOOGLE_AUTH_CLIENT_ID`: Your Client ID
      - `GOOGLE_AUTH_CLIENT_SECRET`: Your Client Secret
 
+#### Microsoft Graph OAuth authentication
+
+Microsoft Graph OAuth authentication is disabled by default. You can enable it by setting `MICROSOFT_GRAPH_AUTHENTICATION_FEATURE` to `true`.
+
+To enable Microsoft Graph OAuth authentication, you need to set up Microsoft Graph OAuth in the Microsoft Azure portal. It's a bit involved but we've outlined the steps below. After you follow these steps you will set the following environment variables:
+
+- `MICROSOFT_GRAPH_AUTH_CLIENT_ID` - Microsoft Graph OAuth client ID
+- `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET` - Microsoft Graph OAuth client secret
+- `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read mailboxsettings.read`.
+
+Alternately, add the following to your encrypted credentials file:
+
+```yaml
+microsoft_graph:
+  auth_client_id: <your client id>
+  auth_client_secret: <your client secret>
+  scope: openid profile email offline_access user.read mailboxsettings.read
+```
+
+Users will need to have setup their full name in their Microsoft account before they can use this authentication method, via <https://profile.live.com/>, otherwise they will see a login/registration error like "First name can't be blank and last name can't be blank".
+
+Users can remotely remove the connection between their Microsoft account and HostedGPT by going to <https://account.microsoft.com/privacy/app-access> and clicking "Don't Allow" on the corresponding application. However, this will not sign out the user from HostedGPT until the session expires.
+
+**Steps to set up:**
+
+1. **Go to the Microsoft Azure portal and create a new application:**
+
+   - Navigate to [Register an application](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType)
+   - Give it a name
+   - Select the Supported account types
+   - Select the Redirect URI for "Web" (e.g., `https://example.com/auth/microsoft/callback` or `http://localhost:3000/auth/microsoft/callback`)
+   - Click Register
+
+2. **Create OAuth Credentials:**
+
+   - The client ID ("Application (client) ID") is displayed on the Overview page
+   - To generate a client secret, click on "Add a certificate or secret" > "New client secret"
+   - Give it a name and pick an expiration date
+   - Back on the "Certificates & secrets" page, the new client secret will be listed under "Value"
+
+3. **Set Environment Variables:**
+   - Set the Client ID and Client Secret as environment variables in your application:
+     - `MICROSOFT_GRAPH_AUTH_CLIENT_ID`: Your Client ID
+     - `MICROSOFT_GRAPH_AUTH_CLIENT_SECRET`: Your Client Secret
+     - `MICROSOFT_GRAPH_SCOPE` - Space separated list of scopes to request. This defaults to `openid profile email offline_access user.read mailboxsettings.read`.
+
 #### HTTP header authentication
 
 Note: Enabling this automatically disables Password-based and Google-auth based authentication.
@@ -274,49 +379,15 @@ HTTP header authentication is an alternative method to authenticate users based 
 
 We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently wrapping up v0.7 and starting 0.8 [View 0.8 Milestone](https://github.com/allyourbot/hostedgpt/milestone/8). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
-### Running locally
+Get your development environment set up by running the Rails app directly on your machine either with Docker or outside of Docker. See [Running locally on your computer](#running-locally-on-your-computer) for more details.
 
-The easiest way to get up and running is to use the provided Docker compose workflow. The only things you need installed on your computer are Docker and Git.
-
-1. Make sure you have [Docker Desktop](https://docs.docker.com/desktop/) installed and running
-1. Clone your fork `git clone [repository url]`
-1. `cd` into your clone
-1. Run `docker compose up --build` to start the app
-1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
-1. Run tests: `docker compose run base rails test` The app has comprehensive test coverage but note that system tests currently do not work in docker.
-1. Open the rails console: `docker compose run base rails console`
-1. Run a psql console: `docker compose run base psql`
-1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `docker compose run base rails db:fixtures:load`
-1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
-
-Every time you pull new changes down, kill docker (if it's running) and re-run:
-`docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
-
-#### Alternatively, you can skip Docker
-
-HostedGPT requires these services to be running:
-
-- Postgres ([installation instructions](https://www.postgresql.org/download/))
-- rbenv ([installation instructions](https://github.com/rbenv/rbenv))
-- ImageMagick (`brew install imagemagick` should work on Mac )
-
-1. `cd` into your local repository clone
-1. `rbenv install` to install the correct ruby version (it reads the .ruby-version in the repo)
-1. `bin/dev` starts up all the services, installs gems, and inits database (don't run **db:setup** as it will not configure encryption properly)
-1. Open [http://localhost:3000](http://localhost:3000) and register as a new user
-1. `bin/rails test` and `bin/rails test:system` to run the comprehensive tests
-1. The project root has an `.editorconfig` file to help eliminate whitespace differences in pull requests. It's nice if you install an extension in your IDE to utilize this (e.g. VS Code has "EditorConfig for VS Code").
-1. If you want a few fake users and a bunch of conversations and other data pre-populated in the database, you can load fixtures into the development database. This can be helpful, for example, if you want to test a migration and save yourself the time manually creating a bunch of data: `bin/rails db:fixtures:load`
-
-Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
-
-### Running tests
+### Running the test suite
 
 If you're set up with Docker you run `docker compose run base rails test`. Note that the system tests, which use a headless browser, are not able to run in Docker. They will be run automatically for you if you create a Pull Request against the project.
 
 If you set up the app outside of Docker, then run the usual `bin/rails test` and `bin/rails test:system`.
 
-## Understanding the Docker configuration
+### Understanding the Docker configuration
 
 The `Dockerfile` is set up to support three distinct situations: development, deploying to Render, and deploying to Fly. Each of these are completely separate targets which don't share any steps, they are simply in the same Dockerfile.
 

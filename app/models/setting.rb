@@ -27,5 +27,9 @@ class Setting
         end
       end
     end
+
+    def key_set?(key)
+      send(key).present?
+    end
   end
 end

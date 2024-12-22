@@ -8,6 +8,7 @@ class Toolbox < SDK
       Toolbox::OpenMeteo,
       Toolbox::Dalle,
       Toolbox::Memory,
+      Toolbox::GoogleSearch,
       gmail_active && Toolbox::Gmail,
       tasks_active && Toolbox::GoogleTasks,
     ].compact

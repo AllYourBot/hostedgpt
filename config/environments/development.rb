@@ -87,8 +87,9 @@ Rails.application.configure do
 
   config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16", "172.18.0.0/16"]
 
-  config.hosts << Setting.app_url_host
+  # TODO should we combine this with APP_URL_HOST?
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
+  config.hosts << Setting.app_url_host if Setting.key_set?(:app_url_host)
 
   stdout_logger = ActiveSupport::Logger.new(STDOUT)
   tagged_logger = ActiveSupport::TaggedLogging.new(stdout_logger)

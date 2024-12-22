@@ -2,7 +2,7 @@ require "test_helper"
 
 class Message::ToolableTest < ActiveSupport::TestCase
   setup do
-    @has_tool_response = { role: :tool, tool_call_id: "abc123", content_text: "success" }
+    @has_tool_response = { role: :tool, tool_call_id: "abc123", content_text: "success", content_tool_calls: { function: "hello" } }
     @has_tool_calls = { content_tool_calls: { func: "hello" } }
     @has_content_text = { content_text: "Hello" }
   end

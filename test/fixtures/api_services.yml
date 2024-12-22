@@ -1,7 +1,7 @@
 keith_openai_service:
   name: OpenAI
   user: keith
-  url: https://api.openai.com/
+  url: https://api.openai.com/v1/
   token: abc-secret
   driver: openai
 
@@ -30,9 +30,16 @@ keith_other_service:
 rob_openai_service:
   name: OpenAI
   user: rob
-  url: https://api.openai.com/
+  url: https://api.openai.com/v1/
   token: rob-secret
   driver: openai
+
+keith_gemini_service:
+  name: Gemini
+  user: keith
+  url: https://generativelanguage.googleapis.com/v1beta/
+  token: keith-secret
+  driver: gemini
 
 rob_anthropic_service:
   name: Anthropic

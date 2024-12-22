@@ -1,40 +1,40 @@
 class SDK
   def get(url, token = nil)
     SDK::Get.new(
-      url: url,
+      url:,
       bearer_token: token || bearer_token,
-      expected_status: expected_status,
-      header: header,
+      expected_status:,
+      header:,
       calling_method: calling_method(__method__),
     )
   end
 
   def post(url, token = nil)
     SDK::Post.new(
-      url: url,
+      url:,
       bearer_token: token || bearer_token,
-      expected_status: expected_status,
-      header: header,
+      expected_status:,
+      header:,
       calling_method: calling_method(__method__),
     )
   end
 
   def patch(url, token = nil)
     SDK::Patch.new(
-      url: url,
+      url:,
       bearer_token: token || bearer_token,
-      expected_status: expected_status,
-      header: header,
+      expected_status:,
+      header:,
       calling_method: calling_method(__method__),
     )
   end
 
   def delete(url, token = nil)
     SDK::Delete.new(
-      url: url,
+      url:,
       bearer_token: token || bearer_token,
-      expected_status: expected_status,
-      header: header,
+      expected_status:,
+      header:,
       calling_method: calling_method(__method__),
     )
   end

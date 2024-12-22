@@ -91,6 +91,7 @@ class MessageTest < ActiveSupport::TestCase
         assistant: assistants(:samantha),
         role: :tool,
         content_text: "tool response",
+        content_tool_calls: { type: "function", function: { name: "memory", arguments: "memory" } },
       )
     end
   end
@@ -101,17 +102,30 @@ class MessageTest < ActiveSupport::TestCase
         assistant: assistants(:samantha),
         role: :tool,
         tool_call_id: "tool_1234",
+        content_tool_calls: { type: "function", function: { name: "memory", arguments: "memory" } },
       )
     end
   end
 
-  test "creating a tool message succeeds with both tool_call_id and content_text" do
+  test "creating a tool message fails without a content_tool_calls" do
+    assert_raises ActiveRecord::RecordInvalid do
+      conversations(:weather).messages.create!(
+        assistant: assistants(:samantha),
+        role: :tool,
+        content_text: "tool response",
+        tool_call_id: "tool_1234",
+      )
+    end
+  end
+
+  test "creating a tool message succeeds with tool_call_id, content_text, and content_tool_calls" do
     assert_nothing_raised do
       conversations(:weather).messages.create!(
         assistant: assistants(:samantha),
         role: :tool,
         content_text: "tool response",
         tool_call_id: "tool_1234",
+        content_tool_calls: { type: "function", function: { name: "memory", arguments: "memory" } },
       )
     end
   end
@@ -123,7 +137,7 @@ class MessageTest < ActiveSupport::TestCase
 
     assert_raises ActiveRecord::RecordInvalid do
       Message.create!(
-        assistant: assistant,
+        assistant:,
         conversation: conversation_owned_by_someone_else,
         content_text: "This should fail"
       )
@@ -137,8 +151,8 @@ class MessageTest < ActiveSupport::TestCase
 
     assert_nothing_raised do
       message = Message.create!(
-        assistant: assistant,
-        conversation: conversation,
+        assistant:,
+        conversation:,
         content_text: "This works since Conversation is owned by Current.user"
       )
       assert_equal Current.user, message.conversation.user
@@ -154,8 +168,8 @@ class MessageTest < ActiveSupport::TestCase
 
     assert_nothing_raised do
       message = Message.create!(
-        assistant: assistant,
-        conversation: conversation,
+        assistant:,
+        conversation:,
         content_text: "This works since Current.user not set"
       )
     end
