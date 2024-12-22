@@ -103,7 +103,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     json_content_text = JSON.parse(content_text)
     assert_equal image_generation_prompt, json_content_text["prompt_given"], "First new message should have the result of calling the tool"
     assert first_new_message.tool_call_id.present?
-    assert first_new_message.content_tool_calls.blank?
+    assert first_new_message.content_tool_calls.present?
     assert_equal @image_generation_message.content_tool_calls.dig(0, :id), first_new_message.tool_call_id, "ID of tool execution should have matched decision to call the tool"
     assert first_new_message.finished?, "This message SHOULD HAVE been considered finished"
 
