@@ -14,15 +14,15 @@ class AIBackend::Anthropic < AIBackend
     end
   end
 
-  def self.test_language_model(language_model, api_name = nil)
-    api_name ||= language_model.api_name
-
+  def self.test_execute(url, token, api_name)
+    Rails.logger.info "Connecting to Anthropic API server at #{url} with access token of length #{token.to_s.length}"
     client = ::Anthropic::Client.new(
-      uri_base: language_model.api_service.url,
-      access_token: language_model.api_service.effective_token
+      uri_base: url,
+      access_token: token
     )
 
-    response = client.messages(
+    Rails.logger.info "Testing using model #{api_name}"
+    client.messages(
       model: api_name,
       messages: [
         { "role": "user", "content": "Hello!" }
@@ -30,7 +30,6 @@ class AIBackend::Anthropic < AIBackend
       system: "You are a helpful assistant.",
       parameters: { max_tokens: 1000 }
     ).dig("content", 0, "text")
-
   rescue => e
     "Error: #{e.message}"
   end

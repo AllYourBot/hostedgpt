@@ -19,7 +19,9 @@ Rails.application.routes.draw do
     resources :language_models do
       get :test, to: "language_models#test"
     end
-    resources :api_services, except: [:show]
+    resources :api_services, except: [:show]  do
+      get :test, to: "api_services#test"
+    end
     resources :memories, only: [:index, :destroy] do
       delete :destroy, to: "memories#destroy_all", on: :collection
     end

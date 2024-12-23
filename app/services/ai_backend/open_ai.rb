@@ -14,25 +14,22 @@ class AIBackend::OpenAI < AIBackend
     end
   end
 
-  def self.test_language_model(language_model, api_name = nil)
-    api_name ||= language_model.api_name
-    params = {
-      model: api_name,
-      messages: [{ role: "user", content: "Hello!" }],
-    }
-
+  def self.test_execute(url, token, api_name)
     if Rails.env.test?
       client = ::TestClient::OpenAI.new(
-        access_token: language_model.api_service.effective_token,
-        uri_base: language_model.api_service.url
+        access_token: token,
+        uri_base: url
       )
-      response = client.send(:chat, ** {parameters: params})
+      response = client.send(:chat, ** {parameters: {model: api_name, messages: [{ role: "user", content: "Hello!" }]}})
     else
+      Rails.logger.info "Connecting to OpenAI API server at #{url} with access token of length #{token.to_s.length}"
       client = ::OpenAI::Client.new(
-        access_token: language_model.api_service.effective_token,
-        uri_base: language_model.api_service.url
+        access_token: token,
+        uri_base: url
       )
-      response = client.chat(parameters: params)
+
+      Rails.logger.info "Testing using model #{api_name}"
+      response = client.chat(parameters: {model: api_name, messages: [{ role: "user", content: "Hello!" }]})
     end
 
     response.dig("choices", 0, "message", "content")

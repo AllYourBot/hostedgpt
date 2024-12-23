@@ -15,13 +15,12 @@ class AIBackend::Gemini < AIBackend
     end
   end
 
-  def self.test_language_model(language_model, api_name = nil)
-    api_name ||= language_model.api_name
-
+  def self.test_execute(url, token, api_name)
+    Rails.logger.info "Connecting to Gemini API server at #{url} with access token of length #{token.to_s.length}"
     client = ::Gemini.new(
       credentials: {
         service: "generative-language-api",
-        api_key: language_model.api_service.effective_token,
+        api_key: token,
         version: "v1beta"
       },
       options: {
@@ -33,7 +32,6 @@ class AIBackend::Gemini < AIBackend
     client.generate_content({
       contents: { role: "user", parts: { text: "Hello!" }}
     }).dig("candidates", 0, "content", "parts", 0, "text")
-
   rescue ::Faraday::Error => e
     "Error: #{e.message}"
   end

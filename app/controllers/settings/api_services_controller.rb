@@ -30,6 +30,16 @@ class Settings::APIServicesController < Settings::ApplicationController
     end
   end
 
+  def test
+    @api_service = Current.user.api_services.find_by(id: params[:api_service_id])
+    @answer = @api_service.test_api_service(params[:url], params[:token])
+
+    respond_to do |format|
+      format.html { redirect_to settings_api_services_path, notice: "Tested: #{@answer}", status: :see_other }
+      format.turbo_stream
+    end
+  end
+
   def destroy
     @api_service.deleted!
     redirect_to settings_api_services_path, notice: "Deleted", status: :see_other
