@@ -38,10 +38,6 @@ class Assistant < ApplicationRecord
     name
   end
 
-  def to_param
-    slug
-  end
-
   def language_model_api_name=(api_name)
     self.language_model = LanguageModel.for_user(user).find_by(api_name:)
   end
