@@ -1,5 +1,6 @@
 class Assistant < ApplicationRecord
   include Export
+  include Slug
 
   MAX_LIST_DISPLAY = 5
 
@@ -23,8 +24,6 @@ class Assistant < ApplicationRecord
 
   delegate :api_name, to: :language_model, prefix: true, allow_nil: true
 
-  before_validation :set_default_slug
-
   def initials
     return nil if name.blank?
 
@@ -38,33 +37,7 @@ class Assistant < ApplicationRecord
     name
   end
 
-  def to_param
-    slug
-  end
-
   def language_model_api_name=(api_name)
     self.language_model = LanguageModel.for_user(user).find_by(api_name:)
-  end
-
-  private
-
-  # Set the slug to the name, downcased, with non-word characters replaced with "-"
-  # and trailing "-" removed.
-  # If the slug is not unique for the user, append "-2", "-3", etc.
-  def set_default_slug
-    return if slug.present?
-    return if name.blank?
-
-    base_slug = name.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/-$/, "")
-
-    existing_base_slugs = user.assistants.where("slug LIKE ?", "#{base_slug}%").pluck(:slug)
-    largest_slug_number = existing_base_slugs.map { |slug| slug.split("--").last.to_i }.max
-    self.slug = if largest_slug_number.present?
-      "#{base_slug}--#{largest_slug_number + 1}"
-    elsif existing_base_slugs.any?
-      "#{base_slug}--1"
-    else
-      base_slug
-    end
   end
 end
