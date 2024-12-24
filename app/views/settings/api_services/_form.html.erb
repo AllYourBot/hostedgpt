@@ -1,4 +1,4 @@
-<%= form_with(model: [:settings, api_service], class: "contents") do |form| %>
+<%= form_with(model: [:settings, api_service], class: "contents", data: {controller: "testing"}) do |form| %>
   <% if api_service.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(api_service.errors.count, "error") %> prohibited this API service from being saved:</h2>
@@ -21,6 +21,7 @@
     <%= form.select :driver,
       APIService.drivers.keys,
       {},
+      data: { action: "change->testing#disable_test_link" },
       class: %|
         block
         border border-gray-200 outline-none
@@ -32,9 +33,22 @@
     %>
   </div>
 
-  <div class="my-5">
+  <div class="my-5 inline-block w-full">
     <%= form.label :url %>
-    <%= form.text_field :url, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+     <span>
+      <% if api_service.persisted? %>
+        <% link_url = settings_api_services_path + "/" + api_service.id.to_s + "/test" %>
+        <%= link_to "Test", link_url,
+          data: { testing_target: "test", turbo_stream: true, action: "click->testing#update_link_api_service" },
+          class: "underline text-blue-600"
+        %>
+      <% end %>
+      <span id="test_result"></span>
+    </span>
+    <%= form.text_field :url,
+      data: { testing_target: "url" },
+      class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black"
+    %>
   </div>
 
   <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
@@ -167,7 +181,16 @@
         %>.
       </li>
     </ol>
-    <%= form.text_field :token, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black", autocomplete: "off" %>
+    <%= form.text_field :token,
+      class: %|
+        block shadow
+        rounded-md border border-gray-200 outline-none
+        px-3 py-2 mt-2 w-full dark:text-black
+      |,
+      autocomplete: "off",
+      id: "input_token",
+      data: { testing_target: "token" }
+    %>
   </div>
 
   <%= form.submit "Save",
