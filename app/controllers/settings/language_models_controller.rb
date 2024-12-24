@@ -34,6 +34,16 @@ class Settings::LanguageModelsController < Settings::ApplicationController
     end
   end
 
+  def test
+    @language_model = Current.user.language_models.find_by(id: params[:language_model_id])
+    @answer = @language_model.test(params[:model])
+
+    respond_to do |format|
+      format.html { redirect_to settings_language_models_path, notice: "Tested: #{@answer}", status: :see_other }
+      format.turbo_stream
+    end
+  end
+
   def destroy
     @language_model.deleted!
     redirect_to settings_language_models_path, notice: "Deleted", status: :see_other

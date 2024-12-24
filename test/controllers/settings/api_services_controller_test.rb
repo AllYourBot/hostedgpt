@@ -108,4 +108,12 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_api_service_url(api_services(:keith_other_service))
     assert_select "button#instructions.hidden"
   end
+
+  test "test should return success and a message" do
+    TestClient::OpenAI.stub :text, "Success." do
+      get settings_api_service_test_url(format: :turbo_stream, api_service_id: api_services(:keith_openai_service).id, url: "https://api.openai.com/v1", token: "abc-secret123")
+      assert_response :success
+      assert_contains_text "div#test_result", "Success."
+    end
+  end
 end

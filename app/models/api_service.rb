@@ -39,6 +39,10 @@ class APIService < ApplicationRecord
     token.presence || default_llm_key
   end
 
+  def test_api_service(url = nil, token = nil)
+    ai_backend.test_api_service(self, url, token)
+  end
+
   private
 
   def default_llm_key

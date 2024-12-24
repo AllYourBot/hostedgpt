@@ -199,4 +199,12 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
       assert_select 'input[name="language_model[supports_system_message]"][checked="checked"]', false
     end
   end
+
+  test "test should return success and a message" do
+    TestClient::OpenAI.stub :text, "Success." do
+      get settings_language_model_test_url(format: :turbo_stream, language_model_id: language_models(:guanaco).id, model: "gpt-4o")
+      assert_response :success
+      assert_contains_text "div#test_result", "Success."
+    end
+  end
 end
