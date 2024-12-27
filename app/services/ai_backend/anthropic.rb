@@ -14,6 +14,26 @@ class AIBackend::Anthropic < AIBackend
     end
   end
 
+  def self.test_execute(url, token, api_name)
+    Rails.logger.info "Connecting to Anthropic API server at #{url} with access token of length #{token.to_s.length}"
+    client = ::Anthropic::Client.new(
+      uri_base: url,
+      access_token: token
+    )
+
+    Rails.logger.info "Testing using model #{api_name}"
+    client.messages(
+      model: api_name,
+      messages: [
+        { "role": "user", "content": "Hello!" }
+      ],
+      system: "You are a helpful assistant.",
+      parameters: { max_tokens: 1000 }
+    ).dig("content", 0, "text")
+  rescue => e
+    "Error: #{e.message}"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin

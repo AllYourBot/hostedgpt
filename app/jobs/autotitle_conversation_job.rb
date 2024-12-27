@@ -7,7 +7,7 @@ class AutotitleConversationJob < ApplicationJob
 
   def perform(conversation_id)
     @conversation = Conversation.find(conversation_id)
-    return false if @conversation.assistant.api_service.effective_token.blank? # should we use anthropic key if that's all the user has?
+    return false if @conversation.assistant.api_service.requires_token? && @conversation.assistant.api_service.effective_token.blank?
 
     messages = @conversation.messages.ordered.limit(4)
     raise ConversationNotReady  if messages.empty?

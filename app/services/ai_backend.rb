@@ -48,6 +48,27 @@ class AIBackend
     end
   end
 
+  def self.test_language_model(language_model, api_name = nil)
+    api_name ||= language_model.api_name
+    url = language_model.api_service.url
+    token = language_model.api_service.effective_token
+    return "Error: API key (token) is blank" if language_model.api_service.requires_token? && token.blank?
+
+    test_execute(url, token, api_name)
+  end
+
+  def self.test_api_service(api_service, url = nil, token = nil)
+    url ||= api_service.url
+    token ||= api_service.effective_token
+    language_model = LanguageModel.where(best: true, api_service: api_service).first
+    api_name = language_model.api_name unless language_model.nil?
+
+    return "Error: API key (token) is blank" if api_service.requires_token? && token.blank?
+    return "Error: API name is blank. Define a best Language Model for this API service." if api_name.blank?
+
+    test_execute(url, token, api_name)
+  end
+
   private
 
   def client_method_name

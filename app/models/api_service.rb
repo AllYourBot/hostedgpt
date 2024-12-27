@@ -1,5 +1,5 @@
 class APIService < ApplicationRecord
-  URL_OPEN_AI = "https://api.openai.com/"
+  URL_OPEN_AI = "https://api.openai.com/v1/"
   URL_ANTHROPIC = "https://api.anthropic.com/"
   URL_GROQ = "https://api.groq.com/openai/v1/"
   URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/"
@@ -37,6 +37,10 @@ class APIService < ApplicationRecord
 
   def effective_token
     token.presence || default_llm_key
+  end
+
+  def test_api_service(url = nil, token = nil)
+    ai_backend.test_api_service(self, url, token)
   end
 
   private
