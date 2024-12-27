@@ -27,5 +27,6 @@
 
 <turbo-frame id="nav-conversations"
   src="<%= conversations_path(conversation_id: @conversation&.id) %>"
+  refresh="morph"
   loading="lazy"
 />
