@@ -2,12 +2,14 @@ class Message < ApplicationRecord
   include DocumentImage, Version, Cancellable, Toolable
 
   belongs_to :assistant
-  belongs_to :conversation
+  belongs_to :conversation, inverse_of: :messages
   belongs_to :content_document, class_name: "Document", inverse_of: :message, optional: true
   belongs_to :run, optional: true
   has_one :latest_assistant_message_for, class_name: "Conversation", inverse_of: :last_assistant_message, dependent: :nullify
 
-  enum role: %w[user assistant tool].index_by(&:to_sym)
+  include Billable
+
+  enum :role, %w[user assistant tool].index_by(&:to_sym)
 
   delegate :user, to: :conversation
 
@@ -23,6 +25,8 @@ class Message < ApplicationRecord
   after_create :start_assistant_reply, if: :user?
   after_create :set_last_assistant_message, if: :assistant?
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
+  before_save :update_input_token_cost, if: :input_token_count_changed?
+  before_save :update_output_token_cost, if: :output_token_count_changed?
 
   scope :ordered, -> { latest_version_for_conversation }
 
@@ -39,14 +43,12 @@ class Message < ApplicationRecord
       (content_text.present? || content_tool_calls.present?)
   end
 
-  def not_finished?
-    !finished?
-  end
+  def not_finished? = !finished?
 
   private
 
   def create_conversation
-    self.conversation = Conversation.create!(user: Current.user, assistant: assistant)
+    self.conversation = Conversation.create!(user: Current.user, assistant:)
   end
 
   def validate_conversation
@@ -58,12 +60,12 @@ class Message < ApplicationRecord
   end
 
   def start_assistant_reply
-    m = conversation.messages.create!(
-      assistant: assistant,
+    conversation.messages.create!(
+      assistant:,
       role: :assistant,
       content_text: nil,
-      version: version,
-      index: index+1
+      version:,
+      index: index + 1
     )
   end
 
@@ -73,6 +75,14 @@ class Message < ApplicationRecord
 
   def update_assistant_on_conversation
     return if conversation.assistant == assistant
-    conversation.update!(assistant: assistant)
+    conversation.update!(assistant:)
+  end
+
+  def update_input_token_cost
+    self.input_token_cost = assistant.language_model.input_token_cost_cents * input_token_count
+  end
+
+  def update_output_token_cost
+    self.output_token_cost = assistant.language_model.output_token_cost_cents * output_token_count
   end
 end

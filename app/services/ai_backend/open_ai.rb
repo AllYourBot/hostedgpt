@@ -1,4 +1,6 @@
 class AIBackend::OpenAI < AIBackend
+  include Tools
+
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
   #
@@ -12,50 +14,76 @@ class AIBackend::OpenAI < AIBackend
     end
   end
 
-  def initialize(user, assistant, conversation, message)
+  def self.test_execute(url, token, api_name)
+    if Rails.env.test?
+      client = ::TestClient::OpenAI.new(
+        access_token: token,
+        uri_base: url
+      )
+      response = client.send(:chat, ** {parameters: {model: api_name, messages: [{ role: "user", content: "Hello!" }]}})
+    else
+      Rails.logger.info "Connecting to OpenAI API server at #{url} with access token of length #{token.to_s.length}"
+      client = ::OpenAI::Client.new(
+        access_token: token,
+        uri_base: url
+      )
+
+      Rails.logger.info "Testing using model #{api_name}"
+      response = client.chat(parameters: {model: api_name, messages: [{ role: "user", content: "Hello!" }]})
+    end
+
+    response.dig("choices", 0, "message", "content")
+  rescue ::Faraday::Error => e
+    "Error: #{e.message}"
+  end
+
+  def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin
       raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to OpenAI API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
-      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token)
+      @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token, api_version: "")
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
-    end
-  end
-
-  def get_next_chat_message(&chunk_handler)
-    @stream_response_text = ""
-    @stream_response_tool_calls = []
-    response_handler = block_given? ? stream_handler(&chunk_handler) : nil
-
-    begin
-      parameters = {
-        model: @assistant.language_model.provider_name,
-        messages: system_message + preceding_messages,
-        stream: response_handler,
-        max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
-      }
-      if @assistant.language_model.supports_tools?
-        parameters[:tools] = Toolbox.tools
-      end
-      response = @client.chat(parameters: parameters)
-    rescue ::Faraday::UnauthorizedError => e
-      raise ::OpenAI::ConfigurationError
-    end
-
-    if @stream_response_tool_calls.present?
-      format_parallel_tool_calls(@stream_response_tool_calls)
-    elsif @stream_response_text.blank?
-      raise ::Faraday::ParsingError
     end
   end
 
   private
 
-  def stream_handler(&chunk_received_handler)
+  def client_method_name
+    :chat
+  end
+
+  def configuration_error
+    ::OpenAI::ConfigurationError
+  end
+
+  def set_client_config(config)
+    super(config)
+
+    @client_config = {
+      parameters: {
+        model: @assistant.language_model.api_name,
+        messages: system_message(config[:instructions]) + config[:messages],
+        stream: config[:streaming] && @response_handler || nil,
+        max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
+        stream_options: config[:streaming] && { include_usage: true } || nil,
+        response_format: { type: "text" },
+        tools: @assistant.language_model.supports_tools? && Toolbox.tools || nil,
+      }.compact.merge(config[:params] || {})
+    }
+  end
+
+  def stream_handler(&chunk_handler)
     proc do |intermediate_response, bytesize|
       content_chunk = intermediate_response.dig("choices", 0, "delta", "content")
       tool_calls_chunk = intermediate_response.dig("choices", 0, "delta", "tool_calls")
+
+      if (input_tokens, output_tokens = intermediate_response["usage"]&.values_at("prompt_tokens", "completion_tokens"))
+        # https://platform.openai.com/docs/api-reference/chat/streaming
+        @message.input_token_count = input_tokens
+        @message.output_token_count = output_tokens
+      end
 
       print content_chunk if Rails.env.development?
       if content_chunk
@@ -75,25 +103,25 @@ class AIBackend::OpenAI < AIBackend
     rescue ::Faraday::UnauthorizedError => e
       raise OpenAI::ConfigurationError
     rescue => e
-      puts "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
-      puts e.backtrace.join("\n")
+      Rails.logger.info "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
+      Rails.logger.info e.backtrace.join("\n")
     end
   end
 
-  def system_message
+  def system_message(content)
     [{
       role: "system",
-      content: full_instructions
+      content:,
     }]
   end
 
-  def preceding_messages
+  def preceding_conversation_messages
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
       if @assistant.supports_images? && message.documents.present?
 
         content_with_images = [{ type: "text", text: message.content_text }]
         content_with_images += message.documents.collect do |document|
-          { type: "image_url", image_url: { url: document.file_data_url(:large) }}
+          { type: "image_url", image_url: { url: document.image_url(:large) }}
         end
 
         {
@@ -105,35 +133,12 @@ class AIBackend::OpenAI < AIBackend
         {
           role: message.role,
           name: message.name_for_api,
-          content: message.content_text,
-          tool_calls: message.content_tool_calls, # only for some assistant messages
+          content: (JSON.parse(message.content_text).except("message_to_user").to_json rescue message.content_text),
+          tool_calls: message.assistant? ? message.content_tool_calls : nil, # only for some assistant messages
           tool_call_id: message.tool_call_id,     # only for tool messages
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
       end
     end
-  end
-
-  def format_parallel_tool_calls(content_tool_calls)
-    if content_tool_calls.length > 1 || (calls = content_tool_calls.dig(0, "id"))&.scan("call_").length == 1
-      return content_tool_calls
-    end
-
-    names = find_repeats_and_split(content_tool_calls.dig(0, "function", "name"))
-    args = content_tool_calls.dig(0, "function", "arguments").split(/(?<=})(?={)/)
-
-    calls.split(/(?=call_)/).map.with_index do |id, i|
-      {
-        index: i,
-        type: "function",
-        id: id[0...40],
-        function: {
-          name: names.fetch(i),
-          arguments: args.fetch(i),
-        }
-      }
-    end
-  rescue
-    {}
   end
 
   def find_repeats_and_split(str)

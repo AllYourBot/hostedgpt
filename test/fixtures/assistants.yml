@@ -1,5 +1,6 @@
 samantha:
   user: keith
+  slug: samantha
   language_model: gpt_4o
   name: Samantha
   description: My personal assistant
@@ -8,31 +9,53 @@ samantha:
 
 keith_gpt4:
   user: keith
+  slug: gpt-4o
   language_model: gpt_4o
-  name: OpenAI's GPT-4
-  description: OpenAI's GPT-4
+  name: OpenAI GPT-4o
+  description: OpenAI's GPT-4o
   instructions:
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
 keith_claude3:
   user: keith
+  slug: claude-opus
   language_model: claude_3_opus_20240229
   name: Claude 3 Opus
   description: Claude 3, Opus version
   instructions:
   tools: []
 
+keith_claude35:
+  user: keith
+  slug: claude-sonnet
+  language_model: claude_3_5_sonnet_20240620
+  name: Claude 3.5 Sonnet
+  description: Claude 3.5, Sonnet version
+  instructions:
+  tools: []
+
 keith_gpt3:
   user: keith
+  slug: gpt-3-5-turbo
   language_model: gpt_3_5_turbo
   name: GPT 3.5
   description: OpenAI's GPT-3 but with Zen
   instructions: Include a Zen perspective when possilbe
   tools: [{"type": "code_interpreter"}, {"type": "retrieval"}, {"type": "function"}]
 
+keith_gemini:
+  user: keith
+  slug: gemini-1-5-pro
+  language_model: gemini-1.5-pro-002
+  name: Gemini Pro 1.5
+  description: Gemini Pro 1.5
+  instructions:
+  tools: []
+
 
 rob_gpt4:
   user: rob
+  slug: gpt-4o
   language_model: rob_gpt
   name: GPT-4
   description: OpenAI's GPT
@@ -41,6 +64,7 @@ rob_gpt4:
 
 mandela_gpt4:
   user: rob
+  slug: mandela
   language_model: rob_gpt
   name: Mandela
   description: OpenAI assistant GPT4
@@ -51,6 +75,7 @@ mandela_gpt4:
 
 alpaca_asst:
   user: taylor
+  slug: alpaca
   language_model: alpaca
   name: Game Alpaca
   description: Play games (Alpaca backed)
@@ -60,6 +85,7 @@ alpaca_asst:
 
 pacos_asst:
   user: taylor
+  slug: pacos
   language_model: pacos
   name: Travel/Flowers
   description: Flowers themed travel advice (Pacos backed)

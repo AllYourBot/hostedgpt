@@ -1,9 +1,9 @@
 name: Ruby on Rails CI
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -28,6 +28,9 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
+      APP_URL_PROTOCOL: "http"
+      APP_URL_HOST: "localhost"
+      APP_URL_PORT: "3000"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,7 +50,7 @@ jobs:
 
   system_tests:
     if: github.repository == 'AllYourBot/hostedgpt'
-    runs-on: large-runner
+    runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref }}-system
       cancel-in-progress: true
@@ -68,9 +71,20 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
+      APP_URL_PROTOCOL: "http"
+      APP_URL_HOST: "localhost"
+      APP_URL_PORT: "3000"
       DISPLAY: "=:99"
+      CHROME_VERSION: "127.0.6533.119"
 
     steps:
+      - name: Install Chrome
+        run: |
+          # Download specific Chrome version
+          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
+          # Install Chrome
+          sudo apt-get install -y --allow-downgrades ./google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
+
       - uses: nanasess/setup-chromedriver@v2
       - name: Start chromedriver
         run: |
@@ -93,7 +107,6 @@ jobs:
 
       - name: Run system tests
         run: |
-          echo -e "###\n###\n###\n### NOTICE: If these tests fail because of Net::ReadTimeout then re-run the test suite. I can't figure out this sporadic failure.\n###\n###\n###"
           sed -i 's/hoverOnlyWhenSupported: true/hoverOnlyWhenSupported: false/' config/tailwind.config.js
           PARALLEL_WORKERS=2 bin/rails test:system
 

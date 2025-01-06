@@ -389,13 +389,13 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
   def task_data(title: "Title of task", notes: "notes for task", deleted: false, due: nil, completed: false)
     {
       id: "mockid",
-      title: title,
+      title:,
       selfLink: "https://www.googleapis.com/tasks/v1/lists/SjBhVUFfLWtEVElJRnJ2Yg/tasks/NHhjQUY3bGlHVHdPUEwwaA",
-      notes: notes,
+      notes:,
       status: completed ? "completed" : "needsAction",
       completed: completed.presence && Time.zone.today.strftime("%Y-%m-%dT00:00:00.000Z"),
       due: due == "clear" ? nil : due,
-      deleted: deleted,
+      deleted:,
       links: [],
       webViewLink: "https://tasks.google.com/task/4xcAF7liGTwOPL0h"
     }
@@ -403,7 +403,7 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
 
   def tasks_data(deleted: false)
     { items: [
-      task_data(deleted: deleted).merge(position: "00001"),
+      task_data(deleted:).merge(position: "00001"),
       {
         id: "mockid2",
         position: "00002",
@@ -411,7 +411,7 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
         selfLink: "https://www.googleapis.com/tasks/v1/lists/SjBhVUFfLWtEVElJRnJ2Yg/tasks/NHhjQUY3bGlHVHdPUEwwaA",
         status: "needsAction",
         due: nil,
-        deleted: deleted,
+        deleted:,
         links: [],
         webViewLink: "https://tasks.google.com/task/4xcAF7liGTwOPL0h"
       },{
@@ -421,7 +421,7 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
         selfLink: "https://www.googleapis.com/tasks/v1/lists/SjBhVUFfLWtEVElJRnJ2Yg/tasks/NHhjQUY3bGlHVHdPUEwwaA",
         status: "needsAction",
         due: nil,
-        deleted: deleted,
+        deleted:,
         links: [],
         webViewLink: "https://tasks.google.com/task/4xcAF7liGTwOPL0h"
       }]
@@ -432,13 +432,13 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
     { kind: "tasks#task",
       id: "mockid",
       etag: "\"NzU5Mjc2NTA2\"",
-      title: title,
+      title:,
       updated: "2024-06-18T21:29:54.000Z",
       selfLink: "https://www.googleapis.com/tasks/v1/lists/SjBhVUFfLWtEVElJRnJ2Yg/tasks/NHhjQUY3bGlHVHdPUEwwaA",
       position: "00000000000000000000",
-      notes: notes,
+      notes:,
       status: "needsAction",
-      due: due,
+      due:,
       links: [],
       webViewLink: "https://tasks.google.com/task/4xcAF7liGTwOPL0h"
     }.compact

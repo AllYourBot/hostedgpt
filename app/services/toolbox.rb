@@ -7,6 +7,7 @@ class Toolbox < SDK
       test_env && Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
       Toolbox::Memory,
+      Toolbox::GoogleSearch,
       gmail_active && Toolbox::Gmail,
       tasks_active && Toolbox::GoogleTasks,
     ].compact

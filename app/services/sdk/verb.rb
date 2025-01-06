@@ -31,7 +31,7 @@ class SDK::Verb
     raise ResponseError.new(response) if !response.status.in? @expected_statuses
 
     if response.status.between?(200, 299)
-      response.body.presence && OpenData.for(JSON.parse(response.body))
+      response.body.presence && OpenData.for(JSON.parse(response.body)) rescue response
     else
       response
     end
@@ -131,6 +131,6 @@ class SDK::Verb
     return if !Rails.env.test?
     return if self.class.send("allow_#{verb}_#{@calling_method}") rescue false
 
-    puts "WARNING: live API call in test. USE: stub_#{verb}_response(:#{@calling_method}, status: ___, response: _______) do; ...; end"
+    Rails.logger.info "WARNING: live API call in test. USE: stub_#{verb}_response(:#{@calling_method}, status: ___, response: _______) do; ...; end"
   end
 end

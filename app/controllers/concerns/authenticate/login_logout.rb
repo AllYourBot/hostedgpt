@@ -35,6 +35,6 @@ module Authenticate::LoginLogout
   end
 
   def manual_login_allowed?
-    Feature.password_authentication? || Feature.google_authentication?
+    Feature.password_authentication? || Feature.google_authentication? || Feature.microsoft_graph_authentication?
   end
 end

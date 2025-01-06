@@ -1,0 +1,11 @@
+<turbo-stream action="replace" target="test_result">
+  <template>
+    <div id="test_result" class="inline-block">
+      <% if @answer.start_with?("Error:") %>
+        <span class="text-red-700"><%= @answer %></span>
+      <% else %>
+        <span class="text-green-700"><%= @answer %></span>
+      <% end %>
+    </div>
+  </template>
+</turbo-stream>

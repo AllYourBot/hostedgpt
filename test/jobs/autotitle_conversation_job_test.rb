@@ -4,7 +4,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
   test "sets conversation title automatically when there are two messages" do
     conversation = conversations(:greeting)
 
-    ChatCompletionAPI.stub :get_next_response, {"topic" => "Hear me"} do
+    TestClient::OpenAI.stub :text, "{\"topic\":\"Hear me\"}" do
       AutotitleConversationJob.perform_now(conversation.id)
     end
 
@@ -15,7 +15,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation = conversations(:javascript)
     conversation.latest_message_for_version(:latest).destroy!
 
-    ChatCompletionAPI.stub :get_next_response, {"topic" => "Javascript popState"} do
+    TestClient::OpenAI.stub :text, "{\"topic\":\"Javascript popState\"}" do
       AutotitleConversationJob.perform_now(conversation.id)
     end
 
@@ -27,7 +27,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation.update!(updated_at: Time.current) # update is what triggers the callback
 
     assert_nothing_raised do # confirms the exception did not raise outside the job
-      ChatCompletionAPI.stub :get_next_response, {"topic" => "This will not be set"} do
+      TestClient::OpenAI.stub :text, "{\"topic\":\"Javascript popState\"}" do
         AutotitleConversationJob.perform_now(conversation.id)
       end
     end

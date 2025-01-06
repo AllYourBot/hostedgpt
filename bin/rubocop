@@ -1,8 +1,8 @@
-#!/usr/bin/env sh
+#!/usr/bin/env ruby
+require "rubygems"
+require "bundler/setup"
 
-if ! gem list rubocop -i --silent; then
-  echo "Installing rubocop..."
-  gem install rubocop
-fi
+# explicit rubocop config increases performance slightly while avoiding config confusion.
+ARGV.unshift("--config", File.expand_path("../.rubocop.yml", __dir__))
 
-bundle exec rubocop --parallel
+load Gem.bin_path("rubocop", "rubocop")

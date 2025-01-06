@@ -1,7 +1,11 @@
 class ConversationsController < ApplicationController
-  before_action :set_conversation, only: [:show, :edit, :update, :destroy]
-  before_action :set_nav_conversations
+  before_action :set_conversation
   before_action :set_nav_assistants
+
+  def index
+    @query = params[:query]
+    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
+  end
 
   def show
   end
@@ -28,16 +32,12 @@ class ConversationsController < ApplicationController
 
   private
 
-  def set_nav_conversations
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
-  end
-
   def set_nav_assistants
     @nav_assistants = Current.user.assistants.ordered
   end
 
   def set_conversation
-    @conversation = Current.user.conversations.find(params[:id])
+    @conversation = Current.user.conversations.find_by(id: params[:id] || params[:conversation_id])
   end
 
   def conversation_params

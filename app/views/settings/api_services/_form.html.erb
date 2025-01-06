@@ -1,4 +1,4 @@
-<%= form_with(model: [:settings, api_service], class: "contents") do |form| %>
+<%= form_with(model: [:settings, api_service], class: "contents", data: {controller: "testing"}) do |form| %>
   <% if api_service.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(api_service.errors.count, "error") %> prohibited this API service from being saved:</h2>
@@ -21,6 +21,7 @@
     <%= form.select :driver,
       APIService.drivers.keys,
       {},
+      data: { action: "change->testing#disable_test_link" },
       class: %|
         block
         border border-gray-200 outline-none
@@ -32,9 +33,22 @@
     %>
   </div>
 
-  <div class="my-5">
+  <div class="my-5 inline-block w-full">
     <%= form.label :url %>
-    <%= form.text_field :url, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+     <span>
+      <% if api_service.persisted? %>
+        <% link_url = settings_api_services_path + "/" + api_service.id.to_s + "/test" %>
+        <%= link_to "Test", link_url,
+          data: { testing_target: "test", turbo_stream: true, action: "click->testing#update_link_api_service" },
+          class: "underline text-blue-600"
+        %>
+      <% end %>
+      <span id="test_result"></span>
+    </span>
+    <%= form.text_field :url,
+      data: { testing_target: "url" },
+      class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black"
+    %>
   </div>
 
   <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
@@ -112,7 +126,7 @@
         "Select Plan" and just pick the "Build" plan.
       </li>
     </ol>
-    <ol id="openai-instructions"
+    <ol id="groq-instructions"
       data-transition-target="<%= groq?(api_service) && 'transitionable' %>"
       class="
         list-decimal
@@ -135,7 +149,48 @@
         %>).</li>
       <li>Click "Create API Key", name it something like "<%= Setting.product_name %>" and paste it below.</li>
     </ol>
-    <%= form.text_field :token, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+    <ol id="gemini-instructions"
+      data-transition-target="<%= gemini?(api_service) && 'transitionable' %>"
+      class="
+        list-decimal
+        my-3 p-2 pl-8
+        border border-gray-200
+        bg-gray-50 dark:bg-transparent
+        hidden
+      "
+    >
+      <li>Make sure you have a Google/Gmail account and are signed into it.</li>
+      <li>Visit
+        <%= link_to "Google AI Studio", "https://aistudio.google.com/",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>.
+      </li>
+      <li>Click "Get API Key" on the left (or
+        <%= link_to "take me to API Keys", "https://aistudio.google.com/apikey",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>).</li>
+      <li>Click "Create API Key" and when it appears click "Copy" and paste it below.</li>
+      <li>After dismissing the dialog, click "Go to billing" to the right of the key.</li>
+      <li>After accepting the Google Cloud terms you'll probably see "This project has no billing account." If so, click "Link a billing account" and then "Create billing account." Follow the directions to set it up. You typically receive $300 in free credit to be used within the first 90 days.</li>
+      <li>Google has other ways you can create an API key directly from Google Cloud, but it's a lot more confusing. If you would like to try this instead, for some reason, there are some instructions on
+        <%= link_to "Gemini Credentials", "https://github.com/gbaptista/gemini-ai#credentials",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>.
+      </li>
+    </ol>
+    <%= form.text_field :token,
+      class: %|
+        block shadow
+        rounded-md border border-gray-200 outline-none
+        px-3 py-2 mt-2 w-full dark:text-black
+      |,
+      autocomplete: "off",
+      id: "input_token",
+      data: { testing_target: "token" }
+    %>
   </div>
 
   <%= form.submit "Save",

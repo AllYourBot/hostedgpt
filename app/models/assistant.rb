@@ -1,4 +1,7 @@
 class Assistant < ApplicationRecord
+  include Export
+  include Slug
+
   MAX_LIST_DISPLAY = 5
 
   belongs_to :user
@@ -19,6 +22,8 @@ class Assistant < ApplicationRecord
 
   scope :ordered, -> { order(:id) }
 
+  delegate :api_name, to: :language_model, prefix: true, allow_nil: true
+
   def initials
     return nil if name.blank?
 
@@ -30,5 +35,9 @@ class Assistant < ApplicationRecord
 
   def to_s
     name
+  end
+
+  def language_model_api_name=(api_name)
+    self.language_model = LanguageModel.for_user(user).find_by(api_name:)
   end
 end

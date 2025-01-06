@@ -55,13 +55,13 @@ class Toolbox::Gmail::Message
 
   def to_h
     {
-      id: id,
-      thread_id: thread_id,
-      date: date,
-      from: from,
-      to: to,
-      subject: subject,
-      snippet: snippet,
+      id:,
+      thread_id:,
+      date:,
+      from:,
+      to:,
+      subject:,
+      snippet:,
       body: body || body_html,
     }
   end

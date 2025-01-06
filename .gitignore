@@ -8,6 +8,9 @@
 /.tool-versions
 /node_modules
 
+# Docker Compose override file
+*compose.override.y*ml
+
 # Ignore all environment files (except templates).
 /.env*
 !/.env*.erb
@@ -48,9 +51,9 @@
 /.ruby-version
 .issues
 
-# Mac
-
+# Other Mac programs
 .DS_Store
+.serenade
 
 # JetBrains
 /.idea/*
