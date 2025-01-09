@@ -39,7 +39,32 @@ export default class extends Controller {
     event.preventDefault() // w/o this chrome opens a new browser tab w/ the image
     let files = event.dataTransfer.files
     this.fileTarget.files = files
+    const shade = this.element.querySelector("#drag-n-drop-shade")
+    if (shade) shade.remove()
     this.previewUpdate()
+  }
+
+  boundDragOver = (event) => this.dragOver(event)
+  dragOver(event) {
+    event.preventDefault()
+    this.insertShadeElement()
+  }
+
+  boundDragLeave = (event) => this.dragLeave(event)
+  dragLeave(event) {
+    event.preventDefault()
+    this.dragCounter--
+    if (this.dragCounter === 0) {
+      const shade = this.element.querySelector("#drag-n-drop-shade")
+      if (shade) shade.remove()
+    }
+  }
+
+  boundDragEnter = (event) => this.dragEnter(event)
+  dragEnter(event) {
+    event.preventDefault()
+    this.dragCounter++
+    this.insertShadeElement()
   }
 
   boundPasted = async (event) => { this.pasted(event) }
@@ -70,6 +95,16 @@ export default class extends Controller {
       }
       reader.readAsDataURL(blob)
     })
+  }
+
+  insertShadeElement() {
+    const existing = this.element.querySelector("#drag-n-drop-shade")
+    if (existing) return
+    
+    this.element.insertAdjacentHTML(
+      'beforeend',
+      '<div id="drag-n-drop-shade"></div>'
+    );
   }
 
   addImageToFileInput(dataURL, fileType) {
