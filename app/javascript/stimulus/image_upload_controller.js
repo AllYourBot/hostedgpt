@@ -5,11 +5,15 @@ export default class extends Controller {
 
   connect() {
     this.dragCounter = 0
+    this.fileTarget.addEventListener("change", this.boundPreviewUpdate)
     this.element.addEventListener("drop", this.boundDropped)
+    this.contentTarget.addEventListener("paste", this.boundPasted)
   }
 
   disconnect() {
+    this.fileTarget.removeEventListener("change", this.boundPreviewUpdate)
     this.element.removeEventListener("drop", this.boundDropped)
+    this.contentTarget.removeEventListener("paste", this.boundPasted)
   }
 
   boundPreviewUpdate = () => { this.previewUpdate() }
