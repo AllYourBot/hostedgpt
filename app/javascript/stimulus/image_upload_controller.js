@@ -4,15 +4,12 @@ export default class extends Controller {
   static targets = [ "file", "content", "preview" ]
 
   connect() {
-    this.fileTarget.addEventListener("change", this.boundPreviewUpdate)
-    this.contentTarget.addEventListener("drop", this.boundDropped)
-    this.contentTarget.addEventListener("paste", this.boundPasted)
+    this.dragCounter = 0
+    this.element.addEventListener("drop", this.boundDropped)
   }
 
   disconnect() {
-    this.fileTarget.removeEventListener("change", this.boundPreviewUpdate)
-    this.contentTarget.removeEventListener("drop", this.boundDropped)
-    this.contentTarget.removeEventListener("paste", this.boundPasted)
+    this.element.removeEventListener("drop", this.boundDropped)
   }
 
   boundPreviewUpdate = () => { this.previewUpdate() }
