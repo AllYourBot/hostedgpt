@@ -8,12 +8,18 @@ export default class extends Controller {
     this.fileTarget.addEventListener("change", this.boundPreviewUpdate)
     this.element.addEventListener("drop", this.boundDropped)
     this.contentTarget.addEventListener("paste", this.boundPasted)
+    this.element.addEventListener("dragenter", this.boundDragEnter)
+    this.element.addEventListener("dragover", this.boundDragOver)
+    this.element.addEventListener("dragleave", this.boundDragLeave)
   }
 
   disconnect() {
     this.fileTarget.removeEventListener("change", this.boundPreviewUpdate)
     this.element.removeEventListener("drop", this.boundDropped)
     this.contentTarget.removeEventListener("paste", this.boundPasted)
+    this.element.removeEventListener("dragenter", this.boundDragEnter)
+    this.element.removeEventListener("dragover", this.boundDragOver)
+    this.element.removeEventListener("dragleave", this.boundDragLeave)
   }
 
   boundPreviewUpdate = () => { this.previewUpdate() }
@@ -51,7 +57,7 @@ export default class extends Controller {
   boundDragOver = (event) => this.dragOver(event)
   dragOver(event) {
     event.preventDefault()
-    this.insertShadeElement()
+    this.displayDragnDropShade()
   }
 
   boundDragLeave = (event) => this.dragLeave(event)
@@ -68,7 +74,7 @@ export default class extends Controller {
   dragEnter(event) {
     event.preventDefault()
     this.dragCounter++
-    this.insertShadeElement()
+    this.displayDragnDropShade()
   }
 
   boundPasted = async (event) => { this.pasted(event) }
@@ -101,7 +107,7 @@ export default class extends Controller {
     })
   }
 
-  insertShadeElement() {
+  displayDragnDropShade() {
     const existing = this.element.querySelector("#drag-n-drop-shade")
     if (existing) return
     
