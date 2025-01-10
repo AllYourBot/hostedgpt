@@ -46,11 +46,13 @@ export default class extends Controller {
 
   boundDropped = (event) => { this.dropped(event) }
   dropped(event) {
-    event.preventDefault() // w/o this chrome opens a new browser tab w/ the image
-    let files = event.dataTransfer.files
-    this.fileTarget.files = files
+    event.preventDefault()
+    this.dragCounter = 0
     const shade = this.element.querySelector("#drag-n-drop-shade")
     if (shade) shade.remove()
+  
+    let files = event.dataTransfer.files
+    this.fileTarget.files = files
     this.previewUpdate()
   }
 
@@ -64,7 +66,8 @@ export default class extends Controller {
   dragLeave(event) {
     event.preventDefault()
     this.dragCounter--
-    if (this.dragCounter === 0) {
+    if (this.dragCounter <= 0) {
+      this.dragCounter = 0
       const shade = this.element.querySelector("#drag-n-drop-shade")
       if (shade) shade.remove()
     }
