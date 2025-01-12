@@ -140,7 +140,7 @@
           pl-6 pr-6 mx-auto mb-6
           w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px]
         "
-        data-controller="composer image-upload"
+        data-controller="composer"
         data-composer-speaker-outlet="[data-controller~='speaker']"
       >
         <%= button_tag type: "button",
@@ -173,7 +173,7 @@
             data-role="preview"
           >
             <%= button_tag type: "button",
-              class: "rounded-full absolute -top-2 -right-2 border border-gray-300 bg-gray-200 hidden group-hover:block",
+              class: "rounded-full absolute -top-2 -right-2 border border-gray-300 bg-gray-200 dark:bg-gray-800 hidden group-hover:block",
               data: {
                 action: "image-upload#remove",
                 role: "preview-remove"
