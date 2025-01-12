@@ -4,15 +4,22 @@ export default class extends Controller {
   static targets = [ "file", "content", "preview" ]
 
   connect() {
+    this.dragCounter = 0
     this.fileTarget.addEventListener("change", this.boundPreviewUpdate)
-    this.contentTarget.addEventListener("drop", this.boundDropped)
+    this.element.addEventListener("drop", this.boundDropped)
     this.contentTarget.addEventListener("paste", this.boundPasted)
+    this.element.addEventListener("dragenter", this.boundDragEnter)
+    this.element.addEventListener("dragover", this.boundDragOver)
+    this.element.addEventListener("dragleave", this.boundDragLeave)
   }
 
   disconnect() {
     this.fileTarget.removeEventListener("change", this.boundPreviewUpdate)
-    this.contentTarget.removeEventListener("drop", this.boundDropped)
+    this.element.removeEventListener("drop", this.boundDropped)
     this.contentTarget.removeEventListener("paste", this.boundPasted)
+    this.element.removeEventListener("dragenter", this.boundDragEnter)
+    this.element.removeEventListener("dragover", this.boundDragOver)
+    this.element.removeEventListener("dragleave", this.boundDragLeave)
   }
 
   boundPreviewUpdate = () => { this.previewUpdate() }
@@ -39,10 +46,38 @@ export default class extends Controller {
 
   boundDropped = (event) => { this.dropped(event) }
   dropped(event) {
-    event.preventDefault() // w/o this chrome opens a new browser tab w/ the image
+    event.preventDefault()
+    this.dragCounter = 0
+    const shade = this.element.querySelector("#drag-n-drop-shade")
+    if (shade) shade.remove()
+  
     let files = event.dataTransfer.files
     this.fileTarget.files = files
     this.previewUpdate()
+  }
+
+  boundDragOver = (event) => this.dragOver(event)
+  dragOver(event) {
+    event.preventDefault()
+    this.displayDragnDropShade()
+  }
+
+  boundDragLeave = (event) => this.dragLeave(event)
+  dragLeave(event) {
+    event.preventDefault()
+    this.dragCounter--
+    if (this.dragCounter <= 0) {
+      this.dragCounter = 0
+      const shade = this.element.querySelector("#drag-n-drop-shade")
+      if (shade) shade.remove()
+    }
+  }
+
+  boundDragEnter = (event) => this.dragEnter(event)
+  dragEnter(event) {
+    event.preventDefault()
+    this.dragCounter++
+    this.displayDragnDropShade()
   }
 
   boundPasted = async (event) => { this.pasted(event) }
@@ -73,6 +108,16 @@ export default class extends Controller {
       }
       reader.readAsDataURL(blob)
     })
+  }
+
+  displayDragnDropShade() {
+    const existing = this.element.querySelector("#drag-n-drop-shade")
+    if (existing) return
+    
+    this.element.insertAdjacentHTML(
+      'beforeend',
+      '<div id="drag-n-drop-shade"></div>'
+    );
   }
 
   addImageToFileInput(dataURL, fileType) {

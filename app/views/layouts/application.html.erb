@@ -66,7 +66,7 @@
       class="fixed inset-0 bg-black z-20 bg-opacity-40 md:hidden nav-closed:hidden "
       data-action="click->transition#toggleClass"
       ></div>
-    <main id="main-container" class="flex flex-1 h-full w-full bg-white dark:bg-gray-800 text-gray-950 dark:text-gray-100 px-safe">
+    <main id="main-container" class="flex flex-1 h-full w-full bg-white dark:bg-gray-800 text-gray-950 dark:text-gray-100 px-safe" data-controller="image-upload">
       <%= content_for?(:main) ? yield(:main) : yield %>
     </main>
     <%= render "layouts/alerts" %>
