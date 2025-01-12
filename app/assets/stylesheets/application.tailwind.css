@@ -191,8 +191,8 @@ nav {
 }
 
 #drag-n-drop-shade {
-  outline: 8px dashed #888;
-  outline-offset: -10px;  
+  outline: 8px dashed #000;
+  outline-offset: -10px;
   background-color: rgba(0, 0, 0, 0.5);
   position: fixed;
   width: 100%;
@@ -200,4 +200,8 @@ nav {
   top: 0;
   left: 0;
   z-index: 99999;
+}
+
+.dark #drag-n-drop-shade {
+  outline-color: #888;
 }
