@@ -4,6 +4,7 @@ module Assistant::Slug
   included do
     before_validation :set_default_slug
     before_validation :clear_conflicting_deleted_assistant_slug
+    validates :slug, uniqueness: { scope: :user_id, message: "has already been taken" }
   end
 
   private
