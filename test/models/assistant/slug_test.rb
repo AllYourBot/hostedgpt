@@ -77,4 +77,22 @@ class Assistant::SlugTest < ActiveSupport::TestCase
     assistant.update!(name: "New Name")
     assert_equal original_slug, assistant.reload.slug
   end
+
+  test "fails to create a new assistant when slug collides with an existing assistant" do
+    existing = assistants(:samantha)
+    new_assistant = existing.user.assistants.new(
+      name: "Different Name",
+      slug: existing.slug,
+      language_model: existing.language_model
+    )
+    assert_not new_assistant.valid?
+    assert_includes new_assistant.errors[:slug], "has already been taken"
+  end
+
+  test "fails to update an assistant's slug when it collides with an existing assistant" do
+    existing = assistants(:samantha)
+    other = assistants(:keith_gpt4)
+    assert_not other.update(slug: existing.slug)
+    assert_includes other.errors[:slug], "has already been taken"
+  end
 end

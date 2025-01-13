@@ -13,8 +13,8 @@ module Assistant::Slug
     return if slug.blank?
     return if !slug_changed?
 
-    conflicting_assistant = user.assistants_including_deleted.where.not(id: id, deleted_at: nil).find_by(slug: slug)
-    conflicting_assistant&.update_column(:slug, nil)
+    conflicting_assistant = user.assistants_including_deleted.where.not(deleted_at: nil).find_by(slug: slug)
+    conflicting_assistant&.update_column(:slug, nil) if conflicting_assistant != self
   end
 
   def set_default_slug
