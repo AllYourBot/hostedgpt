@@ -3,13 +3,17 @@ module Assistant::Slug
 
   included do
     before_validation :set_default_slug
-    before_save :clear_slug_on_delete
+    before_validation :clear_conflicting_deleted_assistant_slug
   end
 
   private
 
-  def clear_slug_on_delete
-    self.slug = nil if deleted_at_changed? && deleted_at_was.nil? && deleted_at.present?
+  def clear_conflicting_deleted_assistant_slug
+    return if slug.blank?
+    return if !slug_changed?
+
+    conflicting_assistant = user.assistants.where.not(id: id).where(slug: slug).where.not(deleted_at: nil).first
+    conflicting_assistant&.update_column(:slug, nil)
   end
 
   def set_default_slug

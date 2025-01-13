@@ -32,21 +32,42 @@ class Assistant::SlugTest < ActiveSupport::TestCase
     end
   end
 
-  test "clears slug when assistant is deleted" do
+  test "keeps slug when assistant is deleted" do
     assistant = assistants(:samantha)
     original_slug = assistant.slug
     assert_not_nil original_slug
 
     assistant.deleted!
-    assert_nil assistant.reload.slug
+    assert_equal original_slug, assistant.reload.slug
+  end
 
-    # Create a new assistant with the same name
+  test "clears slug of deleted assistant when new assistant takes its slug" do
+    assistant = assistants(:samantha)
+    original_slug = assistant.slug
+    assistant.deleted!
+    assert_equal original_slug, assistant.reload.slug
+
+    # Create a new assistant with the same slug
     new_assistant = assistant.user.assistants.create!(
       name: assistant.name,
+      slug: original_slug,
       language_model: assistant.language_model,
       tools: assistant.tools
     )
     assert_equal original_slug, new_assistant.slug
+    assert_nil assistant.reload.slug
+  end
+
+  test "clears slug of deleted assistant when existing assistant changes to its slug" do
+    deleted_assistant = assistants(:samantha)
+    original_slug = deleted_assistant.slug
+    deleted_assistant.deleted!
+
+    existing_assistant = assistants(:keith_gpt4)
+    existing_assistant.update!(slug: original_slug)
+
+    assert_equal original_slug, existing_assistant.reload.slug
+    assert_nil deleted_assistant.reload.slug
   end
 
   test "does not clear slug when other attributes change" do
