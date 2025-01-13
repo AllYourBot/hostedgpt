@@ -24,6 +24,24 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_equal params, Assistant.last.slice(:name, :description, :instructions, :language_model_id)
   end
 
+  test "should show error when creating assistant with duplicate slug" do
+    existing_assistant = assistants(:samantha)
+    params = {
+      name: "New Assistant",
+      slug: existing_assistant.slug,
+      description: "A new description",
+      instructions: "New instructions",
+      language_model_id: language_models(:gpt_4o).id
+    }
+
+    assert_no_difference("Assistant.count") do
+      post settings_assistants_url, params: { assistant: params }
+    end
+
+    assert_response :unprocessable_entity
+    assert_contains_text "main", "Slug has already been taken"
+  end
+
   test "should get edit" do
     get edit_settings_assistant_url(@assistant)
     assert_response :success

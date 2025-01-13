@@ -32,21 +32,42 @@ class Assistant::SlugTest < ActiveSupport::TestCase
     end
   end
 
-  test "clears slug when assistant is deleted" do
+  test "keeps slug when assistant is deleted" do
     assistant = assistants(:samantha)
     original_slug = assistant.slug
     assert_not_nil original_slug
 
     assistant.deleted!
-    assert_nil assistant.reload.slug
+    assert_equal original_slug, assistant.reload.slug
+  end
 
-    # Create a new assistant with the same name
+  test "clears slug of deleted assistant when new assistant takes its slug" do
+    assistant = assistants(:samantha)
+    original_slug = assistant.slug
+    assistant.deleted!
+    assert_equal original_slug, assistant.reload.slug
+
+    # Create a new assistant with the same slug
     new_assistant = assistant.user.assistants.create!(
       name: assistant.name,
+      slug: original_slug,
       language_model: assistant.language_model,
       tools: assistant.tools
     )
     assert_equal original_slug, new_assistant.slug
+    assert_nil assistant.reload.slug
+  end
+
+  test "clears slug of deleted assistant when existing assistant changes to its slug" do
+    deleted_assistant = assistants(:samantha)
+    original_slug = deleted_assistant.slug
+    deleted_assistant.deleted!
+
+    existing_assistant = assistants(:keith_gpt4)
+    existing_assistant.update!(slug: original_slug)
+
+    assert_equal original_slug, existing_assistant.reload.slug
+    assert_nil deleted_assistant.reload.slug
   end
 
   test "does not clear slug when other attributes change" do
@@ -55,5 +76,23 @@ class Assistant::SlugTest < ActiveSupport::TestCase
 
     assistant.update!(name: "New Name")
     assert_equal original_slug, assistant.reload.slug
+  end
+
+  test "fails to create a new assistant when slug collides with an existing assistant" do
+    existing = assistants(:samantha)
+    new_assistant = existing.user.assistants.new(
+      name: "Different Name",
+      slug: existing.slug,
+      language_model: existing.language_model
+    )
+    assert_not new_assistant.valid?
+    assert_includes new_assistant.errors[:slug], "has already been taken"
+  end
+
+  test "fails to update an assistant's slug when it collides with an existing assistant" do
+    existing = assistants(:samantha)
+    other = assistants(:keith_gpt4)
+    assert_not other.update(slug: existing.slug)
+    assert_includes other.errors[:slug], "has already been taken"
   end
 end
