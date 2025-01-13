@@ -42,17 +42,9 @@ module Assistant::Export
       assistants.each do |assistant|
         assistant = assistant.with_indifferent_access
         users.each do |user|
-          existing = user.assistants.not_deleted.find_by(slug: assistant["slug"])
-          if existing
-            existing.assign_attributes(assistant.except("slug", "language_model_api_name"))
-            existing.language_model_api_name = assistant["language_model_api_name"]
-            existing.save!
-          elsif !user.assistants.where(slug: assistant["slug"]).where.not(deleted_at: nil).exists?
-            attrs = assistant.except("language_model_api_name")
-            new_assistant = user.assistants.new(attrs)
-            new_assistant.language_model_api_name = assistant["language_model_api_name"]
-            new_assistant.save!
-          end
+          asst = user.assistants.find_or_create_by(slug: assistant["slug"])
+          asst.assign_attributes(assistant.except("slug")) if asst.deleted_at.nil?
+          asst.save!
         end
       end
     end
