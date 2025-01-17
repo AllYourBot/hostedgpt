@@ -18,7 +18,7 @@ class LanguageModel < ApplicationRecord
   end
 
   def ai_backend
-    if name.starts_with?("gpt-")
+    if name.starts_with?("gpt-") || name.starts_with?("o1")
       AIBackend::OpenAI
     else
       AIBackend::Anthropic
