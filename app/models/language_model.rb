@@ -17,8 +17,12 @@ class LanguageModel < ApplicationRecord
     BEST_MODELS[name] || name
   end
 
+  def openai_o1?
+    name.starts_with?('o1')
+  end
+
   def ai_backend
-    if name.starts_with?("gpt-")
+    if name.starts_with?("gpt-") || openai_o1?
       AIBackend::OpenAI
     else
       AIBackend::Anthropic
