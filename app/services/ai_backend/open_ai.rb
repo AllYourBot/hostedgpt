@@ -76,6 +76,7 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def system_message
+    return [] if @assistant.language_model.name.starts_with?("o1")
     [{
       role: "system",
       content: full_instructions.to_s + "\nThe current time & date for the user is " + DateTime.current.strftime("%-l:%M%P on %A, %B %-d, %Y")
