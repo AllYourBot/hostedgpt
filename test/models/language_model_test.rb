@@ -9,6 +9,17 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_instance_of User, language_models(:gpt_4o).user
   end
 
+  test "has token costs" do
+    assert_equal 0.0001, language_models(:gpt_4o).input_token_cost_cents
+    assert_equal 0.0001, language_models(:gpt_4o).output_token_cost_cents
+  end
+
+  # None in fixture
+  test "dafaults token cost values to 0" do
+    assert_equal 0.0, language_models(:alpaca).input_token_cost_cents
+    assert_equal 0.0, language_models(:alpaca).output_token_cost_cents
+  end
+
   test "has an associated api_service" do
     assert_instance_of APIService, language_models(:gpt_best).api_service
   end
