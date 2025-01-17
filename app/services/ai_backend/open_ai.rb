@@ -27,13 +27,16 @@ class AIBackend::OpenAI < AIBackend
     @stream_response_tool_calls = []
     response_handler = block_given? ? stream_handler(&chunk_handler) : nil
 
+    max_tokens_param = @assistant.openai_o1? ? :max_completion_tokens : :max_tokens
+
     begin
       response = @client.chat(parameters: {
         model: @assistant.language_model.provider_name,
         messages: system_message + preceding_messages,
         stream: response_handler,
-        max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
-      })
+      }.merge({
+        max_tokens_param => 2000 # we should really set this dynamically, based on the model, to the max
+      }))
     rescue ::Faraday::UnauthorizedError => e
       raise ::OpenAI::ConfigurationError
     end
@@ -76,7 +79,7 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def system_message
-    return [] if @assistant.language_model.name.starts_with?("o1")
+    return [] if @assistant.openai_o1?
     [{
       role: "system",
       content: full_instructions.to_s + "\nThe current time & date for the user is " + DateTime.current.strftime("%-l:%M%P on %A, %B %-d, %Y")

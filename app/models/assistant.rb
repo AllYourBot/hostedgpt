@@ -18,6 +18,10 @@ class Assistant < ApplicationRecord
 
   scope :ordered, -> { order(:id) }
 
+  def openai_o1?
+    language_model.name.start_with?('o1')
+  end
+
   def initials
     return nil if name.blank?
 
