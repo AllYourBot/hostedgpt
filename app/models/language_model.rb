@@ -11,6 +11,7 @@ class LanguageModel < ApplicationRecord
   before_validation :populate_position, unless: :position
 
   validates :api_name, :name, :position, presence: true
+  validates :input_token_cost_cents, :output_token_cost_cents, :numericality => { :greater_than_or_equal_to => 0 }
 
   before_save :soft_delete_assistants, if: -> { has_attribute?(:deleted_at) && deleted_at && deleted_at_changed? && deleted_at_was.nil? }
   after_save :update_best_language_model_for_api_service
