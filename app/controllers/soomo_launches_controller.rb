@@ -58,6 +58,7 @@ class SoomoLaunchesController < ApplicationController
 
     assistants = [
       ["o1", "o1"],
+      ["o1-mini", "o1-mini"],
       ["GPT-4o", "gpt-4o"],
       ["GPT-4o mini", "gpt-4o-mini"],
       ["GPT-3.5", "gpt-3.5-turbo"],
