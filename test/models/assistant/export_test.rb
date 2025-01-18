@@ -33,6 +33,77 @@ class Assistant::ExportTest < ActiveSupport::TestCase
     assert_equal assistants.first.keys.sort, %w[name description instructions slug language_model_api_name].sort
   end
 
+  test "import_from_file updates existing undeleted assistant with matching slug" do
+    user = users(:keith)
+    existing_assistant = user.assistants.not_deleted.first
+    new_name = "Updated Name"
+    assistants = [{
+      name: new_name,
+      slug: existing_assistant.slug,
+      description: "new description",
+      instructions: "new instructions",
+      language_model_api_name: language_models(:gpt_4o).api_name
+    }]
+    storage = { "assistants" => assistants }
+    path = Rails.root.join("tmp/update_existing.yml")
+    File.write(path, storage.to_yaml)
+
+    assert_no_difference "Assistant.count" do
+      Assistant.import_from_file(path:, users: [user])
+    end
+    existing_assistant.reload
+    assert_equal new_name, existing_assistant.name
+  end
+
+  test "import_from_file skips deleted assistant with matching slug" do
+    user = users(:keith)
+    deleted_assistant = user.assistants.first
+    original_name = deleted_assistant.name
+    deleted_assistant.deleted!
+
+    assistants = [{
+      name: "New Assistant",
+      slug: deleted_assistant.slug,
+      description: "new description",
+      instructions: "new instructions",
+      language_model_api_name: language_models(:gpt_4o).api_name
+    }]
+    storage = { "assistants" => assistants }
+    path = Rails.root.join("tmp/skip_deleted.yml")
+    File.write(path, storage.to_yaml)
+
+    assert_no_difference "Assistant.count" do
+      Assistant.import_from_file(path:, users: [user])
+    end
+    deleted_assistant.reload
+    assert_equal original_name, deleted_assistant.name
+    assert deleted_assistant.deleted?
+    assert_nil user.assistants.not_deleted.find_by(slug: deleted_assistant.slug)
+  end
+
+  test "import_from_file creates new assistant when no matching slug exists" do
+    user = users(:keith)
+    new_slug = "completely-new-slug"
+
+    assistants = [{
+      name: "Brand New Assistant",
+      slug: new_slug,
+      description: "new description",
+      instructions: "new instructions",
+      language_model_api_name: language_models(:gpt_4o).api_name
+    }]
+    storage = { "assistants" => assistants }
+    path = Rails.root.join("tmp/new_assistant.yml")
+    File.write(path, storage.to_yaml)
+
+    assert_difference "Assistant.count", 1 do
+      Assistant.import_from_file(path:, users: [user])
+    end
+    new_assistant = user.assistants.find_by(slug: new_slug)
+    assert_not_nil new_assistant
+    assert_equal "Brand New Assistant", new_assistant.name
+  end
+
   test "import_from_file with only new models" do
     user = users(:keith)
     user.assistants.destroy_all

@@ -10,7 +10,7 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref }}-test
       cancel-in-progress: true
-    timeout-minutes: 2
+    timeout-minutes: 10
     services:
       postgres:
         image: postgres:16.1
@@ -34,6 +34,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update && sudo apt-get install -y imagemagick
+          sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PS" \/>/<policy domain="coder" rights="read|write" pattern="PS" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="EPS" \/>/<policy domain="coder" rights="read|write" pattern="EPS" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="XPS" \/>/<policy domain="coder" rights="read|write" pattern="XPS" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="path" rights="none" pattern="@\*" \/>/<policy domain="path" rights="read|write" pattern="@\*" \/>/' /etc/ImageMagick-6/policy.xml
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -98,6 +108,16 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update && sudo apt-get install -y imagemagick
+          sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PS" \/>/<policy domain="coder" rights="read|write" pattern="PS" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="EPS" \/>/<policy domain="coder" rights="read|write" pattern="EPS" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="XPS" \/>/<policy domain="coder" rights="read|write" pattern="XPS" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo sed -i 's/<policy domain="path" rights="none" pattern="@\*" \/>/<policy domain="path" rights="read|write" pattern="@\*" \/>/' /etc/ImageMagick-6/policy.xml
 
       - name: Set up database schema
         run: bin/rails db:prepare

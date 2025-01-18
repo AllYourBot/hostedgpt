@@ -43,7 +43,7 @@ module Assistant::Export
         assistant = assistant.with_indifferent_access
         users.each do |user|
           asst = user.assistants.find_or_create_by(slug: assistant["slug"])
-          asst.assign_attributes(assistant.except("slug"))
+          asst.assign_attributes(assistant.except("slug")) if asst.deleted_at.nil?
           asst.save!
         end
       end
