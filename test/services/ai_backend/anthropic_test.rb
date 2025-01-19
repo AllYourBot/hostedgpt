@@ -18,6 +18,19 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     assert @anthropic.client.present?
   end
 
+  test "client uses effective api name for language model" do
+    @assistant.language_model.stub :effective_api_name, 'test-effective' do
+      @anthropic = AIBackend::Anthropic.new(
+        users(:keith),
+        @assistant,
+        @conversation,
+        @conversation.latest_message_for_version(:latest)
+      )
+      @anthropic.send(:set_client_config,{})
+      assert_equal 'test-effective', @anthropic.instance_eval('@client_config')[:model]
+    end
+  end
+
   test "stream_next_conversation_message works to stream text and uses model from assistant" do
     assert_not_equal @assistant, @conversation.assistant, "Should force this next message to use a different assistant so these don't match"
 

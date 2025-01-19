@@ -63,7 +63,7 @@ class AIBackend::OpenAI < AIBackend
 
     @client_config = {
       parameters: {
-        model: @assistant.language_model.api_name,
+        model: @assistant.language_model.effective_api_name,
         messages: system_message(config[:instructions]) + config[:messages],
         stream: config[:streaming] && @response_handler || nil,
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max

@@ -18,6 +18,24 @@ class LanguageModelTest < ActiveSupport::TestCase
     refute language_models(:guanaco).supports_tools?
   end
 
+  test "has effective_api_name when not -best" do
+    assert_equal "gpt-4o", language_models(:gpt_4o).effective_api_name
+    assert_equal "gpt-4o-2024-05-13", language_models(:gpt_4o_2024_05_13).effective_api_name
+  end
+
+  test "effective_api_name needs current user when api_name ends in best" do
+    exc = assert_raises do 
+      language_models(:gpt_best).effective_api_name
+    end
+    assert_equal "Could not resolve best model for gpt-best from API service OpenAI", exc.to_s
+  end
+
+  test "has effective_api_name when api_name ends in best" do
+    Current.stub :user, users(:keith) do
+      assert_equal "gpt-4o", language_models(:gpt_best).effective_api_name
+    end
+  end
+
   test "ai_backend works as a delegated attribute" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
   end

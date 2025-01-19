@@ -148,7 +148,6 @@ gpt_best:
   position: 1
   user: keith
   name: Best OpenAI Model
-  best: true
   api_name: gpt-best
   api_service: keith_openai_service
   supports_images: true
@@ -175,6 +174,7 @@ gpt_4o:
   name: GPT-4o (latest)
   api_name: gpt-4o
   api_service: keith_openai_service
+  best: true
   supports_images: true
   supports_tools: true
   input_token_cost_cents: 0.0001

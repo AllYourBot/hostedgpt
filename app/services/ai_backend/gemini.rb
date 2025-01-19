@@ -48,7 +48,7 @@ class AIBackend::Gemini < AIBackend
           version: "v1beta"
         },
         options: {
-          model: assistant.language_model.api_name,
+          model: assistant.language_model.effective_api_name,
           server_sent_events: true
         }
       )

@@ -18,6 +18,14 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     assert @openai.client.present?
   end
 
+  test "client uses effective api name for language model" do
+    @openai.stub :system_message, 'test-system-message' do # Not sure how not to stub this one
+      @assistant.language_model.stub :effective_api_name, 'test-effective' do
+        @openai.send(:set_client_config,{messages: 'test-msg'})
+        assert_equal 'test-effective', @openai.instance_eval('@client_config')[:parameters][:model]
+      end
+    end
+  end
   test "openai url is properly set" do
     assert_equal "https://api.openai.com/v1/", @openai.client.uri_base
   end

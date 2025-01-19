@@ -1,6 +1,8 @@
 module TestClient
   class Gemini
+    attr_reader :init_args
     def initialize(args)
+      @init_args = args.dup
     end
 
     def self.text

@@ -35,6 +35,21 @@ class LanguageModel < ApplicationRecord
     ai_backend.test_language_model(self, api_name)
   end
 
+  # Records can be labelled "best" for that API Service. When an api_name ends in "-best" we use the one
+  # labelled best for the service. Note the api_service's are scoped to the user.
+  def effective_api_name
+    if api_name =~ /-best\Z/
+      begin
+        Current.user.language_models.best_for_api_service(api_service).first.api_name
+      rescue => e
+        Rails.logger.info "Could not resolve best model for #{api_name} from API service #{api_service.name} : #{e}"
+        raise "Could not resolve best model for #{api_name} from API service #{api_service.name}"
+      end
+    else
+      api_name
+    end
+  end
+
   private
 
   def populate_position

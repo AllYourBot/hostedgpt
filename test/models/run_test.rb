@@ -40,6 +40,20 @@ class RunTest < ActiveSupport::TestCase
       assert_equal "claude-3-opus-20240229", r.model
   end
 
+  test "effective model populated from conversations language_model" do
+    assistant = assistants(:keith_claude3)
+    assistant.language_model.stub :effective_api_name, 'test-effective' do
+      r = Run.create!(
+        assistant: assistant,
+        conversation: conversations(:greeting),
+        instructions: "Some instructions",
+        status: "queued",
+        expired_at: 1.minute.from_now
+      )
+      assert_equal "test-effective", r.model
+    end
+  end
+
   test "associations are deleted upon destroy" do
     assert_difference "Step.count", -1 do
       runs(:hear_me_response).destroy
