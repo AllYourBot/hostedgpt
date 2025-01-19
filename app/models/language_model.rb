@@ -40,7 +40,7 @@ class LanguageModel < ApplicationRecord
   def effective_api_name
     if api_name =~ /-best\Z/
       begin
-        Current.user.language_models.best_for_api_service(api_service).first.api_name
+        api_service.language_models.best_for_api_service(api_service).first.api_name # there should be only one.
       rescue => e
         Rails.logger.info "Could not resolve best model for #{api_name} from API service #{api_service.name} : #{e}"
         raise "Could not resolve best model for #{api_name} from API service #{api_service.name}"

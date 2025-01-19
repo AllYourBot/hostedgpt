@@ -23,7 +23,8 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_equal "gpt-4o-2024-05-13", language_models(:gpt_4o_2024_05_13).effective_api_name
   end
 
-  test "effective_api_name needs current user when api_name ends in best" do
+  test "effective_api_name fails with message when api_name ends in best" do
+    language_models(:gpt_4o).update!(best: false)
     exc = assert_raises do 
       language_models(:gpt_best).effective_api_name
     end
