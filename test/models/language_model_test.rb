@@ -25,7 +25,7 @@ class LanguageModelTest < ActiveSupport::TestCase
 
   test "effective_api_name fails with message when api_name ends in best" do
     language_models(:gpt_4o).update!(best: false)
-    exc = assert_raises do 
+    exc = assert_raises do
       language_models(:gpt_best).effective_api_name
     end
     assert_equal "Could not resolve best model for gpt-best from API service OpenAI", exc.to_s

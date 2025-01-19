@@ -42,7 +42,7 @@ class RunTest < ActiveSupport::TestCase
 
   test "effective model populated from conversations language_model" do
     assistant = assistants(:keith_claude3)
-    assistant.language_model.stub :effective_api_name, 'test-effective' do
+    assistant.language_model.stub :effective_api_name, "test-effective" do
       r = Run.create!(
         assistant: assistant,
         conversation: conversations(:greeting),

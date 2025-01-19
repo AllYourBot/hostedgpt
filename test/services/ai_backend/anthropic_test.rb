@@ -19,7 +19,7 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
   end
 
   test "client uses effective api name for language model" do
-    @assistant.language_model.stub :effective_api_name, 'test-effective' do
+    @assistant.language_model.stub :effective_api_name, "test-effective" do
       @anthropic = AIBackend::Anthropic.new(
         users(:keith),
         @assistant,
@@ -27,7 +27,7 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
         @conversation.latest_message_for_version(:latest)
       )
       @anthropic.send(:set_client_config,{})
-      assert_equal 'test-effective', @anthropic.instance_eval('@client_config')[:model]
+      assert_equal "test-effective", @anthropic.instance_eval("@client_config")[:model]
     end
   end
 
