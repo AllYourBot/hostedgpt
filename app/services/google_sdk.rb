@@ -1,4 +1,4 @@
-class Google < SDK
+class GoogleSDK < SDK
 
   def self.reauthenticate_credential(credential)
     # from here: https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code
