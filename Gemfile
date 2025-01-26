@@ -72,7 +72,6 @@ group :development do
   # gem "spring"
 
   gem "byebug", platforms: %i[mri mingw x64_mingw]
-  gem "pry-rails"
   gem "standard"
   gem "ruby-lsp"
   gem "rubocop-rails"

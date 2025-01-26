@@ -119,7 +119,6 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
-    coderay (1.1.3)
     concurrent-ruby (1.3.4)
     connection_pool (2.4.1)
     crack (1.0.0)
@@ -202,7 +201,6 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.2)
-    method_source (1.0.0)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.25.1)
@@ -277,11 +275,6 @@ GEM
     prism (0.19.0)
     protocol (2.0.0)
       ruby_parser (~> 3.0)
-    pry (0.14.2)
-      coderay (~> 1.1)
-      method_source (~> 1.0)
-    pry-rails (0.3.9)
-      pry (>= 0.10.4)
     psych (5.1.2)
       stringio
     public_suffix (6.0.1)
@@ -520,7 +513,6 @@ DEPENDENCIES
   ostruct
   pg (~> 1.1)
   postmark-rails
-  pry-rails
   puma (>= 6.0)
   rack-cors
   rails (~> 7.2.2)
