@@ -134,7 +134,13 @@ class SDK::Verb
   end
 
   def decompress_body(response)
-    return response.body unless response.headers["content-encoding"] == "gzip"
-    Zlib::GzipReader.new(StringIO.new(response.body)).read
+    return response.body unless response.respond_to?(:headers) &&
+                               response.headers["content-encoding"] == "gzip" &&
+                               response.body.bytes[0..1] == [0x1f, 0x8b]
+    begin
+      Zlib::GzipReader.new(StringIO.new(response.body)).read
+    rescue Zlib::GzipFile::Error
+      response.body
+    end
   end
 end
