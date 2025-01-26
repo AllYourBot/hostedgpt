@@ -31,9 +31,8 @@ class SDK::Verb
     raise ResponseError.new(response) if !response.status.in? @expected_statuses
 
     if response.status.between?(200, 299)
-      response.body.presence && OpenData.for(JSON.parse(response.body)) rescue response
-    else
-      response
+      body = decompress_body(response)
+      body.presence && OpenData.for(JSON.parse(body)) rescue response
     end
   end
 
@@ -132,5 +131,16 @@ class SDK::Verb
     return if self.class.send("allow_#{verb}_#{@calling_method}") rescue false
 
     Rails.logger.info "WARNING: live API call in test. USE: stub_#{verb}_response(:#{@calling_method}, status: ___, response: _______) do; ...; end"
+  end
+
+  def decompress_body(response)
+    return response.body unless response.respond_to?(:headers) &&
+                               response.headers["content-encoding"] == "gzip" &&
+                               response.body.bytes[0..1] == [0x1f, 0x8b]
+    begin
+      Zlib::GzipReader.new(StringIO.new(response.body)).read
+    rescue Zlib::GzipFile::Error
+      response.body
+    end
   end
 end

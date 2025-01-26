@@ -12,7 +12,7 @@ module Toolbox::GoogleTasks::APIHelpers
   end
 
   def get_list(title)
-    list = get_lists.find { |l| l.title == title }
+    list = get_lists&.find { |l| l.title == title }
     raise "Could not find a task list named '#{title}'" if list.nil?
     list
   end

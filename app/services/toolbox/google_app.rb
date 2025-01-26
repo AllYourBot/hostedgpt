@@ -19,7 +19,7 @@ module Toolbox::GoogleApp
   end
 
   def refresh_token!
-    if !Google.reauthenticate_credential(app_credential)
+    if ! ::GoogleSDK.reauthenticate_credential(app_credential)
       raise "Gmail no longer connected"
     else
       true
@@ -32,7 +32,7 @@ module Toolbox::GoogleApp
 
   def bearer_token
     token = app_credential&.oauth_token
-    raise "Unable to find a user with Gmail credentials" unless token
+    raise "Unable to find a user with valid credentials" unless token
     token
   end
 
