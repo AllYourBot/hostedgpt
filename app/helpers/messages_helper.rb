@@ -80,7 +80,9 @@ module MessagesHelper
   end
 
   def message_to_user_from_tool_call?(message)
-    JSON.parse(message.content_text)["message_to_user"].present? if message.content_text.present?
+    return false if message.content_text.blank?
+    msg_hash = JSON.parse(message.content_text)
+    msg_hash.is_a?(Hash) && msg_hash["message_to_user"].present?
   rescue JSON::ParserError
     false
   end
