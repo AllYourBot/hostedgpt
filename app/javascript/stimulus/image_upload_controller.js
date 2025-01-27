@@ -4,6 +4,11 @@ export default class extends Controller {
   static targets = [ "file", "content", "preview" ]
 
   connect() {
+    if (!this.hasFileTarget || !this.hasContentTarget) {
+      console.log("image-upload controller is skipping initialization because a target is missing")
+      return
+    }
+
     this.dragCounter = 0
     this.fileTarget.addEventListener("change", this.boundPreviewUpdate)
     this.element.addEventListener("drop", this.boundDropped)
@@ -14,6 +19,8 @@ export default class extends Controller {
   }
 
   disconnect() {
+    if (!this.hasFileTarget || !this.hasContentTarget) return
+
     this.fileTarget.removeEventListener("change", this.boundPreviewUpdate)
     this.element.removeEventListener("drop", this.boundDropped)
     this.contentTarget.removeEventListener("paste", this.boundPasted)
@@ -24,6 +31,8 @@ export default class extends Controller {
 
   boundPreviewUpdate = () => { this.previewUpdate() }
   previewUpdate() {
+    if (!this.hasFileTarget || !this.hasPreviewTarget) return
+
     const input = this.fileTarget
     if (input.files && input.files[0]) {
       const reader = new FileReader()
@@ -38,19 +47,23 @@ export default class extends Controller {
   }
 
   previewRemove() {
+    if (!this.hasPreviewTarget) return
+
     this.previewTarget.querySelector("img").src = ''
     this.element.classList.remove("show-previews")
-    this.contentTarget.focus()
+    if (this.hasContentTarget) this.contentTarget.focus()
     window.dispatchEvent(new CustomEvent('main-column-changed'))
   }
 
   boundDropped = (event) => { this.dropped(event) }
   dropped(event) {
+    if (!this.hasFileTarget) return
+
     event.preventDefault()
     this.dragCounter = 0
     const shade = this.element.querySelector("#drag-n-drop-shade")
     if (shade) shade.remove()
-  
+
     let files = event.dataTransfer.files
     this.fileTarget.files = files
     this.previewUpdate()
@@ -82,6 +95,8 @@ export default class extends Controller {
 
   boundPasted = async (event) => { this.pasted(event) }
   async pasted(event) {
+    if (!this.hasFileTarget) return
+
     const clipboardData =
       event.clipboardData || event.originalEvent.clipboardData
 
@@ -113,7 +128,7 @@ export default class extends Controller {
   displayDragnDropShade() {
     const existing = this.element.querySelector("#drag-n-drop-shade")
     if (existing) return
-    
+
     this.element.insertAdjacentHTML(
       'beforeend',
       '<div id="drag-n-drop-shade"></div>'
@@ -121,6 +136,8 @@ export default class extends Controller {
   }
 
   addImageToFileInput(dataURL, fileType) {
+    if (!this.hasFileTarget) return
+
     const fileList = new DataTransfer()
     const blob = this.dataURLtoBlob(dataURL, fileType)
     fileList.items.add(
@@ -140,10 +157,12 @@ export default class extends Controller {
   }
 
   choose() {
+    if (!this.hasFileTarget) return
     this.fileTarget.click()
   }
 
   remove() {
+    if (!this.hasFileTarget) return
     this.fileTarget.value = ''
     this.previewRemove()
   }
