@@ -66,7 +66,7 @@ class AIBackend::OpenAI < AIBackend
         model: @assistant.language_model.api_name,
         messages: system_message(config[:instructions]) + config[:messages],
         stream: config[:streaming] && @response_handler || nil,
-        max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
+        max_completion_tokens: 2000, # we should really set this dynamically, based on the model, to the max
         stream_options: config[:streaming] && { include_usage: true } || nil,
         response_format: { type: "text" },
         tools: @assistant.language_model.supports_tools? && Toolbox.tools || nil,
