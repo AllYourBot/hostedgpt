@@ -55,6 +55,15 @@
   <% end %>
 
   <div class="my-5">
+    <%= form.label :input_token_cost_cents  %>
+    <%= form.text_field :input_token_cost_cents , class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+  </div>
+  <div class="my-5">
+    <%= form.label :output_token_cost_cents  %>
+    <%= form.text_field :output_token_cost_cents , class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+  </div>
+
+  <div class="my-5">
     <%= form.check_box :best %>
     <%= form.label :best, "Best?" %>
   </div>
