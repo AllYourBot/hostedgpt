@@ -177,6 +177,16 @@ If you need to make changes to the Docker configuration, see the [Understanding 
 
 If you want to run your LLM locally so the app has no online dependencies, see [Running an LLM on your computer](https://github.com/AllYourBot/hostedgpt/discussions/471).
 
+### Using "Just"
+
+If you have ths `just` tool installed, there are a couple of easy tasks that have been configured for you to start and debug the application:
+
+- `just start` will start the application, this is the best way if you start from 0
+- `just bash` will give you a bash console inside the running Rails Docker container
+- `just overmind` will give you a access to Overmind which you can use to attach to e.g. the worker
+- `just teardown` this will remove everything (sometimes this is great to start from scratch if there are Docker related issues)
+
+
 ### Alternatively, you can run outside of Docker
 
 HostedGPT requires these services to be running:
