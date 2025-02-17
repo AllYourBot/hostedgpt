@@ -72,6 +72,15 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "edit should have token_cost fields" do
+    get edit_settings_language_model_url(@language_model)
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[input_token_cost_cents]"]'
+      assert_select 'input[name="language_model[output_token_cost_cents]"]'
+    end
+  end
+
   test "edit should have supports_tools checkbox checked" do
     get edit_settings_language_model_url(@language_model)
     assert_response :success
@@ -120,6 +129,13 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_language_model_url(@language_model)
     assert_response :success
     assert_contains_text "main", "Delete"
+  end
+
+  test "should update token_costs" do
+    assert @language_model.supports_tools?
+    patch settings_language_model_url(@language_model), params: { language_model: {input_token_cost_cents: 12.3, output_token_cost_cents: 0.0 }}
+    assert_equal 12.3, @language_model.reload.input_token_cost_cents
+    assert_equal 0, @language_model.output_token_cost_cents
   end
 
   test "should update supports_tools" do
