@@ -49,7 +49,7 @@ gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql ac
 gem "aws-sdk-s3", require: false
 gem "postmark-rails"
 gem "ostruct"
-gem "nokogiri", "~> 1.18", platforms: %i[x64-mingw-ucrt x86_64-darwin]
+gem "nokogiri", "~> 1.18", platforms: %i[x64_mingw x86_64-darwin]
 
 gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2", "~> 1.1"
