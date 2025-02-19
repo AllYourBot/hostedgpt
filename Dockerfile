@@ -19,7 +19,7 @@ ENV BUNDLE_DEPLOYMENT="1" \
 
 # Update gems and bundler
 RUN gem update --system --no-document && \
-    gem install -N bundler
+    gem install -N bundler && gem update bundler
 
 
 # Throw-away build stage to reduce size of final image
