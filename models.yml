@@ -18,10 +18,19 @@ models:
   best: true
   supports_system_message: true
   api_service_name: Anthropic
-- api_name: llama-3.1-70b-versatile
-  name: Meta Llama 3.1 70b Versatile
+- api_name: deepseek-r1-distill-llama-70B
+  name: DeepSeek R1 Distill Llama 70B
   supports_images: false
-  supports_tools: true
+  supports_tools: false
+  input_token_cost_cents: '0.000075'
+  output_token_cost_cents: '0.000099'
+  best: true
+  supports_system_message: true
+  api_service_name: Groq
+- api_name: llama-3.3-70b-versatile
+  name: Llama 3.3 70B Versatile 128k
+  supports_images: false
+  supports_tools: false
   input_token_cost_cents: '0.000059'
   output_token_cost_cents: '0.000079'
   best: true

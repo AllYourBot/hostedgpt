@@ -8,7 +8,10 @@ assistants:
   language_model_api_name: claude-3-5-sonnet-20241022
 - name: Meta Llama
   slug: llama-3-70b
-  language_model_api_name: llama-3.1-70b-versatile
+  language_model_api_name: llama-3.3-70b-versatile
+- name: DeepSeek R1
+  slug: deepseek-r1
+  language_model_api_name: deepseek-r1-distill-llama-70B
 - name: Gemini Pro 1.5
   slug: gemini-1-5-pro
   language_model_api_name: gemini-1.5-pro-002

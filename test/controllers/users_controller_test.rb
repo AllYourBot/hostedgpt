@@ -58,7 +58,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     user = Person.find_by(email: email).user
     assert_equal "John", user.first_name
     assert_equal "Doe", user.last_name
-    assert_equal 4, user.assistants.count, "This new user did not get the expected number of assistants"
+    assert_equal 5, user.assistants.count, "This new user did not get the expected number of assistants"
 
     assistant = user.assistants.ordered.first
 
