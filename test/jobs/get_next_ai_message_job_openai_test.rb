@@ -56,6 +56,66 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     refute second_new_message.finished?, "This message SHOULD NOT be considered finished yet"
   end
 
+  test "properly handles a tool response call from the assistant when images are included" do
+    @image_generation = conversations(:image_generation)
+    @image_generation.messages.create! role: :user, content_text: "Generate an image", assistant: @image_generation.assistant
+    @image_generation_message = @image_generation.latest_message_for_version(:latest)
+
+    @image_generation.assistant.language_model.update!(supports_tools: true)
+
+    image_generation_prompt = "Kitten"
+
+    response = {
+      data: [{
+        url: "https://example.com/image.jpg"
+      }]
+    }
+
+    images_mock = Minitest::Mock.new
+    images_mock.expect :generate, response, parameters: {
+      prompt: image_generation_prompt,
+      model: "dall-e-3",
+      size: "1024x1792",
+      quality: "standard"
+    }
+
+    assert_difference "@image_generation.messages.reload.length", 2 do
+      OpenAI::Client.stub_any_instance :images, images_mock do
+        TestClient::OpenAI.stub :function, "dalle_generate_an_image" do
+          TestClient::OpenAI.stub :arguments, { :image_generation_prompt=>image_generation_prompt } do
+            assert GetNextAIMessageJob.perform_now(@user.id, @image_generation_message.id, @image_generation.assistant.id)
+          end
+        end
+      end
+    end
+
+    @image_generation_message.reload
+    assert @image_generation_message.content_text.blank?
+    assert @image_generation_message.tool_call_id.nil?
+    assert @image_generation_message.content_tool_calls.present?, "Assistant should have decided to call a tool"
+
+    @new_messages = @image_generation.messages.where("id > ?", @image_generation_message.id).order(:created_at)
+
+    # first
+    first_new_message = @new_messages.first
+    assert first_new_message.tool?
+    content_text = first_new_message.content_text
+    json_content_text = JSON.parse(content_text)
+    assert_equal image_generation_prompt, json_content_text["prompt_given"], "First new message should have the result of calling the tool"
+    assert first_new_message.tool_call_id.present?
+    assert first_new_message.content_tool_calls.present?
+    assert_equal @image_generation_message.content_tool_calls.dig(0, :id), first_new_message.tool_call_id, "ID of tool execution should have matched decision to call the tool"
+    assert first_new_message.finished?, "This message SHOULD HAVE been considered finished"
+
+    # second
+    second_new_message = @new_messages.second
+    assert second_new_message.assistant?, "Second new message should be queued up for the assistant to reply"
+    assert second_new_message.content_text.nil?, "The content should be nil to indicate that it hasn't even started processing"
+    assert second_new_message.tool_call_id.nil?
+    assert second_new_message.content_tool_calls.blank?
+    refute second_new_message.finished?, "This message SHOULD NOT be considered finished yet"
+  end
+
   test "returns early if the message id was invalid" do
     refute GetNextAIMessageJob.perform_now(@user.id, 0, @assistant.id)
   end
