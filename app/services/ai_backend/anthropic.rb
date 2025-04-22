@@ -59,10 +59,10 @@ class AIBackend::Anthropic < AIBackend
     super(config)
 
     @client_config = {
-      model: @assistant.language_model.api_name,
-      system: config[:instructions],
-      messages: config[:messages],
       parameters: {
+        model: @assistant.language_model.api_name,
+        system: config[:instructions],
+        messages: config[:messages],
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
         stream: config[:streaming] && @response_handler || nil,
       }.compact.merge(config[:params]&.except(:response_format) || {})
