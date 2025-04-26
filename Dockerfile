@@ -101,7 +101,9 @@ ENV BUNDLE_CACHE=/tmp/bundle \
 WORKDIR /rails
 COPY Gemfile Gemfile.lock .ruby-version ./
 
+# Set specific platform for bundle install to avoid cross-platform issues
 RUN --mount=type=cache,id=gems,target=/tmp/bundle \
+  bundle config set --local specific_platform true && \
   bundle install
 
 RUN apk add --no-cache postgresql-client
