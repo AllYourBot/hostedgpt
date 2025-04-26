@@ -335,7 +335,7 @@ GEM
     rake (13.2.1)
     rdoc (6.7.0)
       psych (>= 4.0.0)
-    redcarpet (3.6.0)
+    redcarpet (3.6.1)
     redis (5.0.8)
       redis-client (>= 0.17.0)
     redis-client (0.18.0)
