@@ -92,19 +92,22 @@ EXPOSE 3000
 FROM ruby:${RUBY_VERSION}-alpine@sha256:caeab43b356463e63f87af54a03de1ae4687b36da708e6d37025c557ade450f8 AS development
 # TODO: When we bump to a new version of ruby we'll ahve to unpin from this specific sha
 
-RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
+RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick libxml2-dev libxslt-dev
 
 ENV BUNDLE_CACHE=/tmp/bundle \
   BUNDLE_JOBS=2 \
   PORT=3000
 
 WORKDIR /rails
-COPY Gemfile Gemfile.lock .ruby-version ./
+COPY Gemfile .ruby-version ./
+# Note: Not copying Gemfile.lock initially
 
-# Set specific platform for bundle install to avoid cross-platform issues
+# First install without the lock file
 RUN --mount=type=cache,id=gems,target=/tmp/bundle \
-  bundle config set --local specific_platform true && \
-  bundle install
+    bundle install --jobs=${BUNDLE_JOBS}
+
+# Now copy the rest of the app
+COPY . .
 
 RUN apk add --no-cache postgresql-client
 
