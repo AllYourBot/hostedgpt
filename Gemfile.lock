@@ -207,6 +207,7 @@ GEM
     matrix (0.4.2)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.8)
     minitest (5.25.5)
     minitest-retry (0.2.5)
       minitest (>= 5.0)
@@ -231,6 +232,9 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.4)
+    nokogiri (1.18.8)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.18.8-aarch64-linux-musl)
       racc (~> 1.4)
     nokogiri (1.18.8-arm64-darwin)
@@ -341,6 +345,7 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.2.1)
+    rb_sys (0.9.106)
     rbs (3.9.2)
       logger
     rdoc (6.13.1)
@@ -425,7 +430,7 @@ GEM
       fugit (~> 1.11.0)
       railties (>= 7.1)
       thor (~> 1.3.1)
-    sorbet-runtime (0.5.12041)
+    sorbet-runtime (0.5.12042)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -450,6 +455,8 @@ GEM
       railties (>= 6.0.0)
     stringio (3.1.7)
     sync (0.5.0)
+    tailwindcss-rails (2.7.9)
+      railties (>= 7.0.0)
     tailwindcss-rails (2.7.9-aarch64-linux)
       railties (>= 7.0.0)
     tailwindcss-rails (2.7.9-arm64-darwin)
@@ -459,6 +466,8 @@ GEM
     tailwindcss-rails (2.7.9-x86_64-linux)
       railties (>= 7.0.0)
     thor (1.3.2)
+    tiktoken_ruby (0.0.11.1)
+      rb_sys (= 0.9.106)
     tiktoken_ruby (0.0.11.1-aarch64-linux)
     tiktoken_ruby (0.0.11.1-arm64-darwin)
     tiktoken_ruby (0.0.11.1-x86_64-darwin)
@@ -501,9 +510,9 @@ GEM
 
 PLATFORMS
   aarch64-linux-musl
-  arm64-darwin-23
-  arm64-darwin-24
-  x86_64-darwin-22
+  arm64-darwin
+  ruby
+  x86_64-darwin
   x86_64-darwin-23
   x86_64-linux
 
@@ -561,4 +570,4 @@ RUBY VERSION
    ruby 3.3.6p108
 
 BUNDLED WITH
-   2.5.22
+   2.6.8
