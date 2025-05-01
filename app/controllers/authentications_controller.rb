@@ -17,8 +17,8 @@ class AuthenticationsController < ApplicationController
       return
     end
 
-    flash.now[:alert] = "Invalid email or password"
-    render :new, status: :unprocessable_entity
+    flash[:alert] = "Invalid email or password"
+    redirect_to login_path(email: params[:email]), status: :see_other
   end
 
   def destroy
