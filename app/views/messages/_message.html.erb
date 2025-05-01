@@ -15,19 +15,7 @@ end %>
 <% done_thinking = !thinking && message.content_text.present? %>
 <% debug_tool_message = false %>
 
-<div
-  id="<%= dom_id message %>"
-  class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !message_to_user_from_tool_call?(message) && !debug_tool_message && "hidden" %>"
-  data-role="message"
-  data-subrole="<%= message.role %>-message"
-
-  data-controller="<%= message.assistant? && !message.only_tool_response? && "playback" %>"
-  data-playback-id-value="<%= message.id %>"
-  data-playback-sentences-index-value="0"
-  data-playback-done-prompting-value="false"
-  data-playback-transition-outlet="#playback-control-<%= message.id %>"
-  data-action="turbo:before-morph-attribute->playback#preserveStimulusValues"
-> <!-- this outer div persists throughout streaming updates -->
+<% content_for(:inner_message) do %>
   <div
     class="flex"
     data-role="inner-message"
@@ -275,4 +263,24 @@ end %>
       <% end %>
     </div>
   </div>
-</div>
+<% end %>
+
+<% if streamed %>
+  <%= yield(:inner_message) %>
+<% else %>
+  <div
+    id="<%= dom_id message %>"
+    class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !message_to_user_from_tool_call?(message) && !debug_tool_message && "hidden" %>"
+    data-role="message"
+    data-subrole="<%= message.role %>-message"
+
+    data-controller="<%= message.assistant? && !message.only_tool_response? && "playback" %>"
+    data-playback-id-value="<%= message.id %>"
+    data-playback-sentences-index-value="0"
+    data-playback-done-prompting-value="false"
+    data-playback-transition-outlet="#playback-control-<%= message.id %>"
+    data-action="turbo:before-morph-attribute->playback#preserveStimulusValues"
+  > <!-- this outer div persists throughout streaming updates -->
+    <%= yield(:inner_message) %>
+  </div>
+<% end %>
