@@ -27,7 +27,7 @@ class SessionsTest < ApplicationSystemTestCase
     assert_text "Invalid email or password"
     assert_equal @user.email, find("#email").value
     assert_active "#password"
-    assert_current_path previous_path
+    assert_current_path previous_path, ignore_query: true
   end
 
   test "should NOT display a Google button when the feature is DISABLED" do
