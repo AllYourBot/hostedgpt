@@ -15,7 +15,7 @@ end %>
 <% done_thinking = !thinking && message.content_text.present? %>
 <% debug_tool_message = false %>
 
-<% content_for(:inner_message) do %>
+<% content_for :inner_message do %>
   <div
     class="flex"
     data-role="inner-message"
@@ -266,7 +266,7 @@ end %>
 <% end %>
 
 <% if streamed %>
-  <%= yield(:inner_message) %>
+  <%= content_for :inner_message %>
 <% else %>
   <div
     id="<%= dom_id message %>"
@@ -281,6 +281,6 @@ end %>
     data-playback-transition-outlet="#playback-control-<%= message.id %>"
     data-action="turbo:before-morph-attribute->playback#preserveStimulusValues"
   > <!-- this outer div persists throughout streaming updates -->
-    <%= yield(:inner_message) %>
+    <%= content_for :inner_message %>
   </div>
 <% end %>
