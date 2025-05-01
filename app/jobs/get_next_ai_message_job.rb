@@ -122,7 +122,7 @@ class GetNextAIMessageJob < ApplicationJob
 
   def self.broadcast_updated_message(message, locals = {})
     html = ApplicationController.render(
-      partial: "messages/message",
+      partial: "messages/inner_message",
       locals: {
         message:,
         only_scroll_down_if_was_bottom: true,
