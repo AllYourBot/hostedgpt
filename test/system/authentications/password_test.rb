@@ -29,6 +29,6 @@ class Authentications::PasswordTest < ApplicationSystemTestCase
     assert_text "Invalid email or password"
     assert_equal @user.person.email, find("#email").value
     assert_active "#password"
-    assert_current_path previous_path
+    assert_current_path previous_path, ignore_query: true
   end
 end

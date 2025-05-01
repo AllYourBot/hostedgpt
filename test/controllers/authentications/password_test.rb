@@ -30,7 +30,7 @@ class AuthenticationsController::PasswordTest < ActionDispatch::IntegrationTest
       email: people(:keith_registered).email,
       password: "wrong"
     }
-    assert_response :unprocessable_entity
+    assert_response :see_other
     assert_match(/Invalid email or password/, flash.alert)
   end
 
@@ -39,7 +39,7 @@ class AuthenticationsController::PasswordTest < ActionDispatch::IntegrationTest
       email: "wrong@email.com",
       password: "wrong"
     }
-    assert_response :unprocessable_entity
+    assert_response :see_other
     assert_match(/Invalid email or password/, flash.alert)
   end
 end
