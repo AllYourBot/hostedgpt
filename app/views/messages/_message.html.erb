@@ -1,6 +1,8 @@
 <%# locals: (message:, request_id: nil, scroll_down: false, only_scroll_down_if_was_bottom: false, thinking: nil, streamed: false, message_counter: -1) -%>
 <%# request_id is not used, but broadcasting turbo stream messages provides it as a local so it needs to be accepted %>
 
+<% debug_tool_message = false %>
+
 <div
   id="<%= dom_id message %>"
   class="mb-5 ml-9 sm:ml-3 md:ml-8 group <%= message.only_tool_response? && !message_to_user_from_tool_call?(message) && !debug_tool_message && "hidden" %>"
@@ -14,5 +16,5 @@
   data-playback-transition-outlet="#playback-control-<%= message.id %>"
   data-action="turbo:before-morph-attribute->playback#preserveStimulusValues"
 > <!-- this outer div persists throughout streaming updates -->
-  <%= render partial: 'inner_message', locals: { message:, scroll_down:, only_scroll_down_if_was_bottom:, thinking:, streamed:, message_counter: }, format: 'html' %>
+  <%= render partial: 'inner_message', locals: { message:, scroll_down:, only_scroll_down_if_was_bottom:, thinking:, streamed:, message_counter:, debug_tool_message: }, format: 'html' %>
 </div>

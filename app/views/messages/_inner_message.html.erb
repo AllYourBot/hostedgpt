@@ -1,4 +1,4 @@
-<%# locals: (message:, scroll_down: false, only_scroll_down_if_was_bottom: false, thinking: nil, streamed: false, message_counter: -1) -%>
+<%# locals: (message:, scroll_down: false, only_scroll_down_if_was_bottom: false, thinking: nil, streamed: false, message_counter: -1, debug_tool_message: false) -%>
 
 <% conversation = message.conversation %>
 <% conversation_version = streamed ? message.version : @version %>
@@ -12,7 +12,6 @@ end %>
 <% scroll_down = scroll_down || initial_page_load %>
 <% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
 <% done_thinking = !thinking && message.content_text.present? %>
-<% debug_tool_message = false %>
 
 <div
   class="flex"
