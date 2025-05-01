@@ -207,4 +207,12 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
       assert_contains_text "div#test_result", "Success."
     end
   end
+
+  test "test should return success and a message when ends in best" do
+    TestClient::OpenAI.stub :text, "Success." do
+      get settings_language_model_test_url(format: :turbo_stream, language_model_id: language_models(:gpt_best).id, model: "gpt-best")
+      assert_response :success
+      assert_contains_text "div#test_result", "Success."
+    end
+  end
 end
