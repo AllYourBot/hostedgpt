@@ -9,6 +9,17 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_instance_of User, language_models(:gpt_4o).user
   end
 
+  test "has token costs" do
+    assert_equal 0.0001, language_models(:gpt_4o).input_token_cost_cents
+    assert_equal 0.0001, language_models(:gpt_4o).output_token_cost_cents
+  end
+
+  # None in fixture
+  test "defaults token cost values to 0" do
+    assert_equal 0.0, language_models(:alpaca).input_token_cost_cents
+    assert_equal 0.0, language_models(:alpaca).output_token_cost_cents
+  end
+
   test "has an associated api_service" do
     assert_instance_of APIService, language_models(:gpt_best).api_service
   end
@@ -32,6 +43,36 @@ class LanguageModelTest < ActiveSupport::TestCase
     record = LanguageModel.new(name: "")
     refute record.valid?
     assert_equal ["can't be blank"], record.errors[:name]
+  end
+
+  test "validates input_token_cost_cents" do
+    record = LanguageModel.new(input_token_cost_cents: "")
+    refute record.valid?
+    assert_equal ["is not a number"], record.errors[:input_token_cost_cents]
+    record.input_token_cost_cents = '1'
+    refute record.valid?
+    assert_equal [], record.errors[:input_token_cost_cents] # no problem with this field
+    record.input_token_cost_cents = 'a'
+    refute record.valid?
+    assert_equal ["is not a number"], record.errors[:input_token_cost_cents]
+    record.input_token_cost_cents = '-9'
+    refute record.valid?
+    assert_equal ["must be greater than or equal to 0"], record.errors[:input_token_cost_cents]
+  end
+
+  test "validates output_token_cost_cents" do
+    record = LanguageModel.new(output_token_cost_cents: "")
+    refute record.valid?
+    assert_equal ["is not a number"], record.errors[:output_token_cost_cents]
+    record.output_token_cost_cents = '1'
+    refute record.valid?
+    assert_equal [], record.errors[:output_token_cost_cents] # no problem with this field
+    record.output_token_cost_cents = 'a'
+    refute record.valid?
+    assert_equal ["is not a number"], record.errors[:output_token_cost_cents]
+    record.output_token_cost_cents = '-9'
+    refute record.valid?
+    assert_equal ["must be greater than or equal to 0"], record.errors[:output_token_cost_cents]
   end
 
   test "cannot create without user" do
