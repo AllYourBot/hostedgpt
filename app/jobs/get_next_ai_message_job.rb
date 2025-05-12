@@ -122,16 +122,15 @@ class GetNextAIMessageJob < ApplicationJob
 
   def self.broadcast_updated_message(message, locals = {})
     html = ApplicationController.render(
-      partial: "messages/message",
+      partial: "messages/inner_message",
       locals: {
         message:,
         only_scroll_down_if_was_bottom: true,
         streamed: true,
         message_counter: message.index
-      }.merge(locals)
+      }.merge(locals),
+      layout: false
     )
-    dom = Nokogiri::HTML.fragment(html)
-    html = dom.at_id(dom_id message).inner_html
     message.broadcast_update_to message.conversation, target: message, html: html
   end
 
