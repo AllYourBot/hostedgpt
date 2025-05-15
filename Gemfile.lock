@@ -192,7 +192,7 @@ GEM
     json (2.11.3)
     jwt (2.10.1)
       base64
-    language_server-protocol (3.17.0.4)
+    language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
     loofah (2.24.0)
@@ -346,7 +346,7 @@ GEM
     rainbow (3.1.1)
     rake (13.2.1)
     rb_sys (0.9.106)
-    rbs (3.9.2)
+    rbs (3.9.4)
       logger
     rdoc (6.13.1)
       psych (>= 4.0.0)
@@ -394,7 +394,7 @@ GEM
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
       faraday-multipart (>= 1)
-    ruby-lsp (0.23.17)
+    ruby-lsp (0.23.20)
       language_server-protocol (~> 3.17.0)
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 4)
@@ -430,7 +430,7 @@ GEM
       fugit (~> 1.11.0)
       railties (>= 7.1)
       thor (~> 1.3.1)
-    sorbet-runtime (0.5.12070)
+    sorbet-runtime (0.5.12104)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
