@@ -271,7 +271,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
   end
 
   def assert_spoke_to_sentence(expected, element)
-    assert_true "sentence index value did not update to #{expected}" do
+    assert_true "sentence index value did not update to #{expected}, but to #{element["data-playback-sentences-index-value"].inspect} instead" do
       expected == element["data-playback-sentences-index-value"]
     end
     true
