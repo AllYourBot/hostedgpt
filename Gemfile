@@ -73,7 +73,6 @@ group :development do
 
   gem "byebug", platforms: %i[mri mingw x64_mingw]
   gem "standard"
-  gem "ruby-lsp"
   gem "rubocop-rails"
   gem "rubocop-capybara"
   gem "rubocop-minitest"
