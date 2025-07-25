@@ -34,5 +34,5 @@ end.each do |file|
     pin "/assets/blocks/#{name}", to: file, preload: true
   end
 end
-pin "tailwindcss-safe-area" # @0.5.1
+pin "tailwindcss-safe-area" # @1.0.0
 pin "tailwindcss/plugin", to: "tailwindcss--plugin.js" # @3.4.4
