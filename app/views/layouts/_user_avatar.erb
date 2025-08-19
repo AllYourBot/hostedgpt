@@ -1,15 +1,31 @@
 <%# locals: (user:, size:, classes: nil) -%>
 <% text_size = size > 6 ? "text-sm" : "text-xs" %>
 
-<picture
-  class="
-        rounded-full
-        w-<%= size %> h-<%= size %>
-        bg-green-200 text-black
-        flex justify-center items-center
-        <%= text_size %>
-        <%= classes %>
-        "
->
-  <%= at_most_two_initials(user.name.initials)&.upcase %>
-</picture>
+<% if user.has_profile_picture? %>
+  <picture
+    class="
+          rounded-full
+          w-<%= size %> h-<%= size %>
+          overflow-hidden
+          border border-gray-200 dark:border-gray-600
+          <%= classes %>
+          "
+  >
+    <%= image_tag user.profile_picture_url(:small),
+        alt: "#{user.name.full}'s profile picture",
+        class: "w-full h-full object-cover" %>
+  </picture>
+<% else %>
+  <picture
+    class="
+          rounded-full
+          w-<%= size %> h-<%= size %>
+          bg-green-200 text-black
+          flex justify-center items-center
+          <%= text_size %>
+          <%= classes %>
+          "
+  >
+    <%= at_most_two_initials(user.name.initials)&.upcase %>
+  </picture>
+<% end %>

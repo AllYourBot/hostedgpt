@@ -94,4 +94,21 @@ module ApplicationHelper
   def to_dollars(cents, precision: 2)
     number_to_currency(cents / 100.0, precision:)
   end
+
+  # Profile picture helper methods
+  def user_avatar_image_tag(user, variant: :small, **options)
+    return nil unless user&.has_profile_picture?
+
+    default_options = {
+      alt: "#{user.name.full}'s profile picture",
+      class: "w-full h-full object-cover"
+    }
+
+    image_tag(user.profile_picture_url(variant), **default_options.merge(options))
+  end
+
+  def user_avatar_url(user, variant: :small, fallback: nil)
+    return fallback unless user&.has_profile_picture?
+    user.profile_picture_url(variant) || fallback
+  end
 end

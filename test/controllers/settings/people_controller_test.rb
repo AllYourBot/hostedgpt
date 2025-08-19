@@ -94,6 +94,47 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert @user.password_credential.authenticate("secret")
   end
 
+  # Profile picture tests
+  test "should upload profile picture" do
+    refute @user.has_profile_picture?
+
+    params = person_params
+    params["personable_attributes"]["profile_picture"] = fixture_file_upload("test_image.jpg", "image/jpeg")
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+
+    assert @user.reload.has_profile_picture?
+  end
+
+  test "should remove profile picture" do
+    # First attach a profile picture
+    @user.profile_picture.attach(
+      io: StringIO.new("fake image data"),
+      filename: "test.jpg",
+      content_type: "image/jpeg"
+    )
+    assert @user.has_profile_picture?
+
+    params = person_params
+    params["personable_attributes"]["remove_profile_picture"] = "1"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+
+    refute @user.reload.has_profile_picture?
+  end
+
+  test "should handle invalid profile picture gracefully" do
+    params = person_params
+    params["personable_attributes"]["profile_picture"] = fixture_file_upload("test_document.txt", "text/plain")
+
+    patch settings_person_url, params: { person: params }
+    assert_response :unprocessable_entity
+
+    refute @user.reload.has_profile_picture?
+  end
+
   private
 
   def person_params
