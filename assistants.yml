@@ -1,5 +1,8 @@
 ---
 assistants:
+- name: GPT-5
+  slug: gpt-5
+  language_model_api_name: gpt-5
 - name: GPT-4o
   slug: gpt-4o
   language_model_api_name: gpt-4o
