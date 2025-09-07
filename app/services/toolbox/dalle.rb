@@ -14,11 +14,11 @@ class Toolbox::Dalle < Toolbox
       }
     )
 
-    dalle_url = response.dig("data", 0, "url")
+    url = response.dig("data", 0, "url")
 
     {
       prompt_given: image_generation_prompt_s,
-      url_of_dalle_generated_image: dalle_url,
+      url_of_generated_image: url,
       note_to_assistant: "The image at the URL is already being shown on screen so reply with a nice message confirming the image has been generated, maybe re-describing it, but don't include the link to it."
     }
   end

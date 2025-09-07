@@ -205,7 +205,7 @@ class GetNextAIMessageJob < ApplicationJob
     end
 
     index = @message.index
-    url_of_dalle_generated_image = nil
+    url_of_generated_image = nil
     msgs.each do |tool_message| # one message for each tool executed
       @conversation.messages.create!(
         assistant: @assistant,
@@ -220,8 +220,8 @@ class GetNextAIMessageJob < ApplicationJob
 
       parsed = JSON.parse(tool_message[:content]) rescue nil
 
-      if parsed.is_a?(Hash) && parsed.has_key?("url_of_dalle_generated_image")
-        url_of_dalle_generated_image = parsed["url_of_dalle_generated_image"]
+      if parsed.is_a?(Hash) && parsed.has_key?("url_of_generated_image")
+        url_of_generated_image = parsed["url_of_generated_image"]
       end
 
     end
@@ -234,9 +234,9 @@ class GetNextAIMessageJob < ApplicationJob
       index: index += 1
     )
 
-    unless url_of_dalle_generated_image.nil?
+    unless url_of_generated_image.nil?
       d = Document.new
-      d.file.attach(io: URI.open(url_of_dalle_generated_image), filename: "image.png")
+      d.file.attach(io: URI.open(url_of_generated_image), filename: "image.png")
       assistant_reply.documents << d
     end
 
