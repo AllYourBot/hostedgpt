@@ -2,7 +2,7 @@
 # https://raw.githubusercontent.com/rails/rails/master/.rubocop.yml
 # But with some modifications to fit our needs.
 
-require:
+plugins:
   - rubocop-rails
   - rubocop-capybara
   - rubocop-minitest

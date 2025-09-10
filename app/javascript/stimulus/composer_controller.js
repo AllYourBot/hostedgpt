@@ -30,6 +30,9 @@ export default class extends Controller {
     document.addEventListener('turbo:visit', this.boundDetermineMicButton)
     document.addEventListener('turbo:frame-render', this.boundDetermineMicButton)
 
+    // Ensure composer is re-enabled/refocused after the conversation frame morphs
+    document.addEventListener('turbo:frame-render', this.boundHandleConversationRendered)
+
     this.determineMicButton()
   }
 
@@ -37,6 +40,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:morph', this.boundDetermineMicButton)
     document.removeEventListener('turbo:visit', this.boundDetermineMicButton)
     document.removeEventListener('turbo:frame-render', this.boundDetermineMicButton)
+    document.removeEventListener('turbo:frame-render', this.boundHandleConversationRendered)
   }
 
   cursorToEnd() {
@@ -93,6 +97,23 @@ export default class extends Controller {
       this.blinkingMicrophone() // mic still on
     else if (Listener.disabled)
       this.disableMicrophone()
+  }
+
+  // When the conversation turbo-frame finishes rendering (e.g., after first AI message shows),
+  // if the composer was in a disabled state for submit, reset and refocus so the user can type again.
+  boundHandleConversationRendered = (event) => { this.handleConversationRendered(event) }
+  handleConversationRendered(event) {
+    // Turbo can put id on event.detail, event.target, or event itself depending on source
+    const frameId = event?.detail?.id || event?.target?.id || event?.id
+    if (frameId !== 'conversation') return
+
+    // Only intervene if our overlay is active (i.e., we disabled during submit)
+    if (!this.hasOverlayTarget) return
+    const overlayVisible = !this.overlayTarget.classList.contains('hidden')
+    if (overlayVisible) {
+      // This will hide overlay, clear form, and focus input
+      this.resetForm()
+    }
   }
 
   async enableMicrophone() {

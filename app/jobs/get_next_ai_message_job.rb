@@ -1,3 +1,4 @@
+require "open-uri"
 include ActionView::RecordIdentifier
 require "nokogiri/xml/node"
 class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
@@ -204,6 +205,7 @@ class GetNextAIMessageJob < ApplicationJob
     end
 
     index = @message.index
+    url_of_generated_image = nil
     msgs.each do |tool_message| # one message for each tool executed
       @conversation.messages.create!(
         assistant: @assistant,
@@ -215,6 +217,13 @@ class GetNextAIMessageJob < ApplicationJob
         index: index += 1,
         processed_at: Time.current,
       )
+
+      parsed = JSON.parse(tool_message[:content]) rescue nil
+
+      if parsed.is_a?(Hash) && parsed.has_key?("url_of_generated_image")
+        url_of_generated_image = parsed["url_of_generated_image"]
+      end
+
     end
 
     assistant_reply = @conversation.messages.create!(
@@ -224,6 +233,12 @@ class GetNextAIMessageJob < ApplicationJob
       version: @message.version,
       index: index += 1
     )
+
+    unless url_of_generated_image.nil?
+      d = Document.new
+      d.file.attach(io: URI.open(url_of_generated_image), filename: "image.png")
+      assistant_reply.documents << d
+    end
 
     GetNextAIMessageJob.perform_later(
       @user.id,
