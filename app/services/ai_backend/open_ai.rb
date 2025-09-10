@@ -43,7 +43,7 @@ class AIBackend::OpenAI < AIBackend
       raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to OpenAI API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
       @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token, api_version: "")
-    rescue ::Faraday::UnauthorizedError => e
+    rescue ::Faraday::UnauthorizedError
       raise ::OpenAI::ConfigurationError
     end
   end
@@ -117,7 +117,7 @@ class AIBackend::OpenAI < AIBackend
 
   def preceding_conversation_messages
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
-      if @assistant.supports_images? && message.documents.present?
+      if @assistant.supports_images? && message.documents.present? && message.role == "user"
 
         content_with_images = [{ type: "text", text: message.content_text }]
         content_with_images += message.documents.collect do |document|
