@@ -22,7 +22,7 @@ class DocumentsController < ApplicationController
     if @document.save
       redirect_to @document, notice: "Document was successfully created.", status: :see_other
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -30,7 +30,7 @@ class DocumentsController < ApplicationController
     if @document.update(document_params)
       redirect_to @document, notice: "Document was successfully updated.", status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

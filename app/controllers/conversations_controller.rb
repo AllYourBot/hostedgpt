@@ -17,7 +17,7 @@ class ConversationsController < ApplicationController
     if @conversation.update(conversation_params)
       redirect_to @conversation, status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

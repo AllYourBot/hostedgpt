@@ -18,7 +18,7 @@ class Settings::APIServicesController < Settings::ApplicationController
     if @api_service.save
       redirect_to settings_api_services_path, notice: "Saved", status: :see_other
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -26,7 +26,7 @@ class Settings::APIServicesController < Settings::ApplicationController
     if @api_service.update(api_service_params)
       redirect_to settings_api_services_path, notice: "Saved", status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

@@ -47,13 +47,13 @@ class ActiveStorage::PostgresqlController < ActiveStorage::BaseController
         postgresql_service.upload token[:key], request.body, checksum: token[:checksum]
         head :no_content
       else
-        head :unprocessable_entity
+        head :unprocessable_content
       end
     else
       head :not_found
     end
   rescue ActiveStorage::IntegrityError
-    head :unprocessable_entity
+    head :unprocessable_content
   end
 
   private

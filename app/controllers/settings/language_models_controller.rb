@@ -22,7 +22,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
     if @language_model.save
       redirect_to settings_language_models_path, notice: "Saved", status: :see_other
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -30,7 +30,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
     if @language_model.update(language_model_params)
       redirect_to settings_language_models_path, notice: "Saved", status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

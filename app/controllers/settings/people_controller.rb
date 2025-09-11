@@ -9,7 +9,7 @@ class Settings::PeopleController < Settings::ApplicationController
     redirect_to edit_settings_person_path, notice: "Saved", status: :see_other
   rescue
     @person = Current.person
-    render :edit, status: :unprocessable_entity
+    render :edit, status: :unprocessable_content
   end
 
   private
