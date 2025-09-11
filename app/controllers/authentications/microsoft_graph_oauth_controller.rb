@@ -15,13 +15,13 @@ class Authentications::MicrosoftGraphOauthController < ApplicationController
     if Current.user
       Current.user.microsoft_graph_credential&.destroy
       _, cred = add_person_credentials("MicrosoftGraphCredential")
-      cred.save! && redirect_to(edit_settings_person_path, notice: "Saved") && return
+      cred.save! && redirect_to(edit_settings_person_path, notice: I18n.t("app.flashes.language_models.saved")) && return
 
     elsif (credential = MicrosoftGraphCredential.find_by(oauth_id: auth[:uid]))
       @person = credential.user.person
 
     elsif Feature.disabled?(:registration)
-      redirect_to(root_path, alert: "Registration is disabled") && return
+      redirect_to(root_path, alert: I18n.t("app.flashes.auth.registration_disabled")) && return
 
     elsif auth_email && (user = Person.find_by(email: auth_email)&.user)
       @person = init_for_user(user)
@@ -48,7 +48,7 @@ class Authentications::MicrosoftGraphOauthController < ApplicationController
   rescue => e
     warn e.message
     warn e.backtrace.join("\n")
-    redirect_to edit_settings_person_path, alert: "Error. #{e.message}", status: :see_other
+    redirect_to edit_settings_person_path, alert: I18n.t("app.flashes.auth.error_prefix", message: e.message), status: :see_other
   end
 
   private

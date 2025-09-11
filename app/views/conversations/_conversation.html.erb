@@ -15,7 +15,7 @@
 >
   <turbo-frame id="conversation-<%= conversation.id %>" class="flex-1 flex justify-between items-center">
 
-    <%= link_to conversation.title.presence || "New chat",
+  <%= link_to conversation.title.presence || t('app.conversations.new_chat'),
       conversation_messages_path(conversation),
       class: "flex-1 pl-2 py-2 truncate text-sm text-opacity-1 w-5 radio-behavior",
       data: {
@@ -56,10 +56,10 @@
               <%= icon "pencil",
                 variant: :outline,
                 size: 16,
-                title: "Rename",
+                title: t('app.conversations.rename'),
                 tooltip: :top,
                 class: "mx-[1px]"
-              %>Rename
+              %><%= t('app.conversations.rename') %>
             <% end %>
           </li>
           <li>
@@ -74,35 +74,35 @@
               },
               class: "flex gap-2 w-full py-2 px-4" do
             %>
-              <%= icon "trash", variant: :outline, size: 18 %>Delete
+              <%= icon "trash", variant: :outline, size: 18 %><%= t('app.conversations.delete') %>
             <% end %>
           </li>
           <footer class="py-3 px-4 mt-1 border-t-2 border-gray-100 dark:border-gray-600 gap-2 flex flex-col">
             <table class="w-full text-left">
               <tr>
-                <td class="pb-2 whitespace-nowrap">Conversation ~</td>
+                <td class="pb-2 whitespace-nowrap"><%= t('app.conversations.cost_summary.conversation_approx') %></td>
                 <td class="pb-2"><%= to_dollars(conversation.total_cost)%></td>
               </tr>
               <tr>
-                <td class="pb-2 font-bold" colspan="2">Input</td>
+                <td class="pb-2 font-bold" colspan="2"><%= t('app.conversations.cost_summary.input') %></td>
               </tr>
               <tr>
-                <td class="pb-2">Tokens</td>
+                <td class="pb-2"><%= t('app.conversations.cost_summary.tokens') %></td>
                 <td class="pb-2"><%= conversation.input_token_total_count %></td>
               </tr>
               <tr>
-                <td class="pb-2">Cost</td>
+                <td class="pb-2"><%= t('app.conversations.cost_summary.cost') %></td>
                 <td class="pb-2"><%= to_dollars(conversation.input_token_total_cost, precision: 5) %></td>
               </tr>
               <tr>
-                <td class="pb-2 font-bold" colspan="2">Output</td>
+                <td class="pb-2 font-bold" colspan="2"><%= t('app.conversations.cost_summary.output') %></td>
               </tr>
               <tr>
-                <td>Tokens</td>
+                <td><%= t('app.conversations.cost_summary.tokens') %></td>
                 <td><%= conversation.output_token_total_count %></td>
               </tr>
               <tr>
-                <td>Cost</td>
+                <td><%= t('app.conversations.cost_summary.cost') %></td>
                 <td><%= to_dollars(conversation.output_token_total_cost, precision: 5) %></td>
               </tr>
             </table>

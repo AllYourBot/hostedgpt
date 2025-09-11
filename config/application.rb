@@ -21,6 +21,10 @@ module HostedGPT
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.2
 
+  # I18n configuration
+    config.i18n.available_locales = [:en, :de]
+    config.i18n.default_locale = :en
+
     # To remove in 2025. This allows migration db/migrate/20240415134849_encrypt_keys.rb to encrypt existing plaintext keys
     config.active_record.encryption.support_unencrypted_data = true
 

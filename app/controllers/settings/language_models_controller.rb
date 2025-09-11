@@ -20,7 +20,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
     @language_model = Current.user.language_models.new(language_model_params)
 
     if @language_model.save
-      redirect_to settings_language_models_path, notice: "Saved", status: :see_other
+      redirect_to settings_language_models_path, notice: I18n.t("app.flashes.language_models.saved"), status: :see_other
     else
       render :new, status: :unprocessable_entity
     end
@@ -28,7 +28,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
 
   def update
     if @language_model.update(language_model_params)
-      redirect_to settings_language_models_path, notice: "Saved", status: :see_other
+      redirect_to settings_language_models_path, notice: I18n.t("app.flashes.language_models.saved"), status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
@@ -39,14 +39,14 @@ class Settings::LanguageModelsController < Settings::ApplicationController
     @answer = @language_model.test(params[:model])
 
     respond_to do |format|
-      format.html { redirect_to settings_language_models_path, notice: "Tested: #{@answer}", status: :see_other }
+      format.html { redirect_to settings_language_models_path, notice: I18n.t("app.flashes.language_models.tested", answer: @answer), status: :see_other }
       format.turbo_stream
     end
   end
 
   def destroy
     @language_model.deleted!
-    redirect_to settings_language_models_path, notice: "Deleted", status: :see_other
+    redirect_to settings_language_models_path, notice: I18n.t("app.flashes.language_models.deleted"), status: :see_other
   end
 
   private
@@ -54,7 +54,7 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   def set_users_language_model
     @language_model = Current.user.language_models.find_by(id: params[:id])
     if @language_model.nil?
-      redirect_to settings_language_models_path, status: :see_other, alert: "The Language Model could not be found"
+      redirect_to settings_language_models_path, status: :see_other, alert: I18n.t("app.flashes.language_models.not_found")
     end
   end
 
