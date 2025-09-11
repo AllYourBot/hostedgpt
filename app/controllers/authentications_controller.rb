@@ -17,7 +17,7 @@ class AuthenticationsController < ApplicationController
       return
     end
 
-    flash[:alert] = "Invalid email or password"
+    flash[:alert] = I18n.t("app.flashes.auth.invalid_login")
     redirect_to login_path(email: params[:email]), status: :see_other
   end
 

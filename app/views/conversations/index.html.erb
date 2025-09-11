@@ -8,9 +8,11 @@
       method: :get
     ) do |form| %>
       <div class="relative ml-2 mr-5">
+  <%# Preserve locale when submitting/clearing the search so placeholder stays localized %>
+  <%= hidden_field_tag :locale, I18n.locale unless I18n.locale == I18n.default_locale %>
         <%= form.text_field :query,
           value: @query,
-          placeholder: "Search",
+          placeholder: t('app.conversations.ui.search_placeholder'),
           id: "search-input",
           autofocus: @query.nil? ? false : true,
           class: %|

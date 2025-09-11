@@ -19,9 +19,9 @@ module Message::Version
 
     scope :for_conversation_version, ->(version) do
       version ||= :latest
-      raise "for_conversation_version(version) takes a numerical version or :latest" if version != :latest && version.to_s.to_i.to_s != version.to_s
+      raise I18n.t("app.models.message.errors.version.invalid_argument") if version != :latest && version.to_s.to_i.to_s != version.to_s
       c_id = all.where_clause.send(:predicates).find { |p| p.left.name == "conversation_id" }&.right&.value
-      raise "latest_version_for_conversation needs to be used on a conversation's messages" if c_id.nil?
+      raise I18n.t("app.models.message.errors.version.latest_scope_missing") if c_id.nil?
 
       if version.to_s == "latest"
         # Find the message which is the highest index for the highest version
@@ -73,23 +73,23 @@ module Message::Version
       self.version ||= max_version
 
       if index.negative?
-        errors.add(:index, "is invalid")
+        errors.add(:index, I18n.t("app.models.message.errors.index.invalid"))
       elsif index.positive? && !conversation.messages.exists?(index: index-1)
-        errors.add(:index, "cannot skip a number")
+        errors.add(:index, I18n.t("app.models.message.errors.index.skip"))
       elsif index.positive? && !branched && !conversation.messages.exists?(index: index-1, version: version)
-        errors.add(:branched, "is false but index is not following an existing message")
+        errors.add(:branched, I18n.t("app.models.message.errors.branched.false_follow"))
       else
         if version.negative? || version > max_version
-          errors.add(:version, "#{version} is invalid for this index")
+          errors.add(:version, I18n.t("app.models.message.errors.version.invalid_for_index", version:))
         elsif conversation.messages.exists?(index:, version:)
-          errors.add(:version, "#{version} already exists for this index")
+          errors.add(:version, I18n.t("app.models.message.errors.version.exists_for_index", version:))
         elsif versions.present? && version < versions.max && !conversation.messages.exists?(index: index-1, version:)
-          errors.add(:version, "#{version} is invalid for this index")
+          errors.add(:version, I18n.t("app.models.message.errors.version.invalid_for_index", version:))
         end
       end
     elsif index.blank?
       if version.present?
-        errors.add(:version, "cannot be set without also setting index")
+        errors.add(:version, I18n.t("app.models.message.errors.version.set_without_index"))
       elsif version.blank?
         latest_msg = self.conversation.latest_message_for_version(:latest)
         self.index    = (latest_msg&.index   || -1) + 1
@@ -99,8 +99,8 @@ module Message::Version
   end
 
   def branched_and_version_both_set
-    errors.add(:branched, "must be set when branched_from_version is specified") if not_branched?
-    errors.add(:branched_from_version, "must be set when branched is true") if branched_from_version.nil?
+    errors.add(:branched, I18n.t("app.models.message.errors.branched.required_with_from")) if not_branched?
+    errors.add(:branched_from_version, I18n.t("app.models.message.errors.branched_from_version.required_when_branched")) if branched_from_version.nil?
   end
 
   def set_branched_on_other_message

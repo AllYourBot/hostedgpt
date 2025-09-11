@@ -1,0 +1,11 @@
+<%# Simple locale switcher using URL param ?locale= %>
+<div class="mt-2 flex gap-2 text-xs text-gray-500 dark:text-gray-400">
+  <% I18n.available_locales.each do |loc| %>
+    <% active = I18n.locale == loc %>
+    <%= link_to loc.upcase, url_for(params.permit!.to_h.merge(locale: loc, only_path: true)),
+        class: [
+          "px-2 py-1 rounded border",
+          active ? "border-gray-700 dark:border-gray-300 font-semibold" : "border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+        ].join(' ') %>
+  <% end %>
+</div>

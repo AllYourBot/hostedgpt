@@ -7,12 +7,12 @@ class Settings::MemoriesController < Settings::ApplicationController
 
   def destroy
     @memory.destroy!
-    redirect_to settings_memories_url, notice: "Forgotten", status: :see_other
+    redirect_to settings_memories_url, notice: I18n.t("app.flashes.memories.forgotten"), status: :see_other
   end
 
   def destroy_all
     Current.user.memories.delete_all
-    redirect_to settings_memories_url, notice: "Cleared memory", status: :see_other
+    redirect_to settings_memories_url, notice: I18n.t("app.flashes.memories.cleared"), status: :see_other
   end
 
   private
