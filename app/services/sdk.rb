@@ -44,6 +44,7 @@ class SDK
   def calling_method(verb)
     file = __FILE__
     i = caller_locations.find_index { |l| l.absolute_path&.starts_with?(file) && l.label == verb.to_s }
+    i = 2 # TODO: temp fix
     raise "calling_method is blank" if i.nil?
 
     caller_locations[i+1]&.label&.gsub("block in ", "")
