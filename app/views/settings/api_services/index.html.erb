@@ -1,13 +1,13 @@
-<h1 class="text-3xl">API Services</h1>
+<h1 class="text-3xl"><%= t('app.settings.api_services.index_title') %></h1>
 
 <% if @api_services.empty? %>
   <p id="no-api-services" class="my-8">
-    You have no API services configured.
+    <%= t('app.settings.api_services.none') %>
   </p>
 <% end %>
 
 <p class="my-8">
-  <%= link_to "Add New", new_settings_api_service_path,
+  <%= link_to t('app.settings.api_services.add_new'), new_settings_api_service_path,
     class: %| inline-block font-bold
       bg-gray-200 dark:bg-gray-900
       border border-gray-400
@@ -20,9 +20,9 @@
   <table id="api-services" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
     <thead>
       <tr class="bg-gray-200 dark:bg-gray-900">
-        <th>Name</th>
-        <th>URL</th>
-        <th>Driver</th>
+  <th><%= t('app.settings.api_services.table.name') %></th>
+  <th><%= t('app.settings.api_services.table.url') %></th>
+  <th><%= t('app.settings.api_services.table.driver') %></th>
       </tr>
     </thead>
 

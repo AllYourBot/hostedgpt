@@ -35,7 +35,7 @@
         tooltip tooltip-right hover:tooltip-open
         <%= Current.user.preferences[:nav_closed] && "!hidden" %>
       "
-      data-tip="Close sidebar"
+  data-tip="<%= t('app.conversations.ui.close_sidebar') %>"
     >
       <div id="left" class="flex-col w-1 h-5 opacity-70">
         <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full group-hover:rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
@@ -51,7 +51,7 @@
         tooltip tooltip-right hover:tooltip-open
         <%= !Current.user.preferences[:nav_closed] && "!hidden" %>
       "
-      data-tip="Open sidebar"
+  data-tip="<%= t('app.conversations.ui.open_sidebar') %>"
     >
       <div id="right" class="flex-col w-1 h-5 opacity-70">
         <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full -rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
@@ -77,7 +77,7 @@
             keydown.ctrl+j@document->keyboard#click
           |
         } do %>
-      <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: "New chat", tooltip: :left %>
+  <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: t('app.conversations.new_chat'), tooltip: :left %>
     <% end %>
   </header>
 
@@ -89,13 +89,13 @@
           action: "transition#toggleClass"
         } do
       %>
-        <%= icon "bars-3", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: "Menu", tooltip: :right %>
+  <%= icon "bars-3", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: t('app.conversations.ui.menu'), tooltip: :right %>
       <% end %>
 
       <%= render 'messages/main_column/assistant_header' %>
 
       <%= link_to new_assistant_message_path(@assistant), target: "_top", class: "block cursor-pointer inline-flex mr-1 px-2 group", data: { role: "new" } do %>
-        <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: "New chat", tooltip: :left %>
+  <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: t('app.conversations.new_chat'), tooltip: :left %>
       <% end %>
     </div>
   </header>
@@ -155,7 +155,7 @@
                   text-black dark:text-white
                   cursor-pointer stroke-2
                 |,
-                title: 'Attach',
+                title: t('app.conversations.ui.attach'),
                 tooltip: :top
           %>
         <% end %>
@@ -185,7 +185,7 @@
                   text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white
                   cursor-pointer stroke-2
                 |,
-                title: 'Remove file',
+                title: t('app.conversations.ui.remove_file'),
                 tooltip: :top
               %>
             <% end %>
@@ -233,7 +233,7 @@
                 bg-white dark:bg-gray-800
             | do %>
               <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
-              <%= icon "stop-circle", variant: :outline, size: 39, title: 'Stop', tooltip: :top %>
+              <%= icon "stop-circle", variant: :outline, size: 39, title: t('app.conversations.ui.stop'), tooltip: :top %>
             <% end %>
           <% end %>
         <% end %>
@@ -320,7 +320,7 @@
                 bg-white dark:bg-gray-800
               | do
             %>
-              <%= icon "microphone", variant: :solid, size: 26, title: 'Stop', tooltip: :top %>
+              <%= icon "microphone", variant: :solid, size: 26, title: t('app.conversations.ui.stop'), tooltip: :top %>
             <% end %>
           <% end %>
 
@@ -341,7 +341,7 @@
               bg-white dark:bg-gray-800
             | do
           %>
-            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: t('app.conversations.ui.send_message'), tooltip: :top %>
           <% end %>
 
           <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
@@ -374,7 +374,7 @@
                   enabled:dark:text-white
                 | do
               %>
-                <%= icon "microphone", variant: :outline, size: 26, title: 'Voice mode', tooltip: :top %>
+                <%= icon "microphone", variant: :outline, size: 26, title: t('app.conversations.ui.voice_mode'), tooltip: :top %>
               <% end %>
             </div>
           <% end %>
@@ -395,7 +395,7 @@
               #{Feature.voice? && '!hidden'}
             | do
           %>
-            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: 'Send message', tooltip: :top %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: t('app.conversations.ui.send_message'), tooltip: :top %>
           <% end %>
 
           <div
@@ -418,13 +418,13 @@
 >
   <div class="modal-box max-w-5xl dark:bg-black">
     <header class="font-bold text-lg mb-5">
-      Keyboard shortcuts
+      <%= t('app.conversations.shortcuts.header') %>
     </header>
     <article class="flex flex-col md:flex-row">
       <section class="flex-1 pr-0 md:pr-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Open new conversation
+            <%= t('app.conversations.shortcuts.open_new') %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -433,7 +433,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Focus chat input
+            <%= t('app.conversations.shortcuts.focus_input') %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">/</div>
@@ -441,7 +441,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Unfocus chat input
+            <%= t('app.conversations.shortcuts.unfocus_input') %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">ESC</div>
@@ -449,7 +449,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Toggle microphone mode
+            <%= t('app.conversations.shortcuts.toggle_microphone') %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -461,7 +461,7 @@
       <section class="flex-1 pl-0 md:pl-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <span>Stop streaming response</span>
+            <span><%= t('app.conversations.shortcuts.stop_streaming') %></span>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -470,7 +470,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <span>Copy last response <span class="whitespace-nowrap">(or code)</span></span>
+            <span><%= t('app.conversations.shortcuts.copy_last') %></span>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Shift</div>
@@ -480,7 +480,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Toggle sidebar
+            <%= t('app.conversations.shortcuts.toggle_sidebar') %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -489,7 +489,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Show shortcuts
+            <%= t('app.conversations.shortcuts.show_shortcuts') %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">?</div>
@@ -498,7 +498,7 @@
       </section>
     </article>
     <header class="font-semibold text-lg my-5 pb-1 border-b-2 border-gray-100">
-      Inside chat input
+      <%= t('app.conversations.shortcuts.inside_input_header') %>
     </header>
     <article class="flex flex-col md:flex-row">
       <section class="flex-1 pr-0 md:pr-5">
@@ -522,7 +522,7 @@
       <section class="flex-1 pl-0 md:pl-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <span>Unfocus chat input</span>
+            <span><%= t('app.conversations.shortcuts.unfocus_input') %></span>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">ESC</div>

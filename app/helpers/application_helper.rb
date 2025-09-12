@@ -87,7 +87,7 @@ module ApplicationHelper
     tag.meta(name: "viewport", content:)
   end
 
-  def n_a_if_blank(value, n_a = "Not Available")
+  def n_a_if_blank(value, n_a = I18n.t("app.helpers.application.not_available"))
     value.blank? ? n_a : value.to_s
   end
 

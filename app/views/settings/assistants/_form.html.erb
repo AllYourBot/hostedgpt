@@ -1,7 +1,7 @@
 <%= form_with(model: [:settings, assistant], class: "contents") do |form| %>
   <% if assistant.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(assistant.errors.count, "error") %> prohibited this assistant from being saved:</h2>
+  <h2><%= t('app.settings.assistants.form.errors_title', count: assistant.errors.count) %></h2>
 
       <ul>
         <% assistant.errors.each do |error| %>
@@ -12,7 +12,7 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :name %>
+  <%= form.label :name, t('app.settings.assistants.form.name') %>
     <%= form.text_field :name,
       autofocus: assistant.new_record?,
       class: %|
@@ -26,7 +26,7 @@
 
   <% unless assistant.new_record? %>
     <div class="my-5">
-      <%= form.label :slug %>
+  <%= form.label :slug, t('app.settings.assistants.form.slug') %>
       <%= form.text_field :slug,
         autofocus: assistant.new_record?,
         class: %|
@@ -40,7 +40,7 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :language_model_id  %><br/>
+  <%= form.label :language_model_id, t('app.settings.assistants.form.language_model') %><br/>
     <%= form.select :language_model_id,
       LanguageModel.for_user(Current.user).ordered.pluck(:name, :id),
       {},
@@ -55,12 +55,12 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :description %>
+  <%= form.label :description, t('app.settings.assistants.form.description') %>
     <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :instructions, "Custom Instructions" %>
+  <%= form.label :instructions, t('app.settings.assistants.form.instructions') %>
     <%= form.text_area :instructions,
       autofocus: assistant.persisted?,
       class: %|
@@ -82,7 +82,7 @@
     %>
   </div>
 
-  <%= form.submit "Save",
+  <%= form.submit t('app.settings.assistants.form.save'),
     class: %|
       inline-block font-bold
       bg-gray-200 dark:bg-gray-900
@@ -90,6 +90,6 @@
       rounded-lg py-3 px-5
       cursor-pointer
     |,
-    data: { turbo_submits_with: "Saving..." }
+  data: { turbo_submits_with: t('app.settings.assistants.form.saving') }
   %>
 <% end %>

@@ -1,7 +1,7 @@
 <%= form_with(model: person, url: settings_person_path, class: "contents") do |form| %>
   <% if person.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
+  <h2><%= t('app.settings.people.form.errors_title', count: person.errors.count) %></h2>
 
       <ul>
         <% person.errors.each do |error| %>
@@ -12,7 +12,7 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :email %>
+  <%= form.label :email, t('app.settings.people.form.email') %>
     <%= form.text_field :email, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
@@ -21,12 +21,12 @@
     <%= user_fields.hidden_field :id %>
 
     <div class="my-5">
-      <%= user_fields.label :first_name %>
+  <%= user_fields.label :first_name, t('app.settings.people.form.first_name') %>
       <%= user_fields.text_field :first_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <div class="my-5">
-      <%= user_fields.label :last_name %>
+  <%= user_fields.label :last_name, t('app.settings.people.form.last_name') %>
       <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
@@ -35,20 +35,20 @@
         <%= credential_fields.hidden_field :type, value: credential.type %>
 
         <div class="my-5">
-          <%= credential_fields.label :password %>
+          <%= credential_fields.label :password, t('app.settings.people.form.password') %>
           <%= credential_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
         </div>
       <% end %>
     <% end %>
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-      <%= user_fields.label :dark_mode, "Color Theme" %>
+  <%= user_fields.label :dark_mode, t('app.settings.people.form.color_theme') %>
       <div class="flex items-center justify-between outline-none pl-3 py-2 mt-2 w-full dark:text-black gap-1">
         <%= user_fields.fields_for :preferences do |preferences_fields| %>
           <% %w(dark light system).each do |value| %>
             <div class="flex items-center gap-2">
               <%= preferences_fields.radio_button :dark_mode, value, checked: Current.user.preferences[:dark_mode] == value %>
-              <%= user_fields.label :dark_mode, value.capitalize, class: "dark:text-gray-100", for: "person_personable_attributes_preferences_dark_mode_#{value}"%>
+              <%= user_fields.label :dark_mode, t("app.settings.people.form.theme_options.#{value}"), class: "dark:text-gray-100", for: "person_personable_attributes_preferences_dark_mode_#{value}"%>
             </div>
           <% end %>
         <% end %>
@@ -57,17 +57,17 @@
 
     <% if Feature.google_tools? %>
       <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-        <%= user_fields.label "Enable Tools for Assistants", "Enable Tools for Assistants" %>
+  <%= user_fields.label :enable_tools, t('app.settings.people.form.enable_tools') %>
 
         <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
           <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            Gmail:<br>
-            Trouble? Try <%= link_to "Deleting connection", "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
+            <%= t('app.settings.people.form.gmail_section') %><br>
+            <%= t('app.settings.people.form.gmail_trouble') %> <%= link_to t('app.settings.people.form.deleting_connection'), "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
           </div>
           <% if Current.user.gmail_credential %>
-            <div class="text-green-700 font-bold">Enabled</div>
+            <div class="text-green-700 font-bold"><%= t('app.settings.people.form.enabled') %></div>
           <% else %>
-            <%= form.label :authorize_gmail, "Enable Gmail",
+            <%= form.label :authorize_gmail, t('app.settings.people.form.enable_gmail'),
               class: %|
                 inline-block font-medium
                 bg-gray-100 dark:bg-gray-900 dark:text-white
@@ -81,13 +81,13 @@
 
         <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
           <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            Google Tasks:<br>
-            Trouble? Try <%= link_to "Deleting connection", "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
+            <%= t('app.settings.people.form.google_tasks_section') %><br>
+            <%= t('app.settings.people.form.gmail_trouble') %> <%= link_to t('app.settings.people.form.deleting_connection'), "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
           </div>
           <% if Current.user.google_tasks_credential %>
-            <div class="text-green-700 font-bold">Enabled</div>
+            <div class="text-green-700 font-bold"><%= t('app.settings.people.form.enabled') %></div>
           <% else %>
-            <%= form.label :authorize_google_tasks, "Enable Google Tasks",
+            <%= form.label :authorize_google_tasks, t('app.settings.people.form.enable_google_tasks'),
               class: %|
                 inline-block font-medium
                 bg-gray-100 dark:bg-gray-900 dark:text-white
@@ -105,7 +105,7 @@
   <% end %>
 
   <div class="inline">
-    <%= form.submit "Save",
+  <%= form.submit t('app.settings.people.form.save'),
       class: %|
         inline-block font-bold
         bg-gray-200 dark:bg-gray-900
@@ -113,31 +113,31 @@
         rounded-lg py-3 px-5
         cursor-pointer
       |,
-      data: { turbo_submits_with: "Saving..." }
+  data: { turbo_submits_with: t('app.settings.people.form.saving') }
     %>
-    <%= link_to "Cancel", root_path, class: "float-right inline-block ml-5 py-3" %>
+  <%= link_to t('app.settings.people.form.cancel'), root_path, class: "float-right inline-block ml-5 py-3" %>
   </div>
 <% end # form %>
 
-<%= button_to "Gmail",
+<%= button_to t('app.settings.people.buttons.gmail'),
   "/auth/gmail",
   id: "person_authorize_gmail",
   method: :post,
   data: {
     turbo: false, # w/o this submits w/ ajax and the user won't see it
     controller: "confirm",
-    confirm_text_value: "When you see the permission checkboxes, you need to Select All for this feature to work. Got it?"
+  confirm_text_value: t('app.settings.people.form.oauth_confirm')
   },
   class: "hidden"
 %>
-<%= button_to "Google Tasks",
+<%= button_to t('app.settings.people.buttons.google_tasks'),
   "/auth/google_tasks",
   id: "person_authorize_google_tasks",
   method: :post,
   data: {
     turbo: false, # w/o this submits w/ ajax and the user won't see it
     controller: "confirm",
-    confirm_text_value: "When you see the permission checkboxes, you need to Select All for this feature to work. Got it?"
+  confirm_text_value: t('app.settings.people.form.oauth_confirm')
   },
   class: "hidden"
 %>

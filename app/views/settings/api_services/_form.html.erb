@@ -1,7 +1,9 @@
 <%= form_with(model: [:settings, api_service], class: "contents", data: {controller: "testing"}) do |form| %>
   <% if api_service.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(api_service.errors.count, "error") %> prohibited this API service from being saved:</h2>
+      <h2>
+        <%= t('app.settings.api_services.errors_title', count: api_service.errors.count) %>
+      </h2>
 
       <ul>
         <% api_service.errors.each do |error| %>
@@ -12,12 +14,12 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :name %>
+  <%= form.label :name, t('app.settings.api_services.table.name') %>
     <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :driver %>
+  <%= form.label :driver, t('app.settings.api_services.table.driver') %>
     <%= form.select :driver,
       APIService.drivers.keys,
       {},
@@ -34,11 +36,11 @@
   </div>
 
   <div class="my-5 inline-block w-full">
-    <%= form.label :url %>
+  <%= form.label :url, t('app.settings.api_services.table.url') %>
      <span>
       <% if api_service.persisted? %>
         <% link_url = settings_api_services_path + "/" + api_service.id.to_s + "/test" %>
-        <%= link_to "Test", link_url,
+  <%= link_to t('app.settings.api_services.test'), link_url,
           data: { testing_target: "test", turbo_stream: true, action: "click->testing#update_link_api_service" },
           class: "underline text-blue-600"
         %>
@@ -52,7 +54,7 @@
   </div>
 
   <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-    <%= form.label :token %>
+  <%= form.label :token, :token %>
     <%= button_tag type: "button",
       id: "instructions",
       class: "underline text-blue-600 #{!official?(api_service) && 'hidden'}",
@@ -60,7 +62,7 @@
         transition_target: "transitionable",
         action: "transition#toggleClass",
       } do
-      %>How do I get?
+  %><%= t('app.settings.api_services.instructions_button') %>
     <% end %>
     <ol id="openai-instructions"
       data-transition-target="<%= openai?(api_service) && 'transitionable' %>"
@@ -193,7 +195,7 @@
     %>
   </div>
 
-  <%= form.submit "Save",
+  <%= form.submit t('app.settings.api_services.save'),
     class: %|
       inline-block font-bold
       bg-gray-200 dark:bg-gray-900
@@ -201,6 +203,6 @@
       rounded-lg py-3 px-5
       cursor-pointer
     |,
-    data: { turbo_submits_with: "Saving..." }
+    data: { turbo_submits_with: t('app.settings.api_services.saving') }
   %>
 <% end %>

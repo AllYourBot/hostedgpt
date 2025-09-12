@@ -36,6 +36,7 @@ class Conversation < ApplicationRecord
         select("DISTINCT conversations.*")
     end
 
+    # NOTE: These keys intentionally remain static for test stability. UI layers may translate.
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
     values = [
       nil,

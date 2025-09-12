@@ -13,7 +13,7 @@ module MessagesHelper
 
   def from_name_for(message)
     case message.role
-      when "user" then "You"
+  when "user" then I18n.t("app.helpers.messages.from_user")
       when "assistant" then message.assistant.name
       end
   end
@@ -72,7 +72,7 @@ module MessagesHelper
     icon("stop",
       variant: :solid,
       size: 17,
-      title: "Stopped",
+      title: I18n.t("app.helpers.messages.stopped"),
       tooltip: :top,
       data: { role: "cancelled" },
       class: "inline-block pl-1 #{message.not_cancelled? && 'hidden'}"
@@ -125,9 +125,9 @@ module MessagesHelper
               keyboard_target: "keyboardable",
           }) do
             icon("clipboard", variant: :outline, size: 16, data: { transition_target: "transitionable" }, class: "-mt-[1px]") +
-            span_tag("Copy code", data: { transition_target: "transitionable" }, class: "ml-1") +
+            span_tag(I18n.t("app.helpers.messages.copy_code"), data: { transition_target: "transitionable" }, class: "ml-1") +
             icon("check",     variant: :outline, size: 16, data: { transition_target: "transitionable" }, class: "hidden") +
-            span_tag("Copied!", data: { transition_target: "transitionable" }, class: "hidden ml-1")
+            span_tag(I18n.t("app.helpers.messages.copied"), data: { transition_target: "transitionable" }, class: "hidden ml-1")
           end
         end +
         div_tag(class: "px-4 py-3 overflow-x-auto") do

@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   include Authenticate
 
   skip_before_action :verify_authenticity_token, if: :api_request?
+  before_action :set_locale
   before_action :set_system_ivars
 
   def default_render(*args)
@@ -28,6 +29,20 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def set_locale
+    I18n.locale = extract_locale_param || I18n.default_locale
+  end
+
+  def extract_locale_param
+    l = params[:locale]&.to_sym
+    return l if l && I18n.available_locales.include?(l)
+    nil
+  end
+
+  def default_url_options
+    { locale: (I18n.locale unless I18n.locale == I18n.default_locale) }.compact
+  end
 
   def set_system_ivars
     @system_ivars = public_ivars

@@ -1,0 +1,306 @@
+de:
+  app:
+    navigation:
+      profile_fallback: "Profil"
+      settings: "Einstellungen"
+      logout: "Abmelden"
+    settings:
+      title: "Einstellungen"
+      home: "Startseite"
+      close: "Schließen"
+      api_services:
+        index_title: "API-Dienste"
+        menu:
+          index: "API-Dienste"
+        none: "Sie haben keine API-Dienste konfiguriert."
+        add_new: "Neu hinzufügen"
+        table:
+          name: "Name"
+          url: "URL"
+          driver: "Treiber"
+        new_title: "Neuer API-Dienst"
+        back: "Zurück"
+        editing_title: "%{name} bearbeiten"
+        delete: "Löschen"
+        confirm_delete: "Sind Sie sicher?"
+        save: "Speichern"
+        saving: "Speichere..."
+        test: "Test"
+        instructions_button: "Wie erhalte ich den Schlüssel?"
+        errors_title:
+          one: "%{count} Fehler hat das Speichern dieses API-Dienstes verhindert:"
+          other: "%{count} Fehler haben das Speichern dieses API-Dienstes verhindert:"
+      assistants:
+        new_title: "Neuer Assistent"
+        edit_title: "Assistent konfigurieren"
+        delete: "Löschen"
+        confirm_delete: "Sind Sie sicher?"
+        cancel: "Abbrechen"
+        menu:
+          new: "Neuer Assistent"
+        form:
+          name: "Name"
+          slug: "Slug"
+          language_model: "Sprachmodell"
+          description: "Beschreibung"
+          instructions: "Eigene Anweisungen"
+          save: "Speichern"
+          saving: "Speichere..."
+          errors_title:
+            one: "%{count} Fehler hat das Speichern dieses Assistenten verhindert:"
+            other: "%{count} Fehler haben das Speichern dieses Assistenten verhindert:"
+      language_models:
+        index_title: "Sprachmodelle"
+        menu:
+          index: "Sprachmodelle"
+        add_new: "Neu hinzufügen"
+        new_title: "Neues Sprachmodell"
+        editing_title: "%{name} bearbeiten"
+        delete: "Löschen"
+        confirm_delete: "Sind Sie sicher?"
+        back: "Zurück"
+        table:
+          name: "API-Name"
+          best: "Bestes?"
+          description: "Beschreibung"
+          api_service: "API-Dienst"
+        form:
+          name: "Anzeigename"
+          api_name: "API-Name"
+          api_name_hint: "Wie in der API-Doku angegeben"
+          api_service: "API-Dienst"
+          best: "Bestes?"
+          supports_images: "Unterstützt Bilder?"
+          supports_tools: "Unterstützt Tools (Function Calling)?"
+          supports_system_message: "Unterstützt Systemnachricht (Anweisungen)?"
+          test: "Test"
+          save: "Speichern"
+          saving: "Speichere..."
+          errors_title:
+            one: "%{count} Fehler hat das Speichern dieses Sprachmodells verhindert:"
+            other: "%{count} Fehler haben das Speichern dieses Sprachmodells verhindert:"
+      memories:
+        title: "Assistenten-Erinnerungen"
+        menu:
+          title: "Assistenten-Erinnerungen"
+        description: "Dies sind die Dinge, die aus allen vergangenen Konversationen gemerkt wurden. Alle Assistenten teilen sich diese Erinnerung."
+        none: "Keine Erinnerungen"
+        clear_all: "Alle Erinnerungen löschen"
+        confirm_clear: "Sind Sie sicher?"
+        table:
+          memory: "Erinnerung"
+        forget: "Vergessen"
+      people:
+        menu:
+          account: "Ihr Konto"
+        form:
+          errors_title:
+            one: "%{count} Fehler hat das Speichern dieser Person verhindert:"
+            other: "%{count} Fehler haben das Speichern dieser Person verhindert:"
+          email: "E-Mail"
+          first_name: "Vorname"
+          last_name: "Nachname"
+          password: "Passwort"
+          color_theme: "Farbschema"
+          theme_options:
+            dark: "Dunkel"
+            light: "Hell"
+            system: "System"
+          enable_tools: "Tools für Assistenten aktivieren"
+          gmail_section: "Gmail:" 
+          gmail_trouble: "Probleme? Versuchen Sie"
+          deleting_connection: "Verbindung zu löschen"
+          enabled: "Aktiviert"
+          enable_gmail: "Gmail aktivieren"
+          google_tasks_section: "Google Tasks:" 
+          enable_google_tasks: "Google Tasks aktivieren"
+          save: "Speichern"
+          saving: "Speichere..."
+          cancel: "Abbrechen"
+          oauth_confirm: "Wenn Sie die Berechtigungskästchen sehen, müssen Sie Alle auswählen, damit diese Funktion funktioniert. Verstanden?"
+        buttons:
+          gmail: "Gmail"
+          google_tasks: "Google Tasks"
+      generic:
+        yes: "Ja"
+        no: "Nein"
+    chat:
+      empty_state:
+        greeting: "Wie kann ich dir heute helfen?"
+    auth:
+      welcome_back: "Willkommen zurück"
+      no_account: "Noch kein Konto?"
+      sign_up: "Registrieren"
+      login_with_google: "Mit Google anmelden"
+      login_with_microsoft: "Mit Microsoft anmelden"
+      or: "- Oder -"
+      email_address: "E-Mail-Adresse"
+      password: "Passwort"
+      login: "Anmelden"
+      authenticating: "Authentifiziere..."
+      forgot_password: "Passwort vergessen?"
+    documents:
+      index_title: "Dokumente"
+      new: "Neues Dokument"
+      new_title: "Neues Dokument"
+      editing_title: "Dokument bearbeiten"
+      show_title: "Dokument anzeigen"
+      back_to: "Zurück zu den Dokumenten"
+      edit: "Dokument bearbeiten"
+      destroy: "Dokument löschen"
+      fields:
+        user: "Benutzer"
+        assistant: "Assistent"
+        message: "Nachricht"
+        filename: "Dateiname"
+        purpose: "Zweck"
+        bytes: "Bytes"
+    conversations:
+      editing_title: "Konversation bearbeiten"
+      show_title: "Diese Konversation anzeigen"
+      new_chat: "Neuer Chat"
+      options: "Optionen"
+      rename: "Umbenennen"
+      delete: "Löschen"
+      cost_summary:
+        conversation_approx: "Konversation ~"
+        input: "Eingabe"
+        output: "Ausgabe"
+        tokens: "Tokens"
+        cost: "Kosten"
+      shortcuts:
+        header: "Tastenkürzel"
+        open_new: "Neue Konversation öffnen"
+        focus_input: "Chat-Eingabe fokussieren"
+        unfocus_input: "Chat-Eingabe verlassen"
+        toggle_microphone: "Mikrofonmodus umschalten"
+        stop_streaming: "Antwort stoppen"
+        copy_last: "Letzte Antwort (oder Code) kopieren"
+        toggle_sidebar: "Seitenleiste umschalten"
+        show_shortcuts: "Kürzel anzeigen"
+        inside_input_header: "Im Chat-Eingabefeld"
+      ui:
+        close_sidebar: "Seitenleiste schließen"
+        open_sidebar: "Seitenleiste öffnen"
+        menu: "Menü"
+        attach: "Anhängen"
+        remove_file: "Datei entfernen"
+        stop: "Stopp"
+        voice_mode: "Sprachmodus"
+        send_message: "Nachricht senden"
+        search_placeholder: "Suchen"
+      starters:
+        - title: "Schlage einen gesunden Ernährungsplan vor"
+          description: "für eine Woche für jemanden mit einem vollen Terminplan"
+        - title: "Plane eine Solo-Reise"
+          description: "für einen Wochenendausflug in einer Bergregion"
+        - title: "Verfasse eine kurze Biografie von Matz"
+          description: "mit Fokus auf seine Philosophie bei der Erstellung von Ruby"
+        - title: "Hilf mir auszuwählen"
+          description: "ein Outfit, das vor der Kamera gut aussieht"
+        - title: "Erstelle eine persönliche Webseite für mich"
+          description: "nachdem du mir drei Fragen gestellt hast"
+        - title: "Empfiehl Aktivitäten"
+          description: "für einen Teambuilding-Tag mit Remote-Mitarbeitern"
+        - title: "Schreibe eine SQL-Abfrage"
+          description: "die eine 'status'-Spalte zu einer 'orders'-Tabelle hinzufügt"
+        - title: "Erkläre die Bedeutung des Quantencomputings"
+          description: "bei der Lösung komplexer Probleme"
+        - title: "Erstelle eine wöchentliche Newsletter-Vorlage"
+          description: "für einen Gartenbauverein"
+        - title: "Empfiehl traditionelle bayerische Gerichte"
+          description: "und wo man sie in München findet"
+        - title: "Verfasse eine clevere Einladung"
+          description: "für einen Engineering-Buchclub"
+        - title: "Schreibe einen Survival-Guide"
+          description: "für einen Tag ohne Kaffee"
+        - title: "Hilf mir zu planen"
+          description: "einen Roadtrip von Charleston nach Key West"
+    flashes:
+      auth:
+        invalid_login: "Ungültige E-Mail oder Passwort"
+        registration_disabled: "Registrierung ist deaktiviert"
+        cancelled: "Abgebrochen"
+        error_prefix: "Fehler. %{message}"
+      password_resets:
+        email_sent: "Falls die E-Mail gültig ist, haben wir soeben eine Passwort-Zurücksetzen-Mail gesendet."
+        token_expired: "Ihr Token ist abgelaufen. Bitte erneut versuchen."
+        reset_success: "Ihr Passwort wurde erfolgreich zurückgesetzt."
+        reset_error: "Beim Zurücksetzen Ihres Passworts ist ein Fehler aufgetreten"
+      conversations:
+        deleted: "Konversation gelöscht"
+      language_models:
+        saved: "Gespeichert"
+        tested: "Getestet: %{answer}"
+        deleted: "Gelöscht"
+        not_found: "Das Sprachmodell konnte nicht gefunden werden"
+      assistants:
+        saved: "Gespeichert"
+        deleted: "Gelöscht"
+        deleted_full: "Der Assistent wurde gelöscht"
+        last_delete_error: "Sie können Ihren letzten Assistenten nicht löschen"
+      api_services:
+        saved: "Gespeichert"
+        tested: "Getestet: %{answer}"
+        deleted: "Gelöscht"
+        not_found: "Der API-Dienst konnte nicht gefunden werden"
+      memories:
+        forgotten: "Vergessen"
+        cleared: "Speicher gelöscht"
+      documents:
+        created: "Dokument wurde erfolgreich erstellt."
+        updated: "Dokument wurde erfolgreich aktualisiert."
+        destroyed: "Dokument wurde erfolgreich gelöscht."
+    helpers:
+      messages:
+        from_user: "Du"
+        stopped: "Gestoppt"
+        copy_code: "Code kopieren"
+        copied: "Kopiert!"
+      application:
+        not_available: "Nicht verfügbar"
+    models:
+      document:
+        errors:
+          file:
+            attached: "muss angehängt sein"
+      assistant:
+        errors:
+          slug:
+            taken: "ist bereits vergeben"
+  activerecord:
+    errors:
+      models:
+        assistant:
+          attributes:
+            slug:
+              taken: "ist bereits vergeben"
+      person:
+        errors:
+          personable_id:
+            unchanged: "kann nach der Erstellung nicht geändert werden"
+            provided_on_update: "muss beim Aktualisieren angegeben werden"
+      conversation:
+        group:
+          today: "Heute"
+          yesterday: "Gestern"
+          this_week: "Diese Woche"
+          this_month: "Diesen Monat"
+          last_month: "Letzten Monat"
+          older: "Älter"
+      message:
+        errors:
+          index:
+            invalid: "ist ungültig"
+            skip: "kann keine Zahl überspringen"
+          branched:
+            false_follow: "ist falsch, aber der Index folgt nicht auf eine bestehende Nachricht"
+            required_with_from: "muss gesetzt sein, wenn branched_from_version angegeben ist"
+          branched_from_version:
+            required_when_branched: "muss gesetzt sein, wenn branched wahr ist"
+          version:
+            invalid_argument: "for_conversation_version(version) benötigt eine numerische Version oder :latest"
+            latest_scope_missing: "latest_version_for_conversation muss für die Nachrichten einer Konversation verwendet werden"
+            invalid_for_index: "%{version} ist für diesen Index ungültig"
+            exists_for_index: "%{version} existiert bereits für diesen Index"
+            set_without_index: "kann nicht gesetzt werden, ohne auch den Index zu setzen"

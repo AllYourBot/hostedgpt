@@ -1,7 +1,7 @@
 <%= form_with(model: [:settings, language_model], class: "contents", data: { controller: "testing" }) do |form| %>
   <% if language_model.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(language_model.errors.count, "error") %> prohibited this language model from being saved:</h2>
+  <h2><%= t('app.settings.language_models.form.errors_title', count: language_model.errors.count) %></h2>
 
       <ul>
         <% language_model.errors.each do |error| %>
@@ -12,16 +12,16 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :name %>
+  <%= form.label :name, t('app.settings.language_models.form.name') %>
     <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <div class="my-5 inline-block w-full">
-    <%= form.label :api_name %>
+  <%= form.label :api_name, t('app.settings.language_models.form.api_name') %>
     <span>
       <% if language_model.persisted? %>
         <% link_url = settings_language_models_path + "/" + language_model.id.to_s + "/test" %>
-        <%= link_to "Test", link_url,
+  <%= link_to t('app.settings.language_models.form.test'), link_url,
           data: { testing_target: "test", turbo_stream: true, action: "click->testing#update_link_language_model" },
           class: "underline text-blue-600"
         %>
@@ -32,12 +32,12 @@
       data: { testing_target: "model" },
       class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black"
       %>
-    <span>As specified in the API docs</span>
+  <span><%= t('app.settings.language_models.form.api_name_hint') %></span>
   </div>
 
   <% if Current.user.api_services.exists? %>
     <div class="my-5">
-      <%= form.label :api_service_id  %><br/>
+  <%= form.label :api_service_id, t('app.settings.language_models.form.api_service') %><br/>
       <%= form.select :api_service_id,
         Current.user.api_services.ordered.pluck(:name, :id).reverse,
         {},
@@ -56,23 +56,23 @@
 
   <div class="my-5">
     <%= form.check_box :best %>
-    <%= form.label :best, "Best?" %>
+  <%= form.label :best, t('app.settings.language_models.form.best') %>
   </div>
 
   <div class="my-5">
     <%= form.check_box :supports_images %>
-    <%= form.label :supports_images, "Supports Images?" %>
+  <%= form.label :supports_images, t('app.settings.language_models.form.supports_images') %>
   </div>
   <div class="my-5">
     <%= form.check_box :supports_tools %>
-    <%= form.label :supports_tools, "Supports Tools (Function Calling)?" %>
+  <%= form.label :supports_tools, t('app.settings.language_models.form.supports_tools') %>
   </div>
   <div class="my-5">
     <%= form.check_box :supports_system_message %>
-    <%= form.label :supports_system_message, "Supports System Message (Instructions)?" %>
+  <%= form.label :supports_system_message, t('app.settings.language_models.form.supports_system_message') %>
   </div>
 
-  <%= form.submit "Save",
+  <%= form.submit t('app.settings.language_models.form.save'),
     class: %|
       inline-block font-bold
       bg-gray-200 dark:bg-gray-900
@@ -80,6 +80,6 @@
       rounded-lg py-3 px-5
       cursor-pointer
     |,
-    data: { turbo_submits_with: "Saving..." }
+  data: { turbo_submits_with: t('app.settings.language_models.form.saving') }
   %>
 <% end %>
