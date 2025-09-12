@@ -42,12 +42,16 @@ class SDK
   private
 
   def calling_method(verb)
-    file = __FILE__
-    i = caller_locations.find_index { |l| l.absolute_path&.starts_with?(file) && l.label == verb.to_s }
-    i = 2 # TODO: temp fix
-    raise "calling_method is blank" if i.nil?
+    # Find the method that called get/post/patch/delete
+    # Look through the stack to find the actual method name
+    caller_locations.each_with_index do |location, index|
+      if location.label == verb.to_s
+        # Return the method name from the next frame up
+        return caller_locations[index + 1]&.label&.gsub("block in ", "") || "unknown"
+      end
+    end
 
-    caller_locations[i+1]&.label&.gsub("block in ", "")
+    "unknown"
   end
 
   def key
