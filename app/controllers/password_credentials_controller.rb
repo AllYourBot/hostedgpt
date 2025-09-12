@@ -17,9 +17,9 @@ class PasswordCredentialsController < ApplicationController
     if credential.save
       logout_current if Current.client
       login_as user.person, credential: user.password_credential
-      redirect_to root_path, notice: "Your password was reset successfully."
+      redirect_to root_path, notice: I18n.t("app.flashes.password_resets.reset_success")
     else
-      render "edit", alert: "There was an error resetting your password"
+      render "edit", alert: I18n.t("app.flashes.password_resets.reset_error")
     end
   end
 
@@ -28,7 +28,7 @@ class PasswordCredentialsController < ApplicationController
   def find_signed_user(token)
     User.find_signed!(token, purpose: Email::PasswordReset::TOKEN_PURPOSE)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    redirect_to login_path, alert: "Your token has expired. Please try again."
+    redirect_to login_path, alert: I18n.t("app.flashes.password_resets.token_expired")
   end
 
   def update_params

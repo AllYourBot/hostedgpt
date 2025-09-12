@@ -24,9 +24,9 @@ class ConversationsController < ApplicationController
   def destroy
     @conversation.destroy!
     if request.referer && request.referer.starts_with?(conversation_messages_url(@conversation))
-      redirect_to root_path, notice: "Deleted conversation", status: :see_other
+      redirect_to root_path, notice: I18n.t("app.flashes.conversations.deleted"), status: :see_other
     else
-      redirect_back fallback_location: root_path, notice: "Deleted conversation", status: :see_other
+      redirect_back fallback_location: root_path, notice: I18n.t("app.flashes.conversations.deleted"), status: :see_other
     end
   end
 

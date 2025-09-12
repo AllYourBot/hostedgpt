@@ -28,4 +28,308 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  app:
+    navigation:
+      profile_fallback: "Profile"
+      settings: "Settings"
+      logout: "Logout"
+    settings:
+      title: "Settings"
+      home: "Home"
+      close: "Close"
+      api_services:
+        index_title: "API Services"
+        none: "You have no API services configured."
+        add_new: "Add New"
+        menu:
+          index: "API Services"
+        table:
+          name: "Name"
+          url: "URL"
+          driver: "Driver"
+        new_title: "New API Service"
+        back: "Back"
+        editing_title: "Editing %{name}"
+        delete: "Delete"
+        confirm_delete: "Are you sure?"
+        save: "Save"
+        saving: "Saving..."
+        test: "Test"
+        instructions_button: "How do I get?"
+        errors_title:
+          one: "%{count} error prohibited this API service from being saved:"
+          other: "%{count} errors prohibited this API service from being saved:"
+      assistants:
+        new_title: "New Assistant"
+        edit_title: "Configure Assistant"
+        delete: "Delete"
+        confirm_delete: "Are you sure?"
+        cancel: "Cancel"
+        menu:
+          new: "New Assistant"
+        form:
+          name: "Name"
+          slug: "Slug"
+          language_model: "Language model"
+          description: "Description"
+          instructions: "Custom Instructions"
+          save: "Save"
+          saving: "Saving..."
+          errors_title:
+            one: "%{count} error prohibited this assistant from being saved:"
+            other: "%{count} errors prohibited this assistant from being saved:"
+      language_models:
+        index_title: "Language Models"
+        menu:
+          index: "Language Models"
+        add_new: "Add New"
+        new_title: "New Language Model"
+        editing_title: "Editing %{name}"
+        delete: "Delete"
+        confirm_delete: "Are you sure?"
+        back: "Back"
+        table:
+          name: "API Name"
+          best: "Best?"
+          description: "Description"
+          api_service: "API Service"
+        form:
+          name: "Display Name"
+          api_name: "API Name"
+          api_name_hint: "As specified in the API docs"
+          api_service: "API Service"
+          best: "Best?"
+          supports_images: "Supports Images?"
+          supports_tools: "Supports Tools (Function Calling)?"
+          supports_system_message: "Supports System Message (Instructions)?"
+          test: "Test"
+          save: "Save"
+          saving: "Saving..."
+          errors_title:
+            one: "%{count} error prohibited this language model from being saved:"
+            other: "%{count} errors prohibited this language model from being saved:"
+      memories:
+        title: "Assistant Memories"
+        menu:
+          title: "Assistant Memories"
+        description: "These are the things remembered from all past conversations. All assistants share this memory."
+        none: "No memories"
+        clear_all: "Clear All Memories"
+        confirm_clear: "Are you sure?"
+        table:
+          memory: "Memory"
+        forget: "Forget"
+      people:
+        menu:
+          account: "Your Account"
+        form:
+          errors_title:
+            one: "%{count} error prohibited this person from being saved:"
+            other: "%{count} errors prohibited this person from being saved:"
+          email: "Email"
+          first_name: "First name"
+          last_name: "Last name"
+          password: "Password"
+          color_theme: "Color Theme"
+          theme_options:
+            dark: "Dark"
+            light: "Light"
+            system: "System"
+          enable_tools: "Enable Tools for Assistants"
+          gmail_section: "Gmail:" 
+          gmail_trouble: "Trouble? Try"
+          deleting_connection: "Deleting connection"
+          enabled: "Enabled"
+          enable_gmail: "Enable Gmail"
+          google_tasks_section: "Google Tasks:" 
+          enable_google_tasks: "Enable Google Tasks"
+          save: "Save"
+          saving: "Saving..."
+          cancel: "Cancel"
+          oauth_confirm: "When you see the permission checkboxes, you need to Select All for this feature to work. Got it?"
+        buttons:
+          gmail: "Gmail"
+          google_tasks: "Google Tasks"
+      generic:
+        yes: "Yes"
+        no: "No"
+    chat:
+      empty_state:
+        greeting: "How can I help you today?"
+    auth:
+      welcome_back: "Welcome back"
+      no_account: "Don't have an account?"
+      sign_up: "Sign up"
+      login_with_google: "Log In with Google"
+      login_with_microsoft: "Log In with Microsoft"
+      or: "- Or -"
+      email_address: "Email address"
+      password: "Password"
+      login: "Log In"
+      authenticating: "Authenticating..."
+      forgot_password: "Forgot your password?"
+    documents:
+      index_title: "Documents"
+      new: "New document"
+      new_title: "New document"
+      editing_title: "Editing document"
+      show_title: "Show this document"
+      back_to: "Back to documents"
+      edit: "Edit this document"
+      destroy: "Destroy this document"
+      fields:
+        user: "User"
+        assistant: "Assistant"
+        message: "Message"
+        filename: "Filename"
+        purpose: "Purpose"
+        bytes: "Bytes"
+    conversations:
+      editing_title: "Editing conversation"
+      show_title: "Show this conversation"
+      new_chat: "New chat"
+      options: "Options"
+      rename: "Rename"
+      delete: "Delete"
+      cost_summary:
+        conversation_approx: "Conversation ~"
+        input: "Input"
+        output: "Output"
+        tokens: "Tokens"
+        cost: "Cost"
+      shortcuts:
+        header: "Keyboard shortcuts"
+        open_new: "Open new conversation"
+        focus_input: "Focus chat input"
+        unfocus_input: "Unfocus chat input"
+        toggle_microphone: "Toggle microphone mode"
+        stop_streaming: "Stop streaming response"
+        copy_last: "Copy last response (or code)"
+        toggle_sidebar: "Toggle sidebar"
+        show_shortcuts: "Show shortcuts"
+        inside_input_header: "Inside chat input"
+      ui:
+        close_sidebar: "Close sidebar"
+        open_sidebar: "Open sidebar"
+        menu: "Menu"
+        attach: "Attach"
+        remove_file: "Remove file"
+        stop: "Stop"
+        voice_mode: "Voice mode"
+        send_message: "Send message"
+        search_placeholder: "Search"
+      starters:
+        - title: "Suggest a healthy meal plan"
+          description: "for a week for someone with a busy schedule"
+        - title: "Plan a solo travel itinerary"
+          description: "for a weekend getaway in a mountainous region"
+        - title: "Compose a short biography of Matz"
+          description: "focusing on his philosophy behind creating Ruby"
+        - title: "Help me pick"
+          description: "an outfit that will look good on camera"
+        - title: "Create a personal webpage for me"
+          description: "after asking me three questions"
+        - title: "Recommend activities"
+          description: "for a team-building day with remote employees"
+        - title: "Write a SQL query"
+          description: "that adds a 'status' column to an 'orders' table"
+        - title: "Explain the significance of quantum computing"
+          description: "in addressing complex problems"
+        - title: "Create a weekly newsletter template"
+          description: "for a gardening club"
+        - title: "Recommend traditional Bavarian dishes"
+          description: "and where to find them in Munich"
+        - title: "Craft a clever invitation"
+          description: "for an engineering book club"
+        - title: "Write a survival guide"
+          description: "for making it through a day with no coffee"
+        - title: "Help me plan"
+          description: "a roadtrip from Charleston to Key West"
+    flashes:
+      auth:
+        invalid_login: "Invalid email or password"
+        registration_disabled: "Registration is disabled"
+        cancelled: "Cancelled"
+        error_prefix: "Error. %{message}"
+      password_resets:
+        email_sent: "If that email is valid, we just sent password reset email."
+        token_expired: "Your token has expired. Please try again."
+        reset_success: "Your password was reset successfully."
+        reset_error: "There was an error resetting your password"
+      conversations:
+        deleted: "Deleted conversation"
+      language_models:
+        saved: "Saved"
+        tested: "Tested: %{answer}"
+        deleted: "Deleted"
+        not_found: "The Language Model could not be found"
+      assistants:
+        saved: "Saved"
+        deleted: "Deleted"
+        deleted_full: "The assistant was deleted"
+        last_delete_error: "Cannot delete your last assistant"
+      api_services:
+        saved: "Saved"
+        tested: "Tested: %{answer}"
+        deleted: "Deleted"
+        not_found: "The API Service could not be found"
+      memories:
+        forgotten: "Forgotten"
+        cleared: "Cleared memory"
+      documents:
+        created: "Document was successfully created."
+        updated: "Document was successfully updated."
+        destroyed: "Document was successfully destroyed."
+    helpers:
+      messages:
+        from_user: "You"
+        stopped: "Stopped"
+        copy_code: "Copy code"
+        copied: "Copied!"
+      application:
+        not_available: "Not Available"
+  models:
+      document:
+        errors:
+          file:
+            attached: "must be attached"
+      assistant:
+        errors:
+          slug:
+            taken: "has already been taken"
+  activerecord:
+    errors:
+      models:
+        assistant:
+          attributes:
+            slug:
+              taken: "has already been taken"
+      person:
+        errors:
+          personable_id:
+            unchanged: "cannot be changed after creation"
+            provided_on_update: "must be provided on update"
+      conversation:
+        group:
+          today: "Today"
+          yesterday: "Yesterday"
+          this_week: "This Week"
+          this_month: "This Month"
+          last_month: "Last Month"
+          older: "Older"
+      message:
+        errors:
+          index:
+            invalid: "is invalid"
+            skip: "cannot skip a number"
+          branched:
+            false_follow: "is false but index is not following an existing message"
+            required_with_from: "must be set when branched_from_version is specified"
+          branched_from_version:
+            required_when_branched: "must be set when branched is true"
+          version:
+            invalid_argument: "for_conversation_version(version) takes a numerical version or :latest"
+            latest_scope_missing: "latest_version_for_conversation needs to be used on a conversation's messages"
+            invalid_for_index: "%{version} is invalid for this index"
+            exists_for_index: "%{version} already exists for this index"
+            set_without_index: "cannot be set without also setting index"

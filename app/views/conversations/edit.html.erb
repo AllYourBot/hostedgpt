@@ -1,5 +1,5 @@
 <div class="mx-auto md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">Editing conversation</h1>
+  <h1 class="font-bold text-4xl"><%= t('app.conversations.editing_title') %></h1>
 
   <turbo-frame id="conversation-<%= @conversation.id %>">
     <%= form_with(model: @conversation, data: { controller: "inline-edit" }, class: "contents") do |form| %>
@@ -26,5 +26,5 @@
     <% end %>
   </turbo-frame>
 
-  <%= link_to "Show this conversation", @conversation, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  <%= link_to t('app.conversations.show_title'), @conversation, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
 </div>
