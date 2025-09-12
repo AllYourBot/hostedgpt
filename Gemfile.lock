@@ -242,6 +242,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.9-x86_64-linux-gnu)
       racc (~> 1.4)
+    nokogiri (1.18.9-x86_64-linux-musl)
+      racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
       jwt (>= 1.0, < 3.0)
@@ -461,6 +463,7 @@ GEM
     tiktoken_ruby (0.0.11.1-arm64-darwin)
     tiktoken_ruby (0.0.11.1-x86_64-darwin)
     tiktoken_ruby (0.0.11.1-x86_64-linux)
+    tiktoken_ruby (0.0.11.1-x86_64-linux-musl)
     timecop (0.9.10)
     timeout (0.4.3)
     tins (1.38.0)
@@ -503,6 +506,7 @@ PLATFORMS
   x86_64-darwin
   x86_64-darwin-23
   x86_64-linux
+  x86_64-linux-musl
 
 DEPENDENCIES
   actioncable-enhanced-postgresql-adapter
