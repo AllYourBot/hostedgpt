@@ -105,7 +105,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "should fail to create message when there is no content_text" do
     post assistant_messages_url(@assistant), params: { message: { content_text: nil } }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
   end
 
   test "should fail to create message when there are no params" do
@@ -120,7 +120,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       index: 1,
       version: 10,
     }}
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
   end
 
   test "update succeeds and redirect to message's EXISTING VERSION" do

@@ -60,7 +60,7 @@ end
 
 module ActiveSupport
   class TestCase
-    include Turbo::Broadcastable::TestHelper
+    include Turbo::TestAssertions
     include ActiveJob::TestHelper
     include OptionsHelpers, ViewHelpers, SDKHelpers, ConfigHelpers
 

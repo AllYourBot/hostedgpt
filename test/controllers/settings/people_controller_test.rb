@@ -79,7 +79,7 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     params["personable_attributes"].delete("id")
 
     patch settings_person_url, params: { person: params }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_not_nil @controller.instance_variable_get("@person").errors
   end
 

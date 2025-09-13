@@ -15,7 +15,7 @@ class Settings::AssistantsController < Settings::ApplicationController
     if @assistant.save
       redirect_to edit_settings_assistant_path(@assistant), notice: I18n.t("app.flashes.assistants.saved"), status: :see_other
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -23,7 +23,7 @@ class Settings::AssistantsController < Settings::ApplicationController
     if @assistant.update(assistant_params)
       redirect_to edit_settings_assistant_path(@assistant), notice: I18n.t("app.flashes.assistants.saved"), status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
