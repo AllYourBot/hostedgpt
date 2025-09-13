@@ -48,7 +48,7 @@ class MessagesController < ApplicationController
       set_nav_assistants
       @new_message = @assistant.messages.new
 
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -56,7 +56,7 @@ class MessagesController < ApplicationController
     if @message.update(message_params)
       redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version), status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
