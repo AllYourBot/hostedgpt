@@ -38,7 +38,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
       post settings_assistants_url, params: { assistant: params }
     end
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_contains_text "main", "Slug has already been taken"
   end
 

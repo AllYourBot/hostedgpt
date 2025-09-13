@@ -22,7 +22,7 @@ class UsersController < ApplicationController
       redirect_to root_path, status: :see_other
     else
       @person.errors.delete :personable
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -31,7 +31,7 @@ class UsersController < ApplicationController
       Current.user.reload
       redirect_back fallback_location: root_path, status: :see_other
     else
-      redirect_back fallback_location: root_path, status: :unprocessable_entity
+      redirect_back fallback_location: root_path, status: :unprocessable_content
     end
   end
 

@@ -32,7 +32,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   test "should redirect back when the email address is already in use" do
     email = people(:keith_registered).email
     post users_url, params: { person: { personable_type: "User", email: email, personable_attributes: user_attr } }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_match "Email has already been taken", response.body
   end
 
@@ -41,13 +41,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     modified_user_attr = user_attr
     modified_user_attr[:credentials_attributes]["0"][:password] = ""
     post users_url, params: { person: { personable_type: "User", email: email, personable_attributes: modified_user_attr } }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_match "Password can&#39;t be blank", response.body
   end
 
   test "should show an error message when the email is blank" do
     post users_url, params: { person: { personable_type: "User", email: "", personable_attributes: user_attr } }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_match "Email can&#39;t be blank", response.body
   end
 

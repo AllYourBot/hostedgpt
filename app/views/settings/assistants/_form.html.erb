@@ -42,7 +42,7 @@
   <div class="my-5">
   <%= form.label :language_model_id, t('app.settings.assistants.form.language_model') %><br/>
     <%= form.select :language_model_id,
-      LanguageModel.for_user(Current.user).ordered.pluck(:name, :id),
+      @models,
       {},
       class: %|
         block
