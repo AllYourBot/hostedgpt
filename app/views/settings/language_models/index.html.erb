@@ -18,6 +18,7 @@
   <th><%= t('app.settings.language_models.table.best') %></th>
   <th><%= t('app.settings.language_models.table.description') %></th>
   <th><%= t('app.settings.language_models.table.api_service') %></th>
+  <th><%= t('app.settings.language_models.table.supports_pdf') %></th>
     </tr>
   </thead>
 
@@ -29,6 +30,7 @@
           <td><%= language_model.best? ? t('app.generic.yes', default: 'Yes') : t('app.generic.no', default: 'No') %></td>
           <td><%= language_model.name %></td>
           <td><%= n_a_if_blank(language_model.api_service.name) %></td>
+          <td><%= language_model.supports_pdf? ? t('app.generic.yes', default: 'Yes') : t('app.generic.no', default: 'No') %></td>
         </tr>
       <% end %>
     <% end %>
