@@ -11,7 +11,7 @@ gemini-1.5-pro-002:
   supports_system_message: true
   input_token_cost_cents: 0.0001
   output_token_cost_cents: 0.0001
-  
+
 alpaca:
   position: 1
   user: taylor
@@ -154,6 +154,7 @@ gpt_best:
   supports_images: true
   supports_tools: true
   supports_system_message: true
+  supports_pdf: true
   input_token_cost_cents: 0.0001
   output_token_cost_cents: 0.0001
 
@@ -342,6 +343,7 @@ guanaco:
   api_name: guanaco:large
   supports_images: true
   supports_tools: false
+  supports_pdf: false
   input_token_cost_cents: 0.0001
   output_token_cost_cents: 0.0001
 

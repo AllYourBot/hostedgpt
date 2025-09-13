@@ -207,4 +207,41 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
       assert_contains_text "div#test_result", "Success."
     end
   end
+
+  test "create should not have supports_pdf checkbox" do
+    get new_settings_language_model_url
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_pdf]"]'
+      assert_select 'input[name="language_model[supports_pdf]"][checked="checked"]', false, "Checkbox should default to false within DB"
+    end
+  end
+
+  test "edit should have supports_pdf checkbox checked" do
+    get edit_settings_language_model_url(@language_model)
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_pdf]"][checked="checked"]'
+    end
+  end
+
+  test "edit should have supports_pdf checkbox unchecked" do
+    get edit_settings_language_model_url(language_models(:guanaco))
+    assert_response :success
+    assert_select "form" do
+      assert_select 'input[name="language_model[supports_pdf]"]'
+      assert_select 'input[name="language_model[supports_pdf]"][checked="checked"]', false
+    end
+  end
+
+  test "should update supports_pdf" do
+    assert @language_model.supports_pdf?
+    patch settings_language_model_url(@language_model), params: { language_model: {supports_pdf: false }}
+    refute @language_model.reload.supports_pdf?
+
+    language_model = language_models(:guanaco)
+    refute language_model.supports_pdf?
+    patch settings_language_model_url(language_model), params: { language_model: {supports_pdf: true }}
+    assert language_model.reload.supports_pdf?
+  end
 end
