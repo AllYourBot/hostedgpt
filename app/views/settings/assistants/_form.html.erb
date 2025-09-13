@@ -41,8 +41,12 @@
 
   <div class="my-5">
   <%= form.label :language_model_id, t('app.settings.assistants.form.language_model') %><br/>
+    <% models = LanguageModel.for_user(Current.user).ordered.pluck(:name, :id, :api_service_id) %>
+    <% models.each_with_index do |model, index| %>
+      <% models[index] = [model[0] + ' (' + APIService.find(model[2]).name + ')', model[1]] %>
+    <% end %>
     <%= form.select :language_model_id,
-      LanguageModel.for_user(Current.user).ordered.pluck(:name, :id),
+      models,
       {},
       class: %|
         block
