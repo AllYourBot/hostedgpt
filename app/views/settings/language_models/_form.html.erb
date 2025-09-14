@@ -71,6 +71,10 @@
     <%= form.check_box :supports_system_message %>
   <%= form.label :supports_system_message, t('app.settings.language_models.form.supports_system_message') %>
   </div>
+  <div class="my-5">
+    <%= form.check_box :supports_pdf %>
+  <%= form.label :supports_pdf, t('app.settings.language_models.form.supports_pdf') %>
+  </div>
 
   <%= form.submit t('app.settings.language_models.form.save'),
     class: %|

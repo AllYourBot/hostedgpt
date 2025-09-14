@@ -88,6 +88,7 @@ class LanguageModelTest < ActiveSupport::TestCase
       api_name: "demo name",
       name: "good one",
       supports_images: true,
+      supports_pdf: false,
       api_service: api_services(:rob_other_service),
       user: users(:rob)
     }
