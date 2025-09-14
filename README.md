@@ -4,13 +4,13 @@
 
 HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.
 
-This app is designed to be incredibly easy for ChatGPT users to switch. All the features you expect are here plus it supports GPT-5 and Claude 4 (and others) in a single app. You can also switch assistants in the middle of a conversation!
+This app is designed to be incredibly easy for ChatGPT users to switch. All the features you expect are here plus it supports GPT-5, Claude 4, Gemini 2.5 (and others) in a single app. You can also switch assistants in the middle of a conversation!
 
 This project is led by an experienced rails developer, but I'm actively looking for contributors to help!
 
 ## Top features of HostedGPT
 
-- **Use GPT-5 and Claude 4 (and others) without two $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI and Anthropic API usage.
+- **Use GPT-5, Claude 4, Gemini 2.5 (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage.
 - **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
 - **You will never hit the '_You've reached the current usage cap_' errors**.
 - **Collect and easily search all of your conversions** You can search across conversations and providers.
@@ -390,7 +390,7 @@ See https://github.com/allyourbot/hostedgpt/blob/main/CONTRIBUTING.md
 
 ## Changelog
 
-(Notable features being developed for v0.7: Heroku deploy, voice support, skills for the AI, pin conversations, image generation)
+(Notable features being developed for v0.7: Heroku deploy, Gemini, Groq, voice support, skills for the AI, pin conversations, image generation)
 
 v0.6 - Released on 4/26/2024
 
