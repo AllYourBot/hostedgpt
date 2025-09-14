@@ -1,0 +1,106 @@
+version: 1
+swarm:
+  name: "HostedGPT Rails Development Team"
+  main: architect
+
+  mcps:
+    - name: rails
+      type: stdio
+      command: rails-mcp-server
+      args: []
+      env:
+        RAILS_ENV: development
+
+  instances:
+    architect:
+      description: "Rails architect coordinating full-stack development for HostedGPT"
+      directory: .
+      model: opus
+      connections: [models, controllers, views, stimulus, services, jobs, tests, devops]
+      prompt_file: .claude-on-rails/prompts/architect.md
+      vibe: true
+
+    
+    models:
+      description: "ActiveRecord models, migrations, and database optimization specialist"
+      directory: ./app/models
+      model: opus
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/models.md
+
+
+      
+    controllers:
+      description: "Rails controllers, routing, and request handling specialist"
+      directory: ./app/controllers
+      model: opus
+
+
+
+
+      connections: [services]
+
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/controllers.md
+
+
+    
+    views:
+      description: "Rails views, layouts, partials, and asset pipeline specialist"
+      directory: ./app/views
+      model: opus
+
+      connections: [stimulus]
+
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/views.md
+
+
+
+
+    
+    stimulus:
+      description: "Stimulus.js controllers and Turbo integration specialist"
+      directory: ./app/javascript
+      model: opus
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/stimulus.md
+
+
+    
+    services:
+      description: "Service objects, business logic, and design patterns specialist"
+      directory: ./app/services
+      model: opus
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/services.md
+
+
+      
+    jobs:
+      description: "Background jobs, ActiveJob, and async processing specialist"
+      directory: ./app/jobs
+      model: opus
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/jobs.md
+
+
+
+
+    
+    tests:
+      description: "Minitest testing, factories, and test coverage specialist"
+      directory: ./test
+      model: opus
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/tests.md
+
+
+
+    
+    devops:
+      description: "Deployment, Docker, CI/CD, and production configuration specialist"
+      directory: ./config
+      model: opus
+      allowed_tools: [Read, Edit, Write, Bash, Grep, Glob, LS]
+      prompt_file: .claude-on-rails/prompts/devops.md

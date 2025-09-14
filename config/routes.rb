@@ -11,6 +11,8 @@ Rails.application.routes.draw do
     resources :messages, only: [:index]
   end
 
+  get "share/:share_token", to: "conversations#public_show", as: :public_conversation
+
   resources :messages, only: [:show, :update]
 
   namespace :settings do

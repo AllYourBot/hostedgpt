@@ -1,0 +1,55 @@
+<dialog
+  id="share-modal"
+  class="modal no-focus-outline"
+  data-controller="modal share"
+  data-share-conversation-id-value="<%= conversation.id %>"
+>
+  <div class="modal-box max-w-2xl dark:bg-black">
+    <header class="font-bold text-lg mb-5">
+      Share this conversation
+    </header>
+
+    <div class="space-y-4">
+      <p class="text-gray-600 dark:text-gray-400">
+        Share a publicly accessible link to this conversation. Anyone with the link will be able to view the conversation.
+      </p>
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Shareable URL</span>
+        </label>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            readonly
+            value="<%= conversation.generate_shareable_url(request) %>"
+            data-share-target="urlInput"
+            class="input input-bordered flex-1 bg-gray-50 dark:bg-gray-900"
+          />
+          <button
+            type="button"
+            data-action="share#copyToClipboard"
+            class="btn btn-primary"
+          >
+            <%= icon "clipboard", variant: :outline, size: 20 %>
+            Copy
+          </button>
+        </div>
+        <div
+          data-share-target="copiedMessage"
+          class="hidden text-sm text-green-600 dark:text-green-400 mt-2"
+        >
+          Copied to clipboard!
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <%= icon "exclamation-triangle", variant: :outline, size: 20 %>
+        <span>Anyone with this link can view this conversation. Be careful not to share sensitive information.</span>
+      </div>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop no-focus-outline">
+    <button>close</button>
+  </form>
+</dialog>

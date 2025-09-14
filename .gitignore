@@ -59,3 +59,8 @@
 /.idea/*
 /client/.idea/*
 vendor/bundle
+
+# ClaudeOnRails
+.claude-on-rails/sessions/
+.claude-swarm/
+claude-swarm.log
