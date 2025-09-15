@@ -1,6 +1,10 @@
-require "open-uri"
+#require "open-uri"
 include ActionView::RecordIdentifier
 require "nokogiri/xml/node"
+require "base64"
+require "tempfile"
+require "stringio"
+
 class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
 
 class GetNextAIMessageJob < ApplicationJob
@@ -205,7 +209,7 @@ class GetNextAIMessageJob < ApplicationJob
     end
 
     index = @message.index
-    url_of_generated_image = nil
+    json_of_generated_image = nil
     msgs.each do |tool_message| # one message for each tool executed
       @conversation.messages.create!(
         assistant: @assistant,
@@ -220,8 +224,8 @@ class GetNextAIMessageJob < ApplicationJob
 
       parsed = JSON.parse(tool_message[:content]) rescue nil
 
-      if parsed.is_a?(Hash) && parsed.has_key?("url_of_generated_image")
-        url_of_generated_image = parsed["url_of_generated_image"]
+      if parsed.is_a?(Hash) && parsed.has_key?("json_of_generated_image")
+        json_of_generated_image = parsed["json_of_generated_image"]
       end
 
     end
@@ -234,9 +238,22 @@ class GetNextAIMessageJob < ApplicationJob
       index: index += 1
     )
 
-    unless url_of_generated_image.nil?
+    unless json_of_generated_image.nil?
+      binary = Base64.decode64(json_of_generated_image)
+      # or   b64 = data_uri.split(",", 2).last
+      file = Tempfile.new(["generated", ".png"])
+      file.binmode
+      file.write(binary)
+      file.rewind
+
+      record.image.attach(
+        io: io,
+        filename: "generated.png",
+        content_type: "image/png"
+      )
+
       d = Document.new
-      d.file.attach(io: URI.open(url_of_generated_image), filename: "image.png")
+      d.file.attach(io: io, filename: "image.png")
       assistant_reply.documents << d
     end
 

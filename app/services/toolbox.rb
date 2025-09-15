@@ -6,7 +6,7 @@ class Toolbox < SDK
     [
       test_env && Toolbox::HelloWorld,
       Toolbox::OpenMeteo,
-      Toolbox::Dalle,
+      Toolbox::Image,
       Toolbox::Memory,
       Toolbox::GoogleSearch,
       gmail_active && Toolbox::Gmail,
