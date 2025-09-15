@@ -252,7 +252,7 @@ class GetNextAIMessageJob < ApplicationJob
         filename: "generated.png",
         content_type: "image/png"
       )
-      assistant_reply.documents << d
+      assistant_reply.documents << document
       document.save!
     end
 

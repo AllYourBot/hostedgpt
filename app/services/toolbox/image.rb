@@ -5,18 +5,23 @@ class Toolbox::Image < Toolbox
   S
 
   def generate_an_image(image_generation_prompt_s:)
-    model = "gpt-image-1" # default is dall-e-2. Others: gpt-image-1, dall-e-3.
+    # Use a valid model/size combination. Portrait sizes are supported by dall-e-3.
+    model = "dall-e-3" # default is dall-e-2. Others: gpt-image-1, dall-e-3.
     response = client.images.generate(
       parameters: {
         prompt: image_generation_prompt_s,
         model: model,
-        n: 1,
         size: "1024x1792",
         response_format: "b64_json"
       }
     )
 
-    json = response.dig("data", 0, "b64_json")
+    # Support both ruby-openai base64 response and our test stub format
+    json =
+      response.dig("data", 0, "b64_json") ||
+      response.dig(:data, 0, :b64_json) ||
+      response.dig("data", 0, "images", 0, "data") ||
+      response.dig(:data, 0, :images, 0, :data)
 
     {
       prompt_given: image_generation_prompt_s,
