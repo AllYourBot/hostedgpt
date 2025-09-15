@@ -11,13 +11,13 @@ class Toolbox::Image < Toolbox
         prompt: image_generation_prompt_s,
         model: model,
         n: 1,
-        size: "1024x1792"
+        size: "1024x1792",
+        response_format: "b64_json"
       }
     )
-    # response_format: "b64_json" # needed above only for dall-e
-
 
     json = response.dig("data", 0, "b64_json")
+
     {
       prompt_given: image_generation_prompt_s,
       json_of_generated_image: json,
