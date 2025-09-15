@@ -239,22 +239,21 @@ class GetNextAIMessageJob < ApplicationJob
     )
 
     unless json_of_generated_image.nil?
-      binary = Base64.decode64(json_of_generated_image)
-      # or   b64 = data_uri.split(",", 2).last
-      file = Tempfile.new(["generated", ".png"])
-      file.binmode
-      file.write(binary)
-      file.rewind
+      binary_image_contents = Base64.decode64(json_of_generated_image)
 
-      record.image.attach(
-        io: io,
+      tempfile = Tempfile.new(["generated", ".png"])
+      tempfile.binmode
+      tempfile.write(binary_image_contents)
+      tempfile.rewind
+
+      document = Document.new(message: assistant_reply,assistant: @assistant, user: @user, purpose: :assistants_output)
+      document.file.attach(
+        io: tempfile,
         filename: "generated.png",
         content_type: "image/png"
       )
-
-      d = Document.new
-      d.file.attach(io: io, filename: "image.png")
       assistant_reply.documents << d
+      document.save!
     end
 
     GetNextAIMessageJob.perform_later(

@@ -5,23 +5,21 @@ class Toolbox::Image < Toolbox
   S
 
   def generate_an_image(image_generation_prompt_s:)
-    model = "gpt-image-1", # default is dall-e-2. Others: gpt-image-1, dall-e-3.
+    model = "gpt-image-1" # default is dall-e-2. Others: gpt-image-1, dall-e-3.
     response = client.images.generate(
       parameters: {
         prompt: image_generation_prompt_s,
         model: model,
         n: 1,
         size: "1024x1792"
-        # quality: "standard"
-        # response_format: "b64_json" # only for dall-e
       }
     )
+    # response_format: "b64_json" # needed above only for dall-e
 
-    # url = response.dig("data", 0, "url")
+
     json = response.dig("data", 0, "b64_json")
     {
       prompt_given: image_generation_prompt_s,
-      # url_of_generated_image: url, # gpt-image-1 will always return base64-encoded
       json_of_generated_image: json,
       note_to_assistant: "The image at the URL is already being shown on screen so reply with a nice message confirming the image has been generated, maybe re-describing it, but don't include the link to it."
     }
