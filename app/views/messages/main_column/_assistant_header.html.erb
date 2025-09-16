@@ -1,15 +1,16 @@
-<div class="dropdown">
-  <div tabindex="0" role="button" class="inline-flex items-center px-3 py-2 text-lg font-medium outline-none cursor-pointer scale-down rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-gray-50 dark:focus:bg-gray-700">
-    <%= @assistant.name %>
-    <%= icon "chevron-down", variant: :mini, size: 18, class: 'text-gray-400 ml-[2px]' %>
-  </div>
+<div class="flex items-center gap-2">
+  <div class="dropdown">
+    <div tabindex="0" role="button" class="inline-flex items-center px-3 py-2 text-lg font-medium outline-none cursor-pointer scale-down rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-gray-50 dark:focus:bg-gray-700">
+      <%= @assistant.name %>
+      <%= icon "chevron-down", variant: :mini, size: 18, class: 'text-gray-400 ml-[2px]' %>
+    </div>
 
-  <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
-    <li>
-      <%= link_to edit_settings_assistant_path(@assistant), target: "_top" do %>
-        <%= icon "cog-6-tooth", variant: :outline, size: 18 %><%= t('app.navigation.settings') %>
-      <% end %>
-    </li>
-    <!-- <li><a><%= icon "arrow-up-tray", variant: :outline, size: 18 %>Share</a></li> -->
-  </menu>
+    <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
+      <li>
+        <%= link_to edit_settings_assistant_path(@assistant), target: "_top" do %>
+          <%= icon "cog-6-tooth", variant: :outline, size: 18 %><%= t('app.navigation.settings') %>
+        <% end %>
+      </li>
+    </menu>
+  </div>
 </div>

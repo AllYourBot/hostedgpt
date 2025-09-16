@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_13_181329) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_14_143833) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -122,9 +122,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_13_181329) do
     t.decimal "output_token_total_cost", precision: 30, scale: 15, default: "0.0", null: false
     t.integer "input_token_total_count", default: 0, null: false
     t.integer "output_token_total_count", default: 0, null: false
+    t.string "share_token"
     t.index ["assistant_id"], name: "index_conversations_on_assistant_id"
     t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
+    t.index ["share_token"], name: "index_conversations_on_share_token"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end

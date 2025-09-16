@@ -64,7 +64,15 @@
   <header id="wide-header" class="justify-between flex-none hidden h-10 mt-2 mb-3 ml-2 text-lg text-gray-950 dark:text-gray-100 md:flex">
     <%= render 'messages/main_column/assistant_header' %>
 
-    <%= link_to new_assistant_message_path(@assistant),
+    <div class="flex items-center gap-2">
+      <%= button_tag type: "button",
+            class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{'opacity-50 cursor-not-allowed' unless @conversation&.persisted?}",
+            onclick: @conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
+            disabled: !@conversation&.persisted? do %>
+        <%= icon "arrow-up-tray", variant: :outline, size: 20, class: 'text-gray-950 dark:text-gray-100', title: @conversation&.persisted? ? 'Share conversation' : 'Share conversation (no conversation to share)', tooltip: :bottom %>
+      <% end %>
+
+      <%= link_to new_assistant_message_path(@assistant),
         target: "_top",
         class: "block cursor-pointer inline-flex mr-3 px-2 py-2 group",
         data: {
@@ -78,7 +86,8 @@
           |
         } do %>
   <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: t('app.conversations.new_chat'), tooltip: :left %>
-    <% end %>
+      <% end %>
+    </div>
   </header>
 
   <header id="narrow-header" class="flex-none text-lg text-center h-14 md:hidden">
@@ -94,9 +103,18 @@
 
       <%= render 'messages/main_column/assistant_header' %>
 
-      <%= link_to new_assistant_message_path(@assistant), target: "_top", class: "block cursor-pointer inline-flex mr-1 px-2 group", data: { role: "new" } do %>
+      <div class="flex items-center gap-2">
+        <%= button_tag type: "button",
+              class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{'opacity-50 cursor-not-allowed' unless @conversation&.persisted?}",
+              onclick: @conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
+              disabled: !@conversation&.persisted? do %>
+          <%= icon "arrow-up-tray", variant: :outline, size: 20, class: 'text-gray-950 dark:text-gray-100', title: @conversation&.persisted? ? 'Share conversation' : 'Share conversation (no conversation to share)', tooltip: :bottom %>
+        <% end %>
+
+        <%= link_to new_assistant_message_path(@assistant), target: "_top", class: "block cursor-pointer inline-flex mr-1 px-2 group", data: { role: "new" } do %>
   <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: t('app.conversations.new_chat'), tooltip: :left %>
-      <% end %>
+        <% end %>
+      </div>
     </div>
   </header>
   <!-- end header possibilities -->
@@ -537,3 +555,7 @@
 </dialog>
 
 <%= render "layouts/visualizer_overlay" %>
+
+<% if @conversation&.persisted? %>
+  <%= render "conversations/share_modal", conversation: @conversation %>
+<% end %>
