@@ -4,16 +4,16 @@
 
 HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.
 
-This app is designed to be incredibly easy for ChatGPT users to switch. All the features you expect are here plus it supports GPT-5, Claude 4, Gemini 2.5 (and others) in a single app. You can also switch assistants in the middle of a conversation!
+This app is intended to be incredibly easy for ChatGPT users to switch. Features you expect are here plus it supports GPT-5, Claude 4, Gemini 2.5 (and others) in a single app. You can also switch assistants in the middle of a conversation!
 
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
 ## Top features of HostedGPT
 
-- **Use GPT-5, Claude 4, Gemini 2.5 (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage.
-- **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
-- **You will never hit the '_You've reached the current usage cap_' errors**.
-- **Collect and easily search all of your conversions** You can search across conversations and providers.
+- **Use GPT-5, Claude 4, Gemini 2.5 (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage.  There are hosting costs if not running locally.
+- **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen". German localization included.
+- **You will rarely hit the '_You've reached the current usage cap_' errors**.
+- **Collect and easily search and share all of your conversions** You can search across conversations and providers.
 
 ### Watch a short demo
 
@@ -42,7 +42,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 
 ## Deploy the app on Render
 
-For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free (with caveats). This free app works for 90 days and then the database will stop working. The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid version of the database, which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
+For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free (with caveats). This free app works for 90 days and then the database will stop working. The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid service in Render, which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
@@ -188,7 +188,7 @@ If you have ths `just` tool installed, there are a couple of easy tasks that hav
 - `just teardown` this will remove everything (sometimes this is great to start from scratch if there are Docker related issues)
 
 
-### Alternatively, you can run outside of Docker
+### Alternatively, you can run outside of Docker, such as on your own server
 
 HostedGPT requires these services to be running:
 
@@ -235,6 +235,8 @@ There are a number of optional feature flags that can be set and settings that c
 - `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
 
 ### Configuring Google Tools
+
+**NOTE: Some users experience failures with this feature.  Expected to be fixed next version**
 
 You first need to follow all the steps in the [Google OAuth instructions](#google-oauth-authentication). The only step that is optional is that you can leave `GOOGLE_AUTHENTICATION_FEATURE` set to false, which means you don't have to enable new users to register with Google. However, following all the steps will also set up Google Auth so you can connect Google Tools to your assistants. After, you complete those steps, here is the additional configuration you need to do in order to enable the Google tools:
 
@@ -392,7 +394,26 @@ See https://github.com/allyourbot/hostedgpt/blob/main/CONTRIBUTING.md
 
 ## Changelog
 
-(Notable features for v0.7, many of which are done already: Gemini, Groq, voice support, skills for the AI, pin conversations, image generation, search)
+(Notable features planned for v0.8: Voice mode, pin conversations, bookmarks, multiple service image generation/tool calling)
+
+V0.7 - Released on 8/16/2056
+- Anthropic Claude, Google Gemini, Llama, and Groq services support
+- Tools (OpenAI) for memory, weather, images, google search
+- Conversation search across conversations/assistants
+- Share conversation with sharable URL
+- Dark mode
+- Token count per message
+- Localization (German)
+- Allow default/shared API keys
+- Google & Microsoft Auth registration and login
+- Auth via HTTP request header
+- Automated Assistant management(models.yaml)
+- Improved development environment (local and docker)
+- Bug fixes
+- Optional Cloudflare R2 file storage
+- Optional tools for gmail and tasks (with some bugs)
+- Optional Voice feature (incomplete)
+
 
 v0.6 - Released on 4/26/2024
 
