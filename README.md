@@ -6,7 +6,7 @@ HostedGPT is a free, open-source alternative to ChatGPT also supporting other pr
 
 This app is designed to be incredibly easy for ChatGPT users to switch. All the features you expect are here plus it supports GPT-5, Claude 4, Gemini 2.5 (and others) in a single app. You can also switch assistants in the middle of a conversation!
 
-This project is led by an experienced rails developer, but I'm actively looking for contributors to help!
+This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
 ## Top features of HostedGPT
 
@@ -42,7 +42,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
 
 ## Deploy the app on Render
 
-For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working. You will need to upgrade to a paid version of the database which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
+For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free (with caveats). This free app works for 90 days and then the database will stop working. The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid version of the database, which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
@@ -56,7 +56,7 @@ For the easiest way to get started, deploy a full version of HostedGPT to the ho
 7. You should see two "Service Names" called "hostedgpt-..." (the name you picked), click the one that is of type **Web Service**
 8. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
 
-**NOTE: After 15 minutes of not using the app your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. If this annoys you, upgrade Render for $7 per month:**
+**NOTE: After 15 minutes of not using the app with the free service your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. You probably need to upgrade $7 per month anyway:**
 
 1. To upgrade, go to your [Render Dashboard](https://dashboard.render.com/)
 2. Click "HostedGPT" or whatever you named your Web Service
@@ -78,25 +78,27 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 ## Deploy the app on Fly.io
 
-Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free service so Fly is actually less expensive over the long term.
+Deploying to Fly.io is another option. It's not quite one-click like Render and it's not 100% free. We've made the configuration really easy for you but it appears that it now costs $38 to activate the Postgres database.
 
 1. Click Fork > Create New Fork at the top of this repository. **Pull your forked repository down to your computer (the usual git clone ...)**.
 1. Go into the directory you just created with your git clone and run `bundle`
-1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise `curl -L https://fly.io/install.sh | sh` ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
+1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise there is a 'curl' command ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
 1. Think of an internal Fly name for your app, it has to be unique to all of Fly. You'll use this **APP_NAME** three times in the steps below. First, in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME`
 
    - Say "Yes" when it asks if you want to tweak these settings
 
-1. When it opens your browser, (i) change the Database to `Fly Automated Postgres`, (ii) set the name to be `[APP_NAME]-db`, (iii) and you can set the configuration to `Development`.
+1. When it opens your browser, (i) change the Database to `Fly Managed Postgres`, and set the name to be `[APP_NAME]-db`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
 1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and **save the Postgres username & password somewhere as you'll never be able to see those again**.
 1. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly. (If you get an error you may have forgotten to run `bundle`).
 1. Run `fly deploy --ha=false`
-1. Assuming you chose `Development` as the DB size in the step above, now you should run `bin/rails db:fly[APP_NAME,swap,512]` This will increase the swap on your database machine so that it doesn't crash since the Development database has less ram.
+1. In an older version of fly, you needed to run `bin/rails db:fly[APP_NAME,swap,512]` This increased the swap on your database machine so that it doesn't crash since the Development database has less RAM.
 
 You may want to read about [configuring optional features](#configure-optional-features).
 
 ## Deploy the app on Heroku
+
+**NOTE: Deploying to Heroku is currently broken for HostedGPT, so we could use some help fixing it!**
 
 Heroku is a one-click option that will cost $10/month for the compute (dyno) and database. By default, apps use Eco dynos ($5) if you are subscribed to Eco. Otherwise, it defaults to Basic dynos ($7). The Eco dynos plan is shared across all Eco dynos in your account and is recommended if you plan on deploying many small apps to Heroku. Eco dynos "sleep" after 30 minutes of inactivity and take a few seconds to wake up. Basic dynos do not sleep.
 
@@ -390,7 +392,7 @@ See https://github.com/allyourbot/hostedgpt/blob/main/CONTRIBUTING.md
 
 ## Changelog
 
-(Notable features being developed for v0.7: Heroku deploy, Gemini, Groq, voice support, skills for the AI, pin conversations, image generation)
+(Notable features for v0.7, many of which are done already: Gemini, Groq, voice support, skills for the AI, pin conversations, image generation, search)
 
 v0.6 - Released on 4/26/2024
 
