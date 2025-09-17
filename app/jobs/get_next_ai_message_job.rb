@@ -211,22 +211,30 @@ class GetNextAIMessageJob < ApplicationJob
     index = @message.index
     json_of_generated_image = nil
     msgs.each do |tool_message| # one message for each tool executed
+      parsed = JSON.parse(tool_message[:content]) rescue nil
+
+      if parsed.is_a?(Hash) && parsed.has_key?("json_of_generated_image")
+        json_of_generated_image = parsed["json_of_generated_image"]
+        # Redact the large base64 payload from the saved tool message content
+        parsed = parsed.except("json_of_generated_image")
+      end
+
+      content_to_save = if parsed.is_a?(Hash)
+        parsed.to_json
+      else
+        tool_message[:content]
+      end
+
       @conversation.messages.create!(
         assistant: @assistant,
         role: tool_message[:role],
-        content_text: tool_message[:content],
+        content_text: content_to_save,
         tool_call_id: tool_message[:tool_call_id],
         content_tool_calls: tool_message[:content_tool_calls],
         version: @message.version,
         index: index += 1,
         processed_at: Time.current,
       )
-
-      parsed = JSON.parse(tool_message[:content]) rescue nil
-
-      if parsed.is_a?(Hash) && parsed.has_key?("json_of_generated_image")
-        json_of_generated_image = parsed["json_of_generated_image"]
-      end
 
     end
 
@@ -253,7 +261,6 @@ class GetNextAIMessageJob < ApplicationJob
         content_type: "image/png"
       )
       assistant_reply.documents << document
-      document.save!
     end
 
     GetNextAIMessageJob.perform_later(
