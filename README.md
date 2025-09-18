@@ -78,6 +78,8 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 ## Deploy the app on Fly.io
 
+**NOTE: The instructions below have not been verified in a while.  It needes to be tested and possibly fixes will be required.**
+
 Deploying to Fly.io is another option. It's not quite one-click like Render and it's not 100% free. We've made the configuration really easy for you but it appears that it now costs $38 to activate the Postgres database.
 
 1. Click Fork > Create New Fork at the top of this repository. **Pull your forked repository down to your computer (the usual git clone ...)**.
@@ -188,7 +190,7 @@ If you have ths `just` tool installed, there are a couple of easy tasks that hav
 - `just teardown` this will remove everything (sometimes this is great to start from scratch if there are Docker related issues)
 
 
-### Alternatively, you can run outside of Docker, such as on your own server
+### Alternatively, you can run outside of Docker, such as on your own Mac
 
 HostedGPT requires these services to be running:
 
@@ -396,7 +398,7 @@ See https://github.com/allyourbot/hostedgpt/blob/main/CONTRIBUTING.md
 
 (Notable features planned for v0.8: Voice mode, pin conversations, bookmarks, multiple service image generation/tool calling)
 
-V0.7 - Released on 8/16/2056
+V0.7 - Released on 8/18/2026
 - Anthropic Claude, Google Gemini, Llama, and Groq services support
 - Tools (OpenAI) for memory, weather, images, google search
 - Conversation search across conversations/assistants
