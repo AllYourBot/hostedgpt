@@ -1,9 +1,5 @@
-#require "open-uri"
 include ActionView::RecordIdentifier
 require "nokogiri/xml/node"
-require "base64"
-require "tempfile"
-require "stringio"
 
 class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
 

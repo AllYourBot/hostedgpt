@@ -37,9 +37,8 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
 
         params = images_double.last_parameters
         assert_equal @prompt, params[:prompt]
-        assert_equal "1024x1792", params[:size]
-        assert_equal "standard", params[:quality]
-        assert_equal "b64_json", params[:response_format]
+        assert_equal "1024x1024", params[:size]
+        assert_equal "auto", params[:quality] # dalle-e is "standard"
 
         assert_equal @prompt, result[:prompt_given]
         assert_includes result[:note_to_assistant], "image"

@@ -5,24 +5,25 @@ class Toolbox::Image < Toolbox
   S
 
   def generate_an_image(image_generation_prompt_s:)
-    model = "dall-e-3" # default is dall-e-2. Others: gpt-image-1, dall-e-3.
+    model = "gpt-image-1" # default is dall-e-2. Others: gpt-image-1, dall-e-3.
     response = client.images.generate(
       parameters: {
         prompt: image_generation_prompt_s,
         model: model,
-        size: "1024x1792",
-        # n: 1,
-        # size: "1024x1024",
+        # dall-e
+        # size: "1024x1792",
         # quality: "standard",
-        response_format: "b64_json"
+        # response_format: "b64_json"
+        #
+        # gpt-image-1:
+        n: 1,
+        size: "1024x1024",
+        quality: "auto"
       }
     )
 
-    json =
-      response.dig("data", 0, "b64_json") ||
-      response.dig(:data, 0, :b64_json)
-      # response.dig("data", 0, "images", 0, "data") ||
-      # response.dig(:data, 0, :images, 0, :data)
+    json = response.dig("data", 0, "b64_json") ||
+           response.dig(:data, 0, :b64_json)
 
     {
       prompt_given: image_generation_prompt_s,
