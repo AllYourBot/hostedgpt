@@ -68,7 +68,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     response = {
       data: [{
         images: [
-          data:"/9j/4AAQSkZJRgABAQEAYABIAAD"
+          b54_json:"/9j/4AAQSkZJRgABAQEAYABIAAD"
         ]
       }]
     }
