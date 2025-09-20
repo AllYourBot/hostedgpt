@@ -4,16 +4,16 @@
 
 HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.
 
-This app is designed to be incredibly easy for ChatGPT users to switch. All the features you expect are here plus it supports GPT-5, Claude 4, Gemini 2.5 (and others) in a single app. You can also switch assistants in the middle of a conversation!
+This app is intended to be incredibly easy for ChatGPT users to switch. Features you expect are here plus it supports GPT-5, Claude 4, Gemini 2.5 (and others) in a single app. You can also switch assistants in the middle of a conversation!
 
-This project is led by an experienced rails developer, but I'm actively looking for contributors to help!
+This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
 ## Top features of HostedGPT
 
-- **Use GPT-5, Claude 4, Gemini 2.5 (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage.
-- **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
-- **You will never hit the '_You've reached the current usage cap_' errors**.
-- **Collect and easily search all of your conversions** You can search across conversations and providers.
+- **Use GPT-5, Claude 4, Gemini 2.5 (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage.  There are hosting costs if not running locally.
+- **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen". German localization included.
+- **You will rarely hit the '_You've reached the current usage cap_' errors**.
+- **Collect and easily search and share all of your conversions** You can search across conversations and providers.
 
 ### Watch a short demo
 
@@ -42,7 +42,7 @@ This project is led by an experienced rails developer, but I'm actively looking 
 
 ## Deploy the app on Render
 
-For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working. You will need to upgrade to a paid version of the database which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
+For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free (with caveats). This free app works for 90 days and then the database will stop working. The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid service in Render, which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
@@ -56,7 +56,7 @@ For the easiest way to get started, deploy a full version of HostedGPT to the ho
 7. You should see two "Service Names" called "hostedgpt-..." (the name you picked), click the one that is of type **Web Service**
 8. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
 
-**NOTE: After 15 minutes of not using the app your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. If this annoys you, upgrade Render for $7 per month:**
+**NOTE: After 15 minutes of not using the app with the free service your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. You probably need to upgrade $7 per month anyway:**
 
 1. To upgrade, go to your [Render Dashboard](https://dashboard.render.com/)
 2. Click "HostedGPT" or whatever you named your Web Service
@@ -78,25 +78,29 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 ## Deploy the app on Fly.io
 
-Deploying to Fly.io is another great option. It's not quite one-click like Render and it's not 100% free. But we've made the configuration really easy for you and the cost should be about $2 per month, and Render costs $7 per month after 90 days of free service so Fly is actually less expensive over the long term.
+**NOTE: The instructions below have not been verified in a while.  It needes to be tested and possibly fixes will be required.**
+
+Deploying to Fly.io is another option. It's not quite one-click like Render and it's not 100% free. We've made the configuration really easy for you but it appears that it now costs $38 to activate the Postgres database.
 
 1. Click Fork > Create New Fork at the top of this repository. **Pull your forked repository down to your computer (the usual git clone ...)**.
 1. Go into the directory you just created with your git clone and run `bundle`
-1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise `curl -L https://fly.io/install.sh | sh` ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
+1. Install the Fly command-line tool on Mac with `brew install flyctl` otherwise there is a 'curl' command ([view instructions](https://fly.io/docs/hands-on/install-flyctl/))
 1. Think of an internal Fly name for your app, it has to be unique to all of Fly. You'll use this **APP_NAME** three times in the steps below. First, in the root directory of the repository you pulled down, run `fly launch --build-only --copy-config --name=APP_NAME`
 
    - Say "Yes" when it asks if you want to tweak these settings
 
-1. When it opens your browser, (i) change the Database to `Fly Automated Postgres`, (ii) set the name to be `[APP_NAME]-db`, (iii) and you can set the configuration to `Development`.
+1. When it opens your browser, (i) change the Database to `Fly Managed Postgres`, and set the name to be `[APP_NAME]-db`.
 1. Click `Confirm Settings` at the bottom of the page and close the browser.
 1. The app will do a bunch of build steps and then return to the command line. Scroll through the output and **save the Postgres username & password somewhere as you'll never be able to see those again**.
 1. Next run `bin/rails db:setup_encryption[true]`. This will initialize some private keys for your app and send them to Fly. (If you get an error you may have forgotten to run `bundle`).
 1. Run `fly deploy --ha=false`
-1. Assuming you chose `Development` as the DB size in the step above, now you should run `bin/rails db:fly[APP_NAME,swap,512]` This will increase the swap on your database machine so that it doesn't crash since the Development database has less ram.
+1. In an older version of fly, you needed to run `bin/rails db:fly[APP_NAME,swap,512]` This increased the swap on your database machine so that it doesn't crash since the Development database has less RAM.
 
 You may want to read about [configuring optional features](#configure-optional-features).
 
 ## Deploy the app on Heroku
+
+**NOTE: Deploying to Heroku is currently broken for HostedGPT, so we could use some help fixing it!**
 
 Heroku is a one-click option that will cost $10/month for the compute (dyno) and database. By default, apps use Eco dynos ($5) if you are subscribed to Eco. Otherwise, it defaults to Basic dynos ($7). The Eco dynos plan is shared across all Eco dynos in your account and is recommended if you plan on deploying many small apps to Heroku. Eco dynos "sleep" after 30 minutes of inactivity and take a few seconds to wake up. Basic dynos do not sleep.
 
@@ -186,7 +190,7 @@ If you have ths `just` tool installed, there are a couple of easy tasks that hav
 - `just teardown` this will remove everything (sometimes this is great to start from scratch if there are Docker related issues)
 
 
-### Alternatively, you can run outside of Docker
+### Alternatively, you can run outside of Docker, such as on your own Mac
 
 HostedGPT requires these services to be running:
 
@@ -233,6 +237,8 @@ There are a number of optional feature flags that can be set and settings that c
 - `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
 
 ### Configuring Google Tools
+
+**NOTE: Some users experience failures with this feature.  Expected to be fixed next version**
 
 You first need to follow all the steps in the [Google OAuth instructions](#google-oauth-authentication). The only step that is optional is that you can leave `GOOGLE_AUTHENTICATION_FEATURE` set to false, which means you don't have to enable new users to register with Google. However, following all the steps will also set up Google Auth so you can connect Google Tools to your assistants. After, you complete those steps, here is the additional configuration you need to do in order to enable the Google tools:
 
@@ -390,7 +396,26 @@ See https://github.com/allyourbot/hostedgpt/blob/main/CONTRIBUTING.md
 
 ## Changelog
 
-(Notable features being developed for v0.7: Heroku deploy, Gemini, Groq, voice support, skills for the AI, pin conversations, image generation)
+(Notable features planned for v0.8: Voice mode, pin conversations, bookmarks, multiple service image generation/tool calling)
+
+V0.7 - Released on 8/18/2026
+- Anthropic Claude, Google Gemini, Llama, and Groq services support
+- Tools (OpenAI) for memory, weather, images, google search
+- Conversation search across conversations/assistants
+- Share conversation with sharable URL
+- Dark mode
+- Token count per message
+- Localization (German)
+- Allow default/shared API keys
+- Google & Microsoft Auth registration and login
+- Auth via HTTP request header
+- Automated Assistant management(models.yaml)
+- Improved development environment (local and docker)
+- Bug fixes
+- Optional Cloudflare R2 file storage
+- Optional tools for gmail and tasks (with some bugs)
+- Optional Voice feature (incomplete)
+
 
 v0.6 - Released on 4/26/2024
 

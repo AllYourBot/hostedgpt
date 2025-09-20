@@ -1,6 +1,7 @@
 class ConversationsController < ApplicationController
-  before_action :set_conversation
-  before_action :set_nav_assistants
+  before_action :set_conversation, except: [:public_show]
+  before_action :set_nav_assistants, except: [:public_show]
+  allow_unauthenticated_access only: [:public_show]
 
   def index
     @query = params[:query]
@@ -28,6 +29,13 @@ class ConversationsController < ApplicationController
     else
       redirect_back fallback_location: root_path, notice: I18n.t("app.flashes.conversations.deleted"), status: :see_other
     end
+  end
+
+  def public_show
+    @conversation = Conversation.find_by!(share_token: params[:share_token])
+    @messages = @conversation.messages.includes(:assistant).ordered
+    @assistant = @conversation.assistant
+    render "public_show", layout: "public"
   end
 
   private

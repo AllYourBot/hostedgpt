@@ -72,7 +72,8 @@ class MessagesController < ApplicationController
 
   def set_assistant
     @assistant = Current.user.assistants_including_deleted.find_by(id: params[:assistant_id])
-    @assistant ||= @conversation.latest_message_for_version(@version).assistant
+    @assistant ||= @conversation.latest_message_for_version(@version)&.assistant
+    @assistant ||= @conversation.assistant
   end
 
   def set_message
