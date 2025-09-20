@@ -130,10 +130,21 @@ class AIBackend::OpenAI < AIBackend
           content: content_with_images,
         }.compact
       else
+        begin
+          parsed = JSON.parse(message.content_text)
+          sanitized_content = if parsed.is_a?(Hash)
+            parsed.except("message_to_user", "json_of_generated_image").to_json
+          else
+            message.content_text
+          end
+        rescue
+          sanitized_content = message.content_text
+        end
+
         {
           role: message.role,
           name: message.name_for_api,
-          content: (JSON.parse(message.content_text).except("message_to_user").to_json rescue message.content_text),
+          content: sanitized_content,
           tool_calls: message.assistant? ? message.content_tool_calls : nil, # only for some assistant messages
           tool_call_id: message.tool_call_id,     # only for tool messages
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
