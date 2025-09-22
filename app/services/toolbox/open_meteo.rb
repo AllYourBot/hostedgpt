@@ -100,6 +100,8 @@ class Toolbox::OpenMeteo < Toolbox
       good_summary: summary,
       right_now_weather_code: d.curr_code,
       today_weather_code: d.today_code,
+
+      message_to_user: "Weather retrieved by tool"
     }
   end
 
@@ -171,6 +173,8 @@ class Toolbox::OpenMeteo < Toolbox
         precipitation_formatted: format(day[:precipitation_sum], qty_unit),
         rain_formatted: format(day[:rain_sum], qty_unit),
         snowfall_formatted: format(day[:snowfall_sum], qty_unit),
+
+        message_to_user: "Historical weather retrieved by tool"
       }
     end
   end

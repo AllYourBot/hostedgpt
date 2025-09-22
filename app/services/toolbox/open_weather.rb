@@ -34,6 +34,7 @@ class Toolbox::OpenWeather < Toolbox
       today: response.daily.first.summary,
       today_high: response.daily.first.temp.max.round,
       today_low: response.daily.first.temp.min.round,
+      message_to_user: "Weather retrieved by tool"
     }
   end
 end
