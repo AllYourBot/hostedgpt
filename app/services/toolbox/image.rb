@@ -28,7 +28,8 @@ class Toolbox::Image < Toolbox
     {
       prompt_given: image_generation_prompt_s,
       json_of_generated_image: json,
-      note_to_assistant: "The image is already being shown on screen so reply with a nice message confirming the image has been generated, maybe re-describing it."
+      note_to_assistant: "The image is already being shown on screen so reply with a nice message confirming the image has been generated, maybe re-describing it.",
+      message_to_user: "Image created by tool"
     }
   end
 
