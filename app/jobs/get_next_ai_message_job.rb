@@ -257,6 +257,9 @@ class GetNextAIMessageJob < ApplicationJob
         content_type: "image/png"
       )
       assistant_reply.documents << document
+
+      tempfile.close
+      tempfile.unlink
     end
 
     GetNextAIMessageJob.perform_later(
