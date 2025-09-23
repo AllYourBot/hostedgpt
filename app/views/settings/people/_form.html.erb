@@ -30,6 +30,63 @@
       <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
+    <!-- Profile Picture Upload -->
+    <div class="my-5" data-controller="profile-picture-upload">
+      <%= user_fields.label :profile_picture, "Profile Picture" %>
+      <div class="mt-2">
+        <div class="flex items-center space-x-4">
+          <!-- Current avatar display -->
+          <div data-profile-picture-upload-target="currentAvatar">
+            <%= render partial: "layouts/user_avatar", locals: { user: person.personable, size: 16, classes: "" } %>
+          </div>
+
+          <!-- Upload controls -->
+          <div class="flex-1">
+            <%= user_fields.file_field :profile_picture,
+                accept: "image/*",
+                class: "hidden",
+                data: {
+                  profile_picture_upload_target: "fileInput",
+                  action: "change->profile-picture-upload#previewImage"
+                } %>
+
+            <div class="flex space-x-2">
+              <%= button_tag "Choose Photo",
+                  type: "button",
+                  class: "inline-block font-medium bg-gray-100 dark:bg-gray-900 dark:text-white border border-gray-400 rounded-lg py-2 px-4 cursor-pointer text-sm",
+                  data: { action: "profile-picture-upload#chooseFile" } %>
+
+              <% if person.personable.has_profile_picture? %>
+                <%= button_tag "Remove",
+                    type: "button",
+                    class: "inline-block font-medium bg-red-100 dark:bg-red-900 dark:text-white border border-red-400 rounded-lg py-2 px-4 cursor-pointer text-sm",
+                    data: { action: "profile-picture-upload#removeImage" } %>
+              <% end %>
+            </div>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              JPEG, PNG, GIF, or WebP. Max 5MB.
+            </p>
+          </div>
+        </div>
+
+        <!-- Preview area (hidden by default) -->
+        <div class="mt-4 hidden" data-profile-picture-upload-target="previewContainer">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview:</p>
+          <div class="flex items-center space-x-4">
+            <div class="rounded-full w-16 h-16 overflow-hidden border border-gray-200 dark:border-gray-600">
+              <img data-profile-picture-upload-target="previewImage"
+                   class="w-full h-full object-cover"
+                   alt="Profile picture preview">
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              This is how your profile picture will appear.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <% person.personable.credentials.type_is("PasswordCredential").each do |credential| %>
       <%= user_fields.fields_for :credentials_attributes, credential, index: credential.id do |credential_fields| %>
         <%= credential_fields.hidden_field :type, value: credential.type %>

@@ -30,4 +30,44 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "pQ", at_most_two_initials("p v Q")
   end
 
+  # Profile picture helper tests
+  test "user_avatar_image_tag returns nil when user has no profile picture" do
+    user = users(:keith)
+    assert_nil user_avatar_image_tag(user)
+  end
+
+  test "user_avatar_image_tag returns image tag when user has profile picture" do
+    user = users(:keith)
+    user.profile_picture.attach(
+      io: StringIO.new("fake image data"),
+      filename: "test.jpg",
+      content_type: "image/jpeg"
+    )
+
+    result = user_avatar_image_tag(user)
+    assert_not_nil result
+    assert_includes result, "img"
+    assert_includes result, "test.jpg"
+  end
+
+  test "user_avatar_url returns fallback when user has no profile picture" do
+    user = users(:keith)
+    fallback_url = "http://example.com/default.jpg"
+
+    assert_equal fallback_url, user_avatar_url(user, fallback: fallback_url)
+  end
+
+  test "user_avatar_url returns profile picture URL when user has profile picture" do
+    user = users(:keith)
+    user.profile_picture.attach(
+      io: StringIO.new("fake image data"),
+      filename: "test.jpg",
+      content_type: "image/jpeg"
+    )
+
+    result = user_avatar_url(user)
+    assert_not_nil result
+    assert_includes result, "test.jpg"
+  end
+
 end
