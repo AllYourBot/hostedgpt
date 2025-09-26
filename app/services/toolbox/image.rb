@@ -5,8 +5,24 @@ class Toolbox::Image < Toolbox
   S
 
   def generate_an_image(image_generation_prompt_s:)
+    # Determine the current AI backend
+    current_backend = Current.message&.assistant&.language_model&.api_service&.ai_backend
+
+    if current_backend == AIBackend::Anthropic
+      # For Anthropic backend, use OpenAI client for image generation
+      # since Anthropic doesn't have native image generation
+      generate_with_openai_client(image_generation_prompt_s)
+    else
+      # For other backends (OpenAI, etc.), use the appropriate client
+      generate_with_openai_client(image_generation_prompt_s)
+    end
+  end
+
+  private
+
+  def generate_with_openai_client(image_generation_prompt_s)
     model = "gpt-image-1" # default is dall-e-2. Others: gpt-image-1, dall-e-3.
-    response = client.images.generate(
+    response = openai_client.images.generate(
       parameters: {
         prompt: image_generation_prompt_s,
         model: model,
@@ -33,18 +49,17 @@ class Toolbox::Image < Toolbox
     }
   end
 
-  private
-
-  def client
-    # Find the user's OpenAI API service for image generation
+  def openai_client
     openai_service = Current.user.api_services.find_by(driver: :openai)
 
     if openai_service.nil? || openai_service.effective_token.blank?
-      raise "OpenAI API key not found. Please configure your OpenAI API key in Settings > API Services to use image generation."
+      current_backend = Current.message&.assistant&.language_model&.api_service&.name || "current AI backend"
+      raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services to use image generation with #{current_backend}."
     end
 
     OpenAI::Client.new(
       access_token: openai_service.effective_token
     )
+    Rails.logger.info "\n#### OpenAI client created with token length #{openai_service.effective_token.to_s.length}"
   end
 end
