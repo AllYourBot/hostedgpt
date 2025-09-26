@@ -142,6 +142,7 @@ class AIBackend::Anthropic < AIBackend
   def stream_handler(&chunk_handler)
     proc do |intermediate_response, bytesize|
       chunk = intermediate_response.dig("delta", "text")
+      tool_use_chunk = intermediate_response.dig("delta", "tool_use")
 
       handle_tool_use_streaming(intermediate_response)
 
@@ -157,6 +158,11 @@ class AIBackend::Anthropic < AIBackend
       if chunk
         @stream_response_text += chunk
         yield chunk
+      end
+
+      if tool_use_chunk
+        @stream_response_tool_calls ||= []
+        @stream_response_tool_calls << tool_use_chunk
       end
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e

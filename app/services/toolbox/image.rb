@@ -36,8 +36,15 @@ class Toolbox::Image < Toolbox
   private
 
   def client
+    # Find the user's OpenAI API service for image generation
+    openai_service = Current.user.api_services.find_by(driver: :openai)
+
+    if openai_service.nil? || openai_service.effective_token.blank?
+      raise "OpenAI API key not found. Please configure your OpenAI API key in Settings > API Services to use image generation."
+    end
+
     OpenAI::Client.new(
-      access_token: Current.message.assistant.api_service.effective_token
+      access_token: openai_service.effective_token
     )
   end
 end
