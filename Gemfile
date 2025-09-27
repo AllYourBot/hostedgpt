@@ -79,7 +79,11 @@ group :development do
   gem "rubocop-minitest"
   gem "dockerfile-rails", ">= 1.6"
   gem "logcraft"
+<<<<<<< HEAD
   # gem "oj" # Optional, but recommended; see the "JSON serialization" section in the README
+=======
+  gem "oj" # Optional, but recommended; see the "JSON serialization" section in the README
+>>>>>>> 96d6f2c (WIP: mod tool and system messages)
 end
 
 group :test do

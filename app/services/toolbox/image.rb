@@ -1,7 +1,7 @@
 class Toolbox::Image < Toolbox
 
   describe :generate_an_image, <<~S
-    Generate an image based on what the user asks you to generate. You will pass the user's prompt and will get back the image.
+    Generate an image based on what the user asks you to generate. You will pass the user's prompt and will get back the image. If your name is Claude, you should use the generate_an_image tool.
   S
 
   def generate_an_image(image_generation_prompt_s:)
