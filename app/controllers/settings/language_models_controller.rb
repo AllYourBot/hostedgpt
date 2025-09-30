@@ -63,6 +63,17 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   end
 
   def language_model_params
-    params.require(:language_model).permit(:api_name, :name, :best, :supports_images, :supports_tools, :api_service_id, :supports_system_message, :supports_pdf)
+    params.require(:language_model).permit(
+      :api_name,
+      :name,
+      :best,
+      :supports_images,
+      :supports_tools,
+      :api_service_id,
+      :supports_system_message,
+      :supports_pdf,
+      :input_token_cost_cents,
+      :output_token_cost_cents
+    )
   end
 end

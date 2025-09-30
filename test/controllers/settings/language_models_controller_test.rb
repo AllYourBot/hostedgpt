@@ -29,7 +29,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to settings_language_models_url
     assert_equal "Saved", flash[:notice]
-    assert_equal params, LanguageModel.last.slice(:api_name, :api_service_id, :name, :supports_images)
+    assert_equal params.slice(:api_name, :api_service_id, :name, :supports_images), LanguageModel.last.slice(:api_name, :api_service_id, :name, :supports_images)
     assert_equal @user, LanguageModel.last.user
   end
 
@@ -149,7 +149,8 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to settings_language_models_url
     assert_equal "Saved", flash[:notice]
-    assert_equal params, @language_model.reload.slice(:api_name, :name, :supports_images)
+    @language_model.reload
+    assert_equal params.slice("api_name", "name", "supports_images"), @language_model.slice(:api_name, :name, :supports_images)
   end
 
   test "update should update best language model" do

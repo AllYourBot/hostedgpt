@@ -76,6 +76,32 @@
   <%= form.label :supports_pdf, t('app.settings.language_models.form.supports_pdf') %>
   </div>
 
+    <div class="my-5">
+      <%= form.label :input_token_cost_cents, t('app.settings.language_models.form.input_token_cost_cents') %>
+      <div class="mt-2 flex items-center gap-2">
+        <%= form.number_field :input_token_cost_cents,
+          step: :any,
+          min: 0,
+          class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 w-full dark:text-black"
+        %>
+        <span class="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap"><%= t('app.settings.language_models.form.token_cost_unit') %></span>
+      </div>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mt-1"><%= t('app.settings.language_models.form.token_cost_hint') %></p>
+    </div>
+
+    <div class="my-5">
+      <%= form.label :output_token_cost_cents, t('app.settings.language_models.form.output_token_cost_cents') %>
+      <div class="mt-2 flex items-center gap-2">
+        <%= form.number_field :output_token_cost_cents,
+          step: :any,
+          min: 0,
+          class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 w-full dark:text-black"
+        %>
+        <span class="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap"><%= t('app.settings.language_models.form.token_cost_unit') %></span>
+      </div>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mt-1"><%= t('app.settings.language_models.form.token_cost_hint') %></p>
+    </div>
+
   <%= form.submit t('app.settings.language_models.form.save'),
     class: %|
       inline-block font-bold
