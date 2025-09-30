@@ -1,5 +1,5 @@
 guest:
-  email: nil
+  email: ~
 
 keith_registered:
   email: keith@hostedgpt.com

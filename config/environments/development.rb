@@ -87,6 +87,9 @@ Rails.application.configure do
 
   config.web_console.permissions = ["192.168.0.0/16", "172.17.0.0/16", "172.18.0.0/16"]
 
+  # Encrypt fixtures when loading them
+  config.active_record.encryption.encrypt_fixtures = true
+
   # TODO should we combine this with APP_URL_HOST?
   config.hosts << ENV["DEV_HOST"] if ENV["DEV_HOST"].present?
   config.hosts << Setting.app_url_host if Setting.key_set?(:app_url_host)
