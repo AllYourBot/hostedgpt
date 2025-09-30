@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_14_143833) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_30_104155) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -118,8 +118,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_14_143833) do
     t.datetime "updated_at", null: false
     t.bigint "last_assistant_message_id"
     t.text "external_id", comment: "The Backend AI system (e.g OpenAI) Thread Id"
-    t.decimal "input_token_total_cost", precision: 30, scale: 15, default: "0.0", null: false
-    t.decimal "output_token_total_cost", precision: 30, scale: 15, default: "0.0", null: false
     t.integer "input_token_total_count", default: 0, null: false
     t.integer "output_token_total_count", default: 0, null: false
     t.string "share_token"
@@ -174,8 +172,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_14_143833) do
     t.bigint "user_id", null: false
     t.bigint "api_service_id"
     t.boolean "supports_tools", default: false
-    t.decimal "input_token_cost_cents", precision: 30, scale: 15
-    t.decimal "output_token_cost_cents", precision: 30, scale: 15
     t.boolean "best", default: false
     t.boolean "supports_system_message", default: false
     t.boolean "supports_pdf", default: false, null: false

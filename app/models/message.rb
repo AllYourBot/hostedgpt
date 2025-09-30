@@ -25,8 +25,6 @@ class Message < ApplicationRecord
   after_create :start_assistant_reply, if: :user?
   after_create :set_last_assistant_message, if: :assistant?
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
-  before_save :update_input_token_cost, if: :input_token_count_changed?
-  before_save :update_output_token_cost, if: :output_token_count_changed?
 
   scope :ordered, -> { latest_version_for_conversation }
 
@@ -78,13 +76,5 @@ class Message < ApplicationRecord
     conversation.update!(assistant:)
   end
 
-  def update_input_token_cost
-    return if assistant.language_model.input_token_cost_cents.blank?
-    self.input_token_cost = assistant.language_model.input_token_cost_cents * input_token_count
-  end
 
-  def update_output_token_cost
-    return if assistant.language_model.output_token_cost_cents.blank?
-    self.output_token_cost = assistant.language_model.output_token_cost_cents * output_token_count
-  end
 end
