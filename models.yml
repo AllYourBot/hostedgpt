@@ -4,8 +4,6 @@ models:
   name: GPT-5 (latest)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.00025'
-  output_token_cost_cents: '0.001'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -13,8 +11,6 @@ models:
   name: GPT-4o
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.00025'
-  output_token_cost_cents: '0.001'
   best: true
   supports_system_message: true
   api_service_name: OpenAI
@@ -22,8 +18,6 @@ models:
   name: Claude 3.5 Sonnet (latest)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.0003'
-  output_token_cost_cents: '0.0015'
   best: true
   supports_system_message: true
   api_service_name: Anthropic
@@ -31,8 +25,6 @@ models:
   name: DeepSeek R1 Distill Llama 70B
   supports_images: false
   supports_tools: false
-  input_token_cost_cents: '0.000075'
-  output_token_cost_cents: '0.000099'
   best: true
   supports_system_message: true
   api_service_name: Groq
@@ -40,8 +32,6 @@ models:
   name: Llama 3.3 70B Versatile 128k
   supports_images: false
   supports_tools: false
-  input_token_cost_cents: '0.000059'
-  output_token_cost_cents: '0.000079'
   best: true
   supports_system_message: true
   api_service_name: Groq
@@ -49,8 +39,6 @@ models:
   name: GPT-4o Omni Multimodal (2024-08-06)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.00025'
-  output_token_cost_cents: '0.001'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -58,8 +46,6 @@ models:
   name: GPT-4o Omni Multimodal (2024-05-13)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.0005'
-  output_token_cost_cents: '0.0015'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -67,8 +53,6 @@ models:
   name: GPT-4 Turbo with Vision (latest)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.001'
-  output_token_cost_cents: '0.003'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -76,8 +60,6 @@ models:
   name: GPT-4 Turbo with Vision (2024-04-09)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.001'
-  output_token_cost_cents: '0.003'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -85,8 +67,6 @@ models:
   name: GPT-4 Turbo Preview
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.001'
-  output_token_cost_cents: '0.003'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -94,8 +74,6 @@ models:
   name: GPT-4 Turbo Preview (2024-01-25)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.001'
-  output_token_cost_cents: '0.003'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -103,8 +81,6 @@ models:
   name: GPT-4 Turbo Preview (2023-11-06)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.001'
-  output_token_cost_cents: '0.003'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -112,8 +88,6 @@ models:
   name: GPT-4 Turbo with Vision Preview (2023-11-06)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.001'
-  output_token_cost_cents: '0.003'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -121,8 +95,6 @@ models:
   name: GPT-4 Turbo with Vision Preview (2023-11-06)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.001'
-  output_token_cost_cents: '0.003'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -130,8 +102,6 @@ models:
   name: GPT-4 (latest)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.003'
-  output_token_cost_cents: '0.006'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -139,8 +109,6 @@ models:
   name: GPT-4 Snapshot improved function calling (2023-06-13)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.001'
-  output_token_cost_cents: '0.003'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -148,8 +116,6 @@ models:
   name: GPT-3.5 Turbo (latest)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.0003'
-  output_token_cost_cents: '0.0006'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -157,8 +123,6 @@ models:
   name: GPT-3.5 Turbo (2022-01-25)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.00005'
-  output_token_cost_cents: '0.00015'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -166,8 +130,6 @@ models:
   name: GPT-3.5 Turbo (2022-11-06)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.0001'
-  output_token_cost_cents: '0.0002'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -175,8 +137,6 @@ models:
   name: Claude 3.5 Sonnet (2024-06-20)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.0003'
-  output_token_cost_cents: '0.0015'
   best: false
   supports_system_message: true
   api_service_name: Anthropic
@@ -184,8 +144,6 @@ models:
   name: Claude 3 Opus (2024-02-29)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.0015'
-  output_token_cost_cents: '0.0075'
   best: false
   supports_system_message: true
   api_service_name: Anthropic
@@ -193,8 +151,6 @@ models:
   name: Claude 3 Sonnet (2024-02-29)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.0003'
-  output_token_cost_cents: '0.0015'
   best: false
   supports_system_message: true
   api_service_name: Anthropic
@@ -202,8 +158,6 @@ models:
   name: Claude 3 Haiku (2024-03-07)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.000025'
-  output_token_cost_cents: '0.000125'
   best: false
   supports_system_message: true
   api_service_name: Anthropic
@@ -211,8 +165,6 @@ models:
   name: Claude 2.1
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.0008'
-  output_token_cost_cents: '0.0024'
   best: false
   supports_system_message: true
   api_service_name: Anthropic
@@ -220,8 +172,6 @@ models:
   name: Claude 2.0
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.0008'
-  output_token_cost_cents: '0.0024'
   best: false
   supports_system_message: true
   api_service_name: Anthropic
@@ -229,8 +179,6 @@ models:
   name: Claude Instant 1.2
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.00008'
-  output_token_cost_cents: '0.00024'
   best: false
   supports_system_message: true
   api_service_name: Anthropic
@@ -238,8 +186,6 @@ models:
   name: Meta Llama 3 70b
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.000059'
-  output_token_cost_cents: '0.000079'
   best: false
   supports_system_message: true
   api_service_name: Groq
@@ -247,8 +193,6 @@ models:
   name: Meta Llama 3 8b
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.000005'
-  output_token_cost_cents: '0.000008'
   best: false
   supports_system_message: true
   api_service_name: Groq
@@ -256,8 +200,6 @@ models:
   name: Mistral 8 7b
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.000024'
-  output_token_cost_cents: '0.000024'
   best: false
   supports_system_message: true
   api_service_name: Groq
@@ -265,8 +207,6 @@ models:
   name: Google Gemma 7b
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.000007'
-  output_token_cost_cents: '0.000007'
   best: false
   supports_system_message: true
   api_service_name: Groq
@@ -274,8 +214,6 @@ models:
   name: GPT-3.5 Turbo Instruct
   supports_images: false
   supports_tools: false
-  input_token_cost_cents: '0.00015'
-  output_token_cost_cents: '0.0002'
   best: false
   supports_system_message: false
   api_service_name: OpenAI
@@ -283,8 +221,6 @@ models:
   name: GPT-3.5 Turbo (2022-06-13)
   supports_images: false
   supports_tools: false
-  input_token_cost_cents: '0.0003'
-  output_token_cost_cents: '0.0004'
   best: false
   supports_system_message: false
   api_service_name: OpenAI
@@ -292,8 +228,6 @@ models:
   name: GPT-4o Mini (latest)
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: '0.000015'
-  output_token_cost_cents: '0.00006'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -301,8 +235,6 @@ models:
   name: OpenAI o1 (preview)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.015'
-  output_token_cost_cents: '0.06'
   best: false
   supports_system_message: true
   api_service_name: OpenAI
@@ -310,8 +242,6 @@ models:
   name: Claude 3.5 Haiku (latest)
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: '0.0001'
-  output_token_cost_cents: '0.0005'
   best: false
   supports_system_message: true
   api_service_name: Anthropic
@@ -319,8 +249,6 @@ models:
   name: Google Gemini Pro 1.5 (latest)
   supports_images: true
   supports_tools: false
-  input_token_cost_cents: '0.0000'
-  output_token_cost_cents: '0.0000'
   best: true
   supports_system_message: true
   api_service_name: Google Gemini

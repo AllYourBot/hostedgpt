@@ -65,9 +65,6 @@ class Conversation < ApplicationRecord
       .delete_if { |_, v| v.empty? }
   end
 
-  def total_cost
-    input_token_total_cost + output_token_total_cost
-  end
 
   def generate_shareable_url(request)
     ensure_share_token!

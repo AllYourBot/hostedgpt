@@ -47,8 +47,6 @@ debugging:
   last_assistant_message: filter_map_example
   input_token_total_count: 12
   output_token_total_count: 36
-  input_token_total_cost: 0.12
-  output_token_total_cost: 0.72
 
 #  0.1
 #  1.1

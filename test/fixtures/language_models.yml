@@ -9,8 +9,6 @@ gemini-1.5-pro-002:
   supports_images: true
   supports_tools: false
   supports_system_message: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 alpaca:
   position: 1
@@ -29,8 +27,6 @@ pacos:
   api_name: pacos-imagine
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 # Rob's Language Models
 gpt_4_turbo:
@@ -41,8 +37,6 @@ gpt_4_turbo:
   api_service: rob_openai_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4_turbo_2024_04_09:
   position: 2
@@ -52,8 +46,6 @@ gpt_4_turbo_2024_04_09:
   api_service: rob_openai_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4_turbo_preview:
   position: 3
@@ -63,8 +55,6 @@ gpt_4_turbo_preview:
   api_service: rob_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4_0125_preview:
   position: 4
@@ -74,8 +64,6 @@ gpt_4_0125_preview:
   api_service: rob_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_3_5_turbo_0125:
   position: 5
@@ -85,8 +73,6 @@ gpt_3_5_turbo_0125:
   api_service: rob_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_3_5_turbo_1106:
   position: 6
@@ -96,8 +82,6 @@ gpt_3_5_turbo_1106:
   api_service: rob_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_3_5_turbo_instruct:
   position: 7
@@ -107,8 +91,6 @@ gpt_3_5_turbo_instruct:
   api_service: rob_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 claude_2_0:
   position: 8
@@ -118,8 +100,6 @@ claude_2_0:
   api_service: rob_anthropic_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 claude_instant_1_2:
   position: 9
@@ -129,8 +109,6 @@ claude_instant_1_2:
   api_service: rob_anthropic_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 rob_gpt:
   position: 10
@@ -140,8 +118,6 @@ rob_gpt:
   api_service: rob_openai_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 # Keith's Language Models
 gpt_best:
@@ -155,8 +131,6 @@ gpt_best:
   supports_tools: true
   supports_system_message: true
   supports_pdf: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 claude_best:
   position: 2
@@ -167,8 +141,6 @@ claude_best:
   api_name: claude-best
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4o:
   position: 3
@@ -178,8 +150,6 @@ gpt_4o:
   api_service: keith_openai_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4o_2024_05_13:
   position: 4
@@ -189,8 +159,6 @@ gpt_4o_2024_05_13:
   api_service: keith_openai_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4_1106_preview:
   position: 9
@@ -200,8 +168,6 @@ gpt_4_1106_preview:
   api_service: keith_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4_vision_preview:
   position: 10
@@ -211,8 +177,6 @@ gpt_4_vision_preview:
   api_service: keith_openai_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4_1106_vision_preview:
   position: 11
@@ -222,8 +186,6 @@ gpt_4_1106_vision_preview:
   api_service: keith_openai_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4:
   position: 12
@@ -233,8 +195,6 @@ gpt_4:
   api_service: keith_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_4_0613:
   position: 13
@@ -244,8 +204,6 @@ gpt_4_0613:
   api_service: keith_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_3_5_turbo:
   position: 14
@@ -255,8 +213,6 @@ gpt_3_5_turbo:
   api_service: keith_openai_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gpt_3_5_turbo_16k_0613:
   position: 15
@@ -266,8 +222,6 @@ gpt_3_5_turbo_16k_0613:
   api_service: keith_openai_service
   supports_images: false
   supports_tools: false
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 claude_3_5_sonnet_20240620:
   position: 16
@@ -277,8 +231,6 @@ claude_3_5_sonnet_20240620:
   api_service: keith_anthropic_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 claude_3_opus_20240229:
   position: 17
@@ -288,8 +240,6 @@ claude_3_opus_20240229:
   api_service: keith_anthropic_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 claude_3_sonnet_20240229:
   position: 18
@@ -299,8 +249,6 @@ claude_3_sonnet_20240229:
   api_service: keith_anthropic_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 claude_3_haiku_20240307:
   position: 19
@@ -310,8 +258,6 @@ claude_3_haiku_20240307:
   api_service: keith_anthropic_service
   supports_images: true
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 claude_2_1:
   position: 20
@@ -321,8 +267,6 @@ claude_2_1:
   api_service: keith_anthropic_service
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 camel:
   position: 21
@@ -332,8 +276,6 @@ camel:
   api_name: camel
   supports_images: false
   supports_tools: true
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 guanaco:
   position: 22
@@ -344,8 +286,6 @@ guanaco:
   supports_images: true
   supports_tools: false
   supports_pdf: false
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001
 
 gemini_flash_1_5:
   position: 23
@@ -355,5 +295,3 @@ gemini_flash_1_5:
   api_service: keith_gemini_service
   supports_images: true
   supports_tools: false
-  input_token_cost_cents: 0.0001
-  output_token_cost_cents: 0.0001

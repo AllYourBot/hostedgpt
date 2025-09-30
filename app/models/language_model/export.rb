@@ -9,8 +9,6 @@ module LanguageModel::Export
     supports_images
     supports_tools
     supports_system_message
-    input_token_cost_cents
-    output_token_cost_cents
   ]
 
   DEFAULT_MODEL_FILE = "models.yml"
