@@ -47,6 +47,85 @@ class AIBackend::Anthropic < AIBackend
 
   private
 
+  def anthropic_format_tools(openai_tools)
+    return [] if openai_tools.blank?
+
+    openai_tools.map do |tool|
+      function = tool[:function]
+      {
+        name: function[:name],
+        description: function[:description],
+        input_schema: {
+          type: function.dig(:parameters, :type) || "object",
+          properties: function.dig(:parameters, :properties) || {},
+          required: function.dig(:parameters, :required) || []
+        }
+      }
+    end
+  rescue => e
+    Rails.logger.info "Error formatting tools for Anthropic: #{e.message}"
+    []
+  end
+
+  def handle_tool_use_streaming(intermediate_response)
+    event_type = intermediate_response["type"]
+    Rails.logger.info "#### Anthropic streaming event: #{event_type}, response: #{intermediate_response.inspect}"
+
+    # Check if this is a tool-related event at all
+    if intermediate_response.to_s.include?("tool")
+      Rails.logger.info "#### Found tool-related content in streaming response!"
+    end
+
+    case event_type
+    when "content_block_start"
+      # Start of a new content block (text or tool_use)
+      content_block = intermediate_response["content_block"]
+      if content_block&.dig("type") == "tool_use"
+        index = intermediate_response["index"] || 0
+        Rails.logger.info "#### Starting tool_use block at index #{index}"
+        @stream_response_tool_calls[index] = {
+          "id" => content_block["id"],
+          "name" => content_block["name"],
+          "input" => {}
+        }
+        Rails.logger.info "#### Initialized tool call: #{@stream_response_tool_calls[index].inspect}"
+      end
+    when "content_block_delta"
+      # Delta update for content block
+      delta = intermediate_response["delta"]
+      index = intermediate_response["index"] || 0
+
+      if delta&.dig("type") == "input_json_delta"
+        # Tool use parameter streaming
+        if @stream_response_tool_calls[index]
+          partial_json = delta["partial_json"]
+          @stream_response_tool_calls[index]["_partial_json"] ||= ""
+          @stream_response_tool_calls[index]["_partial_json"] += partial_json
+
+          Rails.logger.info "#### Accumulating JSON for index #{index}: #{@stream_response_tool_calls[index]["_partial_json"]}"
+
+          begin
+            @stream_response_tool_calls[index]["input"] = JSON.parse(@stream_response_tool_calls[index]["_partial_json"])
+            Rails.logger.info "#### Successfully parsed input: #{@stream_response_tool_calls[index]["input"]}"
+          rescue JSON::ParserError
+            Rails.logger.info "#### JSON still incomplete, continuing to accumulate"
+          end
+        else
+          Rails.logger.error "#### Received input_json_delta for index #{index} but no tool call initialized"
+        end
+      end
+    when "content_block_stop"
+      index = intermediate_response["index"] || 0
+      if @stream_response_tool_calls[index]
+        @stream_response_tool_calls[index].delete("_partial_json")
+        Rails.logger.info "#### Finalized tool call at index #{index}: #{@stream_response_tool_calls[index].inspect}"
+      end
+    end
+
+  rescue => e
+    Rails.logger.error "Error handling Anthropic tool use streaming: #{e.message}"
+  end
+
   def client_method_name
     :messages
   end
@@ -62,12 +141,14 @@ class AIBackend::Anthropic < AIBackend
       model: @assistant.language_model.api_name,
       system: config[:instructions],
       messages: config[:messages],
+      tools: @assistant.language_model.supports_tools? && anthropic_format_tools(Toolbox.tools) || nil,
       parameters: {
         model: @assistant.language_model.api_name,
         system: config[:instructions],
         messages: config[:messages],
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
         stream: config[:streaming] && @response_handler || nil,
+        tools: @assistant.language_model.supports_tools? && anthropic_format_tools(Toolbox.tools) || nil,
       }.compact.merge(config[:params]&.except(:response_format) || {})
     }.compact
   end
@@ -75,6 +156,9 @@ class AIBackend::Anthropic < AIBackend
   def stream_handler(&chunk_handler)
     proc do |intermediate_response, bytesize|
       chunk = intermediate_response.dig("delta", "text")
+
+      # Handle tool use content blocks
+      handle_tool_use_streaming(intermediate_response)
 
       if (input_tokens = intermediate_response.dig("message", "usage", "input_tokens"))
         # https://docs.anthropic.com/en/api/messages-streaming
@@ -96,13 +180,31 @@ class AIBackend::Anthropic < AIBackend
     rescue => e
       Rails.logger.info "\nUnhandled error in AIBackend::Anthropic response handler: #{e.message}"
       Rails.logger.info e.backtrace
+    ensure
+      # Log the final state before the base class processes it
+      Rails.logger.info "#### Final @stream_response_tool_calls before base class processing: #{@stream_response_tool_calls.inspect}"
     end
   end
 
   def preceding_conversation_messages
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
-      if @assistant.supports_images? && message.documents.present?
+      # Anthropic doesn't support "tool" role - convert tool messages to user messages with tool_result content
+      if message.tool?
+        Rails.logger.info "#### Converting tool message to tool_result format"
+        Rails.logger.info "#### Tool call ID: #{message.tool_call_id}"
+        Rails.logger.info "#### Tool content: #{message.content_text}"
 
+        {
+          role: "user",
+          content: [
+            {
+              type: "tool_result",
+              tool_use_id: message.tool_call_id,
+              content: message.content_text || ""
+            }
+          ]
+        }
+      elsif @assistant.supports_images? && message.documents.present?
         content = [{ type: "text", text: message.content_text }]
         content += message.documents.collect do |document|
           { type: "image",
@@ -111,6 +213,32 @@ class AIBackend::Anthropic < AIBackend
               media_type: document.file.blob.content_type,
               data: document.file_base64(:large),
             }
+          }
+        end
+
+        {
+          role: message.role,
+          content: content
+        }
+      elsif message.assistant? && message.content_tool_calls.present?
+        # Assistant message with tool calls - convert to Anthropic's tool_use format
+        Rails.logger.info "#### Converting assistant message with tool calls"
+        Rails.logger.info "#### Tool calls: #{message.content_tool_calls.inspect}"
+
+        content = []
+
+        # Add text content if present
+        if message.content_text.present?
+          content << { type: "text", text: message.content_text }
+        end
+
+        # Add tool_use blocks
+        message.content_tool_calls.each do |tool_call|
+          content << {
+            type: "tool_use",
+            id: tool_call["id"] || tool_call[:id],
+            name: tool_call.dig("function", "name") || tool_call.dig(:function, :name),
+            input: JSON.parse(tool_call.dig("function", "arguments") || tool_call.dig(:function, :arguments) || "{}")
           }
         end
 
