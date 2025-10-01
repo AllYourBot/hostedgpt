@@ -71,7 +71,6 @@ class AutotitleConversationJob < ApplicationJob
       ```
     END
 
-    # For Anthropic, be more explicit about JSON-only responses
     if @conversation.assistant.api_service.driver == "anthropic"
       base_message + "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content. Your entire response should be exactly: {\"topic\": \"Your 2-4 word summary here\"}"
     else
