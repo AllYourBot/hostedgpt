@@ -25,10 +25,12 @@ class AutotitleConversationJob < ApplicationJob
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
 
     if ai_backend.class == AIBackend::OpenAI || ai_backend.class == AIBackend::Anthropic
+      params = ai_backend.class == AIBackend::OpenAI ? { response_format: { type: "json_object" } } : {}
+
       response = ai_backend.get_oneoff_message(
         system_message,
         [text],
-        response_format: { type: "json_object" }  # this causes problems for Groq even though it's supported: https://console.groq.com/docs/api-reference#chat-create
+        params
       )
       return JSON.parse(response)["topic"]
     elsif ai_backend.class == AIBackend::Gemini
@@ -48,7 +50,7 @@ class AutotitleConversationJob < ApplicationJob
   end
 
   def system_message
-    <<~END
+    base_message = <<~END
       You extract a 2-4 word topic from text. I will give the text of a chat. You reply with the topic of this chat,
       but summarize the topic in 2-4 words. Even though it's not a complete sentence, capitalize the first letter of
       the first word unless it's some odd anomaly like "iPhone". Make sure that your answer matches the language of
@@ -68,5 +70,11 @@ class AutotitleConversationJob < ApplicationJob
       { "topic": "Rails collection counter" }
       ```
     END
+
+    if @conversation.assistant.api_service.driver == "anthropic"
+      base_message + "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content. Your entire response should be exactly: {\"topic\": \"Your 2-4 word summary here\"}"
+    else
+      base_message
+    end
   end
 end
