@@ -208,11 +208,14 @@ class AIBackend::Anthropic < AIBackend
         end
 
         message.content_tool_calls.each do |tool_call|
+          arguments = tool_call.dig("function", "arguments") || tool_call.dig(:function, :arguments) || "{}"
+          input = arguments.is_a?(String) ? JSON.parse(arguments) : arguments
+
           content << {
             type: "tool_use",
             id: tool_call["id"] || tool_call[:id],
             name: tool_call.dig("function", "name") || tool_call.dig(:function, :name),
-            input: JSON.parse(tool_call.dig("function", "arguments") || tool_call.dig(:function, :arguments) || "{}")
+            input: input
           }
         end
 
