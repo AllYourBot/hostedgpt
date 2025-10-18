@@ -127,11 +127,7 @@ class AIBackend::Anthropic < AIBackend
       model: @assistant.language_model.api_name,
       system: config[:instructions],
       messages: config[:messages],
-<<<<<<< HEAD
       tools: @assistant.language_model.supports_tools? && anthropic_format_tools(Toolbox.tools) || nil,
-=======
-      tools: @assistant.language_model.supports_tools?, # && Toolbox.tools || nil,
->>>>>>> a685f76 (WIP: claude image gen)
       parameters: {
         model: @assistant.language_model.api_name,
         system: config[:instructions],

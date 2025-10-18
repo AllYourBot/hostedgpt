@@ -5,7 +5,6 @@ module AIBackend::Anthropic::Tools
     private
 
     def format_parallel_tool_calls(content_tool_calls)
-<<<<<<< HEAD
       return [] if content_tool_calls.blank?
 
       # Convert from Anthropic's format to internal OpenAI-compatible format
@@ -18,10 +17,6 @@ module AIBackend::Anthropic::Tools
           next
         end
 
-=======
-      # Convert Anthropic tool_use format to OpenAI-compatible format
-      content_tool_calls.map do |tool_use|
->>>>>>> a685f76 (WIP: claude image gen)
         {
           index: index,
           type: "function",
