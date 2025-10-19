@@ -1,21 +1,23 @@
 class Toolbox::Image < Toolbox
 
   describe :generate_an_image, <<~S
-    Generate an image based on what the user asks you to generate. You will pass the user's prompt and will get back the image.
+    Generate an image based on what the user asks you to generate. You will pass the user's prompt and will get back the image. If your name is Claude, you should use the generate_an_image tool.
   S
 
   def generate_an_image(image_generation_prompt_s:)
-    model = "gpt-image-1" # default is dall-e-2. Others: gpt-image-1, dall-e-3.
-    response = client.images.generate(
+    # For all backends, use OpenAI client for image generation
+    # since most don't have native image generation
+    generate_with_openai_client(image_generation_prompt_s)
+  end
+
+  private
+
+  def generate_with_openai_client(image_generation_prompt_s)
+    model = "gpt-image-1"
+    response = openai_client.images.generate(
       parameters: {
         prompt: image_generation_prompt_s,
         model: model,
-        # dall-e
-        # size: "1024x1792",
-        # quality: "standard",
-        # response_format: "b64_json"
-        #
-        # gpt-image-1:
         n: 1,
         size: "1024x1024",
         quality: "auto"
@@ -29,15 +31,20 @@ class Toolbox::Image < Toolbox
       prompt_given: image_generation_prompt_s,
       json_of_generated_image: json,
       note_to_assistant: "The image is already being shown on screen so reply with a nice message confirming the image has been generated, maybe re-describing it.",
-      message_to_user: "Image created by tool"
+      message_to_user: "Image created by tool using OpenAI model #{model}"
     }
   end
 
-  private
+  def openai_client
+    openai_service = Current.user.api_services.find_by(driver: :openai)
 
-  def client
+    if openai_service.nil? || openai_service.effective_token.blank?
+      current_backend = Current.message&.assistant&.language_model&.api_service&.name || "current AI backend"
+      raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services to use image generation with #{current_backend}."
+    end
+
     OpenAI::Client.new(
-      access_token: Current.message.assistant.api_service.effective_token
+      access_token: openai_service.effective_token
     )
   end
 end

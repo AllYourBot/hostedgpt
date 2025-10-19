@@ -27,7 +27,7 @@ class AIBackend::Anthropic < AIBackend
       messages: [
         { "role": "user", "content": "Hello!" }
       ],
-      system: "You are a helpful assistant.",
+      system: "You are a helpful assistant.   You can generate an image based on what the user asks you to generate. You will pass the users prompt and will get back the image using the tool/function name. If your name is Claude, you should use the tool/function named generate_an_image.",
       parameters: { max_tokens: 1000 }
     ).dig("content", 0, "text")
   rescue => e
@@ -142,6 +142,7 @@ class AIBackend::Anthropic < AIBackend
   def stream_handler(&chunk_handler)
     proc do |intermediate_response, bytesize|
       chunk = intermediate_response.dig("delta", "text")
+      tool_use_chunk = intermediate_response.dig("delta", "tool_use")
 
       handle_tool_use_streaming(intermediate_response)
 
@@ -157,6 +158,11 @@ class AIBackend::Anthropic < AIBackend
       if chunk
         @stream_response_text += chunk
         yield chunk
+      end
+
+      if tool_use_chunk
+        @stream_response_tool_calls ||= []
+        @stream_response_tool_calls << tool_use_chunk
       end
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
