@@ -5,33 +5,19 @@ class Toolbox::Image < Toolbox
   S
 
   def generate_an_image(image_generation_prompt_s:)
-    # Determine the current AI backend
-    current_backend = Current.message&.assistant&.language_model&.api_service&.ai_backend
-
-    if current_backend == AIBackend::Anthropic
-      # For Anthropic backend, use OpenAI client for image generation
-      # since Anthropic doesn't have native image generation
-      generate_with_openai_client(image_generation_prompt_s)
-    else
-      # For other backends (OpenAI, etc.), use the appropriate client
-      generate_with_openai_client(image_generation_prompt_s)
-    end
+    # For all backends, use OpenAI client for image generation
+    # since most don't have native image generation
+    generate_with_openai_client(image_generation_prompt_s)
   end
 
   private
 
   def generate_with_openai_client(image_generation_prompt_s)
-    model = "gpt-image-1" # default is dall-e-2. Others: gpt-image-1, dall-e-3.
+    model = "gpt-image-1"
     response = openai_client.images.generate(
       parameters: {
         prompt: image_generation_prompt_s,
         model: model,
-        # dall-e
-        # size: "1024x1792",
-        # quality: "standard",
-        # response_format: "b64_json"
-        #
-        # gpt-image-1:
         n: 1,
         size: "1024x1024",
         quality: "auto"
@@ -45,7 +31,7 @@ class Toolbox::Image < Toolbox
       prompt_given: image_generation_prompt_s,
       json_of_generated_image: json,
       note_to_assistant: "The image is already being shown on screen so reply with a nice message confirming the image has been generated, maybe re-describing it.",
-      message_to_user: "Image created by tool"
+      message_to_user: "Image created by tool using OpenAI model #{model}"
     }
   end
 
