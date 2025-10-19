@@ -46,6 +46,5 @@ class Toolbox::Image < Toolbox
     OpenAI::Client.new(
       access_token: openai_service.effective_token
     )
-    Rails.logger.info "\n#### OpenAI client created with token length #{openai_service.effective_token.to_s.length}"
   end
 end
