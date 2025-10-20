@@ -40,7 +40,7 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal "new secret", api_service.token
   end
 
-  test "both ai_backends are specified for best models" do
+  test "both ai_backends are specified for language models" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
     assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
   end

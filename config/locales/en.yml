@@ -90,7 +90,6 @@ en:
         back: "Back"
         table:
           name: "API Name"
-          best: "Best?"
           description: "Description"
           api_service: "API Service"
           supports_pdf: "Supports PDFs"
@@ -99,7 +98,6 @@ en:
           api_name: "API Name"
           api_name_hint: "As specified in the API docs"
           api_service: "API Service"
-          best: "Best?"
           supports_images: "Supports Images?"
           supports_tools: "Supports Tools (Function Calling)?"
           supports_system_message: "Supports System Message (Instructions)?"

@@ -61,7 +61,6 @@ de:
         back: "Zurück"
         table:
           name: "API-Name"
-          best: "Bestes?"
           description: "Beschreibung"
           api_service: "API-Dienst"
           supports_pdf: "Unterstützt PDFs"
@@ -70,7 +69,6 @@ de:
           api_name: "API-Name"
           api_name_hint: "Wie in der API-Doku angegeben"
           api_service: "API-Dienst"
-          best: "Bestes?"
           supports_images: "Unterstützt Bilder?"
           supports_tools: "Unterstützt Tools (Function Calling)?"
           supports_system_message: "Unterstützt Systemnachricht (Anweisungen)?"
