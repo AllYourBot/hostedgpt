@@ -4,7 +4,6 @@ module LanguageModel::Export
   DEFAULT_EXPORT_ONLY = %i[
     api_name
     name
-    best
     api_service_name
     supports_images
     supports_tools

@@ -33,15 +33,14 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @user, LanguageModel.last.user
   end
 
-  test "create new best language model replaces existing best" do
+  test "create new language model works" do
     api_service = api_services(:keith_anthropic_service)
-    assert_equal api_service.language_models.best.pluck(:api_name), ["claude-best"]
+    initial_count = api_service.language_models.count
 
     params = {
       api_name: "new-claude-service",
       api_service_id: api_service.id,
-      name: "new best service",
-      best: true,
+      name: "new service",
       supports_images: false,
       supports_tools: false
     }
@@ -51,8 +50,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to settings_language_models_url
-
-    assert_equal api_service.language_models.best.pluck(:api_name), ["new-claude-service"]
+    assert_equal initial_count + 1, api_service.language_models.count
   end
 
   test "should get edit" do
@@ -152,15 +150,16 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert_equal params, @language_model.reload.slice(:api_name, :name, :supports_images)
   end
 
-  test "update should update best language model" do
+  test "update language model works" do
     api_service = api_services(:keith_anthropic_service)
-    assert_equal api_service.language_models.best.pluck(:api_name), ["claude-best"]
+    initial_count = api_service.language_models.count
 
     another_language_model = language_models(:claude_3_opus_20240229)
 
-    patch settings_language_model_url(another_language_model), params: { language_model: {best: true}}
+    patch settings_language_model_url(another_language_model), params: { language_model: {supports_images: true}}
     assert_redirected_to settings_language_models_url
-    assert_equal api_service.language_models.best.pluck(:api_name), ["claude-3-opus-20240229"]
+    assert another_language_model.reload.supports_images?
+    assert_equal initial_count, api_service.language_models.count
   end
 
   test "destroy should soft-delete language_model" do

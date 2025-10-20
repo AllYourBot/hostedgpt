@@ -15,7 +15,6 @@
   <thead>
     <tr class="bg-gray-200 dark:bg-gray-900">
   <th><%= t('app.settings.language_models.table.name') %></th>
-  <th><%= t('app.settings.language_models.table.best') %></th>
   <th><%= t('app.settings.language_models.table.description') %></th>
   <th><%= t('app.settings.language_models.table.api_service') %></th>
   <th><%= t('app.settings.language_models.table.supports_pdf') %></th>
@@ -27,7 +26,6 @@
       <%= turbo_frame_tag dom_id(language_model) do %>
         <tr class="<%= cycle('bg-gray-100 dark:bg-gray-600', 'bg-white dark:bg-gray-900') %> cursor-pointer" data-href="<%= edit_settings_language_model_path(language_model) %>">
           <td class="underline"><%= language_model.api_name %></td>
-          <td><%= language_model.best? ? t('app.generic.yes', default: 'Yes') : t('app.generic.no', default: 'No') %></td>
           <td><%= language_model.name %></td>
           <td><%= n_a_if_blank(language_model.api_service.name) %></td>
           <td><%= language_model.supports_pdf? ? t('app.generic.yes', default: 'Yes') : t('app.generic.no', default: 'No') %></td>
