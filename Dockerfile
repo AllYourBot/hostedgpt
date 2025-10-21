@@ -3,7 +3,7 @@
 ### START of FLY ####
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=3.3.6
+ARG RUBY_VERSION=3.4.7
 FROM quay.io/evl.ms/fullstaq-ruby:${RUBY_VERSION}-jemalloc-slim as base-for-fly
 
 LABEL fly_launch_runtime="rails"
@@ -89,10 +89,9 @@ EXPOSE 3000
 #### START of DEV ####
 
 # RUBY_VERSION is the only thing used from anything above
-FROM ruby:${RUBY_VERSION}-alpine@sha256:caeab43b356463e63f87af54a03de1ae4687b36da708e6d37025c557ade450f8 AS development
-# TODO: When we bump to a new version of ruby we'll have to unpin from this specific sha
+FROM ruby:${RUBY_VERSION}-alpine AS development
 
-RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
+RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick yaml-dev
 
 ENV BUNDLE_CACHE=/tmp/bundle \
   BUNDLE_JOBS=2 \
@@ -116,7 +115,7 @@ CMD ["./bin/dev"]
 # RUBY_VERSION is the only thing used from anything above
 FROM ruby:${RUBY_VERSION}-alpine AS render-production
 
-RUN apk add --no-cache git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
+RUN apk add --no-cache git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick yaml-dev
 
 WORKDIR /rails
 COPY Gemfile Gemfile.lock .ruby-version ./
