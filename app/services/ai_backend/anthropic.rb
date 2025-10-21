@@ -187,16 +187,34 @@ class AIBackend::Anthropic < AIBackend
             }
           ]
         }
-      elsif @assistant.supports_images? && message.documents.present?
+      elsif @assistant.supports_images? && message.documents.present? && message.role == "user"
+        # Handle mixed content (images and PDFs)
         content = [{ type: "text", text: message.content_text }]
-        content += message.documents.collect do |document|
-          { type: "image",
-            source: {
-              type: "base64",
-              media_type: document.file.blob.content_type,
-              data: document.file_base64(:large),
+
+        message.documents.each do |document|
+          if document.has_image?
+            content << { type: "image",
+              source: {
+                type: "base64",
+                media_type: document.file.blob.content_type,
+                data: document.file_base64(:large),
+              }
             }
-          }
+          elsif document.has_document_pdf?
+            # Extract text from PDF and include it in the conversation
+            pdf_text = document.extract_pdf_text
+            if pdf_text.present?
+              content << {
+                type: "text",
+                text: "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
+              }
+            else
+              content << {
+                type: "text",
+                text: "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
+              }
+            end
+          end
         end
 
         {
