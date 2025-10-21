@@ -101,6 +101,35 @@ class Document < ApplicationRecord
     Base64.strict_encode64(file_contents)
   end
 
+  def has_document_pdf?
+    file.attached? && file.content_type == "application/pdf"
+  end
+
+  def extract_pdf_text
+    return nil unless has_document_pdf?
+
+    begin
+      pdf_data = file.download
+
+      pdf_reader = PDF::Reader.new(StringIO.new(pdf_data))
+
+      text_content = ""
+      pdf_reader.pages.each_with_index do |page, index|
+        page_text = page.text
+        text_content += "--- Page #{index + 1} ---\n" if pdf_reader.pages.count > 1
+        text_content += page_text + "\n\n"
+      end
+      text_content.strip
+
+    rescue PDF::Reader::MalformedPDFError => e
+      Rails.logger.error "PDF file is corrupted or malformed: #{e.message}"
+      nil
+    rescue => e
+      Rails.logger.error "Error processing PDF: #{e.message}"
+      nil
+    end
+  end
+
   private
 
   def file_data_url(variant = :large)

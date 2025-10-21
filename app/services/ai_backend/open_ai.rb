@@ -118,16 +118,33 @@ class AIBackend::OpenAI < AIBackend
   def preceding_conversation_messages
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
       if @assistant.supports_images? && message.documents.present? && message.role == "user"
+        # Handle mixed content (images and PDFs)
+        content_with_media = [{ type: "text", text: message.content_text }]
 
-        content_with_images = [{ type: "text", text: message.content_text }]
-        content_with_images += message.documents.collect do |document|
-          { type: "image_url", image_url: { url: document.image_url(:large) }}
+        message.documents.each do |document|
+          if document.has_image?
+            content_with_media << { type: "image_url", image_url: { url: document.image_url(:large) }}
+          elsif document.has_document_pdf?
+            # Extract text from PDF and include it in the conversation
+            pdf_text = document.extract_pdf_text
+            if pdf_text.present?
+              content_with_media << {
+                type: "text",
+                text: "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
+              }
+            else
+              content_with_media << {
+                type: "text",
+                text: "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
+              }
+            end
+          end
         end
 
         {
           role: message.role,
           name: message.name_for_api,
-          content: content_with_images,
+          content: content_with_media,
         }.compact
       else
         begin
