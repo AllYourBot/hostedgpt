@@ -92,6 +92,7 @@ EXPOSE 3000
 FROM ruby:${RUBY_VERSION}-alpine AS development
 
 RUN apk add --no-cache bash git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
+RUN apt-get update -qq && apt-get install --no-install-recommends -y libyaml-dev
 
 ENV BUNDLE_CACHE=/tmp/bundle \
   BUNDLE_JOBS=2 \
@@ -116,6 +117,7 @@ CMD ["./bin/dev"]
 FROM ruby:${RUBY_VERSION}-alpine AS render-production
 
 RUN apk add --no-cache git build-base postgresql-dev curl-dev gcompat tzdata vips-dev imagemagick
+RUN apt-get update -qq && apt-get install --no-install-recommends -y libyaml-dev
 
 WORKDIR /rails
 COPY Gemfile Gemfile.lock .ruby-version ./
