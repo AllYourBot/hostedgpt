@@ -51,7 +51,7 @@ end %>
       data-controller="
         clipboard
         transition
-        <%= (message.has_document_image? || message.has_document_pdf?) && "modal" %>
+        <%= message.has_document_image? && "modal" %>
       "
       data-transition-toggle-class="hidden"
     >
@@ -104,12 +104,10 @@ end %>
               </div>
             <% end %>
           <% elsif message.has_document_pdf? %>
-            <%= button_tag type: "button",
-              class: "w-full my-2 p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-              data: {
-                role: "pdf-preview",
-                action: "modal#open",
-            } do %>
+            <%= link_to message.document_pdf_url,
+              class: "w-full my-2 p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 block",
+              target: "_blank",
+              rel: "noopener noreferrer" do %>
               <div class="flex items-center space-x-3">
                 <div class="flex-shrink-0">
                   <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
@@ -121,13 +119,12 @@ end %>
                     <%= message.document_filename %>
                   </p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
-                    PDF Document - Click to view
+                    PDF Document - Click to open
                   </p>
                 </div>
                 <div class="flex-shrink-0">
                   <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                   </svg>
                 </div>
               </div>
@@ -296,47 +293,6 @@ end %>
                 <%= spinner size: 6, class: "text-black dark:text-white" %>
               </div>
             </article>
-          </main>
-          <form method="dialog" class="modal-backdrop no-focus-outline">
-            <button id="modal-backdrop">close</button>
-          </form>
-        </dialog>
-      <% elsif message.has_document_pdf? %>
-        <dialog class="modal no-focus-outline" data-modal-target="dialog" data-role="pdf-modal">
-          <main class="modal-box max-w-4xl p-6">
-            <div class="flex flex-col items-center space-y-4">
-              <div class="flex items-center space-x-3">
-                <svg class="w-12 h-12 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
-                </svg>
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    <%= message.document_filename %>
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    PDF Document
-                  </p>
-                </div>
-              </div>
-              <div class="flex space-x-3">
-                <%= link_to message.document_pdf_url,
-                  target: "_blank",
-                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                  </svg>
-                  Open PDF
-                <% end %>
-                <button type="button"
-                  class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  data-action="click->modal#close">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                  Close
-                </button>
-              </div>
-            </div>
           </main>
           <form method="dialog" class="modal-backdrop no-focus-outline">
             <button id="modal-backdrop">close</button>
