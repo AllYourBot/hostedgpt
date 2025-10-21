@@ -99,8 +99,37 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    (user_msg, asst_msg) = Message.last(2)
+    (user_msg, _asst_msg) = Message.last(2)
     assert_equal Document.last, user_msg.documents.first
+  end
+
+  test "should create message with PDF attachment" do
+    # Create a simple PDF file for testing
+    pdf_content = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n174\n%%EOF"
+
+    # Create a temporary PDF file
+    test_file = Tempfile.new(["test", ".pdf"])
+    test_file.write(pdf_content)
+    test_file.rewind
+
+    # Create a proper test file using the same pattern as the image test
+    pdf_file = fixture_file_upload(test_file.path, "application/pdf")
+
+    assert_difference "Conversation.count", 1 do
+      assert_difference "Document.count", 1 do
+        assert_difference "Message.count", 2 do
+          post assistant_messages_url(@assistant), params: { message: { documents_attributes: {"0": {file: pdf_file}}, content_text: @message.content_text } }
+        end
+      end
+    end
+
+    (user_msg, _asst_msg) = Message.last(2)
+    assert_equal Document.last, user_msg.documents.first
+    assert_equal "application/pdf", user_msg.documents.first.file.content_type
+    assert user_msg.has_document_pdf?
+
+    test_file.close
+    test_file.unlink
   end
 
   test "should fail to create message when there is no content_text" do
