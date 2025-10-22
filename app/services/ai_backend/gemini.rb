@@ -119,15 +119,30 @@ class AIBackend::Gemini < AIBackend
 
   def preceding_conversation_messages
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
-      if @assistant.supports_images? && message.documents.present?
-
+      if @assistant.supports_images? && message.documents.present? && message.role == "user"
+        # Handle mixed content (images and PDFs)
         content = [{ text: message.content_text }]
-        content += message.documents.collect do |document|
-          { inline_data: {
-              mime_type: document.file.blob.content_type,
-              data: document.file_base64(:large),
+
+        message.documents.each do |document|
+          if document.has_image?
+            content << { inline_data: {
+                mime_type: document.file.blob.content_type,
+                data: document.file_base64(:large),
+              }
             }
-          }
+          elsif document.has_document_pdf?
+            # Extract text from PDF and include it in the conversation
+            pdf_text = document.extract_pdf_text
+            if pdf_text.present?
+              content << {
+                text: "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
+              }
+            else
+              content << {
+                text: "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
+              }
+            end
+          end
         end
 
         {
