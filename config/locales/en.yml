@@ -280,6 +280,14 @@ en:
         created: "Document was successfully created."
         updated: "Document was successfully updated."
         destroyed: "Document was successfully destroyed."
+    share:
+      title: "Share this conversation"
+      description: "Share a publicly accessible link to this conversation. Anyone with the link will be able to view the conversation."
+      url: "Shareable URL"
+      copy: "Copy"
+      copied: "Copied to clipboard!"
+      warning: "Anyone with this link can view this conversation. Be careful not to share sensitive information."
+      close: "Close"
     helpers:
       messages:
         from_user: "You"

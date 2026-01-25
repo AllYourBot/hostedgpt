@@ -251,6 +251,14 @@ de:
         created: "Dokument wurde erfolgreich erstellt."
         updated: "Dokument wurde erfolgreich aktualisiert."
         destroyed: "Dokument wurde erfolgreich gelöscht."
+    share:
+      title: "Diese Unterhaltung teilen"
+      description: "Teilen Sie einen öffentlich zugänglichen Link zu dieser Konversation. Jeder mit diesem Link kann die Konversation ansehen."
+      url: "Teilbare Link"
+      copy: "Kopieren"
+      copied: "In die Zwischenablage kopiert!"
+      warning: "Jeder mit diesem Link kann diese Konversation ansehen. Achten Sie darauf, keine sensiblen Informationen zu teilen."
+      close: "Schließen"
     helpers:
       messages:
         from_user: "Du"

@@ -6,17 +6,17 @@
 >
   <div class="modal-box max-w-2xl dark:bg-black">
     <header class="font-bold text-lg mb-5">
-      Share this conversation
+      <%= t('app.share.title') %>
     </header>
 
     <div class="space-y-4">
       <p class="text-gray-600 dark:text-gray-400">
-        Share a publicly accessible link to this conversation. Anyone with the link will be able to view the conversation.
+        <%= t('app.share.description') %>
       </p>
 
       <div class="form-control">
         <label class="label">
-          <span class="label-text">Shareable URL</span>
+          <span class="label-text"><%= t('app.share.url') %></span>
         </label>
         <div class="flex gap-2">
           <input
@@ -32,24 +32,24 @@
             class="btn btn-primary"
           >
             <%= icon "clipboard", variant: :outline, size: 20 %>
-            Copy
+            <%= t('app.share.copy') %>
           </button>
         </div>
         <div
           data-share-target="copiedMessage"
           class="hidden text-sm text-green-600 dark:text-green-400 mt-2"
         >
-          Copied to clipboard!
+          <%= t('app.share.copied') %>
         </div>
       </div>
 
       <div class="alert alert-warning">
         <%= icon "exclamation-triangle", variant: :outline, size: 20 %>
-        <span>Anyone with this link can view this conversation. Be careful not to share sensitive information.</span>
+        <span><%= t('app.share.warning') %></span>
       </div>
     </div>
   </div>
   <form method="dialog" class="modal-backdrop no-focus-outline">
-    <button>close</button>
+    <button><%= t('app.share.close') %></button>
   </form>
 </dialog>
