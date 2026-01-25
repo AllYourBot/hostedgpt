@@ -111,7 +111,7 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
 1. If you wish to Eco dynos, you will need to subscribe to the $5 Eco dyno plan at [the billing page](https://dashboard.heroku.com/account/billing).
 1. View your newly created fork within github.com and click the button below (be sure you're viewing your fork of this repo before clicking):
 
-   [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy)
+   [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/heroku/nodejs-getting-start)
 
 You may want to read about [configuring optional features](#configure-optional-features).
 
