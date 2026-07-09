@@ -245,6 +245,13 @@ en:
           description: "for making it through a day with no coffee"
         - title: "Help me plan"
           description: "a roadtrip from Charleston to Key West"
+      image_starters:
+        - title: "Generate an image"
+          description: "of a spookey black cat with glowing eyes"
+        - title: "Create a logo image"
+          description: "for a new AI-powered productivity app"
+        - title: "Design a book cover image"
+          description: "for a new fantasy novel set in a magical forest"
     flashes:
       auth:
         invalid_login: "Invalid email or password"

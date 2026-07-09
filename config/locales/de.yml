@@ -216,6 +216,9 @@ de:
           description: "für einen Tag ohne Kaffee"
         - title: "Hilf mir zu planen"
           description: "einen Roadtrip von Charleston nach Key West"
+      image_starters:
+        - title: "Entwirf ein Buchcover-Bild."
+          description: "für einen neuen Fantasy-Roman, der in einem magischen Wald spielt"
     flashes:
       auth:
         invalid_login: "Ungültige E-Mail oder Passwort"
