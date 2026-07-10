@@ -11,7 +11,6 @@ class AIBackend
     @conversation = conversation
     @message = message
     @stream_response_text = ""
-    @stream_response_tool_calls = []
   end
 
   def get_oneoff_message(instructions, messages, params = {})
@@ -32,10 +31,11 @@ class AIBackend
     end
 
     response.respond_to?(:content) ? response.content : response.to_s
+  rescue RubyLLM::UnauthorizedError
+    raise configuration_error
   end
   def stream_next_conversation_message(&chunk_handler)
     @stream_response_text = ""
-    @stream_response_tool_calls = []
 
     chat = build_chat
     chat.with_instructions(full_instructions)
@@ -69,7 +69,7 @@ class AIBackend
     tool_calls = chat.messages.last&.tool_calls
     return format_tool_calls(tool_calls) if tool_calls.present?
 
-    if @stream_response_text.blank? && @stream_response_tool_calls.blank?
+    if @stream_response_text.blank?
       raise Faraday::ParsingError
     end
 
@@ -180,7 +180,7 @@ class AIBackend
 
   def build_multimodal_message(message)
     driver = @assistant.api_service.driver
-    content_parts = [{ type: "text", text: message.content_text }]
+    content_parts = [text_part(message.content_text, driver)]
 
     message.documents.each do |document|
       if document.has_image?
@@ -188,14 +188,18 @@ class AIBackend
       elsif document.has_document_pdf?
         pdf_text = document.extract_pdf_text
         if pdf_text.present?
-          content_parts << { type: "text", text: "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}" }
+          content_parts << text_part("\n\n[PDF Document: #{document.filename}]\n#{pdf_text}", driver)
         else
-          content_parts << { type: "text", text: "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]" }
+          content_parts << text_part("\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]", driver)
         end
       end
     end
 
     { role: message.role.to_sym, content: RubyLLM::Content::Raw.new(content_parts) }
+  end
+
+  def text_part(text, driver)
+    driver == "gemini" ? { text: text } : { type: "text", text: text }
   end
 
   def build_image_content(document, driver)
@@ -215,7 +219,7 @@ class AIBackend
       id = tc["id"] || tc[:id]
       name = tc.dig("function", "name") || tc.dig(:function, :name)
       args = tc.dig("function", "arguments") || tc.dig(:function, :arguments) || "{}"
-      args_hash = args.is_a?(String) ? JSON.parse(args) : args
+      args_hash = args.is_a?(String) ? (JSON.parse(args) rescue {}) : args
 
       tool_calls_hash[id] = RubyLLM::ToolCall.new(id: id, name: name, arguments: args_hash)
     end
@@ -231,13 +235,6 @@ class AIBackend
       parsed.is_a?(Hash) ? parsed.except("message_to_user", "json_of_generated_image").to_json : content_text
     rescue
       content_text
-    end
-  end
-
-  def preceding_messages(messages = [])
-    messages.map.with_index do |msg, i|
-      role = (i % 2).even? ? :user : :assistant
-      { role: role, content: msg }
     end
   end
 

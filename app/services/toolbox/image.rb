@@ -19,11 +19,11 @@ class Toolbox::Image < Toolbox
     end
 
     ctx = self.class.build_llm_context(openai_service.effective_token)
-    image = ctx.paint(prompt, model: "gpt-image-1")
+    image = ctx.paint(prompt, model: "gpt-image-1", provider: :openai, assume_model_exists: true)
 
     {
       prompt_given: prompt,
-      json_of_generated_image: image&.data || image&.b64_json,
+      json_of_generated_image: image&.data,
       note_to_assistant: "The image is already being shown on screen so reply with a nice message confirming the image has been generated, maybe re-describing it.",
       message_to_user: "Image created by tool using OpenAI model gpt-image-1"
     }

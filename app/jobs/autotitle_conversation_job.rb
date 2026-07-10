@@ -23,8 +23,11 @@ class AutotitleConversationJob < ApplicationJob
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
     driver = @conversation.assistant.api_service.driver
 
-    params = if driver == "openai"
+    params = case driver
+    when "openai"
       { response_format: { type: "json_object" } }
+    when "gemini"
+      { generationConfig: { responseMimeType: "application/json" } }
     else
       {}
     end

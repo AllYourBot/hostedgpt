@@ -85,6 +85,15 @@ class GetNextAIMessageJob < ApplicationJob
     @message.content_text = "I experienced a connection error. #{e.message}"
     wrap_up_the_message
     return true
+  rescue RubyLLM::OverloadedError, RubyLLM::ServiceUnavailableError, RubyLLM::ServerError => e
+    set_response_error
+    wrap_up_the_message
+    return true
+  rescue RubyLLM::BadRequestError, RubyLLM::ContextLengthExceededError, RubyLLM::ForbiddenError => e
+    error_text = e.try(:response) ? (e.response.dig(:body, "error", "message") rescue e.message) : e.message
+    set_unexpected_error(e.inspect.slice(0...1500), error_text)
+    wrap_up_the_message
+    return true
   rescue RubyLLM::RateLimitError => e
     set_billing_error
     wrap_up_the_message

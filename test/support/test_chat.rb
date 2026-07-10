@@ -18,7 +18,7 @@ class TestChat
   end
 
   def with_params(**params)
-    @params = @params.merge(params)
+    @params = params
     self
   end
 
