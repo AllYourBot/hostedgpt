@@ -21,14 +21,7 @@ class APIService < ApplicationRecord
   scope :ordered, -> { order(:name) }
 
   def ai_backend
-    case driver
-    when "openai"
-      AIBackend::OpenAI
-    when "anthropic"
-      AIBackend::Anthropic
-    when "gemini"
-      AIBackend::Gemini
-    end
+    AIBackend
   end
 
   def requires_token?

@@ -40,14 +40,14 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal "new secret", api_service.token
   end
 
-  test "both ai_backends are specified for language models" do
-    assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
-    assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
+  test "ai_backend is specified for language models" do
+    assert_equal AIBackend, language_models(:gpt_best).ai_backend
+    assert_equal AIBackend, language_models(:claude_best).ai_backend
   end
 
-  test "both ai_backends can be specified for user models" do
-    assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
-    assert_equal AIBackend::OpenAI, language_models(:guanaco).ai_backend
+  test "ai_backend can be specified for user models" do
+    assert_equal AIBackend, language_models(:alpaca).ai_backend
+    assert_equal AIBackend, language_models(:guanaco).ai_backend
   end
 
   test "cannot create record without user" do

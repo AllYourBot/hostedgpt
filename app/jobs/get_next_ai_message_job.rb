@@ -1,8 +1,6 @@
 include ActionView::RecordIdentifier
 require "nokogiri/xml/node"
 
-class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
-
 class GetNextAIMessageJob < ApplicationJob
   include ActionView::Helpers::RenderingHelper
   class ResponseCancelled < StandardError; end
@@ -64,23 +62,19 @@ class GetNextAIMessageJob < ApplicationJob
     Rails.logger.info "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     wrap_up_the_message
     return true
-  rescue OpenAI::ConfigurationError => e
+  rescue RubyLLM::ConfigurationError => e
     name = @assistant.language_model.api_service.name
     if name == "OpenAI"
       set_openai_error
+    elsif name == "Anthropic"
+      set_anthropic_error
     elsif name == "Groq"
       set_groq_error
+    elsif name == "Gemini" || name == "Google Gemini"
+      set_generic_error("Gemini")
     else
       set_generic_error(name)
     end
-    wrap_up_the_message
-    return true
-  rescue Anthropic::ConfigurationError => e
-    set_anthropic_error
-    wrap_up_the_message
-    return true
-  rescue Gemini::Errors::ConfigurationError => e
-    set_generic_error("Gemini")
     wrap_up_the_message
     return true
   rescue Faraday::ParsingError => e
@@ -91,7 +85,11 @@ class GetNextAIMessageJob < ApplicationJob
     @message.content_text = "I experienced a connection error. #{e.message}"
     wrap_up_the_message
     return true
-  rescue Faraday::TooManyRequestsError => e
+  rescue RubyLLM::RateLimitError => e
+    set_billing_error
+    wrap_up_the_message
+    return true
+  rescue RubyLLM::PaymentRequiredError => e
     set_billing_error
     wrap_up_the_message
     return true
@@ -171,13 +169,13 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def set_billing_error
-    service = ai_backend.to_s.split("::").second
+    service = @assistant.language_model.api_service.name
     url = case service
     when "OpenAI"
       "https://platform.openai.com/account/billing/overview"
     when "Anthropic"
       "https://console.anthropic.com/settings/plans"
-    when "Gemini"
+    when "Gemini", "Google Gemini"
       "https://aistudio.google.com/app/apikey"
     else
       "https://platform.openai.com/account/billing/overview"

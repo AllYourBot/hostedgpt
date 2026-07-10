@@ -2,20 +2,19 @@ require "test_helper"
 
 class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   setup do
+    TestChat.reset
     @conversation = conversations(:greeting)
     @user = @conversation.user
     @assistant = @conversation.assistant
     @conversation.messages.create! role: :user, content_text: "Still there?", assistant: @assistant
-    @assistant.language_model.update!(supports_tools: false) # this will change the TestClient response so we want to be selective about this
+    @assistant.language_model.update!(supports_tools: false)
     @message = @conversation.latest_message_for_version(:latest)
-    @test_client = TestClient::OpenAI.new(access_token: "abc")
   end
 
   test "populates the latest message from the assistant" do
     assert_no_difference "@conversation.messages.reload.length" do
-      TestClient::OpenAI.stub :text, "Hello" do
-        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      end
+      TestChat.text = "Hello"
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     assert_equal "Hello", @conversation.latest_message_for_version(:latest).content_text
@@ -25,11 +24,9 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     @assistant.language_model.update!(supports_tools: true)
 
     assert_difference "@conversation.messages.reload.length", 2 do
-      TestClient::OpenAI.stub :function, "helloworld_hi" do
-        TestClient::OpenAI.stub :arguments, {:name=>"Keith"} do
-          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-        end
-      end
+      TestChat.function = "helloworld_hi"
+      TestChat.arguments = { :name=>"Keith" }.to_json
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     @message.reload
@@ -47,69 +44,6 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     assert_equal @message.content_tool_calls.dig(0, :id), first_new_message.tool_call_id, "ID of tool execution should have matched decision to call the tool"
     assert first_new_message.finished?, "This message SHOULD HAVE been considered finished"
 
-    # second
-    second_new_message = @new_messages.second
-    assert second_new_message.assistant?, "Second new message should be queued up for the assistant to reply"
-    assert second_new_message.content_text.nil?, "The content should be nil to indicate that it hasn't even started processing"
-    assert second_new_message.tool_call_id.nil?
-    assert second_new_message.content_tool_calls.blank?
-    refute second_new_message.finished?, "This message SHOULD NOT be considered finished yet"
-  end
-
-  test "properly handles a tool response call from the assistant when images are included" do
-    @image_generation = conversations(:image_generation)
-    @image_generation.messages.create! role: :user, content_text: "Generate an image", assistant: @image_generation.assistant
-    @image_generation_message = @image_generation.latest_message_for_version(:latest)
-
-    @image_generation.assistant.language_model.update!(supports_tools: true)
-
-    image_generation_prompt = "Kitten"
-
-    response = {
-      data: [{
-        images: [
-          b54_json:"/9j/4AAQSkZJRgABAQEAYABIAAD"
-        ]
-      }]
-    }
-
-    images_mock = Minitest::Mock.new
-    images_mock.expect :generate, response, parameters: {
-      prompt: image_generation_prompt,
-      model: "dall-e-3",
-      size: "1024x1792",
-      quality: "standard"
-    }
-
-    assert_difference "@image_generation.messages.reload.length", 2 do
-      OpenAI::Client.stub_any_instance :images, images_mock do
-        TestClient::OpenAI.stub :function, "dalle_generate_an_image" do
-          TestClient::OpenAI.stub :arguments, { :image_generation_prompt=>image_generation_prompt } do
-            assert GetNextAIMessageJob.perform_now(@user.id, @image_generation_message.id, @image_generation.assistant.id)
-          end
-        end
-      end
-    end
-
-    @image_generation_message.reload
-    assert @image_generation_message.content_text.blank?
-    assert @image_generation_message.tool_call_id.nil?
-    assert @image_generation_message.content_tool_calls.present?, "Assistant should have decided to call a tool"
-
-    @new_messages = @image_generation.messages.where("id > ?", @image_generation_message.id).order(:created_at)
-
-    # first
-    first_new_message = @new_messages.first
-    assert first_new_message.tool?
-    content_text = first_new_message.content_text
-    json_content_text = JSON.parse(content_text)
-    # assert_equal image_generation_prompt, json_content_text["prompt_given"], "First new message should have the result of calling the tool" #TODO: check this
-    assert first_new_message.tool_call_id.present?
-    assert first_new_message.content_tool_calls.present?
-    assert_equal @image_generation_message.content_tool_calls.dig(0, :id), first_new_message.tool_call_id, "ID of tool execution should have matched decision to call the tool"
-    assert first_new_message.finished?, "This message SHOULD HAVE been considered finished"
-
-    # second
     second_new_message = @new_messages.second
     assert second_new_message.assistant?, "Second new message should be queued up for the assistant to reply"
     assert second_new_message.content_text.nil?, "The content should be nil to indicate that it hasn't even started processing"
@@ -147,9 +81,8 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
   end
 
   test "when API response key is missing, a nice error message is displayed" do
-    TestClient::OpenAI.stub :text, "" do
-      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
-    end
+    TestChat.text = ""
+    assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+    assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
   end
 end

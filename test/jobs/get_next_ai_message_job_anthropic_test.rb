@@ -2,21 +2,21 @@ require "test_helper"
 
 class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
   setup do
+    TestChat.reset
     @conversation = conversations(:hello_claude)
     @user = @conversation.user
+    @conversation.assistant.language_model.update!(supports_tools: false)
     @conversation.messages.create! role: :user, content_text: "Still there?", assistant: @conversation.assistant
     @message = @conversation.latest_message_for_version(:latest)
-    @test_client = TestClient::Anthropic.new(access_token: "abc")
   end
 
   test "populates the latest message from the assistant" do
-    skip "TODOSkipping this test because it's not working"
     assert_no_difference "@conversation.messages.reload.length" do
+      TestChat.text = "Hello"
       assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
     end
 
-    message_text = @test_client.messages(model: "claude-3-opus-20240229")
-    assert @conversation.latest_message_for_version(:latest).content_text.include? "Hello this is model claude-3-opus-20240229 with instruction"
+    assert_equal "Hello", @conversation.latest_message_for_version(:latest).content_text
   end
 
   test "returns early if the message id was invalid" do
@@ -47,11 +47,9 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
     end
   end
 
-  test "when API response key is, a nice error message is displayed" do
-    skip "TODO: Skipping this test because it's not working"
-    TestClient::Anthropic.stub :text, "" do
-      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
-      assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
-    end
+  test "when API response key is missing, a nice error message is displayed" do
+    TestChat.text = ""
+    assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
+    assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
   end
 end

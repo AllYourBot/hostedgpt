@@ -19,7 +19,7 @@ class LanguageModelTest < ActiveSupport::TestCase
   end
 
   test "ai_backend works as a delegated attribute" do
-    assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
+    assert_equal AIBackend, language_models(:gpt_best).ai_backend
   end
 
   test "validates api_name" do

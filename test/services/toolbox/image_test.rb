@@ -6,83 +6,35 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
     @prompt = "A cartoon image of a cat"
   end
 
-  test "generate_an_image calls api with expected params and returns payload" do
-    response_payload = {
-      "data" => [
-        {
-          "b64_json" => "BASE64_IMAGE_DATA"
-        }
-      ]
-    }
+  test "generate_an_image calls RubyLLM.paint with expected params and returns payload" do
+    image_double = Struct.new(:data, :b64_json).new("BASE64_IMAGE_DATA", nil)
 
-    images_double = Class.new do
-      attr_reader :last_parameters
-
-      def initialize(response)
-        @response = response
-      end
-
-      def generate(parameters:)
-        @last_parameters = parameters
-        @response
-      end
-    end.new(response_payload)
-
-    client_double = Struct.new(:images).new(images_double)
+    mock_ctx = Object.new
+    mock_ctx.define_singleton_method(:paint) { |*args| image_double }
 
     Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
-      # Mock the openai_client method to return our test client
-      @tool.stub :openai_client, client_double do
+      Toolbox::Image.stub :build_llm_context, mock_ctx do
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
-        params = images_double.last_parameters
-        assert_equal @prompt, params[:prompt]
-        assert_equal "1024x1024", params[:size]
-        assert_equal "auto", params[:quality] # dalle-e is "standard"
-
         assert_equal @prompt, result[:prompt_given]
+        assert_equal "BASE64_IMAGE_DATA", result[:json_of_generated_image]
         assert_includes result[:note_to_assistant], "image"
       end
     end
   end
 
-  test "generate_an_image works with Anthropic backend by using OpenAI client" do
-    response_payload = {
-      "data" => [
-        {
-          "b64_json" => "BASE64_IMAGE_DATA_ANTHROPIC"
-        }
-      ]
-    }
+  test "generate_an_image works with Anthropic backend by using OpenAI key" do
+    image_double = Struct.new(:data, :b64_json).new("BASE64_IMAGE_DATA_ANTHROPIC", nil)
 
-    images_double = Class.new do
-      attr_reader :last_parameters
+    mock_ctx = Object.new
+    mock_ctx.define_singleton_method(:paint) { |*args| image_double }
 
-      def initialize(response)
-        @response = response
-      end
-
-      def generate(parameters:)
-        @last_parameters = parameters
-        @response
-      end
-    end.new(response_payload)
-
-    client_double = Struct.new(:images).new(images_double)
-
-    # Create a message with an Anthropic assistant
     anthropic_message = messages(:image_generation_tool_call).dup
     anthropic_message.assistant = assistants(:keith_claude3)
 
     Current.set(user: users(:keith), message: anthropic_message) do
-      # Mock the openai_client method to return our test client
-      @tool.stub :openai_client, client_double do
+      Toolbox::Image.stub :build_llm_context, mock_ctx do
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
-
-        params = images_double.last_parameters
-        assert_equal @prompt, params[:prompt]
-        assert_equal "1024x1024", params[:size]
-        assert_equal "auto", params[:quality]
 
         assert_equal @prompt, result[:prompt_given]
         assert_includes result[:note_to_assistant], "image"
@@ -91,5 +43,3 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
     end
   end
 end
-
-

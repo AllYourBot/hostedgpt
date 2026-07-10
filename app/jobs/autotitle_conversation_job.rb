@@ -1,4 +1,3 @@
-
 class AutotitleConversationJob < ApplicationJob
   class ConversationNotReady < StandardError; end
   retry_on ConversationNotReady
@@ -21,32 +20,20 @@ class AutotitleConversationJob < ApplicationJob
   private
 
   def generate_title_for(text)
-
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
+    driver = @conversation.assistant.api_service.driver
 
-    if ai_backend.class == AIBackend::OpenAI || ai_backend.class == AIBackend::Anthropic
-      params = ai_backend.class == AIBackend::OpenAI ? { response_format: { type: "json_object" } } : {}
-
-      response = ai_backend.get_oneoff_message(
-        system_message,
-        [text],
-        params
-      )
-      return JSON.parse(response)["topic"]
-    elsif ai_backend.class == AIBackend::Gemini
-      response = ai_backend.get_oneoff_message(
-        system_message,
-        [text],
-        generation_config: { response_mime_type: "application/json" }
-      )
-      return JSON.parse(response)["topic"]
+    params = if driver == "openai"
+      { response_format: { type: "json_object" } }
     else
-      response = ai_backend.get_oneoff_message(
-        system_message,
-        [text]
-      )
-      return response.scan(/(?<=:)"(.+?)"/)&.flatten&.first&.strip
+      {}
     end
+
+    system_msg = system_message
+    response = ai_backend.get_oneoff_message(system_msg, [text], params)
+    JSON.parse(response)["topic"]
+  rescue JSON::ParserError
+    response&.scan(/(?<=:)"(.+?)"/)&.flatten&.first&.strip
   end
 
   def system_message

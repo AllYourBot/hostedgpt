@@ -2,20 +2,19 @@ require "test_helper"
 
 class GetNextAIMessageJobGeminiTest < ActiveJob::TestCase
   setup do
+    TestChat.reset
     @conversation = conversations(:gemini_conversation)
     @user = @conversation.user
     @assistant = @conversation.assistant
     @conversation.messages.create! role: :user, content_text: "Still there?", assistant: @assistant
-    @assistant.language_model.update!(supports_tools: false) # this will change the TestClient response so we want to be selective about this
+    @assistant.language_model.update!(supports_tools: false)
     @message = @conversation.latest_message_for_version(:latest)
-    @test_client = TestClient::Gemini.new(access_token: "abc")
   end
 
   test "populates the latest message from the assistant" do
     assert_no_difference "@conversation.messages.reload.length" do
-      TestClient::Gemini.stub :text, "Hello" do
-        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      end
+      TestChat.text = "Hello"
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     assert_equal "Hello", @conversation.latest_message_for_version(:latest).content_text
@@ -48,9 +47,8 @@ class GetNextAIMessageJobGeminiTest < ActiveJob::TestCase
   end
 
   test "when API response key is missing, a nice error message is displayed" do
-    TestClient::Gemini.stub :text, "" do
-      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
-    end
+    TestChat.text = ""
+    assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+    assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
   end
 end
