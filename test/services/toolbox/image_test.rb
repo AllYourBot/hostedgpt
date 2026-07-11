@@ -42,4 +42,25 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "generate_an_image raises a clear error when no OpenAI service exists" do
+    Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
+      users(:keith).api_services.stub(:find_by, nil) do
+        error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
+        assert_match(/OpenAI API key not found/, error.message)
+      end
+    end
+  end
+
+  test "generate_an_image raises a clear error when the OpenAI service token is blank" do
+    openai_service = api_services(:keith_openai_service)
+    openai_service.stub(:effective_token, "") do
+      users(:keith).api_services.stub(:find_by, openai_service) do
+        Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
+          error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
+          assert_match(/OpenAI API key not found/, error.message)
+        end
+      end
+    end
+  end
 end

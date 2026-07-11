@@ -34,4 +34,14 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
 
     assert_nil conversation.reload.title
   end
+
+  test "extracts the topic from a non-JSON response using the fallback regex" do
+    TestChat.reset
+    conversation = conversations(:greeting)
+
+    TestChat.text = 'The topic is:"Hear me now"'
+    AutotitleConversationJob.perform_now(conversation.id)
+
+    assert_equal "Hear me now", conversation.reload.title
+  end
 end

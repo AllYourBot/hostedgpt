@@ -28,8 +28,8 @@ class AIBackendTest < ActiveSupport::TestCase
 
   test "get_oneoff_message with response_format of json returns a hash" do
     TestChat.text = "{\"response\":\"yes\"}"
-    response = @backend.get_oneoff_message("Reply with the JSON { response: 'yes' }", ["Give me the reply."], response_format: { type: "json_object" })
-    assert_equal({"response"=>"yes"}, JSON.parse(response))
+    response = @backend.get_oneoff_message("Reply with the JSON { response: 'yes' }", ["Give me the reply."], response_format: {type: "json_object"})
+    assert_equal({"response" => "yes"}, JSON.parse(response))
   end
 
   test "stream_next_conversation_message works to stream text and uses model from assistant" do
@@ -49,7 +49,7 @@ class AIBackendTest < ActiveSupport::TestCase
       role: "tool",
       content: "\"Hello, World!\"",
       tool_call_id: "abc123",
-      content_tool_calls: messages(:weather_tool_call).content_tool_calls.first,
+      content_tool_calls: messages(:weather_tool_call).content_tool_calls.first
     }
     assert_equal [tool_message], AIBackend.get_tool_messages_by_calling(messages(:weather_tool_call).content_tool_calls)
   end
@@ -83,6 +83,9 @@ class AIBackendTest < ActiveSupport::TestCase
 
     TestChat.function = function
     @backend.stream_next_conversation_message { |chunk| streamed_text += chunk }
+
+    assert @backend.chat.tools.present?
+    assert_includes @backend.chat.tools.map(&:name), function
   end
 
   test "tools not passed when not supported by the language model" do
@@ -90,6 +93,8 @@ class AIBackendTest < ActiveSupport::TestCase
 
     TestChat.text = nil
     @backend.stream_next_conversation_message { |chunk| streamed_text += chunk }
+
+    assert_empty @backend.chat.tools
   end
 
   test "stream_next_conversation_message works to get a function call" do
@@ -125,11 +130,25 @@ class AIBackendTest < ActiveSupport::TestCase
       next if @conversation.messages.length == i + 1
 
       if message.documents.present?
-        assert_instance_of RubyLLM::Content::Raw, preceding[i][:content]
+        assert_instance_of RubyLLM::Content, preceding[i][:content]
+        assert preceding[i][:content].attachments.any?
       else
         assert_equal preceding[i][:content], message.content_text
       end
     end
+  end
+
+  test "preceding_conversation_messages never returns provider-specific raw content shapes" do
+    preceding = @backend.send(:preceding_conversation_messages)
+
+    old_shapes = preceding.filter_map do |msg|
+      content = msg[:content]
+      next unless content.is_a?(Hash)
+
+      content if content[:type] == "image" || content[:inline_data].present? || content[:image_url].present?
+    end
+
+    assert_empty old_shapes, "Should not emit old per-provider raw image payloads"
   end
 
   test "preceding_conversation_messages only considers messages on the intended conversation version and includes the correct names" do
@@ -151,12 +170,12 @@ class AIBackendTest < ActiveSupport::TestCase
     conversation = message.conversation
     assistant = message.assistant
     user = message.user
-    version = message.version
+    message.version
     @backend = AIBackend.new(user, assistant, conversation, message)
 
     msgs = @backend.send(:preceding_conversation_messages)
 
-    m1 = { role: :user, content: "What is the weather in Austin?" }
+    m1 = {role: :user, content: "What is the weather in Austin?"}
     assert_equal m1, msgs.first
 
     m2 = msgs.second
@@ -184,37 +203,55 @@ class AIBackendTest < ActiveSupport::TestCase
     backend = AIBackend.new(users(:keith), assistant, conversation, second_message)
     msgs = backend.send(:preceding_conversation_messages)
 
-    pdf_message = msgs.find { |m| m[:content].is_a?(RubyLLM::Content::Raw) }
-    assert pdf_message, "Should find a message with raw content (PDF)"
+    pdf_message = msgs.find { |m| m[:content].is_a?(RubyLLM::Content) }
+    assert pdf_message, "Should find a message with RubyLLM::Content (PDF)"
     assert_equal :user, pdf_message[:role]
+    assert pdf_message[:content].attachments.any?
 
     test_file.close
     test_file.unlink
   end
 
-  test "preceding_conversation_messages handles PDF extraction errors gracefully" do
-    assistant = assistants(:keith_claude35)
-    assistant.language_model.update!(supports_pdf: true)
+  test "stream_next_conversation_message writes token counts when chunks include token info" do
+    TestChat.text = "Streaming with tokens"
+    TestChat.tokens = {input: 12, output: 5}
+    message = @conversation.latest_message_for_version(:latest)
+    backend = AIBackend.new(users(:keith), @assistant, @conversation, message)
 
-    conversation = Conversation.create!(user: users(:keith), assistant: assistant, title: "PDF Error Test Conversation")
+    backend.stream_next_conversation_message { |chunk| }
 
-    test_file = Tempfile.new(["test", ".pdf"])
-    test_file.write("%PDF-1.4\ncorrupted content")
-    test_file.rewind
+    assert_equal 12, message.input_token_count
+    assert_equal 5, message.output_token_count
+  end
 
-    message = conversation.messages.create!(role: "user", content_text: "Please analyze this PDF", assistant: assistant)
-    message.documents.create!(file: fixture_file_upload(test_file.path, "application/pdf"), filename: "corrupted.pdf")
+  test "stream_next_conversation_message preserves chunk order" do
+    TestChat.chunks = [["First ", nil], ["second ", nil], ["third", nil]]
+    message = @conversation.latest_message_for_version(:latest)
+    backend = AIBackend.new(users(:keith), @assistant, @conversation, message)
 
-    second_message = conversation.messages.create!(role: "assistant", content_text: "I'll try to analyze the PDF for you", assistant: assistant)
+    streamed_text = ""
+    backend.stream_next_conversation_message { |chunk| streamed_text += chunk }
 
-    backend = AIBackend.new(users(:keith), assistant, conversation, second_message)
-    msgs = backend.send(:preceding_conversation_messages)
+    assert_equal "First second third", streamed_text
+  end
 
-    pdf_message = msgs.find { |m| m[:content].is_a?(RubyLLM::Content::Raw) }
-    assert pdf_message, "Should find a message with raw content (PDF)"
-    assert_equal :user, pdf_message[:role]
+  test "test_api_service returns blank token error" do
+    api_service = api_services(:keith_openai_service)
+    assert_equal "Error: API key (token) is blank",
+      AIBackend.test_api_service(api_service, api_service.url, "")
+  end
 
-    test_file.close
-    test_file.unlink
+  test "test_language_model returns an error when RubyLLM raises UnauthorizedError" do
+    language_model = language_models(:gpt_best)
+    original_factory = AIBackend.chat_factory
+
+    AIBackend.chat_factory = ->(context, api_name, provider, assistant = nil) {
+      raise RubyLLM::UnauthorizedError.new(nil, "Invalid key")
+    }
+
+    result = AIBackend.test_language_model(language_model)
+    assert_match(/Error: Invalid key/, result)
+  ensure
+    AIBackend.chat_factory = original_factory
   end
 end
