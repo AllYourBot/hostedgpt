@@ -9,7 +9,7 @@ class AutotitleConversationJob < ApplicationJob
     return false if @conversation.assistant.api_service.requires_token? && @conversation.assistant.api_service.effective_token.blank?
 
     messages = @conversation.messages.ordered.limit(4)
-    raise ConversationNotReady  if messages.empty?
+    raise ConversationNotReady if messages.empty?
 
     new_title = Current.set(user: @conversation.user) do
       generate_title_for(messages.map(&:content_text).join("\n"))
@@ -25,9 +25,11 @@ class AutotitleConversationJob < ApplicationJob
 
     params = case driver
     when "openai"
-      { response_format: { type: "json_object" } }
+      {response_format: {type: "json_object"}}
     when "gemini"
-      { generationConfig: { responseMimeType: "application/json" } }
+      # RubyLLM does not translate OpenAI-style response_format for Gemini, so we
+      # must ask Gemini directly for JSON via its generationConfig key.
+      {generationConfig: {responseMimeType: "application/json"}}
     else
       {}
     end

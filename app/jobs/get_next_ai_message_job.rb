@@ -1,8 +1,10 @@
 include ActionView::RecordIdentifier
+
 require "nokogiri/xml/node"
 
 class GetNextAIMessageJob < ApplicationJob
   include ActionView::Helpers::RenderingHelper
+
   class ResponseCancelled < StandardError; end
   class WaitForPrevious < StandardError; end
 
@@ -15,14 +17,14 @@ class GetNextAIMessageJob < ApplicationJob
   def perform(user_id, message_id, assistant_id, attempt = 1)
     Rails.logger.info "### GetNextAIMessageJob.perform(#{user_id}, #{message_id}, #{assistant_id}, #{attempt})" unless Rails.env.test?
 
-    @user         = User.find(user_id)
-    @message      = Message.find(message_id)
+    @user = User.find(user_id)
+    @message = Message.find(message_id)
     @conversation = @message.conversation
-    @assistant    = Assistant.find(assistant_id)
-    @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index-1)
-    @attempt      = attempt
+    @assistant = Assistant.find(assistant_id)
+    @prev_message = @conversation.messages.assistant.for_conversation_version(@message.version).find_by(index: @message.index - 1)
+    @attempt = attempt
 
-    return false          if generation_was_cancelled? || message_is_populated?
+    return false if generation_was_cancelled? || message_is_populated?
     raise WaitForPrevious if @prev_message&.not_finished?
 
     last_sent_at = Time.current
@@ -33,7 +35,7 @@ class GetNextAIMessageJob < ApplicationJob
 
     response = Current.set(user: @user, message: @message) do
       ai_backend.new(@conversation.user, @assistant, @conversation, @message)
-      .stream_next_conversation_message do |content_chunk|
+        .stream_next_conversation_message do |content_chunk|
         @message.content_text += content_chunk
 
         if Time.current.to_f - last_sent_at.to_f >= 0.1
@@ -48,21 +50,20 @@ class GetNextAIMessageJob < ApplicationJob
       end
     end
     @message.content_tool_calls = response # Typically, stream_next_conversation_message will simply return nil because it executes
-                                           # the content_chunk block to return it's response incrementally. However, tool_call
-                                           # responses don't make sense to stream because they can't be executed incrementally
-                                           # so we just return the full tool response message at once. The only time we return
-                                           # like this is for tool_calls so we know we can simply assign it here.
+    # the content_chunk block to return it's response incrementally. However, tool_call
+    # responses don't make sense to stream because they can't be executed incrementally
+    # so we just return the full tool response message at once. The only time we return
+    # like this is for tool_calls so we know we can simply assign it here.
 
-    raise Faraday::ParsingError if @message.not_finished?
+    raise AIBackend::BlankResponseError if @message.not_finished?
 
     wrap_up_the_message
-    return true
-
-  rescue ResponseCancelled => e
+    true
+  rescue ResponseCancelled
     Rails.logger.info "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     wrap_up_the_message
-    return true
-  rescue RubyLLM::ConfigurationError => e
+    true
+  rescue RubyLLM::ConfigurationError
     name = @assistant.language_model.api_service.name
     if name == "OpenAI"
       set_openai_error
@@ -76,48 +77,56 @@ class GetNextAIMessageJob < ApplicationJob
       set_generic_error(name)
     end
     wrap_up_the_message
-    return true
-  rescue Faraday::ParsingError => e
+    true
+  rescue AIBackend::BlankResponseError
     set_response_error
     wrap_up_the_message
-    return true
+    true
   rescue Faraday::ConnectionFailed => e
     @message.content_text = "I experienced a connection error. #{e.message}"
     wrap_up_the_message
-    return true
-  rescue RubyLLM::OverloadedError, RubyLLM::ServiceUnavailableError, RubyLLM::ServerError => e
+    true
+  rescue RubyLLM::OverloadedError, RubyLLM::ServiceUnavailableError, RubyLLM::ServerError
     set_response_error
     wrap_up_the_message
-    return true
+    true
   rescue RubyLLM::BadRequestError, RubyLLM::ContextLengthExceededError, RubyLLM::ForbiddenError => e
-    error_text = e.try(:response) ? (e.response.dig(:body, "error", "message") rescue e.message) : e.message
+    error_text = e.try(:response) ? begin
+      e.response.dig(:body, "error", "message")
+    rescue
+      e.message
+    end : e.message
     set_unexpected_error(e.inspect.slice(0...1500), error_text)
     wrap_up_the_message
-    return true
-  rescue RubyLLM::RateLimitError => e
+    true
+  rescue RubyLLM::RateLimitError
     set_billing_error
     wrap_up_the_message
-    return true
-  rescue RubyLLM::PaymentRequiredError => e
+    true
+  rescue RubyLLM::PaymentRequiredError
     set_billing_error
     wrap_up_the_message
-    return true
+    true
   rescue WaitForPrevious
     Rails.logger.info "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     raise WaitForPrevious
   rescue => e
-    msg = e.inspect.gsub(/(sk-)[\w\-]{40}/, '\1' + "*" * 40)
+    msg = self.class.redact_error_message(e.inspect)
 
     unless Rails.env.test?
-      Rails.logger.info "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
+      Rails.logger.info "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}"
       Rails.logger.info e.backtrace.join("\n") if Rails.env.development?
 
       if attempt < 3
         GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
-        GetNextAIMessageJob.set(wait: (attempt+1).seconds).perform_later(user_id, message_id, assistant_id, attempt+1)
+        GetNextAIMessageJob.set(wait: (attempt + 1).seconds).perform_later(user_id, message_id, assistant_id, attempt + 1)
       else
         error_text = if e.try(:response)
-          e&.response&.dig(:body, "error", "message") rescue e&.response&.dig(:body)
+          begin
+            e&.response&.dig(:body, "error", "message")
+          rescue
+            e&.response&.dig(:body)
+          end
         else
           e.message
         end
@@ -125,7 +134,11 @@ class GetNextAIMessageJob < ApplicationJob
         wrap_up_the_message
       end
     end
-    return false
+    false
+  end
+
+  def self.redact_error_message(text)
+    text.gsub(/(?:sk-[\w-]+|sk-ant-[\w-]+|gsk_[A-Za-z0-9_]+)/, "[REDACTED]")
   end
 
   def self.broadcast_updated_message(message, locals = {})
@@ -139,7 +152,7 @@ class GetNextAIMessageJob < ApplicationJob
       }.merge(locals)
     )
     dom = Nokogiri::HTML.fragment(html)
-    html = dom.at_id(dom_id message).inner_html
+    html = dom.at_id(dom_id(message)).inner_html
     message.broadcast_update_to message.conversation, target: message, html: html
   end
 
@@ -214,7 +227,11 @@ class GetNextAIMessageJob < ApplicationJob
     index = @message.index
     json_of_generated_image = nil
     msgs.each do |tool_message| # one message for each tool executed
-      parsed = JSON.parse(tool_message[:content]) rescue nil
+      parsed = begin
+        JSON.parse(tool_message[:content])
+      rescue
+        nil
+      end
 
       if parsed.is_a?(Hash) && parsed.has_key?("json_of_generated_image")
         json_of_generated_image = parsed["json_of_generated_image"]
@@ -236,9 +253,8 @@ class GetNextAIMessageJob < ApplicationJob
         content_tool_calls: tool_message[:content_tool_calls],
         version: @message.version,
         index: index += 1,
-        processed_at: Time.current,
+        processed_at: Time.current
       )
-
     end
 
     assistant_reply = @conversation.messages.create!(
@@ -257,7 +273,7 @@ class GetNextAIMessageJob < ApplicationJob
       tempfile.write(binary_image_contents)
       tempfile.rewind
 
-      document = Document.new(message: assistant_reply,assistant: @assistant, user: @user, purpose: :assistants_output)
+      document = Document.new(message: assistant_reply, assistant: @assistant, user: @user, purpose: :assistants_output)
       document.file.attach(
         io: tempfile,
         filename: "generated.png",

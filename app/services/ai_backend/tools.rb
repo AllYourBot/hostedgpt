@@ -16,10 +16,10 @@ module AIBackend::Tools
         function_response = begin
           Toolbox.call(function_name, function_arguments)
         rescue => e
-          Rails.logger.info "## Handled error calling tools: #{e.message}" unless Rails.env.test?
-          Rails.logger.info e.backtrace.join("\n") unless Rails.env.test?
+          Rails.logger.info "## Handled error calling tools: #{e.message}"
+          Rails.logger.info e.backtrace.join("\n")
 
-          <<~STR.gsub("\n", " ")
+          <<~STR.tr("\n", " ")
             An unexpected error occurred (#{e.message}). You were querying information to help you answer a users question. Because this information
             is not available at this time, DO NOT MAKE ANY GUESSES as you attempt to answer the users questions. Instead, consider attempting a
             different query OR let the user know you attempted to retrieve some information but the website is having difficulties at this time.
@@ -30,25 +30,13 @@ module AIBackend::Tools
           role: "tool",
           content: function_response.to_json,
           content_tool_calls: tool_call,
-          tool_call_id: id,
+          tool_call_id: id
         }
       end
     rescue => e
-      Rails.logger.info "## UNHANDLED error calling tools: #{e.message}"
-      Rails.logger.info e.backtrace.join("\n")
-      raise ::Faraday::ParsingError
-    end
-  end
-
-  included do
-    private
-
-    def format_parallel_tool_calls(content_tool_calls)
-      raise NotImplementedError
-    end
-
-    def parallel_tool_calls(content_tool_calls)
-      raise NotImplementedError
+      Rails.logger.error "## UNHANDLED error calling tools: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      raise
     end
   end
 end
