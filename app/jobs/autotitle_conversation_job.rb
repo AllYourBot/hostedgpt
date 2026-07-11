@@ -21,28 +21,25 @@ class AutotitleConversationJob < ApplicationJob
 
   def generate_title_for(text)
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
-    driver = @conversation.assistant.api_service.driver
 
-    params = case driver
-    when "openai"
-      {response_format: {type: "json_object"}}
-    when "gemini"
-      # RubyLLM does not translate OpenAI-style response_format for Gemini, so we
-      # must ask Gemini directly for JSON via its generationConfig key.
-      {generationConfig: {responseMimeType: "application/json"}}
-    else
-      {}
-    end
-
-    system_msg = system_message
-    response = ai_backend.get_oneoff_message(system_msg, [text], params)
+    response = ai_backend.get_oneoff_message(system_message, [text], {response_format: {type: "json_object"}})
     JSON.parse(response)["topic"]
   rescue JSON::ParserError
-    response&.scan(/(?<=:)"(.+?)"/)&.flatten&.first&.strip
+    response&.scan(/(?<=:)"(.+?)"/)&.flatten&.first&.strip || fallback_title
+  rescue RubyLLM::ConfigurationError => e
+    Rails.logger.info "### Autotitle configuration error: #{GetNextAIMessageJob.redact_error_message(e.message)}"
+    fallback_title
+  rescue => e
+    Rails.logger.info "### Autotitle unexpected error: #{GetNextAIMessageJob.redact_error_message(e.message)}"
+    fallback_title
+  end
+
+  def fallback_title
+    @conversation.title || "#{@conversation.assistant.name} Chat"
   end
 
   def system_message
-    base_message = <<~END
+    <<~END
       You extract a 2-4 word topic from text. I will give the text of a chat. You reply with the topic of this chat,
       but summarize the topic in 2-4 words. Even though it's not a complete sentence, capitalize the first letter of
       the first word unless it's some odd anomaly like "iPhone". Make sure that your answer matches the language of
@@ -62,11 +59,5 @@ class AutotitleConversationJob < ApplicationJob
       { "topic": "Rails collection counter" }
       ```
     END
-
-    if @conversation.assistant.api_service.driver == "anthropic"
-      base_message + "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content. Your entire response should be exactly: {\"topic\": \"Your 2-4 word summary here\"}"
-    else
-      base_message
-    end
   end
 end

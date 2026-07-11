@@ -64,17 +64,18 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_message
     true
   rescue RubyLLM::ConfigurationError
-    name = @assistant.language_model.api_service.name
-    if name == "OpenAI"
-      set_openai_error
-    elsif name == "Anthropic"
-      set_anthropic_error
-    elsif name == "Groq"
-      set_groq_error
-    elsif name == "Gemini" || name == "Google Gemini"
-      set_generic_error("Gemini")
+    driver = @assistant.language_model.api_service.driver
+    url = @assistant.language_model.api_service.url
+    if driver == "openai" && url == APIService::URL_GROQ
+      set_api_key_error("Groq", "Llama")
+    elsif driver == "openai"
+      set_api_key_error("OpenAI", "GPT")
+    elsif driver == "anthropic"
+      set_api_key_error("Anthropic", "Claude")
+    elsif driver == "gemini"
+      set_api_key_error("Gemini")
     else
-      set_generic_error(name)
+      set_generic_error(@assistant.language_model.api_service.name)
     end
     wrap_up_the_message
     true
@@ -110,35 +111,37 @@ class GetNextAIMessageJob < ApplicationJob
   rescue WaitForPrevious
     Rails.logger.info "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     raise WaitForPrevious
+  rescue ActiveRecord::RecordNotFound => e
+    Rails.logger.info "\n### RecordNotFound in GetNextAIMessageJob: #{e.message}" unless Rails.env.test?
+    false
   rescue => e
     msg = self.class.redact_error_message(e.inspect)
 
-    unless Rails.env.test?
-      Rails.logger.info "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}"
-      Rails.logger.info e.backtrace.join("\n") if Rails.env.development?
+    Rails.logger.info "\n### Finished GetNextAIMessageJob attempt ##{attempt} with ERROR: #{msg}" unless Rails.env.test?
+    Rails.logger.info e.backtrace.join("\n") if Rails.env.development?
 
-      if attempt < 3
-        GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
-        GetNextAIMessageJob.set(wait: (attempt + 1).seconds).perform_later(user_id, message_id, assistant_id, attempt + 1)
-      else
-        error_text = if e.try(:response)
-          begin
-            e&.response&.dig(:body, "error", "message")
-          rescue
-            e&.response&.dig(:body)
-          end
-        else
-          e.message
+    if attempt < 3
+      GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
+      GetNextAIMessageJob.set(wait: (attempt + 1).seconds).perform_later(user_id, message_id, assistant_id, attempt + 1)
+      false
+    else
+      error_text = if e.try(:response)
+        begin
+          e&.response&.dig(:body, "error", "message")
+        rescue
+          e&.response&.dig(:body)
         end
-        set_unexpected_error(msg&.slice(0...1500), error_text)
-        wrap_up_the_message
+      else
+        e.message
       end
+      set_unexpected_error(msg&.slice(0...1500), error_text)
+      wrap_up_the_message
+      true
     end
-    false
   end
 
   def self.redact_error_message(text)
-    text.gsub(/(?:sk-[\w-]+|sk-ant-[\w-]+|gsk_[A-Za-z0-9_]+)/, "[REDACTED]")
+    text.gsub(/(?:sk-[\w-]+|sk-ant-[\w-]+|gsk_[A-Za-z0-9_]+|AIza[\w-]{35,})/, "[REDACTED]")
   end
 
   def self.broadcast_updated_message(message, locals = {})
@@ -158,24 +161,15 @@ class GetNextAIMessageJob < ApplicationJob
 
   private
 
-  def set_openai_error
-    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
-      "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)"
-  end
-
-  def set_groq_error
-    @message.content_text = "(You need to enter a valid API key for Groq to use Llama. Click your Profile in the bottom " +
-      "left and then Settings and then **API Services**. You will find Groq Key instructions.)"
+  def set_api_key_error(provider, model = nil)
+    model_text = model ? " to use #{model}" : ""
+    @message.content_text = "(You need to enter a valid API key for #{provider}#{model_text}. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find #{provider} Key instructions.)"
   end
 
   def set_generic_error(name)
     @message.content_text = "(There is a configuration error with the #{name} API Service. Maybe you have an invalid API key? Click your Profile in the bottom " +
       "left and then Settings and then **API Services**. You will find #{name} there.)"
-  end
-
-  def set_anthropic_error
-    @message.content_text = "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
-      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
   end
 
   def set_response_error
@@ -191,19 +185,13 @@ class GetNextAIMessageJob < ApplicationJob
   end
 
   def set_billing_error
-    service = @assistant.language_model.api_service.name
-    url = case service
-    when "OpenAI"
-      "https://platform.openai.com/account/billing/overview"
-    when "Anthropic"
-      "https://console.anthropic.com/settings/plans"
-    when "Gemini", "Google Gemini"
-      "https://aistudio.google.com/app/apikey"
-    else
-      "https://platform.openai.com/account/billing/overview"
-    end
+    service = @assistant.language_model.api_service
+    driver = service.driver
+    name = service.name
+    url = APIService::BILLING_URLS[driver] || "https://platform.openai.com/account/billing/overview"
+
     @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
-      "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
+      "#{name} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
   end
 
   def wrap_up_the_message

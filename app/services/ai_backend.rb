@@ -1,6 +1,5 @@
 class AIBackend
   include Tools
-  include Utilities
 
   class ToolCallIntercepted < StandardError; end
   class BlankResponseError < StandardError; end
@@ -273,6 +272,8 @@ class AIBackend
       when "openai" then :openai
       when "anthropic" then :anthropic
       when "gemini" then :gemini
+      else
+        raise ArgumentError, "Unknown driver: #{driver.inspect}"
       end
     end
 

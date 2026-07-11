@@ -4,6 +4,12 @@ class APIService < ApplicationRecord
   URL_GROQ = "https://api.groq.com/openai/v1/"
   URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/"
 
+  BILLING_URLS = {
+    "openai" => "https://platform.openai.com/account/billing/overview",
+    "anthropic" => "https://console.anthropic.com/settings/plans",
+    "gemini" => "https://aistudio.google.com/app/apikey"
+  }.freeze
+
   belongs_to :user
 
   has_many :language_models, -> { not_deleted }
@@ -43,6 +49,7 @@ class APIService < ApplicationRecord
     return Setting.default_openai_key if url == URL_OPEN_AI
     return Setting.default_anthropic_key if url == URL_ANTHROPIC
     return Setting.default_groq_key if url == URL_GROQ
+    return Setting.default_gemini_key if url == URL_GEMINI
   end
 
   def soft_delete_language_models
