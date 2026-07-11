@@ -6,6 +6,8 @@ HostedGPT is a free, open-source alternative to ChatGPT also supporting other pr
 
 This app is intended to be incredibly easy for ChatGPT users to switch. Features you expect are here plus it supports GPT-5, Claude 4, Gemini 2.5 (and others) in a single app. You can also switch assistants in the middle of a conversation!
 
+HostedGPT uses the [RubyLLM](https://github.com/sgoll/ruby_llm) gem under the hood to provide a single, unified backend for all supported AI providers, while still letting you configure per-provider API keys and endpoints.
+
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
 ## Top features of HostedGPT

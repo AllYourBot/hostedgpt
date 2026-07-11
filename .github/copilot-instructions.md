@@ -15,7 +15,7 @@ HostedGPT is a Ruby on Rails 7.2 application providing a multi‑provider conver
 - Rails MVC + Hotwire (Turbo + Stimulus), Tailwind for styling.
 - Background job queue: SolidQueue (runs in Puma with `RUN_SOLID_QUEUE_IN_PUMA=true`).
 - Streaming tokens: ActionCable (PostgreSQL enhanced adapter).
-- AI abstraction: `AIBackend::<Provider>` classes in `app/services/ai_backend/` selected via `APIService#driver`.
+- AI abstraction: unified `AIBackend` service in `app/services/ai_backend.rb` backed by the `ruby_llm` gem. `APIService#driver` selects the provider (`openai`, `anthropic`, `gemini`) and the backend builds a `RubyLLM::Chat` with `assume_model_exists: true`.
 - Dynamic model & assistant provisioning: YAML seeds (`models.yml`, `assistants.yml`) imported per user on registration (`User::Registerable`).
 - Feature flags & settings: `config/options.yml` accessed through `Feature.*` / `Setting.*` helpers.
 - Message flow: `MessagesController` creates user messages; async job fetches assistant reply; streaming handled in backend-specific service.
@@ -37,12 +37,13 @@ OpenAI, Anthropic, Groq (OpenAI-compatible), Google Gemini. Provider selection l
 
 ## Adding a New AI Provider (Guideline)
 1. Add enum value to `APIService.driver` and constants for base URL.
-2. Implement `AIBackend::<NewProvider>` (model naming & streaming semantics similar to existing backends). Reuse shared utility methods in base `AIBackend` class.
-3. Handle test client stub for deterministic tests.
-4. Extend seeding (user registration hook) if you want automatic creation.
-5. Update `models.yml` with default models (capabilities: images, tools, costs, system message support).
-6. Ensure `supports_tools?` logic works or adapt as needed.
-7. Add minimal tests: service connectivity test + message generation path.
+2. Map the driver to a `RubyLLM` provider symbol in `AIBackend.ruby_llm_provider`.
+3. Add the provider's API key/base URL configuration in `AIBackend.set_provider_key` / `set_provider_base`.
+4. Handle test client stub via `AIBackend.chat_factory` (the test suite configures it to produce `TestChat`).
+5. Extend seeding (user registration hook) if you want automatic creation.
+6. Update `models.yml` with default models (capabilities: images, tools, costs, system message support).
+7. Ensure `supports_tools?` logic works or adapt as needed.
+8. Add minimal tests: service connectivity test + message generation path.
 
 ## Adding / Modifying Language Models
 Edit `models.yml`. Fields:
@@ -63,7 +64,7 @@ Settings via `Setting.*` (default tokens, Cloudflare creds, SMTP/Postmark config
 - Tests: Minitest style; place shared helpers in `test/support/`.
 
 ## Testing Guidance
-- For provider tests, stub network classes (see OpenAI test client approach) instead of recording cassettes.
+- The backend uses a configurable `AIBackend.chat_factory`; in tests it is wired to `TestChat` in `test/test_helper.rb`. Stubs like `TestChat.text = "Hello"` or `TestChat.function = "..."` replace provider requests.
 - System tests run outside Docker CI (headless browser). Keep selectors semantic (`data-testid` if needed – add sparingly).
 - When changing streaming logic, add a test ensuring partial token emission order and final persistence.
 
