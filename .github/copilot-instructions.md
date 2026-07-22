@@ -3,7 +3,7 @@
 These instructions give Copilot essential, reusable context about this Rails application so it proposes accurate, idiomatic changes. Keep responses concise, respect existing patterns, and avoid speculative rewrites.
 
 ## Project Overview
-HostedGPT is a Ruby on Rails 7.2 application providing a multi‑provider conversational AI UI (OpenAI, Anthropic, Groq, Google Gemini, others via OpenAI-compatible APIs). Users can:
+HostedGPT is a Ruby on Rails 8.0 application providing a multi‑provider conversational AI UI (OpenAI, Anthropic, Groq, Google Gemini, others via OpenAI-compatible APIs). Users can:
 - Create assistants bound to language models
 - Chat with streaming responses (ActionCable)
 - Switch models/providers mid conversation
