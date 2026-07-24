@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "file", "content", "preview" ]
+  static targets = [ "file", "picker", "content", "previewList", "previewTemplate", "fileInputs" ]
 
   connect() {
     if (!this.hasFileTarget || !this.hasContentTarget) {
@@ -9,8 +9,13 @@ export default class extends Controller {
       return
     }
 
+    this.entries = []
+    this.nextEntryId = 0
+    this.nextCloneIndex = 1
+
     this.dragCounter = 0
-    this.fileTarget.addEventListener("change", this.boundPreviewUpdate)
+    this.fileTarget.addEventListener("change", this.boundPickerChanged)
+    this.pickerTarget.addEventListener("change", this.boundPickerChanged)
     this.element.addEventListener("drop", this.boundDropped)
     this.contentTarget.addEventListener("paste", this.boundPasted)
     this.element.addEventListener("dragenter", this.boundDragEnter)
@@ -21,7 +26,8 @@ export default class extends Controller {
   disconnect() {
     if (!this.hasFileTarget || !this.hasContentTarget) return
 
-    this.fileTarget.removeEventListener("change", this.boundPreviewUpdate)
+    this.fileTarget.removeEventListener("change", this.boundPickerChanged)
+    this.pickerTarget.removeEventListener("change", this.boundPickerChanged)
     this.element.removeEventListener("drop", this.boundDropped)
     this.contentTarget.removeEventListener("paste", this.boundPasted)
     this.element.removeEventListener("dragenter", this.boundDragEnter)
@@ -29,62 +35,99 @@ export default class extends Controller {
     this.element.removeEventListener("dragleave", this.boundDragLeave)
   }
 
-  boundPreviewUpdate = () => { this.previewUpdate() }
-  previewUpdate() {
-    if (!this.hasFileTarget || !this.hasPreviewTarget) return
-
-    const input = this.fileTarget
-    if (input.files && input.files[0]) {
-      const file = input.files[0]
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const previewContainer = this.previewTarget.querySelector("[data-role='preview']")
-        const img = previewContainer.querySelector("img")
-        const fileIcon = previewContainer.querySelector("[data-role='file-icon']")
-
-        if (file.type.startsWith('image/')) {
-          // Handle image files
-          img.src = e.target.result
-          img.style.display = 'block'
-          if (fileIcon) fileIcon.style.display = 'none'
-        } else if (file.type === 'application/pdf') {
-          // Handle PDF files
-          img.style.display = 'none'
-          if (fileIcon) {
-            fileIcon.style.display = 'flex'
-          } else {
-            // Create PDF icon if it doesn't exist
-            const pdfIcon = document.createElement('div')
-            pdfIcon.setAttribute('data-role', 'file-icon')
-            pdfIcon.className = 'w-full h-full flex items-center justify-center bg-red-100 dark:bg-red-900'
-            pdfIcon.innerHTML = `
-              <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
-              </svg>
-            `
-            previewContainer.appendChild(pdfIcon)
-          }
-        }
-
-        this.element.classList.add("show-previews")
-        this.contentTarget.focus()
-        window.dispatchEvent(new CustomEvent('main-column-changed'))
-      }
-      reader.readAsDataURL(file)
-    }
+  // The picker is a plain, unnamed <input multiple> used only to trigger the OS file dialog —
+  // it's never part of the submitted form. Each file it returns is handed off to its own
+  // single-file submission input (fileTarget for the first, a clone for each additional one),
+  // so a real Rails-nested-attributes input is never left both "multiple" and empty, which
+  // browsers submit as a blank value instead of omitting entirely. fileTarget itself is also
+  // watched directly so attaching a file straight to it (e.g. via Capybara) still works.
+  boundPickerChanged = (event) => { this.pickerChanged(event) }
+  pickerChanged(event) {
+    const input = event.target
+    const files = Array.from(input.files || [])
+    if (input === this.pickerTarget) input.value = ''
+    files.forEach((file) => this.addFile(file))
   }
 
-  previewRemove() {
-    if (!this.hasPreviewTarget) return
+  addFile(file) {
+    const entryId = this.nextEntryId++
+    const usingFileTarget = !this.entries.some((entry) => entry.input === this.fileTarget)
 
-    const previewContainer = this.previewTarget.querySelector("[data-role='preview']")
-    const img = previewContainer.querySelector("img")
-    const fileIcon = previewContainer.querySelector("[data-role='file-icon']")
+    let input
+    if (usingFileTarget) {
+      input = this.fileTarget
+    } else {
+      const cloneIndex = this.nextCloneIndex++
+      input = this.fileTarget.cloneNode(false)
+      input.removeAttribute("id")
+      input.name = this.fileTarget.name.replace(/\[documents_attributes\]\[\d+\]/, `[documents_attributes][${cloneIndex}]`)
+      this.fileInputsTarget.appendChild(input)
+    }
 
-    if (img) img.src = ''
-    if (fileIcon) fileIcon.style.display = 'none'
+    const dataTransfer = new DataTransfer()
+    dataTransfer.items.add(file)
+    input.files = dataTransfer.files
 
-    this.element.classList.remove("show-previews")
+    const preview = this.buildPreview(file, entryId)
+    this.entries.push({ entryId, file, input, preview })
+  }
+
+  buildPreview(file, entryId) {
+    const clone = this.previewTemplateTarget.content.firstElementChild.cloneNode(true)
+    clone.dataset.entryId = entryId
+
+    const removeBtn = clone.querySelector("[data-role='preview-remove']")
+    if (removeBtn) removeBtn.dataset.imageUploadIndexParam = entryId
+
+    const img = clone.querySelector("img")
+    const fileIcon = clone.querySelector("[data-role='file-icon']")
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (e) => { img.src = e.target.result }
+      reader.readAsDataURL(file)
+    } else if (file.type === 'application/pdf') {
+      img.style.display = 'none'
+      if (fileIcon) {
+        fileIcon.style.display = 'flex'
+      } else {
+        const pdfIcon = document.createElement('div')
+        pdfIcon.setAttribute('data-role', 'file-icon')
+        pdfIcon.className = 'w-full h-full flex items-center justify-center bg-red-100 dark:bg-red-900'
+        pdfIcon.innerHTML = `
+          <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+          </svg>
+        `
+        clone.appendChild(pdfIcon)
+      }
+    }
+
+    this.previewListTarget.appendChild(clone)
+    this.element.classList.add("show-previews")
+    this.contentTarget.focus()
+    window.dispatchEvent(new CustomEvent('main-column-changed'))
+
+    return clone
+  }
+
+  removeFile(event) {
+    const entryId = parseInt(event.params.index, 10)
+    const index = this.entries.findIndex((entry) => entry.entryId === entryId)
+    if (index === -1) return
+
+    const entry = this.entries[index]
+    entry.preview.remove()
+
+    if (entry.input === this.fileTarget) {
+      this.fileTarget.value = ''
+    } else {
+      entry.input.remove()
+    }
+
+    this.entries.splice(index, 1)
+
+    if (this.entries.length === 0) this.element.classList.remove("show-previews")
     if (this.hasContentTarget) this.contentTarget.focus()
     window.dispatchEvent(new CustomEvent('main-column-changed'))
   }
@@ -98,9 +141,8 @@ export default class extends Controller {
     const shade = this.element.querySelector("#drag-n-drop-shade")
     if (shade) shade.remove()
 
-    let files = event.dataTransfer.files
-    this.fileTarget.files = files
-    this.previewUpdate()
+    const files = Array.from(event.dataTransfer.files || []).filter((file) => this.isAllowedType(file))
+    files.forEach((file) => this.addFile(file))
   }
 
   boundDragOver = (event) => this.dragOver(event)
@@ -137,29 +179,21 @@ export default class extends Controller {
     for (const item of clipboardData.items) {
       if (item.kind === "file") {
         const blob = item.getAsFile()
-        if (!blob) return
+        if (!blob) continue
+        if (!this.isAllowedType(blob)) continue
 
-        // Only handle images and PDFs
-        if (blob.type.startsWith('image/') || blob.type === 'application/pdf') {
-          const dataURL = await this.readPastedBlobAsDataURL(blob)
-          this.addFileToFileInput(dataURL, blob.type, blob.name || "pasted-file")
-        }
+        const file = new File([blob], blob.name || this.defaultFileName(blob.type), { type: blob.type })
+        this.addFile(file)
       }
     }
-    this.previewUpdate()
   }
 
-  async readPastedBlobAsDataURL(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        resolve(event.target.result)
-      }
-      reader.onerror = (error) => {
-        reject(error)
-      }
-      reader.readAsDataURL(blob)
-    })
+  isAllowedType(file) {
+    return file.type.startsWith('image/') || file.type === 'application/pdf'
+  }
+
+  defaultFileName(fileType) {
+    return fileType === 'application/pdf' ? 'pasted-document.pdf' : 'pasted-image.png'
   }
 
   displayDragnDropShade() {
@@ -172,44 +206,8 @@ export default class extends Controller {
     );
   }
 
-  addFileToFileInput(dataURL, fileType, fileName) {
-    if (!this.hasFileTarget) return
-
-    const fileList = new DataTransfer()
-    const blob = this.dataURLtoBlob(dataURL, fileType)
-
-    // Generate appropriate filename based on file type
-    let defaultFileName = "pasted-file"
-    if (fileType.startsWith('image/')) {
-      defaultFileName = "pasted-image.png"
-    } else if (fileType === 'application/pdf') {
-      defaultFileName = "pasted-document.pdf"
-    }
-
-    fileList.items.add(
-      new File([blob], fileName || defaultFileName, { type: fileType }),
-    )
-    this.fileTarget.files = fileList.files
-  }
-
-  dataURLtoBlob(dataURL, fileType) {
-    const binaryString = atob(dataURL.split(",")[1])
-    const arrayBuffer = new ArrayBuffer(binaryString.length)
-    const uint8Array = new Uint8Array(arrayBuffer)
-    for (let i = 0; i < binaryString.length; i++) {
-      uint8Array[i] = binaryString.charCodeAt(i)
-    }
-    return new Blob([uint8Array], { type: fileType })
-  }
-
   choose() {
-    if (!this.hasFileTarget) return
-    this.fileTarget.click()
-  }
-
-  remove() {
-    if (!this.hasFileTarget) return
-    this.fileTarget.value = ''
-    this.previewRemove()
+    if (!this.hasPickerTarget) return
+    this.pickerTarget.click()
   }
 }

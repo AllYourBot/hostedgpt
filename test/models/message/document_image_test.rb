@@ -18,9 +18,22 @@ class Message::DocumentImageTest < ActiveSupport::TestCase
 
   test "document_image_url with data url" do
     stub_custom_config_value(:app_url, "") do
-      url = messages(:examine_this).document_image_url(:small)
+      url = messages(:examine_this).documents.first.image_url(:small)
       assert url.is_a?(String)
       assert url.starts_with?("data:image/png;base64,")
+    end
+  end
+
+  test "has_document_image? is true when a message has multiple image attachments" do
+    message = messages(:two_attachments)
+
+    assert_equal 2, message.documents.count
+    assert message.has_document_image?
+
+    stub_custom_config_value(:app_url, "") do
+      urls = message.documents.map { |document| document.image_url(:small) }
+      assert_equal 2, urls.length
+      urls.each { |url| assert url.starts_with?("data:image/png;base64,") }
     end
   end
 end
