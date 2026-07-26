@@ -94,4 +94,54 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     assert_equal false, model.supports_images
     assert_equal true, model.supports_tools
   end
+
+  test "import_rubyllm_registry creates new models from registry" do
+    with_rubyllm_fixture("rubyllm_models.json") do
+      count = LanguageModel.import_rubyllm_registry(users: [users(:rob)])
+
+      assert_equal 3, count, "Should create 3 models (2 openai + 1 anthropic), skip deepseek"
+      assert users(:rob).language_models.exists?(api_name: "rubyllm-test-1")
+      assert users(:rob).language_models.exists?(api_name: "rubyllm-test-2")
+      refute users(:rob).language_models.exists?(api_name: "rubyllm-test-3")
+
+      lm = users(:rob).language_models.find_by(api_name: "rubyllm-test-1")
+      assert lm.supports_images
+      assert lm.supports_tools
+      assert lm.supports_pdf
+    end
+  end
+
+  test "import_rubyllm_registry skips existing models" do
+    original_name = users(:rob).language_models.find_by(api_name: "gpt-4o").name
+
+    with_rubyllm_fixture("rubyllm_models.json") do
+      count = LanguageModel.import_rubyllm_registry(users: [users(:rob)])
+
+      assert_equal 3, count, "Should skip gpt-4o (already exists), create the rest"
+      assert_equal original_name, users(:rob).language_models.find_by(api_name: "gpt-4o").reload.name
+    end
+  end
+
+  test "import_rubyllm_registry handles nil capabilities gracefully" do
+    with_rubyllm_fixture("rubyllm_models.json") do
+      LanguageModel.import_rubyllm_registry(users: [users(:rob)])
+
+      lm = users(:rob).language_models.find_by(api_name: "rubyllm-nil-cap")
+      refute lm.supports_images
+      refute lm.supports_tools
+    end
+  end
+
+  private
+
+  def with_rubyllm_fixture(filename)
+    path = Rails.root.join("test/fixtures/#{filename}")
+    original_file = RubyLLM.config.model_registry_file
+    RubyLLM.config.model_registry_file = path.to_s
+    RubyLLM::Models.instance_variable_set(:@instance, nil)
+    yield
+  ensure
+    RubyLLM.config.model_registry_file = original_file
+    RubyLLM::Models.instance_variable_set(:@instance, nil)
+  end
 end

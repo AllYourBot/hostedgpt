@@ -18,4 +18,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "SDK"
   inflect.acronym "URL"
   inflect.acronym "XML"
+  inflect.acronym "LLM"
 end

@@ -1,0 +1,70 @@
+[
+  {
+    "id": "rubyllm-test-1",
+    "name": "Test Model 1",
+    "provider": "openai",
+    "family": "test",
+    "created_at": "2026-01-01 00:00:00 UTC",
+    "context_window": 128000,
+    "max_output_tokens": 4096,
+    "knowledge_cutoff": null,
+    "modalities": {
+      "input": ["text", "image", "pdf"],
+      "output": ["text"]
+    },
+    "capabilities": ["function_calling", "vision"],
+    "pricing": {},
+    "metadata": {}
+  },
+  {
+    "id": "rubyllm-test-2",
+    "name": "Test Model 2",
+    "provider": "anthropic",
+    "family": "test",
+    "created_at": "2026-01-01 00:00:00 UTC",
+    "context_window": 200000,
+    "max_output_tokens": 4096,
+    "knowledge_cutoff": null,
+    "modalities": {
+      "input": ["text"],
+      "output": ["text"]
+    },
+    "capabilities": ["function_calling"],
+    "pricing": {},
+    "metadata": {}
+  },
+  {
+    "id": "rubyllm-test-3",
+    "name": "Skipped Provider",
+    "provider": "deepseek",
+    "family": "test",
+    "created_at": "2026-01-01 00:00:00 UTC",
+    "context_window": 64000,
+    "max_output_tokens": 4096,
+    "knowledge_cutoff": null,
+    "modalities": {
+      "input": ["text"],
+      "output": ["text"]
+    },
+    "capabilities": [],
+    "pricing": {},
+    "metadata": {}
+  },
+  {
+    "id": "rubyllm-nil-cap",
+    "name": "Nil Caps",
+    "provider": "openai",
+    "family": "test",
+    "created_at": "2026-01-01 00:00:00 UTC",
+    "context_window": 128000,
+    "max_output_tokens": 4096,
+    "knowledge_cutoff": null,
+    "modalities": {
+      "input": ["text"],
+      "output": ["text"]
+    },
+    "capabilities": null,
+    "pricing": {},
+    "metadata": {}
+  }
+]

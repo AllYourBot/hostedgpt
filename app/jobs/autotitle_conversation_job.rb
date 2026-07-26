@@ -40,6 +40,13 @@ class AutotitleConversationJob < ApplicationJob
         generation_config: { response_mime_type: "application/json" }
       )
       return JSON.parse(response)["topic"]
+    elsif ai_backend.class == AIBackend::RubyLLM
+      response = ai_backend.get_oneoff_message(system_message, [text])
+      begin
+        return JSON.parse(response)["topic"]
+      rescue JSON::ParserError
+        return response.scan(/(?<=:)"(.+?)"/)&.flatten&.first&.strip
+      end
     else
       response = ai_backend.get_oneoff_message(
         system_message,

@@ -83,6 +83,14 @@ class GetNextAIMessageJob < ApplicationJob
     set_generic_error("Gemini")
     wrap_up_the_message
     return true
+  rescue AIBackend::RubyLLM::ConfigurationError => e
+    set_generic_error(@assistant.language_model.api_service.name)
+    wrap_up_the_message
+    return true
+  rescue AIBackend::RubyLLM::RateLimitError => e
+    set_billing_error
+    wrap_up_the_message
+    return true
   rescue Faraday::ParsingError => e
     set_response_error
     wrap_up_the_message
@@ -179,11 +187,28 @@ class GetNextAIMessageJob < ApplicationJob
       "https://console.anthropic.com/settings/plans"
     when "Gemini"
       "https://aistudio.google.com/app/apikey"
+    when "RubyLLM"
+      display_name = @assistant.language_model.api_service.name
+      billing_url = provider_billing_url(@assistant.language_model.api_service.driver)
+      @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
+        "#{display_name} so go here #{billing_url} and add a credit card, or if you already have one review your billing plan.)"
+      return
     else
       "https://platform.openai.com/account/billing/overview"
     end
     @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
       "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
+  end
+
+  def provider_billing_url(driver)
+    case driver
+    when "anthropic"
+      "https://console.anthropic.com/settings/plans"
+    when "gemini"
+      "https://aistudio.google.com/app/apikey"
+    else
+      "https://platform.openai.com/account/billing/overview"
+    end
   end
 
   def wrap_up_the_message

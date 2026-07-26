@@ -15,5 +15,6 @@ module User::Registerable
 
     LanguageModel.import_from_file(users: [self])
     Assistant.import_from_file(users: [self])
+    LanguageModel.import_rubyllm_registry(users: [self]) if Feature.rubyllm?
   end
 end

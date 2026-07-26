@@ -21,6 +21,8 @@ class APIService < ApplicationRecord
   scope :ordered, -> { order(:name) }
 
   def ai_backend
+    return AIBackend::RubyLLM if Feature.rubyllm?
+
     case driver
     when "openai"
       AIBackend::OpenAI

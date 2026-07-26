@@ -51,5 +51,45 @@ module LanguageModel::Export
         end
       end
     end
+
+    PROVIDER_TO_SERVICE_NAME = {
+      "openai" => "OpenAI",
+      "anthropic" => "Anthropic",
+      "gemini" => "Google Gemini",
+    }.freeze
+
+    def import_rubyllm_registry(users: User.all)
+      count = 0
+
+      RubyLLM.models.chat_models.each do |model|
+        service_name = PROVIDER_TO_SERVICE_NAME[model.provider]
+        next unless service_name
+
+        Array.wrap(users).each do |user|
+          count += 1 if create_model_from_registry(model, user, service_name)
+        end
+      end
+
+      count
+    end
+
+    def create_model_from_registry(model, user, service_name)
+      api_service = user.api_services.find_by(name: service_name)
+      return unless api_service
+      return if user.language_models.exists?(api_name: model.id)
+
+      user.language_models.create!(
+        api_name: model.id,
+        name: model.name || model.id,
+        api_service: api_service,
+        supports_images: model.capabilities&.include?("vision") || model.modalities.input.include?("image"),
+        supports_tools: model.capabilities&.include?("function_calling") || false,
+        supports_system_message: true,
+        supports_pdf: model.modalities.input.include?("pdf") || false,
+      )
+      true
+    rescue ActiveRecord::RecordInvalid => e
+      warn "Failed to import '#{model.id}': #{e.message}"
+    end
   end
 end

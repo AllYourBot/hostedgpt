@@ -149,6 +149,8 @@ GEM
       multipart-post (~> 2.0)
     faraday-net_http (3.4.1)
       net-http (>= 0.5.0)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     faraday-typhoeus (1.1.0)
       faraday (~> 2.0)
       typhoeus (~> 1.4)
@@ -430,6 +432,17 @@ GEM
     ruby-vips (2.2.5)
       ffi (~> 1.12)
       logger
+    ruby_llm (1.16.0)
+      base64
+      event_stream_parser (~> 1)
+      faraday (>= 1.10.0)
+      faraday-multipart (>= 1)
+      faraday-net_http (>= 1)
+      faraday-retry (>= 1)
+      marcel (~> 1)
+      ruby_llm-schema (~> 0)
+      zeitwerk (~> 2)
+    ruby_llm-schema (0.4.0)
     rubyzip (3.2.0)
     securerandom (0.4.1)
     selenium-webdriver (4.37.0)
@@ -580,6 +593,7 @@ DEPENDENCIES
   rubocop-rails
   ruby-anthropic (~> 0.4.0)
   ruby-openai (~> 7.0.1)
+  ruby_llm (~> 1.16)
   selenium-webdriver
   solid_queue (~> 1.0.0)
   sprockets-rails

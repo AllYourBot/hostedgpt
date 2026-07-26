@@ -36,6 +36,7 @@ shared:
   features:
     registration: <%= ENV["REGISTRATION_FEATURE"] || true %>
     default_llm_keys: <%= ENV["DEFAULT_LLM_KEYS_FEATURE"] || false %>
+    rubyllm: <%= ENV["RUBYLLM_FEATURE"] || false %>
     cloudflare_storage: <%= ENV["CLOUDFLARE_STORAGE_FEATURE"] || false %>
     google_tools: <%= ENV["GOOGLE_TOOLS_FEATURE"] || false %>
     password_authentication: <%= ENV["PASSWORD_AUTHENTICATION_FEATURE"] || true %>

@@ -235,6 +235,8 @@ There are a number of optional feature flags that can be set and settings that c
 - `PASSWORD_AUTHENTICATION_FEATURE` is `true` by default, see the [Authentication](#authentication) section for more details.
 - `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
 - `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
+- `RUBYLLM_FEATURE` is `false` by default. Set to `true` to route AI requests through [RubyLLM](https://rubyllm.com) instead of the per-provider SDKs. When enabled, all three existing providers (OpenAI, Anthropic, Gemini) work through RubyLLM's unified Chat API. Your existing API keys, settings, and conversations work unchanged. When disabled, the app is byte-for-byte identical to running without this feature.
+- Run `rails models:import_rubyllm` to populate the Language Models list from RubyLLM's registry. This adds 600+ models with auto-detected capabilities (images, tools, PDFs) alongside the existing `models.yml` entries. Run `rails models:update_rubyllm` to refresh the registry from [models.dev](https://models.dev) with updated model data.
 
 ### Configuring Google Tools
 
