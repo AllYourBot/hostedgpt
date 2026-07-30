@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
 HostedGPT is a Ruby on Rails 8.0 app providing a multi-provider conversational AI UI (OpenAI, Anthropic, Groq, Google Gemini, and others via OpenAI-compatible APIs). Users bring their own API keys, create assistants bound to language models, chat with streaming responses, switch models/providers mid-conversation, attach images/files, and use tool/function calling where the provider supports it.
