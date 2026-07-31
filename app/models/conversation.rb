@@ -12,7 +12,7 @@ class Conversation < ApplicationRecord
   before_create :generate_share_token
   after_touch :set_title_async, if: -> { title.blank? && messages.count >= 2 }
 
-  scope :ordered, -> { order(updated_at: :desc) }
+  scope :ordered, -> { order(updated_at: :desc, id: :desc) }
 
   broadcasts_refreshes
 
