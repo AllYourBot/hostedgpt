@@ -7,6 +7,7 @@ class NavColumnTest < ApplicationSystemTestCase
   end
 
   test "clicking conversation in the left column updates the right and preserves scroll position of the left" do
+    assert_text conversations(:attachment).title # wait for the lazy-loaded #nav-conversations frame to render before scrolling it, otherwise scrollTop below silently clamps to 0
     page.execute_script("document.querySelector('#nav-scrollable').scrollTop = 100") # scroll the nav column down slightly
     assert_did_not_scroll "#nav-scrollable" do
       click_text conversations(:attachment).title
