@@ -123,8 +123,8 @@ class Toolbox::GoogleTasks < Toolbox
     end
 
     if (list.title == "Snoozed" && (
-          (format_time(due_date_s).present? && updated_task.try(:due)&.to_date == Date.current) ||
-          (due_date_s == "clear" && updated_task.try(:due).nil?)
+      (format_time(due_date_s).present? && updated_task.try(:due)&.to_date == Date.current) ||
+      (due_date_s == "clear" && updated_task.try(:due).nil?)
     ))
       updated_task = move_task_to_list(updated_task, default_list, keep_due: false)
       list = default_list
