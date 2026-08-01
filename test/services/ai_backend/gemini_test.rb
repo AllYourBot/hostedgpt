@@ -19,6 +19,33 @@ class AIBackend::GeminiTest < ActiveSupport::TestCase
     assert @gemini.client.present?
   end
 
+  test "preceding_conversation_messages constructs a proper response and pivots on images" do
+    conversation = conversations(:attachments)
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_tools: false, supports_images: true)
+    gemini = AIBackend::Gemini.new(
+      users(:keith),
+      assistant,
+      conversation,
+      conversation.latest_message_for_version(:latest)
+    )
+
+    preceding_conversation_messages = gemini.send(:preceding_conversation_messages)
+
+    assert_equal conversation.messages.length - 1, preceding_conversation_messages.length
+
+    conversation.messages.ordered.each_with_index do |message, i|
+      next if conversation.messages.length == i + 1
+
+      if message.documents.present?
+        assert_instance_of Array, preceding_conversation_messages[i][:parts]
+        assert_equal message.documents.length + 1, preceding_conversation_messages[i][:parts].length
+      else
+        assert_equal message.content_text || "", preceding_conversation_messages[i][:parts][:text]
+      end
+    end
+  end
+
   test "preceding_conversation_messages processes PDF documents" do
     # Create a new conversation with a message that has a PDF document
     assistant = assistants(:keith_claude35)

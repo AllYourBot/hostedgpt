@@ -114,6 +114,26 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal Document.last, user_msg.documents.first
   end
 
+  test "should create message with multiple image attachments" do
+    cat_file = fixture_file_upload("cat.png", "image/png")
+    dog_file = fixture_file_upload("cat.png", "image/png")
+
+    assert_difference "Conversation.count", 1 do
+      assert_difference "Document.count", 2 do
+        assert_difference "Message.count", 2 do
+          post assistant_messages_url(@assistant), params: { message: {
+            documents_attributes: { "0": { file: cat_file }, "1": { file: dog_file } },
+            content_text: @message.content_text
+          } }
+        end
+      end
+    end
+
+    (user_msg, _asst_msg) = Message.last(2)
+    assert_equal 2, user_msg.documents.count
+    assert_equal Document.last(2).to_set, user_msg.documents.to_set
+  end
+
   test "should create message with PDF attachment" do
     # Create a simple PDF file for testing
     pdf_content = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n174\n%%EOF"

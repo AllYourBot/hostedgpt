@@ -35,8 +35,36 @@ class MessagesComposerAttachmentTest < ApplicationSystemTestCase
     assert_active @input_selector
   end
 
+  test "attaching multiple images to the composer shows a preview for each" do
+    attach_file "attachment_picker", [
+      Rails.root.join("test", "assets", "cat-image-for-attaching.png"),
+      Rails.root.join("test", "assets", "cat-image-for-attaching.png"),
+    ], make_visible: true
+
+    assert_equal 2, find_previews.length
+    find_previews.each { |preview| assert preview.visible? }
+    refute @submit.visible?
+    assert_active @input_selector
+  end
+
+  test "attaching multiple images and removing one keeps the other" do
+    attach_file "attachment_picker", [
+      Rails.root.join("test", "assets", "cat-image-for-attaching.png"),
+      Rails.root.join("test", "assets", "cat-image-for-attaching.png"),
+    ], make_visible: true
+
+    assert_equal 2, find_previews.length
+
+    find_previews.first.hover
+    find_previews.first.find("[data-role='preview-remove']").click
+
+    assert_equal 1, find_previews.length
+    assert find("#document-previews").visible?
+    refute @submit.visible?
+    assert_active @input_selector
+  end
+
   # TODO: Add a test for submitting this and ensuring it gets attached to the message
-  # TODO: Add tests for attaching multiple images
 
   private
 

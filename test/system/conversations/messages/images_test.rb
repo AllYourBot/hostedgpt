@@ -44,6 +44,35 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
     end
   end
 
+  test "a message with multiple images renders one preview per image, each with its own independent modal" do
+    visit_and_scroll_wait conversation_messages_path(@conversation)
+
+    multi_image_msg = find_messages.fifth
+    previews = multi_image_msg.all("[data-role='image-preview']", visible: :all).to_a
+    modals = multi_image_msg.all("[data-role='image-modal']", visible: :all).to_a
+
+    assert_equal 2, previews.length
+    assert_equal 2, modals.length
+    modals.each { |modal| refute modal.visible? }
+
+    previews.first.click
+    assert_true "first modal should be visible" do
+      modals.first.visible?
+    end
+    refute modals.second.visible?
+
+    send_keys "esc"
+    assert_false "first modal should have closed" do
+      modals.first.visible?
+    end
+
+    previews.second.click
+    assert_true "second modal should be visible" do
+      modals.second.visible?
+    end
+    refute modals.first.visible?
+  end
+
   test "images eventually render in messages WHEN NOT pre-processed, clicking opens modal" do
     simulate_image_variant_processing do
       visit_and_scroll_wait conversation_messages_path(@conversation)

@@ -178,42 +178,45 @@
           %>
         <% end %>
 
-        <div id="document-previews" class="absolute hidden space-x-3 left-9 top-3 show-previews:preview-container" data-image-upload-target="preview">
-          <div class="
-              flex flex-col
-              items-stretch
-              w-16 h-16
-              overflow-hidden
-              border-2 border-gray-100
-              rounded-xl
-              group
-            "
-            data-role="preview"
-          >
-            <%= button_tag type: "button",
-              class: "rounded-full absolute -top-2 -right-2 border border-gray-300 bg-gray-200 dark:bg-gray-800 hidden group-hover:block",
-              data: {
-                action: "image-upload#remove",
-                role: "preview-remove"
-              } do
-            %>
-              <%= icon "x-mark",
-                variant: :mini,
-                class: %|
-                  text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white
-                  cursor-pointer stroke-2
-                |,
-                title: t('app.conversations.ui.remove_file'),
-                tooltip: :top
+        <div id="document-previews" class="absolute hidden flex-wrap gap-3 max-w-[280px] left-9 top-3 show-previews:preview-container" data-image-upload-target="previewList">
+          <template data-image-upload-target="previewTemplate">
+            <div class="
+                flex flex-col
+                items-stretch
+                w-16 h-16
+                overflow-hidden
+                border-2 border-gray-100
+                rounded-xl
+                group
+                relative
+              "
+              data-role="preview"
+            >
+              <%= button_tag type: "button",
+                class: "rounded-full absolute -top-2 -right-2 border border-gray-300 bg-gray-200 dark:bg-gray-800 hidden group-hover:block",
+                data: {
+                  action: "image-upload#removeFile",
+                  role: "preview-remove"
+                } do
               %>
-            <% end %>
+                <%= icon "x-mark",
+                  variant: :mini,
+                  class: %|
+                    text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white
+                    cursor-pointer stroke-2
+                  |,
+                  title: t('app.conversations.ui.remove_file'),
+                  tooltip: :top
+                %>
+              <% end %>
 
-            <%= button_tag type: "button",
-              class: "w-full h-full flex-1 p-0" do
-            %>
-              <%= image_tag "", class: "w-full h-full object-cover" %>
-            <% end %>
-          </div>
+              <%= button_tag type: "button",
+                class: "w-full h-full flex-1 p-0" do
+              %>
+                <%= image_tag "", class: "w-full h-full object-cover" %>
+              <% end %>
+            </div>
+          </template>
         </div>
 
         <% if @streaming_message %>
@@ -268,6 +271,13 @@
           <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
             <%= document_form.file_field :file, accept: "image/*,.pdf", class: "hidden", data: { image_upload_target: "file" } %>
           <% end %>
+          <div class="hidden" data-image-upload-target="fileInputs"></div>
+
+          <%= file_field_tag :attachment_picker,
+            multiple: true,
+            accept: "image/*,.pdf",
+            class: "hidden",
+            data: { image_upload_target: "picker" } %>
 
           <%= form.text_area :content_text,
             id: "composer-input",
