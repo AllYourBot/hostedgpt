@@ -60,6 +60,9 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows]
   gem "timecop"
+  # minitest-skip 1.0+ requires minitest ~> 6.0, but its Minitest.load :skip call breaks under
+  # minitest 6.0.6 (Minitest.load became private). Pin minitest to 5.x until that's fixed upstream.
+  gem "minitest", "~> 5.0"
   gem "minitest-skip"
 end
 
