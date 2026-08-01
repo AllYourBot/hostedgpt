@@ -256,6 +256,10 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.4-aarch64-linux-musl)
       racc (~> 1.4)
+    nokogiri (1.19.4-arm-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.19.4-arm-linux-musl)
+      racc (~> 1.4)
     nokogiri (1.19.4-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.4-x86_64-darwin)
@@ -490,6 +494,8 @@ GEM
       railties (>= 7.0.0)
     tailwindcss-rails (2.7.9-aarch64-linux)
       railties (>= 7.0.0)
+    tailwindcss-rails (2.7.9-arm-linux)
+      railties (>= 7.0.0)
     tailwindcss-rails (2.7.9-arm64-darwin)
       railties (>= 7.0.0)
     tailwindcss-rails (2.7.9-x86_64-darwin)
@@ -541,6 +547,9 @@ PLATFORMS
   aarch64-linux
   aarch64-linux-gnu
   aarch64-linux-musl
+  arm-linux
+  arm-linux-gnu
+  arm-linux-musl
   arm64-darwin
   ruby
   x86_64-darwin
