@@ -1,6 +1,6 @@
 ## Project Overview
 
-HostedGPT is a Ruby on Rails 8.0 app providing a multi-provider conversational AI UI (OpenAI, Anthropic, Groq, Google Gemini, and others via OpenAI-compatible APIs). Users bring their own API keys, create assistants bound to language models, chat with streaming responses, switch models/providers mid-conversation, attach images/files, and use tool/function calling where the provider supports it.
+HostedGPT is a Ruby on Rails 8.1 app providing a multi-provider conversational AI UI (OpenAI, Anthropic, Groq, Google Gemini, and others via OpenAI-compatible APIs). Users bring their own API keys, create assistants bound to language models, chat with streaming responses, switch models/providers mid-conversation, attach images/files, and use tool/function calling where the provider supports it.
 
 ## Commands
 
