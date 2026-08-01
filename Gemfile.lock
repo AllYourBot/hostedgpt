@@ -382,9 +382,6 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.0)
-    rake-compiler-dock (1.12.0)
-    rb_sys (0.9.128)
-      rake-compiler-dock (= 1.12.0)
     rdoc (6.15.0)
       erb
       psych (>= 4.0.0)
@@ -498,13 +495,6 @@ GEM
     tailwindcss-rails (2.7.9-x86_64-linux)
       railties (>= 7.0.0)
     thor (1.3.2)
-    tiktoken_ruby (0.0.12)
-      rb_sys (~> 0.9)
-    tiktoken_ruby (0.0.12-aarch64-linux)
-    tiktoken_ruby (0.0.12-arm64-darwin)
-    tiktoken_ruby (0.0.12-x86_64-darwin)
-    tiktoken_ruby (0.0.12-x86_64-linux)
-    tiktoken_ruby (0.0.12-x86_64-linux-musl)
     timecop (0.9.10)
     timeout (0.4.3)
     tins (1.45.0)
@@ -601,7 +591,6 @@ DEPENDENCIES
   standard
   stimulus-rails (~> 1.3.3)
   tailwindcss-rails (~> 2.7.2)
-  tiktoken_ruby (~> 0.0.9)
   timecop
   turbo-rails (~> 2.0.5)
   tzinfo-data
@@ -609,7 +598,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-   ruby 4.0.6p0
+   ruby 4.0.3p0
 
 BUNDLED WITH
    2.6.8
