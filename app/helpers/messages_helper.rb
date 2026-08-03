@@ -59,7 +59,7 @@ module MessagesHelper
   end
 
   def thinking_html(message, thinking)
-    span_tag("", class: %|
+    span_tag("", data: { role: "thinking", stream_watchdog_target: "thinking" }, class: %|
       animate-breathe
       w-3 h-3
       rounded-full

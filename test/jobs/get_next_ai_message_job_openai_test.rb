@@ -136,20 +136,39 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     refute GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
   end
 
-  test "when openai key is blank, a nice error message is displayed" do
+  test "when openai key is blank, a nice error message is displayed and the message is marked failed" do
     stub_features(default_llm_keys: false) do
       api_service = @assistant.language_model.api_service
       api_service.update!(token: "")
 
       assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for OpenAI"
+      assert @message.reload.failed?, "The message should have been marked failed so a Retry button is offered"
     end
   end
 
-  test "when API response key is missing, a nice error message is displayed" do
+  test "when API response key is missing, a nice error message is displayed and the message is marked failed" do
     TestClient::OpenAI.stub :text, "" do
       assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
+      assert @message.reload.failed?, "The message should have been marked failed so a Retry button is offered"
     end
+  end
+
+  test "when the connection drops mid-stream, the message is marked failed" do
+    TestClient::OpenAI.stub_any_instance :chat, -> (*) { raise Faraday::ConnectionFailed, "connection reset by peer" } do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+    end
+
+    assert_includes @message.reload.content_text, "connection error"
+    assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
+  end
+
+  test "a message which generated successfully is not marked failed" do
+    TestClient::OpenAI.stub :text, "Hello" do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+    end
+
+    assert @message.reload.not_failed?
   end
 end

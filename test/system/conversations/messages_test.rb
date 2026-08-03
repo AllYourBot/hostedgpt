@@ -54,6 +54,36 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_current_path conversation_messages_path(@conversation, version: 2)
   end
 
+  test "a failed response shows a retry button which regenerates the reply" do
+    ask_a_question
+    latest_message.update! content_text: "(I received a blank response.)", failed_at: Time.current
+    visit_and_scroll_wait conversation_messages_path(@conversation)
+
+    retry_button = last_message.find_role("retry-button")
+    assert retry_button.visible?, "A failed message should offer Retry without having to hover it"
+
+    retry_button.click
+
+    assert_no_text "(I received a blank response.)" # the failed reply is replaced by a fresh one
+    assert_current_path conversation_messages_path(@conversation, version: 2)
+  end
+
+  test "a stalled response shows a retry button once the stream goes quiet" do
+    ask_a_question # the assistant's reply is created blank and is never filled in
+    visit_and_scroll_wait conversation_messages_path(@conversation)
+    msg = last_message
+
+    refute msg.find_role("retry").visible?, "Retry should stay hidden while we're still waiting on the stream"
+    assert msg.find_role("thinking").visible?
+
+    page.execute_script("arguments[0].dataset.streamWatchdogSecondsValue = '0.2'", msg.find_role("inner-message"))
+
+    assert_true "Retry should appear once the stream has gone quiet for too long" do
+      msg.find_role("retry").visible?
+    end
+    refute msg.find_role("thinking").visible?, "The thinking indicator should give way to the Retry button"
+  end
+
   test "submitting a message with ENTER inserts two new messages with morphing" do
     assert_page_morphed do
       assert_scrolled_down do
@@ -86,5 +116,15 @@ class ConversationMessagesTest < ApplicationSystemTestCase
         @new_message.save!
       end
     end
+  end
+
+  private
+
+  def ask_a_question
+    @conversation.messages.create! role: :user, content_text: "Are you still there?", assistant: @conversation.assistant
+  end
+
+  def latest_message
+    @conversation.latest_message_for_version(:latest)
   end
 end

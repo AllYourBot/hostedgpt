@@ -127,6 +127,10 @@ de:
     chat:
       empty_state:
         greeting: "Wie kann ich dir heute helfen?"
+    messages:
+      retry:
+        interrupted: "Die Antwort wurde unterbrochen."
+        button: "Erneut versuchen"
     auth:
       welcome_back: "Willkommen zurück"
       no_account: "Noch kein Konto?"

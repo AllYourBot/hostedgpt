@@ -1,0 +1,41 @@
+<%# locals: (message:, failed:) -%>
+<%# Shown right away when the response failed. When the response merely stalled, this starts out hidden and
+    the stream-watchdog controller reveals it once the stream has gone quiet for too long. -%>
+
+<div
+  data-role="retry"
+  data-stream-watchdog-target="retry"
+  class="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 <%= "hidden" unless failed %>"
+>
+  <% unless failed %>
+    <span data-role="retry-explanation">
+      <%= t("app.messages.retry.interrupted") %>
+    </span>
+  <% end %>
+
+  <%= button_to assistant_messages_path(message.assistant),
+    method: :post,
+    form_class: "inline-block p-0",
+    class: %|
+      flex items-center gap-1
+      px-2 py-1
+      rounded-md border border-gray-300 dark:border-gray-500
+      cursor-pointer hover:text-gray-900 dark:hover:text-white
+    |,
+    params: { message: {
+      conversation_id: message.conversation_id,
+      assistant_id: message.assistant_id,
+      role: "assistant",
+      index: message.index,
+      branched: true,
+      branched_from_version: message.version
+    } },
+    data: {
+      role: "retry-button",
+      turbo_frame: "_top",
+      turbo_action: "replace",
+  } do %>
+    <%= icon "arrow-path", variant: :outline, size: 16 %>
+    <%= t("app.messages.retry.button") %>
+  <% end %>
+</div>
