@@ -197,6 +197,28 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to conversation_messages_url(message.conversation, version: 2)
   end
 
+  test "index shows a retry button for a message which failed to generate" do
+    latest_message = @conversation.latest_message_for_version(:latest)
+    latest_message.update! content_text: "(I received a blank response.)", failed_at: Time.current
+
+    get conversation_messages_url(@conversation, version: latest_message.version)
+    assert_select '[data-role="retry"]:not(.hidden)'
+    assert_select '[data-role="retry-button"]'
+  end
+
+  test "index hides the retry button behind the watchdog while a message is still generating" do
+    @conversation.messages.create! role: :user, content_text: "You there?", assistant: @assistant
+
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select '[data-role="retry"].hidden'
+    assert_select '[data-controller~="stream-watchdog"]'
+  end
+
+  test "index shows no retry button for a message which generated successfully" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select '[data-role="retry"]', false
+  end
+
   test "messages can still be viewed when attached to a soft-deleted assistant" do
     @assistant.deleted!
     get conversation_messages_url(@conversation, version: 1)

@@ -73,27 +73,27 @@ class GetNextAIMessageJob < ApplicationJob
     else
       set_generic_error(name)
     end
-    wrap_up_the_message
+    wrap_up_the_failed_message
     return true
   rescue Anthropic::ConfigurationError => e
     set_anthropic_error
-    wrap_up_the_message
+    wrap_up_the_failed_message
     return true
   rescue Gemini::Errors::ConfigurationError => e
     set_generic_error("Gemini")
-    wrap_up_the_message
+    wrap_up_the_failed_message
     return true
   rescue Faraday::ParsingError => e
     set_response_error
-    wrap_up_the_message
+    wrap_up_the_failed_message
     return true
   rescue Faraday::ConnectionFailed => e
     @message.content_text = "I experienced a connection error. #{e.message}"
-    wrap_up_the_message
+    wrap_up_the_failed_message
     return true
   rescue Faraday::TooManyRequestsError => e
     set_billing_error
-    wrap_up_the_message
+    wrap_up_the_failed_message
     return true
   rescue WaitForPrevious
     Rails.logger.info "\n### WaitForPrevious in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
@@ -115,7 +115,7 @@ class GetNextAIMessageJob < ApplicationJob
           e.message
         end
         set_unexpected_error(msg&.slice(0...1500), error_text)
-        wrap_up_the_message
+        wrap_up_the_failed_message
       end
     end
     return false
@@ -184,6 +184,11 @@ class GetNextAIMessageJob < ApplicationJob
     end
     @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
       "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
+  end
+
+  def wrap_up_the_failed_message
+    @message.failed_at = Time.current # the view offers a Retry button for failed messages
+    wrap_up_the_message
   end
 
   def wrap_up_the_message

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_20_230241) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_03_134328) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -210,6 +210,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_230241) do
     t.integer "output_token_count", default: 0, null: false
     t.decimal "input_token_cost", precision: 30, scale: 15, default: "0.0", null: false
     t.decimal "output_token_cost", precision: 30, scale: 15, default: "0.0", null: false
+    t.datetime "failed_at"
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
     t.index ["conversation_id", "index", "version"], name: "index_messages_on_conversation_id_and_index_and_version", unique: true

@@ -11,7 +11,8 @@ end %>
 <% last_message = message_counter == max_index %>
 <% initial_page_load = last_message && !scroll_down # this value is only accurate when rendering last_message %>
 <% scroll_down = scroll_down || initial_page_load %>
-<% thinking ||= last_message && message.content_text == "" && message.not_cancelled? %>
+<% thinking ||= last_message && message.content_text.blank? && message.not_cancelled? %>
+<%# content_text is "" once the job starts streaming and nil before it does; either way we're waiting on a reply %>
 <% done_thinking = !thinking && message.content_text.present? %>
 <% debug_tool_message = false %>
 
@@ -32,7 +33,10 @@ end %>
     class="flex"
     data-role="inner-message"
 
-    data-controller="<%= (scroll_down || only_scroll_down_if_was_bottom) && "message-scroller" %>"
+    data-controller="<%= class_names(
+      "message-scroller" => scroll_down || only_scroll_down_if_was_bottom,
+      "stream-watchdog"  => thinking
+    ) %>"
     data-message-scroller-scroll-down-value="<%= scroll_down %>"
     data-message-scroller-only-scroll-down-if-scrolled-to-bottom-value="<%= only_scroll_down_if_was_bottom %>"
     data-message-scroller-instantly-value="<%= initial_page_load %>"
@@ -166,6 +170,10 @@ end %>
           <% end %>
           <%= formatted_text = format_for_display message, append_inside_tag: thinking_html(message, thinking) %>
         </div>
+
+        <% if message.assistant? && message.assistant.not_deleted? && (message.failed? || thinking) %>
+          <%= render "messages/retry", message: message, failed: message.failed? %>
+        <% end %>
 
         <% if debug_tool_message && message.content_tool_calls.present? %>
           <div
