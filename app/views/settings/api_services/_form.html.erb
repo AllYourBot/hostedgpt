@@ -38,7 +38,7 @@
   <div class="my-5 inline-block w-full">
   <%= form.label :url, t('app.settings.api_services.table.url') %>
      <span>
-      <% if api_service.persisted? %>
+      <% if api_service.persisted? && !brave?(api_service) %>
         <% link_url = settings_api_services_path + "/" + api_service.id.to_s + "/test" %>
   <%= link_to t('app.settings.api_services.test'), link_url,
           data: { testing_target: "test", turbo_stream: true, action: "click->testing#update_link_api_service" },
@@ -182,6 +182,29 @@
           target: "_blank"
         %>.
       </li>
+    </ol>
+    <ol id="brave-instructions"
+      data-transition-target="<%= brave?(api_service) && 'transitionable' %>"
+      class="
+        list-decimal
+        my-3 p-2 pl-8
+        border border-gray-200
+        bg-gray-50 dark:bg-transparent
+        hidden
+      "
+    >
+      <li>Sign up for the
+        <%= link_to "Brave Search API", "https://brave.com/search/api/",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %> and choose a plan (a free tier is available).
+      </li>
+      <li>Go to
+        <%= link_to "API Keys", "https://api.search.brave.com/app/keys",
+          class: "underline text-blue-600",
+          target: "_blank"
+        %>.</li>
+      <li>Click "Add API key", name it something like "<%= Setting.product_name %>" and paste it below.</li>
     </ol>
     <%= form.text_field :token,
       class: %|

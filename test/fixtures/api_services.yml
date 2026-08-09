@@ -69,3 +69,10 @@ taylor_openai_service:
   url: http://taylor.org/doit-open
   token: open-secret
   driver: openai
+
+keith_brave_service:
+  name: Brave
+  user: keith
+  url: https://api.search.brave.com/res/v1/
+  token: abc-secret
+  driver: brave
