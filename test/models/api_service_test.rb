@@ -100,6 +100,28 @@ class APIServiceTest < ActiveSupport::TestCase
     end
   end
 
+  test "brave key falls back to BRAVE_API_KEY-derived setting even when default_llm_keys is disabled" do
+    api_services(:keith_brave_service).update!(token: nil)
+
+    stub_features(default_llm_keys: false) do
+      stub_settings(default_brave_key: "brave-default-key") do
+        assert_equal "brave-default-key", api_services(:keith_brave_service).effective_token
+      end
+    end
+  end
+
+  test "brave key prefers the user's own token over the default" do
+    api_services(:keith_brave_service).update!(token: "user-brave-key")
+
+    stub_settings(default_brave_key: "brave-default-key") do
+      assert_equal "user-brave-key", api_services(:keith_brave_service).effective_token
+    end
+  end
+
+  test "test_api_service returns a friendly error for drivers without an ai_backend" do
+    assert_equal "Error: Testing is not supported for this API service.", api_services(:keith_brave_service).test_api_service
+  end
+
   private
 
   def create_params

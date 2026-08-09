@@ -15,4 +15,8 @@ class Settings::APIServicesHelperTest < ActiveSupport::TestCase
   test "anthropic is official" do
     assert official?(api_services(:rob_anthropic_service))
   end
+
+  test "brave is official" do
+    assert official?(api_services(:keith_brave_service))
+  end
 end

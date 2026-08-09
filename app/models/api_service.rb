@@ -3,12 +3,13 @@ class APIService < ApplicationRecord
   URL_ANTHROPIC = "https://api.anthropic.com/"
   URL_GROQ = "https://api.groq.com/openai/v1/"
   URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/"
+  URL_BRAVE = "https://api.search.brave.com/res/v1/"
 
   belongs_to :user
 
   has_many :language_models, -> { not_deleted }
 
-  enum :driver, %w[openai anthropic gemini].index_by(&:to_sym)
+  enum :driver, %w[openai anthropic gemini brave].index_by(&:to_sym)
 
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
   validates :name, :url, presence: true
@@ -32,18 +33,24 @@ class APIService < ApplicationRecord
   end
 
   def requires_token?
-    [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI].include?(url) # other services may require it but we don't always know
+    [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI, URL_BRAVE].include?(url) # other services may require it but we don't always know
   end
 
   def effective_token
-    token.presence || default_llm_key
+    token.presence || default_token
   end
 
   def test_api_service(url = nil, token = nil)
+    return "Error: Testing is not supported for this API service." if ai_backend.nil?
     ai_backend.test_api_service(self, url, token)
   end
 
   private
+
+  def default_token
+    return Setting.default_brave_key if url == URL_BRAVE
+    default_llm_key
+  end
 
   def default_llm_key
     return nil unless Feature.default_llm_keys?

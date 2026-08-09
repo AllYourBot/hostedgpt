@@ -1,7 +1,7 @@
 module Settings
   module APIServicesHelper
     def official?(model)
-      openai?(model) || anthropic?(model) || groq?(model) || gemini?(model)
+      openai?(model) || anthropic?(model) || groq?(model) || gemini?(model) || brave?(model)
     end
 
     def openai?(api_service)
@@ -18,6 +18,10 @@ module Settings
 
     def gemini?(api_service)
       api_service.url == APIService::URL_GEMINI
+    end
+
+    def brave?(api_service)
+      api_service.url == APIService::URL_BRAVE
     end
   end
 end
