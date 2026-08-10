@@ -12,8 +12,14 @@ models:
   supports_tools: true
   supports_system_message: true
   api_service_name: OpenAI
-- api_name: claude-3-5-sonnet-20241022
-  name: Claude 3.5 Sonnet (latest)
+- api_name: claude-sonnet-5
+  name: Claude Sonnet 5 (latest)
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: Anthropic
+- api_name: claude-opus-5
+  name: Claude Opus 5 (latest)
   supports_images: true
   supports_tools: true
   supports_system_message: true
@@ -204,9 +210,9 @@ models:
   supports_tools: true
   supports_system_message: true
   api_service_name: OpenAI
-- api_name: claude-3-5-haiku-20241022
-  name: Claude 3.5 Haiku (latest)
-  supports_images: false
+- api_name: claude-haiku-4-5-20251001
+  name: Claude Haiku 4.5 (latest)
+  supports_images: true
   supports_tools: true
   supports_system_message: true
   api_service_name: Anthropic

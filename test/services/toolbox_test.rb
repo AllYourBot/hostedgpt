@@ -32,6 +32,24 @@ class ToolboxTest < ActiveSupport::TestCase
     end
   end
 
+  test "tools includes brave search if the user has a Brave API key configured" do
+    Current.set(user: users(:keith)) do
+      assert Toolbox.descendants.include? Toolbox::BraveSearch
+    end
+  end
+
+  test "tools excludes brave search if the user has no Brave API key configured" do
+    api_services(:keith_brave_service).update!(token: nil)
+
+    stub_features(default_llm_keys: false) do
+      stub_settings(default_brave_key: nil) do
+        Current.set(user: users(:keith)) do
+          refute Toolbox.descendants.include? Toolbox::BraveSearch
+        end
+      end
+    end
+  end
+
   test "describe directive within a tool sets the function description" do
     tool = Toolbox::HelloWorld.tools.find { |t| t[:function][:name] == "helloworld_hi" }
     assert_equal "This is a description for hi", tool.dig(:function, :description)

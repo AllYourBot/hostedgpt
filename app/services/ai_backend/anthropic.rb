@@ -23,12 +23,14 @@ class AIBackend::Anthropic < AIBackend
 
     Rails.logger.info "Testing using model #{api_name}"
     client.messages(
-      model: api_name,
-      messages: [
-        { "role": "user", "content": "Hello!" }
-      ],
-      system: "You are a helpful assistant.   You can generate an image based on what the user asks you to generate. You will pass the users prompt and will get back the image using the tool/function name. If your name is Claude, you should use the tool/function named generate_an_image.",
-      parameters: { max_tokens: 1000 }
+      parameters: {
+        model: api_name,
+        messages: [
+          { "role": "user", "content": "Hello!" }
+        ],
+        system: "You are a helpful assistant.   You can generate an image based on what the user asks you to generate. You will pass the users prompt and will get back the image using the tool/function name. If your name is Claude, you should use the tool/function named generate_an_image.",
+        max_tokens: 1000
+      }
     ).dig("content", 0, "text")
   rescue => e
     "Error: #{e.message}"

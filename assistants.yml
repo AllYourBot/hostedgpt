@@ -6,9 +6,9 @@ assistants:
 - name: GPT-4o
   slug: gpt-4o
   language_model_api_name: gpt-4o
-- name: Claude 3.5 Sonnet
+- name: Claude Sonnet 5
   slug: claude-sonnet
-  language_model_api_name: claude-3-5-sonnet-20241022
+  language_model_api_name: claude-sonnet-5
 - name: Meta Llama
   slug: llama-3-70b
   language_model_api_name: llama-3.3-70b-versatile
