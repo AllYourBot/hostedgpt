@@ -32,6 +32,18 @@ class SDKTest < ActiveSupport::TestCase
     end
   end
 
+  class CallingMethodService < SDK
+    def fetch_widgets
+      get("http://dummy")
+    end
+
+    def fetch_widgets_from_a_block
+      request = nil
+      [1].each { request = get("http://dummy") }
+      request
+    end
+  end
+
   setup do
     @service_get = Service.new.get("http://dummy")
     @service_post = Service.new.post("http://dummy")
@@ -125,5 +137,15 @@ class SDKTest < ActiveSupport::TestCase
   test "expected_status starts with the default" do
     assert_equal [301], @status_service_get.instance_variable_get(:@expected_statuses)
     assert_equal [301], @status_service_post.instance_variable_get(:@expected_statuses)
+  end
+
+  test "calling_method identifies the method that called get, even across Ruby backtrace label formats" do
+    request = CallingMethodService.new.fetch_widgets
+    assert_equal "fetch_widgets", request.instance_variable_get(:@calling_method)
+  end
+
+  test "calling_method sees through a block to the enclosing method" do
+    request = CallingMethodService.new.fetch_widgets_from_a_block
+    assert_equal "fetch_widgets_from_a_block", request.instance_variable_get(:@calling_method)
   end
 end

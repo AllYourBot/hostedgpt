@@ -44,14 +44,22 @@ class SDK
   def calling_method(verb)
     # Find the method that called get/post/patch/delete
     # Look through the stack to find the actual method name
-    caller_locations.each_with_index do |location, index|
-      if location.label == verb.to_s
+    locations = caller_locations
+    locations.each_with_index do |location, index|
+      if bare_label(location) == verb.to_s
         # Return the method name from the next frame up
-        return caller_locations[index + 1]&.label&.gsub("block in ", "") || "unknown"
+        return bare_label(locations[index + 1]) || "unknown"
       end
     end
 
     "unknown"
+  end
+
+  # Ruby >= 3.4 qualifies backtrace labels with the defining class, e.g. "SDK#get"
+  # instead of just "get", and "block in Toolbox::Gmail#get_user_profile" instead of
+  # "block in get_user_profile". Strip both so callers only see the bare method name.
+  def bare_label(location)
+    location&.label&.gsub("block in ", "")&.split("#")&.last
   end
 
   def key

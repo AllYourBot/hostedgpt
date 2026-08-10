@@ -36,10 +36,15 @@ module MessagesHelper
         return link_to message_to_user,
         settings_memories_path,
         { data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
-      when "googlesearch_google_search"
+      when "googlesearch_google_search" # kept so old messages still render as a link
         query = message_to_user.partition(":").last
         return link_to message_to_user,
         "https://www.google.com/search?q=#{URI.encode_www_form_component(query)}",
+        { target: :_blank, data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
+      when "bravesearch_brave_search"
+        query = message_to_user.partition(":").last
+        return link_to message_to_user,
+        "https://search.brave.com/search?q=#{URI.encode_www_form_component(query)}",
         { target: :_blank, data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
       else
         return content_tag(:span, message_to_user, class: "text-gray-400 dark:!text-gray-500")
