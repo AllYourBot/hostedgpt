@@ -4,14 +4,14 @@
 
 HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.
 
-This app is intended to be incredibly easy for ChatGPT users to switch. Features you expect are here plus it supports GPT-5, Claude 4, Gemini 2.5 (and others) in a single app. You can also switch assistants in the middle of a conversation!
+You can also switch providers and models in the middle of a conversation, so it is great for comparing different models!
 
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
 ## Top features of HostedGPT
 
-- **Use GPT-5, Claude 4, Gemini 2.5 (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage.  There are hosting costs if not running locally.
-- **A very polished interface with great mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen". German localization included.
+- **Use GPT-5, Claude 5, Gemini 3.6 (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage.  There are hosting costs if not running locally.
+- **A polished interface with mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen". German localization included.
 - **You will rarely hit the '_You've reached the current usage cap_' errors**.
 - **Collect and easily search and share all of your conversions** You can search across conversations and providers.
 
@@ -224,6 +224,7 @@ There are a number of optional feature flags that can be set and settings that c
   - `DEFAULT_OPENAI_KEY` will be used by the pre-configured OpenAI API Service
   - `DEFAULT_ANTHROPIC_KEY` will be used by the pre-configured Anthropic API Service
   - `DEFAULT_GROQ_KEY` will be used by the pre-configured Groq API Service
+- `BRAVE_API_KEY` will be used as the default Brave Search API key for tool based web searches
 - Edit `models.yml` to modify which Language Models are automatically created for new users upon signing up. Any changes to this file will be applied to existing users when `rails models:import` is run, or when `rails db:prepare` is run, or when the server is restarted. If you ever need to export your list of models you can do `rails models:export[tmp/models.json]`
 - `CLOUDFLARE_STORAGE_FEATURE` is `false` by default so any files that are uploaded while chatting with your assistant will be stored in postgres. This is recommended for small deployments. Set this to `true` if you would like to store message attachments in Cloudflare's R2 storage (this mimics AWS S3). You must also sign up for Cloudflare. The free tier allows 10 GB of storage. After you sign up, you need to create a new bucket and an API token. The API token should have "Object Read and Write" access to your bucket. Take note of your Access Key ID and your Secret Access Key along with your Account ID. Set the following environment variables:
   - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare Account ID
@@ -415,7 +416,6 @@ V0.7 - Released on 8/18/2025
 - Optional Cloudflare R2 file storage
 - Optional tools for gmail and tasks (with some bugs)
 - Optional Voice feature (incomplete)
-
 
 v0.6 - Released on 4/26/2024
 
