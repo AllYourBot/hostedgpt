@@ -6,17 +6,16 @@ class MessagesComposerSubmittingTest < ApplicationSystemTestCase
   setup do
     @user = users(:keith)
     login_as @user
-    @submit = find("#composer #send", visible: :all)
     @long_conversation = conversations(:greeting)
   end
 
   test "submit button is hidden and can only be clicked when text is entered" do
     path = current_path
 
-    refute @submit.visible?
+    refute submit_button.visible?
     send_keys "Entered text so we can now submit"
-    assert @submit.visible?
-    click_element @submit
+    assert submit_button.visible?
+    click_element submit_button
 
     assert_composer_blank
     assert_equal conversation_messages_path(@user.conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
@@ -25,12 +24,12 @@ class MessagesComposerSubmittingTest < ApplicationSystemTestCase
   test "enter works to submit but only when text has been entered" do
     path = current_path
 
-    refute @submit.visible?
+    refute submit_button.visible?
     send_keys "enter"
     assert_equal path, current_path, "Path should not have changed because form should not submit"
 
     send_keys "Entered text so we can now submit"
-    assert @submit.visible?
+    assert submit_button.visible?
     assert_conversation_navigation_finished do
       send_keys "enter"
     end
@@ -85,7 +84,7 @@ class MessagesComposerSubmittingTest < ApplicationSystemTestCase
     assert_active composer_selector
     assert_page_morphed do
       send_keys "This is a message"
-      click_element @submit
+      click_element submit_button
     end
 
     assert_composer_blank
@@ -93,10 +92,15 @@ class MessagesComposerSubmittingTest < ApplicationSystemTestCase
 
     assert_page_morphed do
       send_keys "This is a second message"
-      click_element @submit
+      click_element submit_button
     end
 
     assert_composer_blank
     assert_equal starting_path, current_path, "The page should not have changed urls"
+  end
+
+  private
+  def submit_button
+    find("#composer #send", visible: :all)
   end
 end
