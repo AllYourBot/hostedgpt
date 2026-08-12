@@ -100,7 +100,7 @@ class MessagesComposerSubmittingTest < ApplicationSystemTestCase
   end
 
   private
-    def submit_button
-      find("#composer #send", visible: :all)
-    end
+  def submit_button
+    find("#composer #send", visible: :all)
+  end
 end
