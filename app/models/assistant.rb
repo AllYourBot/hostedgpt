@@ -21,7 +21,7 @@ class Assistant < ApplicationRecord
   validates :tools, presence: true, allow_blank: true
   validates :name, presence: true
 
-  scope :ordered, -> { order(:id) }
+  scope :ordered, -> { order(id: :desc) }
 
   delegate :api_name, to: :language_model, prefix: true, allow_nil: true
 

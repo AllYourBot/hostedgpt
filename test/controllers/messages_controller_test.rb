@@ -271,15 +271,16 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       @user.assistants.create! name: "New assistant #{x+1}", language_model: LanguageModel.find_by(api_name: "gpt-3.5-turbo")
     end
     get conversation_messages_url(@conversation, version: 1)
-    @user.assistants.each do |assistant|
+    @user.assistants.ordered.each do |assistant|
       assert_select %{div[data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
     end
-    @user.assistants.each_with_index do |assistant, index|
-      if index>5
-        assert_select %{div.hidden[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
-      else
+    @user.assistants.ordered.each_with_index do |assistant, index|
+      # The selected assistant is always shown, regardless of its position in the list
+      if index < Assistant::MAX_LIST_DISPLAY || assistant == @assistant
         assert_select %{div[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
         assert_select %{div.hiden[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}, false
+      else
+        assert_select %{div.hidden[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
       end
     end
   end
