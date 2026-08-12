@@ -134,6 +134,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def assert_did_not_scroll(selector = "section #messages-container")
     raise "No block given" unless block_given?
 
+    wait_for_images_to_load
+
     scroll_position_first_element_relative_viewport = nil
 
     assert_true "The #{selector} should have stopped scrolling before it could begin" do
