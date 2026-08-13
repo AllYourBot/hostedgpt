@@ -25,7 +25,7 @@ class AIBackend::Gemini < AIBackend
       },
       options: {
         model: api_name,
-        server_sent_events: true
+        server_sent_events: false
       }
     )
 
