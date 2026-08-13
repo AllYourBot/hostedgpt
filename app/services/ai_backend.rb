@@ -60,13 +60,19 @@ class AIBackend
   def self.test_api_service(api_service, url = nil, token = nil)
     url ||= api_service.url
     token ||= api_service.effective_token
-    language_model = api_service.language_models.first
-    api_name = language_model.api_name unless language_model.nil?
+    language_models = api_service.language_models.order(created_at: :desc)
 
     return "Error: API key (token) is blank" if api_service.requires_token? && token.blank?
-    return "Error: API name is blank. Define a Language Model for this API service." if api_name.blank?
+    return "Error: API name is blank. Define a Language Model for this API service." if language_models.none?
 
-    test_execute(url, token, api_name)
+    # A provider can retire a model out from under us, so don't bet the whole test on
+    # whichever language model happens to be first; walk newest-first until one answers.
+    result = nil
+    language_models.each do |language_model|
+      result = test_execute(url, token, language_model.api_name)
+      break unless result.start_with?("Error:")
+    end
+    result
   end
 
   private

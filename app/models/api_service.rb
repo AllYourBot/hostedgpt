@@ -17,6 +17,8 @@ class APIService < ApplicationRecord
   normalizes :url, with: -> url { url.strip }
   encrypts :token
 
+  normalizes :token, with: -> token { token.strip }
+
   before_save :soft_delete_language_models, if: -> { deleted_at && deleted_at_changed? && deleted_at_was.nil? }
 
   scope :ordered, -> { order(:name) }
