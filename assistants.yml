@@ -20,7 +20,7 @@ assistants:
   slug: deepseek-r1
   description: "Model deepseek-r1-distill-llama-70B on Groq"
   language_model_api_name: deepseek-r1-distill-llama-70B
-- name: Gemini Pro 1.5
-  slug: gemini-1-5-pro
-  description: "Model gemini-1.5-pro-002 on Google Gemini"
-  language_model_api_name: gemini-1.5-pro-002
+- name: Gemini Flash 3.6
+  slug: gemini-3.6-flash
+  description: "Model gemini-3.6-flash on Google Gemini"
+  language_model_api_name: gemini-3.6-flash
