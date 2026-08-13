@@ -1,8 +1,8 @@
 <%# locals: (assistant:, size:, classes: nil) -%>
+<% initials_font_size = assistant.initials.to_s.length > 1 ? "text-[10px] tracking-tighter" : (size > 6 ? "text-sm" : "text-xs") %>
 <% classes = %|
     rounded-full
     w-#{size} h-#{size}
-    #{size > 6 ? "text-sm" : "text-xs"}
     #{classes}
 |%>
 <% logo = if assistant.name.starts_with?("GPT-")
@@ -16,15 +16,15 @@ elsif assistant.name.starts_with?("Gemini")
 end
 %>
 <% if logo %>
-  <picture class="<%= classes %> bg-white border border-gray-100 overflow-hidden">
+  <picture class="<%= classes %> bg-white border border-gray-100 overflow-hidden flex-shrink-0">
     <%= image_tag(logo, class: "w-full h-full") %>
   </picture>
 <% else %>
   <picture
     class="
-          <%= classes %>
+          <%= classes %> <%= initials_font_size %>
           bg-blue-200 text-black
-          flex justify-center items-center
+          flex justify-center items-center overflow-hidden flex-shrink-0
           "
   >
     <%= assistant.initials %>

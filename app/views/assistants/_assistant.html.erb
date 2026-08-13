@@ -22,7 +22,14 @@
       data-radio-behavior-id-param="<%= assistant.id %>"
       data-transition-target="<%= !visible && 'transitionable' %>"
     >
-    <%= link_to new_assistant_message_path(assistant), class: "flex-1 flex py-1 items-center text-gray-950 dark:text-gray-100 font-medium truncate", data: { role: "name" } do %>
+    <%= link_to new_assistant_message_path(assistant),
+        class: "flex-1 flex py-1 items-center text-gray-950 dark:text-gray-100 font-medium truncate",
+        data: {
+          role: "name",
+          controller: "overflow-expand",
+          action: "mouseenter->overflow-expand#show mouseleave->overflow-expand#hide",
+          overflow_expand_popout_class: "bg-gray-100 dark:bg-gray-700 rounded-lg shadow-xl pr-4",
+        } do %>
       <%= render partial: "layouts/assistant_avatar", locals: { assistant:, size: 7, classes: "mr-2" } %>
       <%= assistant.name %>
     <% end %>
