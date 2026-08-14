@@ -14,6 +14,18 @@ class NavColumnTest < ApplicationSystemTestCase
     end
   end
 
+  test "clicking a conversation title from the assistants page (before visiting any chat) loads the conversation" do
+    with_assistants_page(true) do
+      login_as @user
+      visit root_url
+      assert_current_path root_path # the Assistants index page itself, not a chat page
+
+      click_text conversations(:greeting).title
+      assert_current_path conversation_messages_path(conversations(:greeting), version: 1)
+      assert_first_message conversations(:greeting).messages.ordered.first
+    end
+  end
+
   test "clicking conversations in the left side updates the right column and path when assistants page is enabled" do
     with_assistants_page(true) do
       assistant = @user.assistants.ordered.first
