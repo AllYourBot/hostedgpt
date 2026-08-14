@@ -36,6 +36,14 @@ class APIService < ApplicationRecord
     [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI, URL_BRAVE].include?(url) # other services may require it but we don't always know
   end
 
+  def logo_filename
+    case url
+    when URL_OPEN_AI then "openai_logo.svg"
+    when URL_ANTHROPIC then "claude_logo.svg"
+    when URL_GEMINI then "google_gemini_logo.svg"
+    end
+  end
+
   def effective_token
     token.presence || default_token
   end

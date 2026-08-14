@@ -22,6 +22,15 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
   end
 
+  test "logo_filename" do
+    assert_equal "openai_logo.svg", language_models(:gpt_4o).logo_filename
+    assert_equal "claude_logo.svg", language_models(:claude_best).logo_filename
+    assert_equal "google_gemini_logo.svg", language_models(:"gemini-1.5-pro-002").logo_filename
+    assert_nil language_models(:guanaco).logo_filename # api_service has no recognized logo and name isn't a llama model
+
+    assert_equal "meta_ai_logo.svg", LanguageModel.new(api_name: "llama-3.3-70b-versatile").logo_filename
+  end
+
   test "validates api_name" do
     record = LanguageModel.new(api_name: "")
     refute record.valid?

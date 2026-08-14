@@ -40,6 +40,14 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal "new secret", api_service.token
   end
 
+  test "logo_filename" do
+    assert_equal "openai_logo.svg", api_services(:keith_openai_service).logo_filename
+    assert_equal "claude_logo.svg", api_services(:keith_anthropic_service).logo_filename
+    assert_equal "google_gemini_logo.svg", api_services(:keith_gemini_service).logo_filename
+    assert_nil api_services(:keith_groq_service).logo_filename
+    assert_nil api_services(:keith_other_service).logo_filename
+  end
+
   test "both ai_backends are specified for language models" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
     assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend

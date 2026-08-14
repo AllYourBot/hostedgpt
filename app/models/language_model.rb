@@ -29,6 +29,11 @@ class LanguageModel < ApplicationRecord
       api_service.name != "Groq" # TODO: Remove this short circuit once I can debug tool use with Groq
   end
 
+  def logo_filename
+    return "meta_ai_logo.svg" if api_name.match?(/llama/i)
+    api_service.logo_filename
+  end
+
   def test(api_name = nil)
     ai_backend.test_language_model(self, api_name)
   end
