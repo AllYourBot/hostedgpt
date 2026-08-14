@@ -2,19 +2,25 @@
 assistants:
 - name: GPT-5
   slug: gpt-5
+  description: "Model gpt-5 on OpenAI"
   language_model_api_name: gpt-5
 - name: GPT-4o
   slug: gpt-4o
+  description: "Model gpt-4o on OpenAI"
   language_model_api_name: gpt-4o
 - name: Claude Sonnet 5
   slug: claude-sonnet
+  description: "Model claude-sonnet-5 on Anthropic"
   language_model_api_name: claude-sonnet-5
 - name: Meta Llama
   slug: llama-3-70b
+  description: "Model llama-3.3-70b-versatile on Groq"
   language_model_api_name: llama-3.3-70b-versatile
 - name: DeepSeek R1
   slug: deepseek-r1
+  description: "Model deepseek-r1-distill-llama-70B on Groq"
   language_model_api_name: deepseek-r1-distill-llama-70B
-- name: Gemini Pro 2.5
-  slug: gemini-1-5-pro
-  language_model_api_name: gemini-2.5-pro
+- name: Gemini Flash 3.6
+  slug: gemini-3.6-flash
+  description: "Model gemini-3.6-flash on Google Gemini"
+  language_model_api_name: gemini-3.6-flash

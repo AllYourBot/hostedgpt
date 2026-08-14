@@ -15,6 +15,7 @@ class Assistant < ApplicationRecord
   delegate :supports_images?, to: :language_model
   delegate :supports_pdf?, to: :language_model
   delegate :api_service, to: :language_model
+  delegate :logo_filename, to: :language_model, allow_nil: true
 
   belongs_to :language_model
 

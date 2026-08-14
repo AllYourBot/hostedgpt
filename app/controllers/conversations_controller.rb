@@ -40,10 +40,6 @@ class ConversationsController < ApplicationController
 
   private
 
-  def set_nav_assistants
-    @nav_assistants = Current.user.assistants.ordered
-  end
-
   def set_conversation
     @conversation = Current.user.conversations.find_by(id: params[:id] || params[:conversation_id])
   end

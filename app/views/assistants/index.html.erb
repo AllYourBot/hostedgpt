@@ -1,0 +1,11 @@
+<%= content_for :nav_column do %>
+  <%= render 'messages/nav_column' %>
+<% end %>
+
+<div class="container mx-[2rem] my-[4rem]">
+  <h1 class="text-2xl mb-4 font-semibold tracking-tighter">Assistants</h1>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <%= render partial: "assistant_index", collection: @nav_assistants, as: :assistant %>
+  </div>
+</div>

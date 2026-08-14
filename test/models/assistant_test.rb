@@ -12,6 +12,11 @@ class AssistantTest < ActiveSupport::TestCase
     assert_equal "G3", keith_gpt3.initials
   end
 
+  test "logo_filename reflects the underlying language model's api_service, not the assistant's own name" do
+    samantha = assistants(:samantha) # named "Samantha", but backed by gpt_4o
+    assert_equal "openai_logo.svg", samantha.logo_filename
+  end
+
   test "to_s" do
     samantha = assistants(:samantha)
     assert_equal "Samantha", samantha.to_s

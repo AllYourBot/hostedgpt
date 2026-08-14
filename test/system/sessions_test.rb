@@ -6,15 +6,32 @@ class SessionsTest < ApplicationSystemTestCase
     visit root_url
   end
 
-  test "should login as an existing user" do
-    assert_active "#email"
+  test "should login as an existing user when assistants page is enabled" do
+    with_assistants_page(true) do
+      visit root_url
+      assert_active "#email"
 
-    fill_in "Email address", with: @user.email
-    fill_in "Password", with: "secret"
-    click_text "Log In"
+      fill_in "Email address", with: @user.email
+      fill_in "Password", with: "secret"
+      click_text "Log In"
 
-    sleep 0.1
-    assert_current_path new_assistant_message_path(@user.assistants.ordered.first)
+      sleep 0.1
+      assert_current_path root_path
+    end
+  end
+
+  test "should login as an existing user when assistants page is disabled" do
+    with_assistants_page(false) do
+      visit root_url
+      assert_active "#email"
+
+      fill_in "Email address", with: @user.email
+      fill_in "Password", with: "secret"
+      click_text "Log In"
+
+      sleep 0.1
+      assert_current_path new_assistant_message_path(@user.assistants.ordered.first)
+    end
   end
 
   test "when password is wrong, it shows an error message and keeps email pre-filled" do

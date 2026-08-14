@@ -73,18 +73,38 @@ class ConversationsTest < ApplicationSystemTestCase
     assert_current_path(@starting_path)
   end
 
-  test "clicking the conversation delete, when you ARE not on this conversation, deletes it and redirects you to a new conversation" do
-    visit_and_scroll_wait conversation_messages_path(conversations(:greeting))
-    convo = hover_conversation conversations(:greeting)
-    options = convo.find_role("options")
-    delete = convo.find_role("delete")
+  test "clicking the conversation delete, when you ARE not on this conversation, deletes it and redirects you to a new conversation when assistants page is enabled" do
+    with_assistants_page(true) do
+      login_as users(:keith)
+      visit_and_scroll_wait conversation_messages_path(conversations(:greeting))
+      convo = hover_conversation conversations(:greeting)
+      options = convo.find_role("options")
+      delete = convo.find_role("delete")
 
-    options.click
-    assert_true { delete.visible? }
-    delete.click
+      options.click
+      assert_true { delete.visible? }
+      delete.click
 
-    assert_alert "Deleted conversation"
-    assert_current_path new_assistant_message_path(users(:keith).assistants.ordered.first)
+      assert_alert "Deleted conversation"
+      assert_current_path root_path
+    end
+  end
+
+  test "clicking the conversation delete, when you ARE not on this conversation, deletes it and redirects you to a new conversation when assistants page is disabled" do
+    with_assistants_page(false) do
+      login_as users(:keith)
+      visit_and_scroll_wait conversation_messages_path(conversations(:greeting))
+      convo = hover_conversation conversations(:greeting)
+      options = convo.find_role("options")
+      delete = convo.find_role("delete")
+
+      options.click
+      assert_true { delete.visible? }
+      delete.click
+
+      assert_alert "Deleted conversation"
+      assert_current_path new_assistant_message_path(users(:keith).assistants.ordered.first)
+    end
   end
 
   private

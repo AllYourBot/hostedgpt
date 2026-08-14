@@ -29,22 +29,47 @@ class UsersTest < ApplicationSystemTestCase
     assert_visible "#person_personable_attributes_name"
   end
 
-  test "should create a new user" do
-    click_text "Sign up", match: :first
+  test "should create a new user when assistants page is enabled" do
+    with_assistants_page(true) do
+      visit root_url
+      click_text "Sign up", match: :first
 
-    fill_in "Email", with: "tester@test.com"
-    fill_in "Password", with: "secret"
-    fill_in "Name", with: "John Doe"
+      email = "tester_true@test.com"
+      fill_in "Email", with: email
+      fill_in "Password", with: "secret"
+      fill_in "Name", with: "John Doe"
 
-    click_text "Sign Up"
+      click_text "Sign Up"
 
-    sleep 0.3
-    user = Person.ordered.last.user
-    assert_current_path new_assistant_message_path(user.assistants.ordered.first)
+      sleep 0.3
+      user = Person.find_by(email: email)&.user
+      assert_current_path root_path
+      assert_equal email, user.person.email
+      assert_equal "John Doe", user.name
+      assert_equal 1, user.credentials.count
+      assert user.password_credential.password_digest.present?
+    end
+  end
 
-    assert_equal "tester@test.com", user.person.email
-    assert_equal "John Doe", user.name
-    assert_equal 1, user.credentials.count
-    assert user.password_credential.password_digest.present?
+  test "should create a new user when assistants page is disabled" do
+    with_assistants_page(false) do
+      visit root_url
+      click_text "Sign up", match: :first
+
+      email = "tester_false@test.com"
+      fill_in "Email", with: email
+      fill_in "Password", with: "secret"
+      fill_in "Name", with: "John Doe"
+
+      click_text "Sign Up"
+
+      sleep 0.3
+      user = Person.find_by(email: email)&.user
+      assert_current_path new_assistant_message_path(user.assistants.ordered.first)
+      assert_equal email, user.person.email
+      assert_equal "John Doe", user.name
+      assert_equal 1, user.credentials.count
+      assert user.password_credential.password_digest.present?
+    end
   end
 end

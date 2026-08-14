@@ -77,7 +77,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     model = user.language_models.find_by(api_name:)
     models = [{
       api_name:,
-      name: "new name",
+      name: "new model name",
       supports_images: false,
       supports_tools: true,
     }]
@@ -90,7 +90,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
       LanguageModel.import_from_file(path:, users: [user])
     end
     model.reload
-    assert_equal "new name", model.name
+    assert_equal "new model name", model.name
     assert_equal false, model.supports_images
     assert_equal true, model.supports_tools
   end

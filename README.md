@@ -236,6 +236,7 @@ There are a number of optional feature flags that can be set and settings that c
 - `PASSWORD_AUTHENTICATION_FEATURE` is `true` by default, see the [Authentication](#authentication) section for more details.
 - `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
 - `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
+- `ASSISTANTS_PAGE_FEATURE` is true by default. Is shows the word Assistants obove the list of Assistants, which when clicked on shows a page with all of the Assistants in square boxes. Turn this off by setting it to `false`.
 
 ### Configuring Google Tools
 
