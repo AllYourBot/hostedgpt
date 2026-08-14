@@ -6,7 +6,7 @@
     <%= link_to new_assistant_message_path(assistant), data: { role: "name" } do %>
       <span class="absolute inset-0" aria-hidden="true"></span>
       <p class="text-sm font-medium text-gray-900"><%= assistant.name %></p>
-      <p class="text-sm text-gray-500"><%= assistant.description %></p>
+      <p class="text-sm text-gray-500"><%= assistant.description %> (<%= assistant.language_model_api_name %>)</p>
     <% end %>
   </div>
 </div>
