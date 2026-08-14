@@ -22,7 +22,23 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     fill_in "email", with: user.email
     fill_in "password", with: password
     click_text "Log In"
-    assert_current_path new_assistant_message_path(assistant)
+
+    if Feature.assistants_page?
+      assert_current_path root_path
+      # For tests that need to be on the assistant messages page, navigate there
+      visit new_assistant_message_path(assistant)
+    else
+      assert_current_path new_assistant_message_path(assistant)
+    end
+  end
+
+  def with_assistants_page(enabled)
+    stub_features(assistants_page: enabled) do
+      Capybara.reset_sessions!
+      yield
+    ensure
+      Capybara.reset_sessions!
+    end
   end
 
   def logout

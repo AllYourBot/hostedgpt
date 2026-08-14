@@ -14,50 +14,57 @@ class NavColumnTest < ApplicationSystemTestCase
     end
   end
 
-  test "clicking conversations in the left side updates the right column, the path, and back button works as expected" do
-    assistant = @user.assistants.ordered.first
+  test "clicking conversations in the left side updates the right column and path when assistants page is enabled" do
+    with_assistants_page(true) do
+      assistant = @user.assistants.ordered.first
 
-    visit root_url
+      login_as @user
+      visit root_url
+      assert_current_path root_path
+      visit new_assistant_message_path(assistant)
+      assert_selected_assistant assistant
 
-    assert_current_path new_assistant_message_path(assistant)
-    assert_selected_assistant assistant
+      click_text conversations(:greeting).title
+      assert_current_path conversation_messages_path(conversations(:greeting), version: 1)
+      assert_selected_assistant conversations(:greeting).assistant
+      assert_first_message conversations(:greeting).messages.ordered.first
 
-    click_text conversations(:greeting).title
-    assert_current_path conversation_messages_path(conversations(:greeting), version: 1)
-    assert_selected_assistant conversations(:greeting).assistant
-    assert_first_message conversations(:greeting).messages.ordered.first
+      click_text conversations(:javascript).title
+      assert_current_path conversation_messages_path(conversations(:javascript), version: 1)
+      assert_selected_assistant conversations(:javascript).assistant
+      assert_first_message conversations(:javascript).messages.ordered.first
 
-    click_text conversations(:javascript).title
-    assert_current_path conversation_messages_path(conversations(:javascript), version: 1)
-    assert_selected_assistant conversations(:javascript).assistant
-    assert_first_message conversations(:javascript).messages.ordered.first
+      click_text conversations(:ruby_version).title
+      assert_current_path conversation_messages_path(conversations(:ruby_version), version: 1)
+      assert_selected_assistant conversations(:ruby_version).assistant
+      assert_first_message conversations(:ruby_version).messages.ordered.first
+    end
+  end
 
-    click_text conversations(:ruby_version).title
-    assert_current_path conversation_messages_path(conversations(:ruby_version), version: 1)
-    assert_selected_assistant conversations(:ruby_version).assistant
-    assert_first_message conversations(:ruby_version).messages.ordered.first
+  test "clicking conversations in the left side updates the right column and path when assistants page is disabled" do
+    with_assistants_page(false) do
+      assistant = @user.assistants.ordered.first
 
-    # TODO: These two cases should be working but this test sporadically fails. I suspect that there is actually
-    # bugginess in the back-state management of turbo but we need to dig in and figure out why.
-    #
-    # page.go_back
-    # sleep 2
-    # assert_current_path conversation_messages_path(conversations(:javascript))
-    # assert_selected_assistant conversations(:javascript).assistant
-    # assert_first_message conversations(:javascript).messages.ordered.first
+      login_as @user
+      visit root_url
+      assert_current_path new_assistant_message_path(assistant)
+      assert_selected_assistant assistant
 
-    # page.go_back
-    # sleep 2
-    # assert_current_path conversation_messages_path(conversations(:greeting))
-    # assert_selected_assistant conversations(:greeting).assistant
-    # assert_first_message conversations(:greeting).messages.ordered.first
+      click_text conversations(:greeting).title
+      assert_current_path conversation_messages_path(conversations(:greeting), version: 1)
+      assert_selected_assistant conversations(:greeting).assistant
+      assert_first_message conversations(:greeting).messages.ordered.first
 
-    # TODO: There is a bug with the latest turbo where the final back doesn't properly load from cache.
-    #
-    # page.go_back
-    # sleep 2
-    # assert_current_path new_assistant_message_path(assistant)
-    # assert_selected_assistant assistant
+      click_text conversations(:javascript).title
+      assert_current_path conversation_messages_path(conversations(:javascript), version: 1)
+      assert_selected_assistant conversations(:javascript).assistant
+      assert_first_message conversations(:javascript).messages.ordered.first
+
+      click_text conversations(:ruby_version).title
+      assert_current_path conversation_messages_path(conversations(:ruby_version), version: 1)
+      assert_selected_assistant conversations(:ruby_version).assistant
+      assert_first_message conversations(:ruby_version).messages.ordered.first
+    end
   end
 
   test "nav column close handle shows proper tooltip and hides/shows column when clicked" do
