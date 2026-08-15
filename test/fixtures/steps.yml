@@ -1,64 +1,43 @@
+DEFAULTS: &DEFAULTS
+  kind: message_creation
+  status: completed
+  last_error:
+  expired_at: 2023-12-25 15:07:10
+  cancelled_at: 2023-12-25 15:07:10
+  failed_at: 2023-12-25 15:07:10
+  completed_at: 2023-12-25 15:07:10
+
 hear_me_response:
+  <<: *DEFAULTS
   assistant: samantha
   conversation: greeting
   run: hear_me_response
-  kind: message_creation
-  status: completed
   details: {"type": "message_creation", "message_id": "<%= ActiveRecord::FixtureSet.identify(:yes_i_do) %>"}
-  last_error:
-  expired_at: 2023-12-25 15:07:10
-  cancelled_at: 2023-12-25 15:07:10
-  failed_at: 2023-12-25 15:07:10
-  completed_at: 2023-12-25 15:07:10
 
 identify_photo_response:
+  <<: *DEFAULTS
   assistant: samantha
   conversation: greeting
   run: identify_photo_response
-  kind: message_creation
-  status: completed
   details: {"type": "message_creation", "message_id": "<%= ActiveRecord::FixtureSet.identify(:yes_i_do) %>"}
-  last_error:
-  expired_at: 2023-12-25 15:07:10
-  cancelled_at: 2023-12-25 15:07:10
-  failed_at: 2023-12-25 15:07:10
-  completed_at: 2023-12-25 15:07:10
 
 popstate_response:
+  <<: *DEFAULTS
   assistant: keith_gpt4
   conversation: javascript
   run: popstate_response
-  kind: message_creation
-  status: completed
   details: {"type": "message_creation", "message_id": "<%= ActiveRecord::FixtureSet.identify(:popstate_event) %>"}
-  last_error:
-  expired_at: 2023-12-25 15:07:10
-  cancelled_at: 2023-12-25 15:07:10
-  failed_at: 2023-12-25 15:07:10
-  completed_at: 2023-12-25 15:07:10
 
 ruby_version_response:
+  <<: *DEFAULTS
   assistant: samantha
   conversation: ruby_version
   run: ruby_version_response
-  kind: message_creation
-  status: completed
   details: {"type": "message_creation", "message_id": "<%= ActiveRecord::FixtureSet.identify(:latest_ruby_version) %>"}
-  last_error:
-  expired_at: 2023-12-25 15:07:10
-  cancelled_at: 2023-12-25 15:07:10
-  failed_at: 2023-12-25 15:07:10
-  completed_at: 2023-12-25 15:07:10
 
 filter_map_response:
+  <<: *DEFAULTS
   assistant: rob_gpt4
   conversation: debugging
   run: filter_map_response
-  kind: message_creation
-  status: completed
   details: {"type": "message_creation", "message_id": "<%= ActiveRecord::FixtureSet.identify(:filter_map_example) %>"}
-  last_error:
-  expired_at: 2023-12-25 15:07:10
-  cancelled_at: 2023-12-25 15:07:10
-  failed_at: 2023-12-25 15:07:10
-  completed_at: 2023-12-25 15:07:10
