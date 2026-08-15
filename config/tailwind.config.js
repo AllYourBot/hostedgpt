@@ -1,4 +1,5 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
+const plugin = require("tailwindcss/plugin");
 
 module.exports = {
   content: [
@@ -59,5 +60,10 @@ module.exports = {
     require("@tailwindcss/typography"),
     require("@tailwindcss/container-queries"),
     require("../vendor/javascript/tailwindcss-safe-area.js"),
+    plugin(({ addVariant }) => {
+      addVariant("tap", "&:hover");
+      addVariant("group-tap", ":merge(.group):hover &");
+      addVariant("peer-tap", ":merge(.peer):hover ~ &");
+    }),
   ],
 };
