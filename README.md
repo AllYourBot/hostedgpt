@@ -2,9 +2,11 @@
 
 # HostedGPT
 
-HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.
+HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.  Your assistant will do web searches if you get a free Brave Search API key.
 
 You can also switch providers and models in the middle of a conversation, so it is great for comparing different models!
+
+And you can attach your Google email and tasks account and manipulate them in your conversation. Calendar soon.
 
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
