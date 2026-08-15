@@ -1,4 +1,5 @@
 class GoogleSDK < SDK
+  APP_CREDENTIAL_TYPES = %w[GmailCredential GoogleTasksCredential]
 
   def self.reauthenticate_credential(credential)
     # from here: https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code
@@ -17,8 +18,14 @@ class GoogleSDK < SDK
 
       return true
     rescue => e
-      credential.destroy if e.status == 400 && e.body.dig("error_description")&.include?("Token has been expired")
+      credential.destroy if e.respond_to?(:status) && e.status == 400 && e.try(:body)&.dig("error_description")&.include?("Token has been expired")
       return false
+    end
+  end
+
+  def self.prune_revoked_credentials!(user)
+    user.credentials.where(type: APP_CREDENTIAL_TYPES).find_each do |credential|
+      reauthenticate_credential(credential)
     end
   end
 end

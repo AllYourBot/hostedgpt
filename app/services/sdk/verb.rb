@@ -33,6 +33,8 @@ class SDK::Verb
     if response.status.between?(200, 299)
       body = decompress_body(response)
       body.presence && OpenData.for(JSON.parse(body)) rescue response
+    else
+      response
     end
   end
 

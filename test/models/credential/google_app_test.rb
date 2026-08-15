@@ -18,22 +18,38 @@ class Credential::GoogleAppTest < ActiveSupport::TestCase
     refute @user.credentials.new(details.except(:oauth_email)).valid?
   end
 
-  test "oauth_email must be unique" do
+  test "oauth_email must be unique per user" do
+    first = @user.credentials.new(details)
+    assert first.save
+
+    duplicate = @user.credentials.new(details.merge(oauth_id: "123uniq"))
+    refute duplicate.save
+    assert_equal ["has already been taken"], duplicate.errors[:oauth_email]
+  end
+
+  test "oauth_id must be unique per user" do
+    first = @user.credentials.new(details)
+    assert first.save
+
+    duplicate = @user.credentials.new(details.merge(oauth_email: "uniq123@email.com"))
+    refute duplicate.save
+    assert_equal ["has already been taken"], duplicate.errors[:oauth_id]
+  end
+
+  test "oauth_email is not required to be unique across users" do
     rob_cred = @user.credentials.new(details)
     assert rob_cred.save
 
     keith_cred = users(:keith).credentials.new(details.merge(oauth_id: "123uniq"))
-    refute keith_cred.save
-    assert_equal ["has already been taken"], keith_cred.errors[:oauth_email]
+    assert keith_cred.save
   end
 
-  test "oauth_id must be unique" do
+  test "oauth_id is not required to be unique across users" do
     rob_cred = @user.credentials.new(details)
     assert rob_cred.save
 
     keith_cred = users(:keith).credentials.new(details.merge(oauth_email: "uniq123@email.com"))
-    refute keith_cred.save
-    assert_equal ["has already been taken"], keith_cred.errors[:oauth_id]
+    assert keith_cred.save
   end
 
   test "permissions returns the permissions" do

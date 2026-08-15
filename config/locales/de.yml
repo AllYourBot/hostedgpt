@@ -107,6 +107,7 @@ de:
             light: "Hell"
             system: "System"
           enable_tools: "Tools für Assistenten aktivieren"
+          enable_tools_note: "Hinweis für Entwickler: Die entsprechende API (Gmail, Google Tasks) muss auch in der Google Cloud Console für das Projekt hinter dem OAuth-Client dieser App aktiviert sein, sonst schlägt die Verbindung fehl."
           gmail_section: "Gmail:"
           gmail_trouble: "Probleme? Versuchen Sie"
           deleting_connection: "Verbindung zu löschen"

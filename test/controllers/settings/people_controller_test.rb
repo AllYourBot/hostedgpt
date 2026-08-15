@@ -94,7 +94,52 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert @user.password_credential.authenticate("secret")
   end
 
+  test "edit prunes a Gmail credential that Google reports as revoked, so it no longer shows Enabled" do
+    with_feature(:google_tools, true) do
+      assert @user.gmail_credential.present?
+
+      GoogleSDK.stub :reauthenticate_credential, ->(credential) { credential.destroy; false } do
+        get edit_settings_person_url
+      end
+
+      assert_response :success
+      assert_nil @user.reload.gmail_credential
+      assert_match I18n.t("app.settings.people.form.enable_gmail"), response.body
+      assert_no_match I18n.t("app.settings.people.form.enabled"), response.body
+    end
+  end
+
+  test "edit leaves a still-valid Gmail credential alone and shows Enabled" do
+    with_feature(:google_tools, true) do
+      GoogleSDK.stub :reauthenticate_credential, ->(credential) { true } do
+        get edit_settings_person_url
+      end
+
+      assert_response :success
+      assert @user.reload.gmail_credential.present?
+      assert_match I18n.t("app.settings.people.form.enabled"), response.body
+    end
+  end
+
+  test "edit does not call GoogleSDK when the google_tools feature is disabled" do
+    with_feature(:google_tools, false) do
+      GoogleSDK.stub :prune_revoked_credentials!, ->(*) { raise "should not be called" } do
+        get edit_settings_person_url
+      end
+
+      assert_response :success
+    end
+  end
+
   private
+
+  def with_feature(name, enabled)
+    original = Feature.features_hash
+    Feature.features_hash = Feature.features.merge(name.to_sym => enabled)
+    yield
+  ensure
+    Feature.features_hash = original
+  end
 
   def person_params
     params = {}

@@ -14,7 +14,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       https://www.googleapis.com/auth/gmail.modify
     |,
     # Permissions explained: https://stackoverflow.com/questions/19102557/google-oauth-scope-for-sending-mail
-    include_granted_scopes: true
+    include_granted_scopes: true,
+    prompt: "consent"
   }
 
   provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
@@ -23,7 +24,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       email
       https://www.googleapis.com/auth/tasks
     |,
-    include_granted_scopes: true
+    include_granted_scopes: true,
+    prompt: "consent"
   }
 
   provider :microsoft_graph, Setting.microsoft_graph_auth_client_id, Setting.microsoft_graph_auth_client_secret, {
