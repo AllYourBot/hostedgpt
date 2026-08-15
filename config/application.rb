@@ -41,8 +41,6 @@ module HostedGPT
     config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("lib")
 
-    config.active_support.to_time_preserves_timezone = :zone
-
     url_settings = [:app_url_protocol, :app_url_host]
     if url_settings.any?{|k| Setting.key_set?(k)}
       Setting.require_keys!(*url_settings)
