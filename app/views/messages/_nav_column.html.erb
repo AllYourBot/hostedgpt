@@ -1,4 +1,4 @@
-<% if Feature.assistants_page? %>
+<% if Feature.assistants_page? && !mobile_device? %>
   <div class="sticky top-0 pt-2 z-40 bg-gray-50 dark:bg-gray-900">
     <%= link_to assistants_path, class: %|
           flex

@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   include Authenticate
 
+  helper_method :mobile_device?
+
   skip_before_action :verify_authenticity_token, if: :api_request?
   before_action :set_locale
   before_action :set_system_ivars
@@ -62,6 +64,10 @@ class ApplicationController < ActionController::Base
 
   def api_request?
     request.format.json?
+  end
+
+  def mobile_device?
+    request.user_agent.to_s.match?(/iPhone|iPod|Android.*Mobile|Windows Phone|BlackBerry|Opera Mini|IEMobile/i)
   end
 
   def user_defined_ivars
