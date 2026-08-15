@@ -1,5 +1,6 @@
 class Settings::PeopleController < Settings::ApplicationController
   before_action :check_personable_id, only: :update
+  before_action :prune_revoked_google_credentials, only: :edit
 
   def edit
   end
@@ -27,5 +28,9 @@ class Settings::PeopleController < Settings::ApplicationController
     if personable_id.present? && personable_id.to_i != Current.person.personable_id
       return render :edit, status: :unauthorized
     end
+  end
+
+  def prune_revoked_google_credentials
+    GoogleSDK.prune_revoked_credentials!(Current.user) if Feature.google_tools?
   end
 end
