@@ -91,4 +91,96 @@ class UserTest < ActiveSupport::TestCase
   end
 
   # Tests for creating_google_credential? are in person_test
+
+  # Profile picture tests
+  test "has_profile_picture? returns false when no profile picture attached" do
+    user = users(:keith)
+    refute user.has_profile_picture?
+  end
+
+  test "has_profile_picture? returns true when profile picture is attached" do
+    user = users(:keith)
+    user.profile_picture.attach(
+      io: StringIO.new("fake image data"),
+      filename: "test.jpg",
+      content_type: "image/jpeg"
+    )
+    assert user.has_profile_picture?
+  end
+
+  test "profile_picture_url returns nil when no profile picture attached" do
+    user = users(:keith)
+    assert_nil user.profile_picture_url
+  end
+
+  test "profile_picture_url returns URL when profile picture is attached" do
+    user = users(:keith)
+    user.profile_picture.attach(
+      io: StringIO.new("fake image data"),
+      filename: "test.jpg",
+      content_type: "image/jpeg"
+    )
+    assert_not_nil user.profile_picture_url
+    assert user.profile_picture_url.include?("test.jpg")
+  end
+
+  test "remove_profile_picture= removes attached profile picture" do
+    user = users(:keith)
+    user.profile_picture.attach(
+      io: StringIO.new("fake image data"),
+      filename: "test.jpg",
+      content_type: "image/jpeg"
+    )
+    assert user.has_profile_picture?
+
+    user.remove_profile_picture = "1"
+    refute user.has_profile_picture?
+  end
+
+  test "remove_profile_picture= does nothing when no profile picture attached" do
+    user = users(:keith)
+    refute user.has_profile_picture?
+
+    assert_nothing_raised do
+      user.remove_profile_picture = "1"
+    end
+    refute user.has_profile_picture?
+  end
+
+  test "profile picture validates content type" do
+    user = users(:keith)
+    user.profile_picture.attach(
+      io: StringIO.new("fake file data"),
+      filename: "test.txt",
+      content_type: "text/plain"
+    )
+    refute user.valid?
+    assert_includes user.errors[:profile_picture], "must be a valid image format (JPEG, PNG, GIF, or WebP)"
+  end
+
+  test "profile picture validates file size" do
+    user = users(:keith)
+    # Create a large fake file (6MB)
+    large_data = "x" * (6 * 1024 * 1024)
+    user.profile_picture.attach(
+      io: StringIO.new(large_data),
+      filename: "large.jpg",
+      content_type: "image/jpeg"
+    )
+    refute user.valid?
+    assert_includes user.errors[:profile_picture], "must be less than 5MB"
+  end
+
+  test "profile picture accepts valid image formats" do
+    user = users(:keith)
+    %w[image/jpeg image/jpg image/png image/gif image/webp].each do |content_type|
+      user.profile_picture.attach(
+        io: StringIO.new("fake image data"),
+        filename: "test.#{content_type.split('/').last}",
+        content_type: content_type
+      )
+      assert user.valid?, "Should accept #{content_type}"
+      user.profile_picture.purge
+    end
+  end
 end
