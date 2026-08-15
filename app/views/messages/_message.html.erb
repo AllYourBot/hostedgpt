@@ -189,7 +189,7 @@ end %>
           gap-2
           text-gray-600 dark:text-gray-300
           h-[19px]
-          <%= !last_message && done_thinking && 'invisible' %> group-hover:visible
+          <%= !last_message && done_thinking && 'invisible' %> group-tap:visible
         ">
           <% if message.versions.length > 1 %>
             <%= button_to message_path(message, version: previous_version),
