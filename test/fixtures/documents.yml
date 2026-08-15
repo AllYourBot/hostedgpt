@@ -1,39 +1,38 @@
-background:
+DEFAULTS: &DEFAULTS
   user: keith
+  purpose: assistants
+
+background:
+  <<: *DEFAULTS
   assistant: samantha
   message:
   filename: background.docx
-  purpose: assistants
   bytes: 100
 
 cat_photo:
-  user: keith
+  <<: *DEFAULTS
   assistant:
   message: examine_this
   filename: cat.png
-  purpose: assistants
   bytes: 51452
 
 cute_cat_photo:
-  user: keith
+  <<: *DEFAULTS
   assistant:
   message: one_attachment
   filename: cute_cat_photo.png
-  purpose: assistants
   bytes: 200
 
 single_cat_photo:
-  user: keith
+  <<: *DEFAULTS
   assistant:
   message: two_attachments
   filename: single_cat_photo.png
-  purpose: assistants
   bytes: 300
 
 single_dog_photo:
-  user: keith
+  <<: *DEFAULTS
   assistant:
   message: two_attachments
   filename: single_dog_photo.png
-  purpose: assistants
   bytes: 400
