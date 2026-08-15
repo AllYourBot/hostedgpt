@@ -52,12 +52,17 @@ class User < ApplicationRecord
     return nil unless has_profile_picture?
     return nil unless profile_picture.variable? # e.g. a rejected non-image upload still attached in memory
 
-    if Rails.application.config.x.app_url.blank?
-      # For development/test environments without configured app URL
-      Rails.application.routes.url_helpers.rails_blob_url(profile_picture.variant(variant), only_path: true)
-    else
-      profile_picture.variant(variant).url
-    end
+    # Always route through rails_blob_url rather than calling profile_picture.variant(variant).url directly:
+    # the latter needs the variant to already be processed (a VariantRecord to exist), which only happens once
+    # the async preprocessing job runs, so it returns nil for a freshly-uploaded picture. rails_blob_url resolves
+    # to the representation redirect route, which transforms on demand and works immediately either way.
+    url_options = Rails.application.config.x.app_url.present? ? {
+      protocol: Rails.application.config.x.app_url_protocol,
+      host: Rails.application.config.x.app_url_host,
+      port: Rails.application.config.x.app_url_port,
+    } : { only_path: true } # development/test environments without a configured app URL
+
+    Rails.application.routes.url_helpers.rails_blob_url(profile_picture.variant(variant), **url_options)
   end
 
   # Virtual attribute for removing profile picture
