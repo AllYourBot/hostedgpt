@@ -20,7 +20,7 @@ class DocumentsController < ApplicationController
     @document = Document.new(document_params)
 
     if @document.save
-      redirect_to @document, notice: I18n.t("app.flashes.documents.created"), status: :see_other
+      redirect_to documents_url, notice: I18n.t("app.flashes.documents.created"), status: :see_other
     else
       render :new, status: :unprocessable_content
     end
@@ -42,7 +42,7 @@ class DocumentsController < ApplicationController
   private
 
   def set_document
-    @document = Document.find(params[:id])
+    @document = Current.user.documents.find_by(id: params[:id])
   end
 
   def document_params
