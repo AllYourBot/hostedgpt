@@ -132,6 +132,12 @@ de:
       retry:
         interrupted: "Die Antwort wurde unterbrochen."
         button: "Erneut versuchen"
+      edit: "Bearbeiten"
+      copy: "Kopieren"
+      copied: "Kopiert!"
+      regenerate: "Neu generieren"
+      regenerate_menu:
+        using: "Mit %{name}"
     auth:
       welcome_back: "Willkommen zurück"
       no_account: "Noch kein Konto?"
