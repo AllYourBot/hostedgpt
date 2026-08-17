@@ -52,6 +52,7 @@ class Toolbox::GoogleTasks < Toolbox
 
     date_str = task.try(:due) && " It's due in #{time_ago_in_words(DateTime.parse(task.due))}"
     {
+      message_to_user: "Google Tasks",
       good_summary: "Created the task '#{task.title}' on the list '#{list.title}'.#{date_str}",
       task: task_for_display(task).merge(list: list.title),
       undo_by: undo_task(:remove_or_restore_task, params),
@@ -89,6 +90,7 @@ class Toolbox::GoogleTasks < Toolbox
     }.compact
 
     {
+      message_to_user: "Google Tasks",
       good_summary: "#{is_deleted ? 'Removed' : 'Restored'} '#{task.title}'. This action is destructive so ALWAYS tell the user this title.",
       task: (!is_deleted).presence && task_for_display(task),
       undo_by: undo_task(:remove_or_restore_task, params),
@@ -140,6 +142,7 @@ class Toolbox::GoogleTasks < Toolbox
     }.compact
 
     {
+      message_to_user: "Google Tasks",
       good_summary: "Updated '#{updated_task.title}'",
       task: task_for_display(updated_task).merge(list: list.title),
       undo_by: undo_task(:change_task, params),
@@ -157,6 +160,7 @@ class Toolbox::GoogleTasks < Toolbox
     tasks = get_tasks_for_list(list).map.with_index { |t, i| task_for_display(t).merge(position: i+1, list: list.title) }
 
     {
+      message_to_user: "Google Tasks",
       good_summary: "You have #{tasks.length} items on your '#{list.title}' list.",
       tasks: tasks,
       undo_by: "There is no need to undo this",
