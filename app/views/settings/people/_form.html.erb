@@ -31,8 +31,13 @@
     </div>
 
     <!-- Profile Picture Upload -->
-    <div class="my-5" data-controller="profile-picture-upload">
-      <%= user_fields.label :profile_picture, "Profile Picture" %>
+    <div class="my-5"
+      data-controller="profile-picture-upload"
+      data-profile-picture-upload-invalid-file-type-value="<%= t('app.settings.people.form.invalid_file_type') %>"
+      data-profile-picture-upload-file-too-large-value="<%= t('app.settings.people.form.file_too_large') %>"
+      data-profile-picture-upload-confirm-remove-value="<%= t('app.settings.people.form.confirm_remove_photo') %>"
+    >
+      <%= user_fields.label :profile_picture, t('app.settings.people.form.profile_picture') %>
       <div class="mt-2">
         <div class="flex items-center space-x-4">
           <!-- Current avatar display -->
@@ -51,13 +56,13 @@
                 } %>
 
             <div class="flex space-x-2">
-              <%= button_tag "Choose Photo",
+              <%= button_tag t('app.settings.people.form.choose_photo'),
                   type: "button",
                   class: "inline-block font-medium bg-gray-100 dark:bg-gray-900 dark:text-white border border-gray-400 rounded-lg py-2 px-4 cursor-pointer text-sm",
                   data: { action: "profile-picture-upload#chooseFile" } %>
 
               <% if person.personable.has_profile_picture? %>
-                <%= button_tag "Remove",
+                <%= button_tag t('app.settings.people.form.remove_photo'),
                     type: "button",
                     class: "inline-block font-medium bg-red-100 dark:bg-red-900 dark:text-white border border-red-400 rounded-lg py-2 px-4 cursor-pointer text-sm",
                     data: { action: "profile-picture-upload#removeImage", profile_picture_upload_target: "removeButton" } %>
@@ -65,25 +70,25 @@
             </div>
 
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              JPEG, PNG, GIF, or WebP. Max 5MB.
+              <%= t('app.settings.people.form.photo_hint') %>
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 hidden" data-profile-picture-upload-target="removalNotice">
-              Photo will be removed when you save.
+              <%= t('app.settings.people.form.photo_removal_notice') %>
             </p>
           </div>
         </div>
 
         <!-- Preview area (hidden by default) -->
         <div class="mt-4 hidden" data-profile-picture-upload-target="previewContainer">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview:</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2"><%= t('app.settings.people.form.photo_preview_label') %></p>
           <div class="flex items-center space-x-4">
             <div class="rounded-full w-16 h-16 overflow-hidden border border-gray-200 dark:border-gray-600">
               <img data-profile-picture-upload-target="previewImage"
                    class="w-full h-full object-cover"
-                   alt="Profile picture preview">
+                   alt="<%= t('app.settings.people.form.photo_preview_alt') %>">
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              This is how your profile picture will appear.
+              <%= t('app.settings.people.form.photo_preview_description') %>
             </p>
           </div>
         </div>

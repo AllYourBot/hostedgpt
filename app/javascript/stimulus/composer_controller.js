@@ -5,7 +5,7 @@ export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
     "disabledSubmit", "microphoneEnable", "microphoneDisable" ]
   static outlets = [ "speaker" ]
-  static values = { blurPlaceholder: String, focusPlaceholder: String, speakPlaceholder: String }
+  static values = { blurPlaceholder: String, focusPlaceholder: String, speakPlaceholder: String, micPermissionRequired: String }
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -126,7 +126,7 @@ export default class extends Controller {
     if (Listener.disabled) {
       let micApproved = await Approve.Transcriber.access()
       if (!micApproved) {
-        alert("You must enable browser microphone access to use this feature. If you are unsure how to do this, try searching: 'change microphone permission for a single website'")
+        alert(this.micPermissionRequiredValue)
         this.disableMicrophone()
         return
       }
