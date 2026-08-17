@@ -161,6 +161,12 @@ en:
       retry:
         interrupted: "The response was interrupted."
         button: "Retry"
+      edit: "Edit"
+      copy: "Copy"
+      copied: "Copied!"
+      regenerate: "Regenerate"
+      regenerate_menu:
+        using: "Using %{name}"
     auth:
       welcome_back: "Welcome back"
       no_account: "Don't have an account?"
