@@ -160,6 +160,10 @@ de:
         filename: "Dateiname"
         purpose: "Zweck"
         bytes: "Bytes"
+    assistants:
+      ui:
+        new: "Neu"
+        more: "Mehr"
     conversations:
       editing_title: "Konversation bearbeiten"
       show_title: "Diese Konversation anzeigen"
