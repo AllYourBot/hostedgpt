@@ -207,7 +207,7 @@ end %>
               data: {
                 role: "previous",
             } do %>
-              <%= icon "chevron-left", variant: :micro, title: previous_version.present? && "Previous", data: { } %>
+              <%= icon "chevron-left", variant: :micro, title: previous_version.present? && t('app.messages.previous_version'), data: { } %>
             <% end %>
 
             v<%= message.version %>
@@ -226,7 +226,7 @@ end %>
               data: {
                 role: "next",
             } do %>
-              <%= icon "chevron-right", variant: :micro, title: next_version.present? && "Next", data: { } %>
+              <%= icon "chevron-right", variant: :micro, title: next_version.present? && t('app.messages.next_version'), data: { } %>
             <% end %>
           <% end %>
 
@@ -253,8 +253,8 @@ end %>
                     playback#toggleSpeakingMessage
                   |,
               } do %>
-                <%= icon "speaker-wave", variant: :outline, size: 19, title: "Read aloud", data: { role: "play", transition_target: "transitionable" } %>
-                <%= icon "stop-circle", variant: :outline, size: 19, title: "Stop", data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
+                <%= icon "speaker-wave", variant: :outline, size: 19, title: t('app.messages.read_aloud'), data: { role: "play", transition_target: "transitionable" } %>
+                <%= icon "stop-circle", variant: :outline, size: 19, title: t('app.conversations.ui.stop'), data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
               <% end %>
             <% end %>
             <%= button_tag type: "button",

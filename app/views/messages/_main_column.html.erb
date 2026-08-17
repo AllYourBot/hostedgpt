@@ -137,7 +137,7 @@
         <%= button_tag type: "button",
               class: "block rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer group",
               data: {
-                tip: "Scroll down",
+                tip: t('app.conversations.ui.scroll_down'),
                 action: "scrollable#scrollToBottom"
               } do
         %>
@@ -163,6 +163,7 @@
         data-composer-blur-placeholder-value="<%= t('app.conversations.composer.blur_placeholder') %>"
         data-composer-focus-placeholder-value="<%= t('app.conversations.composer.focus_placeholder') %>"
         data-composer-speak-placeholder-value="<%= t('app.conversations.composer.speak_placeholder') %>"
+        data-composer-mic-permission-required-value="<%= t('app.conversations.ui.mic_permission_required') %>"
       >
         <%= button_tag type: "button",
               id: "attach-button",
