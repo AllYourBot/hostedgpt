@@ -189,6 +189,10 @@ en:
         filename: "Filename"
         purpose: "Purpose"
         bytes: "Bytes"
+    assistants:
+      ui:
+        new: "New"
+        more: "More"
     conversations:
       editing_title: "Editing conversation"
       show_title: "Show this conversation"
