@@ -194,6 +194,10 @@ de:
         voice_mode: "Sprachmodus"
         send_message: "Nachricht senden"
         search_placeholder: "Suchen"
+      composer:
+        blur_placeholder: "/  um Eingabe zu fokussieren"
+        focus_placeholder: "EINGABE zum Senden   ↑ um letzte Nachricht zu bearbeiten"
+        speak_placeholder: "Laut sprechen..."
       starters:
         - title: "Schlage einen gesunden Ernährungsplan vor"
           description: "für eine Woche für jemanden mit einem vollen Terminplan"

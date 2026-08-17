@@ -223,6 +223,10 @@ en:
         voice_mode: "Voice mode"
         send_message: "Send message"
         search_placeholder: "Search"
+      composer:
+        blur_placeholder: "/  to focus input"
+        focus_placeholder: "RETURN to submit   ↑ to edit last message"
+        speak_placeholder: "Speak aloud..."
       starters:
         - title: "Suggest a healthy meal plan"
           description: "for a week for someone with a busy schedule"
