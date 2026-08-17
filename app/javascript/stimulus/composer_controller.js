@@ -5,6 +5,7 @@ export default class extends Controller {
   static targets = [ "form", "input", "submit", "overlay", "cancel",
     "disabledSubmit", "microphoneEnable", "microphoneDisable" ]
   static outlets = [ "speaker" ]
+  static values = { blurPlaceholder: String, focusPlaceholder: String, speakPlaceholder: String }
 
   get cleanInputValue() {
     return this.inputTarget.value.trim()
@@ -121,7 +122,7 @@ export default class extends Controller {
     this.microphoneDisableTarget.classList.remove('hidden')
     this.microphoneDisableTarget.classList.remove('animate-blink')
     this.disableComposer()
-    this.inputTarget.placeholder = "Speak aloud..."
+    this.inputTarget.placeholder = this.speakPlaceholderValue
     if (Listener.disabled) {
       let micApproved = await Approve.Transcriber.access()
       if (!micApproved) {
@@ -161,7 +162,7 @@ export default class extends Controller {
 
   async focus() {
     if (viewport('md')) {
-      this.inputTarget.placeholder = 'RETURN to submit   ↑ to edit last message'
+      this.inputTarget.placeholder = this.focusPlaceholderValue
     } else {
       this.inputTarget.placeholder = ''
     }
@@ -175,7 +176,7 @@ export default class extends Controller {
 
   blur() {
     if (viewport('md')) {
-      this.inputTarget.placeholder = '/  to focus input'
+      this.inputTarget.placeholder = this.blurPlaceholderValue
     } else {
       this.inputTarget.placeholder = ''
     }
