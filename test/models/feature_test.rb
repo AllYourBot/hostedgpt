@@ -1,7 +1,6 @@
 require "test_helper"
 
 class FeatureTest < ActiveSupport::TestCase
-
   test "should return value of feature" do
     stub_features(my_feature: true) do
       assert Feature.enabled?(:my_feature)
@@ -33,7 +32,7 @@ class FeatureTest < ActiveSupport::TestCase
 
   test "a user's preferences can ENABLE a feature which is globally DISABLED" do
     user = users(:keith)
-    user.preferences = user.preferences.merge(feature: { my_feature: true })
+    user.preferences = user.preferences.merge(feature: {my_feature: true})
     user.save!
 
     stub_features(my_feature: false) do
@@ -45,7 +44,7 @@ class FeatureTest < ActiveSupport::TestCase
 
   test "a user's preferences can DISABLE a feature which is globally ENABLED" do
     user = users(:keith)
-    user.preferences = user.preferences.merge(feature: { my_feature: false })
+    user.preferences = user.preferences.merge(feature: {my_feature: false})
     user.save!
 
     stub_features(my_feature: true) do
@@ -74,7 +73,6 @@ class FeatureTest < ActiveSupport::TestCase
   end
 
   test "password and google auth are ALLOWED if HTTP header auth is DISABLED" do
-
     stub_features(
       http_header_authentication: false,
       password_authentication: true,
@@ -89,6 +87,29 @@ class FeatureTest < ActiveSupport::TestCase
       refute Feature.google_authentication?
       refute Feature.enabled?(:microsoft_graph_authentication)
       refute Feature.microsoft_graph_authentication?
+    end
+  end
+
+  test "use_ruby_llm? reads options.yml default and can be overridden by user preference" do
+    user = users(:keith)
+
+    stub_features(use_ruby_llm: false) do
+      refute Feature.use_ruby_llm?
+    end
+
+    stub_features(use_ruby_llm: false) do
+      Current.set(user: user) do
+        refute Feature.use_ruby_llm?
+      end
+    end
+
+    user.preferences = user.preferences.merge(feature: {use_ruby_llm: true})
+    user.save!
+
+    stub_features(use_ruby_llm: false) do
+      Current.set(user: user) do
+        assert Feature.use_ruby_llm?
+      end
     end
   end
 

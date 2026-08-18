@@ -14,16 +14,18 @@ class APIService < ApplicationRecord
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
   validates :name, :url, presence: true
 
-  normalizes :url, with: -> url { url.strip }
+  normalizes :url, with: ->(url) { url.strip }
   encrypts :token
 
-  normalizes :token, with: -> token { token.strip }
+  normalizes :token, with: ->(token) { token.strip }
 
   before_save :soft_delete_language_models, if: -> { deleted_at && deleted_at_changed? && deleted_at_was.nil? }
 
   scope :ordered, -> { order(:name) }
 
   def ai_backend
+    return AIBackend::RubyLLM if Feature.use_ruby_llm? && AIBackend::RubyLLM.supports_driver?(driver)
+
     case driver
     when "openai"
       AIBackend::OpenAI
@@ -66,7 +68,7 @@ class APIService < ApplicationRecord
     return nil unless Feature.default_llm_keys?
     return Setting.default_openai_key if url == URL_OPEN_AI
     return Setting.default_anthropic_key if url == URL_ANTHROPIC
-    return Setting.default_groq_key if url == URL_GROQ
+    Setting.default_groq_key if url == URL_GROQ
   end
 
   def soft_delete_language_models
