@@ -44,6 +44,7 @@ gem "rails_heroicon", "~> 2.2.0"
 gem "ruby-openai", "~> 7.0.1"
 gem "ruby-anthropic", "~> 0.4.0"
 gem "gemini-ai", "~> 4.2.0"
+gem "ruby_llm", "~> 1.16.0"
 gem "solid_queue", "~> 1.0.0"
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable

@@ -92,6 +92,29 @@ class FeatureTest < ActiveSupport::TestCase
     end
   end
 
+  test "use_ruby_llm? reads options.yml default and can be overridden by user preference" do
+    user = users(:keith)
+
+    stub_features(use_ruby_llm: false) do
+      refute Feature.use_ruby_llm?
+    end
+
+    stub_features(use_ruby_llm: false) do
+      Current.set(user: user) do
+        refute Feature.use_ruby_llm?
+      end
+    end
+
+    user.preferences = user.preferences.merge(feature: {use_ruby_llm: true})
+    user.save!
+
+    stub_features(use_ruby_llm: false) do
+      Current.set(user: user) do
+        assert Feature.use_ruby_llm?
+      end
+    end
+  end
+
   test "referencing a feature that does not exist raises an exception" do
     assert_raises do
       Feature.foobar?

@@ -46,6 +46,7 @@ shared:
     default_to_voice: <%= ENV["DEFAULT_TO_VOICE_FEATURE"] || false %>
     email: <%= ENV["EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
     password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
+    use_ruby_llm: <%= ENV["USE_RUBY_LLM_FEATURE"] || false %>
     assistants_page: <%= ENV["ASSISTANTS_PAGE_FEATURE"] || true %>
     use_ruby_llm: <%= ENV["USE_RUBY_LLM_FEATURE"] || false %>
   settings:
