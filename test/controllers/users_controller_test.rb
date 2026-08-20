@@ -86,6 +86,21 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "preferences merge preserves unrelated keys when setting nav_closed" do
+    user = users(:keith)
+    user.preferences = { dark_mode: "light", feature: { use_ruby_llm: true } }
+    user.save!
+    login_as user
+
+    patch user_url(user), params: { user: { preferences: { nav_closed: true } } }
+    assert_response :redirect
+    user.reload
+
+    assert user.preferences[:nav_closed]
+    assert_equal "light", user.preferences[:dark_mode]
+    assert_equal({ use_ruby_llm: true }, user.preferences[:feature])
+  end
+
   test "updates user preferences" do
     user = users(:keith)
     login_as user

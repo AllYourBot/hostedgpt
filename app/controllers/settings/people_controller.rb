@@ -17,16 +17,21 @@ class Settings::PeopleController < Settings::ApplicationController
 
   def person_params
     h = params.require(:person).permit(:email, personable_attributes: [
-      :id, :first_name, :last_name, :password, :profile_picture, :remove_profile_picture, preferences: [:dark_mode],
-      credentials_attributes: [ :id, :type, :password ]
+      :id, :first_name, :last_name, :password, :profile_picture, :remove_profile_picture, preferences: [:dark_mode, feature: [:use_ruby_llm]],
+                                                                                          credentials_attributes: [:id, :type, :password]
     ]).to_h
+
+    if (prefs = h.dig("personable_attributes", "preferences")).present? && (user = Current.person.user)
+      h["personable_attributes"]["preferences"] = user.preferences.deep_merge(prefs.deep_symbolize_keys)
+    end
+
     format_and_strip_all_but_first_valid_credential(h)
   end
 
   def check_personable_id
     personable_id = params[:person].try(:[], :personable_attributes).try(:[], :id)
     if personable_id.present? && personable_id.to_i != Current.person.personable_id
-      return render :edit, status: :unauthorized
+      render :edit, status: :unauthorized
     end
   end
 

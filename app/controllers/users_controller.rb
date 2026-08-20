@@ -27,7 +27,9 @@ class UsersController < ApplicationController
   end
 
   def update
-    if @user.update(user_params)
+    incoming = user_params[:preferences]&.to_h&.deep_symbolize_keys || {}
+    @user.preferences = @user.preferences.deep_merge(incoming)
+    if @user.save
       Current.user.reload
       redirect_back fallback_location: root_path, status: :see_other
     else
@@ -53,12 +55,12 @@ class UsersController < ApplicationController
 
   def person_params
     h = params.require(:person).permit(:email, :personable_type, personable_attributes: [
-      :name, credentials_attributes: [ :type, :password ]
+      :name, credentials_attributes: [:type, :password]
     ]).to_h
     format_and_strip_all_but_first_valid_credential(h)
   end
 
   def user_params
-    params.require(:user).permit(preferences: [:nav_closed, :dark_mode])
+    params.require(:user).permit(preferences: [:nav_closed, :dark_mode, feature: [:use_ruby_llm]])
   end
 end
