@@ -70,7 +70,8 @@ class AIBackend::Gemini < AIBackend
 
     @client_config =  {
       contents: config[:messages],
-      system_instruction: ( system_message(config[:instructions]) if @assistant.language_model.supports_system_message?)
+      system_instruction: ( system_message(config[:instructions]) if @assistant.language_model.supports_system_message?),
+      tools: ( gemini_format_tools(Toolbox.tools) if @assistant.language_model.supports_tools? )
     }.compact
   end
 
@@ -84,6 +85,9 @@ class AIBackend::Gemini < AIBackend
   end
 
   def stream_next_conversation_message(&chunk_handler)
+    @stream_response_text = ""
+    @stream_response_tool_calls = []
+
     set_client_config(
       messages: preceding_conversation_messages,
       instructions: full_instructions,
@@ -92,23 +96,37 @@ class AIBackend::Gemini < AIBackend
     begin
       if Rails.env.test?
         @client.send(client_method_name, @client_config).each do |intermediate_response|
-          content_chunk = intermediate_response.dig("candidates",0,"content","parts",0,"text")
-          yield content_chunk if content_chunk != nil
+          process_intermediate_response(intermediate_response, &chunk_handler)
         end
       else
-        response = @client.send(client_method_name, @client_config) do |intermediate_response, parsed, raw|
-          content_chunk = intermediate_response.dig("candidates",0,"content","parts",0,"text")
-          yield content_chunk if content_chunk != nil
+        @client.send(client_method_name, @client_config) do |intermediate_response, parsed, raw|
+          process_intermediate_response(intermediate_response, &chunk_handler)
         end
       end
     rescue ::Faraday::UnauthorizedError, ::Faraday::BadRequestError => e
-      puts e.message
+      Rails.logger.error "Gemini rejected the request: #{e.try(:response)&.dig(:body) || e.message}"
       raise configuration_error
     end
-    return nil
+
+    return format_parallel_tool_calls(@stream_response_tool_calls) if @stream_response_tool_calls.present?
+    nil
   end
 
   private
+
+  def process_intermediate_response(intermediate_response, &chunk_handler)
+    parts = intermediate_response.dig("candidates", 0, "content", "parts")
+    parts = [parts] if parts.is_a?(Hash)
+
+    Array(parts).each do |part|
+      if part["functionCall"].present?
+        @stream_response_tool_calls << part # the whole part, because Gemini 3 hangs thoughtSignature off it
+      elsif (text = part["text"])
+        @stream_response_text += text
+        chunk_handler&.call(text)
+      end
+    end
+  end
 
   def system_message(content)
     return [] if content.blank?
@@ -119,7 +137,11 @@ class AIBackend::Gemini < AIBackend
 
   def preceding_conversation_messages
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
-      if @assistant.supports_images? && message.documents.present? && message.role == "user"
+      if message.tool?
+        tool_response_message(message)
+      elsif message.assistant? && message.content_tool_calls.present?
+        tool_call_message(message)
+      elsif @assistant.supports_images? && message.documents.present? && message.role == "user"
         # Handle mixed content (images and PDFs)
         content = [{ text: message.content_text }]
 
@@ -154,5 +176,50 @@ class AIBackend::Gemini < AIBackend
         }
       end
     end
+  end
+
+  def tool_call_message(message)
+    parts = []
+    parts << { text: message.content_text } if message.content_text.present?
+
+    tool_calls = message.content_tool_calls
+    tool_calls = [tool_calls] if tool_calls.is_a?(Hash)
+
+    tool_calls.each do |tool_call|
+      arguments = tool_call.dig("function", "arguments") || tool_call.dig(:function, :arguments) || {}
+      args = arguments.is_a?(String) ? (JSON.parse(arguments) rescue {}) : arguments
+
+      parts << {
+        functionCall: {
+          name: tool_call.dig("function", "name") || tool_call.dig(:function, :name),
+          args: args
+        },
+        # Gemini 3 rejects a functionCall replayed without the signature it issued
+        thoughtSignature: tool_call[:thought_signature] || tool_call["thought_signature"]
+      }.compact
+    end
+
+    { role: "model", parts: parts }
+  end
+
+  # Gemini has no "tool" role; a tool result is a functionResponse part sent by
+  # the user, and it's matched to the call by function name rather than by id.
+  def tool_response_message(message)
+    tool_call = message.content_tool_calls
+    tool_call = tool_call.first if tool_call.is_a?(Array)
+    tool_call = {} unless tool_call.is_a?(Hash)
+
+    name = tool_call.dig("function", "name") || tool_call.dig(:function, :name) || message.tool_call_id
+    content = JSON.parse(message.content_text.to_s) rescue message.content_text
+
+    {
+      role: "user",
+      parts: [{
+        functionResponse: {
+          name: name,
+          response: { name: name, content: content }
+        }
+      }]
+    }
   end
 end
