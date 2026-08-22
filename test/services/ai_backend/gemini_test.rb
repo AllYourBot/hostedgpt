@@ -163,4 +163,126 @@ class AIBackend::GeminiTest < ActiveSupport::TestCase
     test_file.close
     test_file.unlink
   end
+
+  test "set_client_config only sends tools when the language model supports them" do
+    gemini, assistant = gemini_for(conversations(:gemini_conversation))
+
+    assistant.language_model.update!(supports_tools: false)
+    gemini.send(:set_client_config, messages: [], instructions: "hi")
+    assert_nil gemini.instance_variable_get(:@client_config)[:tools]
+
+    assistant.language_model.update!(supports_tools: true)
+    gemini.send(:set_client_config, messages: [], instructions: "hi")
+    declarations = gemini.instance_variable_get(:@client_config).dig(:tools, 0, :function_declarations)
+    assert declarations.present?, "Tools should have been declared for Gemini"
+    assert_includes declarations.map { |d| d[:name] }, "helloworld_hi"
+  end
+
+  test "process_intermediate_response yields text chunks in order and accumulates them" do
+    gemini, _assistant = gemini_for(conversations(:gemini_conversation))
+    chunks = []
+
+    ["Hello", " there", "!"].each do |text|
+      gemini.instance_variable_set(:@stream_response_text, chunks.join)
+      gemini.send(:process_intermediate_response, streamed_text(text)) { |chunk| chunks << chunk }
+    end
+
+    assert_equal ["Hello", " there", "!"], chunks
+    assert_equal "Hello there!", gemini.instance_variable_get(:@stream_response_text)
+  end
+
+  test "process_intermediate_response collects function call parts instead of yielding them" do
+    gemini, _assistant = gemini_for(conversations(:gemini_conversation))
+    gemini.instance_variable_set(:@stream_response_text, "")
+    gemini.instance_variable_set(:@stream_response_tool_calls, [])
+
+    chunks = []
+    gemini.send(:process_intermediate_response, streamed_function_call("helloworld_hi", { "name" => "Keith" })) { |chunk| chunks << chunk }
+
+    assert_empty chunks
+    assert_equal [{
+      "functionCall" => { "name" => "helloworld_hi", "args" => { "name" => "Keith" } },
+      "thoughtSignature" => "sig-abc"
+    }], gemini.instance_variable_get(:@stream_response_tool_calls)
+  end
+
+  test "stream_next_conversation_message returns tool calls in the internal format" do
+    conversation = conversations(:gemini_conversation)
+    gemini, assistant = gemini_for(conversation)
+    assistant.language_model.update!(supports_tools: true)
+
+    response = TestClient::Gemini.stub :function, "helloworld_hi" do
+      TestClient::Gemini.stub :arguments, { "name" => "Keith" } do
+        gemini.stream_next_conversation_message { |chunk| }
+      end
+    end
+
+    assert_equal 1, response.length
+    assert_equal "helloworld_hi", response[0][:function][:name]
+    assert_equal '{"name":"Keith"}', response[0][:function][:arguments]
+  end
+
+  test "preceding_conversation_messages converts tool calls and results into function parts" do
+    conversation = conversations(:weather)
+    gemini, _assistant = gemini_for(conversation)
+
+    messages = gemini.send(:preceding_conversation_messages)
+
+    tool_call = messages.find { |m| m[:parts].is_a?(Array) && m[:parts].any? { |p| p[:functionCall] } }
+    assert_equal "model", tool_call[:role]
+    assert_equal "helloworld_hi", tool_call[:parts][0][:functionCall][:name]
+    assert_equal({ name: "World" }, tool_call[:parts][0][:functionCall][:args])
+
+    tool_result = messages.find { |m| m[:parts].is_a?(Array) && m[:parts].any? { |p| p[:functionResponse] } }
+    assert_equal "user", tool_result[:role], "Gemini has no tool role, so results come back from the user"
+    assert_equal "helloworld_hi", tool_result[:parts][0][:functionResponse][:name]
+    assert_equal "weather is", tool_result[:parts][0][:functionResponse][:response][:content]
+  end
+
+  test "preceding_conversation_messages replays the thoughtSignature Gemini issued with a tool call" do
+    conversation = conversations(:weather)
+    message = conversation.messages.ordered.find { |m| m.content_tool_calls.present? && m.assistant? }
+    message.update!(content_tool_calls: message.content_tool_calls.map { |c| c.merge(thought_signature: "sig-abc") })
+
+    gemini, _assistant = gemini_for(conversation)
+    part = function_call_part_in(gemini.send(:preceding_conversation_messages))
+
+    assert_equal "sig-abc", part[:thoughtSignature],
+      "Gemini 3 rejects the follow-up request when a replayed functionCall has no signature"
+  end
+
+  test "preceding_conversation_messages omits thoughtSignature when the call never had one" do
+    conversation = conversations(:weather)
+    gemini, _assistant = gemini_for(conversation)
+
+    part = function_call_part_in(gemini.send(:preceding_conversation_messages))
+
+    refute part.key?(:thoughtSignature), "An empty signature should be left out rather than sent as null"
+  end
+
+  private
+
+  def function_call_part_in(messages)
+    messages.flat_map { |m| m[:parts].is_a?(Array) ? m[:parts] : [m[:parts]] }.find { |part| part[:functionCall] }
+  end
+
+  def gemini_for(conversation)
+    assistant = assistants(:keith_gemini)
+    gemini = AIBackend::Gemini.new(
+      users(:keith),
+      assistant,
+      conversation,
+      conversation.latest_message_for_version(:latest)
+    )
+    [gemini, assistant]
+  end
+
+  def streamed_text(text)
+    { "candidates" => [{ "content" => { "role" => "model", "parts" => [{ "text" => text }] } }] }
+  end
+
+  def streamed_function_call(name, args)
+    { "candidates" => [{ "content" => { "role" => "model",
+      "parts" => [{ "functionCall" => { "name" => name, "args" => args }, "thoughtSignature" => "sig-abc" }] } }] }
+  end
 end

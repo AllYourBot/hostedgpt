@@ -219,12 +219,12 @@ models:
 - api_name: gemini-2.5-pro
   name: Google Gemini Pro 2.5 (latest)
   supports_images: true
-  supports_tools: false
+  supports_tools: true
   supports_system_message: true
   api_service_name: Google Gemini
 - api_name: gemini-3.6-flash
   name: Google Gemini Flash 3.6
   supports_images: true
-  supports_tools: false
+  supports_tools: true
   supports_system_message: true
   api_service_name: Google Gemini
