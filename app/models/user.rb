@@ -38,25 +38,18 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :credentials
   serialize :preferences, coder: JsonSerializer
+  store_accessor :preferences, :dark_mode, :nav_closed
 
   def preferences
     attributes["preferences"] || {}
   end
 
   def dark_mode
-    preferences[:dark_mode].presence || "system"
-  end
-
-  def dark_mode=(value)
-    write_attribute(:preferences, preferences.merge(dark_mode: value))
-  end
-
-  def nav_closed
-    preferences[:nav_closed]
+    super.presence || "system"
   end
 
   def nav_closed=(value)
-    write_attribute(:preferences, preferences.merge(nav_closed: value))
+    super(value.nil? ? nil : value.to_b)
   end
 
   # Profile picture helper methods

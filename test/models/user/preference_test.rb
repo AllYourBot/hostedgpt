@@ -50,4 +50,23 @@ class User::PreferenceTest < ActiveSupport::TestCase
 
     assert_equal "dark", user.preferences[:dark_mode]
   end
+
+  test "accessors coerce form payloads and round-trip through save and reload" do
+    user = User.create!(first_name: "First", last_name: "Last")
+
+    user.dark_mode = "dark"
+    user.nav_closed = "true"
+    user.save!
+    user.reload
+
+    assert_equal "dark", user.dark_mode
+    assert_equal true, user.reload.preferences[:nav_closed]
+    assert_equal true, user.nav_closed
+
+    user.nav_closed = "false"
+    assert_equal false, user.nav_closed
+
+    keys = user.reload.preferences.keys.map(&:to_s)
+    assert_equal keys.count, keys.uniq.count
+  end
 end
