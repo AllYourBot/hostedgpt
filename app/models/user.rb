@@ -40,7 +40,23 @@ class User < ApplicationRecord
   serialize :preferences, coder: JsonSerializer
 
   def preferences
-    attributes["preferences"].with_defaults(dark_mode: "system")
+    attributes["preferences"] || {}
+  end
+
+  def dark_mode
+    preferences[:dark_mode].presence || "system"
+  end
+
+  def dark_mode=(value)
+    write_attribute(:preferences, preferences.merge(dark_mode: value))
+  end
+
+  def nav_closed
+    preferences[:nav_closed]
+  end
+
+  def nav_closed=(value)
+    write_attribute(:preferences, preferences.merge(nav_closed: value))
   end
 
   # Profile picture helper methods

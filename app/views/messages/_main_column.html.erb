@@ -13,7 +13,7 @@
       group
     |,
     method: :patch,
-    params: { user: { preferences: { nav_closed: !Current.user.preferences[:nav_closed] } } },
+    params: { user: { preferences: { nav_closed: !Current.user.nav_closed } } },
     class: %| flex-1 flex w-8 h-20
     |,
     data: {
@@ -33,7 +33,7 @@
         flex-1 flex h-full
         items-center justify-center
         tooltip tooltip-right hover:tooltip-open
-        <%= Current.user.preferences[:nav_closed] && "!hidden" %>
+        <%= Current.user.nav_closed && "!hidden" %>
       "
   data-tip="<%= t('app.conversations.ui.close_sidebar') %>"
     >
@@ -49,7 +49,7 @@
         flex-1 flex h-full
         items-center justify-center
         tooltip tooltip-right hover:tooltip-open
-        <%= !Current.user.preferences[:nav_closed] && "!hidden" %>
+        <%= !Current.user.nav_closed && "!hidden" %>
       "
   data-tip="<%= t('app.conversations.ui.open_sidebar') %>"
     >

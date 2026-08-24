@@ -107,7 +107,7 @@
         <%= user_fields.fields_for :preferences do |preferences_fields| %>
           <% %w(dark light system).each do |value| %>
             <div class="flex items-center gap-2">
-              <%= preferences_fields.radio_button :dark_mode, value, checked: Current.user.preferences[:dark_mode] == value %>
+              <%= preferences_fields.radio_button :dark_mode, value, checked: Current.user.dark_mode == value %>
               <%= user_fields.label :dark_mode, t("app.settings.people.form.theme_options.#{value}"), class: "dark:text-gray-100", for: "person_personable_attributes_preferences_dark_mode_#{value}"%>
             </div>
           <% end %>
