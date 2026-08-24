@@ -52,6 +52,19 @@ class User < ApplicationRecord
     super(value.nil? ? nil : value.to_b)
   end
 
+  def features
+    User::Features.new(self)
+  end
+
+  def ai_backend(driver)
+    features[:"#{driver}_ai_backend"]
+  end
+
+  # @todo: generalize into a per-flag opinion API if other features ever need per-user values (#740)
+  def ruby_llm?(driver)
+    ai_backend(driver).presence || use_ruby_llm?
+  end
+
   # Profile picture helper methods
   def has_profile_picture?
     profile_picture.attached?
@@ -101,5 +114,9 @@ class User < ApplicationRecord
     return false unless credential = credentials.first
 
     !credential.persisted? && credential.type == "GoogleCredential"
+  end
+
+  def use_ruby_llm?
+    Feature.raw_features.key?(:use_ruby_llm) ? Feature.use_ruby_llm? : false
   end
 end
