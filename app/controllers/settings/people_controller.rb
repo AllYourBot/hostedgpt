@@ -7,6 +7,7 @@ class Settings::PeopleController < Settings::ApplicationController
 
   def update
     Current.person.update!(person_params)
+    apply_backend_choices!
     redirect_to edit_settings_person_path, notice: I18n.t("app.flashes.assistants.saved"), status: :see_other
   rescue
     @person = Current.person
@@ -17,10 +18,20 @@ class Settings::PeopleController < Settings::ApplicationController
 
   def person_params
     h = params.require(:person).permit(:email, personable_attributes: [
-      :id, :first_name, :last_name, :password, :profile_picture, :remove_profile_picture, preferences: [:dark_mode],
+      :id, :first_name, :last_name, :password, :profile_picture, :remove_profile_picture,
+      :dark_mode,
       credentials_attributes: [ :id, :type, :password ]
     ]).to_h
     format_and_strip_all_but_first_valid_credential(h)
+  end
+
+  def apply_backend_choices!
+    choices = params.permit(person: { backend_choices: User::Features.derived_backend_names })
+                   .dig(:person, :backend_choices)
+    return if choices.blank?
+
+    user = Current.person.reload.user   # merge against fresh state, not a stale session copy
+    choices.each { |name, value| user.features[name.to_sym] = value.presence }
   end
 
   def check_personable_id

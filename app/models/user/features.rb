@@ -9,6 +9,12 @@ class User::Features
     derived_backend_names + [:use_ruby_llm]
   end
 
+  def self.ruby_llm_available?(driver)
+    defined?(AIBackend::RubyLLM) &&
+      AIBackend::RubyLLM.respond_to?(:supports_driver?) &&
+      AIBackend::RubyLLM.supports_driver?(driver)
+  end
+
   def initialize(user)
     @user = user
   end

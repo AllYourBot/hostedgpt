@@ -86,17 +86,17 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "updates user preferences" do
+  test "updates nav_closed preference without touching other preferences" do
     user = users(:keith)
+    user.update!(dark_mode: "dark", nav_closed: false)
     login_as user
 
-    assert_changes "user.preferences[:nav_closed]", to: true do
-      assert_changes "user.preferences[:dark_mode]", to: "dark" do
-        patch user_url(user), params: { user: { preferences: { nav_closed: true, dark_mode: "dark" } } }
-        user.reload
-      end
-    end
+    patch user_url(user), params: { user: { nav_closed: true } }
     assert_response :redirect
+    user.reload
+
+    assert_equal true, user.nav_closed
+    assert_equal "dark", user.dark_mode, "sidebar toggle must not disturb dark_mode"
   end
 
   private

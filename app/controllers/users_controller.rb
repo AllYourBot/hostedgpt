@@ -59,6 +59,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(preferences: [:nav_closed, :dark_mode])
+    params.require(:user).permit(:nav_closed)
   end
 end

@@ -162,6 +162,40 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "updating dark_mode leaves nav_closed and feature opinions intact" do
+    @user.update!(nav_closed: true)
+    @user.update!(preferences: @user.preferences.merge(feature: { openai_backend: "sdk" }))
+
+    params = person_params
+    params["personable_attributes"]["dark_mode"] = "dark"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+    assert_nil flash[:error]
+
+    @user.reload
+    assert_equal "dark", @user.dark_mode
+    assert_equal true, @user.nav_closed
+    assert_equal "sdk", @user.preferences[:feature][:openai_backend]
+  end
+
+  test "stores and inherits backend choices without touching other preferences" do
+    @user.update!(dark_mode: "dark", nav_closed: true)
+
+    params = person_params
+    params["backend_choices"] = { "openai_ai_backend" => "ruby_llm", "gemini_ai_backend" => "" }
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+    assert_nil flash[:error]
+
+    @user.reload
+    assert_equal "ruby_llm", @user.features[:openai_ai_backend]
+    assert_nil @user.features[:gemini_ai_backend]
+    assert_equal true, @user.nav_closed
+    assert_equal "dark", @user.dark_mode
+  end
+
   private
 
   def with_feature(name, enabled)
