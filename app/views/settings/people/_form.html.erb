@@ -114,18 +114,17 @@
     </div>
 
     <div class="my-5">
-      <span class="block mb-2">AI backends</span>
+      <span class="block mb-2"><%= t('app.settings.people.form.ai_backends') %></span>
       <p class="text-sm text-gray-500 dark:text-gray-400">
-        Which implementation handles each provider. Default follows the site-wide setting
-        (currently <%= Feature.raw_features.fetch(:use_ruby_llm, false).to_b ? "RubyLLM" : "Built-in SDK" %>).
-        RubyLLM becomes selectable as its rollout lands.
+        <%= t('app.settings.people.form.ai_backends_description',
+              current: Feature.raw_features.fetch(:use_ruby_llm, false).to_b ? t('app.settings.people.form.backend_choice_ruby_llm') : t('app.settings.people.form.backend_choice_sdk')) %>
       </p>
       <div class="pl-3 mt-2">
         <div class="flex items-center gap-8 mb-1 text-sm text-gray-500 dark:text-gray-400">
           <span class="w-28"></span>
-          <span class="w-32">Default</span>
-          <span class="w-32">RubyLLM</span>
-          <span class="w-32">Built-in SDK</span>
+          <span class="w-32"><%= t('app.settings.people.form.backend_choice_default') %></span>
+          <span class="w-32"><%= t('app.settings.people.form.backend_choice_ruby_llm') %></span>
+          <span class="w-32"><%= t('app.settings.people.form.backend_choice_sdk') %></span>
         </div>
         <% User::Features.derived_backend_names.each do |choice| %>
           <% driver = choice.to_s.delete_suffix("_ai_backend") %>
@@ -135,16 +134,16 @@
             <span class="w-28 dark:text-gray-400"><%= display_name %></span>
             <span class="w-32">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "", current_choice.blank?,
-                    aria: { label: "#{display_name}: default" } %>
+                    aria: { label: t('app.settings.people.form.backend_choice_aria_default', driver: display_name) } %>
             </span>
             <span class="w-32">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "ruby_llm", current_choice == "ruby_llm",
                     disabled: !User::Features.ruby_llm_available?(driver),
-                    aria: { label: "#{display_name}: RubyLLM" } %>
+                    aria: { label: t('app.settings.people.form.backend_choice_aria_ruby_llm', driver: display_name) } %>
             </span>
             <span class="w-32">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "sdk", current_choice == "sdk",
-                    aria: { label: "#{display_name}: built-in SDK" } %>
+                    aria: { label: t('app.settings.people.form.backend_choice_aria_sdk', driver: display_name) } %>
             </span>
           </div>
         <% end %>
