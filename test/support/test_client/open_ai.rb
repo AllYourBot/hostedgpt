@@ -116,5 +116,36 @@ module TestClient
         self.class.api_oneoff_response
       end
     end
+
+    def self.images
+      @images ||= Images.new
+    end
+
+    def images
+      self.class.images
+    end
+
+    class Images
+      class << self
+        attr_accessor :parameters
+      end
+
+      def parameters
+        self.class.parameters
+      end
+
+      def self.api_images_response
+        {
+          "data" => [
+            { "b64_json" => "TEST_BASE64_IMAGE_DATA" }
+          ]
+        }
+      end
+
+      def generate(parameters:)
+        self.class.parameters = parameters
+        self.class.api_images_response
+      end
+    end
   end
 end

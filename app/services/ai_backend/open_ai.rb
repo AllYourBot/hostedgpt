@@ -1,6 +1,8 @@
 class AIBackend::OpenAI < AIBackend
   include Tools
 
+  IMAGE_MODEL = "gpt-image-1"
+
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
   #
@@ -35,6 +37,28 @@ class AIBackend::OpenAI < AIBackend
     response.dig("choices", 0, "message", "content")
   rescue ::Faraday::Error => e
     "Error: #{e.message}"
+  end
+
+  def self.generate_image(prompt:, user:)
+    openai_service = user.api_services.find_by(driver: :openai)
+
+    if openai_service.nil? || openai_service.effective_token.blank?
+      current_backend = Current.message&.assistant&.language_model&.api_service&.name || "current AI backend"
+      raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services to use image generation with #{current_backend}."
+    end
+
+    response = client.new(access_token: openai_service.effective_token).images.generate(
+      parameters: {
+        prompt: prompt,
+        model: IMAGE_MODEL,
+        n: 1,
+        size: "1024x1024",
+        quality: "auto"
+      }
+    )
+
+    b64_json = response.dig("data", 0, "b64_json") || response.dig(:data, 0, :b64_json)
+    { b64_json: b64_json, model: IMAGE_MODEL }
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)
