@@ -5,7 +5,7 @@
   <body
     class="
       nav-closed
-      <%= Current.user.preferences[:dark_mode] %>
+      <%= Current.user.dark_mode %>
       bg-white dark:bg-gray-800
     "
     data-controller="transition focus-restore"
@@ -17,7 +17,7 @@
         min-w-[260px]
         bg-gray-50 dark:bg-gray-900
         h-full
-        flex nav-closed:hidden <%= !Current.user.preferences[:nav_closed] && "md:!flex" %>
+        flex nav-closed:hidden <%= !Current.user.nav_closed && "md:!flex" %>
         z-30 md:z-auto nav-closed:z-auto
         absolute md:relative nav-closed:relative
         overflow-x-clip

@@ -47,6 +47,7 @@ shared:
     email: <%= ENV["EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
     password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
     assistants_page: <%= ENV["ASSISTANTS_PAGE_FEATURE"] || true %>
+    use_ruby_llm: <%= ENV["USE_RUBY_LLM_FEATURE"] || false %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     app_url_protocol: <%= ENV["APP_URL_PROTOCOL"] || default_to(app_url: :protocol) %>
