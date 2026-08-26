@@ -75,6 +75,12 @@ class AIBackend
     result
   end
 
+  # New backends: override this or accept OpenAI delegation — until a provider
+  # ships native image generation, OpenAI covers the capability for everyone.
+  def self.generate_image(prompt:, user:)
+    AIBackend::OpenAI.generate_image(prompt:, user:)
+  end
+
   private
 
   def client_method_name
