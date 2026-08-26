@@ -207,7 +207,7 @@ end %>
               data: {
                 role: "previous",
             } do %>
-              <%= icon "chevron-left", variant: :micro, title: previous_version.present? && "Previous", data: { } %>
+              <%= icon "chevron-left", variant: :micro, title: previous_version.present? && t('app.messages.previous_version'), data: { } %>
             <% end %>
 
             v<%= message.version %>
@@ -226,7 +226,7 @@ end %>
               data: {
                 role: "next",
             } do %>
-              <%= icon "chevron-right", variant: :micro, title: next_version.present? && "Next", data: { } %>
+              <%= icon "chevron-right", variant: :micro, title: next_version.present? && t('app.messages.next_version'), data: { } %>
             <% end %>
           <% end %>
 
@@ -238,7 +238,7 @@ end %>
                 composer_target: "messageEdit",
                 turbo_frame: "message-text-#{message.id}",
               } do %>
-              <%= icon "pencil", variant: :outline, size: 18, title: "Edit" %>
+              <%= icon "pencil", variant: :outline, size: 18, title: t('app.messages.edit') %>
             <% end %>
           <% elsif message.assistant? && message.assistant.not_deleted? %>
             <% if Feature.voice? %>
@@ -253,8 +253,8 @@ end %>
                     playback#toggleSpeakingMessage
                   |,
               } do %>
-                <%= icon "speaker-wave", variant: :outline, size: 19, title: "Read aloud", data: { role: "play", transition_target: "transitionable" } %>
-                <%= icon "stop-circle", variant: :outline, size: 19, title: "Stop", data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
+                <%= icon "speaker-wave", variant: :outline, size: 19, title: t('app.messages.read_aloud'), data: { role: "play", transition_target: "transitionable" } %>
+                <%= icon "stop-circle", variant: :outline, size: 19, title: t('app.conversations.ui.stop'), data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
               <% end %>
             <% end %>
             <%= button_tag type: "button",
@@ -269,8 +269,8 @@ end %>
                 keyboard_target: formatted_text.present? && formatted_text.exclude?('keyboard-target') ? "keyboardable" : nil,
                 # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
             } do %>
-              <%= icon "clipboard", variant: :outline, size: 18, title: "Copy", data: { transition_target: "transitionable" } %>
-              <%= icon "check", variant: :outline, size: 18, title: "Copied!", data: { transition_target: "transitionable" }, class: "hidden" %>
+              <%= icon "clipboard", variant: :outline, size: 18, title: t('app.messages.copy'), data: { transition_target: "transitionable" } %>
+              <%= icon "check", variant: :outline, size: 18, title: t('app.messages.copied'), data: { transition_target: "transitionable" }, class: "hidden" %>
             <% end %>
 
             <div class="dropdown dropdown-top flex items-center">
@@ -279,7 +279,7 @@ end %>
                 role: :button,
                 variant: :outline,
                 size: 18,
-                title: "Regenerate",
+                title: t('app.messages.regenerate'),
                 data: { role: "regenerate" }
               %>
 
@@ -303,7 +303,7 @@ end %>
                         turbo_frame: "_top",
                         turbo_action: "replace",
                     } do %>
-                      Using <%= assistant.name %>
+                      <%= t('app.messages.regenerate_menu.using', name: assistant.name) %>
                     <% end %>
                   </li>
                 <% end %>

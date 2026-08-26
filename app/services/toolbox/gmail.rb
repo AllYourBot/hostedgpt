@@ -52,6 +52,7 @@ class Toolbox::Gmail < Toolbox
     latest_sent_message = get_message(:latest_sent)
 
     {
+      message_to_user: "Gmail",
       messages_in_inbox: inbox.length,
       unread_messages_in_inbox: unread_inbox.length,
       read_messages_in_inbox: inbox.length - unread_inbox.length,

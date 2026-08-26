@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["fileInput", "currentAvatar", "previewContainer", "previewImage", "removeButton", "removalNotice"]
+  static values = { invalidFileType: String, fileTooLarge: String, confirmRemove: String }
 
   connect() {
     // Initialize the controller
@@ -17,14 +18,14 @@ export default class extends Controller {
 
     // Validate file type
     if (!file.type.match(/^image\/(jpeg|jpg|png|gif|webp)$/)) {
-      alert("Please select a valid image file (JPEG, PNG, GIF, or WebP)")
+      alert(this.invalidFileTypeValue)
       this.clearFileInput()
       return
     }
 
     // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      alert("File size must be less than 5MB")
+      alert(this.fileTooLargeValue)
       this.clearFileInput()
       return
     }
@@ -39,7 +40,7 @@ export default class extends Controller {
   }
 
   removeImage() {
-    if (confirm("Are you sure you want to remove your profile picture?")) {
+    if (confirm(this.confirmRemoveValue)) {
       this.clearFileInput()
       this.hidePreview()
 

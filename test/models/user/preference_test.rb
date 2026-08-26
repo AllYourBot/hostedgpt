@@ -27,15 +27,46 @@ class User::PreferenceTest < ActiveSupport::TestCase
 
   test "dark_mode preference defaults to system and it can update user dark_mode preference" do
     new_user = User.create!(first_name: "First", last_name: "Last")
-    assert_equal "system", new_user.preferences[:dark_mode]
+    assert_equal "system", new_user.dark_mode
 
     new_user.update!(preferences: { dark_mode: "light" })
-    assert_equal "light", new_user.preferences[:dark_mode]
+    assert_equal "light", new_user.dark_mode
 
     new_user.update!(preferences: { dark_mode: "dark" })
-    assert_equal "dark", new_user.preferences[:dark_mode]
+    assert_equal "dark", new_user.dark_mode
 
     new_user.update!(preferences: { dark_mode: "system" })
-    assert_equal "system", new_user.preferences[:dark_mode]
+    assert_equal "system", new_user.dark_mode
+  end
+
+  test "accessor writes persist through the reworked preferences getter" do
+    user = User.create!(first_name: "First", last_name: "Last")
+    assert_nil user.preferences[:dark_mode]
+
+    user.dark_mode = "dark"
+    assert_predicate user, :will_save_change_to_preferences?
+    user.save!
+    user.reload
+
+    assert_equal "dark", user.preferences[:dark_mode]
+  end
+
+  test "accessors coerce form payloads and round-trip through save and reload" do
+    user = User.create!(first_name: "First", last_name: "Last")
+
+    user.dark_mode = "dark"
+    user.nav_closed = "true"
+    user.save!
+    user.reload
+
+    assert_equal "dark", user.dark_mode
+    assert_equal true, user.reload.preferences[:nav_closed]
+    assert_equal true, user.nav_closed
+
+    user.nav_closed = "false"
+    assert_equal false, user.nav_closed
+
+    keys = user.reload.preferences.keys.map(&:to_s)
+    assert_equal keys.count, keys.uniq.count
   end
 end

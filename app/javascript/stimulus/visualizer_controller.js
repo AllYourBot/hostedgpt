@@ -1,6 +1,8 @@
 import {Controller} from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static values = { micPermissionBlocked: String }
+
   connect() {
     this.bodyElement = document.body
     this.wrapElement = document.getElementById("visualizer-container")
@@ -63,7 +65,7 @@ export default class extends Controller {
 
     let canProceed = await this.doPermissionPrompts()
     if (!canProceed) {
-      alert("The app needs microphone access to work. Click the circle (i) in the address bar and reset permissions in order to try again.")
+      alert(this.micPermissionBlockedValue)
       button.classList.remove("hidden")
       return
     }

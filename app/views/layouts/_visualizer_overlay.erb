@@ -31,7 +31,7 @@
             stroke-2
             text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white
           |,
-          title: "Close",
+          title: t('app.layouts.visualizer.close'),
           tooltip: :left
         %>
       <% end %>
@@ -41,6 +41,7 @@
       class="w-4/5 h-4/5 relative flex justify-center items-center"
       style="background-color: #d1684e"
       data-controller="visualizer"
+      data-visualizer-mic-permission-blocked-value="<%= t('app.conversations.ui.mic_permission_blocked') %>"
     >
       <%= button_tag type: "button",
         data: {
@@ -59,7 +60,7 @@
           rounded-md
           shadow-md
         | do %>
-          Enable
+          <%= t('app.layouts.visualizer.enable') %>
       <% end %>
     </div>
   </div>

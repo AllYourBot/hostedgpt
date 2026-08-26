@@ -31,8 +31,13 @@
     </div>
 
     <!-- Profile Picture Upload -->
-    <div class="my-5" data-controller="profile-picture-upload">
-      <%= user_fields.label :profile_picture, "Profile Picture" %>
+    <div class="my-5"
+      data-controller="profile-picture-upload"
+      data-profile-picture-upload-invalid-file-type-value="<%= t('app.settings.people.form.invalid_file_type') %>"
+      data-profile-picture-upload-file-too-large-value="<%= t('app.settings.people.form.file_too_large') %>"
+      data-profile-picture-upload-confirm-remove-value="<%= t('app.settings.people.form.confirm_remove_photo') %>"
+    >
+      <%= user_fields.label :profile_picture, t('app.settings.people.form.profile_picture') %>
       <div class="mt-2">
         <div class="flex items-center space-x-4">
           <!-- Current avatar display -->
@@ -51,13 +56,13 @@
                 } %>
 
             <div class="flex space-x-2">
-              <%= button_tag "Choose Photo",
+              <%= button_tag t('app.settings.people.form.choose_photo'),
                   type: "button",
                   class: "inline-block font-medium bg-gray-100 dark:bg-gray-900 dark:text-white border border-gray-400 rounded-lg py-2 px-4 cursor-pointer text-sm",
                   data: { action: "profile-picture-upload#chooseFile" } %>
 
               <% if person.personable.has_profile_picture? %>
-                <%= button_tag "Remove",
+                <%= button_tag t('app.settings.people.form.remove_photo'),
                     type: "button",
                     class: "inline-block font-medium bg-red-100 dark:bg-red-900 dark:text-white border border-red-400 rounded-lg py-2 px-4 cursor-pointer text-sm",
                     data: { action: "profile-picture-upload#removeImage", profile_picture_upload_target: "removeButton" } %>
@@ -65,25 +70,25 @@
             </div>
 
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              JPEG, PNG, GIF, or WebP. Max 5MB.
+              <%= t('app.settings.people.form.photo_hint') %>
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 hidden" data-profile-picture-upload-target="removalNotice">
-              Photo will be removed when you save.
+              <%= t('app.settings.people.form.photo_removal_notice') %>
             </p>
           </div>
         </div>
 
         <!-- Preview area (hidden by default) -->
         <div class="mt-4 hidden" data-profile-picture-upload-target="previewContainer">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview:</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2"><%= t('app.settings.people.form.photo_preview_label') %></p>
           <div class="flex items-center space-x-4">
             <div class="rounded-full w-16 h-16 overflow-hidden border border-gray-200 dark:border-gray-600">
               <img data-profile-picture-upload-target="previewImage"
                    class="w-full h-full object-cover"
-                   alt="Profile picture preview">
+                   alt="<%= t('app.settings.people.form.photo_preview_alt') %>">
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              This is how your profile picture will appear.
+              <%= t('app.settings.people.form.photo_preview_description') %>
             </p>
           </div>
         </div>
@@ -104,13 +109,48 @@
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
   <%= user_fields.label :dark_mode, t('app.settings.people.form.color_theme') %>
       <div class="flex items-center justify-between outline-none pl-3 py-2 mt-2 w-full dark:text-black gap-1">
-        <%= user_fields.fields_for :preferences do |preferences_fields| %>
-          <% %w(dark light system).each do |value| %>
-            <div class="flex items-center gap-2">
-              <%= preferences_fields.radio_button :dark_mode, value, checked: Current.user.preferences[:dark_mode] == value %>
-              <%= user_fields.label :dark_mode, t("app.settings.people.form.theme_options.#{value}"), class: "dark:text-gray-100", for: "person_personable_attributes_preferences_dark_mode_#{value}"%>
-            </div>
-          <% end %>
+      <% %w(dark light system).each do |value| %>
+        <div class="flex items-center gap-2">
+          <%= user_fields.radio_button :dark_mode, value, checked: Current.user.dark_mode == value %>
+          <%= user_fields.label :dark_mode, t("app.settings.people.form.theme_options.#{value}"), class: "dark:text-gray-100", for: "person_personable_attributes_dark_mode_#{value}"%>
+        </div>
+      <% end %>
+      </div>
+    </div>
+
+    <div class="my-5">
+      <span class="block mb-2"><%= t('app.settings.people.form.ai_backends') %></span>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        <%= t('app.settings.people.form.ai_backends_description',
+              current: Feature.raw_features.fetch(:use_ruby_llm, false).to_b ? t('app.settings.people.form.backend_choice_ruby_llm') : t('app.settings.people.form.backend_choice_sdk')) %>
+      </p>
+      <div class="pl-3 mt-2">
+        <div class="flex items-center gap-8 mb-1 text-sm text-gray-500 dark:text-gray-400">
+          <span class="w-28"></span>
+          <span class="w-32"><%= t('app.settings.people.form.backend_choice_default') %></span>
+          <span class="w-32"><%= t('app.settings.people.form.backend_choice_ruby_llm') %></span>
+          <span class="w-32"><%= t('app.settings.people.form.backend_choice_sdk') %></span>
+        </div>
+        <% User::Features.derived_backend_names.each do |choice| %>
+          <% driver = choice.to_s.delete_suffix("_ai_backend") %>
+          <% display_name = { "openai" => "OpenAI" }.fetch(driver) { driver.humanize } %>
+          <% current_choice = Current.person.user.features[choice] %>
+          <div class="flex items-center gap-8 py-1">
+            <span class="w-28 dark:text-gray-400"><%= display_name %></span>
+            <span class="w-32">
+              <%= radio_button_tag "person[backend_choices][#{choice}]", "", current_choice.blank?,
+                    aria: { label: t('app.settings.people.form.backend_choice_aria_default', driver: display_name) } %>
+            </span>
+            <span class="w-32">
+              <%= radio_button_tag "person[backend_choices][#{choice}]", "ruby_llm", current_choice == "ruby_llm",
+                    disabled: !User::Features.ruby_llm_available?(driver),
+                    aria: { label: t('app.settings.people.form.backend_choice_aria_ruby_llm', driver: display_name) } %>
+            </span>
+            <span class="w-32">
+              <%= radio_button_tag "person[backend_choices][#{choice}]", "sdk", current_choice == "sdk",
+                    aria: { label: t('app.settings.people.form.backend_choice_aria_sdk', driver: display_name) } %>
+            </span>
+          </div>
         <% end %>
       </div>
     </div>
