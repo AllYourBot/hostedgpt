@@ -26,6 +26,13 @@ module TestClient
       @@parameters
     end
 
+    def self.reset_recordings!
+      @@model = nil
+      @@instruction = nil
+      @@parameters = nil
+      Images.parameters = nil
+    end
+
     def self.api_oneoff_response
       {
         "id"=>"chatcmpl-A0ZcGrOn1iO5bUgDVFMEj7pX6ZB9A",

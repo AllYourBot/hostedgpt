@@ -12,10 +12,15 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       @conversation.latest_message_for_version(:latest)
     )
     TestClient::OpenAI.new(access_token: "abc")
+    TestClient::OpenAI.reset_recordings!
   end
 
   test "initializing client works" do
     assert @openai.client.present?
+  end
+
+  test "recordings start clean in every example" do
+    assert_nil TestClient::OpenAI.parameters
   end
 
   test "openai url is properly set" do
