@@ -25,6 +25,12 @@ class AutotitleConversationJob < ApplicationJob
     return true if @conversation.title.present?
 
     @conversation.update!(title: topic)
+  rescue Faraday::Error,
+         ::OpenAI::ConfigurationError,
+         ::Anthropic::ConfigurationError,
+         ::Gemini::Errors::ConfigurationError => e
+    Rails.logger.warn("[AutotitleConversationJob] Provider failure for conversation #{@conversation.id}: #{e.class}")
+    true
   end
 
   private

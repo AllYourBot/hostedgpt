@@ -87,6 +87,26 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     assert_equal "Twin Title", conversation.reload.title
   end
 
+  test "provider network failures degrade to a warning instead of dead-lettering" do
+    conversation = conversations(:greeting)
+    conversation.update!(title: nil)
+
+    failing_class = Class.new(TestClient::OpenAI) do
+      define_method(:chat) { |**args| raise Faraday::ConnectionFailed, "connection refused" }
+    end
+
+    warnings = []
+    AIBackend::OpenAI.stub :client, failing_class do
+      Rails.logger.stub :warn, ->(message) { warnings << message } do
+        AutotitleConversationJob.perform_now(conversation.id)
+      end
+    end
+
+    assert_equal 1, warnings.length
+    assert_includes warnings.first, conversation.id.to_s
+    assert_nil conversation.reload.title
+  end
+
   UNUSABLE_REPLIES = {
     empty_string: "",
     whitespace_only: "   ",
