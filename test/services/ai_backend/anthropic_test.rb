@@ -13,6 +13,7 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
       @conversation.latest_message_for_version(:latest)
     )
     TestClient::Anthropic.new(access_token: "abc")
+    TestClient::Anthropic.reset_recordings!
   end
 
   test "initializing client works" do

@@ -12,6 +12,11 @@ module TestClient
         @@payload
       end
 
+      def reset_recordings!
+        @@payload = nil
+        self.blocked = false
+      end
+
       def text
         nil
       end

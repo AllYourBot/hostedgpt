@@ -29,6 +29,10 @@ module TestClient
       @@messages_args
     end
 
+    def self.reset_recordings!
+      @@messages_args = nil
+    end
+
     # This response is a valid example response from the API.
     #
     # Stub this method to respond with something more specific if needed.

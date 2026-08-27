@@ -37,22 +37,27 @@ class AutotitleConversationJob < ApplicationJob
   end
 
   def usable_topic(response)
-    return nil if response.blank?
+    if response.blank?
+      Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}")
+      return nil
+    end
 
-    topic = JSON.parse(response)["topic"]
+    document = JSON.parse(response)
+    topic = document.is_a?(Hash) ? document["topic"] : nil
+
     if topic.is_a?(String) && topic.present?
       topic
     else
       Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}")
       nil
     end
-  rescue JSON::ParserError, TypeError => e
+  rescue JSON::ParserError, TypeError, NoMethodError => e
     Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}: #{e.class}")
     nil
   end
 
   def system_message
-    base_message = <<~END
+    <<~END
       You extract a 2-4 word topic from text. I will give the text of a chat. You reply with the topic of this chat,
       but summarize the topic in 2-4 words. Even though it's not a complete sentence, capitalize the first letter of
       the first word unless it's some odd anomaly like "iPhone". Make sure that your answer matches the language of
@@ -72,7 +77,5 @@ class AutotitleConversationJob < ApplicationJob
       { "topic": "Rails collection counter" }
       ```
     END
-
-    base_message
   end
 end

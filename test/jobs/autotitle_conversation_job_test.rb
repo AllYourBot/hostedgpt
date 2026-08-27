@@ -76,7 +76,11 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     numeric_topic: "{\"topic\":42}",
     array_topic: "{\"topic\":[\"a\",\"b\"]}",
     object_topic: "{\"topic\":{\"k\":\"v\"}}",
-    not_json: "not json at all"
+    not_json: "not json at all",
+    null_literal: "null",
+    true_literal: "true",
+    false_literal: "false",
+    hash_payload: { "topic" => 42 }
   }
 
   test "unusable replies keep the prior title instead of raising" do
@@ -84,13 +88,18 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation.update!(title: nil)
 
     UNUSABLE_REPLIES.each do |label, reply|
+      warnings = []
       begin
-        TestClient::OpenAI.stub :text, reply do
-          AutotitleConversationJob.perform_now(conversation.id)
+        Rails.logger.stub :warn, ->(message) { warnings << message } do
+          TestClient::OpenAI.stub :text, reply do
+            AutotitleConversationJob.perform_now(conversation.id)
+          end
         end
       rescue StandardError => e
         flunk("case #{label} raised #{e.class}: #{e.message}")
       end
+      assert_equal 1, warnings.length, "case #{label} should warn exactly once, got #{warnings.inspect}"
+      assert_includes warnings.first, conversation.id.to_s, "case #{label} warning should carry the conversation id"
       assert_nil conversation.reload.title, "case #{label} should leave the title untouched"
     end
   end

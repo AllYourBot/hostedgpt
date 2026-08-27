@@ -13,6 +13,7 @@ class AIBackend::GeminiTest < ActiveSupport::TestCase
       @conversation.latest_message_for_version(:latest)
     )
     TestClient::Gemini.new(access_token: "abc")
+    TestClient::Gemini.reset_recordings!
   end
 
   test "one-off get_oneoff_message with json intent requests the json mime type" do
