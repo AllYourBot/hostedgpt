@@ -67,6 +67,49 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     assert_equal "Already Named", conversation.reload.title
   end
 
+  UNUSABLE_REPLIES = {
+    empty_string: "",
+    whitespace_only: "   ",
+    plain_prose: "Here is a perfectly fine prose answer.",
+    missing_key: "{}",
+    blank_topic_value: "{\"topic\":\"\"}",
+    numeric_topic: "{\"topic\":42}",
+    array_topic: "{\"topic\":[\"a\",\"b\"]}",
+    object_topic: "{\"topic\":{\"k\":\"v\"}}",
+    not_json: "not json at all"
+  }
+
+  test "unusable replies keep the prior title instead of raising" do
+    conversation = conversations(:greeting)
+    conversation.update!(title: nil)
+
+    UNUSABLE_REPLIES.each do |label, reply|
+      begin
+        TestClient::OpenAI.stub :text, reply do
+          AutotitleConversationJob.perform_now(conversation.id)
+        end
+      rescue StandardError => e
+        flunk("case #{label} raised #{e.class}: #{e.message}")
+      end
+      assert_nil conversation.reload.title, "case #{label} should leave the title untouched"
+    end
+  end
+
+  test "safety-blocked gemini replies keep the prior title too" do
+    conversation = conversations(:gemini_conversation)
+    conversation.update!(title: nil)
+
+    TestClient::Gemini.blocked = true
+
+    assert_nothing_raised do
+      AutotitleConversationJob.perform_now(conversation.id)
+    end
+
+    assert_nil conversation.reload.title
+  ensure
+    TestClient::Gemini.blocked = false
+  end
+
   test "the topic is not set if the conversation has no messages" do
     conversation = users(:keith).conversations.create!(assistant: assistants(:samantha))
     conversation.update!(updated_at: Time.current) # update is what triggers the callback

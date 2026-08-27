@@ -14,23 +14,37 @@ class AutotitleConversationJob < ApplicationJob
     messages = @conversation.messages.ordered.limit(4)
     raise ConversationNotReady  if messages.empty?
 
-    new_title = Current.set(user: @conversation.user) do
-      generate_title_for(messages.map(&:content_text).join("\n"))
+    response = Current.set(user: @conversation.user) do
+      fetch_reply_for(messages.map(&:content_text).join("\n"))
     end
-    @conversation.update!(title: new_title)
+    topic = usable_topic(response)
+
+    if topic.blank?
+      Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}")
+      return true
+    end
+
+    @conversation.update!(title: topic)
+  rescue JSON::ParserError, TypeError => e
+    Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}: #{e.class}")
+    true
   end
 
   private
 
-  def generate_title_for(text)
+  def fetch_reply_for(text)
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
 
-    response = ai_backend.get_oneoff_message(
+    ai_backend.get_oneoff_message(
       system_message,
       [text],
       json: true
     )
-    JSON.parse(response)["topic"]
+  end
+
+  def usable_topic(response)
+    topic = JSON.parse(response)["topic"]
+    topic if topic.is_a?(String)
   end
 
   def system_message
