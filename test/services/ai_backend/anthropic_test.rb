@@ -439,4 +439,38 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     assert_equal "be terse", TestClient::Anthropic.messages_args.dig(:parameters, :system)
     assert response.dig("content", 0, "text").present?
   end
+
+  test "one-off with json intent appends the exact suffix to both system slots and never sends response_format" do
+    suffix = "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content. Your entire response should be exactly: {\"topic\": \"Your 2-4 word summary here\"}"
+
+    TestClient::Anthropic.stub :text, "{\"topic\":\"Claude Notes\"}" do
+      reply = @anthropic.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
+      args = TestClient::Anthropic.messages_args
+
+      assert_equal "Claude Notes", JSON.parse(reply)["topic"]
+      assert args[:system].end_with?(suffix)
+      assert args.dig(:parameters, :system).end_with?(suffix)
+      assert_equal args[:system], args.dig(:parameters, :system), "outer and inner system slots carry identical bytes"
+      assert_nil args[:response_format]
+      assert_nil args.dig(:parameters, :response_format)
+    end
+  end
+
+  test "one-off without json intent leaves instructions unsuffixed while params strip persists" do
+    TestClient::Anthropic.stub :text, "plain answer" do
+      reply = @anthropic.get_oneoff_message(
+        "Just answer.",
+        ["some text"],
+        { model: "claude-override", response_format: { type: "json_object" } }
+      )
+      args = TestClient::Anthropic.messages_args
+
+      assert_not args[:system].end_with?("ONLY valid JSON")
+      assert_not args.dig(:parameters, :system).end_with?("ONLY valid JSON")
+      assert_includes args[:system], "Just answer."
+      assert_nil args.dig(:parameters, :response_format), "foreign keys stay stripped from transmitted parameters"
+      assert_equal "claude-override", args.dig(:parameters, :model), "explicit caller params still win"
+      assert_equal "plain answer", reply
+    end
+  end
 end

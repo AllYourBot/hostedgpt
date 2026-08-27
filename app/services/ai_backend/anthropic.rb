@@ -125,14 +125,19 @@ class AIBackend::Anthropic < AIBackend
   def set_client_config(config)
     super(config)
 
+    instructions = config[:instructions]
+    if config[:json]
+      instructions += "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content. Your entire response should be exactly: {\"topic\": \"Your 2-4 word summary here\"}"
+    end
+
     @client_config = {
       model: @assistant.language_model.api_name,
-      system: config[:instructions],
+      system: instructions,
       messages: config[:messages],
       tools: @assistant.language_model.supports_tools? && anthropic_format_tools(Toolbox.tools) || nil,
       parameters: {
         model: @assistant.language_model.api_name,
-        system: config[:instructions],
+        system: instructions,
         messages: config[:messages],
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
         stream: config[:streaming] && @response_handler || nil,
