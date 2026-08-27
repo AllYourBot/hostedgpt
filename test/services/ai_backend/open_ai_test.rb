@@ -70,6 +70,20 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     end
   end
 
+  test "a direct OpenAI subclass inherits json intent untouched" do
+    subclass = Class.new(AIBackend::OpenAI)
+    instance = subclass.new(users(:keith), @assistant, @conversation, @conversation.latest_message_for_version(:latest))
+
+    TestClient::OpenAI.stub :text, "{\"topic\":\"Inherited\"}" do
+      reply = instance.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
+
+      params = TestClient::OpenAI.parameters
+      assert_equal({ type: "json_object" }, params[:response_format])
+      assert_equal @assistant.language_model.api_name, params[:model]
+      assert_equal "Inherited", JSON.parse(reply)["topic"]
+    end
+  end
+
   test "stream_next_conversation_message works to stream text and uses model from assistant" do
     assert_not_equal @assistant, @conversation.assistant, "Should force this next message to use a different assistant so these don't match"
 
