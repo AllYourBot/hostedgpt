@@ -7,6 +7,8 @@ class AutotitleConversationJob < ApplicationJob
 
   def perform(conversation_id)
     @conversation = Conversation.find(conversation_id)
+    return true if @conversation.title.present?
+
     return false if @conversation.assistant.api_service.requires_token? && @conversation.assistant.api_service.effective_token.blank?
 
     messages = @conversation.messages.ordered.limit(4)
