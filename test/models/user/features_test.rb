@@ -39,8 +39,10 @@ class User::FeaturesTest < ActiveSupport::TestCase
     assert_raises(KeyError) { @user.features[:voic] = true }
   end
 
-  test "RubyLLM is unavailable while the RubyLLM backend does not exist or does not support a driver" do
-    refute User::Features.ruby_llm_available?("openai")
+  test "RubyLLM is available for all three drivers in Phase 3" do
+    assert User::Features.ruby_llm_available?("openai")
+    assert User::Features.ruby_llm_available?("anthropic")
+    assert User::Features.ruby_llm_available?("gemini")
   end
 
   test "derived backend names are valid and non-chat drivers are not" do

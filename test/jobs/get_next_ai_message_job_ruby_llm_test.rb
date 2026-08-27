@@ -79,4 +79,56 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
 
     assert @message.reload.not_failed?
   end
+
+  # Phase 3 — Anthropic + Gemini/Groq text chat
+
+  test "populates the latest message from the assistant via RubyLLM with anthropic driver" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    stub_features(use_ruby_llm: true) do
+      assert_no_difference "@conversation.messages.reload.length" do
+        TestClient::RubyLLM::Chat.stub :text, "Hello from Claude via RubyLLM" do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+        end
+      end
+    end
+
+    assert_equal "Hello from Claude via RubyLLM", @conversation.latest_message_for_version(:latest).content_text
+  end
+
+  test "populates the latest message from the assistant via RubyLLM with gemini driver" do
+    @assistant.language_model.api_service.update!(driver: "gemini")
+    stub_features(use_ruby_llm: true) do
+      assert_no_difference "@conversation.messages.reload.length" do
+        TestClient::RubyLLM::Chat.stub :text, "Hello from Gemini via RubyLLM" do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+        end
+      end
+    end
+
+    assert_equal "Hello from Gemini via RubyLLM", @conversation.latest_message_for_version(:latest).content_text
+  end
+
+  test "when API response is empty with anthropic driver, a nice error message is displayed" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :text, "" do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+      end
+    end
+
+    assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
+    assert @message.reload.failed?
+  end
+
+  test "when API response is empty with gemini driver, a nice error message is displayed" do
+    @assistant.language_model.api_service.update!(driver: "gemini")
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :text, "" do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+      end
+    end
+
+    assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
+    assert @message.reload.failed?
+  end
 end

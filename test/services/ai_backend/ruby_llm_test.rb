@@ -10,12 +10,12 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     @gemini_service = api_services(:keith_gemini_service)
   end
 
-  # Phase 1 — updated for Phase 2 driver support
+  # Phase 1 — updated for Phase 3 driver support
 
-  test "supports_driver? returns true for openai, false for others in Phase 2" do
+  test "supports_driver? returns true for all backends in Phase 3" do
     assert AIBackend::RubyLLM.supports_driver?("openai")
-    refute AIBackend::RubyLLM.supports_driver?("anthropic")
-    refute AIBackend::RubyLLM.supports_driver?("gemini")
+    assert AIBackend::RubyLLM.supports_driver?("anthropic")
+    assert AIBackend::RubyLLM.supports_driver?("gemini")
   end
 
   test "APIService#ai_backend returns old OpenAI class when feature flag is off" do
@@ -42,10 +42,11 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     end
   end
 
-  test "APIService#ai_backend falls back to old classes for unsupported drivers even with flag on" do
+  test "APIService#ai_backend returns RubyLLM for all drivers when flag is on in Phase 3" do
     stub_features(use_ruby_llm: true) do
-      assert_equal AIBackend::Anthropic, @anthropic_service.ai_backend
-      assert_equal AIBackend::Gemini, @gemini_service.ai_backend
+      assert_equal AIBackend::RubyLLM, @openai_service.ai_backend
+      assert_equal AIBackend::RubyLLM, @anthropic_service.ai_backend
+      assert_equal AIBackend::RubyLLM, @gemini_service.ai_backend
     end
   end
 
@@ -304,5 +305,115 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
 
     context = backend.send(:ruby_llm_context)
     assert_nil context.openai_api_base
+  end
+
+  # Phase 3 — Anthropic + Gemini/Groq text chat
+
+  test "provider_for_url returns anthropic for Anthropic URL" do
+    assert_equal :anthropic, AIBackend::RubyLLM.provider_for_url(APIService::URL_ANTHROPIC)
+  end
+
+  test "provider_for_url returns gemini for Gemini URL" do
+    assert_equal :gemini, AIBackend::RubyLLM.provider_for_url(APIService::URL_GEMINI)
+  end
+
+  test "provider_for_url returns openai for OpenAI URL" do
+    assert_equal :openai, AIBackend::RubyLLM.provider_for_url(APIService::URL_OPEN_AI)
+  end
+
+  test "provider_for_url returns openai for Groq URL" do
+    assert_equal :openai, AIBackend::RubyLLM.provider_for_url(APIService::URL_GROQ)
+  end
+
+  test "test_execute uses anthropic provider for Anthropic URL" do
+    TestClient::RubyLLM::Chat.stub :text, "Bonjour" do
+      result = AIBackend::RubyLLM.test_execute(APIService::URL_ANTHROPIC, "abc", "claude-3-opus")
+      assert_equal "Bonjour", result
+    end
+  end
+
+  test "test_execute uses gemini provider for Gemini URL" do
+    TestClient::RubyLLM::Chat.stub :text, "Hallo" do
+      result = AIBackend::RubyLLM.test_execute(APIService::URL_GEMINI, "abc", "gemini-pro")
+      assert_equal "Hallo", result
+    end
+  end
+
+  test "ruby_llm_context sets anthropic_api_key for anthropic driver" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    context = backend.send(:ruby_llm_context)
+    assert_equal @assistant.language_model.api_service.effective_token, context.anthropic_api_key
+  end
+
+  test "ruby_llm_context sets gemini_api_key for gemini driver" do
+    @assistant.language_model.api_service.update!(driver: "gemini")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    context = backend.send(:ruby_llm_context)
+    assert_equal @assistant.language_model.api_service.effective_token, context.gemini_api_key
+  end
+
+  test "build_chat uses provider_slug for anthropic" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+    chat_class = AIBackend::RubyLLM.gem_class
+
+    chat_class.stub :new, ->(**kwargs) { kwargs } do
+      chat_args = backend.send(:build_chat)
+      assert_equal :anthropic, chat_args[:provider]
+    end
+  end
+
+  test "build_chat uses provider_slug for gemini" do
+    @assistant.language_model.api_service.update!(driver: "gemini")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+    chat_class = AIBackend::RubyLLM.gem_class
+
+    chat_class.stub :new, ->(**kwargs) { kwargs } do
+      chat_args = backend.send(:build_chat)
+      assert_equal :gemini, chat_args[:provider]
+    end
+  end
+
+  test "stream_next_conversation_message works with anthropic driver" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "Claude streaming" do
+      chunks = []
+      result = backend.stream_next_conversation_message { |c| chunks << c }
+      assert_equal ["Claude streaming"], chunks
+      assert_nil result
+    end
+  end
+
+  test "stream_next_conversation_message works with gemini driver" do
+    @assistant.language_model.api_service.update!(driver: "gemini")
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "Gemini streaming" do
+      chunks = []
+      result = backend.stream_next_conversation_message { |c| chunks << c }
+      assert_equal ["Gemini streaming"], chunks
+      assert_nil result
+    end
   end
 end

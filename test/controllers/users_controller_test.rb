@@ -106,7 +106,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     user.update!(dark_mode: "dark", nav_closed: false)
     login_as user
 
-    patch user_url(user), params: { user: { nav_closed: true } }
+    patch user_url(user), params: { user: { preferences: { nav_closed: "true" } } }
     assert_response :redirect
     user.reload
 

@@ -13,7 +13,7 @@ class AIBackend::RubyLLM < AIBackend
   ].freeze
 
   def self.supports_driver?(driver)
-    ["openai"].include?(driver)
+    ["openai", "anthropic", "gemini"].include?(driver)
   end
 
   def self.client
@@ -24,16 +24,30 @@ class AIBackend::RubyLLM < AIBackend
     Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::RubyLLM::Chat
   end
 
+  def self.provider_for_url(url)
+    if url&.include?("api.anthropic.com")
+      :anthropic
+    elsif url&.include?("generativelanguage.googleapis.com")
+      :gemini
+    else
+      :openai
+    end
+  end
+
   def self.test_execute(url, token, api_name)
+    provider = provider_for_url(url)
     if Rails.env.test?
-      chat = TestClient::RubyLLM::Chat.new(model: api_name, provider: :openai, assume_model_exists: true)
+      chat = TestClient::RubyLLM::Chat.new(model: api_name, provider: provider, assume_model_exists: true)
       chat.add_message({ role: "user", content: "Hello!" })
       chat.complete.content
     else
-      Rails.logger.info "Connecting to OpenAI API server at #{url} with access token of length #{token.to_s.length}"
-      Rails.logger.info "Testing using model #{api_name}"
-      context = RubyLLM.context { |c| c.openai_api_key = token; c.openai_api_base = url if url != APIService::URL_OPEN_AI }
-      chat = RubyLLM::Chat.new(model: api_name, provider: :openai, assume_model_exists: true, context: context)
+      Rails.logger.info "Connecting to AI API server at #{url} with access token of length #{token.to_s.length}"
+      Rails.logger.info "Testing using model #{api_name} for provider #{provider}"
+      context = RubyLLM.context { |c| c.public_send("#{provider}_api_key=", token) }
+      if provider == :openai && url != APIService::URL_OPEN_AI
+        context.openai_api_base = url
+      end
+      chat = RubyLLM::Chat.new(model: api_name, provider: provider, assume_model_exists: true, context: context)
       chat.add_message({ role: "user", content: "Hello!" })
       chat.complete.content
     end
@@ -72,14 +86,20 @@ class AIBackend::RubyLLM < AIBackend
 
   private
 
+  def provider_slug
+    @api_service.driver.to_sym
+  end
+
   def build_chat
-    self.class.gem_class.new(model: @api_name, provider: :openai, assume_model_exists: true, context: ruby_llm_context)
+    self.class.gem_class.new(model: @api_name, provider: provider_slug, assume_model_exists: true, context: ruby_llm_context)
   end
 
   def ruby_llm_context
     self.class.client.context do |c|
-      c.openai_api_key = @token
-      c.openai_api_base = @api_service.url if @api_service.url != APIService::URL_OPEN_AI
+      c.public_send("#{provider_slug}_api_key=", @token)
+      if provider_slug == :openai && @api_service.url != APIService::URL_OPEN_AI
+        c.openai_api_base = @api_service.url
+      end
     end
   end
 

@@ -12,13 +12,13 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     @user.save!
 
     params = person_params
-    params["personable_attributes"]["preferences"] = { dark_mode: "dark" }
+    params["personable_attributes"]["dark_mode"] = "dark"
 
     patch settings_person_url, params: { person: params }
     assert_redirected_to edit_settings_person_url
     @user.reload
 
-    assert_equal "dark", @user.preferences[:dark_mode]
+    assert_equal "dark", @user.dark_mode
     assert_equal({ use_ruby_llm: true }, @user.preferences[:feature])
   end
 
