@@ -19,6 +19,31 @@ class AIBackend::GeminiTest < ActiveSupport::TestCase
     assert @gemini.client.present?
   end
 
+  test "one-off get_oneoff_message with json intent requests the json mime type" do
+    TestClient::Gemini.stub :text, "{\"topic\":\"Gemini Tips\"}" do
+      payload = @gemini.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
+
+      assert_equal({ response_mime_type: "application/json" }, TestClient::Gemini.payload[:generation_config])
+      assert_equal({ role: "user", parts: { text: "Here is chat text." } }, TestClient::Gemini.payload[:contents])
+      assert_equal "Gemini Tips", JSON.parse(payload)["topic"]
+    end
+  end
+
+  test "one-off get_oneoff_message without json intent omits generation_config" do
+    @gemini.get_oneoff_message("plain", ["text"])
+
+    assert_equal [ :system_instruction, :contents ], TestClient::Gemini.payload.keys
+    refute TestClient::Gemini.payload.key?(:generation_config)
+  end
+
+  test "one-off get_oneoff_message with json intent through a safety-blocked reply returns nil" do
+    TestClient::Gemini.blocked = true
+
+    assert_nil @gemini.get_oneoff_message("Extract a topic.", ["chat text"], json: true)
+  ensure
+    TestClient::Gemini.blocked = false
+  end
+
   test "preceding_conversation_messages constructs a proper response and pivots on images" do
     conversation = conversations(:attachments)
     assistant = assistants(:keith_claude35)
