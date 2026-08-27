@@ -281,6 +281,27 @@ class AIBackend::GeminiTest < ActiveSupport::TestCase
     { "candidates" => [{ "content" => { "role" => "model", "parts" => [{ "text" => text }] } }] }
   end
 
+  test "one-off generate_content records its payload and answers a candidates-shaped hash" do
+    client = TestClient::Gemini.new({})
+    payload = { contents: { role: "user", parts: { text: "Hello!" } }, system_instruction: "be terse" }
+
+    response = client.generate_content(payload)
+
+    assert_equal payload, TestClient::Gemini.payload
+    assert response.dig("candidates", 0, "content", "parts", 0, "text").present?
+  end
+
+  test "generate_content honors a safety-block toggle and stays dig-safe" do
+    TestClient::Gemini.blocked = true
+
+    response = TestClient::Gemini.new({}).generate_content({ contents: {} })
+
+    assert_nil response.dig("candidates", 0, "content", "parts", 0, "text")
+    assert_equal "SAFETY", response.dig("promptFeedback", "blockReason")
+  ensure
+    TestClient::Gemini.blocked = false
+  end
+
   def streamed_function_call(name, args)
     { "candidates" => [{ "content" => { "role" => "model",
       "parts" => [{ "functionCall" => { "name" => name, "args" => args }, "thoughtSignature" => "sig-abc" }] } }] }

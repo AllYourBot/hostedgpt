@@ -429,4 +429,14 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     test_file.close
     test_file.unlink
   end
+
+  test "one-off messages call records arguments and returns a diggable envelope" do
+    response = TestClient::Anthropic.new(access_token: "abc").messages(
+      model: "claude-x", parameters: { system: "be terse" }
+    )
+
+    assert_instance_of Hash, response
+    assert_equal "be terse", TestClient::Anthropic.messages_args.dig(:parameters, :system)
+    assert response.dig("content", 0, "text").present?
+  end
 end
