@@ -441,8 +441,16 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     assert response.dig("content", 0, "text").present?
   end
 
+  test "json intent suffix coerces mechanism without promising a topic schema" do
+    @anthropic.send(:set_client_config, { instructions: "Extract a topic.", messages: [], json: true })
+    suffix = @anthropic.instance_variable_get(:@client_config)[:system].split("\n\n").last
+
+    assert_includes suffix, "ONLY valid JSON"
+    refute_includes suffix, "topic"
+  end
+
   test "one-off with json intent appends the exact suffix to both system slots and never sends response_format" do
-    suffix = "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content. Your entire response should be exactly: {\"topic\": \"Your 2-4 word summary here\"}"
+    suffix = "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content."
 
     TestClient::Anthropic.stub :text, "{\"topic\":\"Claude Notes\"}" do
       reply = @anthropic.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
