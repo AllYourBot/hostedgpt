@@ -22,6 +22,34 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     assert_equal "Javascript popState", conversation.reload.title
   end
 
+  test "claude conversations are titled through the same intent path" do
+    conversation = conversations(:hello_claude)
+
+    TestClient::Anthropic.stub :text, "{\"topic\":\"Claude Summary\"}" do
+      AutotitleConversationJob.perform_now(conversation.id)
+    end
+
+    assert_equal "Claude Summary", conversation.reload.title
+  end
+
+  test "gemini conversations are titled through the same intent path" do
+    conversation = conversations(:gemini_conversation)
+
+    TestClient::Gemini.stub :text, "{\"topic\":\"Gemini Summary\"}" do
+      AutotitleConversationJob.perform_now(conversation.id)
+    end
+
+    assert_equal "Gemini Summary", conversation.reload.title
+  end
+
+  test "the job source stays provider-blind" do
+    source = File.read(Rails.root.join("app/jobs/autotitle_conversation_job.rb"))
+
+    [".scan(", ".driver ==", ".class =="].each do |needle|
+      refute_includes source, needle
+    end
+  end
+
   test "the topic is not set if the conversation has no messages" do
     conversation = users(:keith).conversations.create!(assistant: assistants(:samantha))
     conversation.update!(updated_at: Time.current) # update is what triggers the callback

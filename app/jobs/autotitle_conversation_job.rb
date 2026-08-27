@@ -21,32 +21,14 @@ class AutotitleConversationJob < ApplicationJob
   private
 
   def generate_title_for(text)
-
     ai_backend = @conversation.assistant.api_service.ai_backend.new(@conversation.user, @conversation.assistant)
 
-    if ai_backend.class == AIBackend::OpenAI || ai_backend.class == AIBackend::Anthropic
-      params = ai_backend.class == AIBackend::OpenAI ? { response_format: { type: "json_object" } } : {}
-
-      response = ai_backend.get_oneoff_message(
-        system_message,
-        [text],
-        params
-      )
-      return JSON.parse(response)["topic"]
-    elsif ai_backend.class == AIBackend::Gemini
-      response = ai_backend.get_oneoff_message(
-        system_message,
-        [text],
-        { generation_config: { response_mime_type: "application/json" } }
-      )
-      return JSON.parse(response)["topic"]
-    else
-      response = ai_backend.get_oneoff_message(
-        system_message,
-        [text]
-      )
-      return response.scan(/(?<=:)"(.+?)"/)&.flatten&.first&.strip
-    end
+    response = ai_backend.get_oneoff_message(
+      system_message,
+      [text],
+      json: true
+    )
+    JSON.parse(response)["topic"]
   end
 
   def system_message
@@ -71,10 +53,6 @@ class AutotitleConversationJob < ApplicationJob
       ```
     END
 
-    if @conversation.assistant.api_service.driver == "anthropic"
-      base_message + "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content. Your entire response should be exactly: {\"topic\": \"Your 2-4 word summary here\"}"
-    else
-      base_message
-    end
+    base_message
   end
 end
