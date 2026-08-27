@@ -127,21 +127,25 @@ class AIBackend::Anthropic < AIBackend
 
     instructions = config[:instructions]
     if config[:json]
+      # The example schema matches the historical autotitle prompt byte-for-byte;
+      # json intent is not yet exercised by any other caller.
       instructions += "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content. Your entire response should be exactly: {\"topic\": \"Your 2-4 word summary here\"}"
     end
+
+    formatted_tools = @assistant.language_model.supports_tools? && anthropic_format_tools(Toolbox.tools) || nil
 
     @client_config = {
       model: @assistant.language_model.api_name,
       system: instructions,
       messages: config[:messages],
-      tools: @assistant.language_model.supports_tools? && anthropic_format_tools(Toolbox.tools) || nil,
+      tools: formatted_tools,
       parameters: {
         model: @assistant.language_model.api_name,
         system: instructions,
         messages: config[:messages],
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
         stream: config[:streaming] && @response_handler || nil,
-        tools: @assistant.language_model.supports_tools? && anthropic_format_tools(Toolbox.tools) || nil,
+        tools: formatted_tools,
       }.compact.merge(config[:params]&.except(:response_format) || {})
     }.compact
   end

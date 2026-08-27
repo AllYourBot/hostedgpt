@@ -17,17 +17,11 @@ class AutotitleConversationJob < ApplicationJob
     response = Current.set(user: @conversation.user) do
       fetch_reply_for(messages.map(&:content_text).join("\n"))
     end
-    topic = usable_topic(response)
 
-    if topic.blank?
-      Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}")
-      return true
-    end
+    topic = usable_topic(response)
+    return true if topic.nil?
 
     @conversation.update!(title: topic)
-  rescue JSON::ParserError, TypeError => e
-    Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}: #{e.class}")
-    true
   end
 
   private
@@ -43,8 +37,18 @@ class AutotitleConversationJob < ApplicationJob
   end
 
   def usable_topic(response)
+    return nil if response.blank?
+
     topic = JSON.parse(response)["topic"]
-    topic if topic.is_a?(String)
+    if topic.is_a?(String) && topic.present?
+      topic
+    else
+      Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}")
+      nil
+    end
+  rescue JSON::ParserError, TypeError => e
+    Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}: #{e.class}")
+    nil
   end
 
   def system_message

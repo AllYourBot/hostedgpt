@@ -1,34 +1,36 @@
 module TestClient
   class Gemini
+    USAGE_METADATA = { "promptTokenCount" => 1037, "candidatesTokenCount" => 31, "totalTokenCount" => 1068 }.freeze
+
     def initialize(args)
     end
 
-    def self.text
-      nil
-    end
+    class << self
+      attr_accessor :blocked
 
-    def self.function
-      raise "Attempting to return a function response but .function method is not stubbed."
-    end
+      def payload
+        @@payload
+      end
 
-    def self.arguments
-      { "city" => "Austin", "state" => "TX", "country" => "US" }
-    end
+      def text
+        nil
+      end
 
-    def self.thought_signature
-      "EqIBAdHtim9pbmc9dGhvdWdodF9zaWduYXR1cmU"
-    end
+      def function
+        raise "Attempting to return a function response but .function method is not stubbed."
+      end
 
-    def self.payload
-      @@payload
-    end
+      def arguments
+        { "city" => "Austin", "state" => "TX", "country" => "US" }
+      end
 
-    def self.blocked
-      @@blocked ||= false
-    end
+      def thought_signature
+        "EqIBAdHtim9pbmc9dGhvdWdodF9zaWduYXR1cmU"
+      end
 
-    def self.blocked=(value)
-      @@blocked = value
+      def default_text(system_message)
+        "Hello this is a model with instruction #{system_message.to_s.inspect}! How can I assist you today?"
+      end
     end
 
     def generate_content(args)
@@ -38,7 +40,7 @@ module TestClient
         return { "promptFeedback" => { "blockReason" => "SAFETY" } }
       end
 
-      text = self.class.text || default_text(args.dig(:system_instruction))
+      text = self.class.text || self.class.default_text(args.dig(:system_instruction))
 
       {
         "candidates" =>
@@ -46,14 +48,8 @@ module TestClient
             {"role"=>"model",
               "parts"=>[{"text"=> text}]},
             "finishReason"=>"STOP"}],
-        "usageMetadata"=>{"promptTokenCount"=>1037, "candidatesTokenCount"=>31, "totalTokenCount"=>1068}
+        "usageMetadata"=> USAGE_METADATA
       }
-    end
-
-    private
-
-    def default_text(system_message)
-      "Hello this is a model with instruction #{system_message.to_s.inspect}! How can I assist you today?"
     end
 
     # This response is a valid example response from the API.
@@ -69,13 +65,13 @@ module TestClient
         [{"content"=>
           {"role"=>"model",
             "parts"=>
-            [{"text"=> self.class.text || "Hello this is a model with instruction #{system_message.to_s.inspect}! How can I assist you today?"}]},
+            [{"text"=> self.class.text || self.class.default_text(system_message)}]},
           "safetyRatings"=>
           [{"category"=>"HARM_CATEGORY_HARASSMENT", "probability"=>"NEGLIGIBLE"},
             {"category"=>"HARM_CATEGORY_HATE_SPEECH", "probability"=>"NEGLIGIBLE"},
             {"category"=>"HARM_CATEGORY_SEXUALLY_EXPLICIT", "probability"=>"NEGLIGIBLE"},
             {"category"=>"HARM_CATEGORY_DANGEROUS_CONTENT", "probability"=>"NEGLIGIBLE"}]}],
-      "usageMetadata"=>{"promptTokenCount"=>1037, "candidatesTokenCount"=>31, "totalTokenCount"=>1068}
+      "usageMetadata"=>USAGE_METADATA
       }]
     end
 
@@ -92,7 +88,7 @@ module TestClient
             },
             "thoughtSignature"=> self.class.thought_signature}]},
           "finishReason"=>"STOP"}],
-      "usageMetadata"=>{"promptTokenCount"=>1037, "candidatesTokenCount"=>31, "totalTokenCount"=>1068}
+      "usageMetadata"=>USAGE_METADATA
       }]
     end
   end
