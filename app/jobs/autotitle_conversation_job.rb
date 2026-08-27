@@ -21,6 +21,9 @@ class AutotitleConversationJob < ApplicationJob
     topic = usable_topic(response)
     return true if topic.nil?
 
+    @conversation.reload
+    return true if @conversation.title.present?
+
     @conversation.update!(title: topic)
   end
 

@@ -67,6 +67,26 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     assert_equal "Already Named", conversation.reload.title
   end
 
+  test "a title landing during the provider call survives the write" do
+    conversation = conversations(:greeting)
+    conversation.update!(title: nil)
+
+    twin_class = Class.new(TestClient::OpenAI) do
+      define_singleton_method(:text) { "{\"topic\":\"Ladder Topic\"}" }
+
+      define_method(:chat) do |**args|
+        conversation.update!(title: "Twin Title")
+        super(**args)
+      end
+    end
+
+    AIBackend::OpenAI.stub :client, twin_class do
+      AutotitleConversationJob.perform_now(conversation.id)
+    end
+
+    assert_equal "Twin Title", conversation.reload.title
+  end
+
   UNUSABLE_REPLIES = {
     empty_string: "",
     whitespace_only: "   ",
