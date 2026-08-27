@@ -107,6 +107,32 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     assert_nil conversation.reload.title
   end
 
+  test "a stalled provider call times out instead of pinning the worker" do
+    conversation = conversations(:greeting)
+    conversation.update!(title: nil)
+
+    slow_class = Class.new(TestClient::OpenAI) do
+      define_singleton_method(:text) { "{\"topic\":\"Late Reply\"}" }
+
+      define_method(:chat) do |**args|
+        sleep 0.3
+        super(**args)
+      end
+    end
+
+    warnings = []
+    AIBackend::OpenAI.stub :client, slow_class do
+      AIBackend::OpenAI.stub :oneoff_timeout_seconds, 0.05 do
+        Rails.logger.stub :warn, ->(message) { warnings << message } do
+          AutotitleConversationJob.perform_now(conversation.id)
+        end
+      end
+    end
+
+    assert_nil conversation.reload.title
+    assert warnings.any? { |w| w.include?("Provider failure") }, "expected a provider-failure warning, got #{warnings.inspect}"
+  end
+
   UNUSABLE_REPLIES = {
     empty_string: "",
     whitespace_only: "   ",

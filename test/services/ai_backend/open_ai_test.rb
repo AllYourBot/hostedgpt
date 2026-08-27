@@ -70,6 +70,29 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     end
   end
 
+  test "one-off provider calls are bounded in time" do
+    slow_class = Class.new(TestClient::OpenAI) do
+      define_method(:chat) do |**args|
+        sleep 0.3
+        super(**args)
+      end
+    end
+
+    AIBackend::OpenAI.stub :client, slow_class do
+      AIBackend::OpenAI.stub :oneoff_timeout_seconds, 0.05 do
+        assert_equal 0.05, AIBackend::OpenAI.oneoff_timeout_seconds, "stub must apply"
+
+        openai = AIBackend::OpenAI.new(users(:keith), @assistant, @conversation, @conversation.latest_message_for_version(:latest))
+
+        error = assert_raises(Timeout::Error) do
+          openai.get_oneoff_message("hi", ["there"])
+        end
+
+        assert_includes error.message, "execution expired"
+      end
+    end
+  end
+
   test "a direct OpenAI subclass inherits json intent untouched" do
     subclass = Class.new(AIBackend::OpenAI)
     instance = subclass.new(users(:keith), @assistant, @conversation, @conversation.latest_message_for_version(:latest))

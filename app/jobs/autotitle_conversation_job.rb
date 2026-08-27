@@ -26,6 +26,7 @@ class AutotitleConversationJob < ApplicationJob
 
     @conversation.update!(title: topic)
   rescue Faraday::Error,
+         ::Timeout::Error,
          ::OpenAI::ConfigurationError,
          ::Anthropic::ConfigurationError,
          ::Gemini::Errors::ConfigurationError => e
