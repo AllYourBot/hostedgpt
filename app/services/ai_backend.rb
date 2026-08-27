@@ -12,11 +12,12 @@ class AIBackend
     @response_handler = nil
   end
 
-  def get_oneoff_message(instructions, messages, params = {})
+  def get_oneoff_message(instructions, messages, params = {}, json: false)
     set_client_config(
       instructions:,
       messages: preceding_messages(messages),
       params:,
+      json:,
     )
     response = @client.send(client_method_name, ** @client_config)
 
