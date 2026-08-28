@@ -75,6 +75,107 @@
   @apply relative;
 }
 
+/* Nav sidebar collapse & expand.
+
+   The sidebar is shown and hidden by toggling classes on the <body> (see nav_controller.js), which
+   is an instant swap of `display`. Naming the pieces below hands them to the View Transitions API so
+   the browser tweens between the two layouts: the column slides out of the left edge while the main
+   column grows into the space it left behind. */
+
+nav#nav-column {
+  view-transition-name: nav-column;
+}
+
+#nav-container {
+  view-transition-name: nav-content;
+}
+
+#main-container {
+  view-transition-name: main-column;
+}
+
+#mobile-nav-overlay {
+  view-transition-name: nav-shade;
+}
+
+::view-transition-group(*) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* The main column is the same content in both states, just a different width, so cross-fading it
+   only double-exposes the text. Drop the old snapshot and let the group tween the geometry, which
+   slides and stretches the new layout into place. */
+
+::view-transition-old(main-column) {
+  animation: none;
+  opacity: 0;
+}
+
+::view-transition-new(main-column) {
+  animation: none;
+  opacity: 1;
+  mix-blend-mode: normal;
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+/* The column and the content within it are named separately, because the content is positioned
+   fixed and so is captured as its own snapshot. They slide together. */
+
+::view-transition-old(nav-column),
+::view-transition-old(nav-content) {
+  animation: nav-slide-out 220ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+::view-transition-new(nav-column),
+::view-transition-new(nav-content) {
+  animation: nav-slide-in 220ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* The shade behind the narrow screen drawer is the one piece which really is appearing and
+   disappearing, so it fades. It blends normally rather than additively, otherwise fading a dark
+   overlay in over the conversation washes the conversation out instead of dimming it. */
+
+::view-transition-old(nav-shade),
+::view-transition-new(nav-shade) {
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(nav-shade) {
+  animation: nav-fade-out 220ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+::view-transition-new(nav-shade) {
+  animation: nav-fade-in 220ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes nav-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes nav-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes nav-slide-out {
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes nav-slide-in {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
 .show-previews .show-previews\:preview-container {
   @apply !flex;
 }
