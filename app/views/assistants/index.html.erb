@@ -2,7 +2,7 @@
   <%= render 'messages/nav_column' %>
 <% end %>
 
-<turbo-frame id="conversation" class="relative flex flex-col flex-1" data-turbo-action="advance">
+<turbo-frame id="conversation" class="relative flex flex-col flex-1 min-w-0" data-turbo-action="advance">
   <header id="narrow-header" class="flex-none text-lg h-14 md:hidden">
     <div class="flex items-center flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
       <%= render "layouts/nav_toggle" %>

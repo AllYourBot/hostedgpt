@@ -50,4 +50,32 @@ class ConversationMessagesCodeTest < ApplicationSystemTestCase
     send_keys "meta+shift+c"
     assert_true { conversation.messages.ordered.last.content_text.strip == clipboard }
   end
+
+  test "code block shrinks with the viewport instead of forcing the page wider" do
+    # A <pre> has white-space: pre, so its min-content width is the full unwrappable code line, and
+    # overflow-x only zeroes the automatic minimum size of a *flex item*. So every flex item between
+    # the <pre> and the body needs min-w-0, otherwise that min-content width becomes a floor and the
+    # conversation stops shrinking (overflowing the page) once the viewport gets narrow enough. A long
+    # line puts that floor up near the sidebar breakpoint, where it is most visible.
+    long_line = "SELECT users.id, users.email, accounts.name FROM users INNER JOIN accounts " \
+      "ON accounts.id = users.account_id WHERE users.deleted_at IS NULL ORDER BY users.created_at DESC LIMIT 100;"
+    messages(:im_a_bot).update!(content_text: "Here you go:\n\n```sql\n#{long_line}\n```\n")
+    visit_and_scroll_wait conversation_messages_path(@conversation)
+
+    # Widths spanning the sidebar breakpoint (768px) down to very narrow.
+    [900, 800, 768, 700, 500, 300].each do |width|
+      page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride",
+        width: width, height: 800, deviceScaleFactor: 1, mobile: false)
+
+      assert_true "at #{width}px the conversation should not be wider than the viewport" do
+        page.evaluate_script("document.querySelector(\"turbo-frame#conversation\").getBoundingClientRect().width") <= width
+      end
+
+      assert_true "at #{width}px the page should not scroll horizontally" do
+        page.evaluate_script("document.documentElement.scrollWidth") <= width + 5
+      end
+    end
+  ensure
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+  end
 end
