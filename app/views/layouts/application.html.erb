@@ -5,19 +5,23 @@
   <body
     class="
       nav-closed
+      <%= "nav-open" unless Current.user.nav_closed %>
       <%= Current.user.dark_mode %>
       bg-white dark:bg-gray-800
     "
-    data-controller="transition focus-restore"
+    data-controller="transition focus-restore nav"
     data-transition-toggle-class="nav-closed"
     data-transition-target="transitionable"
+    data-nav-drawer-closed-class="nav-closed"
+    data-nav-column-open-class="nav-open"
   >
     <nav
+      id="nav-column"
       class="
         min-w-[260px]
         bg-gray-50 dark:bg-gray-900
         h-full
-        flex nav-closed:hidden <%= !Current.user.nav_closed && "md:!flex" %>
+        flex nav-closed:hidden md:nav-open:!flex
         z-30 md:z-auto nav-closed:z-auto
         absolute md:relative nav-closed:relative
         overflow-x-clip
@@ -65,7 +69,7 @@
     <div
       id="mobile-nav-overlay"
       class="fixed inset-0 bg-black z-20 bg-opacity-40 md:hidden nav-closed:hidden "
-      data-action="click->transition#toggleClass"
+      data-action="click->nav#toggleDrawer"
       ></div>
     <main id="main-container" class="flex flex-1 min-w-0 h-full w-full bg-white dark:bg-gray-800 text-gray-950 dark:text-gray-100 px-safe" data-controller="image-upload">
       <%= content_for?(:main) ? yield(:main) : yield %>

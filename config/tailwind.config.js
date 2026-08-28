@@ -61,6 +61,7 @@ module.exports = {
     require("@tailwindcss/container-queries"),
     require("../vendor/javascript/tailwindcss-safe-area.js"),
     plugin(({ addVariant }) => {
+      addVariant("nav-open", ".nav-open &");
       addVariant("tap", "&:hover");
       addVariant("group-tap", ":merge(.group):hover &");
       addVariant("peer-tap", ":merge(.peer):hover ~ &");
