@@ -133,11 +133,53 @@ class AIBackend::RubyLLM < AIBackend
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
       next if message.tool?
 
-      {
-        role: message.role,
-        content: message.content_text,
-      }
+      if @assistant.supports_images? && message.documents.present? && message.role == "user"
+        content_parts = [message.content_text]
+        attachments = []
+
+        message.documents.each do |document|
+          if document.has_image?
+            attachments << ::RubyLLM::Attachment.new(document.file)
+          elsif document.has_document_pdf?
+            pdf_text = document.extract_pdf_text
+            if pdf_text.present?
+              content_parts << "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
+            else
+              content_parts << "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
+            end
+          end
+        end
+
+        text = content_parts.compact.join
+        content = if attachments.any?
+          ::RubyLLM::Content.new(text, attachments)
+        else
+          text
+        end
+
+        { role: message.role, content: content }
+      else
+        {
+          role: message.role,
+          content: sanitize_content(message),
+        }
+      end
     end.compact
+  end
+
+  def sanitize_content(message)
+    return "" unless message.content_text.present?
+
+    begin
+      parsed = JSON.parse(message.content_text)
+      if parsed.is_a?(Hash) && parsed.has_key?("json_of_generated_image")
+        parsed.except("json_of_generated_image").to_json
+      else
+        message.content_text
+      end
+    rescue JSON::ParserError
+      message.content_text
+    end
   end
 
   def client_method_name

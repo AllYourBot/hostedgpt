@@ -1,6 +1,8 @@
 require "test_helper"
 
 class AIBackend::RubyLLMTest < ActiveSupport::TestCase
+  include ActionDispatch::TestProcess::FixtureFile
+
   setup do
     @conversation = conversations(:attachments)
     @assistant = assistants(:keith_gpt4)
@@ -415,5 +417,244 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
       assert_equal ["Gemini streaming"], chunks
       assert_nil result
     end
+  end
+
+  # Phase 4 — Image/PDF attachment parity
+
+  test "preceding_conversation_messages includes image attachments when supports_images is true" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    conversation = conversations(:attachments)
+    message = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: assistant,
+      index: conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
+    msgs = backend.send(:preceding_conversation_messages)
+
+    message_with_attachments = msgs.find { |m| m[:content].is_a?(::RubyLLM::Content) }
+    assert message_with_attachments, "Should find a message with RubyLLM::Content for image attachments"
+    assert message_with_attachments[:content].attachments.any?, "Content should have attachments"
+  end
+
+  test "preceding_conversation_messages does not include attachments when supports_images is false" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_images: false, supports_tools: false)
+    conversation = conversations(:attachments)
+    message = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: assistant,
+      index: conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
+    msgs = backend.send(:preceding_conversation_messages)
+
+    msgs_with_attachments = msgs.filter_map { |m| m if m[:content].is_a?(::RubyLLM::Content) }
+    assert_empty msgs_with_attachments, "Should not have any Content objects when supports_images is false"
+  end
+
+  test "preceding_conversation_messages inlines PDF text when supports_images is true" do
+    pdf_content = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n/Contents 4 0 R\n>>\nendobj\n4 0 obj\n<<\n/Length 44\n>>\nstream\nBT\n/F1 12 Tf\n72 720 Td\n(Hello World) Tj\nET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000200 00000 n \ntrailer\n<<\n/Size 5\n/Root 1 0 R\n>>\nstartxref\n294\n%%EOF"
+
+    test_file = Tempfile.new(["test", ".pdf"])
+    test_file.write(pdf_content)
+    test_file.rewind
+
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+
+    conversation = Conversation.create!(user: @user, assistant: assistant, title: "PDF Test")
+
+    pdf_message = conversation.messages.create!(
+      role: "user",
+      content_text: "Check this document",
+      assistant: assistant
+    )
+    pdf_message.documents.create!(
+      file: fixture_file_upload(test_file.path, "application/pdf"),
+      filename: "test.pdf"
+    )
+
+    message = conversation.messages.create!(
+      role: "assistant",
+      content_text: "Let me check",
+      assistant: assistant
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
+    msgs = backend.send(:preceding_conversation_messages)
+
+    pdf_entry = msgs.find { |m| m[:role] == "user" && m[:content].to_s.include?("PDF Document: test.pdf") }
+    assert pdf_entry, "Should include PDF content reference"
+    assert pdf_entry[:content].to_s.include?("PDF Document: test.pdf"), "Should include PDF document reference"
+    assert pdf_entry[:content].to_s.include?("Unable to extract text from this PDF"), "Should include error for failed extraction"
+  ensure
+    test_file&.close
+    test_file&.unlink
+  end
+
+  test "sanitize_content removes json_of_generated_image from JSON content" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: '{"prompt_given":"cat","json_of_generated_image":"base64data","message_to_user":"image"}',
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    result = backend.send(:sanitize_content, message)
+
+    parsed = JSON.parse(result)
+    refute parsed.has_key?("json_of_generated_image"), "Should remove json_of_generated_image"
+    assert_equal "cat", parsed["prompt_given"]
+  end
+
+  test "sanitize_content passes through plain text unchanged" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: "Hello, how are you?",
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    result = backend.send(:sanitize_content, message)
+
+    assert_equal "Hello, how are you?", result
+  end
+
+  test "sanitize_content returns empty string for nil content" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    result = backend.send(:sanitize_content, message)
+
+    assert_equal "", result
+  end
+
+  test "stream_next_conversation_message works with image attachments" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    conversation = conversations(:attachments)
+    message = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: assistant,
+      index: conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "I see a cat" do
+      chunks = []
+      result = backend.stream_next_conversation_message { |c| chunks << c }
+      assert_equal ["I see a cat"], chunks
+      assert_nil result
+    end
+  end
+
+  test "image attachment streaming produces vision response with openai driver" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.api_service.update!(driver: "openai")
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    conversation = conversations(:attachments)
+    message = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: assistant,
+      index: conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "OpenAI sees a feline" do
+      chunks = []
+      result = backend.stream_next_conversation_message { |c| chunks << c }
+      assert_equal ["OpenAI sees a feline"], chunks
+      assert_nil result
+    end
+  end
+
+  test "image attachment streaming produces vision response with anthropic driver" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.api_service.update!(driver: "anthropic")
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    conversation = conversations(:attachments)
+    message = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: assistant,
+      index: conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "Claude sees a feline" do
+      chunks = []
+      result = backend.stream_next_conversation_message { |c| chunks << c }
+      assert_equal ["Claude sees a feline"], chunks
+      assert_nil result
+    end
+  end
+
+  test "image attachment streaming produces vision response with gemini driver" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.api_service.update!(driver: "gemini")
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    conversation = conversations(:attachments)
+    message = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: assistant,
+      index: conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "Gemini sees a feline" do
+      chunks = []
+      result = backend.stream_next_conversation_message { |c| chunks << c }
+      assert_equal ["Gemini sees a feline"], chunks
+      assert_nil result
+    end
+  end
+
+  test "preceding_conversation_messages preserves text alongside image attachments" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    conversation = conversations(:attachments)
+    message = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: assistant,
+      index: conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
+    msgs = backend.send(:preceding_conversation_messages)
+
+    mixed_msg = msgs.find { |m| m[:content].is_a?(::RubyLLM::Content) }
+    assert mixed_msg, "Should find a message with mixed content"
+    assert mixed_msg[:content].text.present?, "Content text should be preserved alongside attachments"
+    assert mixed_msg[:content].attachments.any?, "Attachments should be present"
   end
 end
