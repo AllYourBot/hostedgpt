@@ -92,14 +92,7 @@
 
   <header id="narrow-header" class="flex-none text-lg text-center h-14 md:hidden">
     <div class="flex items-center justify-between flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
-      <%= button_tag type: "button",
-        class: "inline-flex px-2 ml-1 cursor-pointer group",
-        data: {
-          action: "transition#toggleClass"
-        } do
-      %>
-  <%= icon "bars-3", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: t('app.conversations.ui.menu'), tooltip: :right %>
-      <% end %>
+      <%= render "layouts/nav_toggle" %>
 
       <%= render 'messages/main_column/assistant_header' %>
 

@@ -3,7 +3,13 @@
 <% end %>
 
 <turbo-frame id="conversation" class="relative flex flex-col flex-1" data-turbo-action="advance">
-  <div class="px-[2rem] my-[4rem]">
+  <header id="narrow-header" class="flex-none text-lg h-14 md:hidden">
+    <div class="flex items-center flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
+      <%= render "layouts/nav_toggle" %>
+    </div>
+  </header>
+
+  <div class="px-[2rem] mb-[4rem] mt-4 md:mt-[4rem]">
     <h1 class="text-2xl mb-4 font-semibold tracking-tighter">Assistants</h1>
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -8,6 +8,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   fixtures :all
 
+  class << self
+    attr_accessor :pointer_primed
+  end
+
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
       user_or_person.user
@@ -15,6 +19,11 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       user_or_person
     end
 
+    log_in user, password
+    prime_pointer { log_in user, password }
+  end
+
+  def log_in(user, password)
     assistant = user.assistants.ordered.first
 
     visit logout_path
@@ -30,6 +39,16 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     else
       assert_current_path new_assistant_message_path(assistant)
     end
+  end
+
+  # Headless Chrome ignores mouse input for the whole of the first browser session in a process, so CSS :hover never
+  # applies and whichever test hovers first fails. Resetting the session once, after a page has loaded, primes it.
+  def prime_pointer
+    return if ApplicationSystemTestCase.pointer_primed
+    ApplicationSystemTestCase.pointer_primed = true
+
+    Capybara.reset_sessions!
+    yield
   end
 
   def with_assistants_page(enabled)
