@@ -17,6 +17,12 @@ class AIBackend
   def self.billing_url
   end
 
+  # New backends: override this to deny tool calls — a backend whose tool
+  # support is not yet proven should pin it to false.
+  def self.supports_tools?
+    true
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     @user = user
     @assistant = assistant
