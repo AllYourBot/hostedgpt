@@ -8,7 +8,7 @@
 <% logo = assistant.logo_filename %>
 <% if logo %>
   <picture class="<%= classes %> bg-white border border-gray-100 overflow-hidden flex-shrink-0">
-    <%= image_tag(logo, class: "w-full h-full") %>
+    <%= image_tag(logo, class: "w-full h-full", draggable: "false") %>
   </picture>
 <% else %>
   <picture

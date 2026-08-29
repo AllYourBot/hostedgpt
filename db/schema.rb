@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_15_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_29_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -69,6 +69,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_15_120000) do
     t.string "instructions"
     t.bigint "language_model_id"
     t.string "name"
+    t.integer "position"
     t.string "slug"
     t.jsonb "tools", default: [], null: false
     t.datetime "updated_at", null: false
@@ -76,6 +77,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_15_120000) do
     t.index ["external_id"], name: "index_assistants_on_external_id", unique: true
     t.index ["language_model_id"], name: "index_assistants_on_language_model_id"
     t.index ["user_id", "deleted_at"], name: "index_assistants_on_user_id_and_deleted_at"
+    t.index ["user_id", "position"], name: "index_assistants_on_user_id_and_position"
     t.index ["user_id", "slug"], name: "index_assistants_on_user_id_and_slug", unique: true, where: "(slug IS NOT NULL)"
     t.index ["user_id"], name: "index_assistants_on_user_id"
   end

@@ -15,9 +15,12 @@
 
 <section
   id="assistants"
-  data-controller="radio-behavior transition"
+  data-controller="radio-behavior transition sortable"
   data-radio-behavior-selected-class="relationship !flex"
   data-transition-toggle-class="hidden"
+  data-sortable-url-value="<%= reorder_assistants_path %>"
+  data-sortable-dragging-class="opacity-0"
+  data-action="dragover->sortable#over drop->sortable#drop"
   class="flex flex-col"
 >
 

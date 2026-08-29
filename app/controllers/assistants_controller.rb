@@ -9,4 +9,9 @@ class AssistantsController < ApplicationController
       return
     end
   end
+
+  def reorder
+    Current.user.assistants.reposition(params[:ids] || [])
+    head :no_content
+  end
 end
