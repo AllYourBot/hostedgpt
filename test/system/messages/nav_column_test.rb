@@ -7,11 +7,20 @@ class NavColumnTest < ApplicationSystemTestCase
   end
 
   test "clicking conversation in the left column updates the right and preserves scroll position of the left" do
-    assert_text conversations(:attachment).title # wait for the lazy-loaded #nav-conversations frame to render before scrolling it, otherwise scrollTop below silently clamps to 0
-    page.execute_script("document.querySelector('#nav-scrollable').scrollTop = 100") # scroll the nav column down slightly
-    assert_did_not_scroll "#nav-scrollable" do
-      click_text conversations(:attachment).title
-    end
+    conversation = conversations(:attachment)
+
+    assert_text conversation.title # wait for the lazy-loaded #nav-conversations frame to render before scrolling it, otherwise scrollTop below silently clamps to 0
+    wait_for_images_to_load
+    scroll_to_position "#nav-scrollable", 100 # scroll the nav column down slightly
+    assert_scroll_position "#nav-scrollable", 100
+
+    click_text conversation.title
+    # The click is only finished once the right column has swapped in the conversation. Judging the nav
+    # column's scroll while that is still in flight is what made this test flakey.
+    assert_current_path conversation_messages_path(conversation, version: 1)
+    assert_first_message conversation.messages.ordered.first
+
+    assert_scroll_position "#nav-scrollable", 100, "Clicking a conversation should not have scrolled the nav column"
   end
 
   test "clicking a conversation title from the assistants page (before visiting any chat) loads the conversation" do
