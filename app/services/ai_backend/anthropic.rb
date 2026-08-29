@@ -36,6 +36,15 @@ class AIBackend::Anthropic < AIBackend
     "Error: #{e.message}"
   end
 
+  def self.key_error_message
+    "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
+  end
+
+  def self.billing_url
+    "https://console.anthropic.com/settings/plans"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin

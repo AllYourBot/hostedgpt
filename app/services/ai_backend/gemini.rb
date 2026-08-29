@@ -36,6 +36,15 @@ class AIBackend::Gemini < AIBackend
     "Error: #{e.message}"
   end
 
+  def self.key_error_message
+    "(There is a configuration error with the Gemini API Service. Maybe you have an invalid API key? " +
+      "Click your Profile in the bottom left and then Settings and then **API Services**. You will find Gemini there.)"
+  end
+
+  def self.billing_url
+    "https://aistudio.google.com/app/apikey"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin

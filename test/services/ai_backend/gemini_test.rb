@@ -320,6 +320,16 @@ class AIBackend::GeminiTest < ActiveSupport::TestCase
     refute part.key?(:thoughtSignature), "An empty signature should be left out rather than sent as null"
   end
 
+  test "key_error_message returns the recorded Gemini copy" do
+    assert_equal "(There is a configuration error with the Gemini API Service. Maybe you have an invalid API key? " +
+      "Click your Profile in the bottom left and then Settings and then **API Services**. You will find Gemini there.)",
+      AIBackend::Gemini.key_error_message
+  end
+
+  test "billing_url returns the recorded Gemini billing page" do
+    assert_equal "https://aistudio.google.com/app/apikey", AIBackend::Gemini.billing_url
+  end
+
   private
 
   def function_call_part_in(messages)
