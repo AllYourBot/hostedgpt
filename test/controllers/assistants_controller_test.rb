@@ -27,4 +27,22 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to new_assistant_message_path(@assistant)
   end
+
+  test "reorder saves the order the ids arrive in" do
+    ids = @user.assistants.ordered.pluck(:id).rotate
+
+    post reorder_assistants_url, params: { ids: ids }
+
+    assert_response :no_content
+    assert_equal ids, @user.assistants.ordered.pluck(:id)
+  end
+
+  test "reorder leaves another user's assistants alone" do
+    rob_assistant = assistants(:rob_gpt4)
+
+    post reorder_assistants_url, params: { ids: [rob_assistant.id] }
+
+    assert_response :no_content
+    assert_nil rob_assistant.reload.position
+  end
 end

@@ -4,7 +4,13 @@
 <div class="<%= class_names(
   "bg-gray-50 dark:bg-gray-900",
   "first:sticky first:top-0 first:pt-2 first:z-40 first:bg-gray-50 dark:first:bg-gray-900": !Feature.assistants_page? || mobile_device?
-) %>">
+) %>"
+    id="<%= dom_id(assistant) %>"
+    draggable="true"
+    data-sortable-target="item"
+    data-sortable-id="<%= assistant.id %>"
+    data-action="dragstart->sortable#start dragend->sortable#end"
+  >
   <div class="
               flex justify-between items-center
               mb-1 pl-2 pr-2 mr-5
@@ -24,6 +30,7 @@
     >
     <%= link_to new_assistant_message_path(assistant),
         class: "flex-1 flex py-1 items-center text-gray-950 dark:text-gray-100 font-medium truncate",
+        draggable: "false", # so dragging the name reorders the row rather than dragging the link
         data: {
           role: "name",
           controller: "overflow-expand",
@@ -51,7 +58,7 @@
           </menu>
         </div>
       <% end %>
-      <%= link_to new_assistant_message_path(assistant), class: "inline-flex", data: { role: "new" } do %>
+      <%= link_to new_assistant_message_path(assistant), class: "inline-flex", draggable: "false", data: { role: "new" } do %>
         <%= icon "pencil-square",
           variant: :outline,
           size: 18,

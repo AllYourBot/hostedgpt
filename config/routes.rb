@@ -5,6 +5,7 @@ Rails.application.routes.draw do
 
   resources :assistants do
     resources :messages, only: [:new, :create, :edit]
+    post :reorder, on: :collection
   end
 
   resources :conversations, only: [:index, :show, :edit, :update, :destroy] do
