@@ -216,6 +216,22 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_stopped_scrolling(selector)
   end
 
+  # A scroll container that is asked not to move needs two readings, not one. Turbo swapping a frame's
+  # content shrinks the container for a beat, which clamps scrollTop, so the position has to be caught
+  # settling on the expected value and then confirmed to still be there once everything has rendered.
+  def assert_scroll_position(selector, position, error_msg = nil)
+    assert_true error_msg || "The #{selector} should be scrolled to #{position}" do
+      get_scroll_top(selector) == position
+    end
+
+    assert_stopped_scrolling(selector)
+    assert_equal position, get_scroll_top(selector), error_msg || "The #{selector} should have stayed scrolled to #{position}"
+  end
+
+  def get_scroll_top(selector)
+    page.evaluate_script("document.querySelector('#{selector}').scrollTop").to_i
+  end
+
   def assert_stopped_scrolling(selector = "section #messages")
     assert_true "The #{selector} should have stopped scrolling" do
       prev_scroll_position = get_scroll_position(selector)
