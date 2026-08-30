@@ -35,7 +35,7 @@ class APIService < ApplicationRecord
   end
 
   def requires_token?
-    [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI, URL_BRAVE].include?(url) # other services may require it but we don't always know
+    [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI, URL_BRAVE, URL_GROQ].include?(url) # other services may require it but we don't always know
   end
 
   def logo_filename
