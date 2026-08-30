@@ -58,6 +58,7 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal AIBackend::Groq, language_models(:llama_3_3_70b_versatile).ai_backend
     assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
     assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
+    assert_equal AIBackend::Gemini, language_models(:gemini_flash_1_5).ai_backend
   end
 
   test "openai-dialect services with custom URLs keep the OpenAI backend" do

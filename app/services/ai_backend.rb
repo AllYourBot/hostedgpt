@@ -62,8 +62,8 @@ class AIBackend
 
     begin
       response = @client.send(client_method_name, ** @client_config)
-    rescue ::Faraday::UnauthorizedError => e
-      raise configuration_error
+    rescue ::Faraday::UnauthorizedError
+      raise AIBackend::ConfigurationError
     end
 
     if @stream_response_tool_calls.present?
@@ -110,10 +110,6 @@ class AIBackend
 
   def client_method_name
     raise NotImplementedError
-  end
-
-  def configuration_error
-    AIBackend::ConfigurationError
   end
 
   def set_client_config(config)
