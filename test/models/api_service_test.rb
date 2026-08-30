@@ -53,6 +53,21 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
   end
 
+  test "official providers require a token and custom URLs do not" do
+    assert api_services(:keith_openai_service).requires_token?
+    assert api_services(:keith_groq_service).requires_token?
+    refute api_services(:keith_other_service).requires_token?
+  end
+
+  test "the Test button reports a blank token for Groq services" do
+    service = api_services(:keith_groq_service)
+    service.update!(token: "")
+
+    stub_features(default_llm_keys: false) do
+      assert_equal "Error: API key (token) is blank", service.test_api_service
+    end
+  end
+
   test "both ai_backends can be specified for user models" do
     assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
     assert_equal AIBackend::OpenAI, language_models(:guanaco).ai_backend

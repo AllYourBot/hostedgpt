@@ -54,15 +54,35 @@ class GetNextAIMessageJobGroqTest < ActiveJob::TestCase
     assert_equal AIBackend::Gemini.key_error_message, conversation.latest_message_for_version(:latest).content_text
   end
 
-  test "a quota error on a Groq row renders today's template with the OpenAI fallthrough" do
-    TestClient::OpenAI.stub_any_instance :chat, -> (*) { raise Faraday::TooManyRequestsError, "quota exceeded" } do
-      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+  test "a blank Groq key fails fast instead of making a doomed provider call" do
+    stub_features(default_llm_keys: false) do
+      @assistant.language_model.api_service.update!(token: "")
+
+      assert_no_enqueued_jobs only: GetNextAIMessageJob do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+      end
+
+      # Dispatch still routes Groq rows to the OpenAI backend until the
+      # pair-first dispatch lands, so the copy is OpenAI's until then.
+      assert_equal AIBackend::OpenAI.key_error_message, @conversation.latest_message_for_version(:latest).content_text
+      assert @message.reload.failed?, "The message should have been marked failed so a Retry button is offered"
+      assert_equal 0, @message.reload.input_token_count.to_i + @message.reload.output_token_count.to_i
+    end
+  end
+
+  test "a blank Groq key skips title generation before any provider call" do
+    conversation = conversations(:hello_groq)
+    conversation.update!(title: nil)
+
+    stub_features(default_llm_keys: false) do
+      conversation.assistant.language_model.api_service.update!(token: "")
+
+      assert_no_enqueued_jobs only: AutotitleConversationJob do
+        refute AutotitleConversationJob.perform_now(conversation.id)
+      end
     end
 
-    expected = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
-      "OpenAI so go here https://platform.openai.com/account/billing/overview and add a credit card, or if you already have one review your billing plan.)"
-    assert_equal expected, @message.reload.content_text
-    assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
+    assert_nil conversation.reload.title
   end
 
   test "a custom-URL anthropic service with a nil token has the gem's own error translated to the unified one" do
@@ -77,5 +97,16 @@ class GetNextAIMessageJobGroqTest < ActiveJob::TestCase
       end
       assert_kind_of AIBackend::ConfigurationError, error
     end
+  end
+
+  test "a quota error on a Groq row renders today's template with the OpenAI fallthrough" do
+    TestClient::OpenAI.stub_any_instance :chat, -> (*) { raise Faraday::TooManyRequestsError, "quota exceeded" } do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+    end
+
+    expected = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
+      "OpenAI so go here https://platform.openai.com/account/billing/overview and add a credit card, or if you already have one review your billing plan.)"
+    assert_equal expected, @message.reload.content_text
+    assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
   end
 end
