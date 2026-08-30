@@ -62,9 +62,9 @@ class GetNextAIMessageJobGroqTest < ActiveJob::TestCase
         assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       end
 
-      # Dispatch still routes Groq rows to the OpenAI backend until the
-      # pair-first dispatch lands, so the copy is OpenAI's until then.
-      assert_equal AIBackend::OpenAI.key_error_message, @conversation.latest_message_for_version(:latest).content_text
+      # Dispatch now routes Groq rows to their own backend, so the copy and
+      # billing URL are Groq's.
+      assert_equal AIBackend::Groq.key_error_message, @conversation.latest_message_for_version(:latest).content_text
       assert @message.reload.failed?, "The message should have been marked failed so a Retry button is offered"
       assert_equal 0, @message.reload.input_token_count.to_i + @message.reload.output_token_count.to_i
     end
@@ -99,14 +99,30 @@ class GetNextAIMessageJobGroqTest < ActiveJob::TestCase
     end
   end
 
-  test "a quota error on a Groq row renders today's template with the OpenAI fallthrough" do
+  test "a quota error on a Groq row renders Groq copy with Groq's keys URL" do
     TestClient::OpenAI.stub_any_instance :chat, -> (*) { raise Faraday::TooManyRequestsError, "quota exceeded" } do
       assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     expected = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
-      "OpenAI so go here https://platform.openai.com/account/billing/overview and add a credit card, or if you already have one review your billing plan.)"
+      "Groq so go here https://console.groq.com/keys and add a credit card, or if you already have one review your billing plan.)"
     assert_equal expected, @message.reload.content_text
     assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
+  end
+
+  test "a renamed Groq service still gets Groq's copy, keys URL, and tools policy" do
+    @assistant.language_model.api_service.update!(name: "My Fast Llama")
+
+    assert_equal AIBackend::Groq.key_error_message, @assistant.language_model.ai_backend.key_error_message
+    assert_equal "https://console.groq.com/keys", @assistant.language_model.ai_backend.billing_url
+    refute @assistant.language_model.supports_tools?
+  end
+
+  test "a Groq model with backfilled tool support stays denied through the model" do
+    # The 2024 supports_tools backfill set true on groq/llama rows in existing
+    # databases; the backend policy keeps them denied regardless.
+    @assistant.language_model.update!(supports_tools: true)
+
+    refute @assistant.language_model.supports_tools?
   end
 end

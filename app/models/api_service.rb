@@ -24,13 +24,14 @@ class APIService < ApplicationRecord
   scope :ordered, -> { order(:name) }
 
   def ai_backend
-    case driver
-    when "openai"
-      AIBackend::OpenAI
-    when "anthropic"
+    if driver == "openai" && url == URL_GROQ
+      AIBackend::Groq
+    elsif driver == "anthropic"
       AIBackend::Anthropic
-    when "gemini"
+    elsif driver == "gemini"
       AIBackend::Gemini
+    elsif driver == "openai"
+      AIBackend::OpenAI
     end
   end
 
