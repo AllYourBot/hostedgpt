@@ -40,6 +40,11 @@ gemini_conversation:
   title: Meeting Gemini
   last_assistant_message: hello_gemini
 
+hello_groq:
+  user: keith
+  assistant: keith_groq
+  title: Meeting Groq
+
 debugging:
   user: rob
   assistant: rob_gpt4
@@ -47,6 +52,12 @@ debugging:
   last_assistant_message: filter_map_example
   input_token_total_count: 12
   output_token_total_count: 36
+
+alpaca_conversation:
+  user: taylor
+  assistant: alpaca_asst
+  title: Meeting Alpaca
+
 
 #  0.1
 #  1.1

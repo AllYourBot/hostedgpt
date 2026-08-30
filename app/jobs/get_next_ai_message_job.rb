@@ -1,8 +1,6 @@
 include ActionView::RecordIdentifier
 require "nokogiri/xml/node"
 
-class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
-
 class GetNextAIMessageJob < ApplicationJob
   include ActionView::Helpers::RenderingHelper
   class ResponseCancelled < StandardError; end
@@ -64,23 +62,8 @@ class GetNextAIMessageJob < ApplicationJob
     Rails.logger.info "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     wrap_up_the_message
     return true
-  rescue OpenAI::ConfigurationError => e
-    name = @assistant.language_model.api_service.name
-    if name == "OpenAI"
-      set_openai_error
-    elsif name == "Groq"
-      set_groq_error
-    else
-      set_generic_error(name)
-    end
-    wrap_up_the_failed_message
-    return true
-  rescue Anthropic::ConfigurationError => e
-    set_anthropic_error
-    wrap_up_the_failed_message
-    return true
-  rescue Gemini::Errors::ConfigurationError => e
-    set_generic_error("Gemini")
+  rescue AIBackend::ConfigurationError => e
+    @message.content_text = ai_backend.key_error_message
     wrap_up_the_failed_message
     return true
   rescue Faraday::ParsingError => e
@@ -92,7 +75,9 @@ class GetNextAIMessageJob < ApplicationJob
     wrap_up_the_failed_message
     return true
   rescue Faraday::TooManyRequestsError => e
-    set_billing_error
+    service = ai_backend.to_s.split("::").second
+    @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
+      "#{service} so go here #{ai_backend.billing_url} and add a credit card, or if you already have one review your billing plan.)"
     wrap_up_the_failed_message
     return true
   rescue WaitForPrevious
@@ -138,26 +123,6 @@ class GetNextAIMessageJob < ApplicationJob
 
   private
 
-  def set_openai_error
-    @message.content_text = "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
-      "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)"
-  end
-
-  def set_groq_error
-    @message.content_text = "(You need to enter a valid API key for Groq to use Llama. Click your Profile in the bottom " +
-      "left and then Settings and then **API Services**. You will find Groq Key instructions.)"
-  end
-
-  def set_generic_error(name)
-    @message.content_text = "(There is a configuration error with the #{name} API Service. Maybe you have an invalid API key? Click your Profile in the bottom " +
-      "left and then Settings and then **API Services**. You will find #{name} there.)"
-  end
-
-  def set_anthropic_error
-    @message.content_text = "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
-      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
-  end
-
   def set_response_error
     @message.content_text = "(I received a blank response. It's possible your API key is invalid, has expired, or the AI servers may be " +
       "experiencing trouble. Try again or ensure your API key is valid. You can change your API key by clicking your Profile in the bottom " +
@@ -168,22 +133,6 @@ class GetNextAIMessageJob < ApplicationJob
     @message.content_text = "(I received a unexpected response from the API after retrying 3 times, \"#{text}\". The AI servers may be experiencing trouble. " +
       "Try again later or if you keep getting this error ensure your API key is valid and you haven't run out of funds with your AI service.\n\n" +
       "It's also helpful if you report this to the app developers at: https://github.com/allyourbot/hostedgpt/discussions)\n\n:#{msg}"
-  end
-
-  def set_billing_error
-    service = ai_backend.to_s.split("::").second
-    url = case service
-    when "OpenAI"
-      "https://platform.openai.com/account/billing/overview"
-    when "Anthropic"
-      "https://console.anthropic.com/settings/plans"
-    when "Gemini"
-      "https://aistudio.google.com/app/apikey"
-    else
-      "https://platform.openai.com/account/billing/overview"
-    end
-    @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
-      "#{service} so go here #{url} and add a credit card, or if you already have one review your billing plan.)"
   end
 
   def wrap_up_the_failed_message

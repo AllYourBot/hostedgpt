@@ -1,6 +1,5 @@
 class AIBackend::Gemini < AIBackend
   include Tools
-  class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
 
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
@@ -71,7 +70,7 @@ class AIBackend::Gemini < AIBackend
   end
 
   def configuration_error
-    ::Gemini::Errors::ConfigurationError
+    AIBackend::ConfigurationError
   end
 
   def set_client_config(config)

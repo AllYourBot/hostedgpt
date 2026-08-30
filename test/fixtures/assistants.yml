@@ -52,6 +52,15 @@ keith_gemini:
   instructions:
   tools: []
 
+keith_groq:
+  user: keith
+  slug: groq-llama-3
+  language_model: llama_3_3_70b_versatile
+  name: Groq Llama 3.3
+  description: Groq's Llama 3.3 70B
+  instructions:
+  tools: []
+
 
 rob_gpt4:
   user: rob

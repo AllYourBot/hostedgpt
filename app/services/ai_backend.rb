@@ -3,6 +3,8 @@ require "timeout"
 class AIBackend
   include Utilities, Tools
 
+  class ConfigurationError < StandardError; end
+
   attr :client
 
   def self.oneoff_timeout_seconds
@@ -111,7 +113,7 @@ class AIBackend
   end
 
   def configuration_error
-    raise NotImplementedError
+    AIBackend::ConfigurationError
   end
 
   def set_client_config(config)
