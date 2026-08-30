@@ -25,8 +25,7 @@ class LanguageModel < ApplicationRecord
   end
 
   def supports_tools?
-    attributes["supports_tools"] &&
-      api_service.name != "Groq" # TODO: Remove this short circuit once I can debug tool use with Groq
+    attributes["supports_tools"] && api_service.ai_backend.supports_tools?
   end
 
   def logo_filename

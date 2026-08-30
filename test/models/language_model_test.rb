@@ -18,6 +18,16 @@ class LanguageModelTest < ActiveSupport::TestCase
     refute language_models(:guanaco).supports_tools?
   end
 
+  test "tools support combines the model attribute with the backend's policy" do
+    # attribute true + backend allowed -> tools sent (today's default-named behavior)
+    assert language_models(:gpt_4o).supports_tools?
+
+    # attribute false -> denied regardless of the backend's policy
+    model = language_models(:gpt_4o)
+    model.supports_tools = false
+    refute model.supports_tools?
+  end
+
   test "ai_backend works as a delegated attribute" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
   end
