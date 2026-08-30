@@ -87,10 +87,6 @@ class AIBackend::OpenAI < AIBackend
     :chat
   end
 
-  def configuration_error
-    AIBackend::ConfigurationError
-  end
-
   def set_client_config(config)
     super(config)
 

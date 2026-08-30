@@ -62,11 +62,11 @@ class GetNextAIMessageJob < ApplicationJob
     Rails.logger.info "\n### Response cancelled in GetNextAIMessageJob(#{message_id})" unless Rails.env.test?
     wrap_up_the_message
     return true
-  rescue AIBackend::ConfigurationError => e
+  rescue AIBackend::ConfigurationError
     @message.content_text = ai_backend.key_error_message
     wrap_up_the_failed_message
     return true
-  rescue Faraday::ParsingError => e
+  rescue Faraday::ParsingError
     set_response_error
     wrap_up_the_failed_message
     return true
@@ -74,8 +74,8 @@ class GetNextAIMessageJob < ApplicationJob
     @message.content_text = "I experienced a connection error. #{e.message}"
     wrap_up_the_failed_message
     return true
-  rescue Faraday::TooManyRequestsError => e
-    service = ai_backend.to_s.split("::").second
+  rescue Faraday::TooManyRequestsError
+    service = ai_backend.name.demodulize
     @message.content_text = "(I received a quota error. Try again and if you still get this error then your API key is probably valid, but you may need to adding billing details. You are using " +
       "#{service} so go here #{ai_backend.billing_url} and add a credit card, or if you already have one review your billing plan.)"
     wrap_up_the_failed_message

@@ -69,10 +69,6 @@ class AIBackend::Gemini < AIBackend
     :stream_generate_content
   end
 
-  def configuration_error
-    AIBackend::ConfigurationError
-  end
-
   def set_client_config(config)
     super(config)
 

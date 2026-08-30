@@ -51,10 +51,10 @@ class AIBackend::Anthropic < AIBackend
       raise AIBackend::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to Anthropic API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
       @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token)
-    rescue ::Anthropic::ConfigurationError => e
+    rescue ::Anthropic::ConfigurationError
       # The gem raises its own class for a nil token when it falls back to its
       # configuration getter, which custom-URL services reach because they are
-      # not in the requires_token? gate. Translate it to the unified error.
+      # not in the requires_token? gate.
       raise AIBackend::ConfigurationError
     rescue ::Faraday::UnauthorizedError => e
       raise AIBackend::ConfigurationError
@@ -130,10 +130,6 @@ class AIBackend::Anthropic < AIBackend
 
   def client_method_name
     :messages
-  end
-
-  def configuration_error
-    AIBackend::ConfigurationError
   end
 
   def set_client_config(config)

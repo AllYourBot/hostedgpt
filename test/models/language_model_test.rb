@@ -28,6 +28,14 @@ class LanguageModelTest < ActiveSupport::TestCase
     refute model.supports_tools?
   end
 
+  test "a model on a service without a backend denies tools" do
+    brave_service = api_services(:keith_brave_service)
+    model = language_models(:gpt_4o)
+    model.update!(api_service: brave_service, supports_tools: true)
+
+    refute model.supports_tools?
+  end
+
   test "ai_backend works as a delegated attribute" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
   end

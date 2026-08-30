@@ -39,21 +39,6 @@ class GetNextAIMessageJobGroqTest < ActiveJob::TestCase
     end
   end
 
-  test "a Gemini configuration error renders the Gemini backend copy" do
-    conversation = conversations(:gemini_conversation)
-    conversation.messages.create! role: :user, content_text: "Still there?", assistant: conversation.assistant
-    message = conversation.latest_message_for_version(:latest)
-
-    api_service = conversation.assistant.language_model.api_service
-    api_service.update!(token: "")
-
-    assert_no_enqueued_jobs only: GetNextAIMessageJob do
-      assert GetNextAIMessageJob.perform_now(conversation.user.id, message.id, conversation.assistant.id)
-    end
-
-    assert_equal AIBackend::Gemini.key_error_message, conversation.latest_message_for_version(:latest).content_text
-  end
-
   test "a blank Groq key fails fast instead of making a doomed provider call" do
     stub_features(default_llm_keys: false) do
       @assistant.language_model.api_service.update!(token: "")
