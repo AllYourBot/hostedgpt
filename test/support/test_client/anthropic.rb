@@ -25,10 +25,19 @@ module TestClient
       {:city=>"Austin", :state=>"TX", :country=>"US"}.to_json
     end
 
+    def self.messages_args
+      @@messages_args
+    end
+
+    def self.reset_recordings!
+      @@messages_args = nil
+    end
+
     # This response is a valid example response from the API.
     #
     # Stub this method to respond with something more specific if needed.
     def messages(**args)
+      @@messages_args = args
       model = args.dig(:model) || "no model"
       system_message = args.dig(:system)
       tools = args.dig(:parameters, :tools)
@@ -64,7 +73,7 @@ module TestClient
           "stop_reason"=>"end_turn",
           "stop_sequence"=>nil,
           "usage"=>{"input_tokens"=>10, "output_tokens"=>19}
-        }.dig("content", 0, "text")
+        }
       end
     end
 

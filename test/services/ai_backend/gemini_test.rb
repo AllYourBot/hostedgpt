@@ -13,6 +13,66 @@ class AIBackend::GeminiTest < ActiveSupport::TestCase
       @conversation.latest_message_for_version(:latest)
     )
     TestClient::Gemini.new(access_token: "abc")
+    TestClient::Gemini.reset_recordings!
+  end
+
+  test "one-off get_oneoff_message with json intent requests the json mime type" do
+    TestClient::Gemini.stub :text, "{\"topic\":\"Gemini Tips\"}" do
+      payload = @gemini.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
+
+      assert_equal({ response_mime_type: "application/json" }, TestClient::Gemini.payload[:generation_config])
+      assert_equal({ role: "user", parts: { text: "Here is chat text." } }, TestClient::Gemini.payload[:contents])
+      assert_equal "Gemini Tips", JSON.parse(payload)["topic"]
+    end
+  end
+
+  test "one-off get_oneoff_message without json intent omits generation_config" do
+    @gemini.get_oneoff_message("plain", ["text"])
+
+    assert_equal [ :system_instruction, :contents ], TestClient::Gemini.payload.keys
+    refute TestClient::Gemini.payload.key?(:generation_config)
+  end
+
+  test "explicit caller generation_config still wins over json intent" do
+    TestClient::Gemini.stub :text, "{}" do
+      @gemini.get_oneoff_message(
+        "Try to get JSON.",
+        ["some text"],
+        { generation_config: { response_mime_type: "text/plain" } },
+        json: true
+      )
+
+      assert_equal({ response_mime_type: "text/plain" }, TestClient::Gemini.payload[:generation_config])
+    end
+  end
+
+  test "one-off get_oneoff_message with json intent through a safety-blocked reply returns nil" do
+    TestClient::Gemini.blocked = true
+
+    assert_nil @gemini.get_oneoff_message("Extract a topic.", ["chat text"], json: true)
+  ensure
+    TestClient::Gemini.blocked = false
+  end
+
+  test "one-off generate_content records its payload and answers a candidates-shaped hash" do
+    client = TestClient::Gemini.new({})
+    payload = { contents: { role: "user", parts: { text: "Hello!" } }, system_instruction: "be terse" }
+
+    response = client.generate_content(payload)
+
+    assert_equal payload, TestClient::Gemini.payload
+    assert response.dig("candidates", 0, "content", "parts", 0, "text").present?
+  end
+
+  test "generate_content honors a safety-block toggle and stays dig-safe" do
+    TestClient::Gemini.blocked = true
+
+    response = TestClient::Gemini.new({}).generate_content({ contents: {} })
+
+    assert_nil response.dig("candidates", 0, "content", "parts", 0, "text")
+    assert_equal "SAFETY", response.dig("promptFeedback", "blockReason")
+  ensure
+    TestClient::Gemini.blocked = false
   end
 
   test "initializing client works" do

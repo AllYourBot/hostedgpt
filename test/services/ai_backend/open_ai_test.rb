@@ -12,10 +12,15 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
       @conversation.latest_message_for_version(:latest)
     )
     TestClient::OpenAI.new(access_token: "abc")
+    TestClient::OpenAI.reset_recordings!
   end
 
   test "initializing client works" do
     assert @openai.client.present?
+  end
+
+  test "recordings start clean in every example" do
+    assert_nil TestClient::OpenAI.parameters
   end
 
   test "openai url is properly set" do
@@ -32,9 +37,78 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
   test "get_oneoff_message with response_format of json returns a hash" do
     TestClient::OpenAI.stub :text, "{\"response\":\"yes\"}" do
-      response = @openai.get_oneoff_message("Reply with the JSON { response: 'yes' }", ["Give me the reply."], response_format: { type: "json_object" } )
+      response = @openai.get_oneoff_message("Reply with the JSON { response: 'yes' }", ["Give me the reply."], { response_format: { type: "json_object" } })
       assert_equal({"response"=>"yes"}, JSON.parse(response))
       assert_equal({:type=>"json_object"}, TestClient::OpenAI.parameters[:response_format])
+    end
+  end
+
+  test "get_oneoff_message with intent shapes the exact expected request" do
+    TestClient::OpenAI.stub :text, "{\"topic\":\"Rails collection counter\"}" do
+      @openai.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
+
+      params = TestClient::OpenAI.parameters
+
+      assert_equal @assistant.language_model.api_name, params[:model]
+      assert_equal({ type: "json_object" }, params[:response_format])
+      assert_equal 2000, params[:max_completion_tokens]
+      assert_nil params[:stream]
+      assert_nil params[:stream_options]
+      assert_not params.key?(:tools), "supports_tools is forced off in setup"
+      assert_equal 2, params[:messages].length
+      assert_equal "system", params[:messages][0][:role]
+      assert_includes params[:messages][0][:content], "Extract a topic."
+      assert_equal({ role: "user", content: "Here is chat text." }, params[:messages][1])
+    end
+  end
+
+  test "explicit caller response_format still wins over internal intent" do
+    TestClient::OpenAI.stub :text, "{}" do
+      @openai.get_oneoff_message(
+        "Try to get JSON.",
+        ["some text"],
+        { response_format: { type: "text" } },
+        json: true
+      )
+
+      assert_equal({ type: "text" }, TestClient::OpenAI.parameters[:response_format])
+    end
+  end
+
+  test "one-off provider calls are bounded in time" do
+    slow_class = Class.new(TestClient::OpenAI) do
+      define_method(:chat) do |**args|
+        sleep 0.3
+        super(**args)
+      end
+    end
+
+    AIBackend::OpenAI.stub :client, slow_class do
+      AIBackend::OpenAI.stub :oneoff_timeout_seconds, 0.05 do
+        assert_equal 0.05, AIBackend::OpenAI.oneoff_timeout_seconds, "stub must apply"
+
+        openai = AIBackend::OpenAI.new(users(:keith), @assistant, @conversation, @conversation.latest_message_for_version(:latest))
+
+        error = assert_raises(Timeout::Error) do
+          openai.get_oneoff_message("hi", ["there"])
+        end
+
+        assert_includes error.message, "execution expired"
+      end
+    end
+  end
+
+  test "a direct OpenAI subclass inherits json intent untouched" do
+    subclass = Class.new(AIBackend::OpenAI)
+    instance = subclass.new(users(:keith), @assistant, @conversation, @conversation.latest_message_for_version(:latest))
+
+    TestClient::OpenAI.stub :text, "{\"topic\":\"Inherited\"}" do
+      reply = instance.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
+
+      params = TestClient::OpenAI.parameters
+      assert_equal({ type: "json_object" }, params[:response_format])
+      assert_equal @assistant.language_model.api_name, params[:model]
+      assert_equal "Inherited", JSON.parse(reply)["topic"]
     end
   end
 

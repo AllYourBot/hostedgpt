@@ -13,6 +13,7 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
       @conversation.latest_message_for_version(:latest)
     )
     TestClient::Anthropic.new(access_token: "abc")
+    TestClient::Anthropic.reset_recordings!
   end
 
   test "initializing client works" do
@@ -428,5 +429,57 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
 
     test_file.close
     test_file.unlink
+  end
+
+  test "one-off messages call records arguments and returns a diggable envelope" do
+    response = TestClient::Anthropic.new(access_token: "abc").messages(
+      model: "claude-x", parameters: { system: "be terse" }
+    )
+
+    assert_instance_of Hash, response
+    assert_equal "be terse", TestClient::Anthropic.messages_args.dig(:parameters, :system)
+    assert response.dig("content", 0, "text").present?
+  end
+
+  test "json intent suffix coerces mechanism without promising a topic schema" do
+    @anthropic.send(:set_client_config, { instructions: "Extract a topic.", messages: [], json: true })
+    suffix = @anthropic.instance_variable_get(:@client_config)[:system].split("\n\n").last
+
+    assert_includes suffix, "ONLY valid JSON"
+    refute_includes suffix, "topic"
+  end
+
+  test "one-off with json intent appends the exact suffix to both system slots and never sends response_format" do
+    suffix = "\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or other content."
+
+    TestClient::Anthropic.stub :text, "{\"topic\":\"Claude Notes\"}" do
+      reply = @anthropic.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
+      args = TestClient::Anthropic.messages_args
+
+      assert_equal "Claude Notes", JSON.parse(reply)["topic"]
+      assert args[:system].end_with?(suffix)
+      assert args.dig(:parameters, :system).end_with?(suffix)
+      assert_equal args[:system], args.dig(:parameters, :system), "outer and inner system slots carry identical bytes"
+      assert_nil args[:response_format]
+      assert_nil args.dig(:parameters, :response_format)
+    end
+  end
+
+  test "one-off without json intent leaves instructions unsuffixed while params strip persists" do
+    TestClient::Anthropic.stub :text, "plain answer" do
+      reply = @anthropic.get_oneoff_message(
+        "Just answer.",
+        ["some text"],
+        { model: "claude-override", response_format: { type: "json_object" } }
+      )
+      args = TestClient::Anthropic.messages_args
+
+      assert_not args[:system].end_with?("ONLY valid JSON")
+      assert_not args.dig(:parameters, :system).end_with?("ONLY valid JSON")
+      assert_includes args[:system], "Just answer."
+      assert_nil args.dig(:parameters, :response_format), "foreign keys stay stripped from transmitted parameters"
+      assert_equal "claude-override", args.dig(:parameters, :model), "explicit caller params still win"
+      assert_equal "plain answer", reply
+    end
   end
 end

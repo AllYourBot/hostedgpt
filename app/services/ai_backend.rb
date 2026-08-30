@@ -1,7 +1,13 @@
+require "timeout"
+
 class AIBackend
   include Utilities, Tools
 
   attr :client
+
+  def self.oneoff_timeout_seconds
+    30
+  end
 
   def initialize(user, assistant, conversation = nil, message = nil)
     @user = user
@@ -12,13 +18,16 @@ class AIBackend
     @response_handler = nil
   end
 
-  def get_oneoff_message(instructions, messages, params = {})
+  def get_oneoff_message(instructions, messages, params = {}, json: false)
     set_client_config(
       instructions:,
       messages: preceding_messages(messages),
       params:,
+      json:,
     )
-    response = @client.send(client_method_name, ** @client_config)
+    response = Timeout.timeout(self.class.oneoff_timeout_seconds) do
+      @client.send(client_method_name, ** @client_config)
+    end
 
     response.dig("content", 0, "text") ||
       response.dig("choices", 0, "message", "content")
