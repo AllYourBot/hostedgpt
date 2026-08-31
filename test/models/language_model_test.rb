@@ -97,6 +97,23 @@ class LanguageModelTest < ActiveSupport::TestCase
     end
   end
 
+  test "models.yml has 25 OpenRouter entries that import successfully" do
+    storage = YAML.load_file(Rails.root.join("models.yml"))
+    openrouter_models = storage["models"].select { |m| m["api_service_name"] == "OpenRouter" }
+    assert_equal 25, openrouter_models.count
+
+    user = users(:keith)
+    LanguageModel.import_from_file(users: [user])
+    by_api_name = user.language_models.joins(:api_service).where(api_services: { name: "OpenRouter" }).index_by(&:api_name)
+
+    openrouter_models.each do |model|
+      lm = by_api_name[model["api_name"]]
+      assert lm, "Expected #{model['api_name']} to be imported"
+      assert_equal model["supports_tools"], lm.supports_tools
+      assert_equal model["supports_images"], lm.supports_images
+    end
+  end
+
   test "for_user scope" do
     list = LanguageModel.for_user(users(:keith)).all.pluck(:api_name)
     assert list.include?("camel")
