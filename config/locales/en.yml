@@ -78,6 +78,11 @@ en:
             step1_html: "Create an account on %{link} and log in."
             step2_html: "Click \"API Keys\" on the left (or %{link})."
             step3_html: "Click \"Create API Key\", name it something like \"%{name}\" and paste it below."
+          openrouter:
+            step1_html: "Create an account on %{link} and log in."
+            step2_html: "Click \"Keys\" on the left (or %{link})."
+            step3_html: "Click \"Create Key\", name it something like \"%{name}\" and paste it below."
+            step4_html: "Add credits to your account by clicking \"Credits\" (or %{link}). OpenRouter uses a credit-based system, not a subscription."
           gemini:
             step1: "Make sure you have a Google/Gmail account and are signed into it."
             step2_html: "Visit %{link}."

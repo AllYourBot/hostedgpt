@@ -49,6 +49,11 @@ de:
             step1_html: "Erstellen Sie ein Konto in der %{link} und melden Sie sich an."
             step2_html: "Klicken Sie links auf \"API Keys\" (oder %{link})."
             step3_html: "Klicken Sie auf \"Create API Key\", benennen Sie ihn zum Beispiel \"%{name}\" und fügen Sie ihn unten ein."
+          openrouter:
+            step1_html: "Erstellen Sie ein Konto auf %{link} und melden Sie sich an."
+            step2_html: "Klicken Sie links auf \"Keys\" (oder %{link})."
+            step3_html: "Klicken Sie auf \"Create Key\", benennen Sie ihn zum Beispiel \"%{name}\" und fügen Sie ihn unten ein."
+            step4_html: "Fügen Sie Ihrem Konto Guthaben hinzu, indem Sie auf \"Credits\" klicken (oder %{link}). OpenRouter verwendet ein Guthabensystem, kein Abonnement."
           gemini:
             step1: "Stellen Sie sicher, dass Sie ein Google-/Gmail-Konto haben und angemeldet sind."
             step2_html: "Besuchen Sie %{link}."

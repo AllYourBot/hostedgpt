@@ -104,6 +104,17 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
     assert_select "button#instructions:not(.hidden)"
   end
 
+  test "special instruction link is visible for openrouter url" do
+    get edit_settings_api_service_url(api_services(:keith_openrouter_service))
+    assert_select "button#instructions:not(.hidden)"
+    assert_select "ol#openrouter-instructions[data-transition-target=transitionable]"
+  end
+
+  test "openrouter instructions block is not active for other providers" do
+    get edit_settings_api_service_url(api_services(:keith_openai_service))
+    assert_select "ol#openrouter-instructions[data-transition-target=transitionable]", count: 0
+  end
+
   test "special instruction link is NOT visible for other urls" do
     get edit_settings_api_service_url(api_services(:keith_other_service))
     assert_select "button#instructions.hidden"
