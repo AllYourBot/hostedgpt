@@ -57,6 +57,7 @@ shared:
     default_openai_key: <%= ENV["DEFAULT_OPENAI_KEY"] %>
     default_anthropic_key: <%= ENV["DEFAULT_ANTHROPIC_KEY"] %>
     default_groq_key: <%= ENV["DEFAULT_GROQ_KEY"] %>
+    default_openrouter_key: <%= ENV["DEFAULT_OPENROUTER_KEY"] %>
     default_brave_key: <%= ENV["BRAVE_API_KEY"] %>
     cloudflare_account_id: <%= ENV["CLOUDFLARE_ACCOUNT_ID"] || default_to(cloudflare: :account_id) %>
     cloudflare_access_key_id: <%= ENV["CLOUDFLARE_ACCESS_KEY_ID"] || default_to(cloudflare: :access_key_id) %>
