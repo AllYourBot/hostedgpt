@@ -11,6 +11,7 @@ module User::Registerable
     api_services.create!(url: APIService::URL_OPEN_AI, driver: :openai, name: "OpenAI")
     api_services.create!(url: APIService::URL_ANTHROPIC, driver: :anthropic, name: "Anthropic")
     api_services.create!(url: APIService::URL_GROQ, driver: :openai, name: "Groq")
+    api_services.create!(url: APIService::URL_OPENROUTER, driver: :openai, name: "OpenRouter")
     api_services.create!(url: APIService::URL_GEMINI, driver: :gemini, name: "Google Gemini")
     api_services.create!(url: APIService::URL_BRAVE, driver: :brave, name: "Brave")
 

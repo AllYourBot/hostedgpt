@@ -11,4 +11,10 @@ class User::RegisterableTest < ActiveSupport::TestCase
     assert people(:ali_invited).user.language_models.where(supports_tools: false).present?
     assert people(:ali_invited).user.language_models.where(supports_tools: true).present?
   end
+
+  test "it provisions an OpenRouter service for the new user" do
+    people(:ali_invited).update!(personable_type: "User", personable_attributes: { first_name: "John", last_name: "Doe", })
+    user = people(:ali_invited).user
+    assert user.api_services.exists?(name: "OpenRouter", url: APIService::URL_OPENROUTER, driver: "openai")
+  end
 end
