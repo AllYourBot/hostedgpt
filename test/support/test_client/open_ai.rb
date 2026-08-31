@@ -1,9 +1,15 @@
 module TestClient
   class OpenAI
-    attr_reader :uri_base
+    attr_reader :uri_base, :extra_headers
 
     def initialize(access_token:, uri_base:nil, api_version: "")
       @uri_base = uri_base
+    end
+
+    # Mirrors OpenAI::Client#add_headers (HTTPHeaders) so attribution-header
+    # behavior is exercisable in tests via the extra_headers reader.
+    def add_headers(headers)
+      @extra_headers = (@extra_headers || {}).merge(headers.transform_keys(&:to_s))
     end
 
     def self.text

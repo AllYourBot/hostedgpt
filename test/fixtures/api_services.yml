@@ -19,6 +19,13 @@ keith_groq_service:
   token: abc-secret
   driver: openai
 
+keith_openrouter_service:
+  name: OpenRouter
+  user: keith
+  url: https://openrouter.ai/api/v1/
+  token: abc-secret
+  driver: openai
+
 keith_other_service:
   name: Keith Server
   user: keith
