@@ -292,3 +292,12 @@ gemini_flash_1_5:
   api_service: keith_gemini_service
   supports_images: true
   supports_tools: false
+
+llama_3_3_70b_versatile:
+  position: 24
+  user: keith
+  name: Llama 3.3 70B Versatile 128k
+  api_name: llama-3.3-70b-versatile
+  api_service: keith_groq_service
+  supports_images: false
+  supports_tools: true

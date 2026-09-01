@@ -141,10 +141,23 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
       api_service = @assistant.language_model.api_service
       api_service.update!(token: "")
 
-      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for OpenAI"
+      assert_no_enqueued_jobs only: GetNextAIMessageJob do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+      end
+      assert_equal AIBackend::OpenAI.key_error_message, @conversation.latest_message_for_version(:latest).content_text
       assert @message.reload.failed?, "The message should have been marked failed so a Retry button is offered"
     end
+  end
+
+  test "a mid-stream 401 renders the backend's key error without retrying" do
+    TestClient::OpenAI.stub_any_instance :chat, -> (*) { raise Faraday::UnauthorizedError, "401" } do
+      assert_no_enqueued_jobs only: GetNextAIMessageJob do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+      end
+    end
+
+    assert_equal AIBackend::OpenAI.key_error_message, @conversation.latest_message_for_version(:latest).content_text
+    assert @message.reload.failed?, "The message should have been marked failed so a Retry button is offered"
   end
 
   test "when API response key is missing, a nice error message is displayed and the message is marked failed" do

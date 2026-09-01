@@ -79,8 +79,10 @@ class GetNextAIMessageJobGeminiTest < ActiveJob::TestCase
     api_service = @assistant.language_model.api_service
     api_service.update!(token: "")
 
-    assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-    assert_includes @conversation.latest_message_for_version(:latest).content_text, "There is a configuration error with the Gemini API Service"
+    assert_no_enqueued_jobs only: GetNextAIMessageJob do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+    end
+    assert_equal AIBackend::Gemini.key_error_message, @conversation.latest_message_for_version(:latest).content_text
   end
 
   test "when API response key is missing, a nice error message is displayed" do

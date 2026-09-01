@@ -24,18 +24,19 @@ class APIService < ApplicationRecord
   scope :ordered, -> { order(:name) }
 
   def ai_backend
-    case driver
-    when "openai"
-      AIBackend::OpenAI
-    when "anthropic"
+    if driver == "openai" && url == URL_GROQ
+      AIBackend::Groq
+    elsif driver == "anthropic"
       AIBackend::Anthropic
-    when "gemini"
+    elsif driver == "gemini"
       AIBackend::Gemini
+    elsif driver == "openai"
+      AIBackend::OpenAI
     end
   end
 
   def requires_token?
-    [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI, URL_BRAVE].include?(url) # other services may require it but we don't always know
+    [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI, URL_BRAVE, URL_GROQ].include?(url) # other services may require it but we don't always know
   end
 
   def logo_filename

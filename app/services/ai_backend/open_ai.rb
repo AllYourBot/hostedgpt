@@ -61,14 +61,23 @@ class AIBackend::OpenAI < AIBackend
     { b64_json: b64_json, model: IMAGE_MODEL }
   end
 
+  def self.key_error_message
+    "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)"
+  end
+
+  def self.billing_url
+    "https://platform.openai.com/account/billing/overview"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin
-      raise ::OpenAI::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
+      raise AIBackend::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to OpenAI API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
       @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token, api_version: "")
     rescue ::Faraday::UnauthorizedError
-      raise ::OpenAI::ConfigurationError
+      raise AIBackend::ConfigurationError
     end
   end
 
@@ -76,10 +85,6 @@ class AIBackend::OpenAI < AIBackend
 
   def client_method_name
     :chat
-  end
-
-  def configuration_error
-    ::OpenAI::ConfigurationError
   end
 
   def set_client_config(config)
@@ -125,7 +130,7 @@ class AIBackend::OpenAI < AIBackend
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue ::Faraday::UnauthorizedError => e
-      raise OpenAI::ConfigurationError
+      raise AIBackend::ConfigurationError
     rescue => e
       Rails.logger.info "\nUnhandled error in AIBackend::OpenAI response handler: #{e.message}"
       Rails.logger.info e.backtrace.join("\n")

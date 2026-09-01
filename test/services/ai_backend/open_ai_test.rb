@@ -272,6 +272,16 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     assert_equal m2, messages.second
     assert_equal m3, messages.third
   end
+
+  test "key_error_message returns the recorded OpenAI copy" do
+    assert_equal "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)",
+      AIBackend::OpenAI.key_error_message
+  end
+
+  test "billing_url returns the recorded OpenAI billing page" do
+    assert_equal "https://platform.openai.com/account/billing/overview", AIBackend::OpenAI.billing_url
+  end
 end
 
 class AIBackend::OpenAIImageTest < ActiveSupport::TestCase

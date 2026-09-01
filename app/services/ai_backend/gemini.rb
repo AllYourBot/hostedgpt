@@ -1,6 +1,5 @@
 class AIBackend::Gemini < AIBackend
   include Tools
-  class ::Gemini::Errors::ConfigurationError < ::Gemini::Errors::GeminiError; end
 
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
@@ -36,10 +35,19 @@ class AIBackend::Gemini < AIBackend
     "Error: #{e.message}"
   end
 
+  def self.key_error_message
+    "(There is a configuration error with the Gemini API Service. Maybe you have an invalid API key? " +
+      "Click your Profile in the bottom left and then Settings and then **API Services**. You will find Gemini there.)"
+  end
+
+  def self.billing_url
+    "https://aistudio.google.com/app/apikey"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin
-      raise configuration_error if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
+      raise AIBackend::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to Gemini API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
       @client = self.class.client.new(
         credentials: {
@@ -53,16 +61,12 @@ class AIBackend::Gemini < AIBackend
         }
       )
     rescue ::Faraday::UnauthorizedError, ::Faraday::BadRequestError => e
-      raise configuration_error
+      raise AIBackend::ConfigurationError
     end
   end
 
   def client_method_name
     :stream_generate_content
-  end
-
-  def configuration_error
-    ::Gemini::Errors::ConfigurationError
   end
 
   def set_client_config(config)
@@ -106,7 +110,7 @@ class AIBackend::Gemini < AIBackend
       end
     rescue ::Faraday::UnauthorizedError, ::Faraday::BadRequestError => e
       Rails.logger.error "Gemini rejected the request: #{e.try(:response)&.dig(:body) || e.message}"
-      raise configuration_error
+      raise AIBackend::ConfigurationError
     end
 
     return format_parallel_tool_calls(@stream_response_tool_calls) if @stream_response_tool_calls.present?

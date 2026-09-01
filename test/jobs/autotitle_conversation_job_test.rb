@@ -107,6 +107,22 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     assert_nil conversation.reload.title
   end
 
+  test "provider configuration errors degrade to a warning instead of dead-lettering" do
+    conversation = conversations(:greeting)
+    conversation.update!(title: nil)
+
+    warnings = []
+    AIBackend::OpenAI.stub_any_instance :get_oneoff_message, -> (*) { raise AIBackend::ConfigurationError } do
+      Rails.logger.stub :warn, ->(message) { warnings << message } do
+        assert AutotitleConversationJob.perform_now(conversation.id)
+      end
+    end
+
+    assert_equal 1, warnings.length
+    assert_includes warnings.first, conversation.id.to_s
+    assert_nil conversation.reload.title
+  end
+
   test "a stalled provider call times out instead of pinning the worker" do
     conversation = conversations(:greeting)
     conversation.update!(title: nil)

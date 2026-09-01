@@ -42,8 +42,10 @@ class GetNextAIMessageJobAnthropicTest < ActiveJob::TestCase
       api_service = @conversation.assistant.language_model.api_service
       api_service.update!(token: "")
 
-      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
-      assert_includes @conversation.latest_message_for_version(:latest).content_text, "need to enter a valid API key for Anthropic"
+      assert_no_enqueued_jobs only: GetNextAIMessageJob do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @conversation.assistant.id)
+      end
+      assert_equal AIBackend::Anthropic.key_error_message, @conversation.latest_message_for_version(:latest).content_text
     end
   end
 

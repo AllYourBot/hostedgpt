@@ -3,10 +3,26 @@ require "timeout"
 class AIBackend
   include Utilities, Tools
 
+  class ConfigurationError < StandardError; end
+
   attr :client
 
   def self.oneoff_timeout_seconds
     30
+  end
+
+  def self.key_error_message
+    "(There is a configuration error with this API Service. Maybe you have an invalid API key? " +
+      "Click your Profile in the bottom left and then Settings and then **API Services**.)"
+  end
+
+  def self.billing_url
+  end
+
+  # New backends: override this to deny tool calls — a backend whose tool
+  # support is not yet proven should pin it to false.
+  def self.supports_tools?
+    true
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)
@@ -46,8 +62,8 @@ class AIBackend
 
     begin
       response = @client.send(client_method_name, ** @client_config)
-    rescue ::Faraday::UnauthorizedError => e
-      raise configuration_error
+    rescue ::Faraday::UnauthorizedError
+      raise AIBackend::ConfigurationError
     end
 
     if @stream_response_tool_calls.present?
@@ -93,10 +109,6 @@ class AIBackend
   private
 
   def client_method_name
-    raise NotImplementedError
-  end
-
-  def configuration_error
     raise NotImplementedError
   end
 

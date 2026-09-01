@@ -36,14 +36,28 @@ class AIBackend::Anthropic < AIBackend
     "Error: #{e.message}"
   end
 
+  def self.key_error_message
+    "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
+  end
+
+  def self.billing_url
+    "https://console.anthropic.com/settings/plans"
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super(user, assistant, conversation, message)
     begin
-      raise ::Anthropic::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
+      raise AIBackend::ConfigurationError if assistant.api_service.requires_token? && assistant.api_service.effective_token.blank?
       Rails.logger.info "Connecting to Anthropic API server at #{assistant.api_service.url} with access token of length #{assistant.api_service.effective_token.to_s.length}"
       @client = self.class.client.new(uri_base: assistant.api_service.url, access_token: assistant.api_service.effective_token)
+    rescue ::Anthropic::ConfigurationError
+      # The gem raises its own class for a nil token when it falls back to its
+      # configuration getter, which custom-URL services reach because they are
+      # not in the requires_token? gate.
+      raise AIBackend::ConfigurationError
     rescue ::Faraday::UnauthorizedError => e
-      raise ::Anthropic::ConfigurationError
+      raise AIBackend::ConfigurationError
     end
   end
 
@@ -118,10 +132,6 @@ class AIBackend::Anthropic < AIBackend
     :messages
   end
 
-  def configuration_error
-    ::Anthropic::ConfigurationError
-  end
-
   def set_client_config(config)
     super(config)
 
@@ -179,7 +189,7 @@ class AIBackend::Anthropic < AIBackend
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue ::Faraday::UnauthorizedError => e
-      raise ::Anthropic::ConfigurationError
+      raise AIBackend::ConfigurationError
     rescue => e
       Rails.logger.info "\nUnhandled error in AIBackend::Anthropic response handler: #{e.message}"
     end

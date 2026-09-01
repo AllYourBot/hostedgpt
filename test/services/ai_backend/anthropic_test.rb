@@ -482,4 +482,14 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
       assert_equal "plain answer", reply
     end
   end
+
+  test "key_error_message returns the recorded Anthropic copy" do
+    assert_equal "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
+      "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)",
+      AIBackend::Anthropic.key_error_message
+  end
+
+  test "billing_url returns the recorded Anthropic billing page" do
+    assert_equal "https://console.anthropic.com/settings/plans", AIBackend::Anthropic.billing_url
+  end
 end
