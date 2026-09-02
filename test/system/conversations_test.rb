@@ -107,7 +107,27 @@ class ConversationsTest < ApplicationSystemTestCase
     end
   end
 
+  test "on a narrow screen, clicking a conversation closes the nav drawer so the conversation is visible" do
+    on_a_narrow_screen do
+      find("[data-role='nav-toggle']").click
+      assert_visible "#nav-column"
+
+      find("#conversation-#{conversations(:greeting).id} a[data-role='title']").click
+
+      assert_hidden "#nav-column"
+      assert_current_path conversation_messages_path(conversations(:greeting)), ignore_query: true
+      assert_first_message messages(:hear_me)
+    end
+  end
+
   private
+
+  def on_a_narrow_screen
+    resize_browser_to(400, 800)
+    yield
+  ensure
+    resize_browser_to(1400, 800)
+  end
 
   def hover_conversation(c)
     assert_visible "#conversation-#{c.id} a[data-role='title']"
