@@ -92,12 +92,13 @@ class FeatureTest < ActiveSupport::TestCase
     end
   end
 
-  test "use_ruby_llm? reads options.yml default and can be overridden by user preference" do
+  test "use_ruby_llm site default is off in test and can be overridden by user preference" do
     user = users(:keith)
 
-    stub_features(use_ruby_llm: false) do
-      refute Feature.use_ruby_llm?
-    end
+    # Phase 6 flips the default on in every environment except test, so the raw
+    # site default stays boolean false here (the ERB renders a bare "false" token
+    # that YAML parses back to false) — keeping the old-SDK test suite green.
+    assert_equal false, Feature.raw_features[:use_ruby_llm]
 
     stub_features(use_ruby_llm: false) do
       Current.set(user: user) do

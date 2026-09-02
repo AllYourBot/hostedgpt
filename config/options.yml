@@ -47,7 +47,10 @@ shared:
     email: <%= ENV["EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
     password_reset_email: <%= ENV["PASSWORD_RESET_EMAIL_FEATURE"] || default_to(false, except_env_test: true) %>
     assistants_page: <%= ENV["ASSISTANTS_PAGE_FEATURE"] || true %>
-    use_ruby_llm: <%= ENV["USE_RUBY_LLM_FEATURE"] || false %>
+    # Hand-rolled ERB: default_to can't express a falsy except_env_test override
+    # (it uses ||=), and the old SDK test suite must keep dispatching to the old
+    # backends (uneditable through Phase 6), so the test-env default stays false.
+    use_ruby_llm: <%= ENV["USE_RUBY_LLM_FEATURE"] || (Rails.env.test? ? "false" : "true") %>
   settings:
     # Be sure to add these ENV to docker-compose.yml
     app_url_protocol: <%= ENV["APP_URL_PROTOCOL"] || default_to(app_url: :protocol) %>
