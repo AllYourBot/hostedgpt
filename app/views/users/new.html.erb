@@ -1,16 +1,16 @@
-<% content_for :heading, t('app.auth.create_account') %>
+<% content_for :heading, t("app.auth.create_account") %>
 <% if @person.errors.any? %>
   <div id="error_explanation" class="px-3 py-2 mt-3 font-medium text-red-500 rounded-lg bg-red-50">
     <ul>
       <% @person.errors.full_messages.reverse.each do |error| # We want the User error first %>
-        <li><%= error.gsub(/Personable |credentials /, '').capitalize %><%# Cleanup "Personable password is ..." %></li>
+        <li><%= error.gsub(/Personable |credentials /, "").capitalize %><%# Cleanup "Personable password is ..." %></li>
       <% end %>
     </ul>
   </div>
 <% end %>
 
 <% if Feature.google_authentication? %>
-  <%= button_to t('app.auth.sign_up_with_google'), "/auth/google",
+  <%= button_to t("app.auth.sign_up_with_google"), "/auth/google",
     method: "post",
     class: %|
       text-white font-medium
@@ -25,13 +25,13 @@
       turbo: false,
     }
   %>
-  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && 'hidden' %>">
-    <%= t('app.auth.or') %>
+  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && "hidden" %>">
+    <%= t("app.auth.or") %>
   </span>
 <% end %>
 
 <% if Feature.microsoft_graph_authentication? %>
-  <%= button_to t('app.auth.sign_up_with_microsoft'), "/auth/microsoft_graph",
+  <%= button_to t("app.auth.sign_up_with_microsoft"), "/auth/microsoft_graph",
       method: "post",
       class: %|
         text-white font-medium
@@ -46,8 +46,8 @@
         turbo: false,
       }
     %>
-  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && 'hidden' %>">
-    <%= t('app.auth.or') %>
+  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && "hidden" %>">
+    <%= t("app.auth.or") %>
   </span>
 <% end %>
 
@@ -64,10 +64,10 @@
     <%= f.hidden_field :personable_type, id: "personable_type", value: "User" %>
 
     <%= f.label :email, class: "input input-bordered flex items-center justify-between" do %>
-      <span><%= t('app.auth.email') %> <span class="">*</span></span>
+      <span><%= t("app.auth.email") %> <span>*</span></span>
       <%= f.email_field :email,
         autofocus: true,
-        placeholder: t('app.auth.email'),
+        placeholder: t("app.auth.email"),
         class: "w-44 border-0 dark:text-black"
       %>
     <% end %>
@@ -76,9 +76,9 @@
       <%= user_fields.fields_for :credentials_attributes, @person.personable.credentials.build, index: "0" do |credential_fields| %>
         <%= credential_fields.hidden_field :type, value: "PasswordCredential" %>
         <%= credential_fields.label :password, class: "input input-bordered flex items-center justify-between" do %>
-          <span><%= t('app.auth.password') %> <span class="">*</span></span>
+          <span><%= t("app.auth.password") %> <span>*</span></span>
           <%= credential_fields.password_field :password,
-            placeholder: t('app.auth.password'),
+            placeholder: t("app.auth.password"),
             class: "w-44 border-0 dark:text-black",
             data: { action: "focus->transition#toggleClassOn" }
           %>
@@ -96,15 +96,15 @@
       >
 
         <%= user_fields.label :name, class: "input input-bordered flex items-center justify-between" do %>
-          <span><%= t('app.auth.full_name') %> <span class="">*</span></span>
+          <span><%= t("app.auth.full_name") %> <span>*</span></span>
           <%= user_fields.text_field :name,
-            placeholder: t('app.auth.full_name_placeholder'),
+            placeholder: t("app.auth.full_name_placeholder"),
             class: "w-44 border-0 dark:text-black"
           %>
         <% end %>
       </div>
     <% end %>
-    <%= f.submit t('app.auth.sign_up_button'),
+    <%= f.submit t("app.auth.sign_up_button"),
       class: %|
         text-white font-medium
         bg-brand-blue dark:bg-gray-900
@@ -113,12 +113,12 @@
         cursor-pointer
         hover:opacity-95
       |,
-      data: { turbo_submits_with: t('app.auth.creating') }
+      data: { turbo_submits_with: t("app.auth.creating") }
     %>
   <% end # password_authentication? %>
 <% end %>
 
 <span class="text-sm text-center">
-  <%= t('app.auth.already_have_account') %>
-  <%= link_to t('app.auth.login'), login_path, class: "underline" %>
+  <%= t("app.auth.already_have_account") %>
+  <%= link_to t("app.auth.login"), login_path, class: "underline" %>
 </span>

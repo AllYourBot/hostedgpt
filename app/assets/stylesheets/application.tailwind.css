@@ -121,7 +121,7 @@ nav#nav-column {
 }
 
 /* The column and the content within it are named separately, because the content is positioned
-   fixed and so is captured as its own snapshot. They slide together. */
+   absolutely and so is captured as its own snapshot. They slide together. */
 
 ::view-transition-old(nav-column),
 ::view-transition-old(nav-content) {

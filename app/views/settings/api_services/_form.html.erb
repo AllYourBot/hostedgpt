@@ -2,7 +2,7 @@
   <% if api_service.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2>
-        <%= t('app.settings.api_services.errors_title', count: api_service.errors.count) %>
+        <%= t("app.settings.api_services.errors_title", count: api_service.errors.count) %>
       </h2>
 
       <ul>
@@ -14,12 +14,12 @@
   <% end %>
 
   <div class="my-5">
-  <%= form.label :name, t('app.settings.api_services.table.name') %>
+    <%= form.label :name, t("app.settings.api_services.table.name") %>
     <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
   <div class="my-5">
-  <%= form.label :driver, t('app.settings.api_services.table.driver') %>
+    <%= form.label :driver, t("app.settings.api_services.table.driver") %>
     <%= form.select :driver,
       APIService.drivers.keys,
       {},
@@ -36,11 +36,11 @@
   </div>
 
   <div class="my-5 inline-block w-full">
-  <%= form.label :url, t('app.settings.api_services.table.url') %>
-     <span>
+    <%= form.label :url, t("app.settings.api_services.table.url") %>
+    <span>
       <% if api_service.persisted? && !brave?(api_service) %>
         <% link_url = settings_api_services_path + "/" + api_service.id.to_s + "/test" %>
-  <%= link_to t('app.settings.api_services.test'), link_url,
+        <%= link_to t("app.settings.api_services.test"), link_url,
           data: { testing_target: "test", turbo_stream: true, action: "click->testing#update_link_api_service" },
           class: "underline text-blue-600"
         %>
@@ -54,18 +54,18 @@
   </div>
 
   <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-  <%= form.label :token, :token %>
+    <%= form.label :token, :token %>
     <%= button_tag type: "button",
       id: "instructions",
-      class: "underline text-blue-600 #{!official?(api_service) && 'hidden'}",
+      class: "underline text-blue-600 #{!official?(api_service) && "hidden"}",
       data: {
         transition_target: "transitionable",
         action: "transition#toggleClass",
       } do
-  %><%= t('app.settings.api_services.instructions_button') %>
+    %><%= t("app.settings.api_services.instructions_button") %>
     <% end %>
     <ol id="openai-instructions"
-      data-transition-target="<%= openai?(api_service) && 'transitionable' %>"
+      data-transition-target="<%= openai?(api_service) && "transitionable" %>"
       class="
         list-decimal
         my-3 p-2 pl-8
@@ -74,21 +74,21 @@
         hidden
       "
     >
-      <li><%= t('app.settings.api_services.instructions.openai.step1_html',
+      <li><%= t("app.settings.api_services.instructions.openai.step1_html",
         link: link_to("Platform", "https://platform.openai.com/", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.openai.step2_html',
-        link: link_to(t('app.settings.api_services.instructions.take_me_to_api_keys'), "https://platform.openai.com/api-keys", class: "underline text-blue-600", target: "_blank")
+      <li><%= t("app.settings.api_services.instructions.openai.step2_html",
+        link: link_to(t("app.settings.api_services.instructions.take_me_to_api_keys"), "https://platform.openai.com/api-keys", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.openai.step3') %></li>
-      <li><%= t('app.settings.api_services.instructions.openai.step4_html', name: Setting.product_name) %></li>
-      <li><%= t('app.settings.api_services.instructions.openai.step5_html',
-        link: link_to(t('app.settings.api_services.instructions.take_me_to_billing'), "https://platform.openai.com/account/billing/overview", class: "underline text-blue-600", target: "_blank")
+      <li><%= t("app.settings.api_services.instructions.openai.step3") %></li>
+      <li><%= t("app.settings.api_services.instructions.openai.step4_html", name: Setting.product_name) %></li>
+      <li><%= t("app.settings.api_services.instructions.openai.step5_html",
+        link: link_to(t("app.settings.api_services.instructions.take_me_to_billing"), "https://platform.openai.com/account/billing/overview", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.openai.step6') %></li>
+      <li><%= t("app.settings.api_services.instructions.openai.step6") %></li>
     </ol>
     <ol id="anthropic-instructions"
-      data-transition-target="<%= anthropic?(api_service) && 'transitionable' %>"
+      data-transition-target="<%= anthropic?(api_service) && "transitionable" %>"
       class="
         list-decimal
         my-3 p-2 pl-8
@@ -97,21 +97,21 @@
         hidden
       "
     >
-      <li><%= t('app.settings.api_services.instructions.anthropic.step1_html',
+      <li><%= t("app.settings.api_services.instructions.anthropic.step1_html",
         link: link_to("Console", "https://console.anthropic.com/", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.anthropic.step2_html',
-        link: link_to(t('app.settings.api_services.instructions.take_me_to_api_keys'), "https://console.anthropic.com/settings/keys", class: "underline text-blue-600", target: "_blank")
+      <li><%= t("app.settings.api_services.instructions.anthropic.step2_html",
+        link: link_to(t("app.settings.api_services.instructions.take_me_to_api_keys"), "https://console.anthropic.com/settings/keys", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.anthropic.step3_html', name: Setting.product_name) %></li>
-      <li><%= t('app.settings.api_services.instructions.anthropic.step4') %></li>
-      <li><%= t('app.settings.api_services.instructions.anthropic.step5_html',
-        link: link_to(t('app.settings.api_services.instructions.take_me_to_plans'), "https://console.anthropic.com/settings/plans", class: "underline text-blue-600", target: "_blank")
+      <li><%= t("app.settings.api_services.instructions.anthropic.step3_html", name: Setting.product_name) %></li>
+      <li><%= t("app.settings.api_services.instructions.anthropic.step4") %></li>
+      <li><%= t("app.settings.api_services.instructions.anthropic.step5_html",
+        link: link_to(t("app.settings.api_services.instructions.take_me_to_plans"), "https://console.anthropic.com/settings/plans", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.anthropic.step6') %></li>
+      <li><%= t("app.settings.api_services.instructions.anthropic.step6") %></li>
     </ol>
     <ol id="groq-instructions"
-      data-transition-target="<%= groq?(api_service) && 'transitionable' %>"
+      data-transition-target="<%= groq?(api_service) && "transitionable" %>"
       class="
         list-decimal
         my-3 p-2 pl-8
@@ -120,16 +120,16 @@
         hidden
       "
     >
-      <li><%= t('app.settings.api_services.instructions.groq.step1_html',
+      <li><%= t("app.settings.api_services.instructions.groq.step1_html",
         link: link_to("Groq Cloud Console", "https://console.groq.com/", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.groq.step2_html',
-        link: link_to(t('app.settings.api_services.instructions.take_me_to_api_keys'), "https://console.groq.com/keys", class: "underline text-blue-600", target: "_blank")
+      <li><%= t("app.settings.api_services.instructions.groq.step2_html",
+        link: link_to(t("app.settings.api_services.instructions.take_me_to_api_keys"), "https://console.groq.com/keys", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.groq.step3_html', name: Setting.product_name) %></li>
+      <li><%= t("app.settings.api_services.instructions.groq.step3_html", name: Setting.product_name) %></li>
     </ol>
     <ol id="gemini-instructions"
-      data-transition-target="<%= gemini?(api_service) && 'transitionable' %>"
+      data-transition-target="<%= gemini?(api_service) && "transitionable" %>"
       class="
         list-decimal
         my-3 p-2 pl-8
@@ -138,22 +138,22 @@
         hidden
       "
     >
-      <li><%= t('app.settings.api_services.instructions.gemini.step1') %></li>
-      <li><%= t('app.settings.api_services.instructions.gemini.step2_html',
+      <li><%= t("app.settings.api_services.instructions.gemini.step1") %></li>
+      <li><%= t("app.settings.api_services.instructions.gemini.step2_html",
         link: link_to("Google AI Studio", "https://aistudio.google.com/", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.gemini.step3_html',
-        link: link_to(t('app.settings.api_services.instructions.take_me_to_api_keys'), "https://aistudio.google.com/apikey", class: "underline text-blue-600", target: "_blank")
+      <li><%= t("app.settings.api_services.instructions.gemini.step3_html",
+        link: link_to(t("app.settings.api_services.instructions.take_me_to_api_keys"), "https://aistudio.google.com/apikey", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.gemini.step4') %></li>
-      <li><%= t('app.settings.api_services.instructions.gemini.step5') %></li>
-      <li><%= t('app.settings.api_services.instructions.gemini.step6') %></li>
-      <li><%= t('app.settings.api_services.instructions.gemini.step7_html',
+      <li><%= t("app.settings.api_services.instructions.gemini.step4") %></li>
+      <li><%= t("app.settings.api_services.instructions.gemini.step5") %></li>
+      <li><%= t("app.settings.api_services.instructions.gemini.step6") %></li>
+      <li><%= t("app.settings.api_services.instructions.gemini.step7_html",
         link: link_to("Gemini Credentials", "https://github.com/gbaptista/gemini-ai#credentials", class: "underline text-blue-600", target: "_blank")
       ) %></li>
     </ol>
     <ol id="brave-instructions"
-      data-transition-target="<%= brave?(api_service) && 'transitionable' %>"
+      data-transition-target="<%= brave?(api_service) && "transitionable" %>"
       class="
         list-decimal
         my-3 p-2 pl-8
@@ -162,13 +162,13 @@
         hidden
       "
     >
-      <li><%= t('app.settings.api_services.instructions.brave.step1_html',
+      <li><%= t("app.settings.api_services.instructions.brave.step1_html",
         link: link_to("Brave Search API", "https://brave.com/search/api/", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.brave.step2_html',
+      <li><%= t("app.settings.api_services.instructions.brave.step2_html",
         link: link_to("API Keys", "https://api.search.brave.com/app/keys", class: "underline text-blue-600", target: "_blank")
       ) %></li>
-      <li><%= t('app.settings.api_services.instructions.brave.step3_html', name: Setting.product_name) %></li>
+      <li><%= t("app.settings.api_services.instructions.brave.step3_html", name: Setting.product_name) %></li>
     </ol>
     <%= form.text_field :token,
       class: %|
@@ -182,7 +182,7 @@
     %>
   </div>
 
-  <%= form.submit t('app.settings.api_services.save'),
+  <%= form.submit t("app.settings.api_services.save"),
     class: %|
       inline-block font-bold
       bg-gray-200 dark:bg-gray-900
@@ -190,6 +190,6 @@
       rounded-lg py-3 px-5
       cursor-pointer
     |,
-    data: { turbo_submits_with: t('app.settings.api_services.saving') }
+    data: { turbo_submits_with: t("app.settings.api_services.saving") }
   %>
 <% end %>

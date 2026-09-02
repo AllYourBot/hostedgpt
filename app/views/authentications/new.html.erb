@@ -1,12 +1,12 @@
-<% content_for :heading, t('app.auth.welcome_back') %>
+<% content_for :heading, t("app.auth.welcome_back") %>
 <% if Feature.registration? %>
   <span class="text-sm text-center">
-    <%= t('app.auth.no_account') %> <%= link_to t('app.auth.sign_up'), register_path, class: "underline" %>
+    <%= t("app.auth.no_account") %> <%= link_to t("app.auth.sign_up"), register_path, class: "underline" %>
   </span>
 <% end %>
 
 <% if Feature.google_authentication? %>
-  <%= button_to t('app.auth.login_with_google'), "/auth/google",
+  <%= button_to t("app.auth.login_with_google"), "/auth/google",
     method: "post",
     class: %|
       text-white font-medium
@@ -21,13 +21,13 @@
       turbo: false,
     }
   %>
-  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && 'hidden' %>">
-  <%= t('app.auth.or') %>
+  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && "hidden" %>">
+    <%= t("app.auth.or") %>
   </span>
 <% end %>
 
 <% if Feature.microsoft_graph_authentication? %>
-  <%= button_to t('app.auth.login_with_microsoft'), "/auth/microsoft_graph",
+  <%= button_to t("app.auth.login_with_microsoft"), "/auth/microsoft_graph",
       method: "post",
       class: %|
         text-white font-medium
@@ -42,8 +42,8 @@
         turbo: false,
       }
     %>
-  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && 'hidden' %>">
-  <%= t('app.auth.or') %>
+  <span class="text-sm text-center <%= Feature.disabled?(:password_authentication) && "hidden" %>">
+    <%= t("app.auth.or") %>
   </span>
 <% end %>
 
@@ -53,16 +53,16 @@
       value: params[:email],
       id: "email",
       autofocus: params[:email].present? ? false : true,
-      placeholder: t('app.auth.email_address'),
+      placeholder: t("app.auth.email_address"),
       class: "border border-gray-400 rounded p-3 dark:text-black"
     %>
     <%= f.password_field :password,
       id: "password",
       autofocus: params[:email].present? ? true : false,
-      placeholder: t('app.auth.password'),
+      placeholder: t("app.auth.password"),
       class: "border border-gray-400 rounded p-3 dark:text-black"
     %>
-  <%= f.submit t('app.auth.login'),
+    <%= f.submit t("app.auth.login"),
       class: %|
         text-white font-medium
         bg-brand-blue dark:bg-gray-900
@@ -71,12 +71,12 @@
         cursor-pointer
         hover:opacity-95
       |,
-  data: { turbo_submits_with: t('app.auth.authenticating') }
+      data: { turbo_submits_with: t("app.auth.authenticating") }
     %>
   <% end %>
   <% if Feature.password_reset_email? %>
     <span class="text-sm text-center">
-  <%= link_to t('app.auth.forgot_password'), new_password_reset_path, class: "underline" %>
+      <%= link_to t("app.auth.forgot_password"), new_password_reset_path, class: "underline" %>
     </span>
   <% end %>
 <% end %>
