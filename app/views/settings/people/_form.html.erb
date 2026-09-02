@@ -132,8 +132,8 @@
           <span class="w-32"><%= t("app.settings.people.form.backend_choice_sdk") %></span>
         </div>
         <% User::Features.derived_backend_names.each do |choice| %>
-          <% driver = choice.to_s.delete_suffix("_ai_backend") %>
-          <% display_name = { "openai" => "OpenAI" }.fetch(driver) { driver.humanize } %>
+          <% backend = choice.to_s.delete_suffix("_ai_backend") %>
+          <% display_name = { "openai" => "OpenAI", "openrouter" => "OpenRouter" }.fetch(backend) { backend.humanize } %>
           <% current_choice = Current.person.user.features[choice] %>
           <div class="flex items-center gap-8 py-1">
             <span class="w-28 dark:text-gray-400"><%= display_name %></span>
@@ -143,7 +143,7 @@
             </span>
             <span class="w-32">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "ruby_llm", current_choice == "ruby_llm",
-                    disabled: !User::Features.ruby_llm_available?(driver),
+                    disabled: !User::Features.ruby_llm_available?(backend),
                     aria: { label: t("app.settings.people.form.backend_choice_aria_ruby_llm", driver: display_name) } %>
             </span>
             <span class="w-32">

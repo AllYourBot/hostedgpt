@@ -226,6 +226,7 @@ There are a number of optional feature flags that can be set and settings that c
   - `DEFAULT_OPENAI_KEY` will be used by the pre-configured OpenAI API Service
   - `DEFAULT_ANTHROPIC_KEY` will be used by the pre-configured Anthropic API Service
   - `DEFAULT_GROQ_KEY` will be used by the pre-configured Groq API Service
+  - `DEFAULT_OPENROUTER_KEY` will be used by the pre-configured OpenRouter API Service
 - `BRAVE_API_KEY` will be used as the default Brave Search API key for tool based web searches
 - Edit `models.yml` to modify which Language Models are automatically created for new users upon signing up. Any changes to this file will be applied to existing users when `rails models:import` is run, or when `rails db:prepare` is run, or when the server is restarted. If you ever need to export your list of models you can do `rails models:export[tmp/models.json]`
 - `CLOUDFLARE_STORAGE_FEATURE` is `false` by default so any files that are uploaded while chatting with your assistant will be stored in postgres. This is recommended for small deployments. Set this to `true` if you would like to store message attachments in Cloudflare's R2 storage (this mimics AWS S3). You must also sign up for Cloudflare. The free tier allows 10 GB of storage. After you sign up, you need to create a new bucket and an API token. The API token should have "Object Read and Write" access to your bucket. Take note of your Access Key ID and your Secret Access Key along with your Account ID. Set the following environment variables:

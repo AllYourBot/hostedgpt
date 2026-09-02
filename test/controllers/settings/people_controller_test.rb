@@ -183,7 +183,7 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     @user.update!(dark_mode: "dark", nav_closed: true)
 
     params = person_params
-    params["backend_choices"] = { "openai_ai_backend" => "ruby_llm", "gemini_ai_backend" => "" }
+    params["backend_choices"] = { "openai_ai_backend" => "ruby_llm", "gemini_ai_backend" => "", "openrouter_ai_backend" => "sdk" }
 
     patch settings_person_url, params: { person: params }
     assert_redirected_to edit_settings_person_url
@@ -192,8 +192,17 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     @user.reload
     assert_equal "ruby_llm", @user.features[:openai_ai_backend]
     assert_nil @user.features[:gemini_ai_backend]
+    assert_equal "sdk", @user.features[:openrouter_ai_backend]
     assert_equal true, @user.nav_closed
     assert_equal "dark", @user.dark_mode
+  end
+
+  test "the settings form renders an OpenRouter backend choice row" do
+    get edit_settings_person_url
+    assert_response :success
+    assert_select "span", text: "OpenRouter"
+    assert_select "input[type=radio][name='person[backend_choices][openrouter_ai_backend]'][value='sdk']"
+    assert_select "input[type=radio][name='person[backend_choices][openrouter_ai_backend]'][value='ruby_llm'][disabled]"
   end
 
   private

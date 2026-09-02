@@ -50,6 +50,17 @@ class User::FeaturesTest < ActiveSupport::TestCase
 
     error = assert_raises(KeyError) { @user.features[:brave_ai_backend] = "sdk" }
     assert_match "Did you typo a feature name?", error.message
+
+    assert_raises(KeyError) { @user.features[:groq_ai_backend] = "sdk" }
+    refute_includes User::Features.derived_backend_names, :groq_ai_backend
+  end
+
+  test "openrouter has its own backend choice row even though it rides the openai driver" do
+    assert_includes User::Features.derived_backend_names, :openrouter_ai_backend
+
+    @user.features[:openrouter_ai_backend] = "sdk"
+    @user.reload
+    assert_equal "sdk", @user.features[:openrouter_ai_backend]
   end
 
   test "an explicit per-driver choice overrides an off site default, per driver" do

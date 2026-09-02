@@ -1,18 +1,20 @@
 class User::Features
+  # OpenRouter rides the openai driver, so it needs its own name here. Groq
+  # rides it too but stays out until RubyLLM support is verified.
   def self.derived_backend_names
     APIService.drivers.keys
       .select { |driver| APIService.new(driver: driver).ai_backend }
-      .map { |driver| :"#{driver}_ai_backend" }
+      .map { |driver| :"#{driver}_ai_backend" } + [:openrouter_ai_backend]
   end
 
   def self.valid_names
     derived_backend_names + [:use_ruby_llm]
   end
 
-  def self.ruby_llm_available?(driver)
+  def self.ruby_llm_available?(backend)
     defined?(AIBackend::RubyLLM) &&
       AIBackend::RubyLLM.respond_to?(:supports_driver?) &&
-      AIBackend::RubyLLM.supports_driver?(driver)
+      AIBackend::RubyLLM.supports_driver?(backend)
   end
 
   def initialize(user)
@@ -39,7 +41,7 @@ class User::Features
   def guard_name!(name)
     key = name.to_s.chomp("=").to_sym
     unless self.class.valid_names.include?(key)
-      raise KeyError, "You attempted to reference '#{key}' but only AI-backend choices (<driver>_ai_backend) and use_ruby_llm are accessible here. Did you typo a feature name?"
+      raise KeyError, "You attempted to reference '#{key}' but only AI-backend choices (<backend>_ai_backend) and use_ruby_llm are accessible here. Did you typo a feature name?"
     end
 
     key

@@ -228,3 +228,153 @@ models:
   supports_tools: true
   supports_system_message: true
   api_service_name: Google Gemini
+- api_name: deepseek/deepseek-v4-flash-0731
+  name: DeepSeek V4 Flash 0731
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: xiaomi/mimo-v2.5
+  name: Xiaomi MiMo V2.5
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: openai/gpt-5.6-luna
+  name: GPT-5.6 Luna
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: tencent/hy3
+  name: Tencent Hy3
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: nvidia/nemotron-3-ultra-550b-a55b:free
+  name: Nemotron 3 Ultra (free)
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: deepseek/deepseek-v4-flash
+  name: DeepSeek V4 Flash 0423
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: z-ai/glm-5.3-flash
+  name: GLM 5.3 Flash
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: google/gemini-3.7-flash
+  name: Gemini 3.7 Flash
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: z-ai/glm-5.2
+  name: GLM 5.2
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: tencent/hy4-preview
+  name: Tencent Hy4 (preview)
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: minimax/minimax-m3:free
+  name: MiniMax M3 (free)
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: deepseek/deepseek-v4-pro
+  name: DeepSeek V4 Pro 0423
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: openai/gpt-5.6-sol
+  name: GPT-5.6 Sol
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: moonshotai/kimi-k3
+  name: Kimi K3
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: minimax/minimax-m3
+  name: MiniMax M3
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: anthropic/claude-opus-5
+  name: Claude Opus 5
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: poolside/laguna-s-2.1:free
+  name: Poolside Laguna S 2.1 (free)
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: z-ai/glm-5.3
+  name: GLM 5.3
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: anthropic/claude-sonnet-5
+  name: Claude Sonnet 5
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: deepseek/deepseek-v4-pro-0813
+  name: DeepSeek V4 Pro 0813
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: nvidia/nemotron-3.5-lightning:free
+  name: Nemotron 3.5 Lightning (free)
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: google/gemini-2.5-flash-lite
+  name: Gemini 2.5 Flash Lite
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: google/gemini-3-flash-preview
+  name: Gemini 3 Flash (preview)
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: anthropic/claude-sonnet-4.6
+  name: Claude Sonnet 4.6
+  supports_images: true
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
+- api_name: upstage/solar-pro4
+  name: Upstage Solar Pro 4
+  supports_images: false
+  supports_tools: true
+  supports_system_message: true
+  api_service_name: OpenRouter
