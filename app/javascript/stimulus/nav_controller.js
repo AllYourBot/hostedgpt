@@ -21,6 +21,7 @@ import { Controller } from '@hotwired/stimulus'
 //   data-nav-column-open-class="nav-open"
 // >
 //   <button data-action="nav#toggleDrawer">hamburger</button>
+//   <a data-action="nav#closeDrawer" href="/somewhere">a link inside the drawer</a>
 //   <button data-action="nav#toggleColumn">handle</button>
 // </body>
 
@@ -28,6 +29,15 @@ export default class extends Controller {
   static classes = [ "drawerClosed", "columnOpen" ]
 
   toggleDrawer() {
+    this.#transition(this.drawerClosedClass)
+  }
+
+  // On a narrow screen the drawer covers the conversation, so following a link inside it has to shut
+  // it on the way out, otherwise the page it loads is left hidden behind the drawer. On a wide screen
+  // the drawer is already closed (the sidebar is a column there) so this does nothing.
+  closeDrawer() {
+    if (this.#drawerClosed) return
+
     this.#transition(this.drawerClosedClass)
   }
 
@@ -61,6 +71,10 @@ export default class extends Controller {
     // Showing and hiding the nav causes the page to flow differently, very similarly to what happens
     // when the browser size changes. Throw this event in case we have other listeners on the resize event.
     window.dispatchEvent(new CustomEvent('main-column-changed'))
+  }
+
+  get #drawerClosed() {
+    return this.element.classList.contains(this.drawerClosedClass)
   }
 
   get #columnOpen() {
