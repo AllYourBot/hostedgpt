@@ -1,46 +1,41 @@
-<h1 class="text-3xl"><%= t('app.settings.language_models.index_title') %></h1>
+<h1 class="text-3xl"><%= t("app.settings.language_models.index_title") %></h1>
 
 <p class="my-8">
-  <%= link_to t('app.settings.language_models.add_new'),
-    new_settings_language_model_path,
-    class: %| inline-block font-bold
+  <%= link_to t("app.settings.language_models.add_new"), new_settings_language_model_path,
+    class: %|
+      inline-block font-bold
       bg-gray-200 dark:bg-gray-900
       border border-gray-400
       rounded-lg py-3 px-5
       cursor-pointer
-    | %>
+    |
+  %>
 </p>
 
 <table id="language-models" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
   <thead>
     <tr class="bg-gray-200 dark:bg-gray-900">
-  <th><%= t('app.settings.language_models.table.name') %></th>
-  <th><%= t('app.settings.language_models.table.description') %></th>
-  <th><%= t('app.settings.language_models.table.api_service') %></th>
-  <th><%= t('app.settings.language_models.table.supports_pdf') %></th>
+      <th><%= t("app.settings.language_models.table.name") %></th>
+      <th><%= t("app.settings.language_models.table.description") %></th>
+      <th><%= t("app.settings.language_models.table.api_service") %></th>
+      <th><%= t("app.settings.language_models.table.supports_pdf") %></th>
     </tr>
   </thead>
 
   <tbody>
     <% @language_models.each do |language_model| %>
       <%= turbo_frame_tag dom_id(language_model) do %>
-        <tr class="<%= cycle('bg-gray-100 dark:bg-gray-600', 'bg-white dark:bg-gray-900') %> cursor-pointer" data-href="<%= edit_settings_language_model_path(language_model) %>">
+        <tr
+          class="<%= cycle("bg-gray-100 dark:bg-gray-600", "bg-white dark:bg-gray-900") %> cursor-pointer"
+          data-controller="clickable-row"
+          data-clickable-row-url-value="<%= edit_settings_language_model_path(language_model) %>"
+        >
           <td class="underline"><%= language_model.api_name %></td>
           <td><%= language_model.name %></td>
           <td><%= n_a_if_blank(language_model.api_service.name) %></td>
-          <td><%= language_model.supports_pdf? ? t('app.generic.yes', default: 'Yes') : t('app.generic.no', default: 'No') %></td>
+          <td><%= language_model.supports_pdf? ? t("app.settings.generic.yes") : t("app.settings.generic.no") %></td>
         </tr>
       <% end %>
     <% end %>
   </tbody>
 </table>
-
-<script>
-  document.addEventListener("turbo:load", () => {
-    document.querySelectorAll("table#language-models tr[data-href]").forEach(row => {
-      row.addEventListener("click", () => {
-        window.location.href = row.dataset.href;
-      });
-    });
-  });
-</script>

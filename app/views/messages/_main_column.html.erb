@@ -36,7 +36,7 @@
         items-center justify-center
         tooltip tooltip-right hover:tooltip-open
       "
-  data-tip="<%= t('app.conversations.ui.close_sidebar') %>"
+      data-tip="<%= t("app.conversations.ui.close_sidebar") %>"
     >
       <div id="left" class="flex-col w-1 h-5 opacity-70">
         <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full group-hover:rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
@@ -51,7 +51,7 @@
         items-center justify-center
         tooltip tooltip-right hover:tooltip-open
       "
-  data-tip="<%= t('app.conversations.ui.open_sidebar') %>"
+      data-tip="<%= t("app.conversations.ui.open_sidebar") %>"
     >
       <div id="right" class="flex-col w-1 h-5 opacity-70">
         <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full -rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
@@ -62,14 +62,20 @@
 
   <!-- Only one of these headers is visible at a time, depending on width -->
   <header id="wide-header" class="justify-between flex-none hidden h-10 mt-2 mb-3 ml-2 text-lg text-gray-950 dark:text-gray-100 md:flex">
-    <%= render 'messages/main_column/assistant_header' %>
+    <%= render "messages/main_column/assistant_header" %>
 
     <div class="flex items-center gap-2">
       <%= button_tag type: "button",
-            class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{'opacity-50 cursor-not-allowed' unless @conversation&.persisted?}",
-            onclick: @conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
-            disabled: !@conversation&.persisted? do %>
-        <%= icon "arrow-up-tray", variant: :outline, size: 20, class: 'text-gray-950 dark:text-gray-100', title: @conversation&.persisted? ? 'Share conversation' : 'Share conversation (no conversation to share)', tooltip: :bottom %>
+        class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{"opacity-50 cursor-not-allowed" unless @conversation&.persisted?}",
+        onclick: @conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
+        disabled: !@conversation&.persisted? do %>
+        <%= icon "arrow-up-tray",
+          variant: :outline,
+          size: 20,
+          class: "text-gray-950 dark:text-gray-100",
+          title: @conversation&.persisted? ? t("app.conversations.ui.share") : t("app.conversations.ui.share_unavailable"),
+          tooltip: :bottom
+        %>
       <% end %>
 
       <%= link_to new_assistant_message_path(@assistant),
@@ -85,7 +91,7 @@
             keydown.ctrl+j@document->keyboard#click
           |
         } do %>
-  <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: t('app.conversations.new_chat'), tooltip: :left %>
+        <%= icon "pencil-square", variant: :outline, size: 22, class: "stroke-2 text-gray-950 dark:text-gray-100", title: t("app.conversations.new_chat"), tooltip: :left %>
       <% end %>
     </div>
   </header>
@@ -94,18 +100,24 @@
     <div class="flex items-center justify-between flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
       <%= render "layouts/nav_toggle" %>
 
-      <%= render 'messages/main_column/assistant_header' %>
+      <%= render "messages/main_column/assistant_header" %>
 
       <div class="flex items-center gap-2">
         <%= button_tag type: "button",
-              class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{'opacity-50 cursor-not-allowed' unless @conversation&.persisted?}",
-              onclick: @conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
-              disabled: !@conversation&.persisted? do %>
-          <%= icon "arrow-up-tray", variant: :outline, size: 20, class: 'text-gray-950 dark:text-gray-100', title: @conversation&.persisted? ? 'Share conversation' : 'Share conversation (no conversation to share)', tooltip: :bottom %>
+          class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{"opacity-50 cursor-not-allowed" unless @conversation&.persisted?}",
+          onclick: @conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
+          disabled: !@conversation&.persisted? do %>
+          <%= icon "arrow-up-tray",
+            variant: :outline,
+            size: 20,
+            class: "text-gray-950 dark:text-gray-100",
+            title: @conversation&.persisted? ? t("app.conversations.ui.share") : t("app.conversations.ui.share_unavailable"),
+            tooltip: :bottom
+          %>
         <% end %>
 
         <%= link_to new_assistant_message_path(@assistant), target: "_top", class: "block cursor-pointer inline-flex mr-1 px-2 group", data: { role: "new" } do %>
-  <%= icon "pencil-square", variant: :outline, size: 22, class: 'stroke-2 text-gray-950 dark:text-gray-100', title: t('app.conversations.new_chat'), tooltip: :left %>
+          <%= icon "pencil-square", variant: :outline, size: 22, class: "stroke-2 text-gray-950 dark:text-gray-100", title: t("app.conversations.new_chat"), tooltip: :left %>
         <% end %>
       </div>
     </div>
@@ -130,22 +142,22 @@
         <%= button_tag type: "button",
               class: "block rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-600 inline-flex px-2 py-2 tooltip tooltip-top hover:tooltip-open cursor-pointer group",
               data: {
-                tip: t('app.conversations.ui.scroll_down'),
+                tip: t("app.conversations.ui.scroll_down"),
                 action: "scrollable#scrollToBottom"
               } do
         %>
-          <%= icon "arrow-down", variant: :outline, size: 16, class: 'text-gray-800 dark:text-white cursor-pointer stroke-3' %>
+          <%= icon "arrow-down", variant: :outline, size: 16, class: "text-gray-800 dark:text-white cursor-pointer stroke-3" %>
         <% end %>
       </div>
 
-      <div class="<%= @assistant.not_deleted? && 'hidden' %> flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
-        <p class="text-center"><%= @assistant.name %> has been deleted and cannot assist any longer.</p>
+      <div class="<%= @assistant.not_deleted? && "hidden" %> flex-1 pl-6 pr-6 w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto relative leading-relaxed">
+        <p class="text-center"><%= t("app.conversations.assistant_deleted", name: @assistant.name) %></p>
       </div>
 
       <div id="composer"
         class="
-          <%= @assistant.deleted? && 'hidden' %>
-          <%= !@assistant.supports_images? && 'relationship' %>
+          <%= @assistant.deleted? && "hidden" %>
+          <%= !@assistant.supports_images? && "relationship" %>
           flex-1 relative
           leading-relaxed
           pl-6 pr-6 mx-auto mb-6
@@ -153,10 +165,10 @@
         "
         data-controller="composer"
         data-composer-speaker-outlet="[data-controller~='speaker']"
-        data-composer-blur-placeholder-value="<%= t('app.conversations.composer.blur_placeholder') %>"
-        data-composer-focus-placeholder-value="<%= t('app.conversations.composer.focus_placeholder') %>"
-        data-composer-speak-placeholder-value="<%= t('app.conversations.composer.speak_placeholder') %>"
-        data-composer-mic-permission-required-value="<%= t('app.conversations.ui.mic_permission_required') %>"
+        data-composer-blur-placeholder-value="<%= t("app.conversations.composer.blur_placeholder") %>"
+        data-composer-focus-placeholder-value="<%= t("app.conversations.composer.focus_placeholder") %>"
+        data-composer-speak-placeholder-value="<%= t("app.conversations.composer.speak_placeholder") %>"
+        data-composer-mic-permission-required-value="<%= t("app.conversations.ui.mic_permission_required") %>"
       >
         <%= button_tag type: "button",
               id: "attach-button",
@@ -170,7 +182,7 @@
                   text-black dark:text-white
                   cursor-pointer stroke-2
                 |,
-                title: t('app.conversations.ui.attach'),
+                title: t("app.conversations.ui.attach"),
                 tooltip: :top
           %>
         <% end %>
@@ -202,7 +214,7 @@
                     text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white
                     cursor-pointer stroke-2
                   |,
-                  title: t('app.conversations.ui.remove_file'),
+                  title: t("app.conversations.ui.remove_file"),
                   tooltip: :top
                 %>
               <% end %>
@@ -251,7 +263,7 @@
                 bg-white dark:bg-gray-800
             | do %>
               <%= icon "stop", variant: :solid, size: 15, class: "absolute top-[6px] left-[6px]" %>
-              <%= icon "stop-circle", variant: :outline, size: 39, title: t('app.conversations.ui.stop'), tooltip: :top %>
+              <%= icon "stop-circle", variant: :outline, size: 39, title: t("app.conversations.ui.stop"), tooltip: :top %>
             <% end %>
           <% end %>
         <% end %>
@@ -345,7 +357,7 @@
                 bg-white dark:bg-gray-800
               | do
             %>
-              <%= icon "microphone", variant: :solid, size: 26, title: t('app.conversations.ui.stop'), tooltip: :top %>
+              <%= icon "microphone", variant: :solid, size: 26, title: t("app.conversations.ui.stop"), tooltip: :top %>
             <% end %>
           <% end %>
 
@@ -366,7 +378,7 @@
               bg-white dark:bg-gray-800
             | do
           %>
-            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: t('app.conversations.ui.send_message'), tooltip: :top %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: t("app.conversations.ui.send_message"), tooltip: :top %>
           <% end %>
 
           <!-- the cancel button is z-20, it's declared above the current form and positioned in this same spot -->
@@ -399,7 +411,7 @@
                   enabled:dark:text-white
                 | do
               %>
-                <%= icon "microphone", variant: :outline, size: 26, title: t('app.conversations.ui.voice_mode'), tooltip: :top %>
+                <%= icon "microphone", variant: :outline, size: 26, title: t("app.conversations.ui.voice_mode"), tooltip: :top %>
               <% end %>
             </div>
           <% end %>
@@ -417,10 +429,10 @@
               text-gray-100 dark:text-gray-600
               enabled:text-black
               enabled:dark:text-white
-              #{Feature.voice? && '!hidden'}
+              #{Feature.voice? && "!hidden"}
             | do
           %>
-            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: t('app.conversations.ui.send_message'), tooltip: :top %>
+            <%= icon "arrow-up-circle", variant: :solid, size: 39, title: t("app.conversations.ui.send_message"), tooltip: :top %>
           <% end %>
 
           <div
@@ -432,7 +444,8 @@
 
         <% end %>
       </div>
-  </footer>
+    </footer>
+  </section>
 </turbo-frame>
 
 <dialog
@@ -443,13 +456,13 @@
 >
   <div class="modal-box max-w-5xl dark:bg-black">
     <header class="font-bold text-lg mb-5">
-      <%= t('app.conversations.shortcuts.header') %>
+      <%= t("app.conversations.shortcuts.header") %>
     </header>
     <article class="flex flex-col md:flex-row">
       <section class="flex-1 pr-0 md:pr-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <%= t('app.conversations.shortcuts.open_new') %>
+            <%= t("app.conversations.shortcuts.open_new") %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -458,7 +471,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <%= t('app.conversations.shortcuts.focus_input') %>
+            <%= t("app.conversations.shortcuts.focus_input") %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">/</div>
@@ -466,7 +479,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <%= t('app.conversations.shortcuts.unfocus_input') %>
+            <%= t("app.conversations.shortcuts.unfocus_input") %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">ESC</div>
@@ -474,7 +487,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <%= t('app.conversations.shortcuts.toggle_microphone') %>
+            <%= t("app.conversations.shortcuts.toggle_microphone") %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -486,7 +499,7 @@
       <section class="flex-1 pl-0 md:pl-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <span><%= t('app.conversations.shortcuts.stop_streaming') %></span>
+            <span><%= t("app.conversations.shortcuts.stop_streaming") %></span>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -495,7 +508,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <span><%= t('app.conversations.shortcuts.copy_last') %></span>
+            <span><%= t("app.conversations.shortcuts.copy_last") %></span>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Shift</div>
@@ -505,7 +518,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <%= t('app.conversations.shortcuts.toggle_sidebar') %>
+            <%= t("app.conversations.shortcuts.toggle_sidebar") %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">Ctrl or ⌘</div>
@@ -514,7 +527,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <%= t('app.conversations.shortcuts.show_shortcuts') %>
+            <%= t("app.conversations.shortcuts.show_shortcuts") %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">?</div>
@@ -523,13 +536,13 @@
       </section>
     </article>
     <header class="font-semibold text-lg my-5 pb-1 border-b-2 border-gray-100">
-      <%= t('app.conversations.shortcuts.inside_input_header') %>
+      <%= t("app.conversations.shortcuts.inside_input_header") %>
     </header>
     <article class="flex flex-col md:flex-row">
       <section class="flex-1 pr-0 md:pr-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Submit your chat
+            <%= t("app.conversations.shortcuts.submit_chat") %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">RETURN</div>
@@ -537,7 +550,7 @@
         </figure>
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            Edit previous chat
+            <%= t("app.conversations.shortcuts.edit_previous") %>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">↑</div>
@@ -547,7 +560,7 @@
       <section class="flex-1 pl-0 md:pl-5">
         <figure class="flex py-2">
           <figcaption class="flex-grow flex items-center">
-            <span><%= t('app.conversations.shortcuts.unfocus_input') %></span>
+            <span><%= t("app.conversations.shortcuts.unfocus_input") %></span>
           </figcaption>
           <kbd class="w-50 text-right flex flex-row gap-1">
             <div class="key">ESC</div>

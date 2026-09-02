@@ -1,14 +1,15 @@
 <% if Feature.assistants_page? && !mobile_device? %>
   <div class="sticky top-0 pt-2 z-40 bg-gray-50 dark:bg-gray-900">
-    <%= link_to assistants_path, class: %|
-          flex
-          mb-1 p-1 pl-2 pr-2 mr-5
-          rounded-lg
-          text-sm
-          hover:bg-gray-100 dark:hover:bg-gray-700
-        | do %>
+    <%= link_to assistants_path,
+      class: %|
+        flex
+        mb-1 p-1 pl-2 pr-2 mr-5
+        rounded-lg
+        text-sm
+        hover:bg-gray-100 dark:hover:bg-gray-700
+      | do %>
       <%= icon "sparkles", variant: :outline %>
-      <span class="ml-2 font-semibold">Assistants</span>
+      <span class="ml-2 font-semibold"><%= t("app.navigation.assistants") %></span>
     <% end %>
   </div>
 <% end %>
@@ -23,7 +24,6 @@
   data-action="dragover->sortable#over drop->sortable#drop"
   class="flex flex-col"
 >
-
   <%= render @nav_assistants %>
 
   <%= button_tag type: "button",
@@ -34,13 +34,14 @@
       mb-1 p-1 pl-2 pr-2 mr-5
       hover:bg-gray-100 dark:hover:bg-gray-700
       pointer
-      #{@nav_assistants.length <= Assistant::MAX_LIST_DISPLAY && 'hidden'}
+      #{@nav_assistants.length <= Assistant::MAX_LIST_DISPLAY && "hidden"}
     |,
     data: {
       transition_target: "transitionable",
-      action: "transition#toggleClass",
+      action: "transition#toggleClass"
     } do %>
-    <%= icon "chevron-down", variant: :mini, class: 'text-gray-500 ml-[2px] mr-[14px]' %> Show All
+    <%= icon "chevron-down", variant: :mini, class: "text-gray-500 ml-[2px] mr-[14px]" %>
+    <%= t("app.assistants.ui.show_all") %>
   <% end %>
 </section>
 

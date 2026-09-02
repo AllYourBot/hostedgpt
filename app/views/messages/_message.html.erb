@@ -134,7 +134,7 @@ end %>
                         </article>
                       </main>
                       <form method="dialog" class="modal-backdrop no-focus-outline">
-                        <button id="modal-backdrop">close</button>
+                        <button><%= t("app.share.close") %></button>
                       </form>
                     </dialog>
                   </div>
@@ -154,7 +154,7 @@ end %>
                           <%= document.filename %>
                         </p>
                         <p class="text-sm text-gray-500 dark:text-gray-400">
-                          PDF Document - Click to open
+                          <%= t("app.messages.pdf_document") %>
                         </p>
                       </div>
                       <div class="flex-shrink-0">
@@ -189,7 +189,7 @@ end %>
           gap-2
           text-gray-600 dark:text-gray-300
           h-[19px]
-          <%= !last_message && done_thinking && 'invisible' %> group-tap:visible
+          <%= !last_message && done_thinking && "invisible" %> group-tap:visible
         ">
           <% if message.versions.length > 1 %>
             <%= button_to message_path(message, version: previous_version),
@@ -207,7 +207,7 @@ end %>
               data: {
                 role: "previous",
             } do %>
-              <%= icon "chevron-left", variant: :micro, title: previous_version.present? && t('app.messages.previous_version'), data: { } %>
+              <%= icon "chevron-left", variant: :micro, title: previous_version.present? && t("app.messages.previous_version") %>
             <% end %>
 
             v<%= message.version %>
@@ -226,7 +226,7 @@ end %>
               data: {
                 role: "next",
             } do %>
-              <%= icon "chevron-right", variant: :micro, title: next_version.present? && t('app.messages.next_version'), data: { } %>
+              <%= icon "chevron-right", variant: :micro, title: next_version.present? && t("app.messages.next_version") %>
             <% end %>
           <% end %>
 
@@ -238,7 +238,7 @@ end %>
                 composer_target: "messageEdit",
                 turbo_frame: "message-text-#{message.id}",
               } do %>
-              <%= icon "pencil", variant: :outline, size: 18, title: t('app.messages.edit') %>
+              <%= icon "pencil", variant: :outline, size: 18, title: t("app.messages.edit") %>
             <% end %>
           <% elsif message.assistant? && message.assistant.not_deleted? %>
             <% if Feature.voice? %>
@@ -253,8 +253,8 @@ end %>
                     playback#toggleSpeakingMessage
                   |,
               } do %>
-                <%= icon "speaker-wave", variant: :outline, size: 19, title: t('app.messages.read_aloud'), data: { role: "play", transition_target: "transitionable" } %>
-                <%= icon "stop-circle", variant: :outline, size: 19, title: t('app.conversations.ui.stop'), data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
+                <%= icon "speaker-wave", variant: :outline, size: 19, title: t("app.messages.read_aloud"), data: { role: "play", transition_target: "transitionable" } %>
+                <%= icon "stop-circle", variant: :outline, size: 19, title: t("app.conversations.ui.stop"), data: { role: "stop", transition_target: "transitionable" }, class: "hidden" %>
               <% end %>
             <% end %>
             <%= button_tag type: "button",
@@ -266,11 +266,11 @@ end %>
                   transition#toggleClassOn
                   mouseleave->transition#toggleClassOff
                 |,
-                keyboard_target: formatted_text.present? && formatted_text.exclude?('keyboard-target') ? "keyboardable" : nil,
+                keyboard_target: formatted_text.present? && formatted_text.exclude?("keyboard-target") ? "keyboardable" : nil,
                 # ^ ensure the keyboard shortcut is only attached if there is text && if this text does not contain a code block
             } do %>
-              <%= icon "clipboard", variant: :outline, size: 18, title: t('app.messages.copy'), data: { transition_target: "transitionable" } %>
-              <%= icon "check", variant: :outline, size: 18, title: t('app.messages.copied'), data: { transition_target: "transitionable" }, class: "hidden" %>
+              <%= icon "clipboard", variant: :outline, size: 18, title: t("app.messages.copy"), data: { transition_target: "transitionable" } %>
+              <%= icon "check", variant: :outline, size: 18, title: t("app.messages.copied"), data: { transition_target: "transitionable" }, class: "hidden" %>
             <% end %>
 
             <div class="dropdown dropdown-top flex items-center">
@@ -279,14 +279,14 @@ end %>
                 role: :button,
                 variant: :outline,
                 size: 18,
-                title: t('app.messages.regenerate'),
+                title: t("app.messages.regenerate"),
                 data: { role: "regenerate" }
               %>
 
               <menu tabindex="0" class="dropdown-content -ml-6 z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
                 <% message.user.assistants.ordered.excluding(message.assistant).to_a.push(message.assistant).each do |assistant| %>
                   <% last = message.assistant == assistant %>
-                  <li class="overflow-hidden <%= 'border-t border-gray-200 dark:border-gray-500 pt-1 mt-1' if last %>">
+                  <li class="overflow-hidden <%= "border-t border-gray-200 dark:border-gray-500 pt-1 mt-1" if last %>">
                     <%= button_to assistant_messages_path(assistant),
                       form_class: "inline-block p-0",
                       class: "truncate w-full py-2 px-4 text-left",
@@ -303,7 +303,7 @@ end %>
                         turbo_frame: "_top",
                         turbo_action: "replace",
                     } do %>
-                      <%= t('app.messages.regenerate_menu.using', name: assistant.name) %>
+                      <%= t("app.messages.regenerate_menu.using", name: assistant.name) %>
                     <% end %>
                   </li>
                 <% end %>

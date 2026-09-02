@@ -6,8 +6,8 @@
   <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" %>
   <%# daisyui (^) is declared above application (v) so we can override classes from it %>
   <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
-  <%= stylesheet_link_tag "application", 'https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap', "data-turbo-track": "reload" %>
   <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap", "data-turbo-track": "reload" %>
   <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
   <script async src="https://ga.jspm.io/npm:es-module-shims@1.8.2/dist/es-module-shims.js" data-turbo-track="reload"></script>
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" data-turbo-track="reload"></script>
@@ -27,7 +27,7 @@
   <% end %>
   <!-- /ios-pwa-splash screen-->
   <!-- /PWA -->
-  <%= render 'application/head/favicons' %>
-  <%= render 'application/head/meta_tags' %>
+  <%= render "application/head/favicons" %>
+  <%= render "application/head/meta_tags" %>
   <%= content_for :head %>
 </head>

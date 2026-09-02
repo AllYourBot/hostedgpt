@@ -1,7 +1,7 @@
 <%= form_with(model: document, class: "contents") do |form| %>
   <% if document.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(document.errors.count, "error") %> prohibited this document from being saved:</h2>
+      <h2><%= t("app.documents.form.errors_title", count: document.errors.count) %></h2>
 
       <ul>
         <% document.errors.each do |error| %>
@@ -12,32 +12,32 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :user_id, "User ID" %>
+    <%= form.label :user_id, t("app.documents.form.user_id") %>
     <%= form.text_field :user_id, value: User.last.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :assistant_id, "Assistant ID" %>
+    <%= form.label :assistant_id, t("app.documents.form.assistant_id") %>
     <%= form.text_field :assistant_id, value: Assistant.last.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :message_id, "Message ID" %>
+    <%= form.label :message_id, t("app.documents.form.message_id") %>
     <%= form.text_field :message_id, value: Message.last.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :filename %>
+    <%= form.label :filename, t("app.documents.fields.filename") %>
     <%= form.text_field :filename, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :purpose %>
+    <%= form.label :purpose, t("app.documents.fields.purpose") %>
     <%= form.text_field :purpose, value: "assistants", class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :bytes %>
+    <%= form.label :bytes, t("app.documents.fields.bytes") %>
     <%= form.number_field :bytes, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 

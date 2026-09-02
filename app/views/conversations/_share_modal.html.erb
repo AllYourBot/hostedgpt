@@ -6,17 +6,17 @@
 >
   <div class="modal-box max-w-2xl dark:bg-black">
     <header class="font-bold text-lg mb-5">
-      <%= t('app.share.title') %>
+      <%= t("app.share.title") %>
     </header>
 
     <div class="space-y-4">
       <p class="text-gray-600 dark:text-gray-400">
-        <%= t('app.share.description') %>
+        <%= t("app.share.description") %>
       </p>
 
       <div class="form-control">
         <label class="label">
-          <span class="label-text"><%= t('app.share.url') %></span>
+          <span class="label-text"><%= t("app.share.url") %></span>
         </label>
         <div class="flex gap-2">
           <input
@@ -32,24 +32,24 @@
             class="btn btn-primary"
           >
             <%= icon "clipboard", variant: :outline, size: 20 %>
-            <%= t('app.share.copy') %>
+            <%= t("app.share.copy") %>
           </button>
         </div>
         <div
           data-share-target="copiedMessage"
           class="hidden text-sm text-green-600 dark:text-green-400 mt-2"
         >
-          <%= t('app.share.copied') %>
+          <%= t("app.share.copied") %>
         </div>
       </div>
 
       <div class="alert alert-warning">
         <%= icon "exclamation-triangle", variant: :outline, size: 20 %>
-        <span><%= t('app.share.warning') %></span>
+        <span><%= t("app.share.warning") %></span>
       </div>
     </div>
   </div>
   <form method="dialog" class="modal-backdrop no-focus-outline">
-    <button><%= t('app.share.close') %></button>
+    <button><%= t("app.share.close") %></button>
   </form>
 </dialog>

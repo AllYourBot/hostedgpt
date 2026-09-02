@@ -1,0 +1,4 @@
+<%# locals: (answer:) -%>
+<div id="test_result" class="inline-block">
+  <span class="<%= answer.start_with?("Error:") ? "text-red-700" : "text-green-700" %>"><%= answer %></span>
+</div>
