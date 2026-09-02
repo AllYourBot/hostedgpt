@@ -1,16 +1,16 @@
-<% content_for :heading, t('app.auth.forgot_password') %>
+<% content_for :heading, t("app.auth.forgot_password") %>
 
 <%= form_with url: password_resets_path, class: "flex flex-col space-y-4 w-80" do |f| %>
   <%= f.label :email, class: "input input-bordered flex items-center justify-between" do %>
-    <span><%= t('app.auth.email') %> <span class="">*</span></span>
+    <span><%= t("app.auth.email") %> <span>*</span></span>
     <%= f.email_field :email,
       autofocus: true,
-      placeholder: t('app.auth.email'),
+      placeholder: t("app.auth.email"),
       class: "w-44 border-0 dark:text-black"
     %>
   <% end %>
 
-  <%= f.submit t('app.auth.send_reset_email'),
+  <%= f.submit t("app.auth.send_reset_email"),
     class: %|
       text-white font-medium
       bg-brand-blue dark:bg-gray-900

@@ -1,8 +1,8 @@
-<%= content_for :nav_column do %>
-  <%= render 'nav_column' %>
+<% content_for :nav_column do %>
+  <%= render "nav_column" %>
 <% end %>
 
-<%= content_for :messages do %>
+<% content_for :messages do %>
 
   <%= turbo_stream_from @conversation %>
 

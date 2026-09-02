@@ -4,6 +4,7 @@ de:
       profile_fallback: "Profil"
       settings: "Einstellungen"
       logout: "Abmelden"
+      assistants: "Assistenten"
     settings:
       title: "Einstellungen"
       home: "Startseite"
@@ -181,8 +182,8 @@ de:
           gmail: "Gmail"
           google_tasks: "Google Tasks"
       generic:
-        yes: "Ja"
-        no: "Nein"
+        "yes": "Ja"
+        "no": "Nein"
     chat:
       empty_state:
         greeting: "Wie kann ich dir heute helfen?"
@@ -199,6 +200,7 @@ de:
       previous_version: "Vorherige"
       next_version: "Nächste"
       read_aloud: "Vorlesen"
+      pdf_document: "PDF-Dokument - Zum Öffnen klicken"
       editing_title: "Nachricht bearbeiten"
       form:
         save_and_submit: "Speichern & Senden (⌘ RETURN)"
@@ -245,13 +247,23 @@ de:
         filename: "Dateiname"
         purpose: "Zweck"
         bytes: "Bytes"
+      form:
+        errors_title:
+          one: "%{count} Fehler hat das Speichern dieses Dokuments verhindert:"
+          other: "%{count} Fehler haben das Speichern dieses Dokuments verhindert:"
+        user_id: "Benutzer-ID"
+        assistant_id: "Assistenten-ID"
+        message_id: "Nachrichten-ID"
     assistants:
+      index_title: "Assistenten"
       ui:
         new: "Neu"
         more: "Mehr"
+        show_all: "Alle anzeigen"
     conversations:
       editing_title: "Konversation bearbeiten"
       show_title: "Diese Konversation anzeigen"
+      assistant_deleted: "%{name} wurde gelöscht und kann nicht mehr helfen."
       new_chat: "Neuer Chat"
       options: "Optionen"
       rename: "Umbenennen"
@@ -281,6 +293,8 @@ de:
         copy_last: "Letzte Antwort (oder Code) kopieren"
         toggle_sidebar: "Seitenleiste umschalten"
         show_shortcuts: "Kürzel anzeigen"
+        submit_chat: "Chat absenden"
+        edit_previous: "Vorherigen Chat bearbeiten"
         inside_input_header: "Im Chat-Eingabefeld"
       ui:
         close_sidebar: "Seitenleiste schließen"
@@ -293,6 +307,8 @@ de:
         send_message: "Nachricht senden"
         search_placeholder: "Suchen"
         scroll_down: "Nach unten scrollen"
+        share: "Konversation teilen"
+        share_unavailable: "Konversation teilen (keine Konversation zum Teilen)"
         mic_permission_required: "Der Mikrofonzugriff des Browsers muss aktiviert werden, um diese Funktion zu nutzen. Falls unklar ist, wie das geht: nach 'Mikrofonberechtigung für eine einzelne Website ändern' suchen."
         mic_permission_blocked: "Für die Nutzung der App ist Mikrofonzugriff erforderlich. Auf das Kreissymbol (i) in der Adressleiste klicken und die Berechtigungen zurücksetzen, um es erneut zu versuchen."
       composer:

@@ -1,7 +1,7 @@
 <%= form_with(model: person, url: settings_person_path, class: "contents") do |form| %>
   <% if person.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-  <h2><%= t('app.settings.people.form.errors_title', count: person.errors.count) %></h2>
+      <h2><%= t("app.settings.people.form.errors_title", count: person.errors.count) %></h2>
 
       <ul>
         <% person.errors.each do |error| %>
@@ -12,7 +12,7 @@
   <% end %>
 
   <div class="my-5">
-  <%= form.label :email, t('app.settings.people.form.email') %>
+    <%= form.label :email, t("app.settings.people.form.email") %>
     <%= form.text_field :email, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
   </div>
 
@@ -21,23 +21,23 @@
     <%= user_fields.hidden_field :id %>
 
     <div class="my-5">
-  <%= user_fields.label :first_name, t('app.settings.people.form.first_name') %>
+      <%= user_fields.label :first_name, t("app.settings.people.form.first_name") %>
       <%= user_fields.text_field :first_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <div class="my-5">
-  <%= user_fields.label :last_name, t('app.settings.people.form.last_name') %>
+      <%= user_fields.label :last_name, t("app.settings.people.form.last_name") %>
       <%= user_fields.text_field :last_name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
     </div>
 
     <!-- Profile Picture Upload -->
     <div class="my-5"
       data-controller="profile-picture-upload"
-      data-profile-picture-upload-invalid-file-type-value="<%= t('app.settings.people.form.invalid_file_type') %>"
-      data-profile-picture-upload-file-too-large-value="<%= t('app.settings.people.form.file_too_large') %>"
-      data-profile-picture-upload-confirm-remove-value="<%= t('app.settings.people.form.confirm_remove_photo') %>"
+      data-profile-picture-upload-invalid-file-type-value="<%= t("app.settings.people.form.invalid_file_type") %>"
+      data-profile-picture-upload-file-too-large-value="<%= t("app.settings.people.form.file_too_large") %>"
+      data-profile-picture-upload-confirm-remove-value="<%= t("app.settings.people.form.confirm_remove_photo") %>"
     >
-      <%= user_fields.label :profile_picture, t('app.settings.people.form.profile_picture') %>
+      <%= user_fields.label :profile_picture, t("app.settings.people.form.profile_picture") %>
       <div class="mt-2">
         <div class="flex items-center space-x-4">
           <!-- Current avatar display -->
@@ -56,13 +56,13 @@
                 } %>
 
             <div class="flex space-x-2">
-              <%= button_tag t('app.settings.people.form.choose_photo'),
+              <%= button_tag t("app.settings.people.form.choose_photo"),
                   type: "button",
                   class: "inline-block font-medium bg-gray-100 dark:bg-gray-900 dark:text-white border border-gray-400 rounded-lg py-2 px-4 cursor-pointer text-sm",
                   data: { action: "profile-picture-upload#chooseFile" } %>
 
               <% if person.personable.has_profile_picture? %>
-                <%= button_tag t('app.settings.people.form.remove_photo'),
+                <%= button_tag t("app.settings.people.form.remove_photo"),
                     type: "button",
                     class: "inline-block font-medium bg-red-100 dark:bg-red-900 dark:text-white border border-red-400 rounded-lg py-2 px-4 cursor-pointer text-sm",
                     data: { action: "profile-picture-upload#removeImage", profile_picture_upload_target: "removeButton" } %>
@@ -70,25 +70,25 @@
             </div>
 
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              <%= t('app.settings.people.form.photo_hint') %>
+              <%= t("app.settings.people.form.photo_hint") %>
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 hidden" data-profile-picture-upload-target="removalNotice">
-              <%= t('app.settings.people.form.photo_removal_notice') %>
+              <%= t("app.settings.people.form.photo_removal_notice") %>
             </p>
           </div>
         </div>
 
         <!-- Preview area (hidden by default) -->
         <div class="mt-4 hidden" data-profile-picture-upload-target="previewContainer">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2"><%= t('app.settings.people.form.photo_preview_label') %></p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2"><%= t("app.settings.people.form.photo_preview_label") %></p>
           <div class="flex items-center space-x-4">
             <div class="rounded-full w-16 h-16 overflow-hidden border border-gray-200 dark:border-gray-600">
               <img data-profile-picture-upload-target="previewImage"
                    class="w-full h-full object-cover"
-                   alt="<%= t('app.settings.people.form.photo_preview_alt') %>">
+                   alt="<%= t("app.settings.people.form.photo_preview_alt") %>">
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              <%= t('app.settings.people.form.photo_preview_description') %>
+              <%= t("app.settings.people.form.photo_preview_description") %>
             </p>
           </div>
         </div>
@@ -100,14 +100,14 @@
         <%= credential_fields.hidden_field :type, value: credential.type %>
 
         <div class="my-5">
-          <%= credential_fields.label :password, t('app.settings.people.form.password') %>
+          <%= credential_fields.label :password, t("app.settings.people.form.password") %>
           <%= credential_fields.text_field :password, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
         </div>
       <% end %>
     <% end %>
 
     <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-  <%= user_fields.label :dark_mode, t('app.settings.people.form.color_theme') %>
+      <%= user_fields.label :dark_mode, t("app.settings.people.form.color_theme") %>
       <div class="flex items-center justify-between outline-none pl-3 py-2 mt-2 w-full dark:text-black gap-1">
       <% %w(dark light system).each do |value| %>
         <div class="flex items-center gap-2">
@@ -119,17 +119,17 @@
     </div>
 
     <div class="my-5">
-      <span class="block mb-2"><%= t('app.settings.people.form.ai_backends') %></span>
+      <span class="block mb-2"><%= t("app.settings.people.form.ai_backends") %></span>
       <p class="text-sm text-gray-500 dark:text-gray-400">
-        <%= t('app.settings.people.form.ai_backends_description',
-              current: Feature.raw_features.fetch(:use_ruby_llm, false).to_b ? t('app.settings.people.form.backend_choice_ruby_llm') : t('app.settings.people.form.backend_choice_sdk')) %>
+        <%= t("app.settings.people.form.ai_backends_description",
+              current: Feature.raw_features.fetch(:use_ruby_llm, false).to_b ? t("app.settings.people.form.backend_choice_ruby_llm") : t("app.settings.people.form.backend_choice_sdk")) %>
       </p>
       <div class="pl-3 mt-2">
         <div class="flex items-center gap-8 mb-1 text-sm text-gray-500 dark:text-gray-400">
           <span class="w-28"></span>
-          <span class="w-32"><%= t('app.settings.people.form.backend_choice_default') %></span>
-          <span class="w-32"><%= t('app.settings.people.form.backend_choice_ruby_llm') %></span>
-          <span class="w-32"><%= t('app.settings.people.form.backend_choice_sdk') %></span>
+          <span class="w-32"><%= t("app.settings.people.form.backend_choice_default") %></span>
+          <span class="w-32"><%= t("app.settings.people.form.backend_choice_ruby_llm") %></span>
+          <span class="w-32"><%= t("app.settings.people.form.backend_choice_sdk") %></span>
         </div>
         <% User::Features.derived_backend_names.each do |choice| %>
           <% backend = choice.to_s.delete_suffix("_ai_backend") %>
@@ -139,16 +139,16 @@
             <span class="w-28 dark:text-gray-400"><%= display_name %></span>
             <span class="w-32">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "", current_choice.blank?,
-                    aria: { label: t('app.settings.people.form.backend_choice_aria_default', driver: display_name) } %>
+                    aria: { label: t("app.settings.people.form.backend_choice_aria_default", driver: display_name) } %>
             </span>
             <span class="w-32">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "ruby_llm", current_choice == "ruby_llm",
                     disabled: !User::Features.ruby_llm_available?(backend),
-                    aria: { label: t('app.settings.people.form.backend_choice_aria_ruby_llm', driver: display_name) } %>
+                    aria: { label: t("app.settings.people.form.backend_choice_aria_ruby_llm", driver: display_name) } %>
             </span>
             <span class="w-32">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "sdk", current_choice == "sdk",
-                    aria: { label: t('app.settings.people.form.backend_choice_aria_sdk', driver: display_name) } %>
+                    aria: { label: t("app.settings.people.form.backend_choice_aria_sdk", driver: display_name) } %>
             </span>
           </div>
         <% end %>
@@ -157,18 +157,18 @@
 
     <% if Feature.google_tools? %>
       <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
-  <%= user_fields.label :enable_tools, t('app.settings.people.form.enable_tools') %>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t('app.settings.people.form.enable_tools_note') %></p>
+        <%= user_fields.label :enable_tools, t("app.settings.people.form.enable_tools") %>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t("app.settings.people.form.enable_tools_note") %></p>
 
         <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
           <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            <%= t('app.settings.people.form.gmail_section') %><br>
-            <%= t('app.settings.people.form.gmail_trouble') %> <%= link_to t('app.settings.people.form.deleting_connection'), "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
+            <%= t("app.settings.people.form.gmail_section") %><br>
+            <%= t("app.settings.people.form.gmail_trouble") %> <%= link_to t("app.settings.people.form.deleting_connection"), "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
           </div>
           <% if Current.user.gmail_credential %>
-            <div class="text-green-700 font-bold"><%= t('app.settings.people.form.enabled') %></div>
+            <div class="text-green-700 font-bold"><%= t("app.settings.people.form.enabled") %></div>
           <% else %>
-            <%= form.label :authorize_gmail, t('app.settings.people.form.enable_gmail'),
+            <%= form.label :authorize_gmail, t("app.settings.people.form.enable_gmail"),
               class: %|
                 inline-block font-medium
                 bg-gray-100 dark:bg-gray-900 dark:text-white
@@ -182,13 +182,13 @@
 
         <div class="flex items-center justify-between outline-none py-2 mt-2 w-full dark:text-black gap-1">
           <div class="dark:text-gray-400 border-l-4 border-gray-100 dark:border-gray-600 pl-5 pr-1">
-            <%= t('app.settings.people.form.google_tasks_section') %><br>
-            <%= t('app.settings.people.form.gmail_trouble') %> <%= link_to t('app.settings.people.form.deleting_connection'), "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
+            <%= t("app.settings.people.form.google_tasks_section") %><br>
+            <%= t("app.settings.people.form.gmail_trouble") %> <%= link_to t("app.settings.people.form.deleting_connection"), "https://myaccount.google.com/connections", target: "_blank", class: "underline" %>
           </div>
           <% if Current.user.google_tasks_credential %>
-            <div class="text-green-700 font-bold"><%= t('app.settings.people.form.enabled') %></div>
+            <div class="text-green-700 font-bold"><%= t("app.settings.people.form.enabled") %></div>
           <% else %>
-            <%= form.label :authorize_google_tasks, t('app.settings.people.form.enable_google_tasks'),
+            <%= form.label :authorize_google_tasks, t("app.settings.people.form.enable_google_tasks"),
               class: %|
                 inline-block font-medium
                 bg-gray-100 dark:bg-gray-900 dark:text-white
@@ -206,7 +206,7 @@
   <% end %>
 
   <div class="inline">
-  <%= form.submit t('app.settings.people.form.save'),
+    <%= form.submit t("app.settings.people.form.save"),
       class: %|
         inline-block font-bold
         bg-gray-200 dark:bg-gray-900
@@ -214,31 +214,31 @@
         rounded-lg py-3 px-5
         cursor-pointer
       |,
-  data: { turbo_submits_with: t('app.settings.people.form.saving') }
+      data: { turbo_submits_with: t("app.settings.people.form.saving") }
     %>
-  <%= link_to t('app.settings.people.form.cancel'), root_path, class: "float-right inline-block ml-5 py-3" %>
+    <%= link_to t("app.settings.people.form.cancel"), root_path, class: "float-right inline-block ml-5 py-3" %>
   </div>
 <% end # form %>
 
-<%= button_to t('app.settings.people.buttons.gmail'),
+<%= button_to t("app.settings.people.buttons.gmail"),
   "/auth/gmail",
   id: "person_authorize_gmail",
   method: :post,
   data: {
     turbo: false, # w/o this submits w/ ajax and the user won't see it
     controller: "confirm",
-  confirm_text_value: t('app.settings.people.form.oauth_confirm')
+    confirm_text_value: t("app.settings.people.form.oauth_confirm")
   },
   class: "hidden"
 %>
-<%= button_to t('app.settings.people.buttons.google_tasks'),
+<%= button_to t("app.settings.people.buttons.google_tasks"),
   "/auth/google_tasks",
   id: "person_authorize_google_tasks",
   method: :post,
   data: {
     turbo: false, # w/o this submits w/ ajax and the user won't see it
     controller: "confirm",
-  confirm_text_value: t('app.settings.people.form.oauth_confirm')
+    confirm_text_value: t("app.settings.people.form.oauth_confirm")
   },
   class: "hidden"
 %>

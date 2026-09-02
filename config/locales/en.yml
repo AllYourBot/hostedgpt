@@ -33,6 +33,7 @@ en:
       profile_fallback: "Profile"
       settings: "Settings"
       logout: "Logout"
+      assistants: "Assistants"
     settings:
       title: "Settings"
       home: "Home"
@@ -204,14 +205,14 @@ en:
           enable_google_tasks: "Enable Google Tasks"
           save: "Save"
           saving: "Saving..."
-          cancel: "Cancel"
+          cancel: "Back"
           oauth_confirm: "When you see the permission checkboxes, you need to Select All for this feature to work. Got it?"
         buttons:
           gmail: "Gmail"
           google_tasks: "Google Tasks"
       generic:
-        yes: "Yes"
-        no: "No"
+        "yes": "Yes"
+        "no": "No"
     chat:
       empty_state:
         greeting: "How can I help you today?"
@@ -228,6 +229,7 @@ en:
       previous_version: "Previous"
       next_version: "Next"
       read_aloud: "Read aloud"
+      pdf_document: "PDF Document - Click to open"
       editing_title: "Editing message"
       form:
         save_and_submit: "Save & Submit (⌘ RETURN)"
@@ -274,13 +276,23 @@ en:
         filename: "Filename"
         purpose: "Purpose"
         bytes: "Bytes"
+      form:
+        errors_title:
+          one: "%{count} error prohibited this document from being saved:"
+          other: "%{count} errors prohibited this document from being saved:"
+        user_id: "User ID"
+        assistant_id: "Assistant ID"
+        message_id: "Message ID"
     assistants:
+      index_title: "Assistants"
       ui:
         new: "New"
         more: "More"
+        show_all: "Show All"
     conversations:
       editing_title: "Editing conversation"
       show_title: "Show this conversation"
+      assistant_deleted: "%{name} has been deleted and cannot assist any longer."
       new_chat: "New chat"
       options: "Options"
       rename: "Rename"
@@ -310,6 +322,8 @@ en:
         copy_last: "Copy last response (or code)"
         toggle_sidebar: "Toggle sidebar"
         show_shortcuts: "Show shortcuts"
+        submit_chat: "Submit your chat"
+        edit_previous: "Edit previous chat"
         inside_input_header: "Inside chat input"
       ui:
         close_sidebar: "Close sidebar"
@@ -322,6 +336,8 @@ en:
         send_message: "Send message"
         search_placeholder: "Search"
         scroll_down: "Scroll down"
+        share: "Share conversation"
+        share_unavailable: "Share conversation (no conversation to share)"
         mic_permission_required: "You must enable browser microphone access to use this feature. If you are unsure how to do this, try searching: 'change microphone permission for a single website'"
         mic_permission_blocked: "The app needs microphone access to work. Click the circle (i) in the address bar and reset permissions in order to try again."
       composer:
