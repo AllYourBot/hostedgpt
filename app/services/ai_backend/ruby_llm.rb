@@ -1,6 +1,7 @@
 class AIBackend::RubyLLM < AIBackend
   class ConfigurationError < StandardError; end
   class RateLimitError < StandardError; end
+  class ToolCallIntercepted < StandardError; end
 
   CONFIGURATION_ERRORS = [
     ::RubyLLM::UnauthorizedError, ::RubyLLM::ConfigurationError,
