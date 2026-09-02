@@ -203,7 +203,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     end
   end
 
-  test "stream_handler raises RateLimitError on rate limit" do
+  test "stream_handler raises Faraday::TooManyRequestsError on rate limit" do
     @assistant.language_model.update!(supports_tools: false)
     message = @conversation.messages.create!(
       role: :assistant,
@@ -221,7 +221,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     error_chunk.define_singleton_method(:input_tokens) { nil }
     error_chunk.define_singleton_method(:output_tokens) { nil }
 
-    assert_raises(AIBackend::RubyLLM::RateLimitError) do
+    assert_raises(Faraday::TooManyRequestsError) do
       handler.call(error_chunk, ->(c) { })
     end
   end
@@ -656,5 +656,189 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert mixed_msg, "Should find a message with mixed content"
     assert mixed_msg[:content].text.present?, "Content text should be preserved alongside attachments"
     assert mixed_msg[:content].attachments.any?, "Attachments should be present"
+  end
+
+  # Phase 5 — Tool/function calling parity
+
+  test "ConfigurationError inherits from AIBackend::ConfigurationError" do
+    assert AIBackend::RubyLLM::ConfigurationError < AIBackend::ConfigurationError
+  end
+
+  test "get_oneoff_message with json: true appends a JSON-coercion instruction" do
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+    TestClient::RubyLLM::Chat.stub :text, '{"topic":"Hi"}' do
+      backend.get_oneoff_message("Extract a topic", ["Hello"], json: true)
+    end
+    assert_includes TestClient::RubyLLM::Chat.instructions, "Respond with ONLY valid JSON"
+  end
+
+  test "get_oneoff_message without json does not append the JSON instruction" do
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+    TestClient::RubyLLM::Chat.stub :text, "Plain" do
+      backend.get_oneoff_message("Extract a topic", ["Hello"])
+    end
+    refute_includes TestClient::RubyLLM::Chat.instructions, "Respond with ONLY valid JSON"
+  end
+
+  test "tool_instances maps each Toolbox tool to an InterceptedTool" do
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+    instances = backend.send(:tool_instances)
+
+    assert instances.all? { |i| i.is_a?(AIBackend::RubyLLM::InterceptedTool) }
+    assert_includes instances.map(&:name), "helloworld_hi"
+    assert_includes instances.map(&:name), "openmeteo_get_current_and_todays_weather"
+  end
+
+  test "tools are not enabled for Groq URL" do
+    @assistant.language_model.api_service.update!(url: APIService::URL_GROQ, driver: "openai")
+    @assistant.language_model.update!(supports_tools: true)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    assert_not backend.send(:tools_enabled?)
+  end
+
+  test "tools are enabled for a canonical OpenAI service when supports_tools is true" do
+    @assistant.language_model.update!(supports_tools: true)
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+    assert backend.send(:tools_enabled?)
+  end
+
+  test "stream_next_conversation_message returns a formatted tool call when the model requests one" do
+    @assistant.language_model.update!(supports_tools: true)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+      result = backend.stream_next_conversation_message { |c| }
+      assert_equal 1, result.length
+      assert_equal "function", result[0][:type]
+      assert_equal "helloworld_hi", result[0][:function][:name]
+      assert_equal TestClient::RubyLLM::Chat.id, result[0][:id]
+      assert_includes result[0][:function][:arguments], "Austin"
+    end
+  end
+
+  test "stream_next_conversation_message returns parallel tool calls with distinct ids" do
+    @assistant.language_model.update!(supports_tools: true)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+      TestClient::RubyLLM::Chat.stub :num_tool_calls, 2 do
+        result = backend.stream_next_conversation_message { |c| }
+        assert_equal 2, result.length
+        assert_equal [0, 1], result.map { |tc| tc[:index] }
+        assert_operator result.map { |tc| tc[:id] }.uniq.length, :>, 1
+      end
+    end
+  end
+
+  test "preceding_conversation_messages replays tool calls and tool results" do
+    @assistant.language_model.update!(supports_tools: true)
+    conversation = @conversation
+
+    conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      content_tool_calls: [
+        { type: "function", id: "call_123", function: { name: "helloworld_hi", arguments: '{"name":"Keith"}' } },
+      ]
+    )
+    conversation.messages.create!(
+      role: :tool,
+      content_text: "Hello, Keith!".to_json,
+      assistant: @assistant,
+      tool_call_id: "call_123",
+      content_tool_calls: [
+        { type: "function", id: "call_123", function: { name: "helloworld_hi", arguments: '{"name":"Keith"}' } },
+      ]
+    )
+    follow_up = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, conversation, follow_up)
+    msgs = backend.send(:preceding_conversation_messages)
+
+    tool_replay = msgs.find { |m| m[:role] == :tool }
+    assert tool_replay, "expected a tool result message to be replayed"
+    assert_equal "call_123", tool_replay[:tool_call_id]
+    assert_equal "Hello, Keith!".to_json, tool_replay[:content]
+
+    assistant_replay = msgs.find { |m| m[:role] == :assistant && m[:tool_calls].present? }
+    assert assistant_replay, "expected the assistant tool-call message to be replayed"
+    assert_equal "helloworld_hi", assistant_replay[:tool_calls]["call_123"].name
+    assert_equal({ "name" => "Keith" }, assistant_replay[:tool_calls]["call_123"].arguments)
+  end
+
+  # Error contract: errors raised at the chat.complete boundary (where the gem
+  # raises them) must map to the unified contract, not only chunk-level errors.
+
+  test "stream_next_conversation_message maps a complete-level UnauthorizedError to ConfigurationError" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::UnauthorizedError.new("401 bad key") do
+      assert_raises(AIBackend::RubyLLM::ConfigurationError) do
+        backend.stream_next_conversation_message { |c| }
+      end
+    end
+  end
+
+  test "stream_next_conversation_message maps a complete-level RateLimitError to Faraday::TooManyRequestsError" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::RateLimitError.new("429 rate limited") do
+      assert_raises(Faraday::TooManyRequestsError) do
+        backend.stream_next_conversation_message { |c| }
+      end
+    end
+  end
+
+  test "get_oneoff_message maps a complete-level UnauthorizedError to ConfigurationError" do
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+    TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::UnauthorizedError.new("401 bad key") do
+      assert_raises(AIBackend::RubyLLM::ConfigurationError) do
+        backend.get_oneoff_message("Extract a topic", ["Hello"])
+      end
+    end
   end
 end

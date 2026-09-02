@@ -65,4 +65,23 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
     assert_equal 1, chat.messages.count { |m| m.role == :assistant },
       "the chat should not have auto-continued with a follow-up assistant message"
   end
+
+  # InterceptedChat (used in production) halts on ANY tool call — including an
+  # unregistered/hallucinated name, which the InterceptedTool#execute raise
+  # cannot catch because Chat#execute_tool returns an error hash for unknown
+  # names rather than calling execute.
+  test "InterceptedChat halts on an unregistered tool name instead of auto-executing" do
+    chat = AIBackend::RubyLLM::InterceptedChat.new(model: "gpt-4o", provider: :openai, assume_model_exists: true)
+    chat.add_message(role: :user, content: "Do something with a tool")
+    chat.with_tools(build_tool)
+
+    hallucinated = RubyLLM::ToolCall.new(id: "call_halluc", name: "not_a_registered_tool", arguments: {})
+
+    assert_raises(AIBackend::RubyLLM::ToolCallIntercepted) do
+      stub_tool_call_response(chat, [hallucinated]) { chat.complete }
+    end
+
+    assert_empty chat.messages.select { |m| m.role == :tool },
+      "no role: :tool result message should be appended for an unregistered tool"
+  end
 end

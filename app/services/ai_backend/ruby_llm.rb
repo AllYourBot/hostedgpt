@@ -1,6 +1,8 @@
 class AIBackend::RubyLLM < AIBackend
-  class ConfigurationError < StandardError; end
-  class RateLimitError < StandardError; end
+  # Inherits the base ConfigurationError so GetNextAIMessageJob's unified
+  # `rescue AIBackend::ConfigurationError` catches bad-key failures and renders
+  # key_error_message, instead of falling through to the generic 3x-retry path.
+  class ConfigurationError < AIBackend::ConfigurationError; end
   class ToolCallIntercepted < StandardError; end
 
   CONFIGURATION_ERRORS = [
@@ -22,7 +24,7 @@ class AIBackend::RubyLLM < AIBackend
   end
 
   def self.gem_class
-    Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::RubyLLM::Chat
+    Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::AIBackend::RubyLLM::InterceptedChat
   end
 
   def self.provider_for_url(url)
@@ -65,12 +67,18 @@ class AIBackend::RubyLLM < AIBackend
     raise ConfigurationError if @api_service.requires_token? && @token.blank?
   end
 
-  def get_oneoff_message(instructions, messages, params = {})
+  def get_oneoff_message(instructions, messages, params = {}, json: false)
+    instructions = "#{instructions} Respond with ONLY valid JSON, no markdown or explanation." if json
+
     chat = build_chat
     chat.with_instructions(instructions)
     preceding_messages(messages).each { |msg| chat.add_message(msg) }
     chat.with_params(**params) if params.present?
     chat.complete.content
+  rescue *CONFIGURATION_ERRORS => e
+    raise ConfigurationError, e.message
+  rescue *RATE_LIMIT_ERRORS => e
+    raise ::Faraday::TooManyRequestsError, e.message
   end
 
   def stream_next_conversation_message(&chunk_handler)
@@ -79,7 +87,20 @@ class AIBackend::RubyLLM < AIBackend
     chat = build_chat
     chat.with_instructions(full_instructions)
     preceding_conversation_messages.each { |msg| chat.add_message(msg) }
-    chat.complete { |chunk| stream_handler.call(chunk, chunk_handler) }
+    chat.with_tools(*tool_instances) if tools_enabled?
+
+    begin
+      chat.complete { |chunk| stream_handler.call(chunk, chunk_handler) }
+    rescue ToolCallIntercepted
+      tool_calls = chat.messages.last&.tool_calls
+      return format_tool_calls(tool_calls) if tool_calls.present?
+
+      raise ::Faraday::ParsingError
+    rescue *CONFIGURATION_ERRORS => e
+      raise ConfigurationError, e.message
+    rescue *RATE_LIMIT_ERRORS => e
+      raise ::Faraday::TooManyRequestsError, e.message
+    end
 
     raise ::Faraday::ParsingError if @stream_response_text.blank?
     nil
@@ -123,7 +144,7 @@ class AIBackend::RubyLLM < AIBackend
     rescue *CONFIGURATION_ERRORS => e
       raise ConfigurationError, e.message
     rescue *RATE_LIMIT_ERRORS => e
-      raise RateLimitError, e.message
+      raise ::Faraday::TooManyRequestsError, e.message
     rescue => e
       Rails.logger.info "\nUnhandled error in AIBackend::RubyLLM response handler: #{e.message}"
       Rails.logger.info e.backtrace.join("\n")
@@ -132,9 +153,9 @@ class AIBackend::RubyLLM < AIBackend
 
   def preceding_conversation_messages
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
-      next if message.tool?
-
-      if @assistant.supports_images? && message.documents.present? && message.role == "user"
+      if message.tool?
+        { role: :tool, content: message.content_text || "", tool_call_id: message.tool_call_id }
+      elsif @assistant.supports_images? && message.documents.present? && message.role == "user"
         content_parts = [message.content_text]
         attachments = []
 
@@ -159,6 +180,12 @@ class AIBackend::RubyLLM < AIBackend
         end
 
         { role: message.role, content: content }
+      elsif message.assistant? && message.content_tool_calls.present?
+        {
+          role: :assistant,
+          content: sanitize_content(message),
+          tool_calls: tool_calls_hash(message),
+        }
       else
         {
           role: message.role,
@@ -166,6 +193,20 @@ class AIBackend::RubyLLM < AIBackend
         }
       end
     end.compact
+  end
+
+  # Reconstructs the stored OpenAI-shaped content_tool_calls (serialized via
+  # JsonSerializer) into RubyLLM::ToolCall objects keyed by id — the shape
+  # RubyLLM expects on a replayed assistant message.
+  def tool_calls_hash(message)
+    message.content_tool_calls.each_with_object({}) do |tc, hash|
+      id = tc[:id] || tc["id"]
+      name = tc.dig(:function, :name) || tc.dig("function", "name")
+      args = tc.dig(:function, :arguments) || tc.dig("function", "arguments") || "{}"
+      args = JSON.parse(args) if args.is_a?(String)
+
+      hash[id] = ::RubyLLM::ToolCall.new(id: id, name: name, arguments: args)
+    end
   end
 
   def sanitize_content(message)
@@ -195,7 +236,35 @@ class AIBackend::RubyLLM < AIBackend
     raise NotImplementedError
   end
 
-  def format_parallel_tool_calls(*)
-    raise NotImplementedError
+  def tools_enabled?
+    @assistant.language_model.supports_tools? && @api_service.url != APIService::URL_GROQ
+  end
+
+  def tool_instances
+    Toolbox.tools.map do |tool|
+      AIBackend::RubyLLM::InterceptedTool.new(
+        name: tool.dig(:function, :name),
+        description: tool.dig(:function, :description),
+        params_schema: tool.dig(:function, :parameters),
+      )
+    end
+  end
+
+  def format_tool_calls(tool_calls)
+    tool_calls.values.map.with_index do |tc, i|
+      { index: i, type: "function", id: tc.id,
+        function: { name: tc.name, arguments: tc.arguments.to_json } }
+    end
+  end
+
+  # RubyLLM returns tool calls already separated, so these defensive identities
+  # satisfy the AIBackend::Tools contract even though the overridden
+  # stream_next_conversation_message never calls them.
+  def format_parallel_tool_calls(content_tool_calls)
+    content_tool_calls
+  end
+
+  def parallel_tool_calls(content_tool_calls)
+    content_tool_calls
   end
 end

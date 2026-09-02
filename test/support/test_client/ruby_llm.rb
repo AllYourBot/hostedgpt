@@ -33,7 +33,9 @@ module TestClient
       def complete(&block)
         raise self.class.error_to_raise if self.class.error_to_raise
 
-        if block
+        if self.class.function
+          simulate_tool_calls
+        elsif block
           response = self.class.api_streaming_response
           block.call(response) if response.content.present?
         else
@@ -49,6 +51,23 @@ module TestClient
       def ask(message = nil, with: nil, &block)
         add_message({role: "user", content: message}) if message
         complete(&block)
+      end
+
+      private
+
+      # Mirrors the real RubyLLM::Chat tool flow: the assistant message carrying
+      # the tool calls is appended to messages before the intercepted execute
+      # raises, so the backend can read chat.messages.last.tool_calls.
+      def simulate_tool_calls
+        tool_calls = Array.new(self.class.num_tool_calls) do |i|
+          ::RubyLLM::ToolCall.new(
+            id: i.zero? ? self.class.id : "#{self.class.id}_#{i}",
+            name: self.class.function,
+            arguments: JSON.parse(self.class.arguments)
+          )
+        end
+        @messages << OpenStruct.new(role: :assistant, content: nil, tool_calls: tool_calls.to_h { |tc| [tc.id, tc] })
+        raise AIBackend::RubyLLM::ToolCallIntercepted
       end
 
       def self.api_oneoff_response
@@ -79,6 +98,16 @@ module TestClient
 
       def self.text
         raise "Attempting to return a text response but .text method is not stubbed. Stub this to nil if you want to return default text."
+      end
+
+      # Returns the name of the tool the model "requested"; nil means the model
+      # responds with text instead. Mirrors TestClient::OpenAI#function.
+      def self.function
+        nil
+      end
+
+      def self.num_tool_calls
+        1
       end
 
       def self.default_text
