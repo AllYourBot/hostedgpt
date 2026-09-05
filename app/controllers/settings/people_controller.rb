@@ -19,9 +19,14 @@ class Settings::PeopleController < Settings::ApplicationController
   def person_params
     h = params.require(:person).permit(:email, personable_attributes: [
       :id, :first_name, :last_name, :password, :profile_picture, :remove_profile_picture,
-      :dark_mode,
+      :dark_mode, preferences: [feature: [:use_ruby_llm]],
       credentials_attributes: [ :id, :type, :password ]
     ]).to_h
+
+    if (prefs = h.dig("personable_attributes", "preferences")).present? && (user = Current.person.user)
+      h["personable_attributes"]["preferences"] = user.preferences.deep_merge(prefs.deep_symbolize_keys)
+    end
+
     format_and_strip_all_but_first_valid_credential(h)
   end
 

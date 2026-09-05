@@ -25,6 +25,8 @@ class APIService < ApplicationRecord
   scope :ordered, -> { order(:name) }
 
   def ai_backend
+    return AIBackend::RubyLLM if Feature.use_ruby_llm? && AIBackend::RubyLLM.supports_driver?(driver)
+
     if driver == "openai" && url == URL_GROQ
       AIBackend::Groq
     elsif driver == "openai" && url == URL_OPENROUTER

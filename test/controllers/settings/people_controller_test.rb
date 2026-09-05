@@ -7,6 +7,21 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     login_as @person
   end
 
+  test "preferences merge preserves unrelated keys when updating dark_mode" do
+    @user.preferences = { dark_mode: "light", feature: { use_ruby_llm: true } }
+    @user.save!
+
+    params = person_params
+    params["personable_attributes"]["dark_mode"] = "dark"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+    @user.reload
+
+    assert_equal "dark", @user.dark_mode
+    assert_equal({ use_ruby_llm: true }, @user.preferences[:feature])
+  end
+
   test "should get edit with password field VISIBLE" do
     assert @user.password_credential.present?
     get edit_settings_person_url

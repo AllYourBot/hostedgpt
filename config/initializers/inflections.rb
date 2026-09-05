@@ -15,6 +15,7 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   # inflect.acronym "RESTful"
   inflect.acronym "AI"
   inflect.acronym "API"
+  inflect.acronym "LLM"
   inflect.acronym "SDK"
   inflect.acronym "URL"
   inflect.acronym "XML"
