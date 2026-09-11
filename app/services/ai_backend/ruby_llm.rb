@@ -5,6 +5,8 @@ class AIBackend::RubyLLM < AIBackend
   class ConfigurationError < AIBackend::ConfigurationError; end
   class ToolCallIntercepted < StandardError; end
 
+  IMAGE_MODEL = "gpt-image-1"
+
   CONFIGURATION_ERRORS = [
     ::RubyLLM::UnauthorizedError, ::RubyLLM::ConfigurationError,
     ::RubyLLM::BadRequestError, ::RubyLLM::ForbiddenError,
@@ -56,6 +58,33 @@ class AIBackend::RubyLLM < AIBackend
     end
   rescue ::Faraday::Error => e
     "Error: #{e.message}"
+  end
+
+  # Image generation: the flag routes here via api_service.ai_backend instead
+  # of the base AIBackend → AIBackend::OpenAI delegation. Image generation
+  # always rides the user's OpenAI service (even when the chat backend is
+  # Anthropic/Gemini) — same provider, different client. The flag-off path
+  # keeps using AIBackend::OpenAI.generate_image until Phase 7.
+  def self.generate_image(prompt:, user:)
+    # Uses name "OpenAI" to avoid picking up Groq (also driver: :openai).
+    openai_service = user.api_services.find_by(name: "OpenAI", driver: :openai)
+    token = openai_service&.effective_token
+
+    if openai_service.nil? || token.blank?
+      current_backend = Current.message&.assistant&.language_model&.api_service&.name || "current AI backend"
+      raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services to use image generation with #{current_backend}."
+    end
+
+    context = client.context { |c| c.openai_api_key = token }
+    image = context.paint(
+      prompt,
+      model: IMAGE_MODEL,
+      provider: :openai,
+      assume_model_exists: true,
+      size: "1024x1024",
+    )
+
+    { b64_json: image.data, model: IMAGE_MODEL }
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)

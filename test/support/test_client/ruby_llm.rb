@@ -142,6 +142,30 @@ module TestClient
     class ContextDouble
       attr_accessor :openai_api_key, :anthropic_api_key, :gemini_api_key,
         :openai_api_base, :anthropic_api_base, :gemini_api_base
+
+      # Mirrors the real RubyLLM::Context#paint: records the call and returns an
+      # Image-shaped double. Used to exercise AIBackend::RubyLLM.generate_image.
+      def paint(prompt, **kwargs)
+        raise self.class.paint_error_to_raise if self.class.paint_error_to_raise
+
+        self.class.last_paint_call = { prompt: prompt, kwargs: kwargs, openai_api_key: openai_api_key }
+        OpenStruct.new(data: self.class.image_data, url: self.class.image_url, mime_type: "image/png")
+      end
+
+      class << self
+        attr_accessor :image_url, :paint_error_to_raise, :last_paint_call
+
+        def image_data
+          @image_data || "RUBYLLM_BASE64_IMAGE_DATA"
+        end
+
+        def reset_recordings!
+          @last_paint_call = nil
+          @image_data = nil
+          @image_url = nil
+          @paint_error_to_raise = nil
+        end
+      end
     end
 
     def self.context(&block)
