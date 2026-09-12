@@ -1,11 +1,16 @@
 class ConversationsController < ApplicationController
-  before_action :set_conversation, except: [:public_show]
+  before_action :set_conversation, except: [:public_show, :reorder]
   before_action :set_nav_assistants, except: [:public_show]
   allow_unauthenticated_access only: [:public_show]
 
   def index
     @query = params[:query]
     @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
+  end
+
+  def reorder
+    Current.user.conversations.reposition(params[:ids] || [])
+    head :no_content
   end
 
   def show
