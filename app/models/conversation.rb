@@ -1,5 +1,6 @@
 class Conversation < ApplicationRecord
   include Version
+  include Reorderable
 
   belongs_to :user
   belongs_to :assistant
@@ -11,8 +12,6 @@ class Conversation < ApplicationRecord
 
   before_create :generate_share_token
   after_touch :set_title_async, if: -> { title.blank? && messages.count >= 2 }
-
-  scope :ordered, -> { order(updated_at: :desc, id: :desc) }
 
   broadcasts_refreshes
 

@@ -159,4 +159,20 @@ class ConversationTest < ActiveSupport::TestCase
       conversations(:ruby_version).id # matches "latest" in messages
     ].sort, grouped_conversations.map(&:id).sort, "Should have returned these conversations based on title and message content"
   end
+
+  test "a new conversation goes to the top of the list" do
+    user = users(:keith)
+
+    conversation = user.conversations.create!(assistant: assistants(:samantha))
+
+    assert_equal conversation, user.conversations.ordered.first
+  end
+
+  test "ordered follows position once conversations have been dragged into shape" do
+    user = users(:keith)
+    ids = user.conversations.ordered.pluck(:id).rotate
+    user.conversations.reposition(ids)
+
+    assert_equal ids, user.conversations.ordered.pluck(:id)
+  end
 end

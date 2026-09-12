@@ -128,6 +128,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.integer "input_token_total_count", default: 0, null: false
     t.bigint "last_assistant_message_id"
     t.integer "output_token_total_count", default: 0, null: false
+    t.integer "position", default: 0, null: false
     t.string "share_token"
     t.string "title"
     t.datetime "updated_at", null: false
@@ -137,6 +138,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
     t.index ["share_token"], name: "index_conversations_on_share_token"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
+    t.index ["user_id", "position"], name: "index_conversations_on_user_id_and_position"
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end
 
