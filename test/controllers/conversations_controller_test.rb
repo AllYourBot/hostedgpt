@@ -11,6 +11,17 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "index lists the user's conversations in position order" do
+    user = @conversation.user
+    ids = user.conversations.ordered.pluck(:id).rotate
+    user.conversations.reposition(ids)
+
+    get conversations_url
+
+    assert_response :success
+    assert_equal ids, assigns(:nav_conversations).pluck(:id)
+  end
+
   test "should get edit" do
     get edit_conversation_url(@conversation)
     assert_response :success

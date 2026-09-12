@@ -5,7 +5,7 @@ class ConversationsController < ApplicationController
 
   def index
     @query = params[:query]
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
+    @nav_conversations = Conversation.nav_for_user(Current.user, @query)
   end
 
   def reorder

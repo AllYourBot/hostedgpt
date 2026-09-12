@@ -2,6 +2,7 @@
 <% selected = conversation == @conversation %>
 
 <div
+  id="<%= dom_id(conversation) %>"
   class="
     rounded-lg mr-5 cursor-pointer group
     hover:bg-gray-100 dark:hover:bg-gray-700
@@ -9,6 +10,10 @@
     mb-px
     <%= selected && "relationship" %>
   "
+  draggable="true"
+  data-sortable-target="item"
+  data-sortable-id="<%= conversation.id %>"
+  data-action="dragstart->sortable#start dragend->sortable#end"
   data-role="conversation"
   data-radio-behavior-target="radio"
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
@@ -17,6 +22,7 @@
     <%= link_to conversation.title.presence || t("app.conversations.new_chat"),
       conversation_messages_path(conversation),
       class: "flex-1 pl-2 py-2 truncate text-sm text-opacity-1 w-5 radio-behavior",
+      draggable: "false", # so dragging the title reorders the row rather than dragging the link
       data: {
         turbo_frame: "conversation",
         action: "radio-behavior#select nav#closeDrawer",
