@@ -168,6 +168,18 @@ class ConversationTest < ActiveSupport::TestCase
     assert_equal conversation, user.conversations.ordered.first
   end
 
+  test "#matching_query matches titles and message content" do
+    user = users(:keith)
+
+    found = user.conversations.matching_query("test").map(&:id).sort
+
+    assert_equal [
+      conversations(:attachment).id,  # matches title
+      conversations(:attachments).id, # matches title
+      conversations(:ruby_version).id # matches "test" inside "latest" in message content
+    ].sort, found
+  end
+
   test "ordered follows position once conversations have been dragged into shape" do
     user = users(:keith)
     ids = user.conversations.ordered.pluck(:id).rotate

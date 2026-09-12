@@ -15,6 +15,24 @@ class Conversation < ApplicationRecord
 
   broadcasts_refreshes
 
+  # The sidebar's search: conversations whose title, or any message's content, matches the query.
+  # DISTINCT because a conversation matching on both would otherwise repeat once per matching
+  # message.
+  scope :matching_query, ->(query) {
+    joins(:messages).ordered.where("messages.content_text ILIKE ?", "%#{query}%").
+      or(ordered.where("title ILIKE ?", "%#{query}%")).
+      select("DISTINCT conversations.*")
+  }
+
+  # The sidebar's conversation list: every conversation for the user in display order, optionally
+  # narrowed by the search query. The blank case bypasses the join on purpose — an empty search
+  # must still return conversations that have no messages yet.
+  def self.nav_for_user(user, query = nil)
+    return user.conversations.ordered if query.blank?
+
+    user.conversations.matching_query(query)
+  end
+
   # Builds a hash of date interval keys and queries which fetch the records for that internal.
   #
   # Empty intervals are removed from the hash.
@@ -28,13 +46,7 @@ class Conversation < ApplicationRecord
   #  "Older" => relation
   # }
   def self.grouped_by_increasing_time_interval_for_user(user, query = nil)
-    if query.blank?
-      nav_conversations = user.conversations.ordered
-    else
-      nav_conversations = user.conversations.joins(:messages).ordered.where("messages.content_text ILIKE ?", "%#{query}%").
-        or(user.conversations.ordered.where("title ILIKE ?", "%#{query}%")).
-        select("DISTINCT conversations.*")
-    end
+    nav_conversations = nav_for_user(user, query)
 
     # NOTE: These keys intentionally remain static for test stability. UI layers may translate.
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
