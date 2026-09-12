@@ -24,9 +24,10 @@ class Assistant < ApplicationRecord
   validates :tools, presence: true, allow_blank: true
   validates :name, presence: true
 
-  before_create :position_at_top
-
   delegate :api_name, to: :language_model, prefix: true, allow_nil: true
+
+  # Soft-deleted assistants keep holding places in the list, so the position math has to see them.
+  scope :reorder_scope, ->(user) { user.assistants_including_deleted }
 
   def initials
     return nil if name.blank?
@@ -43,13 +44,5 @@ class Assistant < ApplicationRecord
 
   def language_model_api_name=(api_name)
     self.language_model = LanguageModel.for_user(user).find_by(api_name:)
-  end
-
-  private
-
-  # A new assistant belongs at the top of the list, which is where it landed back when the list was
-  # ordered newest-first.
-  def position_at_top
-    self.position ||= (user.assistants_including_deleted.minimum(:position) || 0) - 1
   end
 end
