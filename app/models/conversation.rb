@@ -36,50 +36,6 @@ class Conversation < ApplicationRecord
     user.conversations.preload(:assistant).matching_query(query)
   end
 
-  # Builds a hash of date interval keys and queries which fetch the records for that internal.
-  #
-  # Empty intervals are removed from the hash.
-  #
-  # {
-  #  "Today" => relation,
-  #  "Yesterday" => relation,
-  #  "This Week" => relation,
-  #  "This Month" => relation,
-  #  "Last Month" => relation,
-  #  "Older" => relation
-  # }
-  def self.grouped_by_increasing_time_interval_for_user(user, query = nil)
-    nav_conversations = nav_for_user(user, query)
-
-    # NOTE: These keys intentionally remain static for test stability. UI layers may translate.
-    keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
-    values = [
-      nil,
-      Date.current.beginning_of_day,
-      (Date.current - 1.day).beginning_of_day,
-      (Date.current - 1.week).beginning_of_day,
-      (Date.current - 1.month).beginning_of_day,
-      (Date.current - 2.months).beginning_of_day,
-      nil
-    ].each_cons(2).map do |range_start, range_end|
-      range = case
-      when range_start.nil?
-        range_end..
-      when range_end.nil?
-        ..range_start
-      else
-        range_end..range_start
-      end
-
-      nav_conversations.where(updated_at: range)
-    end
-
-    keys.zip(values)
-      .to_h
-      .delete_if { |_, v| v.empty? }
-  end
-
-
   def generate_shareable_url(request)
     ensure_share_token!
     Rails.application.routes.url_helpers.public_conversation_url(share_token, host: request.host_with_port)

@@ -332,13 +332,6 @@ en:
       delete: "Delete"
       shared_conversation: "Shared Conversation"
       shared_by: "Shared by %{name}"
-      time_groups:
-        today: "Today"
-        yesterday: "Yesterday"
-        this_week: "This Week"
-        this_month: "This Month"
-        last_month: "Last Month"
-        older: "Older"
       cost_summary:
         conversation_approx: "Conversation ~"
         input: "Input"

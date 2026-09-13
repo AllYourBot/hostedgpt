@@ -46,10 +46,6 @@ class ApplicationController < ActionController::Base
     { locale: (I18n.locale unless I18n.locale == I18n.default_locale) }.compact
   end
 
-  def set_nav_conversations
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
-  end
-
   def set_nav_assistants
     @nav_assistants = Current.user.assistants.includes(language_model: :api_service).ordered
   end
