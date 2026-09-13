@@ -20,13 +20,14 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal ids, assigns(:nav_conversations).pluck(:id)
+    assert_match(/pointerdown->sortable#press/, response.body)
   end
 
   test "a search-filtered sidebar is not drag-reorderable" do
     get conversations_url(query: "test")
 
     assert_response :success
-    assert_no_match(/draggable="true"/, response.body)
+    assert_no_match(/pointerdown->sortable#press/, response.body)
   end
 
   test "should get edit" do

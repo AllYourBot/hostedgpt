@@ -7,10 +7,9 @@
     "bg-gray-50 dark:bg-gray-900",
     "first:sticky first:top-0 first:pt-2 first:z-40 first:bg-gray-50 dark:first:bg-gray-900": !Feature.assistants_page? || mobile_device?
   ) %>"
-  draggable="true"
   data-sortable-target="item"
   data-sortable-id="<%= assistant.id %>"
-  data-action="dragstart->sortable#start dragend->sortable#end"
+  data-action="pointerdown->sortable#press"
 >
   <div
     class="

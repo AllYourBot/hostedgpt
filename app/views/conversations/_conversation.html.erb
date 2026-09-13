@@ -11,11 +11,10 @@
     mb-px
     <%= selected && "relationship" %>
   "
-  draggable="<%= sortable %>"
   <% if sortable %>
     data-sortable-target="item"
     data-sortable-id="<%= conversation.id %>"
-    data-action="dragstart->sortable#start dragend->sortable#end"
+    data-action="pointerdown->sortable#press"
   <% end %>
   data-role="conversation"
   data-radio-behavior-target="radio"
