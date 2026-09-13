@@ -128,7 +128,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.integer "input_token_total_count", default: 0, null: false
     t.bigint "last_assistant_message_id"
     t.integer "output_token_total_count", default: 0, null: false
-    t.integer "position", default: 0, null: false
+    t.integer "position"
     t.string "share_token"
     t.string "title"
     t.datetime "updated_at", null: false

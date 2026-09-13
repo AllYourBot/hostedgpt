@@ -160,11 +160,14 @@ class ConversationTest < ActiveSupport::TestCase
     ].sort, grouped_conversations.map(&:id).sort, "Should have returned these conversations based on title and message content"
   end
 
-  test "a new conversation goes to the top of the list" do
+  test "a new conversation claims the top slot, not a collision at zero" do
     user = users(:keith)
+    user.conversations.reposition(user.conversations.ordered.pluck(:id)) # normalize to 0..n-1
+    min_before = user.conversations.minimum(:position)
 
     conversation = user.conversations.create!(assistant: assistants(:samantha))
 
+    assert_equal min_before - 1, conversation.position
     assert_equal conversation, user.conversations.ordered.first
   end
 
