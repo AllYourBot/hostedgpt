@@ -22,6 +22,11 @@ import { Controller } from '@hotwired/stimulus'
 // browser considers us an invalid drop target and, on links, follows the href instead. And rows
 // usually contain links and images, which the browser would rather drag than the row — mark those
 // draggable="false" so the row is what gets picked up.
+//
+// One more: this list may live inside a turbo-frame that other pages can refresh mid-drag (the
+// conversations sidebar morphs itself whenever any conversation changes anywhere). A morph that
+// swaps the row out from under a held cursor kills the drag — dragend never fires once the source
+// node leaves the DOM — so while a drag is in flight, frame renders are held off until the drop.
 
 export default class extends Controller {
   static targets = [ "item" ]
@@ -40,6 +45,8 @@ export default class extends Controller {
     // With the copy carrying the cursor, the real row is free to disappear right now, leaving a gap
     // that travels through the list showing where the drop will land — one row on screen, not two.
     event.dataTransfer.setDragImage(...this.#cloneForDragImage(event))
+
+    document.addEventListener("turbo:before-frame-render", this.#holdFrameRender, true)
 
     this.dragged.classList.add(...this.draggingClasses)
   }
@@ -76,10 +83,30 @@ export default class extends Controller {
     this.dragged.classList.remove(...this.draggingClasses)
     this.dragged = null
 
+    document.removeEventListener("turbo:before-frame-render", this.#holdFrameRender, true)
+
     this.dragImage?.remove()
     this.dragImage = null
 
     if (this.#ids.join() !== this.orderAtDragStart.join()) this.#persist()
+  }
+
+  disconnect() {
+    // A drag interrupted by the row being torn out of the DOM never fires dragend, so clean up
+    // whatever it left behind rather than leaking an invisible row state and the drag image.
+    if (!this.dragged) return
+
+    document.removeEventListener("turbo:before-frame-render", this.#holdFrameRender, true)
+    this.dragImage?.remove()
+    this.dragImage = null
+    this.dragged = null
+  }
+
+  // An idiomorph mid-drag would detach the row the user is holding — dragend never fires from a
+  // detached source, which strands the dragging class, the drag image, and the whole reorder —
+  // so the refresh waits until the drag is over.
+  #holdFrameRender = (event) => {
+    if (this.dragged) event.preventDefault()
   }
 
   #persist() {
