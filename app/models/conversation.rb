@@ -16,11 +16,13 @@ class Conversation < ApplicationRecord
   broadcasts_refreshes
 
   # The sidebar's search: conversations whose title, or any message's content, matches the query.
-  # DISTINCT because a conversation matching on both would otherwise repeat once per matching
-  # message.
+  # Wildcards the user types are literal characters, not patterns — a search for "%" means a
+  # literal percent sign. DISTINCT because a conversation matching on both would otherwise repeat
+  # once per matching message.
   scope :matching_query, ->(query) {
-    joins(:messages).ordered.where("messages.content_text ILIKE ?", "%#{query}%").
-      or(ordered.where("title ILIKE ?", "%#{query}%")).
+    pattern = "%#{ActiveRecord::Base.sanitize_sql_like(query)}%"
+    joins(:messages).ordered.where("messages.content_text ILIKE ?", pattern).
+      or(ordered.where("title ILIKE ?", pattern)).
       select("DISTINCT conversations.*")
   }
 

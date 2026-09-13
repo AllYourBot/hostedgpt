@@ -13,6 +13,7 @@
 ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
@@ -137,6 +138,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
     t.index ["share_token"], name: "index_conversations_on_share_token"
+    t.index ["title"], name: "index_conversations_on_title", opclass: :gin_trgm_ops, using: :gin
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
     t.index ["user_id", "position"], name: "index_conversations_on_user_id_and_position"
     t.index ["user_id"], name: "index_conversations_on_user_id"
@@ -231,6 +233,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.integer "version", null: false
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
+    t.index ["content_text"], name: "index_messages_on_content_text", opclass: :gin_trgm_ops, using: :gin
     t.index ["conversation_id", "index", "version"], name: "index_messages_on_conversation_id_and_index_and_version", unique: true
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["index"], name: "index_messages_on_index"
