@@ -1,5 +1,6 @@
 <%# locals: (conversation:, settings: true) %>
 <% selected = conversation == @conversation %>
+<% sortable = @query.blank? # a filtered list shows only some conversations; dragging a subset would corrupt the saved order of the rest %>
 
 <div
   id="<%= dom_id(conversation) %>"
@@ -10,10 +11,12 @@
     mb-px
     <%= selected && "relationship" %>
   "
-  draggable="true"
-  data-sortable-target="item"
-  data-sortable-id="<%= conversation.id %>"
-  data-action="dragstart->sortable#start dragend->sortable#end"
+  draggable="<%= sortable %>"
+  <% if sortable %>
+    data-sortable-target="item"
+    data-sortable-id="<%= conversation.id %>"
+    data-action="dragstart->sortable#start dragend->sortable#end"
+  <% end %>
   data-role="conversation"
   data-radio-behavior-target="radio"
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"

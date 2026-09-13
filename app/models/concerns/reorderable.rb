@@ -13,14 +13,18 @@ module Reorderable
   end
 
   # Renumbers this collection to match the order of ids, which is how the sidebar hands back a list
-  # the user has dragged into shape. Ids the collection does not contain are simply ignored, so a
-  # user-scoped relation cannot be talked into reordering someone else's records.
+  # the user has dragged into shape. Call it only on a user-scoped relation (the controller passes
+  # Current.user.conversations); ids the collection does not contain are simply ignored and consume
+  # no slot, so a user-scoped relation cannot be talked into reordering someone else's records.
   class_methods do
     def reposition(ids)
-      ids = ids.map(&:to_i)
+      ids = Array(ids).map(&:to_i).uniq
+      records = where(id: ids).index_by(&:id)
 
       transaction do
-        where(id: ids).each { |record| record.update_column(:position, ids.index(record.id)) }
+        ids.filter_map { |id| records[id] }.each_with_index do |record, index|
+          record.update_column(:position, index)
+        end
       end
     end
   end
