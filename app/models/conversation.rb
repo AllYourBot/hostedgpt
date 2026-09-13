@@ -26,11 +26,12 @@ class Conversation < ApplicationRecord
 
   # The sidebar's conversation list: every conversation for the user in display order, optionally
   # narrowed by the search query. The blank case bypasses the join on purpose — an empty search
-  # must still return conversations that have no messages yet.
+  # must still return conversations that have no messages yet. Rows render their assistant, so it
+  # rides along in one extra query instead of one per row.
   def self.nav_for_user(user, query = nil)
-    return user.conversations.ordered if query.blank?
+    return user.conversations.preload(:assistant).ordered if query.blank?
 
-    user.conversations.matching_query(query)
+    user.conversations.preload(:assistant).matching_query(query)
   end
 
   # Builds a hash of date interval keys and queries which fetch the records for that internal.

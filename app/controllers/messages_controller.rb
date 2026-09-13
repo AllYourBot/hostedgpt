@@ -84,7 +84,7 @@ class MessagesController < ApplicationController
   end
 
   def set_nav_assistants
-    @nav_assistants = Current.user.assistants.ordered
+    @nav_assistants = Current.user.assistants.includes(language_model: :api_service).ordered
   end
 
   def message_params
