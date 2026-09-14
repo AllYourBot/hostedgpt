@@ -14,7 +14,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
   test "index lists the user's conversations in position order" do
     user = @conversation.user
     ids = user.conversations.ordered.pluck(:id).rotate
-    user.conversations.reposition(ids)
+    Conversation.reposition(user, ids)
 
     get conversations_url
 

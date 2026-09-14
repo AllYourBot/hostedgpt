@@ -3,7 +3,7 @@ require "test_helper"
 class ReorderableTest < ActiveSupport::TestCase
   setup do
     @keith = users(:keith)
-    @keith.assistants.reposition(@keith.assistants.ordered.pluck(:id)) # normalize to 0..n-1
+    Assistant.reposition(@keith, @keith.assistants.ordered.pluck(:id)) # normalize to 0..n-1
   end
 
   test "a new assistant lands at the top, above soft-deleted ones too" do

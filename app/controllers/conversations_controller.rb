@@ -9,7 +9,7 @@ class ConversationsController < ApplicationController
   end
 
   def reorder
-    Current.user.conversations.reposition(Array(params[:ids]))
+    Conversation.reposition(Current.user, Array(params[:ids]))
     head :no_content
   end
 

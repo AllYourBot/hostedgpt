@@ -12,14 +12,14 @@ module Reorderable
     before_create :assign_default_position
   end
 
-  # Renumbers this collection to match the order of ids, which is how the sidebar hands back a list
-  # the user has dragged into shape. Call it only on a user-scoped relation (the controller passes
-  # Current.user.conversations); ids the collection does not contain are simply ignored and consume
-  # no slot, so a user-scoped relation cannot be talked into reordering someone else's records.
+  # Renumbers the user's collection to match the order of ids, which is how the sidebar hands back
+  # a list the user has dragged into shape. The user is part of the call on purpose: the
+  # renumbering is confined to reorder_scope(user), so no caller — however lazy — can renumber
+  # anyone else's records. Ids outside that scope are ignored and consume no slot.
   class_methods do
-    def reposition(ids)
+    def reposition(user, ids)
       ids = Array(ids).map(&:to_i).uniq
-      records = where(id: ids).index_by(&:id)
+      records = reorder_scope(user).where(id: ids).index_by(&:id)
 
       transaction do
         ids.filter_map { |id| records[id] }.each_with_index do |record, index|
@@ -51,8 +51,19 @@ module Reorderable
   private
 
   # A new record belongs at the top of the list, which is where it landed back when the list was
-  # ordered newest-first.
+  # ordered newest-first. The lock is what keeps the top honest: two records created in the same
+  # instant would otherwise both read the same minimum and tie for the same slot. Holding the
+  # user's row until the insert commits queues one user's creates behind each other, so each one
+  # reads a minimum that includes the record the last one just claimed — every slot unique.
+  #
+  # The lock is taken with a bare FOR UPDATE select rather than user.lock!, because lock! reloads
+  # the user in place — and a reload mid-save throws away the record's in-flight nested state
+  # (a credential built through nested attributes has not been inserted yet, and the reload
+  # erases it from the association before autosave reaches it).
   def assign_default_position
-    self.position ||= (self.class.reorder_scope(user).minimum(:position) || 0) - 1
+    self.position ||= user.class.transaction do
+      user.class.where(id: user.id).lock.pick(:id)
+      (self.class.reorder_scope(user).minimum(:position) || 0) - 1
+    end
   end
 end

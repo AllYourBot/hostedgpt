@@ -162,7 +162,7 @@ class ConversationTest < ActiveSupport::TestCase
 
   test "a new conversation claims the top slot, not a collision at zero" do
     user = users(:keith)
-    user.conversations.reposition(user.conversations.ordered.pluck(:id)) # normalize to 0..n-1
+    Conversation.reposition(user, user.conversations.ordered.pluck(:id)) # normalize to 0..n-1
     min_before = user.conversations.minimum(:position)
 
     conversation = user.conversations.create!(assistant: assistants(:samantha))
@@ -186,7 +186,7 @@ class ConversationTest < ActiveSupport::TestCase
   test "ordered follows position once conversations have been dragged into shape" do
     user = users(:keith)
     ids = user.conversations.ordered.pluck(:id).rotate
-    user.conversations.reposition(ids)
+    Conversation.reposition(user, ids)
 
     assert_equal ids, user.conversations.ordered.pluck(:id)
   end

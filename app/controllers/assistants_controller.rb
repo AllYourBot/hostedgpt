@@ -1,5 +1,4 @@
 class AssistantsController < ApplicationController
-  before_action :set_nav_conversations
   before_action :set_nav_assistants
   before_action :set_nav_collections
 
@@ -12,7 +11,7 @@ class AssistantsController < ApplicationController
   end
 
   def reorder
-    Current.user.assistants.reposition(params[:ids] || [])
+    Assistant.reposition(Current.user, params[:ids] || [])
     head :no_content
   end
 end
