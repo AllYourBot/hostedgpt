@@ -45,6 +45,14 @@ class DocumentTest < ActiveSupport::TestCase
     assert document.file.attached?
   end
 
+  test "defaults the user to the assistant's user when attached to an assistant" do
+    file = Rack::Test::UploadedFile.new(file_fixture("test_document.txt"), "text/plain")
+    document = Document.create!(assistant: assistants(:samantha), file: file)
+
+    assert_equal assistants(:samantha).user, document.user
+    assert_equal "test_document.txt", document.filename
+  end
+
   test "image_url returns data url when app_url is not set" do
     stub_custom_config_value(:app_url, "") do
       url = documents(:cat_photo).image_url(:small)

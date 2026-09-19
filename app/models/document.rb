@@ -137,7 +137,7 @@ class Document < ApplicationRecord
   end
 
   def set_default_user
-    self.user ||= message.conversation.user
+    self.user ||= assistant&.user || message&.conversation&.user
   end
 
   def set_default_filename

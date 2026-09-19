@@ -3,6 +3,8 @@
 
   <%= render "form", assistant: @assistant %>
 
+  <%= render "context", assistant: @assistant %>
+
   <%= button_to t("app.settings.assistants.delete"),
       settings_assistant_path(@assistant),
       method: :delete,

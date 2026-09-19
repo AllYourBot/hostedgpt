@@ -40,6 +40,21 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     refute_text "Saved"
   end
 
+  test "should upload and remove a context file" do
+    visit edit_settings_assistant_url(@assistant)
+    assert_text "Context"
+
+    attach_file "document[file]", file_fixture("test_document.txt"), make_visible: true
+    assert_alert "File uploaded"
+    assert_text "test_document.txt"
+
+    accept_confirm do
+      within("#context #document_#{@assistant.documents.last.id}") { click_text "Remove" }
+    end
+    assert_no_text "test_document.txt"
+    assert_alert "File removed"
+  end
+
   # test "should destroy Assistant" do
   #   visit edit_settings_assistant_url(@assistant)
   #   accept_confirm do
