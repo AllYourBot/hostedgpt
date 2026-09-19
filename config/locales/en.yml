@@ -107,6 +107,13 @@ en:
         cancel: "Cancel"
         menu:
           new: "New Assistant"
+        context:
+          title: "Context"
+          hint: "Text and PDF files uploaded here are included in this assistant's instructions on every conversation."
+          none: "No files uploaded yet."
+          upload: "Upload file"
+          remove: "Remove"
+          confirm_remove: "Remove this file?"
         form:
           name: "Name"
           slug: "Slug"
@@ -410,6 +417,8 @@ en:
         forgotten: "Forgotten"
         cleared: "Cleared memory"
       documents:
+        uploaded: "File uploaded"
+        removed: "File removed"
         created: "Document was successfully created."
         updated: "Document was successfully updated."
         destroyed: "Document was successfully destroyed."

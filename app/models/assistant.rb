@@ -56,6 +56,18 @@ class Assistant < ApplicationRecord
     self.language_model = LanguageModel.for_user(user).find_by(api_name:)
   end
 
+  # The readable contents of every uploaded context file, ready to be appended to the system prompt.
+  # Files that cannot be turned into text (images, binaries) are left out.
+  def context_prompt
+    files = documents.order(:created_at).filter_map do |document|
+      text = document.text_content
+      %|<file name="#{document.filename}">\n#{text}\n</file>| if text.present?
+    end
+    return nil if files.empty?
+
+    "The following files have been provided as context for you. Use them when answering:\n\n" + files.join("\n\n")
+  end
+
   private
 
   # A new assistant belongs at the top of the list, which is where it landed back when the list was

@@ -64,4 +64,21 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
     refute full_instructions.include? "been told and remembered"
     refute full_instructions.include? "Austin, Texas"
   end
+
+  test "full_instructions INCLUDES the assistant's context files after memories" do
+    file = Rack::Test::UploadedFile.new(file_fixture("test_document.txt"), "text/plain")
+    assistants(:samantha).documents.create!(file: file)
+
+    backend = AIBackend.new(
+      users(:keith),
+      messages(:hear_me).assistant,
+      messages(:hear_me).conversation,
+      messages(:hear_me)
+    )
+    full_instructions = backend.send(:full_instructions)
+    assert_includes full_instructions, %|<file name="test_document.txt">|
+    assert_includes full_instructions, "This is a text document"
+    assert full_instructions.index("remembered") < full_instructions.index("<file"), "context should follow memories"
+    assert full_instructions.index("<file") < full_instructions.index("current time"), "context should precede the date"
+  end
 end

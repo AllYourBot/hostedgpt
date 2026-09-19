@@ -17,7 +17,9 @@ Rails.application.routes.draw do
   resources :messages, only: [:show, :update]
 
   namespace :settings do
-    resources :assistants, except: [:index, :show]
+    resources :assistants, except: [:index, :show] do
+      resources :documents, only: [:create, :destroy]
+    end
     resource :person, only: [:edit, :update]
     resources :language_models do
       get :test, to: "language_models#test"

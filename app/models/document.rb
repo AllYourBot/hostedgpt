@@ -105,6 +105,22 @@ class Document < ApplicationRecord
     file.attached? && file.content_type == "application/pdf"
   end
 
+  TEXT_CONTENT_TYPES = %w[application/json application/xml application/x-yaml application/yaml application/javascript].freeze
+
+  def has_text?
+    return false unless file.attached?
+
+    file.content_type.to_s.start_with?("text/") || TEXT_CONTENT_TYPES.include?(file.content_type)
+  end
+
+  # The file's contents as a string the model can read, or nil for files we cannot turn into text (images, binaries).
+  def text_content
+    return extract_pdf_text if has_document_pdf?
+    return nil unless has_text?
+
+    file.download.force_encoding(Encoding::UTF_8).scrub
+  end
+
   def extract_pdf_text
     return nil unless has_document_pdf?
 
@@ -137,7 +153,7 @@ class Document < ApplicationRecord
   end
 
   def set_default_user
-    self.user ||= message.conversation.user
+    self.user ||= assistant&.user || message&.conversation&.user
   end
 
   def set_default_filename
