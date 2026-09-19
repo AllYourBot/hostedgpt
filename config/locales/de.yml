@@ -78,6 +78,13 @@ de:
         cancel: "Abbrechen"
         menu:
           new: "Neuer Assistent"
+        context:
+          title: "Kontext"
+          hint: "Hier hochgeladene Text- und PDF-Dateien werden in jeder Unterhaltung in die Anweisungen dieses Assistenten aufgenommen."
+          none: "Noch keine Dateien hochgeladen."
+          upload: "Datei hochladen"
+          remove: "Entfernen"
+          confirm_remove: "Diese Datei entfernen?"
         form:
           name: "Name"
           slug: "Slug"
@@ -377,6 +384,8 @@ de:
         forgotten: "Vergessen"
         cleared: "Speicher gelöscht"
       documents:
+        uploaded: "Datei hochgeladen"
+        removed: "Datei entfernt"
         created: "Dokument wurde erfolgreich erstellt."
         updated: "Dokument wurde erfolgreich aktualisiert."
         destroyed: "Dokument wurde erfolgreich gelöscht."
