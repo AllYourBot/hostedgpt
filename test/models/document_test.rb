@@ -53,6 +53,27 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal "test_document.txt", document.filename
   end
 
+  test "text_content returns the contents of a plain text file" do
+    file = Rack::Test::UploadedFile.new(file_fixture("test_document.txt"), "text/plain")
+    document = Document.create!(assistant: assistants(:samantha), file: file)
+
+    assert document.has_text?
+    assert_includes document.text_content, "This is a text document"
+  end
+
+  test "text_content is nil for an image" do
+    file = Rack::Test::UploadedFile.new(file_fixture("cat.png"), "image/png")
+    document = Document.create!(assistant: assistants(:samantha), file: file)
+
+    refute document.has_text?
+    assert_nil document.text_content
+  end
+
+  test "text_content is nil when no file is attached" do
+    refute documents(:background).has_text?
+    assert_nil documents(:background).text_content
+  end
+
   test "image_url returns data url when app_url is not set" do
     stub_custom_config_value(:app_url, "") do
       url = documents(:cat_photo).image_url(:small)

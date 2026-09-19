@@ -109,7 +109,7 @@ en:
           new: "New Assistant"
         context:
           title: "Context"
-          hint: "Files uploaded here are associated with this assistant."
+          hint: "Text and PDF files uploaded here are included in this assistant's instructions on every conversation."
           none: "No files uploaded yet."
           upload: "Upload file"
           remove: "Remove"
