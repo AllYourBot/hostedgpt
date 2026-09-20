@@ -84,6 +84,7 @@ group :development do
   gem "rubocop-capybara"
   gem "rubocop-minitest"
   gem "dockerfile-rails", ">= 1.6"
+  gem "kamal", "~> 2.12"
   gem "logcraft"
   # gem "oj" # Optional, but recommended; see the "JSON serialization" section in the README
 end

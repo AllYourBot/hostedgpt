@@ -29,6 +29,7 @@ This project is led by an experienced rails developer, but we're actively lookin
   - [Troubleshooting Render](#troubleshooting-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
+- [Deploy the app with Kamal](#deploy-the-app-with-kamal)
 - [Deploy on your own server](#deploy-on-your-own-server)
 - [Running locally on your computer](#running-locally-on-your-computer)
   - [Alternatively, you can run outside of Docker](#alternatively-you-can-run-outside-of-docker)]
@@ -116,6 +117,70 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
    [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/heroku/nodejs-getting-start)
 
 You may want to read about [configuring optional features](#configure-optional-features).
+
+## Deploy the app with Kamal
+
+Kamal deploys the app as a Docker container with automatic HTTPS, zero-downtime rollover, and **no accounts on any external service**: no Docker Hub, no container registry, no Redis. The only things you need are a server, a domain name, and SSH access to it.
+
+### Prerequisites
+
+- Your local machine: Ruby matching this repo's `.ruby-version` (bundler enforces it exactly) with `bundle install` run, and Docker running (Kamal builds the image and hosts a private registry locally, so the server never sees your source or credentials)
+- A Linux server with at least 2 GB RAM and 20 GB disk, **amd64** architecture (arm64 hosts work only after a one-line change, see below), Ubuntu LTS family validated
+- Inbound TCP 80 and 443 reachable from the internet. Open them at your **cloud provider's security group or edge firewall** (a host firewall alone is not enough, and Docker-published ports bypass host-firewall rules entirely)
+- A DNS A-record pointing your domain (e.g. `chat.example.com`) at the server
+- SSH access to the server (key-based auth recommended; you'll typically run as root)
+
+### One-time setup
+
+1. Generate your production secrets; each command prints a value you'll use in the next step. These guard every API key your users store in HostedGPT, so **back them up offline in encrypted form before continuing: if you lose them, all stored credentials are permanently unreadable** (recovery requires re-encrypting every stored token). **Migrating an existing HostedGPT deployment from Render or Fly?** Reuse your *original* `ACTIVE_RECORD_ENCRYPTION_*` values instead of generating fresh ones; new keys leave every stored credential permanently undecryptable.
+
+   ```
+   bin/rails secret   # → RAILS_MASTER_KEY
+   bin/rails secret   # → SECRET_KEY_BASE
+   bin/rails secret   # → ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+   bin/rails secret   # → ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+   bin/rails secret   # → ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+   bin/rails secret   # → HOSTED_DB_PASSWORD
+   ```
+
+2. Create `.kamal/secrets` in the repo root with owner-only permissions (`chmod 600 .kamal/secrets`) and these contents (paste your generated values):
+
+   ```
+   RAILS_MASTER_KEY=<value>
+   SECRET_KEY_BASE=<value>
+   ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=<value>
+   ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=<value>
+   ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=<value>
+   HOSTED_DB_PASSWORD=<value>
+   ```
+
+   This file is gitignored and excluded from Docker builds. Never paste its contents anywhere. (No `POSTGRES_PASSWORD` entry is needed: the deploy config injects `HOSTED_DB_PASSWORD` into the database container as `POSTGRES_PASSWORD`, so the app and database can never drift.)
+3. Edit `config/deploy.yml`: set your server's IP in `servers.web` and in the `db` accessory's `host`, and your domain in `proxy.host`.
+4. Commit nothing; your edits stay local to your deployment.
+
+### Deploy
+
+```
+bundle exec kamal setup
+```
+
+That single command installs Docker on the server, starts the proxy and the Postgres database, builds the app image on your machine, transfers it, runs migrations, and brings up HostedGPT with HTTPS. First deploy takes a while: the image transfers through a tunnel from your machine to the server, so duration depends on your upload bandwidth, and your machine must stay awake throughout. Subsequent deploys are `bundle exec kamal deploy`.
+
+A few things worth knowing:
+
+- **Rolling back** needs the machine that deployed: previous images are kept on your local registry, so `bundle exec kamal rollback` works from the same machine with the registry container running. Rolling forward works from anywhere with the repo.
+- **Migrations run at container boot** and bound deploy time. For a lengthy migration, run it first via `bundle exec kamal app exec --reuse "bin/rails db:migrate"` (mirroring Fly's release-command pattern), then deploy.
+- **Base images pull anonymously from Docker Hub.** If `kamal setup` fails with a pull error on a shared IP, wait and retry; rate limits are per-IP and temporary.
+- **Never expose the database port.** The accessory has no published host port by design; if you ever add one, it must be loopback-only (`127.0.0.1:5432:5432`); Docker-published ports bypass host-firewall rules.
+- **Back up your database**: all conversations live in the Postgres data directory on the server (the `db` accessory's `data` directory under your deploy directory). Periodically dump it, encrypted, somewhere outside this repo; the dump contains every conversation:
+
+  ```
+  bundle exec kamal accessory exec db --reuse --raw -q -- "pg_dump -U hostedgpt hostedgpt_production" | gpg --encrypt --recipient you@example.com > ~/backups/hostedgpt-$(date +%F).sql.gpg
+  ```
+
+  (`--reuse` runs inside the live database container; `--raw` keeps kamal's host banners out of the dump; sanity-check the file starts with a pg_dump header.)
+
+Once it's up, you may want to read about [configuring optional features](#configure-optional-features). To run without Docker instead, follow [Deploy on your own server](#deploy-on-your-own-server).
 
 ## Deploy on your own server
 

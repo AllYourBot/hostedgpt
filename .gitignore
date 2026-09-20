@@ -59,3 +59,4 @@
 /.idea/*
 /client/.idea/*
 vendor/bundle
+.kamal/

@@ -1,0 +1,118 @@
+# Deploy HostedGPT to your own server with Kamal 2.12.
+#
+# All secrets come from .kamal/secrets (gitignored; see the README's
+# "Deploy the app with Kamal" section for the exact contents to write).
+# The registry is local to the deployer's machine: no Docker Hub or GHCR
+# account is required anywhere in this flow.
+
+# Name of your application. Used to uniquely configure containers.
+service: hostedgpt
+
+# Name of the container image (pushed to the local registry; no account).
+image: hostedgpt
+
+# Deploy to these servers. Replace with your server's IP or hostname.
+servers:
+  web:
+    - 192.0.2.1
+  # Split job processing out to a dedicated host when you scale beyond one
+  # server (escape hatch; untested):
+  # job:
+  #   hosts:
+  #     - 192.0.2.1
+  #   cmd: bin/jobs
+
+# kamal-proxy terminates TLS (automatic Let's Encrypt for the host below)
+# and forwards X-Forwarded-Proto so Rails' force_ssl does not redirect-loop.
+# The /up health check is exempt from the redirect on the Rails side.
+proxy:
+  ssl: true
+  host: hostedgpt.example.com
+  app_port: 8080
+  forward_headers: true
+
+# The image is pushed to a registry Kamal starts on the deployer's machine;
+# the target server pulls it through a temporary SSH tunnel during deploy.
+# No registry account is created or required. The postgres and kamal-proxy
+# base images are pulled anonymously from Docker Hub (availability, not
+# account, dependency).
+registry:
+  server: localhost:5555
+
+# Inject ENV variables into containers (secrets come from .kamal/secrets).
+env:
+  clear:
+    # Run the Solid Queue Supervisor inside the web server's Puma process.
+    # When you start using multiple servers, split out job processing to a
+    # dedicated machine (see the commented `job` role above).
+    RUN_SOLID_QUEUE_IN_PUMA: true
+
+    # Rails reads its secret_key_base and ActiveRecord-encryption keys from
+    # these ENV values instead of a credentials file (the render.yaml-proven
+    # contract for this app). Values are generated once via `bin/rails secret`.
+    CONFIGURE_ACTIVE_RECORD_ENCRYPTION_FROM_ENV: true
+
+    # Database connection for the accessory below. The hostname is the
+    # accessory's container name (`<service>-<accessory>`; Kamal sets no
+    # network aliases).
+    HOSTED_DB_HOST: hostedgpt-db
+    HOSTED_DB_USERNAME: hostedgpt
+    HOSTED_DB_NAME: hostedgpt
+
+    # `rails server` below reads PORT; must match proxy.app_port.
+    PORT: 8080
+
+  secret:
+    - RAILS_MASTER_KEY
+    - SECRET_KEY_BASE
+    - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+    - ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+    - ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+    - HOSTED_DB_PASSWORD
+
+  # Alternative to the HOSTED_DB_* family: a single connection string.
+  # If you switch to it, list it under `secret` (never `clear`); the URL
+  # embeds the database password.
+  # secret:
+  #   - DATABASE_URL
+
+# Aliases are triggered with `bin/kamal <alias>`.
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole"
+
+# Persistent storage for Active Storage uploads inside the app container.
+volumes:
+  - "hostedgpt_storage:/rails/storage"
+
+# Bridge fingerprinted assets between versions to avoid 404s mid-deploy.
+asset_path: /rails/public/assets
+
+# Configure the image builder: the kamal-production Dockerfile stage
+# (child of fly-production), built for amd64 servers. On an arm64 server,
+# change arch accordingly (untested).
+builder:
+  arch: amd64
+  target: kamal-production
+
+# Use a different ssh user than root
+# ssh:
+#   user: deploy
+
+# The Postgres accessory. Its container name (`hostedgpt-db`) is the hostname
+# the app connects to via HOSTED_DB_HOST. Data persists in a named host
+# directory, and that directory is your database; back it up (see README).
+accessories:
+  db:
+    image: postgres:16
+    host: 192.0.2.1
+    directories:
+      - data:/var/lib/postgresql/data
+    env:
+      clear:
+        POSTGRES_USER: hostedgpt
+        POSTGRES_DB: hostedgpt_production
+      secret:
+        - POSTGRES_PASSWORD:HOSTED_DB_PASSWORD

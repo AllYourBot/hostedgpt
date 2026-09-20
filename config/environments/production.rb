@@ -51,7 +51,10 @@ Rails.application.configure do
   config.force_ssl = true
 
   # Skip http-to-https redirect for the default health check endpoint.
-  # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
+  # Required for Kamal (config/deploy.yml): kamal-proxy's deploy healthcheck
+  # polls /up over plain HTTP inside the server, and force_ssl would redirect
+  # it, failing every deploy.
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT by default
   config.logger = ActiveSupport::Logger.new($stdout)

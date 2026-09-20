@@ -12,7 +12,7 @@ If you set up the app outside of Docker, then run the usual `bin/rails test` and
 
 ### Understanding the Docker configuration
 
-The `Dockerfile` is set up to support three distinct situations: development, deploying to Render, and deploying to Fly. Each of these are completely separate targets which don't share any steps, they are simply in the same Dockerfile.
+The `Dockerfile` is set up to support four distinct situations: development, deploying to Render, deploying to Fly, and deploying to your own server with Kamal. The Fly, Kamal, and Render targets share some build steps: `kamal-production` is a thin child of `fly-production` (defined just below the Fly section, between `#### END of FLY ####` and `#### START of DEV ####`; see `config/deploy.yml` and the README's "Deploy the app with Kamal" section), while `render-production` must remain the last stage because Render always builds the last one.
 
 The `docker-compose.yml` is solely for development. It references the `development` build target.
 
