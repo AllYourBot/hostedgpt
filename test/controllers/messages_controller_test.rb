@@ -312,4 +312,81 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test "react persists on a message" do
+    assert_not @message.user_reacted?("👍", @user)
+
+    post react_message_url(@message), params: { emoji: "👍" }
+
+    assert_response :no_content
+    assert @message.reload.user_reacted?("👍", @user)
+    assert_equal({ "👍" => 1 }, @message.reaction_counts)
+  end
+
+  test "unreact removes a message reaction" do
+    @message.react!("👍", @user)
+
+    post unreact_message_url(@message), params: { emoji: "👍" }
+
+    assert_response :no_content
+    assert_not @message.reload.user_reacted?("👍", @user)
+    assert_equal({}, @message.reaction_counts)
+  end
+
+  test "double react on a message is idempotent" do
+    post react_message_url(@message), params: { emoji: "👍" }
+    assert_response :no_content
+
+    assert_no_difference "Reaction.count" do
+      post react_message_url(@message), params: { emoji: "👍" }
+    end
+
+    assert_response :no_content
+    assert_equal({ "👍" => 1 }, @message.reload.reaction_counts)
+  end
+
+  test "unreact on a clear message emoji is a no-op" do
+    assert_no_difference "Reaction.count" do
+      post unreact_message_url(@message), params: { emoji: "👍" }
+    end
+
+    assert_response :no_content
+  end
+
+  test "react on a message with a blank emoji is rejected" do
+    assert_no_difference "Reaction.count" do
+      post react_message_url(@message), params: { emoji: "" }
+    end
+
+    assert_response :unprocessable_content
+  end
+
+  test "react on another user's message is unauthorized" do
+    foreign = messages(:filter_map)
+    assert_not_equal @user, foreign.conversation.user
+
+    assert_no_difference "Reaction.count" do
+      post react_message_url(foreign), params: { emoji: "👍" }
+    end
+
+    assert_response :unauthorized
+  end
+
+  test "react on a message requires authentication" do
+    get logout_path
+
+    post react_message_url(@message), params: { emoji: "👍" }
+
+    assert_redirected_to login_url
+  end
+
+  test "index renders message reaction counts" do
+    @message.react!("👍", @user)
+
+    get conversation_messages_url(@conversation, version: @message.version)
+
+    assert_response :success
+    assert_match(/data-role="reaction-counts"/, response.body)
+    assert_match(/👍/, response.body)
+  end
 end

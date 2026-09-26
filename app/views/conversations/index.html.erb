@@ -43,7 +43,7 @@
     data-controller="radio-behavior"
     data-radio-behavior-selected-class="relationship"
   >
-    <% if @bookmarks_view %>
+    <% if @bookmarks_view || @reactions_view %>
       <%= link_to conversations_path,
         data: { role: "all-conversations", turbo_frame: "nav-conversations" },
         class: %|
@@ -69,8 +69,20 @@
         <%= icon "bookmark", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
         <span class="ml-2"><%= t("app.conversations.ui.bookmarks") %></span>
       <% end %>
+      <%= link_to reactions_conversations_path,
+        data: { role: "reactions-link", turbo_frame: "nav-conversations" },
+        class: %|
+          flex items-center
+          mb-1 p-1 pl-2 pr-2 mr-5
+          rounded-lg
+          text-sm
+          hover:bg-gray-100 dark:hover:bg-gray-700
+        | do %>
+        <%= icon "face-smile", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
+        <span class="ml-2"><%= t("app.conversations.ui.reactions") %></span>
+      <% end %>
     <% end %>
-    <% if @query.blank? && !@bookmarks_view %>
+    <% if @query.blank? && !@bookmarks_view && !@reactions_view %>
       <turbo-frame id="pinned-conversations"
         target="conversation"
         data-controller="sortable"

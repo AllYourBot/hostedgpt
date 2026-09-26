@@ -370,4 +370,186 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match(%r{href="/conversations/bookmarks"}, response.body)
   end
+
+  test "react persists with counts and leaves order alone" do
+    user = @conversation.user
+    before = user.conversations.ordered.pluck(:id, :position)
+    assert_not @conversation.user_reacted?("👍", user)
+
+    post react_conversation_url(@conversation), params: { emoji: "👍" }
+
+    assert_response :no_content
+    assert @conversation.reload.user_reacted?("👍", user)
+    assert_equal({ "👍" => 1 }, @conversation.reaction_counts)
+    assert_includes Conversation.reacted_for(user).map(&:id), @conversation.id
+    assert_equal before, user.conversations.ordered.pluck(:id, :position)
+  end
+
+  test "unreact persists and leaves order alone" do
+    user = @conversation.user
+    @conversation.react!("👍", user)
+    before = user.conversations.ordered.pluck(:id, :position)
+
+    post unreact_conversation_url(@conversation), params: { emoji: "👍" }
+
+    assert_response :no_content
+    assert_not @conversation.reload.user_reacted?("👍", user)
+    assert_equal before, user.conversations.ordered.pluck(:id, :position)
+  end
+
+  test "double react via the endpoint is idempotent" do
+    post react_conversation_url(@conversation), params: { emoji: "👍" }
+    assert_response :no_content
+
+    assert_no_difference "Reaction.count" do
+      post react_conversation_url(@conversation), params: { emoji: "👍" }
+    end
+
+    assert_response :no_content
+    assert_equal({ "👍" => 1 }, @conversation.reload.reaction_counts)
+  end
+
+  test "unreact when clear is a no-op" do
+    assert_no_difference "Reaction.count" do
+      post unreact_conversation_url(@conversation), params: { emoji: "👍" }
+    end
+
+    assert_response :no_content
+  end
+
+  test "react with a blank emoji is rejected" do
+    assert_no_difference "Reaction.count" do
+      post react_conversation_url(@conversation), params: { emoji: "" }
+    end
+
+    assert_response :unprocessable_content
+  end
+
+  test "react ignores a conversation the user does not own" do
+    foreign = conversations(:debugging)
+
+    assert_no_difference "Reaction.count" do
+      post react_conversation_url(foreign), params: { emoji: "👍" }
+    end
+
+    assert_response :no_content
+    assert_not foreign.reload.user_reacted?("👍", @conversation.user)
+  end
+
+  test "react requires authentication" do
+    get logout_path
+
+    post react_conversation_url(@conversation), params: { emoji: "👍" }
+
+    assert_redirected_to login_url
+  end
+
+  test "unreact requires authentication" do
+    get logout_path
+
+    post unreact_conversation_url(@conversation), params: { emoji: "👍" }
+
+    assert_redirected_to login_url
+  end
+
+  test "reacting never disturbs pinned order" do
+    user = @conversation.user
+    pinned = user.conversations.ordered.limit(2).to_a
+    pinned.each { |c| c.pin!(user) }
+    pin_order = Conversation.pinned_for(user).pluck(:id)
+
+    post react_conversation_url(pinned.first), params: { emoji: "👍" }
+
+    assert_response :no_content
+    assert_equal pin_order, Conversation.pinned_for(user).pluck(:id)
+  end
+
+  test "reactions view lists reacted conversations newest reaction first" do
+    user = @conversation.user
+    other = user.conversations.where.not(id: @conversation.id).first
+    third = user.conversations.where.not(id: [@conversation.id, other.id]).first
+    foreign = conversations(:debugging)
+    foreign.react!("👍", foreign.user)
+    @conversation.react!("👍", user)
+    other.react!("🎉", user)
+    Reaction.where(user: user, reactable: @conversation).update_all(created_at: 2.days.ago)
+
+    get reactions_conversations_url
+
+    assert_response :success
+    assert_equal [other.id, @conversation.id], assigns(:nav_conversations).map(&:id)
+    assert_not_includes assigns(:nav_conversations).map(&:id), third.id
+    assert_not_includes assigns(:nav_conversations).map(&:id), foreign.id
+  end
+
+  test "reactions view lists a conversation reacted through one of its messages" do
+    user = @conversation.user
+    @conversation.messages.first.react!("👍", user)
+
+    get reactions_conversations_url
+
+    assert_response :success
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+  end
+
+  test "reactions view orders a message reaction by its own recency" do
+    user = @conversation.user
+    other = user.conversations.where.not(id: @conversation.id).first
+    @conversation.react!("👍", user)
+    other.messages.first.react!("👍", user)
+    Reaction.where(user: user, reactable: @conversation).update_all(created_at: 2.days.ago)
+
+    get reactions_conversations_url
+
+    assert_response :success
+    assert_equal [other.id, @conversation.id], assigns(:nav_conversations).map(&:id)
+  end
+
+  test "reactions view narrows by search query" do
+    user = @conversation.user
+    other = conversations(:attachment)
+    assert_equal user, other.user
+    @conversation.react!("👍", user)
+    other.react!("👍", user)
+
+    get reactions_conversations_url(query: "Samantha")
+
+    assert_response :success
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+  end
+
+  test "reactions view exposes a link back and the sidebar links to it" do
+    get reactions_conversations_url
+
+    assert_response :success
+    assert_match(%r{href="/conversations"}, response.body)
+
+    get conversations_url
+
+    assert_response :success
+    assert_match(%r{href="/conversations/reactions"}, response.body)
+  end
+
+  test "reactions view includes a pinned conversation once, outside the pinned section" do
+    user = @conversation.user
+    @conversation.pin!(user)
+    @conversation.react!("👍", user)
+
+    get reactions_conversations_url
+
+    assert_response :success
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+    assert_empty assigns(:pinned_conversations)
+    assert_no_match(/pointerdown->sortable#press/, response.body)
+  end
+
+  test "index renders conversation reaction counts" do
+    @conversation.react!("👍", @conversation.user)
+
+    get conversations_url
+
+    assert_response :success
+    assert_match(/data-role="reaction-counts"/, response.body)
+    assert_match(/👍/, response.body)
+  end
 end

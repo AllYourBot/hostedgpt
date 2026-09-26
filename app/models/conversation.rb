@@ -3,6 +3,7 @@ class Conversation < ApplicationRecord
   include Reorderable
   include Pinnable
   include Bookmarkable
+  include Reactable
 
   belongs_to :user
   belongs_to :assistant
@@ -56,6 +57,30 @@ class Conversation < ApplicationRecord
     scope = user.conversations.preload(:assistant).ordered
     scope = scope.matching_query(query) if query.present?
     scope.bookmarked_for(user)
+  end
+
+  # The reactions view: every conversation the user reacted to — directly or on one of its
+  # messages — newest touching reaction first. Reactions never touch position, so this ignores
+  # display order entirely. Pins are not split out here — a pinned conversation still appears
+  # in this list. The search narrows first through the shared matching_query, then membership
+  # applies: the other order raises a structurally-incompatible `or` inside matching_query.
+  def self.reacted_nav_for_user(user, query = nil)
+    scope = user.conversations
+    scope = scope.matching_query(query) if query.present?
+    candidate_ids = scope.ids
+
+    latest_by_conversation = Reaction.where(user: user, reactable_type: "Conversation", reactable_id: candidate_ids)
+      .group(:reactable_id).maximum(:created_at)
+    Reaction.where(user: user, reactable_type: "Message")
+      .joins("INNER JOIN messages ON messages.id = reactions.reactable_id")
+      .where(messages: { conversation_id: candidate_ids })
+      .group("messages.conversation_id").maximum(:created_at)
+      .each { |id, at| latest_by_conversation[id] = [latest_by_conversation[id], at].compact.max }
+
+    return none if latest_by_conversation.empty?
+
+    ordered_ids = latest_by_conversation.sort_by { |_, at| at }.reverse.map(&:first)
+    user.conversations.preload(:assistant).where(id: ordered_ids).in_order_of(:id, ordered_ids)
   end
 
   def generate_shareable_url(request)

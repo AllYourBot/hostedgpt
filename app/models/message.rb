@@ -1,5 +1,6 @@
 class Message < ApplicationRecord
   include DocumentImage, Version, Cancellable, Toolable
+  include Reactable
 
   belongs_to :assistant
   belongs_to :conversation, inverse_of: :messages

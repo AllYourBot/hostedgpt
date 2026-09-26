@@ -5,7 +5,7 @@ class MessagesController < ApplicationController
   before_action :set_version,               only: [:index, :update]
   before_action :set_conversation,          only: [:index]
   before_action :set_assistant,             only: [:index, :new, :edit, :create]
-  before_action :set_message,               only: [:show, :edit, :update]
+  before_action :set_message,               only: [:show, :edit, :update, :react, :unreact]
   before_action :set_nav_assistants,        only: [:index, :new]
   before_action :set_nav_collections,       only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
@@ -60,6 +60,18 @@ class MessagesController < ApplicationController
     else
       render :edit, status: :unprocessable_content
     end
+  end
+
+  def react
+    @message.react!(params[:emoji], Current.user)
+    head :no_content
+  rescue ActiveRecord::RecordInvalid
+    head :unprocessable_content
+  end
+
+  def unreact
+    @message.unreact!(params[:emoji], Current.user)
+    head :no_content
   end
 
   private

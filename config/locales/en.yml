@@ -362,6 +362,7 @@ en:
         send_message: "Send message"
         search_placeholder: "Search"
         bookmarks: "Bookmarks"
+        reactions: "Reactions"
         all_conversations: "All conversations"
         scroll_down: "Scroll down"
         share: "Share conversation"

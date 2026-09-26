@@ -3,8 +3,8 @@
 <%# TODO(pinned-reorder): unpinned drag plugs back in here — extend this guard plus Conversation.nav_for_user ordering to restore global drag. %>
 <% pinned = conversation.pinned?(Current.user) %>
 <% bookmarked = conversation.bookmarked?(Current.user) %>
-<%# No drag in the bookmarks view either: it shows a subset, and dragging a subset would corrupt the saved order of the rest. %>
-<% sortable = @query.blank? && pinned && !@bookmarks_view %>
+<%# No drag in the bookmarks or reactions views either: they show a subset, and dragging a subset would corrupt the saved order of the rest. %>
+<% sortable = @query.blank? && pinned && !@bookmarks_view && !@reactions_view %>
 
 <div
   id="<%= dom_id(conversation) %>"
@@ -59,6 +59,25 @@
       %>
         <%= icon "bookmark",
           variant: bookmarked ? :solid : :outline,
+          size: 16,
+          class: "text-gray-500 dark:text-gray-300"
+        %>
+      <% end %>
+      <%# Counts only, no Stimulus wiring: this row may be a sortable item, and the ghost clone
+          strips controller wiring from its scenery copy — so the picker lives on message rows
+          (never sortable) while this quick heart toggle is plain forms that need no wiring. %>
+      <%= render "reactions/counts", reactable: conversation %>
+      <% reacted = conversation.user_reacted?("❤️", Current.user) %>
+      <%= button_to reacted ? unreact_conversation_path(conversation) : react_conversation_path(conversation),
+        method: :post,
+        params: { emoji: "❤️" },
+        data: { role: reacted ? "unreact-conversation" : "react-conversation" },
+        form: { class: "inline-block p-0" },
+        class: "p-1 leading-none",
+        title: reacted ? "Remove reaction" : "React" do
+      %>
+        <%= icon "heart",
+          variant: reacted ? :solid : :outline,
           size: 16,
           class: "text-gray-500 dark:text-gray-300"
         %>

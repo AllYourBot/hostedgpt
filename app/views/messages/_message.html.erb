@@ -193,6 +193,43 @@ end %>
           h-[19px]
           <%= !last_message && done_thinking && "invisible" %> group-tap:visible
         ">
+          <%# Message rows are never sortable items, so this picker lives here rather than on the
+              sidebar row: the sortable ghost clone strips Stimulus wiring from its scenery copy. %>
+          <% user_emojis = message.reactions.where(user: Current.user).pluck(:emoji).to_set %>
+          <div data-controller="emoji-picker"
+            data-emoji-picker-react-url-value="<%= react_message_path(message) %>"
+            data-emoji-picker-unreact-url-value="<%= unreact_message_path(message) %>"
+            data-action="click@document->emoji-picker#close"
+            class="relative flex items-center gap-1"
+          >
+            <%= button_tag type: "button",
+              class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+              data: {
+                role: "react",
+                action: "click->emoji-picker#toggle",
+                emoji_picker_target: "button",
+              },
+              title: "React" do %>
+              <%= icon "face-smile", variant: :outline, size: 18 %>
+            <% end %>
+            <div data-emoji-picker-target="panel"
+              class="hidden absolute bottom-6 left-0 z-10 flex gap-1 p-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl"
+            >
+              <% %w[👍 ❤️ 🎉 😄 🤔 👎].each do |emoji| %>
+                <%= button_tag type: "button",
+                  data: {
+                    role: "react-emoji",
+                    action: "click->emoji-picker#select",
+                    emoji: emoji,
+                    reacted: user_emojis.include?(emoji).to_s,
+                  },
+                  class: "cursor-pointer px-1 hover:scale-125" do %><%= emoji %><% end %>
+              <% end %>
+            </div>
+            <span data-emoji-picker-target="counts" class="flex items-center">
+              <%= render "reactions/counts", reactable: message %>
+            </span>
+          </div>
           <% if message.versions.length > 1 %>
             <%= button_to message_path(message, version: previous_version),
               method: :patch,

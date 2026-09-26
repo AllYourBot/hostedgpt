@@ -1,0 +1,10 @@
+<%# locals: (reactable:) %>
+<%# Plain markup on purpose — no Stimulus wiring lives here, so the sortable ghost clone
+    (which strips ids and Stimulus wiring from its scenery copy) has nothing to take. The
+    message picker wraps this partial in its own counts target and updates the chips in place. %>
+<% counts = reactable.reaction_counts %>
+<span data-role="reaction-counts" class="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-300">
+  <% counts.each do |emoji, n| %>
+    <span data-emoji-chip="<%= emoji %>"><%= emoji %> <%= n %></span>
+  <% end %>
+</span>

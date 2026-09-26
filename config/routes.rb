@@ -16,15 +16,21 @@ Rails.application.routes.draw do
     resources :messages, only: [:index]
     post :reorder, on: :collection
     get :bookmarks, on: :collection
+    get :reactions, on: :collection
     post :pin, on: :member
     post :unpin, on: :member
     post :bookmark, on: :member
     post :unbookmark, on: :member
+    post :react, on: :member
+    post :unreact, on: :member
   end
 
   get "share/:share_token", to: "conversations#public_show", as: :public_conversation
 
-  resources :messages, only: [:show, :update]
+  resources :messages, only: [:show, :update] do
+    post :react, on: :member
+    post :unreact, on: :member
+  end
 
   resource :speech, only: :create
 

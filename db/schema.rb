@@ -284,6 +284,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.index ["user_id"], name: "index_pins_on_user_id"
   end
 
+  create_table "reactions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "emoji", null: false
+    t.bigint "reactable_id", null: false
+    t.string "reactable_type", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["reactable_type", "reactable_id"], name: "index_reactions_on_reactable"
+    t.index ["user_id", "reactable_type", "reactable_id", "emoji"], name: "index_reactions_on_user_and_reactable_and_emoji", unique: true
+    t.index ["user_id"], name: "index_reactions_on_user_id"
+  end
+
   create_table "replies", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -498,6 +510,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
   add_foreign_key "messages", "runs"
   add_foreign_key "notes", "chats"
   add_foreign_key "pins", "users"
+  add_foreign_key "reactions", "users"
   add_foreign_key "replies", "notes"
   add_foreign_key "runs", "assistants"
   add_foreign_key "runs", "conversations"

@@ -21,6 +21,19 @@ class ConversationsController < ApplicationController
     render :index
   end
 
+  # The reactions view reuses the index template with a reaction filter: every conversation the
+  # user reacted to — directly or on one of its messages — newest touching reaction first (pins
+  # are not split out here), narrowed by the search query when one is present. No pinned
+  # section — a partial pin list must never expose drag, same rationale as the filtered-list
+  # guard.
+  def reactions
+    @query = params[:query]
+    @reactions_view = true
+    @pinned_conversations = Conversation.none
+    @nav_conversations = Conversation.reacted_nav_for_user(Current.user, @query)
+    render :index
+  end
+
   def reorder
     Conversation.reposition(Current.user, Array(params[:ids]))
     head :no_content
@@ -43,6 +56,18 @@ class ConversationsController < ApplicationController
 
   def unbookmark
     @conversation&.unbookmark!(Current.user)
+    head :no_content
+  end
+
+  def react
+    @conversation&.react!(params[:emoji], Current.user)
+    head :no_content
+  rescue ActiveRecord::RecordInvalid
+    head :unprocessable_content
+  end
+
+  def unreact
+    @conversation&.unreact!(params[:emoji], Current.user)
     head :no_content
   end
 

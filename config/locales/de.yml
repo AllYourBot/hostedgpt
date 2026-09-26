@@ -333,6 +333,7 @@ de:
         send_message: "Nachricht senden"
         search_placeholder: "Suchen"
         bookmarks: "Lesezeichen"
+        reactions: "Reaktionen"
         all_conversations: "Alle Konversationen"
         scroll_down: "Nach unten scrollen"
         share: "Konversation teilen"
