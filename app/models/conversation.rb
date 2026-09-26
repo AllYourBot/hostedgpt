@@ -1,6 +1,7 @@
 class Conversation < ApplicationRecord
   include Version
   include Reorderable
+  include Pinnable
 
   belongs_to :user
   belongs_to :assistant

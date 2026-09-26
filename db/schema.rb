@@ -262,6 +262,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.index ["personable_type", "personable_id"], name: "index_people_on_personable"
   end
 
+  create_table "pins", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "pinnable_id", null: false
+    t.string "pinnable_type", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["pinnable_type", "pinnable_id"], name: "index_pins_on_pinnable"
+    t.index ["user_id", "pinnable_type", "pinnable_id"], name: "index_pins_on_user_id_and_pinnable_type_and_pinnable_id", unique: true
+    t.index ["user_id"], name: "index_pins_on_user_id"
+  end
+
   create_table "replies", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -474,6 +485,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
   add_foreign_key "messages", "documents", column: "content_document_id"
   add_foreign_key "messages", "runs"
   add_foreign_key "notes", "chats"
+  add_foreign_key "pins", "users"
   add_foreign_key "replies", "notes"
   add_foreign_key "runs", "assistants"
   add_foreign_key "runs", "conversations"
