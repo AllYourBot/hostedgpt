@@ -42,6 +42,10 @@ export default class extends Controller {
     if (this.dragging) return
     if (event.pointerType === "mouse" && event.button !== 0) return
     if (this.pressed) return // one gesture at a time: a second pointer never steals an armed press
+    // Toggles, picker buttons, and menu items click — they never start drags. (The title link
+    // intentionally still arms: dragging the title reorders the row.) Without this, arming a
+    // press on a button tangles the gesture with the click that follows it.
+    if (event.target.closest("button")) return
 
     this.pressed = event.currentTarget
     this.pointerId = event.pointerId
