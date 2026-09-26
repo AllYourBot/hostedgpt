@@ -23,11 +23,23 @@ module Reactable
   end
 
   def user_reacted?(emoji, reacting_user = user)
-    reactions.exists?(user: reacting_user, emoji: emoji)
+    # Reads the preloaded membership when the sidebar already loaded it, so rows render with no
+    # per-row query; falls back to the exists? check everywhere else. Same answer either way.
+    if reactions.loaded?
+      reactions.any? { |reaction| reaction.user_id == reacting_user&.id && reaction.emoji == emoji }
+    else
+      reactions.exists?(user: reacting_user, emoji: emoji)
+    end
   end
 
   # Counts grouped by emoji, e.g. { "👍" => 2, "🎉" => 1 } — what the row and message chips render.
   def reaction_counts
-    reactions.group(:emoji).count
+    # Tallies the preloaded membership when the sidebar already loaded it, so rows render with
+    # no per-row query; falls back to the grouped count everywhere else. Same answer either way.
+    if reactions.loaded?
+      reactions.group_by(&:emoji).transform_values(&:count)
+    else
+      reactions.group(:emoji).count
+    end
   end
 end

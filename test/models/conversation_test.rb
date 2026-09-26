@@ -188,4 +188,52 @@ class ConversationTest < ActiveSupport::TestCase
 
     assert_equal order_before, Conversation.pinned_for(user).pluck(:id, :position)
   end
+
+  test "sidebar nav scopes preload toggle state with no per-row queries" do
+    user = users(:keith)
+    other = users(:rob)
+    pinned = conversations(:greeting)
+    bookmarked = conversations(:ruby_version)
+    pinned.pin!(user)
+    bookmarked.bookmark!(user)
+    pinned.react!("❤️", user)
+    pinned.react!("👍", other)
+
+    scopes = {
+      "unpinned list" => Conversation.nav_for_user(user),
+      "pinned section" => Conversation.pinned_nav_for_user(user),
+      "bookmarks view" => Conversation.bookmarked_nav_for_user(user),
+      "reactions view" => Conversation.reacted_nav_for_user(user),
+      "search" => Conversation.nav_for_user(user, "test")
+    }
+
+    scopes.each do |name, scope|
+      rows = scope.to_a
+      assert_not_empty rows, "expected rows for #{name}"
+
+      assert_no_queries do
+        rows.each do |conversation|
+          conversation.pinned?(user)
+          conversation.bookmarked?(user)
+          conversation.user_reacted?("❤️", user)
+          conversation.reaction_counts
+        end
+      end
+    end
+
+    # The preloaded answers match the database answers.
+    assert_not_includes Conversation.nav_for_user(user).map(&:id), pinned.id
+    assert_includes Conversation.pinned_nav_for_user(user).map(&:id), pinned.id
+
+    preloaded_pin = Conversation.pinned_nav_for_user(user).find(pinned.id)
+    assert preloaded_pin.pinned?(user)
+    assert_not preloaded_pin.bookmarked?(user)
+    assert preloaded_pin.user_reacted?("❤️", user)
+    assert_not preloaded_pin.user_reacted?("❤️", other)
+    assert_equal({ "❤️" => 1, "👍" => 1 }, preloaded_pin.reaction_counts)
+
+    preloaded_bookmark = Conversation.bookmarked_nav_for_user(user).find(bookmarked.id)
+    assert preloaded_bookmark.bookmarked?(user)
+    assert_not preloaded_bookmark.pinned?(user)
+  end
 end

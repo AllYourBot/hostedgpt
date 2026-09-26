@@ -23,6 +23,12 @@ module Bookmarkable
   end
 
   def bookmarked?(bookmarking_user = user)
-    bookmarks.exists?(user: bookmarking_user)
+    # Reads the preloaded membership when the sidebar already loaded it, so rows render with no
+    # per-row query; falls back to the exists? check everywhere else. Same answer either way.
+    if bookmarks.loaded?
+      bookmarks.any? { |bookmark| bookmark.user_id == bookmarking_user&.id }
+    else
+      bookmarks.exists?(user: bookmarking_user)
+    end
   end
 end

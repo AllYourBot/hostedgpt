@@ -27,6 +27,12 @@ module Pinnable
   end
 
   def pinned?(pinning_user = user)
-    pins.exists?(user: pinning_user)
+    # Reads the preloaded membership when the sidebar already loaded it, so rows render with no
+    # per-row query; falls back to the exists? check everywhere else. Same answer either way.
+    if pins.loaded?
+      pins.any? { |pin| pin.user_id == pinning_user&.id }
+    else
+      pins.exists?(user: pinning_user)
+    end
   end
 end
