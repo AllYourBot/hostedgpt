@@ -44,34 +44,34 @@ class ConversationsController < ApplicationController
 
   def pin
     @conversation&.pin!(Current.user)
-    head :no_content
+    toggle_response
   end
 
   def unpin
     @conversation&.unpin!(Current.user)
-    head :no_content
+    toggle_response
   end
 
   def bookmark
     @conversation&.bookmark!(Current.user)
-    head :no_content
+    toggle_response
   end
 
   def unbookmark
     @conversation&.unbookmark!(Current.user)
-    head :no_content
+    toggle_response
   end
 
   def react
     @conversation&.react!(params[:emoji], Current.user)
-    head :no_content
+    toggle_response
   rescue ActiveRecord::RecordInvalid
     head :unprocessable_content
   end
 
   def unreact
     @conversation&.unreact!(params[:emoji], Current.user)
-    head :no_content
+    toggle_response
   end
 
   def show
@@ -105,6 +105,16 @@ class ConversationsController < ApplicationController
   end
 
   private
+
+  # Toggle endpoints answer 204 to plain requests (tests, curl) but page-refresh to Turbo:
+  # a 204 leaves the sidebar exactly as it was, so the pin would look dead until the next
+  # render. The refresh morphs the page in place with scroll preserved (see _head.html.erb).
+  def toggle_response
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+      format.html { head :no_content }
+    end
+  end
 
   def set_conversation
     @conversation = Current.user.conversations.find_by(id: params[:id] || params[:conversation_id])

@@ -151,6 +151,15 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes Conversation.unpinned_for(@conversation.user).map(&:id), @conversation.id
   end
 
+  test "pin answers a page refresh to Turbo requests so the toggle visibly lands" do
+    post pin_conversation_url(@conversation),
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_match(/action="refresh"/, response.body)
+    assert @conversation.reload.pinned?(@conversation.user)
+  end
+
   test "unpin persists and returns the conversation to recency order" do
     @conversation.pin!(@conversation.user)
     assert @conversation.pinned?(@conversation.user)

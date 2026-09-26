@@ -70,27 +70,36 @@ class MessagesController < ApplicationController
 
   def react
     @message.react!(params[:emoji], Current.user)
-    head :no_content
+    toggle_response
   rescue ActiveRecord::RecordInvalid
     head :unprocessable_content
   end
 
   def unreact
     @message.unreact!(params[:emoji], Current.user)
-    head :no_content
+    toggle_response
   end
 
   def pin
     @message.pin!(Current.user)
-    head :no_content
+    toggle_response
   end
 
   def unpin
     @message.unpin!(Current.user)
-    head :no_content
+    toggle_response
   end
 
   private
+
+  # Same contract as the sidebar toggles: 204 to plain requests, page-refresh to Turbo, so a
+  # hover pin visibly lands the pinned-messages section instead of looking dead.
+  def toggle_response
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+      format.html { head :no_content }
+    end
+  end
 
   def set_version
     @version = params[:version].presence&.to_i

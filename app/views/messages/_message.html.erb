@@ -191,8 +191,11 @@ end %>
           gap-2
           text-gray-600 dark:text-gray-300
           h-[19px]
-          <%= !last_message && done_thinking && "invisible" %> group-tap:visible
+          <%= (!last_message && done_thinking) ? "invisible" : "" %> group-hover:visible group-tap:visible
         ">
+        <%# React and pin offer on every row on hover, Slack-style; version nav, edit, playback,
+            and copy below stay last-message-only behind their own gate. The row carries `group`,
+            so group-hover reveals these on any message. %>
           <%# Message rows are never sortable items, so this picker lives here rather than on the
               sidebar row: the sortable ghost clone strips Stimulus wiring from its scenery copy. %>
           <% user_emojis = message.reactions.where(user: Current.user).pluck(:emoji).to_set %>
@@ -247,6 +250,15 @@ end %>
               size: 18
             %>
           <% end %>
+        </div>
+
+        <div class="
+          flex justify-start
+          gap-2
+          text-gray-600 dark:text-gray-300
+          h-[19px]
+          <%= !last_message && done_thinking && "invisible" %> group-tap:visible
+        ">
           <% if message.versions.length > 1 %>
             <%= button_to message_path(message, version: previous_version),
               method: :patch,

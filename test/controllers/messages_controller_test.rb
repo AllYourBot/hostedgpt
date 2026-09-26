@@ -400,6 +400,15 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_includes Message.pinned_for(@user).map(&:id), @message.id
   end
 
+  test "message pin answers a page refresh to Turbo requests so the section visibly lands" do
+    post pin_message_url(@message),
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_match(/action="refresh"/, response.body)
+    assert @message.reload.pinned?(@user)
+  end
+
   test "unpin removes a message pin" do
     @message.pin!(@user)
     assert @message.pinned?(@user)
