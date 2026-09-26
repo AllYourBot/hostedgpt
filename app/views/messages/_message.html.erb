@@ -186,13 +186,8 @@ end %>
           </div>
         <% end %>
 
-        <div class="
-          flex justify-start
-          gap-2
-          text-gray-600 dark:text-gray-300
-          h-[19px]
-          <%= (!last_message && done_thinking) ? "invisible" : "" %> group-hover:visible group-tap:visible
-        ">
+        <%# display:contents keeps one visual bar: children join the outer flex directly. %>
+        <div class="contents">
         <%# React and pin offer on every row on hover, Slack-style; version nav, edit, playback,
             and copy below stay last-message-only behind their own gate. The row carries `group`,
             so group-hover reveals these on any message. %>
@@ -252,13 +247,9 @@ end %>
           <% end %>
         </div>
 
-        <div class="
-          flex justify-start
-          gap-2
-          text-gray-600 dark:text-gray-300
-          h-[19px]
-          <%= !last_message && done_thinking && "invisible" %> group-tap:visible
-        ">
+        <%# display:contents: no box of its own, so the bar stays single-row; the invisible
+            gate inherits into the version/edit children. %>
+        <div class="contents <%= !last_message && done_thinking && "invisible" %>">
           <% if message.versions.length > 1 %>
             <%= button_to message_path(message, version: previous_version),
               method: :patch,
