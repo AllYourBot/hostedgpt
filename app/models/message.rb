@@ -43,6 +43,11 @@ class Message < ApplicationRecord
 
   def not_finished? = !finished?
 
+  # Tool calls can sit between the user's words and this reply, so walk back to the user message that started it.
+  def replying_to_speech?
+    conversation.messages.for_conversation_version(version).where("messages.index < ?", index).select(&:user?).last&.spoken? || false
+  end
+
   private
 
   def create_conversation

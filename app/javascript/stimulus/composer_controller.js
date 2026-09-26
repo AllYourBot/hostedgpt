@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import viewport from "stimulus/utils/viewport"
 
 export default class extends Controller {
-  static targets = [ "form", "input", "submit", "overlay", "cancel",
+  static targets = [ "form", "input", "spoken", "submit", "overlay", "cancel",
     "disabledSubmit", "microphoneEnable", "microphoneDisable" ]
   static outlets = [ "speaker" ]
   static values = { blurPlaceholder: String, focusPlaceholder: String, speakPlaceholder: String, micPermissionRequired: String }
@@ -16,12 +16,12 @@ export default class extends Controller {
     this.cursorToEnd()
     this.determineSubmitButton()
 
-    Listener.onConsiderationChanged = async () => {
+    Listener.onConsiderationChanged = () => {
       if (Listener.consideration == '') return
 
-        this.inputTarget.value = Listener.consideration
-        Reset.Listener()
-      if (Listener.attachment) await this.addAttachment()
+      this.inputTarget.value = Listener.consideration
+      this.spokenTarget.value = true // resetForm() restores the default of false
+      Reset.Listener()
       this.submitForm()
     }
 
@@ -248,29 +248,5 @@ export default class extends Controller {
     input.selectionStart = input.selectionEnd = startPos + pastedData.length
 
     input.dispatchEvent(new Event('input', { bubbles: true }))
-  }
-
-  async addAttachment() {
-    if (!Listener.attachment) return
-
-    const data = Listener.attachment.split(';base64,').pop()
-    const byteCharacters = atob(data)
-    const byteNumbers = new Array(byteCharacters.length)
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i)
-    }
-
-    const byteArray = new Uint8Array(byteNumbers)
-    const blob = new Blob([byteArray], {type: 'image/jpeg'})
-
-    const file = new File([blob], "filename.jpg", { type: "image/jpeg" })
-    const fileInput = document.querySelector('input[type="file"]')
-
-    const dataTransfer = new DataTransfer()
-    dataTransfer.items.add(file)
-    fileInput.files = dataTransfer.files
-
-    fileInput.dispatchEvent(new Event('change', { bubbles: true }))
   }
 }

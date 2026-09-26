@@ -5,6 +5,14 @@ class AIBackend
 
   class ConfigurationError < StandardError; end
 
+  VOICE_INSTRUCTIONS = <<~TEXT.squish
+    The user is speaking to you out loud and your reply will be read aloud by a text-to-speech voice.
+    Reply the way a person would talk in conversation: keep it brief, usually a few sentences, and let the user ask for more.
+    Do not use markdown, bullet points, numbered lists, headings, tables, emoji, or code blocks.
+    Write out anything that is awkward to hear, such as symbols, abbreviations, and URLs.
+    If the user asks for code or something long, summarize it in a sentence or two and offer to type out the details.
+  TEXT
+
   attr :client
 
   def self.oneoff_timeout_seconds
@@ -154,6 +162,7 @@ class AIBackend
     end
 
     s += "\n\nFor the user, the current time is #{DateTime.current.strftime("%-l:%M%P")}; the current date is #{DateTime.current.strftime("%A, %B %-d, %Y")}"
+    s += "\n\n#{VOICE_INSTRUCTIONS}" if @message&.replying_to_speech?
     s.strip
   end
 end

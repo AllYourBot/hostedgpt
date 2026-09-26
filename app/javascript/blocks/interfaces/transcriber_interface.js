@@ -1,15 +1,12 @@
 import Interface from "../interface.js"
 
-// the length of time we pause before reflecting on what was said should
-// take into account *what* was said. If the last word was clearly the end
-// of a sentence and it ended as a question? e.g. "..., right?" We should
-// start considering those words sooner than if the last word is the sound
-// of someone's voice trailing off. e.g. "... well..."
+// The length of time we pause before reflecting on what was said takes into
+// account *what* was said. If the last word sounds like someone's voice is
+// trailing off mid-thought, e.g. "... and um", we wait longer than when the
+// words sound like a finished thought, e.g. "..., right?"
 
-// For now, we have a hard-coded silence duration. Maybe we utter a sound
-// like "hmm" before this silence duration has elapsed to help it feel more
-// responsive? Also, maybe we start processing the response even before
-// this duration has elapsed but we delay responding?
+// Maybe we could also start processing the response even before this
+// duration has elapsed but delay responding?
 
 export default class extends Interface {
   logLevel_info
@@ -39,7 +36,7 @@ export default class extends Interface {
                         }
 
   log_SpeakTo
-  SpeakTo(text)         { if ($.covered) return
+  SpeakTo(text)         { if ($.covered) { log(`ignored "${text}" because the transcriber is covered while the assistant speaks`); return }
                           $.words += text+' '
                           $.silenceService.restartCounter()
                           $.dismissPoller?.end()
@@ -71,7 +68,7 @@ export default class extends Interface {
   }
 
   _shortWaitThenTell()  { if (!$.tellPoller?.handler) $.tellPoller = runEvery(0.2, () => {
-                            if ($.silenceService.msOfSilence <= 2000) return
+                            if ($.silenceService.msOfSilence <= _msOfSilenceNeeded($.words)) return
                             log('enough silence to start processing...')
 
                             if (! $.covered) Cover.Transcriber()
@@ -82,10 +79,18 @@ export default class extends Interface {
                           })
                         }
 
+  _msOfSilenceNeeded(words) { return _soundsUnfinished(words) ? 2000 : 800 }
+
+  _soundsUnfinished(words) { const lastWord = words.downcase().trim().split(/\s+/).last().replace(/[^a-z']/g, '')
+                             return ["and", "but", "or", "so", "because", "then", "if", "like", "um", "uh", "er", "hmm",
+                               "well", "the", "a", "an", "to", "of", "for", "with", "about", "that", "which", "my", "your",
+                               "is", "are", "was", "i", "i'm", "we", "also", "maybe", "actually", "basically"].include(lastWord)
+                           }
+
   _longWaitThenDismis() { $.silenceService.restartCounter()
 
                           if (!$.dismissPoller?.handler) $.dismissPoller = runEvery(0.2, () => {
-                            if ($.silenceService.msOfSilence <= 3000) return
+                            if ($.silenceService.msOfSilence <= 30000) return
                             log('enough silence to dismiss...')
 
                             Dismiss.Listener()

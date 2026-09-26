@@ -12,6 +12,7 @@ beforeAll(async () => {
 
   if (debug) process.stdout.write('Loading all Blocks modules...\n')
   await importDir('lib')
+  trackTimeouts()
   for (const subdir of subdirs) await importDir(subdir)
 
   if (debug) process.stdout.write('\n')
@@ -47,6 +48,25 @@ beforeAll(async () => {
     })
   }
 })
+// Interfaces start pollers with runEvery that nothing ends between tests. Left running, they keep
+// jest from exiting, so end every timeout a test started once it finishes.
+const liveTimeouts = []
+
+function trackTimeouts() {
+  for (const name of ['runAfter', 'runEvery', 'runEveryBetween']) {
+    const original = global[name]
+    global[name] = (...args) => {
+      const timeout = original(...args)
+      liveTimeouts.push(timeout)
+      return timeout
+    }
+  }
+}
+
+afterEach(() => {
+  liveTimeouts.splice(0).forEach(timeout => timeout.end())
+})
+
 global.allMethodsCall = (actionFunction) => {
   const handler = {
     get: function (target, prop, receiver) {

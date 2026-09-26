@@ -17,19 +17,18 @@ export default class extends Interface {
                         }
                         log(`consideration = ${words}`)
                         $.consideration = words
-                        $.attachment    = await _takeScreenshotIfNeeded(words)
                         _playThinkingSounds()
                       }
   async Invoke()      { if (!$.processing) {
                           log('Invoked')
                           $.processing = true
-                          await $.screenService.start()
                           await Flip.Transcriber.on()
                         } else Uncover.Transcriber()
                       }
   async Dismiss()     { if ($.processing) {
                           log('Dismissed')
                           $.processing = false
+                          Hush.Speaker()
                           await Flip.Transcriber.on() // so it can wait for "wake" words
                           await Play.Speaker.sound('pip')
                         }
@@ -38,7 +37,7 @@ export default class extends Interface {
   async Disable()     { if ($.processing != null) {
                           log('Disabled')
                           $.processing = null
-                          await $.screenService.end()
+                          Hush.Speaker()
                           await Flip.Transcriber.off()
                           await Play.Speaker.sound('pip') // this aborts any speaking that was mid-sentence
                         }
@@ -47,7 +46,6 @@ export default class extends Interface {
   Reset()             { $.consideration = '' }
 
   attr_consideration  = ''
-  attr_attachment     = null
 
   get engaged()       { return $.processing === true  }
   get dismissed()     { return $.processing === false }
@@ -58,7 +56,6 @@ export default class extends Interface {
 
   new() {
     $.processing = null
-    $.screenService = new ScreenService
   }
 
   async _dismissIfNeeded(words) {
@@ -91,16 +88,6 @@ export default class extends Interface {
       return words.slice(words.downcase().indexOf("samantha"))
     else
       return words
-  }
-
-  async _takeScreenshotIfNeeded(words) {
-    if (! _referencingTheScreen(words)) return null
-
-    return await $.screenService.takeScreenshot()
-  }
-
-  _referencingTheScreen(words) {
-    return words.downcase().includeAny(["can you see", "you can see", "do you see", "look at", "this", "my screen", "the screen"])
   }
 
   _playThinkingSounds() {

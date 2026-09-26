@@ -66,6 +66,12 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal @conversation.id, Message.last.conversation_id
   end
 
+  test "should create message marked as spoken when it came from voice" do
+    post assistant_messages_url(@assistant), params: { message: { conversation_id: @message.conversation_id, content_text: "Hello", spoken: true } }
+
+    assert @conversation.messages.user.order(:created_at).last.spoken?
+  end
+
   test "should create message AND create conversation when conversation_id is nil" do
     assert_difference "Message.count", 2 do
       assert_difference "Conversation.count", 1 do

@@ -61,4 +61,28 @@ class MessagesComposerMicrophoneTest < ApplicationSystemTestCase
       assert_equal "Hello?", composer.value
     end
   end
+
+  test "words the listener hears are submitted as a spoken message" do
+    stub_features(voice: true) do
+      visit new_assistant_message_path(assistants(:samantha))
+      enable_mic.click
+      assert disable_mic.visible?
+
+      page.execute_script("Listener.$.consideration = 'What time is it?'")
+
+      assert_text "What time is it?"
+      assert Message.user.find_by!(content_text: "What time is it?").spoken?
+    end
+  end
+
+  test "typed messages are not spoken messages" do
+    stub_features(voice: true) do
+      visit new_assistant_message_path(assistants(:samantha))
+      send_keys "What day is it?"
+      send_keys "enter"
+
+      assert_text "What day is it?"
+      refute Message.user.find_by!(content_text: "What day is it?").spoken?
+    end
+  end
 end

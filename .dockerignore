@@ -33,6 +33,7 @@ Dockerfile
 
 # Ignore assets.
 /node_modules/
+/test/node_modules/
 /app/assets/builds/*
 !/app/assets/builds/.keep
 /public/assets

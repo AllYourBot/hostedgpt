@@ -81,4 +81,17 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
     assert full_instructions.index("remembered") < full_instructions.index("<file"), "context should follow memories"
     assert full_instructions.index("<file") < full_instructions.index("current time"), "context should precede the date"
   end
+
+  test "full_instructions DOES NOT INCLUDE voice instructions when the user typed their message" do
+    backend = AIBackend.new(users(:keith), assistants(:samantha), conversations(:greeting), messages(:yes_i_do))
+
+    refute_includes backend.send(:full_instructions), AIBackend::VOICE_INSTRUCTIONS
+  end
+
+  test "full_instructions ends with voice instructions when the user spoke their message" do
+    messages(:hear_me).update!(spoken: true)
+    backend = AIBackend.new(users(:keith), assistants(:samantha), conversations(:greeting), messages(:yes_i_do))
+
+    assert backend.send(:full_instructions).ends_with?(AIBackend::VOICE_INSTRUCTIONS)
+  end
 end

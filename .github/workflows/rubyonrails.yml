@@ -58,6 +58,31 @@ jobs:
       - name: Run tests
         run: bin/rails test
 
+  javascript_tests:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref }}-javascript
+      cancel-in-progress: true
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: test/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run javascript tests
+        run: npm test
+
   system_tests:
     if: github.repository == 'AllYourBot/hostedgpt'
     runs-on: ubuntu-latest
