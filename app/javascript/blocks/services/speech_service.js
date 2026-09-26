@@ -6,26 +6,19 @@ export default class extends Service {
 
   async audioFromOpenAI(text) {
     const ttsAbortController = new AbortController()
-    const openAITTSUrl = "https://api.openai.com/v1/audio/speech"
     let ttsResponse
 
     $.apiTimeoutHandler = runAfter(3, () => ttsAbortController.abort())
 
     try {
-      ttsResponse = await fetch(openAITTSUrl, {
+      ttsResponse = await fetch("/speech", {
         signal: ttsAbortController.signal,
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${window.openAIKey}`,
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          model: "tts-1",
-          input: text,
-          voice: "nova",
-          response_format: "wav",
-          speed: 1.0
-        })
+        body: JSON.stringify({ text: text })
       })
     } catch (error) {
       throw new Error("Service is currently unavailable")

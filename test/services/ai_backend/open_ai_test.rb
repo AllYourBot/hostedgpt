@@ -284,6 +284,28 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
   end
 end
 
+class AIBackend::OpenAISpeechTest < ActiveSupport::TestCase
+  test "generate_speech calls the audio API with expected parameters and returns the audio" do
+    audio = AIBackend::OpenAI.generate_speech(text: "Hello there", user: users(:keith))
+
+    assert_equal "TEST_WAV_BYTES", audio
+
+    params = TestClient::OpenAI.audio.parameters
+    assert_equal "Hello there", params[:input]
+    assert_equal "tts-1", params[:model]
+    assert_equal "nova", params[:voice]
+    assert_equal "wav", params[:response_format]
+  end
+
+  test "generate_speech requires the canonical OpenAI service" do
+    api_services(:keith_openai_service).update!(deleted_at: Time.current)
+
+    assert_raises(AIBackend::ConfigurationError) do
+      AIBackend::OpenAI.generate_speech(text: "Hello there", user: users(:keith))
+    end
+  end
+end
+
 class AIBackend::OpenAIImageTest < ActiveSupport::TestCase
   test "generate_image calls the images API with expected parameters and returns the payload" do
     response = AIBackend::OpenAI.generate_image(prompt: "A cartoon cat", user: users(:keith))
