@@ -37,10 +37,14 @@
     %>
 
     <div class="flex items-center pr-1">
+      <%# Toggle forms break out to _top: nested inside the row's turbo-frame, a frame-scoped
+          submission would swallow the turbo-stream refresh response (the frame looks for a
+          matching frame, finds a stream, renders nothing). At _top the refresh executes at
+          page level and morphs the sidebar in place. %>
       <%= button_to pinned ? unpin_conversation_path(conversation) : pin_conversation_path(conversation),
         method: :post,
         data: { role: pinned ? "unpin" : "pin" },
-        form: { class: "inline-block p-0" },
+        form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
         class: "p-1 leading-none",
         title: pinned ? "Unpin" : "Pin" do
       %>
@@ -53,7 +57,7 @@
       <%= button_to bookmarked ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
         method: :post,
         data: { role: bookmarked ? "unbookmark" : "bookmark" },
-        form: { class: "inline-block p-0" },
+        form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
         class: "p-1 leading-none",
         title: bookmarked ? "Unbookmark" : "Bookmark" do
       %>
