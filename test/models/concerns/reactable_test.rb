@@ -6,6 +6,17 @@ class ReactableTest < ActiveSupport::TestCase
     @rob = users(:rob)
   end
 
+  test "user_emojis returns the reacting user's emoji set" do
+    conversation = conversations(:greeting)
+    conversation.react!("👍", @keith)
+    conversation.react!("❤️", @keith)
+    conversation.react!("👍", @rob)
+
+    assert_equal Set["👍", "❤️"], conversation.user_emojis(@keith)
+    assert_equal Set["👍"], conversation.user_emojis(@rob)
+    assert_equal Set[], conversation.user_emojis(users(:taylor))
+  end
+
   test "react and unreact toggle counts on a conversation" do
     conversation = conversations(:greeting)
 

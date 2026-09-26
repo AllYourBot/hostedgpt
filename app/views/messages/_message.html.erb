@@ -193,7 +193,7 @@ end %>
             so group-hover reveals these on any message. %>
           <%# Message rows are never sortable items, so this picker lives here rather than on the
               sidebar row: the sortable ghost clone strips Stimulus wiring from its scenery copy. %>
-          <% user_emojis = message.reactions.where(user: Current.user).pluck(:emoji).to_set %>
+          <% user_emojis = message.user_emojis(Current.user) %>
           <div data-controller="emoji-picker"
             data-emoji-picker-react-url-value="<%= react_message_path(message) %>"
             data-emoji-picker-unreact-url-value="<%= unreact_message_path(message) %>"

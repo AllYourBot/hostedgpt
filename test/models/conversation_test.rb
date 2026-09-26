@@ -236,6 +236,7 @@ class ConversationTest < ActiveSupport::TestCase
           conversation.bookmarked?(user)
           conversation.user_reacted?("❤️", user)
           conversation.reaction_counts
+          conversation.user_emojis(user)
         end
       end
     end
@@ -250,6 +251,8 @@ class ConversationTest < ActiveSupport::TestCase
     assert preloaded_pin.user_reacted?("❤️", user)
     assert_not preloaded_pin.user_reacted?("❤️", other)
     assert_equal({ "❤️" => 1, "👍" => 1 }, preloaded_pin.reaction_counts)
+    assert_equal Set["❤️"], preloaded_pin.user_emojis(user)
+    assert_equal Set["👍"], preloaded_pin.user_emojis(other)
 
     preloaded_bookmark = Conversation.bookmarked_nav_for_user(user).find(bookmarked.id)
     assert preloaded_bookmark.bookmarked?(user)
