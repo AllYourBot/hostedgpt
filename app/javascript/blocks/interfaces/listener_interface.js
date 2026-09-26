@@ -30,6 +30,7 @@ export default class extends Interface {
   async Dismiss()     { if ($.processing) {
                           log('Dismissed')
                           $.processing = false
+                          Hush.Speaker()
                           await Flip.Transcriber.on() // so it can wait for "wake" words
                           await Play.Speaker.sound('pip')
                         }
@@ -38,6 +39,7 @@ export default class extends Interface {
   async Disable()     { if ($.processing != null) {
                           log('Disabled')
                           $.processing = null
+                          Hush.Speaker()
                           await $.screenService.end()
                           await Flip.Transcriber.off()
                           await Play.Speaker.sound('pip') // this aborts any speaking that was mid-sentence

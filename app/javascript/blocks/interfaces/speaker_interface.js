@@ -9,6 +9,7 @@ export default class extends Interface {
   Stop()                    { $.audioService.stop() }
   async Play(sound, onEnd)  { await $.audioService.play(sound, onEnd) }
   Loop(sec, sound)          { $.audioService.playEvery(sec, sound) }
+  Hush()                    { $.audioService.stopLooping() }
 
   get speaking()            { $.audioService.speaking }
   get busy()                { $.audioService.busy }
@@ -19,9 +20,7 @@ export default class extends Interface {
       if (busy) {
         Cover.Transcriber()
       } else if (!busy && !Listener.disabled) {
-        Play.Speaker.sound('pop', () => {
-          Loop.Speaker.every(8, 'typing1')
-        })
+        Play.Speaker.sound('pop', () => _loopTypingSounds())
         Invoke.Listener()
         if ($.onBusyDone) $.onBusyDone()
 
@@ -29,5 +28,11 @@ export default class extends Interface {
         if ($.onBusyDone) $.onBusyDone()
       }
     }
+  }
+
+  // The listener can be dismissed while the pop is still playing, so check again once it finishes
+  _loopTypingSounds() {
+    if (!Listener.engaged) return
+    $.audioService.playRandomlyEvery(6, 10, ['typing1', 'typing2', 'typing3'])
   }
 }

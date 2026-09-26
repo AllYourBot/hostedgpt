@@ -37,10 +37,11 @@ function init() {
       let line = undefined
       let options = []
 
-      try {
-        jestPath = execSync('which jest').toString().trim();
-      } catch (error) {
-        console.error('Failed to find Jest path:', error);
+      const jestPath = findJest()
+      if (!jestPath) {
+        console.error('Jest is not installed. Run: (cd test && npm install)')
+        process.exitCode = 1
+        return
       }
 
       if (opts.include('-d') || opts.include('--debug')) {
@@ -64,7 +65,7 @@ function init() {
       } else
         options.push(`-t=.*`)
 
-      spawn('node', options.concat(path), { stdio: 'inherit' })
+      spawn('node', options.concat(path), { stdio: 'inherit' }).on('exit', (code) => process.exitCode = code)
 
       // spawn('jest', ['--config=test/jest.config.js'].concat(path), {
       //   stdio: 'inherit',
@@ -99,6 +100,18 @@ function requireLibThen(init) { // look in test_helper.js for test env version o
 
     init()
   })()
+}
+
+// Prefer the version pinned in test/package.json, falling back to a globally installed jest
+function findJest() {
+  const pinnedPath = path.join(__dirname, '..', 'test', 'node_modules', '.bin', 'jest')
+  if (fs.existsSync(pinnedPath)) return pinnedPath
+
+  try {
+    return execSync('which jest').toString().trim()
+  } catch (error) {
+    return null
+  }
 }
 
 function escapeRegExp(string) {

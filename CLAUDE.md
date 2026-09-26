@@ -13,6 +13,7 @@ HostedGPT is a Ruby on Rails 8.1 app providing a multi-provider conversational A
 - Full suite: `bin/rails test` and `bin/rails test:system` (system tests need a real browser and do not run inside Docker; they run automatically on PRs).
 - Single file: `bin/rails test test/models/message_test.rb`
 - Single test by line: `bin/rails test test/models/message_test.rb:42`
+- JavaScript (voice mode `app/javascript/blocks/`) tests use Jest, pinned in `test/package.json`: run `(cd test && npm install)` once, then `bin/blocks test` from the repo root. Accepts a file or `file.test.js:LINE` for a single test, and `-d` to debug. CI runs `npm test` in `test/`, which calls the same script.
 - Docker equivalent: `docker compose run base rails test`
 - Load sample data (users/conversations/etc.) into dev DB: `bin/rails db:fixtures:load`
 

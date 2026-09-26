@@ -98,6 +98,7 @@ class MessagesController < ApplicationController
       :branched_from_version,
       :input_token_count,
       :output_token_count,
+      :spoken,
       documents_attributes: [:file]
     )
     if modified_params.has_key?(:content_text) && modified_params[:content_text].blank?

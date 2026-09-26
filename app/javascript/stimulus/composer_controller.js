@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import viewport from "stimulus/utils/viewport"
 
 export default class extends Controller {
-  static targets = [ "form", "input", "submit", "overlay", "cancel",
+  static targets = [ "form", "input", "spoken", "submit", "overlay", "cancel",
     "disabledSubmit", "microphoneEnable", "microphoneDisable" ]
   static outlets = [ "speaker" ]
   static values = { blurPlaceholder: String, focusPlaceholder: String, speakPlaceholder: String, micPermissionRequired: String }
@@ -19,8 +19,9 @@ export default class extends Controller {
     Listener.onConsiderationChanged = async () => {
       if (Listener.consideration == '') return
 
-        this.inputTarget.value = Listener.consideration
-        Reset.Listener()
+      this.inputTarget.value = Listener.consideration
+      this.spokenTarget.value = true // resetForm() restores the default of false
+      Reset.Listener()
       if (Listener.attachment) await this.addAttachment()
       this.submitForm()
     }
