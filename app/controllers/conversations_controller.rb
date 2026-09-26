@@ -5,11 +5,22 @@ class ConversationsController < ApplicationController
 
   def index
     @query = params[:query]
+    @pinned_conversations = Conversation.pinned_nav_for_user(Current.user, @query)
     @nav_conversations = Conversation.nav_for_user(Current.user, @query)
   end
 
   def reorder
     Conversation.reposition(Current.user, Array(params[:ids]))
+    head :no_content
+  end
+
+  def pin
+    @conversation&.pin!(Current.user)
+    head :no_content
+  end
+
+  def unpin
+    @conversation&.unpin!(Current.user)
     head :no_content
   end
 

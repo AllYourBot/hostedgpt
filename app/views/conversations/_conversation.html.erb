@@ -1,6 +1,8 @@
 <%# locals: (conversation:, settings: true) %>
 <% selected = conversation == @conversation %>
-<% sortable = @query.blank? # a filtered list shows only some conversations; dragging a subset would corrupt the saved order of the rest %>
+<%# TODO(pinned-reorder): unpinned drag plugs back in here — extend this guard plus Conversation.nav_for_user ordering to restore global drag. %>
+<% pinned = conversation.pinned?(Current.user) %>
+<% sortable = @query.blank? && pinned %>
 
 <div
   id="<%= dom_id(conversation) %>"
@@ -32,6 +34,21 @@
       }
     %>
 
+    <div class="flex items-center pr-1">
+      <%= button_to pinned ? unpin_conversation_path(conversation) : pin_conversation_path(conversation),
+        method: :post,
+        data: { role: pinned ? "unpin" : "pin" },
+        form: { class: "inline-block p-0" },
+        class: "p-1 leading-none",
+        title: pinned ? "Unpin" : "Pin" do
+      %>
+        <%= icon "map-pin",
+          variant: pinned ? :solid : :outline,
+          size: 16,
+          class: "text-gray-500 dark:text-gray-300"
+        %>
+      <% end %>
+    </div>
     <div class="items-center hidden gap-2 pl-2 relationship:flex group-hover:flex">
       <div class="dropdown !inline-flex dropdown-end outline-none pr-2">
         <%= icon "ellipsis-horizontal",

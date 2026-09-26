@@ -30,11 +30,20 @@ class Conversation < ApplicationRecord
   # The sidebar's conversation list: every conversation for the user in display order, optionally
   # narrowed by the search query. The blank case bypasses the join on purpose — an empty search
   # must still return conversations that have no messages yet. Rows render their assistant, so it
-  # rides along in one extra query instead of one per row.
+  # rides along in one extra query instead of one per row. Pins live in their own section above
+  # (pinned_nav_for_user); this is the unpinned relation underneath it.
   def self.nav_for_user(user, query = nil)
-    return user.conversations.preload(:assistant).ordered if query.blank?
+    return user.conversations.preload(:assistant).matching_query(query) if query.present?
 
-    user.conversations.preload(:assistant).matching_query(query)
+    user.conversations.preload(:assistant).unpinned_for(user).ordered
+  end
+
+  # The sidebar's pinned section for the user, in hand order (conversations.position). Hidden
+  # during search so the filtered list stays flat with the drag-disabled guard.
+  def self.pinned_nav_for_user(user, query = nil)
+    return none if query.present?
+
+    user.conversations.preload(:assistant).pinned_for(user)
   end
 
   def generate_shareable_url(request)

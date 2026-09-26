@@ -1,13 +1,15 @@
 require "application_system_test_case"
 
-# The sidebar's conversation list is rearranged by dragging rows. The controller test pins what the
-# reorder endpoint does with the ids it receives; this test pins what a real drag sends it — a mouse
-# press, a lift past the 6px threshold, siblings sliding, a drop, and the order surviving a reload.
+# Only pins carry hand order: the pinned section drags within itself while unpinned rows expose
+# no drop targets. The controller test pins what the reorder endpoint does with the ids it
+# receives; this test pins what a real drag sends it — a mouse press, a lift past the 6px
+# threshold, siblings sliding, a drop, and the order surviving a reload.
 class SidebarDragTest < ApplicationSystemTestCase
-  test "dragging a conversation with the mouse reorders the sidebar and the order persists" do
+  test "dragging a pin with the mouse reorders the pinned section and the order persists" do
     user = users(:keith)
     convs = 3.times.map { |i| user.conversations.create!(assistant: assistants(:samantha), title: "DragTarget#{i}") }
-    Conversation.reposition(user, convs.map(&:id)) # normalize to 0..2 in creation order
+    convs.each { |c| c.pin!(user) }
+    Conversation.reposition(user, convs.map(&:id)) # normalize pins to 0..2 in creation order
 
     login_as(user)
     assert_equal ["DragTarget0", "DragTarget1", "DragTarget2"], drag_targets
@@ -21,10 +23,10 @@ class SidebarDragTest < ApplicationSystemTestCase
     assert_equal [2, 0, 1], convs.map { |c| c.reload.position }
 
     # the dragged row must come back from under the pointer: the dragging class (opacity-0 on the
-    # conversations list) has to be removed when the drag ends, or the row vanishes until the next
+    # pinned list) has to be removed when the drag ends, or the row vanishes until the next
     # server render replaces it
     assert_true "the dragged row should be visible again after the drop" do
-      find("#conversations [data-sortable-id='#{convs[0].id}']") # find only sees visible elements
+      find("#pinned-conversations [data-sortable-id='#{convs[0].id}']") # find only sees visible elements
       true
     end
 
@@ -32,11 +34,49 @@ class SidebarDragTest < ApplicationSystemTestCase
     assert_equal ["DragTarget1", "DragTarget2", "DragTarget0"], drag_targets
   end
 
+  test "toggling the pin icon moves the conversation between sections on the next render" do
+    user = users(:keith)
+    conversation = user.conversations.create!(assistant: assistants(:samantha), title: "PinToggleTarget")
+
+    login_as(user)
+    assert pin_row_titles.exclude?("PinToggleTarget")
+    assert unpinned_row_titles.include?("PinToggleTarget")
+
+    # Hover first: revealing the row's hover actions shifts the pin button, so a cold click
+    # can land beside it and never submit the form.
+    pin_row(conversation).hover
+    pin_row(conversation).find("[data-role='pin']").click
+    assert_true { conversation.reload.pinned?(user) }
+    visit root_path
+
+    assert pin_row_titles.include?("PinToggleTarget")
+
+    pin_row(conversation).hover
+    pin_row(conversation).find("[data-role='unpin']").click
+    assert_true { !conversation.reload.pinned?(user) }
+    visit root_path
+
+    assert pin_row_titles.exclude?("PinToggleTarget")
+    assert unpinned_row_titles.include?("PinToggleTarget")
+  end
+
   private
 
+  def pin_row(record)
+    find("#conversation_#{record.id}")
+  end
+
   def drag_targets
-    all("#conversations [data-role='conversation'] [data-role='title']")
+    all("#pinned-conversations [data-role='conversation'] [data-role='title']")
       .map(&:text).grep(/^DragTarget\d/)
+  end
+
+  def pin_row_titles
+    all("#pinned-conversations [data-role='conversation'] [data-role='title']").map(&:text)
+  end
+
+  def unpinned_row_titles
+    all("#conversations [data-role='conversation'] [data-role='title']").map(&:text)
   end
 
   # Press the center of the source row, travel past the mouse-lift threshold, carry it over the
@@ -73,7 +113,7 @@ class SidebarDragTest < ApplicationSystemTestCase
   end
 
   def find_row(record)
-    find("#conversations [data-sortable-id='#{record.id}']")
+    find("#pinned-conversations [data-sortable-id='#{record.id}']")
   end
 
   def center_of(element)
