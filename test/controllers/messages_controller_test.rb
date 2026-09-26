@@ -389,4 +389,150 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_match(/data-role="reaction-counts"/, response.body)
     assert_match(/👍/, response.body)
   end
+
+  test "pin persists on a message" do
+    assert_not @message.pinned?(@user)
+
+    post pin_message_url(@message)
+
+    assert_response :no_content
+    assert @message.reload.pinned?(@user)
+    assert_includes Message.pinned_for(@user).map(&:id), @message.id
+  end
+
+  test "unpin removes a message pin" do
+    @message.pin!(@user)
+    assert @message.pinned?(@user)
+
+    post unpin_message_url(@message)
+
+    assert_response :no_content
+    assert_not @message.reload.pinned?(@user)
+    assert_not_includes Message.pinned_for(@user).map(&:id), @message.id
+  end
+
+  test "double pin on a message is idempotent" do
+    post pin_message_url(@message)
+    assert_response :no_content
+
+    assert_no_difference "Pin.count" do
+      post pin_message_url(@message)
+    end
+
+    assert_response :no_content
+    assert @message.reload.pinned?(@user)
+  end
+
+  test "unpin on a clear message is a no-op" do
+    assert_no_difference "Pin.count" do
+      post unpin_message_url(@message)
+    end
+
+    assert_response :no_content
+    assert_not @message.reload.pinned?(@user)
+  end
+
+  test "pin on another user's message is unauthorized" do
+    foreign = messages(:filter_map)
+    assert_not_equal @user, foreign.conversation.user
+
+    assert_no_difference "Pin.count" do
+      post pin_message_url(foreign)
+    end
+
+    assert_response :unauthorized
+    assert_not foreign.reload.pinned?(@user)
+  end
+
+  test "unpin on another user's message is unauthorized" do
+    foreign = messages(:filter_map)
+    assert_not_equal @user, foreign.conversation.user
+
+    assert_no_difference "Pin.count" do
+      post unpin_message_url(foreign)
+    end
+
+    assert_response :unauthorized
+  end
+
+  test "pin on a message requires authentication" do
+    get logout_path
+
+    post pin_message_url(@message)
+
+    assert_redirected_to login_url
+  end
+
+  test "unpin on a message requires authentication" do
+    get logout_path
+
+    post unpin_message_url(@message)
+
+    assert_redirected_to login_url
+  end
+
+  test "pinning a message leaves conversation pin order untouched" do
+    positions_before = @user.conversations.order(:id).pluck(:id, :position)
+    pinned_before = Conversation.pinned_for(@user).pluck(:id)
+
+    post pin_message_url(@message)
+
+    assert_response :no_content
+    assert_equal positions_before, @user.conversations.order(:id).pluck(:id, :position)
+    assert_equal pinned_before, Conversation.pinned_for(@user).pluck(:id)
+  end
+
+  test "index renders a pin hover action on each message" do
+    get conversation_messages_url(@conversation, version: @message.version)
+
+    assert_response :success
+    assert_match(/data-role="pin-message"/, response.body)
+    assert_match(%r{/messages/#{@message.id}/pin}, response.body)
+  end
+
+  test "index renders an unpin hover action on a pinned message" do
+    @message.pin!(@user)
+
+    get conversation_messages_url(@conversation, version: @message.version)
+
+    assert_response :success
+    assert_match(/data-role="unpin-message"/, response.body)
+    assert_match(%r{/messages/#{@message.id}/unpin}, response.body)
+  end
+
+  test "index lists pinned messages with jump targets and unpin" do
+    @message.pin!(@user)
+
+    get conversation_messages_url(@conversation, version: @message.version)
+
+    assert_response :success
+    assert_equal [@message.id], assigns(:pinned_messages).map(&:id)
+    # The section lists the pin with a jump-to-message anchor; the row itself carries the id.
+    assert_match(/id="pinned-messages"/, response.body)
+    assert_match(/href="#message_#{@message.id}"/, response.body)
+    assert_match(/id="message_#{@message.id}"/, response.body)
+    assert_match(%r{/messages/#{@message.id}/unpin}, response.body)
+  end
+
+  test "index drops the pinned-messages section once unpinned" do
+    @message.pin!(@user)
+    @message.unpin!(@user)
+
+    get conversation_messages_url(@conversation, version: @message.version)
+
+    assert_response :success
+    assert_empty assigns(:pinned_messages)
+    assert_no_match(/id="pinned-messages"/, response.body)
+  end
+
+  test "index never leaks another user's message pins" do
+    foreign = messages(:filter_map)
+    foreign.pin!(foreign.conversation.user)
+
+    get conversation_messages_url(@conversation, version: @message.version)
+
+    assert_response :success
+    assert_empty assigns(:pinned_messages)
+    assert_no_match(/id="pinned-messages"/, response.body)
+  end
 end

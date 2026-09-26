@@ -5,7 +5,7 @@ class MessagesController < ApplicationController
   before_action :set_version,               only: [:index, :update]
   before_action :set_conversation,          only: [:index]
   before_action :set_assistant,             only: [:index, :new, :edit, :create]
-  before_action :set_message,               only: [:show, :edit, :update, :react, :unreact]
+  before_action :set_message,               only: [:show, :edit, :update, :react, :unreact, :pin, :unpin]
   before_action :set_nav_assistants,        only: [:index, :new]
   before_action :set_nav_collections,       only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
@@ -19,6 +19,10 @@ class MessagesController < ApplicationController
     end
 
     @messages = @conversation.messages.for_conversation_version(@version)
+    # Slack-style pins tab: the conversation's pinned messages in display order (message pins
+    # carry no hand order). Scoped to the conversation through the association, so another
+    # user's pins can never leak in — same Current.user scoping as the other toggles.
+    @pinned_messages = @conversation.messages.pinned_for(Current.user).order(:index)
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
       content_text: [nil, ""],
@@ -71,6 +75,16 @@ class MessagesController < ApplicationController
 
   def unreact
     @message.unreact!(params[:emoji], Current.user)
+    head :no_content
+  end
+
+  def pin
+    @message.pin!(Current.user)
+    head :no_content
+  end
+
+  def unpin
+    @message.unpin!(Current.user)
     head :no_content
   end
 

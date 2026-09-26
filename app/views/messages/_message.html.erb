@@ -230,6 +230,23 @@ end %>
               <%= render "reactions/counts", reactable: message %>
             </span>
           </div>
+          <%# Slack-style pin: a hover action posting to the message pin/unpin member endpoints.
+              Message pins are membership only (no hand order) and scoped per user, mirroring
+              the conversation pin icon but with message-scoped roles so the two never collide
+              on the conversation view. Like the sidebar pin toggle, the 204 response leaves
+              the page as-is; the pinned-messages section picks it up on next render. %>
+          <% message_pinned = message.pinned?(Current.user) %>
+          <%= button_to message_pinned ? unpin_message_path(message) : pin_message_path(message),
+            method: :post,
+            data: { role: message_pinned ? "unpin-message" : "pin-message" },
+            form: { class: "flex items-center" },
+            class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+            title: message_pinned ? "Unpin message" : "Pin message" do %>
+            <%= icon "map-pin",
+              variant: message_pinned ? :solid : :outline,
+              size: 18
+            %>
+          <% end %>
           <% if message.versions.length > 1 %>
             <%= button_to message_path(message, version: previous_version),
               method: :patch,

@@ -84,4 +84,69 @@ class PinnableTest < ActiveSupport::TestCase
     assert_equal min_before_repin - 1, conversation.reload.position
     assert_equal conversation.id, Conversation.pinned_for(@keith).first.id
   end
+
+  test "pin and unpin toggle membership on a message with no hand order" do
+    message = messages(:hear_me)
+
+    assert_not message.pinned?(@keith)
+    assert_not_includes Message.pinned_for(@keith).map(&:id), message.id
+
+    message.pin!(@keith)
+
+    assert message.pinned?(@keith)
+    assert_includes Message.pinned_for(@keith).map(&:id), message.id
+    assert_not_includes Message.unpinned_for(@keith).map(&:id), message.id
+
+    message.unpin!(@keith)
+
+    assert_not message.pinned?(@keith)
+    assert_not_includes Message.pinned_for(@keith).map(&:id), message.id
+    assert_includes Message.unpinned_for(@keith).map(&:id), message.id
+  end
+
+  test "double pin on a message is idempotent" do
+    message = messages(:hear_me)
+    message.pin!(@keith)
+
+    assert_no_difference "Pin.count" do
+      message.pin!(@keith)
+    end
+
+    assert message.pinned?(@keith)
+    assert_includes Message.pinned_for(@keith).map(&:id), message.id
+  end
+
+  test "unpinning an unpinned message is a no-op" do
+    message = messages(:hear_me)
+
+    assert_not message.pinned?(@keith)
+
+    assert_no_difference "Pin.count" do
+      message.unpin!(@keith)
+    end
+
+    assert_not message.pinned?(@keith)
+  end
+
+  test "one user's message pins never leak into another user's scopes" do
+    message = messages(:hear_me)
+    message.pin!(@keith)
+
+    assert_includes Message.pinned_for(@keith).map(&:id), message.id
+    assert_not_includes Message.unpinned_for(@keith).map(&:id), message.id
+
+    assert_empty Message.pinned_for(@rob)
+    assert_not_includes Message.pinned_for(@rob).map(&:id), message.id
+    assert_includes Message.unpinned_for(@rob).map(&:id), messages(:filter_map).id
+  end
+
+  test "pinning a message leaves conversation positions and pin order untouched" do
+    positions_before = @keith.conversations.order(:id).pluck(:id, :position)
+    pinned_before = Conversation.pinned_for(@keith).pluck(:id)
+
+    messages(:hear_me).pin!(@keith)
+
+    assert_equal positions_before, @keith.conversations.order(:id).pluck(:id, :position)
+    assert_equal pinned_before, Conversation.pinned_for(@keith).pluck(:id)
+  end
 end

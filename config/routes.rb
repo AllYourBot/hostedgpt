@@ -30,6 +30,8 @@ Rails.application.routes.draw do
   resources :messages, only: [:show, :update] do
     post :react, on: :member
     post :unreact, on: :member
+    post :pin, on: :member
+    post :unpin, on: :member
   end
 
   resource :speech, only: :create

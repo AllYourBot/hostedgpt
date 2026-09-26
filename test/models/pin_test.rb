@@ -32,4 +32,20 @@ class PinTest < ActiveSupport::TestCase
       conversation.destroy
     end
   end
+
+  test "a message pin shares the pins table under its own pinnable_type" do
+    pin = Pin.create!(user: users(:keith), pinnable: messages(:hear_me))
+
+    assert_equal "Message", pin.pinnable_type
+    assert_equal messages(:hear_me), pin.pinnable
+  end
+
+  test "destroying the message destroys its pins" do
+    message = messages(:hear_me)
+    Pin.create!(user: users(:keith), pinnable: message)
+
+    assert_difference "Pin.count", -1 do
+      message.destroy
+    end
+  end
 end
