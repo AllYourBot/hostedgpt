@@ -114,4 +114,78 @@ class ConversationTest < ActiveSupport::TestCase
 
     assert_equal ids, user.conversations.ordered.pluck(:id)
   end
+
+  test "#grouped_by_increasing_time_interval_for_user restores the six recency groups with pins excluded" do
+    Timecop.freeze(Time.current.beginning_of_day + 12.hours) do
+      user = User.create!(first_name: "John", last_name: "Doe")
+      stamp_for = {
+        "Today" => Time.current,
+        "Yesterday" => 1.day.ago,
+        "This Week" => 3.days.ago,
+        "This Month" => 2.weeks.ago,
+        "Last Month" => 6.weeks.ago,
+        "Older" => 1.year.ago
+      }
+      by_group = stamp_for.transform_values do |at|
+        conversation = user.conversations.create!(assistant: assistants(:samantha))
+        conversation.update_column(:updated_at, at)
+        conversation
+      end
+
+      grouped = Conversation.grouped_by_increasing_time_interval_for_user(user)
+
+      assert_equal stamp_for.keys, grouped.keys
+      stamp_for.each_key do |group|
+        assert_equal [by_group[group].id], grouped[group].map(&:id), "expected only this conversation in #{group}"
+      end
+
+      by_group["Today"].pin!(user)
+
+      regrouped = Conversation.grouped_by_increasing_time_interval_for_user(user)
+      assert_not_includes regrouped.keys, "Today"
+      assert_not_includes regrouped.values.flat_map { |rel| rel.map(&:id) }, by_group["Today"].id
+      assert_includes Conversation.pinned_for(user).map(&:id), by_group["Today"].id
+    end
+  end
+
+  test "nav_for_user orders unpinned conversations by recency, not hand position" do
+    user = users(:keith)
+    old = conversations(:greeting)
+    newer = conversations(:ruby_version)
+    old.update_column(:updated_at, 1.month.ago)
+    newer.update_column(:updated_at, 1.day.ago)
+    old.update_column(:position, -9999) # top by hand order, stale by recency
+
+    ids = Conversation.nav_for_user(user).map(&:id)
+
+    assert ids.index(newer.id) < ids.index(old.id), "expected recency order, not position order"
+  end
+
+  test "a reply moves its conversation to the top of the most recent group" do
+    user = users(:keith)
+    old = conversations(:greeting)
+    old.update_column(:updated_at, 1.month.ago)
+    assert_not_equal old.id, Conversation.nav_for_user(user).first.id
+
+    Current.user = user
+    old.messages.create!(assistant: old.assistant, role: :user, content_text: "still thinking about this")
+
+    grouped = Conversation.grouped_by_increasing_time_interval_for_user(user)
+    assert_equal old.id, grouped["Today"].first.id
+    assert_equal old.id, Conversation.nav_for_user(user).first.id
+  end
+
+  test "a reply in a pinned conversation leaves pin order unchanged" do
+    user = users(:keith)
+    first = conversations(:greeting)
+    second = conversations(:ruby_version)
+    first.pin!(user)
+    second.pin!(user)
+    order_before = Conversation.pinned_for(user).pluck(:id, :position)
+
+    Current.user = user
+    second.messages.create!(assistant: second.assistant, role: :user, content_text: "hello again")
+
+    assert_equal order_before, Conversation.pinned_for(user).pluck(:id, :position)
+  end
 end

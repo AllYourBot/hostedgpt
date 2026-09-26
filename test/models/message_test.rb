@@ -268,6 +268,11 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal 1, message.input_token_cost
   end
 
+  test "replying_to_speech? only considers the most recent user message" do
+    messages(:hear_me).update!(spoken: true)
+    refute messages(:photo_identified).replying_to_speech?
+  end
+
   test "replying_to_speech? is false when the user typed the message being replied to" do
     refute messages(:yes_i_do).replying_to_speech?
   end
@@ -282,8 +287,30 @@ class MessageTest < ActiveSupport::TestCase
     assert messages(:weather_explained).replying_to_speech?
   end
 
-  test "replying_to_speech? only considers the most recent user message" do
-    messages(:hear_me).update!(spoken: true)
-    refute messages(:photo_identified).replying_to_speech?
+  test "a new message bumps its conversation's recency so the reply bubbles up" do
+    Current.user = users(:keith)
+    conversation = conversations(:greeting)
+    conversation.update_column(:updated_at, 1.month.ago)
+
+    conversation.messages.create!(
+      assistant: conversation.assistant,
+      role: :tool,
+      content_text: "tool response",
+      tool_call_id: "tool_1234",
+      content_tool_calls: { type: "function", function: { name: "memory", arguments: "memory" } }
+    )
+
+    assert_in_delta Time.current.to_f, conversation.reload.updated_at.to_f, 5
+  end
+
+  test "the recency bump does not enqueue autotitle jobs" do
+    user = users(:keith)
+    conversation = user.conversations.create!(assistant: assistants(:samantha))
+    assert_nil conversation.title
+
+    assert_no_enqueued_jobs only: AutotitleConversationJob do
+      Current.user = user
+      conversation.messages.create!(assistant: conversation.assistant, role: :user, content_text: "Can you hear me?")
+    end
   end
 end

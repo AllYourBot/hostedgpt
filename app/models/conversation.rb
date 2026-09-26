@@ -33,11 +33,13 @@ class Conversation < ApplicationRecord
   # narrowed by the search query. The blank case bypasses the join on purpose — an empty search
   # must still return conversations that have no messages yet. Rows render their assistant, so it
   # rides along in one extra query instead of one per row. Pins live in their own section above
-  # (pinned_nav_for_user); this is the unpinned relation underneath it.
+  # (pinned_nav_for_user); this is the unpinned relation underneath it, in recency order
+  # (updated_at desc) so a reply bubbles its conversation to the top. Pins carry the only hand
+  # order — position is ignored here.
   def self.nav_for_user(user, query = nil)
     return user.conversations.preload(:assistant).matching_query(query) if query.present?
 
-    user.conversations.preload(:assistant).unpinned_for(user).ordered
+    user.conversations.preload(:assistant).unpinned_for(user).order(updated_at: :desc, id: :desc)
   end
 
   # The sidebar's pinned section for the user, in hand order (conversations.position). Hidden
@@ -46,6 +48,50 @@ class Conversation < ApplicationRecord
     return none if query.present?
 
     user.conversations.preload(:assistant).pinned_for(user)
+  end
+
+  # Builds a hash of date interval keys and the unpinned conversations (pins live in their own
+  # section above) active in each interval, newest interval first, recency order inside each
+  # group. Search bypasses grouping — it keeps the existing flat filtered list. Empty intervals
+  # are removed from the hash.
+  #
+  # {
+  #  "Today" => relation,
+  #  "Yesterday" => relation,
+  #  "This Week" => relation,
+  #  "This Month" => relation,
+  #  "Last Month" => relation,
+  #  "Older" => relation
+  # }
+  def self.grouped_by_increasing_time_interval_for_user(user)
+    nav_conversations = nav_for_user(user)
+
+    # NOTE: These keys intentionally remain static for test stability. UI layers may translate.
+    keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
+    values = [
+      nil,
+      Date.current.beginning_of_day,
+      (Date.current - 1.day).beginning_of_day,
+      (Date.current - 1.week).beginning_of_day,
+      (Date.current - 1.month).beginning_of_day,
+      (Date.current - 2.months).beginning_of_day,
+      nil
+    ].each_cons(2).map do |range_start, range_end|
+      range = case
+      when range_start.nil?
+        range_end..
+      when range_end.nil?
+        ..range_start
+      else
+        range_end..range_start
+      end
+
+      nav_conversations.where(updated_at: range)
+    end
+
+    keys.zip(values)
+      .to_h
+      .delete_if { |_, v| v.empty? }
   end
 
   # The bookmarks view: every bookmarked conversation for the user in display order, optionally

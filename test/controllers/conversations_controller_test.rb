@@ -11,17 +11,39 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "index lists the user's unpinned conversations in position order with no drag when nothing is pinned" do
+  test "index lists unpinned conversations in recency groups with pins excluded and no drag" do
     user = @conversation.user
-    ids = user.conversations.ordered.pluck(:id).rotate
-    Conversation.reposition(user, ids)
+    old = conversations(:ruby_version)
+    old.update_column(:updated_at, 1.month.ago)
+    pinned = conversations(:attachment)
+    pinned.pin!(user)
 
     get conversations_url
 
     assert_response :success
-    assert_equal ids, assigns(:nav_conversations).pluck(:id)
-    assert_empty assigns(:pinned_conversations)
-    # Pins carry the only hand order: unpinned rows expose no drop targets.
+    nav_ids = assigns(:nav_conversations).map(&:id)
+    assert_not_includes nav_ids, pinned.id
+    assert_equal user.conversations.unpinned_for(user).order(updated_at: :desc, id: :desc).pluck(:id), nav_ids
+
+    body = response.body
+    assert_match(/id="pinned-conversations"/, body)
+    assert_match(/data-role="time-group"/, body)
+    assert body.index(pinned.title) < body.index("Today"), "pinned section should render above the groups"
+    assert body.index("Today") < body.index("This Month"), "groups should render in recency order"
+    assert body.index("This Month") < body.index(old.title), "stale conversation should render under its group"
+
+    pinned_block = body[/<turbo-frame id="pinned-conversations".*?<\/turbo-frame>/m]
+    assert_match(/pointerdown->sortable#press/, pinned_block)
+    unpinned_block = body[/<turbo-frame id="conversations".*?<\/turbo-frame>/m]
+    assert_no_match(/pointerdown->sortable#press/, unpinned_block)
+  end
+
+  test "a search-filtered sidebar stays flat with no group headers" do
+    get conversations_url(query: "test")
+
+    assert_response :success
+    assert_not_empty assigns(:nav_conversations)
+    assert_no_match(/data-role="time-group"/, response.body)
     assert_no_match(/pointerdown->sortable#press/, response.body)
   end
 
