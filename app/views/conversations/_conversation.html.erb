@@ -2,7 +2,9 @@
 <% selected = conversation == @conversation %>
 <%# TODO(pinned-reorder): unpinned drag plugs back in here — extend this guard plus Conversation.nav_for_user ordering to restore global drag. %>
 <% pinned = conversation.pinned?(Current.user) %>
-<% sortable = @query.blank? && pinned %>
+<% bookmarked = conversation.bookmarked?(Current.user) %>
+<%# No drag in the bookmarks view either: it shows a subset, and dragging a subset would corrupt the saved order of the rest. %>
+<% sortable = @query.blank? && pinned && !@bookmarks_view %>
 
 <div
   id="<%= dom_id(conversation) %>"
@@ -44,6 +46,19 @@
       %>
         <%= icon "map-pin",
           variant: pinned ? :solid : :outline,
+          size: 16,
+          class: "text-gray-500 dark:text-gray-300"
+        %>
+      <% end %>
+      <%= button_to bookmarked ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
+        method: :post,
+        data: { role: bookmarked ? "unbookmark" : "bookmark" },
+        form: { class: "inline-block p-0" },
+        class: "p-1 leading-none",
+        title: bookmarked ? "Unbookmark" : "Bookmark" do
+      %>
+        <%= icon "bookmark",
+          variant: bookmarked ? :solid : :outline,
           size: 16,
           class: "text-gray-500 dark:text-gray-300"
         %>

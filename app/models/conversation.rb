@@ -2,6 +2,7 @@ class Conversation < ApplicationRecord
   include Version
   include Reorderable
   include Pinnable
+  include Bookmarkable
 
   belongs_to :user
   belongs_to :assistant
@@ -44,6 +45,17 @@ class Conversation < ApplicationRecord
     return none if query.present?
 
     user.conversations.preload(:assistant).pinned_for(user)
+  end
+
+  # The bookmarks view: every bookmarked conversation for the user in display order, optionally
+  # narrowed by the search query. Bookmarks never touch position, so toggles leave this order
+  # alone. Pins are not split out here — a pinned conversation still appears in this list. The
+  # search narrows first through the shared matching_query, then membership applies: the other
+  # order raises a structurally-incompatible `or` inside matching_query.
+  def self.bookmarked_nav_for_user(user, query = nil)
+    scope = user.conversations.preload(:assistant).ordered
+    scope = scope.matching_query(query) if query.present?
+    scope.bookmarked_for(user)
   end
 
   def generate_shareable_url(request)

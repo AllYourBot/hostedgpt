@@ -93,6 +93,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.index ["credential_id"], name: "index_authentications_on_credential_id"
   end
 
+  create_table "bookmarks", force: :cascade do |t|
+    t.bigint "bookmarkable_id", null: false
+    t.string "bookmarkable_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["bookmarkable_type", "bookmarkable_id"], name: "index_bookmarks_on_bookmarkable"
+    t.index ["user_id", "bookmarkable_type", "bookmarkable_id"], name: "index_bookmarks_on_user_and_bookmarkable", unique: true
+    t.index ["user_id"], name: "index_bookmarks_on_user_id"
+  end
+
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -465,6 +476,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
   add_foreign_key "assistants", "users"
   add_foreign_key "authentications", "clients"
   add_foreign_key "authentications", "credentials"
+  add_foreign_key "bookmarks", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "clients", "people"
   add_foreign_key "collections", "users"

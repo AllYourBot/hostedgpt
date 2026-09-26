@@ -214,17 +214,22 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
   test "index exposes a pin toggle distinct from the bookmark icon" do
     @conversation.pin!(@conversation.user)
+    @conversation.bookmark!(@conversation.user)
 
     get conversations_url
 
     assert_response :success
-    # Pin toggle posts to the pin/unpin member endpoints; the bookmark icon ships in a later
-    # unit so its name must not appear yet. The pin icon itself is the map-pin heroicon, which
-    # is visually distinct from the future bookmark icon (see _conversation.html.erb).
-    assert_no_match(/bookmark/, response.body)
+    # Pin and bookmark are separate toggles: the pin posts to the pin/unpin member endpoints
+    # with the map-pin heroicon, the bookmark posts to the bookmark/unbookmark endpoints with
+    # the bookmark heroicon (see _conversation.html.erb). Distinct roles, paths, and titles.
     assert_match(/data-role="unpin"/, response.body)
     assert_match(/data-role="pin"/, response.body)
     assert_match(%r{/conversations/#{@conversation.id}/(un)?pin}, response.body)
+    assert_match(/data-role="unbookmark"/, response.body)
+    assert_match(/data-role="bookmark"/, response.body)
+    assert_match(%r{/conversations/#{@conversation.id}/(un)?bookmark}, response.body)
+    assert_match(/title="Unpin"/, response.body)
+    assert_match(/title="Unbookmark"/, response.body)
   end
 
   test "a search-filtered sidebar with pins exposes no drag" do
@@ -234,5 +239,135 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_no_match(/pointerdown->sortable#press/, response.body)
+  end
+
+  test "bookmark persists without touching order" do
+    user = @conversation.user
+    before = user.conversations.ordered.pluck(:id, :position)
+    assert_not @conversation.bookmarked?(user)
+
+    post bookmark_conversation_url(@conversation)
+
+    assert_response :no_content
+    assert @conversation.reload.bookmarked?(user)
+    assert_includes Conversation.bookmarked_for(user).map(&:id), @conversation.id
+    assert_equal before, user.conversations.ordered.pluck(:id, :position)
+  end
+
+  test "unbookmark persists without touching order" do
+    user = @conversation.user
+    @conversation.bookmark!(user)
+    assert @conversation.bookmarked?(user)
+    before = user.conversations.ordered.pluck(:id, :position)
+
+    post unbookmark_conversation_url(@conversation)
+
+    assert_response :no_content
+    assert_not @conversation.reload.bookmarked?(user)
+    assert_not_includes Conversation.bookmarked_for(user).map(&:id), @conversation.id
+    assert_equal before, user.conversations.ordered.pluck(:id, :position)
+  end
+
+  test "double bookmark via the endpoint is idempotent" do
+    post bookmark_conversation_url(@conversation)
+    assert_response :no_content
+
+    assert_no_difference "Bookmark.count" do
+      post bookmark_conversation_url(@conversation)
+    end
+
+    assert_response :no_content
+    assert @conversation.reload.bookmarked?(@conversation.user)
+  end
+
+  test "unbookmark when clear is a no-op" do
+    assert_no_difference "Bookmark.count" do
+      post unbookmark_conversation_url(@conversation)
+    end
+
+    assert_response :no_content
+    assert_not @conversation.reload.bookmarked?(@conversation.user)
+  end
+
+  test "bookmark ignores a conversation the user does not own" do
+    foreign = conversations(:debugging)
+
+    assert_no_difference "Bookmark.count" do
+      post bookmark_conversation_url(foreign)
+    end
+
+    assert_response :no_content
+    assert_not foreign.reload.bookmarked?(@conversation.user)
+    assert_empty Conversation.bookmarked_for(@conversation.user)
+  end
+
+  test "bookmark requires authentication" do
+    get logout_path
+
+    post bookmark_conversation_url(@conversation)
+
+    assert_redirected_to login_url
+  end
+
+  test "unbookmark requires authentication" do
+    get logout_path
+
+    post unbookmark_conversation_url(@conversation)
+
+    assert_redirected_to login_url
+  end
+
+  test "bookmarks view lists exactly the user's bookmarked conversations" do
+    user = @conversation.user
+    other = user.conversations.where.not(id: @conversation.id).first
+    unbookmarked = user.conversations.where.not(id: [@conversation.id, other.id]).first
+    foreign = conversations(:debugging)
+    foreign.bookmark!(foreign.user)
+    @conversation.bookmark!(user)
+    other.bookmark!(user)
+
+    get bookmarks_conversations_url
+
+    assert_response :success
+    assert_equal [@conversation.id, other.id].sort, assigns(:nav_conversations).map(&:id).sort
+    assert_not_includes assigns(:nav_conversations).map(&:id), unbookmarked.id
+    assert_not_includes assigns(:nav_conversations).map(&:id), foreign.id
+  end
+
+  test "bookmarks view includes a pinned conversation once, outside the pinned section" do
+    user = @conversation.user
+    @conversation.pin!(user)
+    @conversation.bookmark!(user)
+
+    get bookmarks_conversations_url
+
+    assert_response :success
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+    assert_empty assigns(:pinned_conversations)
+  end
+
+  test "bookmarks view narrows by search query" do
+    user = @conversation.user
+    other = conversations(:attachment)
+    assert_equal user, other.user
+    @conversation.bookmark!(user)
+    other.bookmark!(user)
+
+    get bookmarks_conversations_url(query: "Samantha")
+
+    assert_response :success
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+  end
+
+  test "bookmarks view exposes a link back and the sidebar links to it" do
+    get bookmarks_conversations_url
+
+    assert_response :success
+    assert_match(%r{href="/conversations"}, response.body)
+
+    get conversations_url
+
+    assert_response :success
+    assert_match(%r{href="/conversations/bookmarks"}, response.body)
   end
 end

@@ -332,6 +332,8 @@ de:
         voice_mode: "Sprachmodus"
         send_message: "Nachricht senden"
         search_placeholder: "Suchen"
+        bookmarks: "Lesezeichen"
+        all_conversations: "Alle Konversationen"
         scroll_down: "Nach unten scrollen"
         share: "Konversation teilen"
         share_unavailable: "Konversation teilen (keine Konversation zum Teilen)"

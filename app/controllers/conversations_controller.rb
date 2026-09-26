@@ -9,6 +9,18 @@ class ConversationsController < ApplicationController
     @nav_conversations = Conversation.nav_for_user(Current.user, @query)
   end
 
+  # The bookmarks view reuses the index template with a bookmark filter: exactly the user's
+  # bookmarked conversations in display order (pins are not split out here), narrowed by the
+  # search query when one is present. No pinned section — a partial pin list must never expose
+  # drag, same rationale as the filtered-list guard.
+  def bookmarks
+    @query = params[:query]
+    @bookmarks_view = true
+    @pinned_conversations = Conversation.none
+    @nav_conversations = Conversation.bookmarked_nav_for_user(Current.user, @query)
+    render :index
+  end
+
   def reorder
     Conversation.reposition(Current.user, Array(params[:ids]))
     head :no_content
@@ -21,6 +33,16 @@ class ConversationsController < ApplicationController
 
   def unpin
     @conversation&.unpin!(Current.user)
+    head :no_content
+  end
+
+  def bookmark
+    @conversation&.bookmark!(Current.user)
+    head :no_content
+  end
+
+  def unbookmark
+    @conversation&.unbookmark!(Current.user)
     head :no_content
   end
 

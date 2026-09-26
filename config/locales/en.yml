@@ -361,6 +361,8 @@ en:
         voice_mode: "Voice mode"
         send_message: "Send message"
         search_placeholder: "Search"
+        bookmarks: "Bookmarks"
+        all_conversations: "All conversations"
         scroll_down: "Scroll down"
         share: "Share conversation"
         share_unavailable: "Share conversation (no conversation to share)"
