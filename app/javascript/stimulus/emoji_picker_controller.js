@@ -41,6 +41,12 @@ export default class extends Controller {
 
   toggle(event) {
     event.stopPropagation() // the document-level close must not shut the panel this click opened
+    // One panel open at a time: opening this one closes the others, since the toggle's own
+    // stopPropagation would otherwise defeat their document-level close and leave panels stacked.
+    for (const root of document.querySelectorAll('[data-controller="emoji-picker"]')) {
+      if (root === this.element) continue
+      this.application.getControllerForElementAndIdentifier(root, "emoji-picker")?.close()
+    }
     this.panelTarget.classList.toggle("hidden")
   }
 
@@ -57,17 +63,25 @@ export default class extends Controller {
     const body = new FormData()
     body.append("emoji", emoji)
 
-    // A failure needs no handling here: the counts live on the server, so the next render of
-    // this row shows the counts the server kept, which is the honest answer about what stuck.
+    // The chip flips optimistically for instant feel; a non-2xx answer or a failed fetch
+    // reverts it, since 204 endpoints never re-render and a stuck chip would lie until the
+    // next full render of this row.
     fetch(reacted ? this.unreactUrlValue : this.reactUrlValue, {
       method: "POST",
       body,
       headers: { "X-CSRF-Token": this.#csrfToken },
-    }).catch(() => {})
+    }).then((response) => {
+      if (!response.ok) this.#revertSelect(button, emoji, reacted)
+    }).catch(() => this.#revertSelect(button, emoji, reacted))
 
     button.dataset.reacted = String(!reacted)
     this.#bumpCount(emoji, reacted ? -1 : 1)
     this.close()
+  }
+
+  #revertSelect(button, emoji, reacted) {
+    button.dataset.reacted = String(reacted)
+    this.#bumpCount(emoji, reacted ? 1 : -1)
   }
 
   // The chips render server-side as "<emoji> <n>" spans; keep them in step optimistically so

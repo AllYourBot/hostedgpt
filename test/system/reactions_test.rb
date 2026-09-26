@@ -41,4 +41,55 @@ class ReactionsTest < ApplicationSystemTestCase
       !message.reload.user_reacted?("👍", user)
     end
   end
+
+  test "opening a second picker closes the first, and outside click closes the panel" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    first = messages(:hear_me)
+    second = messages(:yes_i_do)
+
+    login_as(user)
+    visit_and_scroll_wait conversation_messages_path(conversation, version: 1)
+
+    # The row action bar is invisible except on the last message, so panels assert through
+    # their hidden class rather than visibility, and clicks dispatch via JS for the same reason.
+    first_panel = find("#message_#{first.id} [data-emoji-picker-target='panel']", visible: :all)
+    second_panel = find("#message_#{second.id} [data-emoji-picker-target='panel']", visible: :all)
+    first_button = find("#message_#{first.id} [data-role='react']", visible: :all)
+    second_button = find("#message_#{second.id} [data-role='react']", visible: :all)
+
+    page.execute_script("arguments[0].click()", first_button)
+    assert_not_includes first_panel[:class], "hidden"
+
+    page.execute_script("arguments[0].click()", second_button)
+    assert_not_includes second_panel[:class], "hidden"
+    assert_includes first_panel[:class], "hidden"
+
+    page.execute_script("document.body.click()")
+    assert_includes second_panel[:class], "hidden"
+  end
+
+  test "reacting to an emoji with an existing count increments it" do
+    user = users(:keith)
+    other = users(:rob)
+    conversation = conversations(:greeting)
+    message = messages(:im_a_bot)
+    message.react!("👍", other)
+
+    login_as(user)
+    visit_and_scroll_wait conversation_messages_path(conversation, version: 1)
+
+    row = find("#message_#{message.id}")
+    assert_match(/👍 1/, row.find("[data-role='reaction-counts']").text)
+
+    row.find("[data-role='react']").click
+    row.find("[data-role='react-emoji']", text: "👍").click
+
+    assert_true "the count should increment" do
+      row.find("[data-role='reaction-counts']").text.include?("👍 2")
+    end
+    assert_true "both reactions should persist" do
+      message.reload.user_reacted?("👍", user) && message.reload.user_reacted?("👍", other)
+    end
+  end
 end

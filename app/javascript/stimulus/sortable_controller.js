@@ -41,6 +41,7 @@ export default class extends Controller {
   press(event) {
     if (this.dragging) return
     if (event.pointerType === "mouse" && event.button !== 0) return
+    if (this.pressed) return // one gesture at a time: a second pointer never steals an armed press
 
     this.pressed = event.currentTarget
     this.pointerId = event.pointerId
@@ -92,10 +93,14 @@ export default class extends Controller {
     if (this.dragging) {
       const orderChanged = this.#ids.join() !== this.orderAtDragStart.join()
       this.#putDown()
-      if (orderChanged) this.#persist()
+      // Replay after the POST resolves when the order changed: reloading first would render
+      // the pre-persist order with no later render to correct it (204 answers carry no HTML).
+      if (orderChanged) this.#persist().finally(() => this.#replayHeldRefresh())
+      else this.#replayHeldRefresh()
       this.#swallowNextClick() // the click that follows a drop must not open the row's link
     } else {
       this.#putDown()
+      this.#replayHeldRefresh()
     }
   }
 
@@ -105,25 +110,31 @@ export default class extends Controller {
 
     if (this.dragging) this.#restoreOrder() // a canceled drag never commits: rows go back as they were
     this.#putDown()
+    this.#replayHeldRefresh()
   }
 
   #lift() {
     clearTimeout(this.holdTimer)
     this.holdTimer = null
+    if (!this.pressed.isConnected) { this.pressed = null; return } // a refresh in the touch-hold window detached the row: no drag
     this.dragging = true
     this.orderAtDragStart = this.#ids
 
+    // The ghost is cloned before the row hides: cloning after would copy the hiding class onto
+    // the carried copy and the user would drag nothing visible.
+    this.ghost = this.#cloneForGhost()
+    this.#slideGhost(this.#syntheticMove())
+
     // Capture keeps every event aiming at the row even when the finger travels off the list —
     // and it aims the click that follows the drop at the row instead of whatever link is under it.
-    this.pressed.setPointerCapture(this.pointerId)
+    try { this.pressed.setPointerCapture(this.pointerId) } catch { /* row detached mid-lift */ }
     this.pressed.classList.add(...this.draggingClasses)
     this.userSelectBeforeDrag = this.pressed.style.userSelect
     this.pressed.style.userSelect = "none" // no text selection while a row rides under the cursor
 
-    this.ghost = this.#cloneForGhost()
-    this.#slideGhost(this.#syntheticMove())
-
     document.addEventListener("turbo:before-frame-render", this.#holdFrameRender, true)
+    document.addEventListener("turbo:before-morph-element", this.#holdSidebarMorph, true)
+    document.addEventListener("turbo:before-stream-render", this.#holdSidebarStream, true)
     if (this.pointerType !== "mouse") window.addEventListener("touchmove", this.#stopScroll, { passive: false })
   }
 
@@ -153,7 +164,7 @@ export default class extends Controller {
 
     // A failure needs no handling here: the order lives on the server, so the next render of this
     // list shows the order the server kept, which is the honest answer about what was saved.
-    fetch(this.urlValue, {
+    return fetch(this.urlValue, {
       method: "POST",
       body,
       headers: { "X-CSRF-Token": this.#csrfToken },
@@ -231,6 +242,8 @@ export default class extends Controller {
       this.pressed.classList.remove(...this.draggingClasses)
       this.pressed.style.userSelect = this.userSelectBeforeDrag
       document.removeEventListener("turbo:before-frame-render", this.#holdFrameRender, true)
+      document.removeEventListener("turbo:before-morph-element", this.#holdSidebarMorph, true)
+      document.removeEventListener("turbo:before-stream-render", this.#holdSidebarStream, true)
       window.removeEventListener("touchmove", this.#stopScroll)
       this.ghost?.remove()
       this.ghost = null
@@ -239,6 +252,16 @@ export default class extends Controller {
 
     this.dragging = false
     this.pressed = null
+  }
+
+  // A refresh held mid-drag was dropped, not deferred: reload the sidebar frame so toggles
+  // answered 204 mid-drag still flip their icons instead of looking dead until the next
+  // broadcast. The frame refetches its src, which re-renders both sections from the server.
+  #replayHeldRefresh() {
+    if (!this.heldRefresh) return
+    this.heldRefresh = false
+    const frame = document.getElementById("nav-conversations")
+    if (frame?.src) frame.reload()
   }
 
   #swallowNextClick() {
@@ -252,10 +275,32 @@ export default class extends Controller {
     setTimeout(() => document.removeEventListener("click", swallow, { capture: true }), 0)
   }
 
-  // A morph mid-drag would detach the row under the cursor — dragend-style cleanup never runs from
-  // a detached source — so the refresh waits until the drag is over.
+  // Sidebar updates arrive as frame renders, morphs, and streams. A morph mid-drag would
+  // detach the row under the cursor — cleanup would run against a detached node — so every
+  // sidebar-bound refresh waits until the drag is over. Frame renders and morphs are scoped to
+  // the sidebar so chat streams keep flowing; held updates are dropped, then replayed by
+  // reloading the sidebar frame in #putDown.
   #holdFrameRender = (event) => {
-    if (this.dragging) event.preventDefault()
+    if (this.dragging) {
+      event.preventDefault()
+      this.heldRefresh = true
+    }
+  }
+
+  #holdSidebarMorph = (event) => {
+    if (this.dragging && event.target.closest?.("#nav-scrollable")) {
+      event.preventDefault()
+      this.heldRefresh = true
+    }
+  }
+
+  #holdSidebarStream = (event) => {
+    if (!this.dragging) return
+    const target = event.target.getAttribute?.("target")
+    if (target && document.getElementById(target)?.closest("#nav-scrollable")) {
+      event.preventDefault()
+      this.heldRefresh = true
+    }
   }
 
   #stopScroll = (event) => {
