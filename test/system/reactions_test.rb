@@ -69,8 +69,7 @@ class ReactionsTest < ApplicationSystemTestCase
     assert_includes second_panel[:class], "hidden"
   end
 
-  test "reacting to an emoji with an existing count increments it" do
-    user = users(:keith)
+  test "reacting to an emoji with an existing count increments it" do    user = users(:keith)
     other = users(:rob)
     conversation = conversations(:greeting)
     message = messages(:im_a_bot)
@@ -91,5 +90,26 @@ class ReactionsTest < ApplicationSystemTestCase
     assert_true "both reactions should persist" do
       message.reload.user_reacted?("👍", user) && message.reload.user_reacted?("👍", other)
     end
+  end
+
+  test "sidebar picker reacts on a pinned row and pin order survives" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    conversation.pin!(user)
+
+    login_as(user)
+    visit root_path
+
+    row = find("#conversation_#{conversation.id}")
+    row.find("[data-role='react-conversation']").click
+    row.find("[data-role='react-emoji-conversation']", text: "🎉").click
+
+    assert_true "the sidebar chip should render" do
+      row.find("[data-role='reaction-counts']").text.include?("🎉 1")
+    end
+    assert_true "the reaction should persist" do
+      conversation.reload.user_reacted?("🎉", user)
+    end
+    assert_equal [conversation.id], Conversation.pinned_for(user).pluck(:id)
   end
 end

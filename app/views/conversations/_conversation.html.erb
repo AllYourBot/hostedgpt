@@ -63,27 +63,48 @@
           class: "text-gray-500 dark:text-gray-300"
         %>
       <% end %>
-      <%# Counts only, no Stimulus wiring: this row may be a sortable item, and the ghost clone
-          strips controller wiring from its scenery copy — so the picker lives on message rows
-          (never sortable) while this quick heart toggle is plain forms that need no wiring. %>
-      <%= render "reactions/counts", reactable: conversation %>
-      <% reacted = conversation.user_reacted?("❤️", Current.user) %>
-      <%= button_to reacted ? unreact_conversation_path(conversation) : react_conversation_path(conversation),
-        method: :post,
-        params: { emoji: "❤️" },
-        data: { role: reacted ? "unreact-conversation" : "react-conversation" },
-        form: { class: "inline-block p-0" },
-        class: "p-1 leading-none",
-        title: reacted ? "Remove reaction" : "React" do
-      %>
-        <%= icon "heart",
-          variant: reacted ? :solid : :outline,
-          size: 16,
-          class: "text-gray-500 dark:text-gray-300"
-        %>
-      <% end %>
+      <%# Full picker on the sidebar row: the ghost clone strips Stimulus wiring from its
+          scenery copy only, so the row's own controller stays connected through drags and
+          morphs like any other row controller. Counts render beside it, same partial as messages. %>
+      <% user_emojis = conversation.user_emojis(Current.user) %>
+      <div data-controller="emoji-picker"
+        data-emoji-picker-react-url-value="<%= react_conversation_path(conversation) %>"
+        data-emoji-picker-unreact-url-value="<%= unreact_conversation_path(conversation) %>"
+        data-action="click@document->emoji-picker#close"
+        class="relative flex items-center gap-1"
+      >
+        <%= button_tag type: "button",
+          class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+          data: {
+            role: "react-conversation",
+            action: "click->emoji-picker#toggle",
+            emoji_picker_target: "button",
+          },
+          title: "React" do %>
+          <%= icon "face-smile", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
+        <% end %>
+        <div data-emoji-picker-target="panel"
+          class="hidden absolute bottom-6 left-0 z-10 flex gap-1 p-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl"
+        >
+          <% %w[👍 ❤️ 🎉 😄 🤔 👎].each do |emoji| %>
+            <%= button_tag type: "button",
+              data: {
+                role: "react-emoji-conversation",
+                action: "click->emoji-picker#select",
+                emoji: emoji,
+                reacted: user_emojis.include?(emoji).to_s,
+              },
+              class: "cursor-pointer px-1 hover:scale-125" do %><%= emoji %><% end %>
+          <% end %>
+        </div>
+        <span data-emoji-picker-target="counts" class="flex items-center">
+          <%= render "reactions/counts", reactable: conversation %>
+        </span>
+      </div>
     </div>
-    <div class="items-center hidden gap-2 pl-2 relationship:flex group-hover:flex">
+    <%# Always laid out (invisible, not hidden): revealing on hover must not reflow the row,
+        or the icons shift out from under the cursor and clicks land on the menu instead. %>
+    <div class="flex items-center invisible gap-2 pl-2 relationship:visible group-hover:visible">
       <div class="dropdown !inline-flex dropdown-end outline-none pr-2">
         <%= icon "ellipsis-horizontal",
           tabindex: 0,

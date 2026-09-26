@@ -37,6 +37,18 @@ module Reactable
     end
   end
 
+  # The reacting user's emoji set, e.g. for seeding picker buttons. Reads the preloaded
+  # membership when loaded so rows render with no per-row query (.pluck would query even
+  # then); falls back to the pluck everywhere else. Same answer either way. Defined here,
+  # with the row markup that calls it, so no commit references a missing method.
+  def user_emojis(reacting_user = user)
+    if reactions.loaded?
+      reactions.select { |reaction| reaction.user_id == reacting_user&.id }.map(&:emoji).to_set
+    else
+      reactions.where(user: reacting_user).pluck(:emoji).to_set
+    end
+  end
+
   # Counts grouped by emoji, e.g. { "👍" => 2, "🎉" => 1 } — what the row and message chips render.
   def reaction_counts
     # Tallies the preloaded membership when the sidebar already loaded it, so rows render with
