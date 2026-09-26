@@ -107,6 +107,25 @@ class ConversationTest < ActiveSupport::TestCase
     ].sort, found
   end
 
+  test "#matching_query treats % and _ as literal characters, not patterns" do
+    user = users(:keith)
+    percent = user.conversations.create!(assistant: assistants(:samantha), title: "100% coverage")
+    underscore = user.conversations.create!(assistant: assistants(:samantha), title: "plain")
+    underscore.messages.create!(assistant: assistants(:samantha), role: :user, content_text: "snake_case notes")
+    plain = user.conversations.create!(assistant: assistants(:samantha), title: "plain alpha beta")
+
+    assert_includes user.conversations.matching_query("%").map(&:id), percent.id
+    assert_not_includes user.conversations.matching_query("%").map(&:id), plain.id
+    assert_includes user.conversations.matching_query("_").map(&:id), underscore.id
+    assert_not_includes user.conversations.matching_query("_").map(&:id), plain.id
+  end
+
+  test ".reacted_nav_for_user is empty when the user reacted to nothing" do
+    user = User.create!(first_name: "John", last_name: "Doe")
+
+    assert_empty Conversation.reacted_nav_for_user(user)
+  end
+
   test "ordered follows position once conversations have been dragged into shape" do
     user = users(:keith)
     ids = user.conversations.ordered.pluck(:id).rotate

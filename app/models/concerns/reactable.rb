@@ -12,9 +12,14 @@ module Reactable
   end
 
   # Membership only — no position change, so toggling never disturbs sidebar order (unlike pin!).
-  # Find-or-create makes a double react a no-op. Blank emoji is rejected by the model validation.
+  # The find runs first so double reacts never touch the database twice; the RecordNotUnique
+  # rescue covers the concurrent-insert window. Blank emoji is rejected by the model validation.
   def react!(emoji, reacting_user = user)
-    reactions.find_or_create_by!(user: reacting_user, emoji: emoji)
+    begin
+      reactions.find_or_create_by!(user: reacting_user, emoji: emoji)
+    rescue ActiveRecord::RecordNotUnique
+      reactions.find_by!(user: reacting_user, emoji: emoji)
+    end
   end
 
   # Membership only — unreacting a clear emoji destroys nothing.

@@ -63,7 +63,7 @@ class PinnableTest < ActiveSupport::TestCase
     assert_includes Conversation.unpinned_for(@rob).map(&:id), rob_conversation.id
   end
 
-  test "pin claims the top slot, unpin leaves it, re-pin re-claims the top" do
+  test "pin claims the top slot, unpin leaves it, re-pin after unpin re-claims the top" do
     Conversation.reposition(@keith, @keith.conversations.ordered.pluck(:id)) # normalize to 0..n-1
     conversation = conversations(:greeting)
     other = conversations(:attachment)
@@ -83,6 +83,20 @@ class PinnableTest < ActiveSupport::TestCase
 
     assert_equal min_before_repin - 1, conversation.reload.position
     assert_equal conversation.id, Conversation.pinned_for(@keith).first.id
+  end
+
+  test "double pin while pinned is fully idempotent and never drifts the minimum" do
+    Conversation.reposition(@keith, @keith.conversations.ordered.pluck(:id)) # normalize to 0..n-1
+    conversation = conversations(:greeting)
+
+    conversation.pin!(@keith)
+    position_after_first_pin = conversation.reload.position
+    min_after_first_pin = @keith.conversations.minimum(:position)
+
+    assert_no_difference("Pin.count") { conversation.pin!(@keith) }
+
+    assert_equal position_after_first_pin, conversation.reload.position
+    assert_equal min_after_first_pin, @keith.conversations.minimum(:position)
   end
 
   test "pin and unpin toggle membership on a message with no hand order" do

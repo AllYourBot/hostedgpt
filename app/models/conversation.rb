@@ -20,12 +20,14 @@ class Conversation < ApplicationRecord
 
   # The sidebar's search: conversations whose title, or any message's content, matches the query.
   # Wildcards the user types are literal characters, not patterns — a search for "%" means a
-  # literal percent sign. DISTINCT because a conversation matching on both would otherwise repeat
-  # once per matching message.
+  # literal percent sign. LEFT JOIN because a conversation with no messages yet must still match
+  # on title; DISTINCT because a conversation matching on both would otherwise repeat once per
+  # matching message. Recency order, matching the unpinned list: a reply bubbles its conversation
+  # in filtered results exactly as it does in the groups.
   scope :matching_query, ->(query) {
     pattern = "%#{ActiveRecord::Base.sanitize_sql_like(query)}%"
-    joins(:messages).ordered.where("messages.content_text ILIKE ?", pattern).
-      or(ordered.where("title ILIKE ?", pattern)).
+    left_outer_joins(:messages).order(updated_at: :desc, id: :desc).where("messages.content_text ILIKE ?", pattern).
+      or(left_outer_joins(:messages).order(updated_at: :desc, id: :desc).where("title ILIKE ?", pattern)).
       select("DISTINCT conversations.*")
   }
 
@@ -96,13 +98,13 @@ class Conversation < ApplicationRecord
       .delete_if { |_, v| v.empty? }
   end
 
-  # The bookmarks view: every bookmarked conversation for the user in display order, optionally
-  # narrowed by the search query. Bookmarks never touch position, so toggles leave this order
-  # alone. Pins are not split out here — a pinned conversation still appears in this list. The
-  # search narrows first through the shared matching_query, then membership applies: the other
-  # order raises a structurally-incompatible `or` inside matching_query.
+  # The bookmarks view: every bookmarked conversation for the user in recency order,
+  # optionally narrowed by the search query. Bookmarks never touch position, so toggles leave
+  # this order alone. Pins are not split out here — a pinned conversation still appears in this
+  # list. The search narrows first through the shared matching_query, then membership applies:
+  # the other order raises a structurally-incompatible `or` inside matching_query.
   def self.bookmarked_nav_for_user(user, query = nil)
-    scope = user.conversations.preload(:assistant, :pins, :bookmarks, :reactions).ordered
+    scope = user.conversations.preload(:assistant, :pins, :bookmarks, :reactions).order(updated_at: :desc, id: :desc)
     scope = scope.matching_query(query) if query.present?
     scope.bookmarked_for(user)
   end

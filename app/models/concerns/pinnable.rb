@@ -20,13 +20,20 @@ module Pinnable
 
   # Membership plus, on position-bearing models only, the top position slot claim mirroring
   # Reorderable#assign_default_position: the minimum over the owner's collection minus one.
-  # update_column keeps updated_at untouched so pinning never disturbs recency. Find-or-create
-  # makes a double pin a no-op on membership; on conversations it still re-claims the top,
-  # which is what re-pinning means. Messages have no position column and no Reorderable, so
-  # their pins are membership only — the guard keeps one concern serving both.
+  # update_column keeps updated_at untouched so pinning never disturbs recency. The find runs
+  # first so double pins never touch the database twice; the RecordNotUnique rescue covers the
+  # concurrent-insert window (create_or_find_by is no help here — the uniqueness validation
+  # rejects existing rows before any INSERT runs). An already-pinned record skips the claim,
+  # so double pins are fully idempotent and the minimum never drifts. The claim takes the same
+  # user-row lock as assign_default_position, so concurrent pins cannot tie for the top slot.
   def pin!(pinning_user = user)
-    pins.find_or_create_by!(user: pinning_user)
-    update_column(:position, (self.class.reorder_scope(user).minimum(:position) || 0) - 1) if position_bearing?
+    already_pinned = pins.exists?(user: pinning_user)
+    begin
+      pins.find_or_create_by!(user: pinning_user)
+    rescue ActiveRecord::RecordNotUnique
+      pins.find_by!(user: pinning_user)
+    end
+    claim_top_position unless already_pinned || !position_bearing?
   end
 
   # Membership only — the position value stays where pinning left it.
@@ -50,5 +57,12 @@ module Pinnable
   # reorder_scope. Messages have neither, so pin! skips the top-slot claim for them.
   def position_bearing?
     respond_to?(:position) && self.class.respond_to?(:reorder_scope)
+  end
+
+  def claim_top_position
+    user.class.transaction do
+      user.class.where(id: user.id).lock.pick(:id)
+      update_column(:position, (self.class.reorder_scope(user).minimum(:position) || 0) - 1)
+    end
   end
 end

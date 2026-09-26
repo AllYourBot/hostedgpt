@@ -18,7 +18,9 @@ class MessagesController < ApplicationController
       end
     end
 
-    @messages = @conversation.messages.for_conversation_version(@version)
+    # Rows render pin and reaction state, so those ride along preloaded instead of one query
+    # per row — same treatment the sidebar nav scopes give toggle state.
+    @messages = @conversation.messages.preload(:pins, :reactions).for_conversation_version(@version)
     # Slack-style pins tab: the conversation's pinned messages in display order (message pins
     # carry no hand order). Scoped to the conversation through the association, so another
     # user's pins can never leak in — same Current.user scoping as the other toggles.

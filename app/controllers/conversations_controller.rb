@@ -34,8 +34,11 @@ class ConversationsController < ApplicationController
     render :index
   end
 
+  # Hand order lives only in the pinned section, so only pinned ids are renumbered: a subset
+  # post (stale JS, replayed fetch, curl) can never overwrite the untouched remainder.
   def reorder
-    Conversation.reposition(Current.user, Array(params[:ids]))
+    pinned_ids = Current.user.conversations.pinned_for(Current.user).pluck(:id)
+    Conversation.reposition(Current.user, Array(params[:ids]).map(&:to_i) & pinned_ids)
     head :no_content
   end
 

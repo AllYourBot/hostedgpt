@@ -514,6 +514,19 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_match(%r{/messages/#{@message.id}/unpin}, response.body)
   end
 
+  test "index lists pinned messages in display order" do
+    second = @conversation.messages.create!(
+      assistant: @message.assistant, role: "user", content_text: "second pinned"
+    )
+    second.pin!(@user)
+    @message.pin!(@user)
+
+    get conversation_messages_url(@conversation, version: @message.version)
+
+    assert_response :success
+    assert_equal [@message.id, second.id].sort_by { |id| Message.find(id).index }, assigns(:pinned_messages).map(&:id)
+  end
+
   test "index drops the pinned-messages section once unpinned" do
     @message.pin!(@user)
     @message.unpin!(@user)

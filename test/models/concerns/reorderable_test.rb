@@ -53,4 +53,25 @@ class ReorderableTest < ActiveSupport::TestCase
 
     assert_equal before, @keith.assistants.ordered.pluck(:id, :position)
   end
+
+  test "insert_at from a nil slot claims it and slides the target down" do
+    ids = @keith.assistants.ordered.pluck(:id)
+    moved = Assistant.find(ids.second)
+    moved.update_column(:position, nil)
+
+    moved.insert_at(0)
+
+    assert_equal 0, moved.reload.position
+    assert_equal [ids.second] + ids[0...1] + ids[2..], @keith.assistants.ordered.pluck(:id)
+  end
+
+  test "reposition numbers duplicate ids densely without double-counting" do
+    ids = @keith.assistants.ordered.pluck(:id)
+    doubled = [ids.first, ids.first, ids.second, ids.second, ids.third]
+
+    Assistant.reposition(@keith, doubled)
+
+    assert_equal [ids.first, ids.second, ids.third], @keith.assistants.ordered.first(3).pluck(:id)
+    assert_equal (0...ids.length).to_a, @keith.assistants.ordered.pluck(:position).sort
+  end
 end

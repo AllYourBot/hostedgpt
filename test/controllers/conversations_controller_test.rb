@@ -38,19 +38,12 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/pointerdown->sortable#press/, unpinned_block)
   end
 
-  test "a search-filtered sidebar stays flat with no group headers" do
+  test "a search-filtered sidebar stays flat and is not drag-reorderable" do
     get conversations_url(query: "test")
 
     assert_response :success
     assert_not_empty assigns(:nav_conversations)
     assert_no_match(/data-role="time-group"/, response.body)
-    assert_no_match(/pointerdown->sortable#press/, response.body)
-  end
-
-  test "a search-filtered sidebar is not drag-reorderable" do
-    get conversations_url(query: "test")
-
-    assert_response :success
     assert_no_match(/pointerdown->sortable#press/, response.body)
   end
 
@@ -72,29 +65,32 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_url
   end
 
-  test "reorder saves the order the ids arrive in" do
+  test "reorder saves the order the pinned ids arrive in" do
     user = @conversation.user
-    ids = user.conversations.ordered.pluck(:id).rotate
+    user.conversations.each { |conversation| conversation.pin!(user) }
+    ids = user.conversations.pinned_for(user).pluck(:id).rotate
 
     post reorder_conversations_url, params: { ids: ids }
 
     assert_response :no_content
-    assert_equal ids, user.conversations.ordered.pluck(:id)
+    assert_equal ids, user.conversations.pinned_for(user).pluck(:id)
   end
 
   test "reorder accepts the string ids the browser sends" do
     user = @conversation.user
-    ids = user.conversations.ordered.pluck(:id).rotate
+    user.conversations.each { |conversation| conversation.pin!(user) }
+    ids = user.conversations.pinned_for(user).pluck(:id).rotate
 
     post reorder_conversations_url, params: { ids: ids.map(&:to_s) }
 
     assert_response :no_content
-    assert_equal ids, user.conversations.ordered.pluck(:id)
+    assert_equal ids, user.conversations.pinned_for(user).pluck(:id)
   end
 
   test "reorder renumbers densely when the list includes ids it does not own" do
     user = @conversation.user
-    keith_ids = user.conversations.ordered.pluck(:id)
+    user.conversations.each { |conversation| conversation.pin!(user) }
+    keith_ids = user.conversations.pinned_for(user).pluck(:id)
     foreign = conversations(:debugging)
     foreign.update_column(:position, 42)
 
@@ -102,8 +98,18 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :no_content
     assert_equal 42, foreign.reload.position
-    assert_equal keith_ids.reverse, user.conversations.ordered.pluck(:id)
-    assert_equal (0...keith_ids.length).to_a, user.conversations.ordered.pluck(:position).sort
+    assert_equal keith_ids.reverse, user.conversations.pinned_for(user).pluck(:id)
+    assert_equal (0...keith_ids.length).to_a, user.conversations.pinned_for(user).pluck(:position).sort
+  end
+
+  test "reorder ignores unpinned ids, leaving hand order to the pinned section" do
+    user = @conversation.user
+    before = user.conversations.ordered.pluck(:id, :position)
+
+    post reorder_conversations_url, params: { ids: user.conversations.pluck(:id) }
+
+    assert_response :no_content
+    assert_equal before, user.conversations.ordered.pluck(:id, :position)
   end
 
   test "reorder with no ids param leaves everything alone" do
@@ -347,11 +353,13 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     foreign.bookmark!(foreign.user)
     @conversation.bookmark!(user)
     other.bookmark!(user)
+    @conversation.update_column(:updated_at, 1.day.ago)
+    other.update_column(:updated_at, Time.current)
 
     get bookmarks_conversations_url
 
     assert_response :success
-    assert_equal [@conversation.id, other.id].sort, assigns(:nav_conversations).map(&:id).sort
+    assert_equal [other.id, @conversation.id], assigns(:nav_conversations).map(&:id)
     assert_not_includes assigns(:nav_conversations).map(&:id), unbookmarked.id
     assert_not_includes assigns(:nav_conversations).map(&:id), foreign.id
   end

@@ -12,9 +12,14 @@ module Bookmarkable
   end
 
   # Membership only — no position change, so toggling never disturbs sidebar order (unlike pin!).
-  # Find-or-create makes a double bookmark a no-op.
+  # The find runs first so double bookmarks never touch the database twice; the RecordNotUnique
+  # rescue covers the concurrent-insert window.
   def bookmark!(bookmarking_user = user)
-    bookmarks.find_or_create_by!(user: bookmarking_user)
+    begin
+      bookmarks.find_or_create_by!(user: bookmarking_user)
+    rescue ActiveRecord::RecordNotUnique
+      bookmarks.find_by!(user: bookmarking_user)
+    end
   end
 
   # Membership only — unbookmarking a clear conversation destroys nothing.
