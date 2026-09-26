@@ -2,6 +2,8 @@ class AIBackend::OpenAI < AIBackend
   include Tools
 
   IMAGE_MODEL = "gpt-image-1"
+  SPEECH_MODEL = "tts-1"
+  SPEECH_VOICE = "nova"
 
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
@@ -40,9 +42,7 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def self.generate_image(prompt:, user:)
-    # Scoped to the canonical OpenAI URL: Groq and OpenRouter services also
-    # carry driver :openai, and their tokens are invalid at api.openai.com.
-    openai_service = user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
+    openai_service = canonical_service_for(user)
 
     if openai_service.nil? || openai_service.effective_token.blank?
       # Context-free on purpose: the toolbox that reaches this method knows the
@@ -68,6 +68,28 @@ class AIBackend::OpenAI < AIBackend
     # native image generation overrides this method and reports itself.
     { b64_json: b64_json, model: IMAGE_MODEL, provider: "OpenAI" }
   end
+
+  def self.generate_speech(text:, user:)
+    openai_service = canonical_service_for(user)
+    raise AIBackend::ConfigurationError if openai_service.nil? || openai_service.effective_token.blank?
+
+    client.new(access_token: openai_service.effective_token).audio.speech(
+      parameters: {
+        model: SPEECH_MODEL,
+        input: text,
+        voice: SPEECH_VOICE,
+        response_format: "wav",
+        speed: 1.0
+      }
+    )
+  end
+
+  # Scoped to the canonical OpenAI URL: Groq and OpenRouter services also
+  # carry driver :openai, and their tokens are invalid at api.openai.com.
+  def self.canonical_service_for(user)
+    user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
+  end
+  private_class_method :canonical_service_for
 
   def self.key_error_message
     "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
