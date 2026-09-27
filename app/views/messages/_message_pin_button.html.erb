@@ -1,0 +1,15 @@
+<%# locals: (message:) -%>
+<%# Re-rendered in place by the pin toggle's turbo-stream response, so the icon flips without
+    a reload. Pinned state is computed inside, keeping the response a pure re-render. %>
+<% message_pinned = message.pinned?(Current.user) %>
+<%= button_to message_pinned ? unpin_message_path(message) : pin_message_path(message),
+  method: :post,
+  data: { role: message_pinned ? "unpin-message" : "pin-message" },
+  form: { class: "flex items-center", data: { turbo_frame: "_top" } },
+  class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+  title: message_pinned ? "Unpin message" : "Pin message" do %>
+  <%= icon "map-pin",
+    variant: message_pinned ? :solid : :outline,
+    size: 18
+  %>
+<% end %>

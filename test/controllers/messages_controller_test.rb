@@ -400,12 +400,15 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_includes Message.pinned_for(@user).map(&:id), @message.id
   end
 
-  test "message pin answers a page refresh to Turbo requests so the section visibly lands" do
+  test "message pin answers section and button morphs to Turbo requests" do
     post pin_message_url(@message),
       headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
 
     assert_response :success
-    assert_match(/action="refresh"/, response.body)
+    assert_match(/action="replace" target="pinned-messages"/, response.body)
+    assert_match(/data-role="pinned-message"/, response.body)
+    assert_match(/action="update" target="message_#{@message.id}-pin"/, response.body)
+    assert_match(/data-role="unpin-message"/, response.body)
     assert @message.reload.pinned?(@user)
   end
 
@@ -536,7 +539,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal [@message.id, second.id].sort_by { |id| Message.find(id).index }, assigns(:pinned_messages).map(&:id)
   end
 
-  test "index drops the pinned-messages section once unpinned" do
+  test "index hides the pinned-messages section once unpinned" do
     @message.pin!(@user)
     @message.unpin!(@user)
 
@@ -544,7 +547,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_empty assigns(:pinned_messages)
-    assert_no_match(/id="pinned-messages"/, response.body)
+    assert_match(/id="pinned-messages"/, response.body)
+    assert_no_match(/data-role="pinned-message"/, response.body)
   end
 
   test "index never leaks another user's message pins" do
@@ -555,6 +559,6 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_empty assigns(:pinned_messages)
-    assert_no_match(/id="pinned-messages"/, response.body)
+    assert_no_match(/data-role="pinned-message"/, response.body)
   end
 end

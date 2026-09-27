@@ -70,33 +70,42 @@ class MessagesController < ApplicationController
 
   def react
     @message.react!(params[:emoji], Current.user)
-    toggle_response
+    head :no_content
   rescue ActiveRecord::RecordInvalid
     head :unprocessable_content
   end
 
   def unreact
     @message.unreact!(params[:emoji], Current.user)
-    toggle_response
+    head :no_content
   end
 
   def pin
     @message.pin!(Current.user)
-    toggle_response
+    render_message_pin
   end
 
   def unpin
     @message.unpin!(Current.user)
-    toggle_response
+    render_message_pin
   end
 
   private
 
-  # Same contract as the sidebar toggles: 204 to plain requests, page-refresh to Turbo, so a
-  # hover pin visibly lands the pinned-messages section instead of looking dead.
-  def toggle_response
+  # Message pins answer with two streams — the pinned-messages section (replaced whole, so its
+  # hidden-when-empty state refreshes too) and the row's own pin button — so both land with no
+  # reload. The picker already updates its chip optimistically, so react/unreact stay bare 204s.
+  # Plain requests still answer 204.
+  def render_message_pin
+    @pinned_messages = @message.conversation.messages.pinned_for(Current.user).order(:index)
+
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace("pinned-messages", partial: "messages/pinned_messages"),
+          turbo_stream.update("#{helpers.dom_id(@message)}-pin", partial: "messages/message_pin_button", locals: { message: @message })
+        ]
+      end
       format.html { head :no_content }
     end
   end

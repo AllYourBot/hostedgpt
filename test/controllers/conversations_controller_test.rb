@@ -151,12 +151,13 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes Conversation.unpinned_for(@conversation.user).map(&:id), @conversation.id
   end
 
-  test "pin answers a page refresh to Turbo requests so the toggle visibly lands" do
+  test "pin answers a nav morph to Turbo requests so the toggle visibly lands" do
     post pin_conversation_url(@conversation),
       headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
 
     assert_response :success
-    assert_match(/action="refresh"/, response.body)
+    assert_match(/action="update" target="nav-conversations"/, response.body)
+    assert_match(/data-role="unpin"/, response.body)
     assert @conversation.reload.pinned?(@conversation.user)
   end
 

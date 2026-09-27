@@ -38,11 +38,14 @@
 
     <div class="flex items-center pr-1">
       <%# Toggle forms break out to _top: nested inside the row's turbo-frame, a frame-scoped
-          submission would swallow the turbo-stream refresh response (the frame looks for a
-          matching frame, finds a stream, renders nothing). At _top the refresh executes at
-          page level and morphs the sidebar in place. %>
+          submission would swallow the turbo-stream response (the frame looks for a matching
+          frame, finds a stream, renders nothing). At _top the streams execute at page level.
+          nav_view + query bounce the current view back so the response re-renders the list the
+          user is looking at instead of resetting to the main view. %>
+      <% nav_view = @bookmarks_view ? "bookmarks" : (@reactions_view ? "reactions" : nil) %>
       <%= button_to pinned ? unpin_conversation_path(conversation) : pin_conversation_path(conversation),
         method: :post,
+        params: { nav_view: nav_view, query: @query },
         data: { role: pinned ? "unpin" : "pin" },
         form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
         class: "p-1 leading-none",
@@ -56,6 +59,7 @@
       <% end %>
       <%= button_to bookmarked ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
         method: :post,
+        params: { nav_view: nav_view, query: @query },
         data: { role: bookmarked ? "unbookmark" : "bookmark" },
         form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
         class: "p-1 leading-none",

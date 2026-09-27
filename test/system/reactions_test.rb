@@ -92,8 +92,7 @@ class ReactionsTest < ApplicationSystemTestCase
     end
   end
 
-  test "sidebar picker reacts on a pinned row and pin order survives" do
-    user = users(:keith)
+  test "sidebar picker reacts on a pinned row and pin order survives" do    user = users(:keith)
     conversation = conversations(:greeting)
     conversation.pin!(user)
 
@@ -111,5 +110,21 @@ class ReactionsTest < ApplicationSystemTestCase
       conversation.reload.user_reacted?("🎉", user)
     end
     assert_equal [conversation.id], Conversation.pinned_for(user).pluck(:id)
+  end
+
+  test "pinning a message shows the pinned section without a reload" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    message = messages(:im_a_bot)
+
+    login_as(user)
+    visit_and_scroll_wait conversation_messages_path(conversation, version: 1)
+
+    row = find("#message_#{message.id}")
+    row.hover
+    row.find("[data-role='pin-message']").click
+
+    assert_selector("#pinned-messages")
+    assert message.reload.pinned?(user)
   end
 end

@@ -6,44 +6,7 @@
 
   <%= turbo_stream_from @conversation %>
 
-  <%# Slack's Pins tab: the conversation's pinned messages with jump-to-message anchors and
-      unpin. Message pins carry no hand order, so this lists them in display order. Each link
-      targets the message row's dom_id further down the page; unpinning drops the row on next
-      render. Empty (or foreign-only) pin sets render nothing at all. %>
-  <% if @pinned_messages.present? %>
-    <section
-      id="pinned-messages"
-      data-role="pinned-messages"
-      class="mb-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 p-3"
-    >
-      <header class="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-200">
-        <%= icon "map-pin", variant: :solid, size: 16 %>
-        Pinned messages
-      </header>
-      <% @pinned_messages.each do |pinned_message| %>
-        <div
-          id="pinned-message-<%= pinned_message.id %>"
-          data-role="pinned-message"
-          class="flex items-center justify-between gap-2 py-1 text-sm"
-        >
-          <%= link_to "##{dom_id(pinned_message)}",
-            data: { role: "pinned-message-link" },
-            class: "flex-1 truncate text-gray-700 dark:text-gray-200 hover:underline" do %>
-            <span class="font-semibold"><%= from_name_for(pinned_message) %></span>
-            <span>: <%= truncate(pinned_message.content_text.to_s, length: 120) %></span>
-          <% end %>
-          <%= button_to unpin_message_path(pinned_message),
-            method: :post,
-            data: { role: "unpin-message" },
-            form: { class: "flex items-center" },
-            class: "cursor-pointer text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white flex items-center",
-            title: "Unpin message" do %>
-            <%= icon "map-pin", variant: :solid, size: 16 %>
-          <% end %>
-        </div>
-      <% end %>
-    </section>
-  <% end %>
+  <%= render "pinned_messages" %>
 
   <div
     class="min-w-full"

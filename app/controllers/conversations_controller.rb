@@ -44,34 +44,34 @@ class ConversationsController < ApplicationController
 
   def pin
     @conversation&.pin!(Current.user)
-    toggle_response
+    render_sidebar
   end
 
   def unpin
     @conversation&.unpin!(Current.user)
-    toggle_response
+    render_sidebar
   end
 
   def bookmark
     @conversation&.bookmark!(Current.user)
-    toggle_response
+    render_sidebar
   end
 
   def unbookmark
     @conversation&.unbookmark!(Current.user)
-    toggle_response
+    render_sidebar
   end
 
   def react
     @conversation&.react!(params[:emoji], Current.user)
-    toggle_response
+    head :no_content
   rescue ActiveRecord::RecordInvalid
     head :unprocessable_content
   end
 
   def unreact
     @conversation&.unreact!(params[:emoji], Current.user)
-    toggle_response
+    head :no_content
   end
 
   def show
@@ -106,12 +106,27 @@ class ConversationsController < ApplicationController
 
   private
 
-  # Toggle endpoints answer 204 to plain requests (tests, curl) but page-refresh to Turbo:
-  # a 204 leaves the sidebar exactly as it was, so the pin would look dead until the next
-  # render. The refresh morphs the page in place with scroll preserved (see _head.html.erb).
-  def toggle_response
+  # Sidebar toggles answer with the re-rendered nav frame, not a page refresh: the response
+  # morphs exactly the list the user is looking at (main, bookmarks, reactions, or search, per
+  # the bounced-back view params), so icons flip and rows move with no reload and no scroll
+  # loss. Plain requests still answer 204.
+  def render_sidebar
+    @query = params[:query]
+    @bookmarks_view = params[:nav_view] == "bookmarks"
+    @reactions_view = params[:nav_view] == "reactions"
+    if @bookmarks_view
+      @pinned_conversations = Conversation.none
+      @nav_conversations = Conversation.bookmarked_nav_for_user(Current.user, @query)
+    elsif @reactions_view
+      @pinned_conversations = Conversation.none
+      @nav_conversations = Conversation.reacted_nav_for_user(Current.user, @query)
+    else
+      @pinned_conversations = Conversation.pinned_nav_for_user(Current.user, @query)
+      @nav_conversations = Conversation.nav_for_user(Current.user, @query)
+    end
+
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+      format.turbo_stream { render turbo_stream: turbo_stream.update("nav-conversations", partial: "conversations/nav") }
       format.html { head :no_content }
     end
   end
