@@ -187,7 +187,13 @@ end %>
         <% end %>
 
         <%# display:contents keeps one visual bar: children join the outer flex directly. %>
-        <div class="contents">
+        <div class="
+          flex justify-start
+          gap-2
+          text-gray-600 dark:text-gray-300
+          h-[19px]
+          <%= (!last_message && done_thinking) ? "invisible" : "" %> group-hover:visible group-tap:visible
+        ">
         <%# React and pin offer on every row on hover, Slack-style; version nav, edit, playback,
             and copy below stay last-message-only behind their own gate. The row carries `group`,
             so group-hover reveals these on any message. %>
