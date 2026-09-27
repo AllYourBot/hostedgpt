@@ -38,9 +38,17 @@
     <% end %>
   </section>
 
+  <%# One sortable list spans the pinned and unpinned sections so drops can cross between
+      them; rows opt in per-row (main view only), so the controller idles in filtered views. %>
   <section class="text-gray-950 dark:text-gray-100 select-none"
-    data-controller="radio-behavior"
+    data-controller="radio-behavior sortable"
     data-radio-behavior-selected-class="relationship"
+    data-sortable-url-value="<%= reorder_conversations_path %>"
+    data-sortable-pin-prefix-value="/conversations/"
+    data-sortable-pin-suffix-value="/pin"
+    data-sortable-unpin-prefix-value="/conversations/"
+    data-sortable-unpin-suffix-value="/unpin"
+    data-sortable-dragging-class="opacity-0"
   >
     <% if @bookmarks_view || @reactions_view %>
       <%= link_to conversations_path,
@@ -113,9 +121,7 @@
       <% end %>
       <turbo-frame id="pinned-conversations"
         target="conversation"
-        data-controller="sortable"
-        data-sortable-url-value="<%= reorder_conversations_path %>"
-        data-sortable-dragging-class="opacity-0"
+        data-sortable-zone="pinned"
         class="block"
       >
         <%= render @pinned_conversations %>
@@ -123,6 +129,7 @@
     <% end %>
     <turbo-frame id="conversations"
       target="conversation"
+      data-sortable-zone="unpinned"
       class="block mb-24" <%# ensures the last conversation's menu has room to open %>
     >
       <% if @query.blank? && !@bookmarks_view && !@reactions_view %>

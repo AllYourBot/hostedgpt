@@ -18,6 +18,11 @@ import { Controller } from '@hotwired/stimulus'
 // Rows slide out of the way as you drag over them, so the list you let go of is the list you get.
 // Once the drag ends the ids are POSTed to the url as ids[] in their new order.
 //
+// Lists can carry zones (data-sortable-zone="pinned|unpinned"): dropping inside the pinned zone
+// pins, dropping below unpins, and the server answers morph streams the client renders in place.
+// Rows without zones (the assistants list) keep the legacy behavior: every drop persists the
+// full order. Filtered views wire no rows at all — dragging a subset cannot express an order.
+//
 // A mouse lifts a row once it has traveled a few pixels, the way HTML5 drag used to. A finger has
 // to rest a moment first, because touching a row is also how the sidebar scrolls — lifting on
 // first contact would steal every scroll. Once a finger has lifted a row, though, the page stops
@@ -35,7 +40,7 @@ const TOUCH_HOLD_MS = 250     // ms a finger must rest before it lifts a row
 
 export default class extends Controller {
   static targets = [ "item" ]
-  static values = { url: String }
+  static values = { url: String, pinPrefix: String, pinSuffix: String, unpinPrefix: String, unpinSuffix: String }
   static classes = [ "dragging" ]
 
   press(event) {
@@ -95,17 +100,74 @@ export default class extends Controller {
     this.#releaseTracking()
 
     if (this.dragging) {
-      const orderChanged = this.#ids.join() !== this.orderAtDragStart.join()
+      const toZone = this.#dropZone(event)
+      const movedId = this.pressed.dataset.sortableId
       this.#putDown()
-      // Replay after the POST resolves when the order changed: reloading first would render
-      // the pre-persist order with no later render to correct it (204 answers carry no HTML).
-      if (orderChanged) this.#persist().finally(() => this.#replayHeldRefresh())
-      else this.#replayHeldRefresh()
+      this.#commitDrop(this.originZone, toZone, movedId)
       this.#swallowNextClick() // the click that follows a drop must not open the row's link
     } else {
       this.#putDown()
       this.#replayHeldRefresh()
     }
+  }
+
+  // Settles a finished drag by origin and drop zone. Zoneless lists (assistants) and
+  // same-zone pinned drops persist the visible order. Same-zone unpinned drops snap back —
+  // recency rules, never the drag. Cross-zone drops flip membership, then persist or re-render
+  // server truth. Drops outside every list never commit.
+  async #commitDrop(fromZone, toZone, movedId) {
+    if (fromZone == null && toZone == null) {
+      if (this.#orderedIds.join() !== this.orderAtDragStart.join()) {
+        await this.#persist().finally(() => this.#replayHeldRefresh())
+      } else {
+        this.#replayHeldRefresh()
+      }
+      return
+    }
+    if (fromZone === "pinned" && toZone === "pinned") {
+      if (this.#orderedIds.join() !== this.orderAtDragStart.join()) {
+        await this.#persist().finally(() => this.#replayHeldRefresh())
+      } else {
+        this.#replayHeldRefresh()
+      }
+      return
+    }
+    if (fromZone === "pinned" && toZone === "unpinned") {
+      await this.#postToggle(this.#unpinUrl(movedId))
+      this.#replayHeldRefresh()
+      return
+    }
+    if (fromZone === "unpinned" && toZone === "pinned") {
+      await this.#postToggle(this.#pinUrl(movedId))
+      await this.#persist().finally(() => this.#replayHeldRefresh())
+      return
+    }
+    this.#restoreOrder()
+    this.#replayHeldRefresh()
+  }
+
+  // The zone under the release point, by coordinates: pointer capture aims every event at the
+  // held row, so the event target itself always reads the origin zone — and the held row sits
+  // under the cursor too (opacity hides it, hit-testing still sees it). Skip past both to the
+  // row or container underneath, whose zone is the drop zone. Floating "..." menus are skipped
+  // the same way: a menu hovered open mid-travel can cover the release point, but the row
+  // beneath it owns the drop, not whichever menu happens to overlap.
+  #dropZone(event) {
+    const stack = document.elementsFromPoint(event.clientX, event.clientY);
+    const under = stack.find(el =>
+      el !== this.pressed &&
+      !this.pressed.contains(el) &&
+      !el.closest(".dropdown-content")
+    );
+    return under?.closest?.('[data-sortable-zone]')?.dataset.sortableZone ?? null;
+  }
+
+  // Pinned ids in DOM order: the only order the server keeps by hand. Zoneless lists persist
+  // every row; unpinned rows never persist (recency rules).
+  get #orderedIds() {
+    const ids = this.itemTargets.map(item => item.dataset.sortableId)
+    if (!this.itemTargets.some(item => item.dataset.sortableZone)) return ids
+    return this.itemTargets.filter(item => item.dataset.sortableZone === "pinned").map(item => item.dataset.sortableId)
   }
 
   #cancelled = (event) => {
@@ -122,7 +184,9 @@ export default class extends Controller {
     this.holdTimer = null
     if (!this.pressed.isConnected) { this.pressed = null; return } // a refresh in the touch-hold window detached the row: no drag
     this.dragging = true
-    this.orderAtDragStart = this.#ids
+    this.originZone = this.pressed.dataset.sortableZone ?? null
+    this.orderAtDragStart = this.#orderedIds
+    this.itemParents = new Map(this.itemTargets.map(item => [String(item.dataset.sortableId), item.parentNode]))
 
     // The ghost is cloned before the row hides: cloning after would copy the hiding class onto
     // the carried copy and the user would drag nothing visible.
@@ -164,15 +228,45 @@ export default class extends Controller {
 
   #persist() {
     const body = new FormData()
-    this.#ids.forEach(id => body.append("ids[]", id))
+    this.#orderedIds.forEach(id => body.append("ids[]", id))
 
-    // A failure needs no handling here: the order lives on the server, so the next render of this
-    // list shows the order the server kept, which is the honest answer about what was saved.
+    // The server answers the re-rendered list as morph streams; rendering them here keeps one
+    // visible order instead of a DOM order that later renders contradict. A failure needs no
+    // handling: the order lives on the server, so the next render shows what was kept.
     return fetch(this.urlValue, {
       method: "POST",
       body,
-      headers: { "X-CSRF-Token": this.#csrfToken },
+      headers: { "X-CSRF-Token": this.#csrfToken, "Accept": "text/vnd.turbo-stream.html" },
+    }).then(async (response) => {
+      const html = await response.text()
+      if (html) Turbo.renderStreamMessage(html)
     }).catch(() => {})
+  }
+
+  // Membership flips post the same morph streams the toggle buttons get; rendering them keeps
+  // the dragged row's new home honest without a reload.
+  async #postToggle(url) {
+    console.error("DBG postToggle " + url);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "X-CSRF-Token": this.#csrfToken, "Accept": "text/vnd.turbo-stream.html" },
+      })
+      console.error("DBG postToggle status " + response.status);
+      const html = await response.text()
+      if (html) Turbo.renderStreamMessage(html)
+      console.error("DBG postToggle rendered");
+    } catch (e) { console.error("DBG postToggle failed " + (e && e.message)) }
+  }
+
+  // Toggle endpoints are per-row member routes, so the markup carries the path halves and the
+  // id slots between them — no placeholder survives Rails segment escaping intact.
+  #pinUrl(id) {
+    return `${this.pinPrefixValue}${id}${this.pinSuffixValue}`
+  }
+
+  #unpinUrl(id) {
+    return `${this.unpinPrefixValue}${id}${this.unpinSuffixValue}`
   }
 
   // Returns the ghost: a copy of the row that floats under the pointer while the real row hides,
@@ -223,10 +317,14 @@ export default class extends Controller {
     return element
   }
 
+  // Puts every row back where the drag found it, each in its own home list: a restore that
+  // appended everything to one container would fuse two sections that must stay apart.
   #restoreOrder() {
     this.orderAtDragStart.forEach(id => {
       const item = this.itemTargets.find(target => String(target.dataset.sortableId) === String(id))
-      if (item) this.element.appendChild(item)
+      const home = this.itemParents?.get(String(id))
+      if (item && home?.isConnected) home.appendChild(item)
+      else if (item) this.element.appendChild(item)
     })
   }
 

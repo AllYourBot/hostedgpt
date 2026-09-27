@@ -1,10 +1,11 @@
 <%# locals: (conversation:, settings: true) %>
 <% selected = conversation == @conversation %>
-<%# TODO(pinned-reorder): unpinned drag plugs back in here — extend this guard plus Conversation.nav_for_user ordering to restore global drag. %>
 <% pinned = conversation.pinned?(Current.user) %>
 <% bookmarked = conversation.bookmarked?(Current.user) %>
-<%# No drag in the bookmarks or reactions views either: they show a subset, and dragging a subset would corrupt the saved order of the rest. %>
-<% sortable = @query.blank? && pinned && !@bookmarks_view && !@reactions_view %>
+<%# Drag spans both sections in the main view only: a filtered list shows a subset, and dragging
+    a subset would corrupt the saved order of the rest. The drop position decides membership —
+    landing in the pinned area pins, landing below unpins. %>
+<% sortable = @query.blank? && !@bookmarks_view && !@reactions_view %>
 
 <div
   id="<%= dom_id(conversation) %>"
@@ -18,6 +19,7 @@
   <% if sortable %>
     data-sortable-target="item"
     data-sortable-id="<%= conversation.id %>"
+    data-sortable-zone="<%= pinned ? "pinned" : "unpinned" %>"
     data-action="pointerdown->sortable#press"
   <% end %>
   data-role="conversation"

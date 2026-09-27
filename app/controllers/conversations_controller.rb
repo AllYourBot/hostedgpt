@@ -57,11 +57,12 @@ class ConversationsController < ApplicationController
   end
 
   # Hand order lives only in the pinned section, so only pinned ids are renumbered: a subset
-  # post (stale JS, replayed fetch, curl) can never overwrite the untouched remainder.
+  # post (stale JS, replayed fetch, curl) can never overwrite the untouched remainder. Answers
+  # the re-rendered sidebar to stream requests so drags land on server truth with no reload.
   def reorder
     pinned_ids = Current.user.conversations.pinned_for(Current.user).pluck(:id)
     Conversation.reposition(Current.user, Array(params[:ids]).map(&:to_i) & pinned_ids)
-    head :no_content
+    render_sidebar
   end
 
   def pin

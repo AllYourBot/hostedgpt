@@ -47,6 +47,7 @@ class SidebarDragTest < ApplicationSystemTestCase
     pin_row(conversation).hover
     pin_row(conversation).find("[data-role='pin']").click
     assert_true { conversation.reload.pinned?(user) }
+    assert_selector("#conversation_#{conversation.id} [data-role='unpin']")
     visit root_path
 
     assert pin_row_titles.include?("PinToggleTarget")
@@ -54,10 +55,40 @@ class SidebarDragTest < ApplicationSystemTestCase
     pin_row(conversation).hover
     pin_row(conversation).find("[data-role='unpin']").click
     assert_true { !conversation.reload.pinned?(user) }
+    assert_selector("#conversation_#{conversation.id} [data-role='pin']")
     visit root_path
 
     assert pin_row_titles.exclude?("PinToggleTarget")
     assert unpinned_row_titles.include?("PinToggleTarget")
+  end
+
+  test "dragging across sections pins and unpins" do
+    user = users(:keith)
+    pinned = user.conversations.create!(assistant: assistants(:samantha), title: "ZonePinned")
+    user.conversations.create!(assistant: assistants(:samantha), title: "ZonePlain")
+    pinned.pin!(user)
+
+    login_as(user)
+    visit root_path
+
+    assert pin_row_titles.include?("ZonePinned")
+
+    # Drag the top unpinned row up into the pinned area: it pins and persists.
+    candidate_id = all("#conversations [data-sortable-id]").first["data-sortable-id"]
+    candidate = Conversation.find(candidate_id)
+    drag_boundary(candidate, zone: "pinned")
+    assert_true { candidate.reload.pinned?(user) }
+    assert_selector("#pinned-conversations [data-sortable-id='#{candidate.id}']")
+
+    # Drag the bottom pinned row down out of the pinned area: it unpins and persists.
+    bottom_pin_id = all("#pinned-conversations [data-sortable-id]").last["data-sortable-id"]
+    bottom_pin = Conversation.find(bottom_pin_id)
+    drag_boundary(bottom_pin, zone: "unpinned")
+    assert_true { !bottom_pin.reload.pinned?(user) }
+
+    visit root_path
+    assert pin_row_titles.exclude?(bottom_pin.title)
+    assert unpinned_row_titles.include?(bottom_pin.title)
   end
 
   private
@@ -114,6 +145,52 @@ class SidebarDragTest < ApplicationSystemTestCase
 
   def find_row(record)
     find("#pinned-conversations [data-sortable-id='#{record.id}']")
+  end
+
+  # Any draggable row in the main-view sidebar, pinned or unpinned: cross-zone drops read the
+  # drop position, so the finder cannot assume a section.
+  def find_any_row(record)
+    find("#nav-conversations [data-sortable-id='#{record.id}']")
+  end
+
+  # Short cross-boundary drags in one action chain. Capybara finds auto-scroll, which yanks
+  # the layout mid-gesture and strands coordinates out of view — so presence waits and all
+  # measuring happen through plain JS (no scrolling side effects), one boundary scroll centers
+  # both ends, and a single chain presses, travels, and releases. Drops land on frame edges:
+  # pinned bottom edge pins, unpinned top edge unpins; both resolve through the containers'
+  # drop zones, immune to rows sliding around mid-drag.
+  def drag_boundary(source_record, zone:)
+    find_any_row(source_record)
+    page.execute_script("document.getElementById('pinned-conversations').scrollIntoView({block: 'end'})")
+    sxy = js_center_of_row(source_record.id)
+    txy = zone == "pinned" ? js_pinned_edge : js_unpinned_edge
+
+    page.driver.browser.action
+      .move_to_location(sxy[0], sxy[1])
+      .click_and_hold
+      .move_by(0, 10)
+      .move_to_location(txy[0], txy[1])
+      .pause
+      .release
+      .perform
+  end
+
+  def js_center_of_row(id)
+    page.evaluate_script(
+      "(function(){ var el = document.querySelector('#nav-conversations [data-sortable-id=\"RID\"]'); var r = el.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; }).call(this)".gsub("RID", id.to_s)
+    ).map(&:to_i)
+  end
+
+  def js_pinned_edge
+    page.evaluate_script(
+      "(function(){ var f = document.getElementById('pinned-conversations'); var r = f.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height - 4]; }).call(this)"
+    ).map(&:to_i)
+  end
+
+  def js_unpinned_edge
+    page.evaluate_script(
+      "(function(){ var f = document.getElementById('conversations'); var r = f.getBoundingClientRect(); return [r.x + r.width / 2, r.y + 4]; }).call(this)"
+    ).map(&:to_i)
   end
 
   def center_of(element)

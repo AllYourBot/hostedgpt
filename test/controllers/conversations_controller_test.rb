@@ -11,7 +11,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "index lists unpinned conversations in recency groups with pins excluded and no drag" do
+  test "index lists unpinned conversations in recency groups with pins excluded and drag in both sections" do
     user = @conversation.user
     old = conversations(:ruby_version)
     old.update_column(:updated_at, 1.month.ago)
@@ -34,8 +34,10 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     pinned_block = body[/<turbo-frame id="pinned-conversations".*?<\/turbo-frame>/m]
     assert_match(/pointerdown->sortable#press/, pinned_block)
+    assert_match(/data-sortable-zone="pinned"/, pinned_block)
     unpinned_block = body[/<turbo-frame id="conversations".*?<\/turbo-frame>/m]
-    assert_no_match(/pointerdown->sortable#press/, unpinned_block)
+    assert_match(/pointerdown->sortable#press/, unpinned_block)
+    assert_match(/data-sortable-zone="unpinned"/, unpinned_block)
   end
 
   test "a search-filtered sidebar stays flat and is not drag-reorderable" do
@@ -226,7 +228,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal unpinned_before, Conversation.unpinned_for(user).ordered.pluck(:id, :position)
   end
 
-  test "index renders the pinned section first with drag only on pins" do
+  test "index renders the pinned section first with drag across both sections" do
     user = @conversation.user
     pinned = user.conversations.ordered.limit(2).to_a
     pinned.each { |c| c.pin!(user) }
@@ -246,8 +248,10 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/id="pinned-conversations"/, body)
     pinned_block = body[/<turbo-frame id="pinned-conversations".*?<\/turbo-frame>/m]
     assert_match(/pointerdown->sortable#press/, pinned_block)
+    assert_match(/data-sortable-zone="pinned"/, pinned_block)
     unpinned_block = body[/<turbo-frame id="conversations".*?<\/turbo-frame>/m]
-    assert_no_match(/pointerdown->sortable#press/, unpinned_block)
+    assert_match(/pointerdown->sortable#press/, unpinned_block)
+    assert_match(/data-sortable-zone="unpinned"/, unpinned_block)
   end
 
   test "index exposes a pin toggle distinct from the bookmark icon" do
