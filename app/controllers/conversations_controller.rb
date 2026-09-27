@@ -1,6 +1,10 @@
 class ConversationsController < ApplicationController
   before_action :set_conversation, except: [:public_show, :reorder]
   before_action :set_nav_assistants, except: [:public_show]
+  # The card pages render the shared sidebar shell, which now carries upstream's
+  # collections section — it needs @nav_collections like every other controller
+  # that renders the shell.
+  before_action :set_nav_collections, only: [:pinned_page, :bookmarked_page, :reacted_page]
   allow_unauthenticated_access only: [:public_show]
 
   def index
@@ -32,6 +36,24 @@ class ConversationsController < ApplicationController
     @pinned_conversations = Conversation.none
     @nav_conversations = Conversation.reacted_nav_for_user(Current.user, @query)
     render :index
+  end
+
+  # Full card pages mirroring assistants#index: each collection renders as Assistant-style
+  # cards in the main column (nav_column still supplies the sidebar). Scopes are the same
+  # nav scopes the sidebar filtered views use, so ordering and isolation match.
+  def pinned_page
+    @page_context = "pinned"
+    @pinned_conversations = Conversation.pinned_nav_for_user(Current.user)
+  end
+
+  def bookmarked_page
+    @page_context = "bookmarked"
+    @bookmarked_conversations = Conversation.bookmarked_nav_for_user(Current.user)
+  end
+
+  def reacted_page
+    @page_context = "reacted"
+    @reacted_conversations = Conversation.reacted_nav_for_user(Current.user)
   end
 
   # Hand order lives only in the pinned section, so only pinned ids are renumbered: a subset
@@ -109,8 +131,12 @@ class ConversationsController < ApplicationController
   # Sidebar toggles answer with the re-rendered nav frame, not a page refresh: the response
   # morphs exactly the list the user is looking at (main, bookmarks, reactions, or search, per
   # the bounced-back view params), so icons flip and rows move with no reload and no scroll
-  # loss. Plain requests still answer 204.
+  # loss. Card-page toggles (page_context bounced back from _conversation_card) answer a
+  # card-replacement stream instead: the grid updates without reload, mirroring the sidebar
+  # morph contract. Plain requests still answer 204.
   def render_sidebar
+    return render_card_toggle if params[:page_context].in?(%w[pinned bookmarked reacted])
+
     @query = params[:query]
     @bookmarks_view = params[:nav_view] == "bookmarks"
     @reactions_view = params[:nav_view] == "reactions"
@@ -133,6 +159,39 @@ class ConversationsController < ApplicationController
 
   def set_conversation
     @conversation = Current.user.conversations.find_by(id: params[:id] || params[:conversation_id])
+  end
+
+  # Card toggles replace (or remove) the card's dom-id so the grid on /pinned, /bookmarks,
+  # and /reactions updates without reload. Removal applies when the toggle drops the
+  # conversation out of the page's own collection (unpin on pinned, unbookmark on
+  # bookmarked); every other toggle keeps the card and flips its icons in place. Pin and
+  # bookmark never disturb reacted membership, so reacted cards always replace.
+  def render_card_toggle
+    @page_context = params[:page_context]
+    return head :no_content if @conversation.nil?
+
+    @conversation.reload
+    card_id = view_context.dom_id(@conversation, :card)
+    still_member = case @page_context
+    when "pinned" then @conversation.pinned?(Current.user)
+    when "bookmarked" then @conversation.bookmarked?(Current.user)
+    else true
+    end
+
+    respond_to do |format|
+      format.turbo_stream do
+        if still_member
+          render turbo_stream: turbo_stream.replace(
+            card_id,
+            partial: "conversations/conversation_card",
+            locals: { conversation: @conversation, page_context: @page_context }
+          )
+        else
+          render turbo_stream: turbo_stream.remove(card_id)
+        end
+      end
+      format.html { head :no_content }
+    end
   end
 
   def conversation_params

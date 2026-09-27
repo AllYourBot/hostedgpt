@@ -1,0 +1,25 @@
+<% content_for :nav_column do %>
+  <%= render "messages/nav_column" %>
+<% end %>
+
+<turbo-frame id="conversation" class="relative flex flex-col flex-1 min-w-0" data-turbo-action="advance">
+  <header id="narrow-header" class="flex-none text-lg h-14 md:hidden">
+    <div class="flex items-center flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
+      <%= render "layouts/nav_toggle" %>
+    </div>
+  </header>
+
+  <div class="px-[2rem] mb-[4rem] mt-4 md:mt-[4rem]">
+    <h1 class="text-2xl mb-4 font-semibold tracking-tighter"><%= t("app.conversations.ui.bookmarked_page_title") %></h1>
+
+    <% if @bookmarked_conversations.present? %>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <%= render partial: "conversation_card", collection: @bookmarked_conversations, as: :conversation, locals: { page_context: "bookmarked" } %>
+      </div>
+    <% else %>
+      <p class="mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="empty-bookmarks">
+        <%= t("app.conversations.ui.no_bookmarks_yet") %>
+      </p>
+    <% end %>
+  </div>
+</turbo-frame>

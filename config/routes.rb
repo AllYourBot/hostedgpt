@@ -27,6 +27,10 @@ Rails.application.routes.draw do
 
   get "share/:share_token", to: "conversations#public_show", as: :public_conversation
 
+  get "/pinned", to: "conversations#pinned_page", as: :pinned_page
+  get "/bookmarks", to: "conversations#bookmarked_page", as: :bookmarked_page
+  get "/reactions", to: "conversations#reacted_page", as: :reacted_page
+
   resources :messages, only: [:show, :update] do
     post :react, on: :member
     post :unreact, on: :member

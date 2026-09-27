@@ -1,0 +1,91 @@
+<%# locals: (conversation:, page_context: nil) %>
+<%# Assistant-style card for the /pinned, /bookmarks, and /reactions pages. The outer id is
+    the card dom-id (dom_id(conversation, :card)), distinct from the sidebar row id, so both
+    can share a page and toggle streams can replace/remove exactly this card. %>
+<% page_context ||= @page_context %>
+<% pinned = conversation.pinned?(Current.user) %>
+<% bookmarked = conversation.bookmarked?(Current.user) %>
+<div
+  id="<%= dom_id(conversation, :card) %>"
+  data-role="conversation-card"
+  class="relative flex items-start space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:bg-gray-700 dark:border-gray-600"
+>
+  <div class="min-w-0 flex-1">
+    <%= link_to conversation_messages_path(conversation),
+      data: { role: "title" },
+      class: "block" do %>
+      <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= conversation.title.presence || t("app.conversations.new_chat") %></p>
+      <p class="truncate text-sm text-gray-500 dark:text-gray-300"><%= conversation.assistant.name %></p>
+      <p class="text-xs text-gray-400 dark:text-gray-400" data-role="recency"><%= time_ago_in_words(conversation.updated_at) %> ago</p>
+    <% end %>
+  </div>
+  <div class="flex items-center pr-1">
+    <%# Card toggle forms break out to _top like the sidebar row toggles: nested inside the
+        page's conversation turbo-frame, a frame-scoped submission would swallow the
+        turbo-stream response. page_context bounces the page back so the response replaces or
+        removes exactly this card instead of resetting the view. %>
+    <%= button_to pinned ? unpin_conversation_path(conversation) : pin_conversation_path(conversation),
+      method: :post,
+      params: { page_context: page_context },
+      data: { role: pinned ? "unpin" : "pin" },
+      form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
+      class: "p-1 leading-none",
+      title: pinned ? "Unpin" : "Pin" do %>
+      <%= icon "map-pin",
+        variant: pinned ? :solid : :outline,
+        size: 16,
+        class: "text-gray-500 dark:text-gray-300"
+      %>
+    <% end %>
+    <%= button_to bookmarked ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
+      method: :post,
+      params: { page_context: page_context },
+      data: { role: bookmarked ? "unbookmark" : "bookmark" },
+      form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
+      class: "p-1 leading-none",
+      title: bookmarked ? "Unbookmark" : "Bookmark" do %>
+      <%= icon "bookmark",
+        variant: bookmarked ? :solid : :outline,
+        size: 16,
+        class: "text-gray-500 dark:text-gray-300"
+      %>
+    <% end %>
+    <%# Counts plus picker, same optimistic fetch contract as the sidebar row: the endpoints
+        answer 204, so no card stream is involved here. %>
+    <% user_emojis = conversation.user_emojis(Current.user) %>
+    <div data-controller="emoji-picker"
+      data-emoji-picker-react-url-value="<%= react_conversation_path(conversation) %>"
+      data-emoji-picker-unreact-url-value="<%= unreact_conversation_path(conversation) %>"
+      data-action="click@document->emoji-picker#close"
+      class="relative flex items-center gap-1"
+    >
+      <%= button_tag type: "button",
+        class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+        data: {
+          role: "react-conversation",
+          action: "click->emoji-picker#toggle",
+          emoji_picker_target: "button",
+        },
+        title: "React" do %>
+        <%= icon "face-smile", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
+      <% end %>
+      <div data-emoji-picker-target="panel"
+        class="hidden absolute bottom-6 left-0 z-10 flex gap-1 p-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl"
+      >
+        <% %w[👍 ❤️ 🎉 😄 🤔 👎].each do |emoji| %>
+          <%= button_tag type: "button",
+            data: {
+              role: "react-emoji-conversation",
+              action: "click->emoji-picker#select",
+              emoji: emoji,
+              reacted: user_emojis.include?(emoji).to_s,
+            },
+            class: "cursor-pointer px-1 hover:scale-125" do %><%= emoji %><% end %>
+        <% end %>
+      </div>
+      <span data-emoji-picker-target="counts" class="flex items-center">
+        <%= render "reactions/counts", reactable: conversation %>
+      </span>
+    </div>
+  </div>
+</div>
