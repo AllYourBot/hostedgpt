@@ -16,8 +16,7 @@ class BookmarksTest < ApplicationSystemTestCase
     assert conversation.reload.bookmarked?(user)
   end
 
-  test "bookmarks view lists bookmarked conversations with a way back" do
-    user = users(:keith)
+  test "bookmarks view lists bookmarked conversations with a way back" do    user = users(:keith)
     conversation = conversations(:greeting)
     conversation.bookmark!(user)
 
@@ -30,5 +29,21 @@ class BookmarksTest < ApplicationSystemTestCase
     find("[data-role='all-conversations']").click
 
     assert_selector("[data-role='bookmarks-link']")
+  end
+
+  test "clicking reactions shows reacted conversations with a way back" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    conversation.react!("🎉", user)
+
+    login_as(user)
+    visit root_path
+
+    find("[data-role='reactions-link']").click
+
+    assert_selector("#conversation_#{conversation.id}")
+    find("[data-role='all-conversations']").click
+
+    assert_selector("[data-role='reactions-link']")
   end
 end

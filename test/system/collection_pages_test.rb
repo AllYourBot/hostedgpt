@@ -29,5 +29,13 @@ class CollectionPagesTest < ApplicationSystemTestCase
 
     find("[data-role='open-bookmarks-page']").click
     assert_selector("h1", text: I18n.t("app.conversations.ui.bookmarked_page_title"))
+
+    visit root_path
+    find("[data-role='open-reactions-page']").click
+    assert_selector("h1", text: I18n.t("app.conversations.ui.reacted_page_title"))
+
+    visit root_path
+    find("[data-role='open-pinned-page']").click
+    assert_selector("h1", text: I18n.t("app.conversations.ui.pinned_page_title"))
   end
 end

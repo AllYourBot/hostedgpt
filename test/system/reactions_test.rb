@@ -128,6 +128,22 @@ class ReactionsTest < ApplicationSystemTestCase
     assert message.reload.pinned?(user)
   end
 
+  test "unpinning a message drops the pinned section without a reload" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    message = messages(:im_a_bot)
+    message.pin!(user)
+
+    login_as(user)
+    visit_and_scroll_wait conversation_messages_path(conversation, version: 1)
+
+    assert_selector("#pinned-messages [data-role='pinned-message']")
+    find("#pinned-messages [data-role='unpin-message']").click
+
+    assert_no_selector("[data-role='pinned-message']")
+    assert_not message.reload.pinned?(user)
+  end
+
   test "message action buttons line up in one horizontal row" do
     user = users(:keith)
     conversation = conversations(:greeting)
