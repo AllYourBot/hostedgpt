@@ -82,6 +82,11 @@
       <% end %>
     <% end %>
     <% if @query.blank? && !@bookmarks_view && !@reactions_view %>
+      <% if @pinned_conversations.present? %>
+        <header class="mx-2 mt-6 mb-2 text-xs font-semibold text-gray-300 text-opacity-1 dark:text-gray-500" data-role="pinned-header">
+          <%= t("app.conversations.ui.pinned") %>
+        </header>
+      <% end %>
       <turbo-frame id="pinned-conversations"
         target="conversation"
         data-controller="sortable"
@@ -105,7 +110,17 @@
           <%= render conversations %>
         <% end %>
       <% else %>
-        <%= render @nav_conversations %>
+        <% if @nav_conversations.present? %>
+          <%= render @nav_conversations %>
+        <% elsif @bookmarks_view %>
+          <p class="mx-2 mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="empty-bookmarks">
+            <%= t("app.conversations.ui.no_bookmarks_yet") %>
+          </p>
+        <% elsif @reactions_view %>
+          <p class="mx-2 mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="empty-reactions">
+            <%= t("app.conversations.ui.no_reactions_yet") %>
+          </p>
+        <% end %>
       <% end %>
     </turbo-frame>
   </section>

@@ -399,6 +399,31 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
   end
 
+  test "bookmarks view explains itself when empty" do
+    get bookmarks_conversations_url
+
+    assert_response :success
+    assert_empty assigns(:nav_conversations)
+    assert_match(/data-role="empty-bookmarks"/, response.body)
+  end
+
+  test "reactions view explains itself when empty" do
+    get reactions_conversations_url
+
+    assert_response :success
+    assert_empty assigns(:nav_conversations)
+    assert_match(/data-role="empty-reactions"/, response.body)
+  end
+
+  test "pinned section carries a header when pins exist" do
+    @conversation.pin!(@conversation.user)
+
+    get conversations_url
+
+    assert_response :success
+    assert_match(/data-role="pinned-header"/, response.body)
+  end
+
   test "bookmarks view exposes a link back and the sidebar links to it" do
     get bookmarks_conversations_url
 
