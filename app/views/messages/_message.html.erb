@@ -241,7 +241,6 @@ end %>
           <span id="<%= dom_id(message) %>-pin" class="flex items-center">
             <%= render "messages/message_pin_button", message: message %>
           </span>
-        </div>
 
         <%# display:contents: no box of its own, so the bar stays single-row; the invisible
             gate inherits into the version/edit children. %>
@@ -366,6 +365,7 @@ end %>
             </div>
           <% end %>
         </div>
+      </div>
       </turbo-frame>
     </div>
   </div>
