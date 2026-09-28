@@ -258,4 +258,101 @@ class ConversationTest < ActiveSupport::TestCase
     assert preloaded_bookmark.bookmarked?(user)
     assert_not preloaded_bookmark.pinned?(user)
   end
+
+  test "sidebar nav scopes preload toggle associations instead of includes" do
+    user = users(:keith)
+    pinned = conversations(:greeting)
+    bookmarked = conversations(:ruby_version)
+    pinned.pin!(user)
+    bookmarked.bookmark!(user)
+    pinned.react!("❤️", user)
+    bookmarked.react!("❤️", user)
+
+    scopes = {
+      "unpinned list" => Conversation.nav_for_user(user),
+      "pinned section" => Conversation.pinned_nav_for_user(user),
+      "bookmarks view" => Conversation.bookmarked_nav_for_user(user),
+      "reactions view" => Conversation.reacted_nav_for_user(user),
+      "search" => Conversation.nav_for_user(user, "test"),
+      "bookmarks search" => Conversation.bookmarked_nav_for_user(user, "test"),
+      "reactions search" => Conversation.reacted_nav_for_user(user, "test")
+    }
+
+    scopes.each do |name, scope|
+      assert_not_empty scope.to_a, "expected rows for #{name}"
+      assert_empty scope.includes_values, "expected no includes on #{name} (preload keeps the DISTINCT shape)"
+      %w[assistant pins bookmarks reactions].each do |association|
+        assert_includes scope.preload_values.map(&:to_s), association, "expected #{association} preloaded on #{name}"
+      end
+    end
+  end
+
+  test "bookmarked_nav_for_user narrows by search before applying membership" do
+    user = users(:keith)
+    match = user.conversations.create!(assistant: assistants(:samantha), title: "Bookmark probe alpha zeta9")
+    other = user.conversations.create!(assistant: assistants(:samantha), title: "Bookmark probe unrelated qwerty7")
+    match.bookmark!(user)
+    other.bookmark!(user)
+
+    found = Conversation.bookmarked_nav_for_user(user, "zeta9").map(&:id)
+
+    assert_includes found, match.id
+    assert_not_includes found, other.id
+  end
+
+  test "reacted_nav_for_user narrows by search before applying membership" do
+    user = users(:keith)
+    match = user.conversations.create!(assistant: assistants(:samantha), title: "Reaction probe alpha zeta8")
+    other = user.conversations.create!(assistant: assistants(:samantha), title: "Reaction probe unrelated qwerty6")
+    match.react!("❤️", user)
+    other.react!("❤️", user)
+
+    found = Conversation.reacted_nav_for_user(user, "zeta8").map(&:id)
+
+    assert_includes found, match.id
+    assert_not_includes found, other.id
+  end
+
+  test "pinned_nav_for_user is empty during search even with pins present" do
+    user = users(:keith)
+    pinned = conversations(:greeting)
+    pinned.pin!(user)
+
+    assert_includes Conversation.pinned_nav_for_user(user).map(&:id), pinned.id
+    assert_empty Conversation.pinned_nav_for_user(user, "test")
+    assert_empty Conversation.pinned_nav_for_user(user, "Meeting")
+  end
+
+  test "sidebar nav query shape stays constant as lists grow" do
+    user = users(:keith)
+
+    baseline = count_sidebar_queries(user, nil)
+    baseline_search = count_sidebar_queries(user, "test")
+
+    5.times do |i|
+      user.conversations.create!(assistant: assistants(:samantha), title: "Growth probe #{i}")
+    end
+
+    assert_equal baseline, count_sidebar_queries(user, nil), "expected constant query shape as the list grows"
+    assert_equal baseline_search, count_sidebar_queries(user, "test"), "expected constant query shape as the list grows"
+  end
+
+  private
+
+  def count_sidebar_queries(user, query)
+    counter = 0
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      counter += 1 unless payload[:cached] || payload[:name] == "SCHEMA"
+    end
+    Conversation.nav_for_user(user, query).to_a.each do |conversation|
+      conversation.pinned?(user)
+      conversation.bookmarked?(user)
+      conversation.user_reacted?("❤️", user)
+      conversation.reaction_counts
+      conversation.user_emojis(user)
+    end
+    counter
+  ensure
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+  end
 end
