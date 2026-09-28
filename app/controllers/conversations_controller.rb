@@ -186,9 +186,12 @@ class ConversationsController < ApplicationController
     end
 
     new_id = params[:new_id].presence
-    return if new_id.blank? || @show == "all"
+    return if new_id.nil? || @show == "all"
 
-    fresh = Current.user.conversations.find_by(id: new_id)
+    # Same toggle preloads as every sibling row: the partial reads pinned?,
+    # bookmarked?, assistant, and reaction counts per row, which fall back to a
+    # query each when the preloaded cache is missing.
+    fresh = Current.user.conversations.preload(:assistant, :pins, :bookmarks, :reactions).find_by(id: new_id)
     return if fresh.nil?
     return if @nav_conversations.map(&:id).include?(fresh.id)
 
