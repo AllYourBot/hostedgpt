@@ -1,8 +1,19 @@
 # Contributing to HostedGPT
 
-We welcome contributors! After you get your development environment setup, review the list of Issues. We organize the issues into Milestones and are currently wrapping up [v0.7](https://github.com/allyourbot/hostedgpt/milestone/6) and starting 0.8 [View 0.8 Milestone](https://github.com/allyourbot/hostedgpt/milestone/8). Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
+We welcome contributors! After you get your development environment setup, review the list of Issues. Look for any issues tagged with **Good first issue** and add a comment so we know you're working on it.
 
 Get your development environment set up by running the Rails app directly on your machine either with Docker or outside of Docker. See [Running locally on your computer](https://github.com/allyourbot/hostedgpt/blob/main/README.md#running-locally-on-your-computer) for more details.
+
+### Development workflow
+
+Work on your feature, committing as you go. Run the tests relevant to your changes before each commit. When you're ready:
+
+1. `/pr-review` — reviews code against project guidelines, verifies Claude CLI assumptions, fixes issues, updates `.claude/rules/` and `USER_STORIES.md`
+2. `/pr` — pushes the branch and creates a pull request
+3. `/pr-feedback` — triages unresolved PR review comments (Copilot + teammates), applies fixes, resolves threads
+4. `/pr-merge` — runs `bin/ci`, verifies PR checklist, squash merges, cleans up branch
+
+Each skill is independent — run them in order or individually as needed.
 
 ### Running the test suite
 

@@ -24,7 +24,7 @@ HostedGPT is a Ruby on Rails 8.1 app providing a multi-provider conversational A
 - Similar `rails assistants:import` / `assistants:export[path]` tasks exist for `assistants.yml`.
 
 ### Linting
-- RuboCop is configured (`.rubocop.yml`, target Ruby 3.3, Rails cops enabled).
+- RuboCop is configured (`.rubocop.yml`, target Ruby 4.0, Rails cops enabled).
 
 ## Architecture
 
