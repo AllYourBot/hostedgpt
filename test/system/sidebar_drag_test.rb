@@ -157,14 +157,14 @@ class SidebarDragTest < ApplicationSystemTestCase
     assert pin_row_titles.include?("ZonePinned")
 
     # Drag the top unpinned row up into the pinned area: it pins and persists.
-    candidate_id = all("#conversations [data-sortable-id]").first["data-sortable-id"]
+    candidate_id = settled_row_id("#conversations", :first)
     candidate = Conversation.find(candidate_id)
     drag_boundary(candidate, zone: "pinned")
     assert_true { candidate.reload.pinned?(user) }
     assert_selector("#pinned-conversations [data-sortable-id='#{candidate.id}']")
 
     # Drag the bottom pinned row down out of the pinned area: it unpins and persists.
-    bottom_pin_id = all("#pinned-conversations [data-sortable-id]").last["data-sortable-id"]
+    bottom_pin_id = settled_row_id("#pinned-conversations", :last)
     bottom_pin = Conversation.find(bottom_pin_id)
     drag_boundary(bottom_pin, zone: "unpinned")
     assert_true { !bottom_pin.reload.pinned?(user) }
@@ -197,6 +197,30 @@ class SidebarDragTest < ApplicationSystemTestCase
     all("#conversations [data-role='conversation'] [data-role='title']").map(&:text)
   end
 
+  # Settles a drop deterministically: the controller flips this flag once the commit
+  # path runs to completion, so DB asserts wait on done instead of racing the commit
+  # fetch against a fixed timeout (a loaded box once stretched the unpin round trip
+  # past the wait window with the row slid but uncommitted). Reset before acting so a
+  # press that never lifts cannot pass on a previous drag's flag.
+  def perform_drop(&action)
+    page.evaluate_script("window.dropSettledForSystemTestsToCheck = false")
+    action.call
+    assert_true "the drop should settle its commit path" do
+      page.evaluate_script("window.dropSettledForSystemTestsToCheck") == true
+    end
+  end
+
+  # Reads a row id off a list that a stream re-render may be replacing: attribute reads
+  # on a node detached mid-render come back nil, so wait for a present value.
+  def settled_row_id(frame_selector, position)
+    row_id = nil
+    assert_true "a row id should be readable in #{frame_selector}" do
+      row_id = all("#{frame_selector} [data-sortable-id]").public_send(position)&.[]("data-sortable-id")
+      row_id.present?
+    end
+    row_id
+  end
+
   # Press the center of the source row, travel past the mouse-lift threshold, carry it over the
   # center of the target row, and let go. Viewport coordinates throughout — element-origin moves
   # are rejected by headless Chrome's action encoder. The two-step move matters: crossing
@@ -212,15 +236,17 @@ class SidebarDragTest < ApplicationSystemTestCase
     ty = target_rect[:y] + 4
     ty_height = target_rect[:height]
 
-    page.driver.browser.action
-      .move_to_location(sx, sy).click_and_hold
-      .move_by(0, 10)
-      .move_to_location(sx, ty)
-      .pause
-      .move_by(0, ty_height / 2)
-      .pause
-      .release
-      .perform
+    perform_drop do
+      page.driver.browser.action
+        .move_to_location(sx, sy).click_and_hold
+        .move_by(0, 10)
+        .move_to_location(sx, ty)
+        .pause
+        .move_by(0, ty_height / 2)
+        .pause
+        .release
+        .perform
+    end
   end
 
   def rect_of(element)
@@ -245,15 +271,17 @@ class SidebarDragTest < ApplicationSystemTestCase
     ty = target_rect[:y] + 4
     ty_height = target_rect[:height]
 
-    page.driver.browser.action
-      .move_to_location(sx, sy).click_and_hold
-      .move_by(0, 10)
-      .move_to_location(sx, ty)
-      .pause
-      .move_by(0, ty_height / 2)
-      .pause
-      .release
-      .perform
+    perform_drop do
+      page.driver.browser.action
+        .move_to_location(sx, sy).click_and_hold
+        .move_by(0, 10)
+        .move_to_location(sx, ty)
+        .pause
+        .move_by(0, ty_height / 2)
+        .pause
+        .release
+        .perform
+    end
   end
 
   def find_row(record)
@@ -288,14 +316,16 @@ class SidebarDragTest < ApplicationSystemTestCase
     sxy = grab == :title ? js_title_of_row(source_record.id) : js_center_of_row(source_record.id)
     txy = zone == "pinned" ? js_pinned_edge : js_unpinned_edge
 
-    page.driver.browser.action
-      .move_to_location(sxy[0], sxy[1])
-      .click_and_hold
-      .move_by(0, 10)
-      .move_to_location(txy[0], txy[1])
-      .pause
-      .release
-      .perform
+    perform_drop do
+      page.driver.browser.action
+        .move_to_location(sxy[0], sxy[1])
+        .click_and_hold
+        .move_by(0, 10)
+        .move_to_location(txy[0], txy[1])
+        .pause
+        .release
+        .perform
+    end
   end
 
   def js_center_of_row(id)

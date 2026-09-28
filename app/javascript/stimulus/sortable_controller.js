@@ -103,11 +103,16 @@ export default class extends Controller {
       const toZone = this.#dropZone(event)
       const movedId = this.pressed.dataset.sortableId
       this.#putDown()
-      this.#commitDrop(this.originZone, toZone, movedId)
+      // Settles the drop for system tests: commit fetches resolve before this flag flips,
+      // so tests wait on completion instead of racing fixed timeouts against DB state.
+      // DOM re-renders still settle through Capybara waits. Mirrors the other
+      // window.*ForSystemTestsToCheck hooks (image loading, scroll, clipboard).
+      this.#commitDrop(this.originZone, toZone, movedId).finally(() => { window.dropSettledForSystemTestsToCheck = true })
       this.#swallowNextClick() // the click that follows a drop must not open the row's link
     } else {
       this.#putDown()
       this.#replayHeldRefresh()
+      window.dropSettledForSystemTestsToCheck = true
     }
   }
 
@@ -177,12 +182,14 @@ export default class extends Controller {
     if (this.dragging) this.#restoreOrder() // a canceled drag never commits: rows go back as they were
     this.#putDown()
     this.#replayHeldRefresh()
+    window.dropSettledForSystemTestsToCheck = true
   }
 
   #lift() {
     clearTimeout(this.holdTimer)
     this.holdTimer = null
     if (!this.pressed.isConnected) { this.pressed = null; return } // a refresh in the touch-hold window detached the row: no drag
+    window.dropSettledForSystemTestsToCheck = false // each drag re-arms the settle flag it will flip on completion
     this.dragging = true
     this.originZone = this.pressed.dataset.sortableZone ?? null
     this.orderAtDragStart = this.#orderedIds
