@@ -109,7 +109,7 @@ en:
           new: "New Assistant"
         context:
           title: "Context"
-          hint: "Text and PDF files uploaded here are included in this assistant's instructions on every conversation."
+          hint: "Text, PDF, and image files uploaded here are given to this assistant on every conversation. Images are shown only when its language model supports images."
           none: "No files uploaded yet."
           upload: "Upload file"
           remove: "Remove"

@@ -499,6 +499,20 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_empty msgs_with_attachments, "Should not have any Content objects when supports_images is false"
   end
 
+  test "preceding_conversation_messages attaches the assistant's context images to the first user message only" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    assistant.documents.create!(file: Rack::Test::UploadedFile.new(file_fixture("cat.png"), "image/png"))
+    conversation = conversations(:hello_claude)
+
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, conversation.latest_message_for_version(:latest))
+    first_user, _reply, newest_user = backend.send(:preceding_conversation_messages)
+
+    assert_instance_of ::RubyLLM::Content, first_user[:content], "The first user message should carry attachments"
+    assert_equal [:image], first_user[:content].attachments.map(&:type), "The context image should be attached"
+    assert_instance_of String, newest_user[:content], "Later messages should stay text-only"
+  end
+
   test "preceding_conversation_messages attaches a PDF natively when the model supports PDFs" do
     assistant = assistants(:keith_claude35)
     assistant.language_model.update!(supports_pdf: true, supports_tools: false)

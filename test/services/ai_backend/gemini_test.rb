@@ -108,6 +108,17 @@ class AIBackend::GeminiTest < ActiveSupport::TestCase
     end
   end
 
+  test "preceding_conversation_messages attaches the assistant's context images to the first user message only" do
+    @assistant.language_model.update!(supports_images: true)
+    @assistant.documents.create!(file: fixture_file_upload("cat.png", "image/png"))
+
+    first_user, _reply, newest_user = @gemini.send(:preceding_conversation_messages)
+
+    assert_equal({ text: "Hi Claude, can you hear me?" }, first_user[:parts].first, "The user's own text should come first")
+    assert_equal "image/png", first_user[:parts].second.dig(:inline_data, :mime_type), "The context image should ride on the first user message"
+    refute newest_user[:parts].any? { |part| part[:inline_data] }, "The context image should not be repeated on later messages"
+  end
+
   test "preceding_conversation_messages sends a PDF as inline data when the model supports PDFs" do
     @assistant.language_model.update!(supports_pdf: true)
 

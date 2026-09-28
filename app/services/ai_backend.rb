@@ -159,6 +159,14 @@ class AIBackend
     history.select(&:user?).last
   end
 
+  # On the first message rather than the latest, so the attachments stay in the prefix providers cache.
+  def documents_for(message, history)
+    first_user_message = history.find(&:user?)
+    return message.documents.to_a unless message == first_user_message
+
+    @assistant.context_attachments + message.documents.to_a
+  end
+
   def current_time_note
     "For the user, the current time is #{DateTime.current.strftime("%-l:%M%P")}; the current date is #{DateTime.current.strftime("%A, %B %-d, %Y")}"
   end

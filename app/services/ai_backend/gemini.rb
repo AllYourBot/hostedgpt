@@ -150,7 +150,7 @@ class AIBackend::Gemini < AIBackend
       elsif message.assistant? && message.content_tool_calls.present?
         tool_call_message(message)
       elsif message.user?
-        user_message(message, with_time: message == latest_user_message)
+        user_message(message, documents_for(message, history), with_time: message == latest_user_message)
       else
         {
           role: message.role == "assistant" ? "model" : "user", parts: { text: message.content_text || "" }
@@ -159,9 +159,9 @@ class AIBackend::Gemini < AIBackend
     end
   end
 
-  def user_message(message, with_time:)
+  def user_message(message, documents, with_time:)
     parts = [{ text: message.content_text || "" }]
-    parts += message.documents.filter_map { |document| document_part(document) }
+    parts += documents.filter_map { |document| document_part(document) }
     parts << { text: current_time_note } if with_time
 
     { role: "user", parts: parts.one? ? parts.first : parts }
