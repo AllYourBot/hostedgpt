@@ -40,6 +40,7 @@ module TestClient
       @@messages_args = args
       model = args.dig(:model) || "no model"
       system_message = args.dig(:system)
+      system_message = system_message.pluck(:text).join if system_message.is_a?(Array)
       tools = args.dig(:parameters, :tools)
 
       if proc = args.dig(:parameters, :stream)

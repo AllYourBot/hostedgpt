@@ -97,7 +97,8 @@ class AIBackend::RubyLLM < AIBackend
     @stream_response_text = ""
 
     chat = build_chat
-    chat.with_instructions(full_instructions)
+    instructions = full_instructions
+    chat.with_instructions(conversation_instructions(instructions)) if instructions.present?
     preceding_conversation_messages.each { |msg| chat.add_message(msg) }
     chat.with_tools(*tool_instances) if tools_enabled?
 
@@ -128,6 +129,14 @@ class AIBackend::RubyLLM < AIBackend
     chat = self.class.gem_class.new(model: @api_name, provider: provider_slug, assume_model_exists: true, context: ruby_llm_context)
     chat.with_headers(**AIBackend::OpenRouter.attribution_headers) if @api_service.provider_identity == :openrouter
     chat
+  end
+
+  # Anthropic caches only what it is told to, so mark the stable system prompt the way the SDK
+  # backend does. OpenAI and Gemini cache a repeated prefix on their own.
+  def conversation_instructions(instructions)
+    return instructions unless provider_slug == :anthropic
+
+    ::RubyLLM::Content::Raw.new([{ type: "text", text: instructions, cache_control: AIBackend::Anthropic::CACHE_CONTROL }])
   end
 
   def ruby_llm_context
@@ -161,34 +170,14 @@ class AIBackend::RubyLLM < AIBackend
   end
 
   def preceding_conversation_messages
-    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
+    history = conversation_history
+    latest_user_message = latest_user_message(history)
+
+    history.collect do |message|
       if message.tool?
         { role: :tool, content: message.content_text || "", tool_call_id: message.tool_call_id }
-      elsif @assistant.supports_images? && message.documents.present? && message.role == "user"
-        content_parts = [message.content_text]
-        attachments = []
-
-        message.documents.each do |document|
-          if document.has_image?
-            attachments << ::RubyLLM::Attachment.new(document.file)
-          elsif document.has_document_pdf?
-            pdf_text = document.extract_pdf_text
-            if pdf_text.present?
-              content_parts << "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
-            else
-              content_parts << "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
-            end
-          end
-        end
-
-        text = content_parts.compact.join
-        content = if attachments.any?
-          ::RubyLLM::Content.new(text, attachments)
-        else
-          text
-        end
-
-        { role: message.role, content: content }
+      elsif message.user?
+        user_message(message, with_time: message == latest_user_message)
       elsif message.assistant? && message.content_tool_calls.present?
         {
           role: :assistant,
@@ -202,6 +191,20 @@ class AIBackend::RubyLLM < AIBackend
         }
       end
     end.compact
+  end
+
+  # RubyLLM formats each attachment for the provider: a PDF becomes Anthropic's document block,
+  # OpenAI's file part, or Gemini's inline data.
+  def user_message(message, with_time:)
+    attachments = message.documents.select { |document| natively_readable?(document) }.map { |document| ::RubyLLM::Attachment.new(document.file) }
+    pdf_texts = message.documents.select { |document| document.has_document_pdf? && !@assistant.supports_pdf? }.map(&:pdf_as_text)
+    text = [message.content_text, *pdf_texts, (current_time_note if with_time)].compact.join("\n\n")
+
+    { role: message.role, content: attachments.any? ? ::RubyLLM::Content.new(text, attachments) : text }
+  end
+
+  def natively_readable?(document)
+    (document.has_image? && @assistant.supports_images?) || (document.has_document_pdf? && @assistant.supports_pdf?)
   end
 
   # Reconstructs the stored OpenAI-shaped content_tool_calls (serialized via

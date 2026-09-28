@@ -26,28 +26,34 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     TestClient::Anthropic.stub :text, nil do # this forces it to fall back to default text
       streamed_text = ""
       @anthropic.stream_next_conversation_message { |chunk| streamed_text += chunk }
-      expected_start = "Hello this is model claude-3-5-sonnet-20240620 with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\nHe owns a cat\\n\\nFor the user, the current time"
-      expected_end = "\"! How can I assist you today?"
-      assert streamed_text.start_with?(expected_start)
-      assert streamed_text.end_with?(expected_end)
+      expected = "Hello this is model claude-3-5-sonnet-20240620 with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\nHe owns a cat\"! How can I assist you today?"
+      assert_equal expected, streamed_text
     end
   end
 
-  test "preceding_conversation_messages constructs a proper response and pivots on images" do
-    preceding_conversation_messages = @anthropic.send(:preceding_conversation_messages)
+  test "stream_next_conversation_message sends the instructions as one cached system block" do
+    @anthropic.stream_next_conversation_message { |chunk| }
 
-    assert_equal @conversation.messages.length-1, preceding_conversation_messages.length
+    system = TestClient::Anthropic.messages_args.dig(:parameters, :system)
+    assert_equal 1, system.length
+    assert_includes system.first[:text], "He owns a cat"
+    assert_equal({ type: "ephemeral" }, system.first[:cache_control])
+  end
 
-    @conversation.messages.ordered.each_with_index do |message, i|
-      next if @conversation.messages.length == i+1
+  test "preceding_conversation_messages puts the current time on the newest user message only" do
+    first_user, _reply, newest_user = @anthropic.send(:preceding_conversation_messages)
 
-      if message.documents.present?
-        assert_instance_of Array, preceding_conversation_messages[i][:content]
-        assert_equal message.documents.length+1, preceding_conversation_messages[i][:content].length
-      else
-        assert_equal preceding_conversation_messages[i][:content], message.content_text
-      end
-    end
+    assert_equal "Hi Claude, can you hear me?", first_user[:content]
+    assert_equal "How old are you?", newest_user[:content].first[:text]
+    assert_includes newest_user[:content].last[:text], "For the user, the current time is"
+    refute newest_user[:content].any? { |block| block[:cache_control] }, "The time note changes every turn, so nothing after it should be cached"
+  end
+
+  test "preceding_conversation_messages ends the cacheable prefix at the reply before the newest user message" do
+    messages = @anthropic.send(:preceding_conversation_messages)
+
+    assert_equal 3, messages.length
+    assert_equal [{ type: "text", text: "Yes, I can hear you.", cache_control: { type: "ephemeral" } }], messages[1][:content]
   end
 
   test "anthropic_format_tools converts OpenAI format to Anthropic format" do
@@ -307,128 +313,35 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     end
   end
 
-  test "preceding_conversation_messages processes PDF documents" do
-    # Create a new conversation with a message that has a PDF document
-    assistant = assistants(:keith_claude35)
-    assistant.language_model.update!(supports_pdf: true)
+  test "preceding_conversation_messages sends a PDF natively and caches it when the model supports PDFs" do
+    @assistant.language_model.update!(supports_pdf: true)
+    backend = backend_replying_to_pdf("report.pdf", "%PDF-1.4 native bytes")
 
-    # Verify supports_pdf? works
-    assert assistant.supports_pdf?, "Assistant should support PDF processing"
+    pdf_message = backend.send(:preceding_conversation_messages).first
+    document = pdf_message[:content].find { |block| block[:type] == "document" }
 
-    conversation = Conversation.create!(
-      user: users(:keith),
-      assistant: assistant,
-      title: "PDF Test Conversation"
-    )
-
-    # Create a simple PDF file for testing
-    pdf_content = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n/Contents 4 0 R\n>>\nendobj\n4 0 obj\n<<\n/Length 44\n>>\nstream\nBT\n/F1 12 Tf\n72 720 Td\n(Hello World) Tj\nET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000200 00000 n \ntrailer\n<<\n/Size 5\n/Root 1 0 R\n>>\nstartxref\n294\n%%EOF"
-
-    # Create a temporary PDF file
-    test_file = Tempfile.new(["test", ".pdf"])
-    test_file.write(pdf_content)
-    test_file.rewind
-
-    # Create a message with PDF attachment
-    message = conversation.messages.create!(
-      role: "user",
-      content_text: "Please analyze this PDF",
-      assistant: assistant
-    )
-
-    # Attach the PDF file
-    document = message.documents.create!(
-      file: fixture_file_upload(test_file.path, "application/pdf"),
-      filename: "test.pdf"
-    )
-
-    # Verify the document was created and is a PDF
-    assert document.has_document_pdf?, "Document should be identified as a PDF"
-
-    # Create a second message to test with
-    second_message = conversation.messages.create!(
-      role: "assistant",
-      content_text: "I'll analyze the PDF for you",
-      assistant: assistant
-    )
-
-    anthropic = AIBackend::Anthropic.new(users(:keith), assistant, conversation, second_message)
-    messages = anthropic.send(:preceding_conversation_messages)
-
-
-    # Find the message with PDF content
-    pdf_message = messages.find { |m| m[:content].is_a?(Array) && m[:content].any? { |c| c[:text]&.include?("PDF Document: test.pdf") } }
-
-    assert pdf_message, "Should find a message with PDF content. Messages: #{messages.inspect}"
-    assert_equal "user", pdf_message[:role]
-
-    # Check that the PDF content was processed (either successfully or with error message)
-    pdf_content_part = pdf_message[:content].find { |c| c[:text]&.include?("PDF Document: test.pdf") }
-    assert pdf_content_part, "Should find PDF content part"
-    # The PDF extraction might fail with our test PDF, so we check for either success or error message
-    assert pdf_content_part[:text].include?("PDF Document: test.pdf"), "Should include PDF document reference"
-    # Since our test PDF is not valid, we expect the error message
-    assert pdf_content_part[:text].include?("Unable to extract text from this PDF"), "Should include error message for failed PDF extraction"
-
-    test_file.close
-    test_file.unlink
+    assert_equal "Please analyze this PDF", pdf_message[:content].first[:text]
+    assert_equal({ type: "base64", media_type: "application/pdf", data: Base64.strict_encode64("%PDF-1.4 native bytes") }, document[:source])
+    assert_equal({ type: "ephemeral" }, document[:cache_control])
   end
 
-  test "preceding_conversation_messages handles PDF extraction errors gracefully" do
-    # Create a new conversation with a message that has a corrupted PDF document
-    assistant = assistants(:keith_claude35)
-    assistant.language_model.update!(supports_pdf: true)
+  test "preceding_conversation_messages falls back to the PDF's text when the model cannot read PDFs, even without image support" do
+    @assistant.language_model.update!(supports_pdf: false, supports_images: false)
+    backend = backend_replying_to_pdf("quarterly.pdf", file_fixture("quarterly.pdf").binread)
 
-    conversation = Conversation.create!(
-      user: users(:keith),
-      assistant: assistant,
-      title: "PDF Error Test Conversation"
-    )
+    pdf_message = backend.send(:preceding_conversation_messages).first
 
-    # Create a corrupted PDF file
-    corrupted_pdf_content = "%PDF-1.4\ncorrupted content"
+    assert_includes pdf_message[:content].pluck(:text), "[PDF Document: quarterly.pdf]\nQuarterly numbers"
+    refute pdf_message[:content].any? { |block| block[:type] == "document" }
+  end
 
-    # Create a temporary PDF file
-    test_file = Tempfile.new(["test", ".pdf"])
-    test_file.write(corrupted_pdf_content)
-    test_file.rewind
+  test "preceding_conversation_messages says so when a PDF's text cannot be extracted" do
+    @assistant.language_model.update!(supports_pdf: false)
+    backend = backend_replying_to_pdf("corrupted.pdf", "%PDF-1.4\ncorrupted content")
 
-    # Create a message with corrupted PDF attachment
-    message = conversation.messages.create!(
-      role: "user",
-      content_text: "Please analyze this PDF",
-      assistant: assistant
-    )
+    pdf_message = backend.send(:preceding_conversation_messages).first
 
-    # Attach the corrupted PDF file
-    message.documents.create!(
-      file: fixture_file_upload(test_file.path, "application/pdf"),
-      filename: "corrupted.pdf"
-    )
-
-    # Create a second message to test with
-    second_message = conversation.messages.create!(
-      role: "assistant",
-      content_text: "I'll try to analyze the PDF for you",
-      assistant: assistant
-    )
-
-    anthropic = AIBackend::Anthropic.new(users(:keith), assistant, conversation, second_message)
-    messages = anthropic.send(:preceding_conversation_messages)
-
-    # Find the message with PDF content
-    pdf_message = messages.find { |m| m[:content].is_a?(Array) && m[:content].any? { |c| c[:text]&.include?("PDF Document: corrupted.pdf") } }
-
-    assert pdf_message, "Should find a message with PDF content"
-    assert_equal "user", pdf_message[:role]
-
-    # Check that the error message was included
-    pdf_content_part = pdf_message[:content].find { |c| c[:text]&.include?("PDF Document: corrupted.pdf") }
-    assert pdf_content_part, "Should find PDF content part"
-    assert_includes pdf_content_part[:text], "Unable to extract text from this PDF"
-
-    test_file.close
-    test_file.unlink
+    assert_includes pdf_message[:content].pluck(:text), "[PDF Document: corrupted.pdf - Unable to extract text from this PDF]"
   end
 
   test "one-off messages call records arguments and returns a diggable envelope" do
@@ -491,5 +404,16 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
 
   test "billing_url returns the recorded Anthropic billing page" do
     assert_equal "https://console.anthropic.com/settings/plans", AIBackend::Anthropic.billing_url
+  end
+
+  private
+
+  def backend_replying_to_pdf(filename, pdf_bytes)
+    conversation = Conversation.create!(user: users(:keith), assistant: @assistant, title: "PDF Test Conversation")
+    message = conversation.messages.create!(role: "user", content_text: "Please analyze this PDF", assistant: @assistant)
+    message.documents.create!(file: { io: StringIO.new(pdf_bytes), filename:, content_type: "application/pdf" })
+    reply = conversation.messages.create!(role: "assistant", content_text: "I'll analyze the PDF for you", assistant: @assistant)
+
+    AIBackend::Anthropic.new(users(:keith), @assistant, conversation, reply)
   end
 end

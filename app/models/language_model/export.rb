@@ -8,6 +8,7 @@ module LanguageModel::Export
     supports_images
     supports_tools
     supports_system_message
+    supports_pdf
   ]
 
   DEFAULT_MODEL_FILE = "models.yml"

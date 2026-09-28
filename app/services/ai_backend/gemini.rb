@@ -134,53 +134,51 @@ class AIBackend::Gemini < AIBackend
   end
 
   def system_message(content)
-    return [] if content.blank?
+    return nil if content.blank?
     {
       role: "user", parts: { text: content }
     }
   end
 
   def preceding_conversation_messages
-    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
+    history = conversation_history
+    latest_user_message = latest_user_message(history)
+
+    history.collect do |message|
       if message.tool?
         tool_response_message(message)
       elsif message.assistant? && message.content_tool_calls.present?
         tool_call_message(message)
-      elsif @assistant.supports_images? && message.documents.present? && message.role == "user"
-        # Handle mixed content (images and PDFs)
-        content = [{ text: message.content_text }]
-
-        message.documents.each do |document|
-          if document.has_image?
-            content << { inline_data: {
-                mime_type: document.file.blob.content_type,
-                data: document.file_base64(:large),
-              }
-            }
-          elsif document.has_document_pdf?
-            # Extract text from PDF and include it in the conversation
-            pdf_text = document.extract_pdf_text
-            if pdf_text.present?
-              content << {
-                text: "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
-              }
-            else
-              content << {
-                text: "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
-              }
-            end
-          end
-        end
-
-        {
-          role: message.role == "assistant" ? "model" : "user", parts: content
-        }
+      elsif message.user?
+        user_message(message, with_time: message == latest_user_message)
       else
         {
           role: message.role == "assistant" ? "model" : "user", parts: { text: message.content_text || "" }
         }
       end
     end
+  end
+
+  def user_message(message, with_time:)
+    parts = [{ text: message.content_text || "" }]
+    parts += message.documents.filter_map { |document| document_part(document) }
+    parts << { text: current_time_note } if with_time
+
+    { role: "user", parts: parts.one? ? parts.first : parts }
+  end
+
+  def document_part(document)
+    if document.has_image?
+      inline_data(document.file.blob.content_type, document.file_base64(:large)) if @assistant.supports_images?
+    elsif document.has_document_pdf?
+      return { text: document.pdf_as_text } unless @assistant.supports_pdf?
+
+      inline_data("application/pdf", document.file_base64)
+    end
+  end
+
+  def inline_data(mime_type, data)
+    { inline_data: { mime_type:, data: } }
   end
 
   def tool_call_message(message)

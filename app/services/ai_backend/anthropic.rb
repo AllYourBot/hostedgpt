@@ -1,6 +1,8 @@
 class AIBackend::Anthropic < AIBackend
   include Tools
 
+  CACHE_CONTROL = { type: "ephemeral" }.freeze
+
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
   #
@@ -144,21 +146,28 @@ class AIBackend::Anthropic < AIBackend
     end
 
     formatted_tools = @assistant.language_model.supports_tools? && anthropic_format_tools(Toolbox.tools) || nil
+    system = config[:streaming] ? cached_system(instructions) : instructions
 
     @client_config = {
       model: @assistant.language_model.api_name,
-      system: instructions,
+      system:,
       messages: config[:messages],
       tools: formatted_tools,
       parameters: {
         model: @assistant.language_model.api_name,
-        system: instructions,
+        system:,
         messages: config[:messages],
         max_tokens: 2000, # we should really set this dynamically, based on the model, to the max
         stream: config[:streaming] && @response_handler || nil,
         tools: formatted_tools,
       }.compact.merge(config[:params]&.except(:response_format) || {})
     }.compact
+  end
+
+  # A conversation resends the same tools and instructions (memories, context files) every turn,
+  # so cache them. One-off prompts are too short to be worth it.
+  def cached_system(instructions)
+    [{ type: "text", text: instructions, cache_control: CACHE_CONTROL }] if instructions.present?
   end
 
   def stream_handler(&chunk_handler)
@@ -196,7 +205,10 @@ class AIBackend::Anthropic < AIBackend
   end
 
   def preceding_conversation_messages
-    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
+    history = conversation_history
+    latest_user_message = latest_user_message(history)
+
+    messages = history.collect do |message|
       # Anthropic doesn't support "tool" role - convert tool messages to user messages with tool_result content
       if message.tool?
         {
@@ -209,40 +221,8 @@ class AIBackend::Anthropic < AIBackend
             }
           ]
         }
-      elsif @assistant.supports_images? && message.documents.present? && message.role == "user"
-        # Handle mixed content (images and PDFs)
-        content = [{ type: "text", text: message.content_text }]
-
-        message.documents.each do |document|
-          if document.has_image?
-            content << { type: "image",
-              source: {
-                type: "base64",
-                media_type: document.file.blob.content_type,
-                data: document.file_base64(:large),
-              }
-            }
-          elsif document.has_document_pdf?
-            # Extract text from PDF and include it in the conversation
-            pdf_text = document.extract_pdf_text
-            if pdf_text.present?
-              content << {
-                type: "text",
-                text: "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
-              }
-            else
-              content << {
-                type: "text",
-                text: "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
-              }
-            end
-          end
-        end
-
-        {
-          role: message.role,
-          content: content
-        }
+      elsif message.user?
+        user_message(message, with_time: message == latest_user_message)
       elsif message.assistant? && message.content_tool_calls.present?
         Rails.logger.info "#### Converting assistant message with tool calls"
         Rails.logger.info "#### Tool calls: #{message.content_tool_calls.inspect}"
@@ -276,5 +256,53 @@ class AIBackend::Anthropic < AIBackend
         }
       end
     end
+
+    add_cache_breakpoints(messages, history.index(latest_user_message))
+  end
+
+  def user_message(message, with_time:)
+    content = [{ type: "text", text: message.content_text || "" }]
+    content += message.documents.filter_map { |document| document_block(document) }
+    content << { type: "text", text: current_time_note } if with_time
+
+    { role: "user", content: content.one? ? content.first[:text] : content }
+  end
+
+  def document_block(document)
+    if document.has_image?
+      base64_block("image", document.file.blob.content_type, document.file_base64(:large)) if @assistant.supports_images?
+    elsif document.has_document_pdf?
+      return { type: "text", text: document.pdf_as_text } unless @assistant.supports_pdf?
+
+      base64_block("document", "application/pdf", document.file_base64)
+    end
+  end
+
+  def base64_block(type, media_type, data)
+    { type:, source: { type: "base64", media_type:, data: } }
+  end
+
+  # A PDF or image is resent on every turn, so mark where the cacheable prefix ends: after the last
+  # exchange before the newest user message (whose time note changes each turn), and after the newest
+  # attachment so it is cached from the turn it arrives.
+  def add_cache_breakpoints(messages, latest_user_index)
+    return messages if latest_user_index.nil?
+
+    cache_block(last_block_of(messages[latest_user_index - 1])) if latest_user_index.positive?
+    cache_block(last_attachment_block_of(messages[latest_user_index]))
+    messages
+  end
+
+  def last_attachment_block_of(message)
+    Array(message[:content]).reverse.find { |block| block.is_a?(Hash) && block[:type].in?(%w[document image]) }
+  end
+
+  def last_block_of(message)
+    message[:content] = [{ type: "text", text: message[:content] }] if message[:content].is_a?(String) && message[:content].present?
+    message[:content].last if message[:content].is_a?(Array)
+  end
+
+  def cache_block(block)
+    block[:cache_control] = CACHE_CONTROL if block
   end
 end

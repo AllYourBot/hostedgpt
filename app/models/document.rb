@@ -121,6 +121,14 @@ class Document < ApplicationRecord
     file.download.force_encoding(Encoding::UTF_8).scrub
   end
 
+  # The PDF as a labeled block of text, for a model that cannot read the PDF itself.
+  def pdf_as_text
+    text = extract_pdf_text
+    return "[PDF Document: #{filename} - Unable to extract text from this PDF]" if text.blank?
+
+    "[PDF Document: #{filename}]\n#{text}"
+  end
+
   def extract_pdf_text
     return nil unless has_document_pdf?
 

@@ -149,6 +149,20 @@ class AIBackend
     raise NotImplementedError
   end
 
+  def conversation_history
+    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).to_a
+  end
+
+  # The current time rides on the newest message the user wrote rather than in the system prompt,
+  # so the instructions and the history before that message stay a stable prefix providers can cache.
+  def latest_user_message(history)
+    history.select(&:user?).last
+  end
+
+  def current_time_note
+    "For the user, the current time is #{DateTime.current.strftime("%-l:%M%P")}; the current date is #{DateTime.current.strftime("%A, %B %-d, %Y")}"
+  end
+
   def full_instructions
     s = @assistant.instructions.to_s
 
@@ -161,7 +175,6 @@ class AIBackend
       s += "\n\n#{context}"
     end
 
-    s += "\n\nFor the user, the current time is #{DateTime.current.strftime("%-l:%M%P")}; the current date is #{DateTime.current.strftime("%A, %B %-d, %Y")}"
     s += "\n\n#{VOICE_INSTRUCTIONS}" if @message&.replying_to_speech?
     s.strip
   end

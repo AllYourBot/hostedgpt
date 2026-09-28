@@ -499,44 +499,68 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_empty msgs_with_attachments, "Should not have any Content objects when supports_images is false"
   end
 
-  test "preceding_conversation_messages inlines PDF text when supports_images is true" do
-    pdf_content = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n/Contents 4 0 R\n>>\nendobj\n4 0 obj\n<<\n/Length 44\n>>\nstream\nBT\n/F1 12 Tf\n72 720 Td\n(Hello World) Tj\nET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000200 00000 n \ntrailer\n<<\n/Size 5\n/Root 1 0 R\n>>\nstartxref\n294\n%%EOF"
-
-    test_file = Tempfile.new(["test", ".pdf"])
-    test_file.write(pdf_content)
-    test_file.rewind
-
+  test "preceding_conversation_messages attaches a PDF natively when the model supports PDFs" do
     assistant = assistants(:keith_claude35)
-    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    assistant.language_model.update!(supports_pdf: true, supports_tools: false)
 
-    conversation = Conversation.create!(user: @user, assistant: assistant, title: "PDF Test")
+    content = backend_replying_to_pdf(assistant, "quarterly.pdf", file_fixture("quarterly.pdf").binread).send(:preceding_conversation_messages).first[:content]
 
-    pdf_message = conversation.messages.create!(
-      role: "user",
-      content_text: "Check this document",
-      assistant: assistant
-    )
-    pdf_message.documents.create!(
-      file: fixture_file_upload(test_file.path, "application/pdf"),
-      filename: "test.pdf"
-    )
+    assert_instance_of ::RubyLLM::Content, content
+    assert_equal [:pdf], content.attachments.map(&:type)
+    refute_includes content.text, "PDF Document"
+  end
 
-    message = conversation.messages.create!(
-      role: "assistant",
-      content_text: "Let me check",
-      assistant: assistant
-    )
+  test "preceding_conversation_messages inlines a PDF's text for a model without PDF or image support" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_pdf: false, supports_images: false, supports_tools: false)
 
-    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
-    msgs = backend.send(:preceding_conversation_messages)
+    content = backend_replying_to_pdf(assistant, "quarterly.pdf", file_fixture("quarterly.pdf").binread).send(:preceding_conversation_messages).first[:content]
 
-    pdf_entry = msgs.find { |m| m[:role] == "user" && m[:content].to_s.include?("PDF Document: test.pdf") }
-    assert pdf_entry, "Should include PDF content reference"
-    assert pdf_entry[:content].to_s.include?("PDF Document: test.pdf"), "Should include PDF document reference"
-    assert pdf_entry[:content].to_s.include?("Unable to extract text from this PDF"), "Should include error for failed extraction"
-  ensure
-    test_file&.close
-    test_file&.unlink
+    assert_instance_of String, content
+    assert_includes content, "[PDF Document: quarterly.pdf]\nQuarterly numbers"
+  end
+
+  test "preceding_conversation_messages says so when a PDF's text cannot be extracted" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_pdf: false, supports_tools: false)
+
+    content = backend_replying_to_pdf(assistant, "corrupted.pdf", "%PDF-1.4\ncorrupted content").send(:preceding_conversation_messages).first[:content]
+
+    assert_includes content, "[PDF Document: corrupted.pdf - Unable to extract text from this PDF]"
+  end
+
+  test "preceding_conversation_messages appends the current time to the newest user message only" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_tools: false)
+    conversation = Conversation.create!(user: @user, assistant: assistant, title: "Time")
+    conversation.messages.create!(role: "user", content_text: "First", assistant: assistant) # each user message gets a blank reply
+    conversation.messages.create!(role: "user", content_text: "Second", assistant: assistant)
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, conversation.messages.ordered.last)
+
+    msgs = backend.stub(:current_time_note, "NOTE") { backend.send(:preceding_conversation_messages) }
+
+    assert_equal ["First", "", "Second\n\nNOTE"], msgs.pluck(:content)
+  end
+
+  test "stream_next_conversation_message marks the system prompt cacheable for Anthropic" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_tools: false)
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversations(:hello_claude), conversations(:hello_claude).latest_message_for_version(:latest))
+
+    TestClient::RubyLLM::Chat.stub(:text, "Hi") { backend.stream_next_conversation_message { |chunk| } }
+
+    instructions = TestClient::RubyLLM::Chat.instructions
+    assert_instance_of ::RubyLLM::Content::Raw, instructions
+    assert_equal({ type: "ephemeral" }, instructions.value.first[:cache_control])
+  end
+
+  test "stream_next_conversation_message leaves the system prompt as text for OpenAI" do
+    @assistant.language_model.update!(supports_tools: false)
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, @conversation.latest_message_for_version(:latest))
+
+    TestClient::RubyLLM::Chat.stub(:text, "Hi") { backend.stream_next_conversation_message { |chunk| } }
+
+    assert_instance_of String, TestClient::RubyLLM::Chat.instructions
   end
 
   test "sanitize_content removes json_of_generated_image from JSON content" do
@@ -945,5 +969,15 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
         backend.get_oneoff_message("Extract a topic", ["Hello"])
       end
     end
+  end
+  private
+
+  def backend_replying_to_pdf(assistant, filename, pdf_bytes)
+    conversation = Conversation.create!(user: @user, assistant: assistant, title: "PDF Test")
+    message = conversation.messages.create!(role: "user", content_text: "Check this document", assistant: assistant)
+    message.documents.create!(file: { io: StringIO.new(pdf_bytes), filename:, content_type: "application/pdf" })
+    reply = conversation.messages.create!(role: "assistant", content_text: "Let me check", assistant: assistant)
+
+    AIBackend::RubyLLM.new(@user, assistant, conversation, reply)
   end
 end

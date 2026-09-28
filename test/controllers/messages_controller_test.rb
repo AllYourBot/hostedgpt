@@ -240,15 +240,16 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "div#composer.hidden", false
   end
 
-  test "when assistant supports images the image upload function is available" do
+  test "when assistant supports images the attachment picker offers images and PDFs" do
     get conversation_messages_url(@conversation, version: 1)
-    assert_select "div#composer"
-    assert_select "div#composer.relationship", false
+    assert_select "#attach-button"
+    assert_select "input#attachment_picker[accept=?]", "image/*,.pdf"
   end
 
-  test "when assistant doesn't support images the image upload function is not available" do
+  test "when assistant doesn't support images the attachment picker still offers PDFs" do
     get conversation_messages_url(conversations(:trees), version: 1)
-    assert_select "div#composer.relationship"
+    assert_select "#attach-button"
+    assert_select "input#attachment_picker[accept=?]", ".pdf"
   end
 
   test "the composer is hidden when viewing a list of messages attached to an assistant that has been soft-deleted" do

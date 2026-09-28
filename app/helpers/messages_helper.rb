@@ -1,6 +1,11 @@
 require "./lib/markdown_renderer"
 
 module MessagesHelper
+  # Every model can take a PDF (as extracted text if nothing else), but only some can see images.
+  def attachment_types_for(assistant)
+    assistant.supports_images? ? "image/*,.pdf" : ".pdf"
+  end
+
   def render_avatar_for(message)
     if message.user?
       render partial: "layouts/user_avatar",      locals: { user: Current.user,           size: 7, classes: "mt-1" }

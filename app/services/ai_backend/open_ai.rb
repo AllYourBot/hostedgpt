@@ -168,6 +168,8 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def system_message(content)
+    return [] if content.blank?
+
     [{
       role: "system",
       content:,
@@ -175,36 +177,12 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def preceding_conversation_messages
-    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
-      if @assistant.supports_images? && message.documents.present? && message.role == "user"
-        # Handle mixed content (images and PDFs)
-        content_with_media = [{ type: "text", text: message.content_text }]
+    history = conversation_history
+    latest_user_message = latest_user_message(history)
 
-        message.documents.each do |document|
-          if document.has_image?
-            content_with_media << { type: "image_url", image_url: { url: document.image_url(:large) }}
-          elsif document.has_document_pdf?
-            # Extract text from PDF and include it in the conversation
-            pdf_text = document.extract_pdf_text
-            if pdf_text.present?
-              content_with_media << {
-                type: "text",
-                text: "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
-              }
-            else
-              content_with_media << {
-                type: "text",
-                text: "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
-              }
-            end
-          end
-        end
-
-        {
-          role: message.role,
-          name: message.name_for_api,
-          content: content_with_media,
-        }.compact
+    history.collect do |message|
+      if message.user?
+        user_message(message, with_time: message == latest_user_message)
       else
         begin
           parsed = JSON.parse(message.content_text)
@@ -225,6 +203,35 @@ class AIBackend::OpenAI < AIBackend
           tool_call_id: message.tool_call_id,     # only for tool messages
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
       end
+    end
+  end
+
+  def user_message(message, with_time:)
+    content = [{ type: "text", text: message.content_text || "" }]
+    content += message.documents.filter_map { |document| document_part(document) }
+    content << { type: "text", text: current_time_note } if with_time
+
+    {
+      role: message.role,
+      name: message.name_for_api,
+      content: text_only_as_string(content),
+    }.compact
+  end
+
+  # Some OpenAI-compatible servers (Groq, local models) only accept string content for text-only models.
+  def text_only_as_string(content)
+    return content unless content.all? { |part| part[:type] == "text" }
+
+    content.pluck(:text).join("\n\n")
+  end
+
+  def document_part(document)
+    if document.has_image?
+      { type: "image_url", image_url: { url: document.image_url(:large) }} if @assistant.supports_images?
+    elsif document.has_document_pdf?
+      return { type: "text", text: document.pdf_as_text } unless @assistant.supports_pdf?
+
+      { type: "file", file: { filename: document.filename, file_data: "data:application/pdf;base64,#{document.file_base64}" }}
     end
   end
 

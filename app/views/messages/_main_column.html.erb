@@ -157,7 +157,6 @@
       <div id="composer"
         class="
           <%= @assistant.deleted? && "hidden" %>
-          <%= !@assistant.supports_images? && "relationship" %>
           flex-1 relative
           leading-relaxed
           pl-6 pr-6 mx-auto mb-6
@@ -172,7 +171,7 @@
       >
         <%= button_tag type: "button",
               id: "attach-button",
-              class: "absolute left-11 bottom-[26px] w-[23px] h-[23px] relationship:hidden",
+              class: "absolute left-11 bottom-[26px] w-[23px] h-[23px]",
               data: { action: "image-upload#choose" } do
         %>
           <%= icon "paper-clip",
@@ -279,13 +278,13 @@
           <%= form.hidden_field :version, value: @version %>
           <%= form.hidden_field :spoken, value: false, data: { composer_target: "spoken" } %>
           <%= form.fields_for :documents, @new_message.documents.build do |document_form| %>
-            <%= document_form.file_field :file, accept: "image/*,.pdf", class: "hidden", data: { image_upload_target: "file" } %>
+            <%= document_form.file_field :file, accept: attachment_types_for(@assistant), class: "hidden", data: { image_upload_target: "file" } %>
           <% end %>
           <div class="hidden" data-image-upload-target="fileInputs"></div>
 
           <%= file_field_tag :attachment_picker,
             multiple: true,
-            accept: "image/*,.pdf",
+            accept: attachment_types_for(@assistant),
             class: "hidden",
             data: { image_upload_target: "picker" } %>
 
@@ -327,7 +326,7 @@
             class: %|
               w-full pt-[14px] pb-[13px] min-h-14
               mb-2 block
-              pl-14 pr-12 relationship:pl-4 show-previews:pt-24
+              pl-14 pr-12 show-previews:pt-24
               bg-transparent
               text-black dark:text-gray-200
               placeholder-gray-300 dark:placeholder-gray-500

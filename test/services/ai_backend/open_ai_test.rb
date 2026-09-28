@@ -118,10 +118,8 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     TestClient::OpenAI.stub :text, nil do # this forces it to fall back to default text
       streamed_text = ""
       @openai.stream_next_conversation_message { |chunk| streamed_text += chunk }
-      expected_start = "Hello this is model gpt-4o with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\nHe owns a cat\\n\\nFor the user, the current time"
-      expected_end = "\"! How can I assist you today?"
-      assert streamed_text.start_with?(expected_start)
-      assert streamed_text.end_with?(expected_end)
+      expected = "Hello this is model gpt-4o with instruction \"Note these additional items that you've been told and remembered:\\n\\nHe lives in Austin, Texas\\nHe owns a cat\"! How can I assist you today?"
+      assert_equal expected, streamed_text
     end
   end
 
@@ -223,19 +221,51 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
   test "preceding_conversation_messages constructs a proper response and pivots on images" do
     preceding_conversation_messages = @openai.send(:preceding_conversation_messages)
+    history = @conversation.messages.ordered.to_a[0...-1]
+    newest_user_message = history.select(&:user?).last
 
-    assert_equal @conversation.messages.length-1, preceding_conversation_messages.length
+    assert_equal history.length, preceding_conversation_messages.length
 
-    @conversation.messages.ordered.each_with_index do |message, i|
-      next if @conversation.messages.length == i+1
-
+    history.zip(preceding_conversation_messages).each do |message, sent|
       if message.documents.present?
-        assert_instance_of Array, preceding_conversation_messages[i][:content]
-        assert_equal message.documents.length+1, preceding_conversation_messages[i][:content].length
+        time_note = message == newest_user_message ? 1 : 0
+        assert_instance_of Array, sent[:content]
+        assert_equal message.documents.length + 1 + time_note, sent[:content].length
       else
-        assert_equal preceding_conversation_messages[i][:content], message.content_text
+        assert sent[:content].start_with?(message.content_text)
       end
     end
+  end
+
+  test "preceding_conversation_messages keeps a text-only newest user message as a string with the time appended" do
+    conversation = Conversation.create!(user: users(:keith), assistant: @assistant, title: "Plain")
+    conversation.messages.create!(role: "user", content_text: "Hello", assistant: @assistant)
+    reply = conversation.messages.create!(role: "assistant", content_text: "Hi", assistant: @assistant)
+    backend = AIBackend::OpenAI.new(users(:keith), @assistant, conversation, reply)
+
+    newest = backend.stub(:current_time_note, "NOTE") { backend.send(:preceding_conversation_messages).first }
+
+    assert_equal "Hello\n\nNOTE", newest[:content]
+  end
+
+  test "preceding_conversation_messages sends a PDF as a file part when the model supports PDFs" do
+    @assistant.language_model.update!(supports_pdf: true)
+    backend = backend_replying_to_pdf
+
+    part = backend.send(:preceding_conversation_messages).first[:content].find { |p| p[:type] == "file" }
+
+    assert_equal "quarterly.pdf", part[:file][:filename]
+    assert_equal "data:application/pdf;base64,#{Base64.strict_encode64(file_fixture("quarterly.pdf").binread)}", part[:file][:file_data]
+  end
+
+  test "preceding_conversation_messages sends a PDF's text to a model without PDF or image support" do
+    @assistant.language_model.update!(supports_pdf: false, supports_images: false)
+    backend = backend_replying_to_pdf
+
+    content = backend.send(:preceding_conversation_messages).first[:content]
+
+    assert_instance_of String, content
+    assert_includes content, "[PDF Document: quarterly.pdf]\nQuarterly numbers"
   end
 
   test "preceding_conversation_messages only considers messages on the intended conversation version and includes the correct names" do
@@ -246,10 +276,12 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     version = message.version
     @openai = AIBackend::OpenAI.new(user, assistant, conversation, message)
 
-    preceding_conversation_messages = @openai.send(:preceding_conversation_messages)
-    convo_messages = conversation.messages.for_conversation_version(version).where("messages.index < ?", message.index)
+    preceding_conversation_messages = @openai.stub(:current_time_note, "NOTE") { @openai.send(:preceding_conversation_messages) }
+    convo_messages = conversation.messages.for_conversation_version(version).where("messages.index < ?", message.index).to_a
+    newest_user_message = convo_messages.select(&:user?).last
+    expected = convo_messages.map { |m| m == newest_user_message ? "#{m.content_text}\n\nNOTE" : m.content_text }
 
-    assert_equal convo_messages.map(&:content_text), preceding_conversation_messages.map { |m| m[:content] }
+    assert_equal expected, preceding_conversation_messages.map { |m| m[:content] }
     assert_equal user.first_name, preceding_conversation_messages.first[:name]
     assert_equal assistant.name, preceding_conversation_messages.second[:name]
   end
@@ -262,9 +294,9 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     version = message.version
     @openai = AIBackend::OpenAI.new(user, assistant, conversation, message)
 
-    messages = @openai.send(:preceding_conversation_messages)
+    messages = @openai.stub(:current_time_note, "NOTE") { @openai.send(:preceding_conversation_messages) }
 
-    m1 = {:role=>"user", :name=>"Keith", :content=>"What is the weather in Austin?"}
+    m1 = {:role=>"user", :name=>"Keith", :content=>"What is the weather in Austin?\n\nNOTE"}
     m2 = {:role=>"assistant", :name=>"Samantha", :tool_calls=>[{:id=>"abc123", :type=>"function", :index=>0, :function=>{:name=>"helloworld_hi", :arguments=>{:name=>"World"}}}]}
     m3 = {:role=>"tool", :content=>"weather is", :tool_call_id=>"abc123"}
 
@@ -281,6 +313,17 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
 
   test "billing_url returns the recorded OpenAI billing page" do
     assert_equal "https://platform.openai.com/account/billing/overview", AIBackend::OpenAI.billing_url
+  end
+
+  private
+
+  def backend_replying_to_pdf
+    conversation = Conversation.create!(user: users(:keith), assistant: @assistant, title: "PDF Test Conversation")
+    message = conversation.messages.create!(role: "user", content_text: "Please analyze this PDF", assistant: @assistant)
+    message.documents.create!(file: { io: StringIO.new(file_fixture("quarterly.pdf").binread), filename: "quarterly.pdf", content_type: "application/pdf" })
+    reply = conversation.messages.create!(role: "assistant", content_text: "I'll analyze the PDF for you", assistant: @assistant)
+
+    AIBackend::OpenAI.new(users(:keith), @assistant, conversation, reply)
   end
 end
 
