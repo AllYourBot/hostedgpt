@@ -51,6 +51,10 @@
   <% funnel_active = funnel_show != "all" %>
   <% funnel_query = @query.presence %>
   <section data-role="filter" class="ml-2 mr-5 mt-2 text-gray-950 dark:text-gray-100 select-none">
+    <%# The clear X sits beside the dropdown, never inside it: a click inside would match
+        :focus-within and pop the menu open over the freshly cleared list. Same one-tap
+        semantics as All — drops the Show scope, keeps the query. %>
+    <div class="flex items-center">
     <div class="dropdown">
       <div tabindex="0" role="button"
         data-role="filter-button"
@@ -85,6 +89,16 @@
             aria: ({ current: "true" } if funnel_show == "reacted") %>
         </li>
       </menu>
+    </div>
+    <% if funnel_active %>
+      <%= link_to conversations_path(query: funnel_query),
+        data: { role: "filter-clear-button", turbo_frame: "nav-conversations" },
+        title: t("app.conversations.ui.filter_clear"),
+        aria: { label: t("app.conversations.ui.filter_clear") },
+        class: "p-1 mb-1 ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" do %>
+        <%= icon "x-mark", variant: :outline, size: 14, class: "text-gray-500 dark:text-gray-300" %>
+      <% end %>
+    <% end %>
     </div>
     <p class="sr-only" aria-live="polite" data-role="filter-announcement"><%= t("app.conversations.ui.filter_announcement_#{funnel_show}") %></p>
   </section>

@@ -100,6 +100,29 @@ class FilterFunnelTest < ApplicationSystemTestCase
     assert_selector("#conversation_#{bookmarked.id}")
   end
 
+  test "X beside the filter exits in one tap without opening the menu" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    conversation.bookmark!(user)
+
+    login_as(user)
+    visit root_path
+
+    assert_no_selector("[data-role='filter-clear-button']")
+
+    open_funnel
+    find("[data-role='filter-show-bookmarked']").click
+    assert_selector("[data-role='filter-label']", text: "Bookmarked")
+
+    clear = find("[data-role='filter-clear-button']")
+    assert_no_match(/show=/, clear[:href], "X must reset Show in one tap")
+    clear.click
+
+    assert_selector("[data-role='bookmarks-link']")
+    assert_no_selector("[data-role='filter-label']")
+    assert_no_selector("[data-role='filter-clear-button']")
+  end
+
   private
 
   def open_funnel
