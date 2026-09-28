@@ -824,15 +824,125 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/aria-pressed="true"/, response.body)
   end
 
-  test "toggle bounce understands legacy nav_view param as funnel state" do
+  test "toggle bounce preserves query alongside funnel scope" do
     user = @conversation.user
-    @conversation.react!("👍", user)
+    @conversation.bookmark!(user)
 
-    post bookmark_conversation_url(@conversation),
-      params: { nav_view: "reactions" },
+    post pin_conversation_url(@conversation),
+      params: { show: "bookmarked", query: "x" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    assert_equal "x", assigns(:query)
+    assert_match(/aria-pressed="true"/, response.body)
+    assert_no_match(/data-role="pinned-header"/, response.body)
+  end
+
+  test "toggle bounce falls back to blank query when params absent" do
+    user = @conversation.user
+    @conversation.bookmark!(user)
+
+    post pin_conversation_url(@conversation),
+      params: { show: "bookmarked" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    assert_nil assigns(:query)
+  end
+
+  test "explicit show wins over legacy nav_view on toggle bounce" do
+    post pin_conversation_url(@conversation),
+      params: { show: "reacted", nav_view: "bookmarks" },
       headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
 
     assert_response :success
     assert_equal "reacted", assigns(:show)
+  end
+
+  test "invalid show falls back to legacy nav_view mapping on toggle bounce" do
+    post pin_conversation_url(@conversation),
+      params: { show: "nope", nav_view: "bookmarks" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+  end
+
+  test "funnel show bookmarked plus query narrows scope and suppresses strip" do
+    user = @conversation.user
+    other = conversations(:attachment)
+    assert_equal user, other.user
+    @conversation.bookmark!(user)
+    other.bookmark!(user)
+
+    get conversations_url(show: "bookmarked", query: "Samantha")
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+    assert_empty assigns(:pinned_conversations)
+  end
+
+  test "filter clear preserves query while resetting show" do
+    get conversations_url(show: "bookmarked", query: "zzz-no-match")
+
+    assert_response :success
+    assert_empty assigns(:nav_conversations)
+    body = response.body
+    clear_link = body[/<a[^>]*data-role="filter-clear"[^>]*>/]
+    assert_not_nil clear_link, "expected a filter clear link"
+    assert_match(/query=/, clear_link)
+    assert_no_match(/show=/, clear_link)
+  end
+
+  test "new_id already in scope appears exactly once" do
+    user = @conversation.user
+    @conversation.bookmark!(user)
+
+    get conversations_url(show: "bookmarked", new_id: @conversation.id)
+
+    assert_response :success
+    nav_ids = assigns(:nav_conversations).map(&:id)
+    assert_equal 1, nav_ids.count(@conversation.id), "already-scoped new_id must not duplicate"
+    assert_equal 1, response.body.scan(/conversation_#{@conversation.id}/).size,
+      "row must render exactly once"
+  end
+
+  test "new_id with show all is ignored and renders in natural position only" do
+    user = @conversation.user
+    fresh = user.conversations.create!(assistant: assistants(:samantha), title: "Fresh natural position")
+    fresh.update_column(:updated_at, 1.day.ago)
+
+    get conversations_url(show: "all", new_id: fresh.id)
+
+    assert_response :success
+    assert_equal "all", assigns(:show)
+    nav_ids = assigns(:nav_conversations).map(&:id)
+    assert_equal 1, nav_ids.count(fresh.id), "fresh row must render once in its natural spot"
+    expected = user.conversations.unpinned_for(user).order(updated_at: :desc, id: :desc).pluck(:id)
+    assert_equal expected, nav_ids, "show=all must ignore new_id prepend and keep natural order"
+    assert_not_equal fresh.id, nav_ids.first, "stale fresh must not jump to top"
+  end
+
+  test "nonexistent new_id leaves scope unchanged" do
+    user = @conversation.user
+    @conversation.bookmark!(user)
+
+    get conversations_url(show: "bookmarked", new_id: -1)
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+  end
+
+  test "bookmarked funnel answers JSON for agent parity" do
+    user = @conversation.user
+    @conversation.bookmark!(user)
+
+    get conversations_url(show: "bookmarked"), headers: { "Accept" => "application/json" }
+
+    assert_response :success
   end
 end

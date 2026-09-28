@@ -289,62 +289,110 @@ class ConversationTest < ActiveSupport::TestCase
 
   test "bookmarked_nav_for_user narrows by search before applying membership" do
     user = users(:keith)
-    match = user.conversations.create!(assistant: assistants(:samantha), title: "Bookmark probe alpha zeta9")
-    other = user.conversations.create!(assistant: assistants(:samantha), title: "Bookmark probe unrelated qwerty7")
+    token = "ProbeTokenXYZBookmark"
+    match = user.conversations.create!(assistant: assistants(:samantha), title: "Bookmark probe alpha #{token}")
+    other = user.conversations.create!(assistant: assistants(:samantha), title: "Bookmark probe unrelated nomatch456")
     match.bookmark!(user)
     other.bookmark!(user)
 
-    found = Conversation.bookmarked_nav_for_user(user, "zeta9").map(&:id)
+    found = Conversation.bookmarked_nav_for_user(user, token).map(&:id)
 
-    assert_includes found, match.id
-    assert_not_includes found, other.id
+    assert_equal [match.id], found
   end
 
   test "reacted_nav_for_user narrows by search before applying membership" do
     user = users(:keith)
-    match = user.conversations.create!(assistant: assistants(:samantha), title: "Reaction probe alpha zeta8")
-    other = user.conversations.create!(assistant: assistants(:samantha), title: "Reaction probe unrelated qwerty6")
+    token = "ProbeTokenXYZReaction"
+    match = user.conversations.create!(assistant: assistants(:samantha), title: "Reaction probe alpha #{token}")
+    other = user.conversations.create!(assistant: assistants(:samantha), title: "Reaction probe unrelated nomatch789")
     match.react!("❤️", user)
     other.react!("❤️", user)
 
-    found = Conversation.reacted_nav_for_user(user, "zeta8").map(&:id)
+    found = Conversation.reacted_nav_for_user(user, token).map(&:id)
 
-    assert_includes found, match.id
-    assert_not_includes found, other.id
+    assert_equal [match.id], found
   end
 
   test "pinned_nav_for_user is empty during search even with pins present" do
     user = users(:keith)
     pinned = conversations(:greeting)
     pinned.pin!(user)
+    token = "ProbeTokenXYZPin"
+    token_pinned = user.conversations.create!(assistant: assistants(:samantha), title: "Pinned probe #{token}")
+    token_pinned.pin!(user)
 
     assert_includes Conversation.pinned_nav_for_user(user).map(&:id), pinned.id
+    assert_includes Conversation.pinned_nav_for_user(user).map(&:id), token_pinned.id
     assert_empty Conversation.pinned_nav_for_user(user, "test")
     assert_empty Conversation.pinned_nav_for_user(user, "Meeting")
+    assert_empty Conversation.pinned_nav_for_user(user, token)
   end
 
   test "sidebar nav query shape stays constant as lists grow" do
     user = users(:keith)
 
+    # Seed filtered views so baselines exercise the toggle preloads.
+    seed_pinned = user.conversations.create!(assistant: assistants(:samantha), title: "Growth seed pinned")
+    seed_pinned.pin!(user)
+    seed_bookmarked = user.conversations.create!(assistant: assistants(:samantha), title: "Growth seed bookmarked")
+    seed_bookmarked.bookmark!(user)
+    seed_reacted = user.conversations.create!(assistant: assistants(:samantha), title: "Growth seed reacted")
+    seed_reacted.react!("❤️", user)
+
     baseline = count_sidebar_queries(user, nil)
     baseline_search = count_sidebar_queries(user, "test")
+    baseline_pinned = count_sidebar_queries(user, nil, :pinned_nav_for_user)
+    baseline_bookmarked = count_sidebar_queries(user, nil, :bookmarked_nav_for_user)
+    baseline_reacted = count_sidebar_queries(user, nil, :reacted_nav_for_user)
+    baseline_bookmarked_search = count_sidebar_queries(user, "test", :bookmarked_nav_for_user)
+    baseline_reacted_search = count_sidebar_queries(user, "test", :reacted_nav_for_user)
+    baseline_pinned_search = count_sidebar_queries(user, "test", :pinned_nav_for_user)
 
     5.times do |i|
       user.conversations.create!(assistant: assistants(:samantha), title: "Growth probe #{i}")
+      bookmarked = user.conversations.create!(
+        assistant: assistants(:samantha), title: "Growth bookmarked probe #{i}"
+      )
+      bookmarked.bookmark!(user)
+      reacted = user.conversations.create!(
+        assistant: assistants(:samantha), title: "Growth reacted probe #{i}"
+      )
+      reacted.react!("❤️", user)
+      pinned = user.conversations.create!(
+        assistant: assistants(:samantha), title: "Growth pinned probe #{i}"
+      )
+      pinned.pin!(user)
     end
 
-    assert_equal baseline, count_sidebar_queries(user, nil), "expected constant query shape as the list grows"
-    assert_equal baseline_search, count_sidebar_queries(user, "test"), "expected constant query shape as the list grows"
+    assert_equal baseline, count_sidebar_queries(user, nil),
+      "expected constant query shape as the list grows"
+    assert_equal baseline_search, count_sidebar_queries(user, "test"),
+      "expected constant query shape as the list grows"
+    assert_equal baseline_pinned, count_sidebar_queries(user, nil, :pinned_nav_for_user),
+      "expected constant pinned query shape as the list grows"
+    assert_equal baseline_bookmarked, count_sidebar_queries(user, nil, :bookmarked_nav_for_user),
+      "expected constant bookmarked query shape as the list grows"
+    assert_equal baseline_reacted, count_sidebar_queries(user, nil, :reacted_nav_for_user),
+      "expected constant reacted query shape as the list grows"
+    assert_equal baseline_bookmarked_search,
+      count_sidebar_queries(user, "test", :bookmarked_nav_for_user),
+      "expected constant bookmarked search shape as the list grows"
+    assert_equal baseline_reacted_search,
+      count_sidebar_queries(user, "test", :reacted_nav_for_user),
+      "expected constant reacted search shape as the list grows"
+    assert_equal baseline_pinned_search,
+      count_sidebar_queries(user, "test", :pinned_nav_for_user),
+      "expected constant pinned search shape as the list grows"
   end
 
   private
 
-  def count_sidebar_queries(user, query)
+  def count_sidebar_queries(user, query, scope_method = :nav_for_user)
     counter = 0
     subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
       counter += 1 unless payload[:cached] || payload[:name] == "SCHEMA"
     end
-    Conversation.nav_for_user(user, query).to_a.each do |conversation|
+    Conversation.public_send(scope_method, user, query).to_a.each do |conversation|
       conversation.pinned?(user)
       conversation.bookmarked?(user)
       conversation.user_reacted?("❤️", user)

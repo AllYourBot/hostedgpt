@@ -52,20 +52,26 @@ class SidebarDragTest < ApplicationSystemTestCase
     assert_includes row.find("[data-role='reaction-counts']").text, "🎉 1"
 
     row.find("[data-role='react-conversation']").click
-    assert row.find("[data-emoji-picker-target='panel']").visible?
+    within("#conversation_#{convs[0].id}") do
+      assert_selector("[data-emoji-picker-target='panel']")
+    end
 
     # Grab the title: the open panel floats above the row's right end, where a center grab
     # would land on the panel (a button — drags never arm from buttons) instead of the row.
     drag_row_by_title(convs[0], onto: convs[1])
-    assert_equal ["DragPicker1", "DragPicker0", "DragPicker2"], drag_picker_targets
+    assert_true { drag_picker_targets == ["DragPicker1", "DragPicker0", "DragPicker2"] }
     assert_equal [1, 0, 2], convs.map { |c| c.reload.position }
 
     # Counts survive the committing drag, and the row's own picker controller is still wired.
     moved = find("#conversation_#{convs[0].id}")
-    assert_includes moved.find("[data-role='reaction-counts']").text, "🎉 1"
+    within("#conversation_#{convs[0].id}") do
+      assert_selector("[data-role='reaction-counts']", text: "🎉 1")
+    end
 
     moved.find("[data-role='react-conversation']").click
-    assert moved.find("[data-emoji-picker-target='panel']").visible?
+    within("#conversation_#{convs[0].id}") do
+      assert_selector("[data-emoji-picker-target='panel']")
+    end
 
     moved.find("[data-role='react-emoji-conversation']", text: "❤️").click
     assert_true "the sidebar chip should render after the drag" do
@@ -102,9 +108,13 @@ class SidebarDragTest < ApplicationSystemTestCase
     assert_selector("#conversations [data-sortable-id='#{pinned.id}']")
 
     moved = find("#conversation_#{pinned.id}")
-    assert_includes moved.find("[data-role='reaction-counts']").text, "🎉 1"
+    within("#conversation_#{pinned.id}") do
+      assert_selector("[data-role='reaction-counts']", text: "🎉 1")
+    end
     moved.find("[data-role='react-conversation']").click
-    assert moved.find("[data-emoji-picker-target='panel']").visible?
+    within("#conversation_#{pinned.id}") do
+      assert_selector("[data-emoji-picker-target='panel']")
+    end
   end
 
   test "toggling the pin icon moves the conversation between sections on the next render" do

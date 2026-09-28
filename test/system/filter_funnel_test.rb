@@ -104,6 +104,6 @@ class FilterFunnelTest < ApplicationSystemTestCase
 
   def open_funnel
     find("[data-role='filter-button']").click
-    assert_selector("[data-role='filter-menu']", visible: :all)
+    assert_selector("[data-role='filter-menu']")
   end
 end
