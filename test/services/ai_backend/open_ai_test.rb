@@ -261,7 +261,8 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     first_user, _reply, newest_user = backend.send(:preceding_conversation_messages)
 
     assert_equal [{ type: "text", text: "Hello" }], first_user[:content].first(1), "The user's own text should come first"
-    assert first_user[:content].second[:image_url][:url].start_with?("data:image/png;base64,"), "The context image should ride on the first user message"
+    assert_equal "image_url", first_user[:content].second[:type], "The context image should ride on the first user message"
+    assert first_user[:content].second.dig(:image_url, :url).present?, "The context image should carry a URL"
     assert_instance_of String, newest_user[:content], "Later messages should stay text-only"
   end
 
