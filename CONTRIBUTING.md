@@ -8,12 +8,11 @@ Get your development environment set up by running the Rails app directly on you
 
 Work on your feature, committing as you go. Run the tests relevant to your changes before each commit. When you're ready:
 
-1. `/pr-review` — reviews code against project guidelines, verifies Claude CLI assumptions, fixes issues, updates `.claude/rules/` and `USER_STORIES.md`
-2. `/pr` — pushes the branch and creates a pull request
+1. `/pr-review` — reviews the branch against project guidelines, fixes issues, runs the tests, and keeps `.claude/rules/` fresh
+2. `/pr` — rebases onto `upstream/main`, pushes the branch, and creates or updates the pull request
 3. `/pr-feedback` — triages unresolved PR review comments (Copilot + teammates), applies fixes, resolves threads
-4. `/pr-merge` — runs `bin/ci`, verifies PR checklist, squash merges, cleans up branch
 
-Each skill is independent — run them in order or individually as needed.
+Each skill is independent — run them in order or individually as needed. GitHub Actions runs the full test suite and rubocop on every PR, and a maintainer squash-merges it once CI is green. `/pr-catchup` summarizes what others have merged since you last checked in.
 
 ### Running the test suite
 

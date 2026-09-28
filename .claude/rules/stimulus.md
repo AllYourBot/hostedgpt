@@ -1,11 +1,11 @@
 ---
 paths:
-  - "app/javascript/controllers/**"
+  - "app/javascript/stimulus/**"
 ---
 
 # Stimulus Controllers
 
-These controllers are designed to be re-used so before you create a new one, you need to be highly confident there is not already a controller that gives the abilities you need. For example, simple things like showing and hiding elements is handled by the `effect_controller`. Similarly, when you write a controller, be thoughtful about how to generalize the controller if it might be appropriate to use this in the future.
+These controllers are designed to be re-used so before you create a new one, you need to be highly confident there is not already a controller in `app/javascript/stimulus/` that gives the abilities you need (e.g. `transition_controller`, `form_controller`, `modal_controller`). Similarly, when you write a controller, be thoughtful about how to generalize the controller if it might be appropriate to use this in the future.
 
 ## Member ordering
 
@@ -39,7 +39,7 @@ Use ES2022 native private class fields — `#methodName()` not `_methodName()`, 
 
 ## Controller communication
 
-Three options — use the simplest that fits.
+Two options — use the simpler one when it fits.
 
 ### 1. `this.dispatch()` + `data-action` (default)
 
@@ -47,10 +47,10 @@ Standard Stimulus events. Sender dispatches, receivers listen via `data-action`.
 
 ```javascript
 // sender
-this.dispatch("turnAborted")
+this.dispatch("submitted")
 
 // receiver wired in HTML:
-// data-action="livekit-agent:turnAborted@document->macos-bridge#onTurnAborted"
+// data-action="composer:submitted@document->message-scroller#scrollDown"
 ```
 
 ### 2. `static outlets` (direct access)
@@ -58,22 +58,9 @@ this.dispatch("turnAborted")
 When the sender needs to call methods on or read properties from the receiver. Creates a direct reference — the sender must declare the outlet upfront.
 
 ```javascript
-static outlets = ["speech-detection"]
+static outlets = ["modal"]
 
-this.speechDetectionOutlet.startMonitoring(stream)
-if (this.speechDetectionOutlet.speechDetected) { ... }
-```
-
-### 3. `callDynamicOutlets()` (wiring lives in HTML)
-
-When the sender shouldn't know about the receiver at code time. Wiring is defined entirely in HTML via value attributes — makes the controller reusable across pages with different receivers.
-
-```javascript
-if (this.onStartedOutletValue) {
-  this.callDynamicOutlets(this.onStartedOutletValue)
-}
-// wiring in HTML:
-// data-livekit-agent-on-started-outlet-value="#macos-bridge->macos-bridge#onStarted"
+this.modalOutlet.open()
 ```
 
 ## HTML formatting
@@ -82,8 +69,8 @@ When an element has multiple Stimulus attributes, put each on its own line:
 
 ```html
 <section
-  data-controller="permissions"
-  data-permissions-requested-value="microphone"
+  data-controller="clipboard"
+  data-action="click->clipboard#copy"
   class="border p-4"
 >
   ...

@@ -17,7 +17,7 @@ If non-empty, treat it as guidance that shapes decisions in the steps below — 
 
 ## Step 1: Land the work on a feature branch
 
-Run `git branch --show-current` and `git status --porcelain` and `git log main..HEAD --oneline` (commits on the current branch beyond `main`) to figure out the state, then pick exactly one of the cases below. **Do not ask the user any questions except in the one explicit case noted.** In particular, never ask the user to confirm a branch name — pick one.
+Run `git branch --show-current` and `git status --porcelain` and `git log upstream/main..HEAD --oneline` (commits on the current branch beyond `upstream/main`, after `git fetch upstream main`) to figure out the state, then pick exactly one of the cases below. **Do not ask the user any questions except in the one explicit case noted.** In particular, never ask the user to confirm a branch name — pick one.
 
 ### Picking a branch name (when needed)
 
@@ -44,7 +44,7 @@ If the conversation history shows you've been committing to this branch for the 
 
 ### Case D — on a feature branch with no commits beyond `main`
 
-`git log main..HEAD --oneline` is empty. This branch was created for some work but nothing has been committed yet — safe to treat as the destination for the current changes:
+`git log upstream/main..HEAD --oneline` is empty. This branch was created for some work but nothing has been committed yet — safe to treat as the destination for the current changes:
 1. If there are uncommitted changes, stage the changed files explicitly and commit with a sensible message.
 2. Continue to "Rebase and push" below.
 
@@ -56,7 +56,7 @@ This is the only ambiguous case. Stop and ask the user exactly one question:
 
 Then act on the answer:
 - "this branch" → stage the changed files explicitly, commit, continue to "Rebase and push".
-- "new branch" → generate a name, `git checkout -b <name>` *from* `main` (not from the current branch — `git checkout main && git checkout -b <name>`), stage, commit, continue.
+- "new branch" → generate a name, `git checkout -b <name>` *from* `upstream/main` (not from the current branch — `git checkout -b <name> upstream/main`), stage, commit, continue.
 
 ### Case F — on a feature branch with existing commits and a clean working tree
 
@@ -65,7 +65,7 @@ Nothing to commit. The PR (new or existing) should reflect what's already on thi
 ### Rebase and push
 
 After whichever case above applied:
-1. Rebase onto main: `git fetch upstream main && git rebase /main`. Resolve any conflicts.
+1. Rebase onto upstream: `git fetch upstream main && git rebase upstream/main`. Resolve any conflicts.
 2. Push the branch: `git push -u origin HEAD`. If the rebase rewrote history (or this is a force-push scenario from a previous push), use `git push --force-with-lease`.
 
 ## Step 2: Create or update the PR
@@ -73,8 +73,8 @@ After whichever case above applied:
 **Never put an issue or PR number in the PR title.** GitHub already appends the PR's own number (`#474`) and auto-links any `#123` you write, so a title like `Fix the thing (#407)` renders as the confusing `Fix the thing (#407) #474` across GitHub's UI. Keep the title plain prose. Reference the issue in the PR *body* instead (e.g. `Fixes #407`), where it links cleanly. This applies to both creating a title and rewriting an existing one.
 
 1. Check if a PR already exists: `gh pr view --json number,url,title,body`.
-2. Run `git log main...HEAD --oneline` to see all commits on this branch.
-3. Run `git diff main...HEAD` to see the full diff.
+2. Run `git log upstream/main..HEAD --oneline` to see all commits on this branch.
+3. Run `git diff upstream/main...HEAD` to see the full diff.
 
 **If no PR exists**, create one:
 
@@ -100,16 +100,16 @@ PREOF
 
 ### Checklist authoring rules
 
-**Do NOT add items that `bin/ci` already covers.** `bin/ci` runs the full test suite (the LiveKit tests whenever `livekit-menubar/` changed on the branch), rubocop, prettier, ruff, swift-format, and security checks, and the merge gate blocks any PR without a green `bin/ci` signoff. Items like "tests pass", "no lint errors", "CI is green", or "the new test in `foo_test.rb` passes" are guaranteed by the merge process — they are noise on the checklist and train you to check boxes for free. If the only verification you can think of is "tests pass", leave the dev section empty.
+**Do NOT add items that CI already covers.** GitHub Actions (`.github/workflows/rubyonrails.yml`) runs the unit tests, the system tests, the Jest tests for `app/javascript/blocks/`, and rubocop on every PR. Items like "tests pass", "no lint errors", "CI is green", or "the new test in `foo_test.rb` passes" are guaranteed by that — they are noise on the checklist and train you to check boxes for free. If the only verification you can think of is "tests pass", leave the dev section empty.
 
 **Split items by where they can actually be verified:**
 
 - **`## Verify in dev`** — things you can do locally on this branch before merging. Examples: walk through a UI flow in the browser, exercise an edge case the tests don't cover, hit a dev OAuth flow, confirm a migration's data shape on the dev database.
-- **`## Verify in production`** — things that *only* work against the real production environment, real prod data, or real hardware. Examples: a real iMessage delivery via LoopMessage, a real Gmail push notification, behavior that depends on prod-only data volume, a deployed scheduled job firing on its real cron.
+- **`## Verify in production`** — things that *only* work against the real production environment, real prod data, or real hardware. Examples: behavior that depends on the Render or Fly build, a production-only setting in `config/options.yml`, or prod-only data volume. A real provider call is not one of these — it works in dev with your own API key.
 
 If something can be verified in dev, it goes in `## Verify in dev`. The production section is reserved for things genuinely impossible to confirm before deploy. If nothing fits production verification, leave the section empty (do not pad it).
 
-The two checklists serve different consumers: `/pr-merge` blocks on unchecked items in `## Verify in dev`, and after a successful deploy it will work the `## Verify in production` items itself (with your confirmation up front).
+The dev checklist should be fully checked before the PR is merged; the production checklist is worked after deploy.
 
 ```bash
 gh pr edit {number} --body "<rewritten body>"
@@ -137,7 +137,7 @@ gh pr edit {number} --body "<rewritten body>"
 
    or, when part of an item needs the user:
 
-   > I can do 1, 2, and 4 on my own. For #3 I need your help to <minimal specific action — e.g. "click the new button in the menubar once the app reloads">. Once you've done that, let me know and I'll <verify the result in the logs / confirm the record landed in the db / check it off>. Want me to start on 1, 2, and 4 now?
+   > I can do 1, 2, and 4 on my own. For #3 I need your help to <minimal specific action — e.g. "send one message in the browser once the server reloads">. Once you've done that, let me know and I'll <verify the result in the logs / confirm the record landed in the db / check it off>. Want me to start on 1, 2, and 4 now?
 
    If there are zero items in `## Verify in dev`, skip this step entirely.
 

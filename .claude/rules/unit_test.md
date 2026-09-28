@@ -13,10 +13,8 @@ Every model needs a unit test file that closely follows this structure.
 
 Test names should be intentionally repetitive across siblings — ALL CAPS the word(s) that distinguish two near-identical tests. Examples:
 
-- `"message_inbound webhook DOES forward when number IS recognized"`
-- `"message_inbound webhook DOES NOT forward and replies back when number IS NOT recognized"`
-- `"message_sent webhook DOES forward when number is recognized"`
-- `"message_sent webhook DOES NOT forward and NO reply back when number IS NOT recognized"`
+- `"context_prompt NAMES the context images when the model CAN see them"`
+- `"context_prompt LEAVES OUT images when the model CANNOT see them"`
 
 Reserve ALL CAPS for that disambiguation only — don't capitalize random words like "WITH" or "EXITS" for emphasis.
 
@@ -32,7 +30,7 @@ test "has_many conversations" do
 end
 ```
 
-Then, **in the same section**, one test per custom scope defined in the model. Don't just `assert_instance_of` — assert that the right fixture comes back (add or adjust a fixture if needed to make the scope's filter meaningful). Do NOT test the auto-generated scopes; see `auto_scopes.md`.
+Then, **in the same section**, one test per custom scope defined in the model. Don't just `assert_instance_of` — assert that the right fixture comes back (add or adjust a fixture if needed to make the scope's filter meaningful).
 
 ### `# Creation tests`
 
@@ -64,19 +62,17 @@ Then additional create permutations or side-effect tests, each titled `"create w
 
 ### `# Destroy test`
 
-Test all destroy propagations. Destroying a `User` defaults to one made in the test with `create_disposable_user` — a fixture user's agent browser deletes a `storage/chrome-sessions` dir other workers read, and `SharedBrowserDirGuard` raises on it (see [[tests]]). Create exactly the rows you assert on:
+Test all destroy propagations, using fixture relationships for the counts:
 
 ```ruby
-test "associations are removed upon destroy" do
-  user = create_disposable_user
-  user.conversations.create!(...)
-  assert_difference "Conversation.count", -1 do
-    user.destroy
+test "associations are destroyed upon destroy" do
+  assert_difference "Conversation.count", -users(:keith).conversations.count do
+    users(:keith).destroy
   end
 end
 ```
 
-Only a test about a fixture user's whole data graph destroys the fixture, after `release_fixture_agent_browser(user)`. Any other model's destroy test keeps using fixture relationships for its counts.
+For a soft-deleted model (`deleted_at`), test `deleted!` / the `not_deleted` scope instead.
 
 ### `# Method tests`
 

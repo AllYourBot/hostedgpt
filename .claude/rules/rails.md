@@ -5,7 +5,7 @@ paths:
 
 # Rails
 
-Path-specific guidance lives in narrowly-scoped rules (`model.md`, `controller_test.md`, `fixtures.md`, `stimulus.md`, `turbo.md`, etc.) that auto-load when you touch matching files. Read `rails/docs/design.md` if making UI/CSS changes.
+Path-specific guidance lives in narrowly-scoped rules (`model.md`, `controller_test.md`, `fixtures.md`, `stimulus.md`, `turbo.md`, etc.) that auto-load when you touch matching files.
 
 ## Constants
 

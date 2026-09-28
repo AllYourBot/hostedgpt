@@ -2,7 +2,7 @@
 name: pr-feedback
 description: Address unresolved PR review comments from Copilot and teammates
 argument-hint: optional filter or guidance (e.g. "ignore Copilot, focus on @teammate", "skip nits")
-allowed-tools: Read, Edit, Write, Glob, Grep, Bash(git *), Bash(gh *), Bash(bin/rubocop*), Bash(bin/prettier*), Bash(uv run ruff*), Bash(xcrun swift-format*), Bash(bin/rails test*)
+allowed-tools: Read, Edit, Write, Glob, Grep, Bash(git *), Bash(gh *), Bash(bin/rubocop*), Bash(bin/rails test*), Bash(bin/blocks test*)
 ---
 
 # /pr-feedback
