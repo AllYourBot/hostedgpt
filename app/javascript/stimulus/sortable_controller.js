@@ -246,17 +246,14 @@ export default class extends Controller {
   // Membership flips post the same morph streams the toggle buttons get; rendering them keeps
   // the dragged row's new home honest without a reload.
   async #postToggle(url) {
-    console.error("DBG postToggle " + url);
     try {
       const response = await fetch(url, {
         method: "POST",
         headers: { "X-CSRF-Token": this.#csrfToken, "Accept": "text/vnd.turbo-stream.html" },
       })
-      console.error("DBG postToggle status " + response.status);
       const html = await response.text()
       if (html) Turbo.renderStreamMessage(html)
-      console.error("DBG postToggle rendered");
-    } catch (e) { console.error("DBG postToggle failed " + (e && e.message)) }
+    } catch (e) {}
   }
 
   // Toggle endpoints are per-row member routes, so the markup carries the path halves and the
