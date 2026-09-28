@@ -39,40 +39,11 @@
     %>
 
     <div class="flex items-center pr-1">
-      <%# Toggle forms break out to _top: nested inside the row's turbo-frame, a frame-scoped
-          submission would swallow the turbo-stream response (the frame looks for a matching
-          frame, finds a stream, renders nothing). At _top the streams execute at page level.
-          nav_view + query bounce the current view back so the response re-renders the list the
-          user is looking at instead of resetting to the main view. %>
+      <%# Pin/bookmark toggles share the save_toggle partial with the card (see partial
+          for the _top break-out and morph contract). nav_view + query bounce the
+          current view back so the response re-renders the list the user is looking at. %>
       <% nav_view = @bookmarks_view ? "bookmarks" : (@reactions_view ? "reactions" : nil) %>
-      <%= button_to pinned ? unpin_conversation_path(conversation) : pin_conversation_path(conversation),
-        method: :post,
-        params: { nav_view: nav_view, query: @query },
-        data: { role: pinned ? "unpin" : "pin" },
-        form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
-        class: "p-1 leading-none",
-        title: pinned ? "Unpin" : "Pin" do
-      %>
-        <%= icon "map-pin",
-          variant: pinned ? :solid : :outline,
-          size: 16,
-          class: "text-gray-500 dark:text-gray-300"
-        %>
-      <% end %>
-      <%= button_to bookmarked ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
-        method: :post,
-        params: { nav_view: nav_view, query: @query },
-        data: { role: bookmarked ? "unbookmark" : "bookmark" },
-        form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
-        class: "p-1 leading-none",
-        title: bookmarked ? "Unbookmark" : "Bookmark" do
-      %>
-        <%= icon "bookmark",
-          variant: bookmarked ? :solid : :outline,
-          size: 16,
-          class: "text-gray-500 dark:text-gray-300"
-        %>
-      <% end %>
+      <%= render "conversations/save_toggle", conversation: conversation, pinned: pinned, bookmarked: bookmarked, nav_view: nav_view, query: @query %>
       <%# Full picker on the sidebar row: the ghost clone strips Stimulus wiring from its
           scenery copy only, so the row's own controller stays connected through drags and
           morphs like any other row controller. Counts render beside it, same partial as messages. %>

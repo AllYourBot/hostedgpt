@@ -20,36 +20,10 @@
     <% end %>
   </div>
   <div class="flex items-center pr-1">
-    <%# Card toggle forms break out to _top like the sidebar row toggles: nested inside the
-        page's conversation turbo-frame, a frame-scoped submission would swallow the
-        turbo-stream response. page_context bounces the page back so the response replaces or
-        removes exactly this card instead of resetting the view. %>
-    <%= button_to pinned ? unpin_conversation_path(conversation) : pin_conversation_path(conversation),
-      method: :post,
-      params: { page_context: page_context },
-      data: { role: pinned ? "unpin" : "pin" },
-      form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
-      class: "p-1 leading-none",
-      title: pinned ? "Unpin" : "Pin" do %>
-      <%= icon "map-pin",
-        variant: pinned ? :solid : :outline,
-        size: 16,
-        class: "text-gray-500 dark:text-gray-300"
-      %>
-    <% end %>
-    <%= button_to bookmarked ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
-      method: :post,
-      params: { page_context: page_context },
-      data: { role: bookmarked ? "unbookmark" : "bookmark" },
-      form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
-      class: "p-1 leading-none",
-      title: bookmarked ? "Unbookmark" : "Bookmark" do %>
-      <%= icon "bookmark",
-        variant: bookmarked ? :solid : :outline,
-        size: 16,
-        class: "text-gray-500 dark:text-gray-300"
-      %>
-    <% end %>
+    <%# Pin/bookmark toggles share the save_toggle partial with the sidebar row.
+        page_context bounces the page back so the response replaces or removes
+        exactly this card instead of resetting the view. %>
+    <%= render "conversations/save_toggle", conversation: conversation, pinned: pinned, bookmarked: bookmarked, page_context: page_context %>
     <%# Counts plus picker, same optimistic fetch contract as the sidebar row: the endpoints
         answer 204, so no card stream is involved here. %>
     <% user_emojis = conversation.user_emojis(Current.user) %>

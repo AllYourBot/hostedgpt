@@ -1,0 +1,37 @@
+<%# locals: (conversation:, pinned:, bookmarked:, nav_view: nil, query: nil, page_context: nil) %>
+<%# Shared pin/bookmark toggles for the sidebar row (_conversation) and the card
+    (_conversation_card). Row bounces nav_view + query; card bounces page_context.
+    Toggle forms break out to _top: nested inside a turbo-frame, a frame-scoped
+    submission would swallow the turbo-stream response (the frame looks for a matching
+    frame, finds a stream, renders nothing). At _top the streams execute at page level:
+    the sidebar answer morphs the nav list, the card answer replaces or removes the card.
+    Same partial as reactions/counts: one shape reused across both surfaces. %>
+<% toggle_params = page_context.present? ? { page_context: page_context } : { nav_view: nav_view, query: query } %>
+<%= button_to pinned ? unpin_conversation_path(conversation) : pin_conversation_path(conversation),
+  method: :post,
+  params: toggle_params,
+  data: { role: pinned ? "unpin" : "pin" },
+  form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
+  class: "p-1 leading-none",
+  title: pinned ? "Unpin" : "Pin" do
+%>
+  <%= icon "map-pin",
+    variant: pinned ? :solid : :outline,
+    size: 16,
+    class: "text-gray-500 dark:text-gray-300"
+  %>
+<% end %>
+<%= button_to bookmarked ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
+  method: :post,
+  params: toggle_params,
+  data: { role: bookmarked ? "unbookmark" : "bookmark" },
+  form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
+  class: "p-1 leading-none",
+  title: bookmarked ? "Unbookmark" : "Bookmark" do
+%>
+  <%= icon "bookmark",
+    variant: bookmarked ? :solid : :outline,
+    size: 16,
+    class: "text-gray-500 dark:text-gray-300"
+  %>
+<% end %>
