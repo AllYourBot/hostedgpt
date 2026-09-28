@@ -56,6 +56,49 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     assert_equal [{ type: "text", text: "Yes, I can hear you.", cache_control: { type: "ephemeral" } }], messages[1][:content]
   end
 
+  test "preceding_conversation_messages attaches the assistant's context images to the first user message only" do
+    @assistant.language_model.update!(supports_images: true)
+    @assistant.documents.create!(file: fixture_file_upload("cat.png", "image/png"))
+
+    first_user, reply, newest_user = @anthropic.send(:preceding_conversation_messages)
+
+    assert_equal "Hi Claude, can you hear me?", first_user[:content].first[:text], "The user's own text should come first"
+    image = first_user[:content].find { |block| block[:type] == "image" }
+    assert_equal "image/png", image.dig(:source, :media_type), "The context image should ride on the first user message"
+    refute newest_user[:content].any? { |block| block[:type] == "image" }, "The context image should not be repeated on later messages"
+    assert_equal({ type: "ephemeral" }, reply[:content].last[:cache_control], "The context image should sit inside the cached prefix")
+  end
+
+  test "preceding_conversation_messages ATTACHES a context PDF natively to the first user message when the model CAN read PDFs" do
+    @assistant.language_model.update!(supports_pdf: true)
+    @assistant.documents.create!(file: fixture_file_upload("quarterly.pdf", "application/pdf"))
+
+    first_user = @anthropic.send(:preceding_conversation_messages).first
+    document = first_user[:content].find { |block| block[:type] == "document" }
+
+    assert_equal({ type: "base64", media_type: "application/pdf", data: Base64.strict_encode64(file_fixture("quarterly.pdf").binread) }, document[:source], "The context PDF should be sent as a native document block")
+    refute_includes @anthropic.send(:full_instructions), "Quarterly numbers", "The PDF's text should not also be in the system prompt"
+  end
+
+  test "preceding_conversation_messages KEEPS a context PDF out of the messages when the model CANNOT read PDFs" do
+    @assistant.language_model.update!(supports_pdf: false)
+    @assistant.documents.create!(file: fixture_file_upload("quarterly.pdf", "application/pdf"))
+
+    first_user = @anthropic.send(:preceding_conversation_messages).first
+
+    assert_equal "Hi Claude, can you hear me?", first_user[:content], "Nothing should be attached"
+    assert_includes @anthropic.send(:full_instructions), "Quarterly numbers", "The PDF's text should be in the system prompt instead"
+  end
+
+  test "preceding_conversation_messages LEAVES OUT context images when the model CANNOT see images" do
+    @assistant.language_model.update!(supports_images: false)
+    @assistant.documents.create!(file: fixture_file_upload("cat.png", "image/png"))
+
+    first_user = @anthropic.send(:preceding_conversation_messages).first
+
+    assert_equal "Hi Claude, can you hear me?", first_user[:content], "An image the model cannot see should not be attached"
+  end
+
   test "anthropic_format_tools converts OpenAI format to Anthropic format" do
     openai_tools = [
       {

@@ -177,7 +177,7 @@ class AIBackend::RubyLLM < AIBackend
       if message.tool?
         { role: :tool, content: message.content_text || "", tool_call_id: message.tool_call_id }
       elsif message.user?
-        user_message(message, with_time: message == latest_user_message)
+        user_message(message, documents_for(message, history), with_time: message == latest_user_message)
       elsif message.assistant? && message.content_tool_calls.present?
         {
           role: :assistant,
@@ -195,16 +195,12 @@ class AIBackend::RubyLLM < AIBackend
 
   # RubyLLM formats each attachment for the provider: a PDF becomes Anthropic's document block,
   # OpenAI's file part, or Gemini's inline data.
-  def user_message(message, with_time:)
-    attachments = message.documents.select { |document| natively_readable?(document) }.map { |document| ::RubyLLM::Attachment.new(document.file) }
-    pdf_texts = message.documents.select { |document| document.has_document_pdf? && !@assistant.supports_pdf? }.map(&:pdf_as_text)
+  def user_message(message, documents, with_time:)
+    attachments = documents.select { |document| @assistant.natively_readable?(document) }.map { |document| ::RubyLLM::Attachment.new(document.file) }
+    pdf_texts = documents.select { |document| document.has_document_pdf? && !@assistant.supports_pdf? }.map(&:pdf_as_text)
     text = [message.content_text, *pdf_texts, (current_time_note if with_time)].compact.join("\n\n")
 
     { role: message.role, content: attachments.any? ? ::RubyLLM::Content.new(text, attachments) : text }
-  end
-
-  def natively_readable?(document)
-    (document.has_image? && @assistant.supports_images?) || (document.has_document_pdf? && @assistant.supports_pdf?)
   end
 
   # Reconstructs the stored OpenAI-shaped content_tool_calls (serialized via

@@ -182,7 +182,7 @@ class AIBackend::OpenAI < AIBackend
 
     history.collect do |message|
       if message.user?
-        user_message(message, with_time: message == latest_user_message)
+        user_message(message, documents_for(message, history), with_time: message == latest_user_message)
       else
         begin
           parsed = JSON.parse(message.content_text)
@@ -206,9 +206,9 @@ class AIBackend::OpenAI < AIBackend
     end
   end
 
-  def user_message(message, with_time:)
+  def user_message(message, documents, with_time:)
     content = [{ type: "text", text: message.content_text || "" }]
-    content += message.documents.filter_map { |document| document_part(document) }
+    content += documents.filter_map { |document| document_part(document) }
     content << { type: "text", text: current_time_note } if with_time
 
     {

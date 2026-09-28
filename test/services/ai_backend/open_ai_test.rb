@@ -248,6 +248,23 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     assert_equal "Hello\n\nNOTE", newest[:content]
   end
 
+  test "preceding_conversation_messages attaches the assistant's context images to the first user message only" do
+    @assistant.language_model.update!(supports_images: true)
+    @assistant.documents.create!(file: Rack::Test::UploadedFile.new(file_fixture("cat.png"), "image/png"))
+    conversation = Conversation.create!(user: users(:keith), assistant: @assistant, title: "Context")
+    conversation.messages.create!(role: "user", content_text: "Hello", assistant: @assistant)
+    conversation.messages.create!(role: "assistant", content_text: "Hi", assistant: @assistant)
+    conversation.messages.create!(role: "user", content_text: "What is in the picture?", assistant: @assistant)
+    reply = conversation.messages.create!(role: "assistant", content_text: "", assistant: @assistant)
+    backend = AIBackend::OpenAI.new(users(:keith), @assistant, conversation, reply)
+
+    first_user, _reply, newest_user = backend.send(:preceding_conversation_messages)
+
+    assert_equal [{ type: "text", text: "Hello" }], first_user[:content].first(1), "The user's own text should come first"
+    assert first_user[:content].second[:image_url][:url].start_with?("data:image/png;base64,"), "The context image should ride on the first user message"
+    assert_instance_of String, newest_user[:content], "Later messages should stay text-only"
+  end
+
   test "preceding_conversation_messages sends a PDF as a file part when the model supports PDFs" do
     @assistant.language_model.update!(supports_pdf: true)
     backend = backend_replying_to_pdf
