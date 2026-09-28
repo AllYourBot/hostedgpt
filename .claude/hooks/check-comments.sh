@@ -18,10 +18,6 @@ fi
 REMAINING=$(
   sort -u "$ACCUMULATOR" | while IFS=$'\t' read -r file line; do
     [ -f "$file" ] || continue
-    # Autobrowse scripts carry their procedure as numbered step comments by
-    # convention — comment cleanup does not apply to them. Class-form scripts
-    # say `include Autobrowse`; flat single-command scripts only require it.
-    grep -qE "include Autobrowse|\.ruby/autobrowse" "$file" && continue
     if grep -Fxq -- "$line" "$file"; then
       printf '%s: %s\n' "$file" "$line"
     fi

@@ -15,10 +15,10 @@ case "$FILE" in
 esac
 
 case "$FILE" in
-  *.rb | *.rake | *.py)
+  *.rb | *.rake)
     PATTERN='^[[:space:]]*#'
     ;;
-  *.js | *.jsx | *.swift)
+  *.js | *.jsx)
     PATTERN='^[[:space:]]*(//|/\*|\*/|\*([[:space:]]|$))'
     ;;
   *)
