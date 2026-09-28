@@ -621,4 +621,218 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/data-role="reaction-counts"/, response.body)
     assert_match(/👍/, response.body)
   end
+
+  test "funnel defaults to All with an inactive button with no label" do
+    get conversations_url
+
+    assert_response :success
+    assert_equal "all", assigns(:show)
+    body = response.body
+    assert_match(/data-role="filter-button"/, body)
+    assert_match(/aria-pressed="false"/, body)
+    assert_no_match(/data-role="filter-label"/, body)
+    assert_match(/data-role="filter-menu"/, body)
+    assert_match(/data-role="filter-announcement"/, body)
+    assert_match(/aria-live="polite"/, body)
+  end
+
+  test "funnel show bookmarked filters to bookmarks with active labeled button and suppressed strip" do
+    user = @conversation.user
+    other = user.conversations.where.not(id: @conversation.id).first
+    @conversation.bookmark!(user)
+    pinned = other
+    pinned.pin!(user)
+
+    get conversations_url(show: "bookmarked")
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+    assert_empty assigns(:pinned_conversations)
+    body = response.body
+    assert_match(/data-role="filter-button"/, body)
+    assert_match(/aria-pressed="true"/, body)
+    assert_match(/data-role="filter-label"/, body)
+    assert_no_match(/data-role="pinned-header"/, body)
+    assert_no_match(/data-role="time-group"/, body)
+  end
+
+  test "funnel show reacted filters to reacted with active labeled button and suppressed strip" do
+    user = @conversation.user
+    @conversation.react!("👍", user)
+    other = user.conversations.where.not(id: @conversation.id).first
+    other.pin!(user)
+
+    get conversations_url(show: "reacted")
+
+    assert_response :success
+    assert_equal "reacted", assigns(:show)
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+    assert_empty assigns(:pinned_conversations)
+    body = response.body
+    assert_match(/aria-pressed="true"/, body)
+    assert_match(/data-role="filter-label"/, body)
+    assert_no_match(/data-role="pinned-header"/, body)
+  end
+
+  test "funnel rejects an invalid show by falling back to All" do
+    get conversations_url(show: "pinned")
+
+    assert_response :success
+    assert_equal "all", assigns(:show)
+    assert_match(/aria-pressed="false"/, response.body)
+  end
+
+  test "funnel menu offers Show All Bookmarked Reacted with no Pinned scope" do
+    get conversations_url(show: "bookmarked")
+
+    assert_response :success
+    body = response.body
+    assert_match(/data-role="filter-show-all"/, body)
+    assert_match(/data-role="filter-show-bookmarked"/, body)
+    assert_match(/data-role="filter-show-reacted"/, body)
+    assert_no_match(/filter-show-pinned/, body)
+  end
+
+  test "All link returns to the unfiltered list in one tap" do
+    get conversations_url(show: "bookmarked")
+
+    assert_response :success
+    body = response.body
+    all_link = body[/<a[^>]*data-role="filter-show-all"[^>]*>/]
+    assert_not_nil all_link, "expected a Show All menu link"
+    assert_no_match(/show=/, all_link, "All returns to the unfiltered list in one tap")
+  end
+
+  test "AE5 empty bookmarked scope suppresses strip and offers one-tap clear" do
+    get conversations_url(show: "bookmarked")
+
+    assert_response :success
+    assert_empty assigns(:nav_conversations)
+    body = response.body
+    assert_no_match(/data-role="pinned-header"/, body)
+    assert_match(/data-role="empty-bookmarks"/, body)
+    assert_match(/data-role="filter-clear"/, body)
+    clear_link = body[/<a[^>]*data-role="filter-clear"[^>]*>/]
+    assert_not_nil clear_link
+    assert_no_match(/show=/, clear_link, "clear returns to All in one tap")
+  end
+
+  test "AE5 empty reacted scope suppresses strip and offers one-tap clear" do
+    get conversations_url(show: "reacted")
+
+    assert_response :success
+    assert_empty assigns(:nav_conversations)
+    body = response.body
+    assert_no_match(/data-role="pinned-header"/, body)
+    assert_match(/data-role="empty-reactions"/, body)
+    assert_match(/data-role="filter-clear"/, body)
+  end
+
+  test "AE6 All from scope returns full list in Last activity order in one tap" do
+    user = @conversation.user
+    other = user.conversations.where.not(id: @conversation.id).first
+    @conversation.bookmark!(user)
+    @conversation.update_column(:updated_at, 1.day.ago)
+    other.update_column(:updated_at, Time.current)
+
+    get conversations_url(show: "bookmarked")
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+
+    get conversations_url
+
+    assert_response :success
+    assert_equal "all", assigns(:show)
+    nav_ids = assigns(:nav_conversations).map(&:id)
+    assert_equal user.conversations.unpinned_for(user).order(updated_at: :desc, id: :desc).pluck(:id), nav_ids
+    assert_includes nav_ids, @conversation.id
+    assert_includes nav_ids, other.id
+    # Last-activity order: recently touched other comes first.
+    assert nav_ids.index(other.id) < nav_ids.index(@conversation.id)
+  end
+
+  test "AE7 new unmarked chat under exclusive filter appears once without clearing scope" do
+    user = @conversation.user
+    @conversation.bookmark!(user)
+    fresh = user.conversations.create!(assistant: assistants(:samantha), title: "Fresh unmarked")
+
+    get conversations_url(show: "bookmarked", new_id: fresh.id)
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    nav_ids = assigns(:nav_conversations).map(&:id)
+    assert_includes nav_ids, fresh.id, "new unmarked chat must appear once without clearing scope"
+    assert_equal fresh.id, nav_ids.first, "new chat enters at top in Last-activity order"
+    assert_match(/data-role="filter-button"/, response.body)
+    assert_match(/aria-pressed="true"/, response.body)
+
+    get conversations_url(show: "bookmarked")
+
+    assert_response :success
+    assert_not_includes assigns(:nav_conversations).map(&:id), fresh.id, "once-visible must not persist"
+  end
+
+  test "AE7 new_id for a foreign conversation is ignored with no leak" do
+    foreign = conversations(:debugging)
+
+    get conversations_url(show: "bookmarked", new_id: foreign.id)
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    assert_not_includes assigns(:nav_conversations).map(&:id), foreign.id
+  end
+
+  test "R13 legacy bookmarks route drives the same funnel state as show param" do
+    user = @conversation.user
+    @conversation.bookmark!(user)
+
+    get bookmarks_conversations_url
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    bookmark_ids = assigns(:nav_conversations).map(&:id)
+
+    get conversations_url(show: "bookmarked")
+    assert_equal bookmark_ids, assigns(:nav_conversations).map(&:id)
+    assert_match(/aria-pressed="true"/, response.body)
+    assert_no_match(/data-role="pinned-header"/, response.body)
+  end
+
+  test "R13 legacy reactions route drives the same funnel state as show param" do
+    user = @conversation.user
+    @conversation.react!("👍", user)
+
+    get reactions_conversations_url
+    assert_response :success
+    assert_equal "reacted", assigns(:show)
+    reaction_ids = assigns(:nav_conversations).map(&:id)
+
+    get conversations_url(show: "reacted")
+    assert_equal reaction_ids, assigns(:nav_conversations).map(&:id)
+  end
+
+  test "toggle bounce preserves funnel scope instead of resetting to All" do
+    user = @conversation.user
+    @conversation.bookmark!(user)
+
+    post pin_conversation_url(@conversation),
+      params: { show: "bookmarked" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_equal "bookmarked", assigns(:show)
+    assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
+    assert_match(/aria-pressed="true"/, response.body)
+  end
+
+  test "toggle bounce understands legacy nav_view param as funnel state" do
+    user = @conversation.user
+    @conversation.react!("👍", user)
+
+    post bookmark_conversation_url(@conversation),
+      params: { nav_view: "reactions" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_equal "reacted", assigns(:show)
+  end
 end

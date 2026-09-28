@@ -195,7 +195,7 @@ class SidebarDragTest < ApplicationSystemTestCase
   def drag_row(source_record, onto: nil)
     source = find_row(source_record)
     target = find_row(onto)
-    source.scroll_to(nil, :center)
+    scroll_row_into_view(source_record)
 
     sx, sy = center_of(source)
     target_rect = rect_of(target)
@@ -226,7 +226,7 @@ class SidebarDragTest < ApplicationSystemTestCase
   def drag_row_by_title(source_record, onto: nil)
     source = find_row(source_record)
     target = find_row(onto)
-    source.scroll_to(nil, :center)
+    scroll_row_into_view(source_record)
 
     rect = rect_of(source)
     sx = (rect[:x] + rect[:width] / 4).to_i
@@ -250,6 +250,16 @@ class SidebarDragTest < ApplicationSystemTestCase
     find("#pinned-conversations [data-sortable-id='#{record.id}']")
   end
 
+  # Real scrollIntoView, measured after: Capybara's scroll_to is a no-op in this
+  # setup, so stale document coords used to send drops onto the footer under the
+  # list — zoneless, silently restored, never committed. The funnel section added
+  # enough sidebar height to push the third pinned row below the fold and expose it.
+  def scroll_row_into_view(record)
+    page.execute_script(
+      "(function(){ document.querySelector('#nav-conversations [data-sortable-id=\"RID\"]'.replace('RID', '#{record.id}')).scrollIntoView({block: 'center'}); })()"
+    )
+  end
+
   # Any draggable row in the main-view sidebar, pinned or unpinned: cross-zone drops read the
   # drop position, so the finder cannot assume a section.
   def find_any_row(record)
@@ -264,7 +274,7 @@ class SidebarDragTest < ApplicationSystemTestCase
   # drop zones, immune to rows sliding around mid-drag.
   def drag_boundary(source_record, zone:, grab: :center)
     find_any_row(source_record)
-    page.execute_script("document.getElementById('pinned-conversations').scrollIntoView({block: 'end'})")
+    scroll_row_into_view(source_record)
     sxy = grab == :title ? js_title_of_row(source_record.id) : js_center_of_row(source_record.id)
     txy = zone == "pinned" ? js_pinned_edge : js_unpinned_edge
 

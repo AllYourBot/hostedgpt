@@ -7,6 +7,10 @@
       <div class="relative ml-2 mr-5">
         <%# Preserve locale when submitting/clearing the search so the placeholder stays localized %>
         <%= hidden_field_tag :locale, I18n.locale unless I18n.locale == I18n.default_locale %>
+        <%# Preserve funnel scope so a search narrows within the active filter (R11 + query). %>
+        <% if (@show.presence || "all") != "all" %>
+          <%= hidden_field_tag :show, @show %>
+        <% end %>
         <%= form.text_field :query,
           value: @query,
           placeholder: t("app.conversations.ui.search_placeholder"),
@@ -36,6 +40,53 @@
         %>
       </div>
     <% end %>
+  </section>
+
+  <%# Funnel minimal slice (R8-R14, KTD6-KTD8): self-announcing filter with a labeled
+      button, Show menu (All, Bookmarked, Reacted — no Show-Pinned, the strip covers it),
+      suppressed strip in scopes, scoped empty states with one-tap clear, and an aria-live
+      announcement. Scope lives in frame params/query and resets on reload (R14). Order is
+      always Last-activity-desc; pins carry the only hand order. %>
+  <% funnel_show = @show.presence || "all" %>
+  <% funnel_active = funnel_show != "all" %>
+  <% funnel_query = @query.presence %>
+  <section data-role="filter" class="ml-2 mr-5 mt-2 text-gray-950 dark:text-gray-100 select-none">
+    <div class="dropdown">
+      <div tabindex="0" role="button"
+        data-role="filter-button"
+        aria-pressed="<%= funnel_active %>"
+        aria-haspopup="menu"
+        aria-label="<%= t("app.conversations.ui.filter") %><%= funnel_show != "all" ? ": #{t("app.conversations.ui.filter_show_#{funnel_show}")}" : "" %>"
+        class="flex items-center mb-1 p-1 pl-2 pr-2 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 <%= "bg-gray-200 dark:bg-gray-700" if funnel_active %>">
+        <%= icon "funnel", variant: (funnel_active ? :solid : :outline), size: 16, class: "text-gray-500 dark:text-gray-300" %>
+        <% if funnel_show != "all" %>
+          <span data-role="filter-label" class="ml-2"><%= t("app.conversations.ui.filter_show_#{funnel_show}") %></span>
+        <% end %>
+      </div>
+      <menu tabindex="0" data-role="filter-menu" aria-label="<%= t("app.conversations.ui.filter") %>"
+        class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
+        <li class="menu-title"><span><%= t("app.conversations.ui.filter_show") %></span></li>
+        <li>
+          <%= link_to t("app.conversations.ui.filter_show_all"),
+            conversations_path(query: funnel_query),
+            data: { role: "filter-show-all", turbo_frame: "nav-conversations" },
+            aria: ({ current: "true" } if funnel_show == "all") %>
+        </li>
+        <li>
+          <%= link_to t("app.conversations.ui.filter_show_bookmarked"),
+            conversations_path(show: "bookmarked", query: funnel_query),
+            data: { role: "filter-show-bookmarked", turbo_frame: "nav-conversations" },
+            aria: ({ current: "true" } if funnel_show == "bookmarked") %>
+        </li>
+        <li>
+          <%= link_to t("app.conversations.ui.filter_show_reacted"),
+            conversations_path(show: "reacted", query: funnel_query),
+            data: { role: "filter-show-reacted", turbo_frame: "nav-conversations" },
+            aria: ({ current: "true" } if funnel_show == "reacted") %>
+        </li>
+      </menu>
+    </div>
+    <p class="sr-only" aria-live="polite" data-role="filter-announcement"><%= t("app.conversations.ui.filter_announcement_#{funnel_show}") %></p>
   </section>
 
   <%# One sortable list spans the pinned and unpinned sections so drops can cross between
@@ -146,10 +197,18 @@
         <% elsif @bookmarks_view %>
           <p class="mx-2 mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="empty-bookmarks">
             <%= t("app.conversations.ui.no_bookmarks_yet") %>
+            <%= link_to t("app.conversations.ui.filter_clear"),
+              conversations_path(query: @query.presence),
+              data: { role: "filter-clear", turbo_frame: "nav-conversations" },
+              class: "underline" %>
           </p>
         <% elsif @reactions_view %>
           <p class="mx-2 mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="empty-reactions">
             <%= t("app.conversations.ui.no_reactions_yet") %>
+            <%= link_to t("app.conversations.ui.filter_clear"),
+              conversations_path(query: @query.presence),
+              data: { role: "filter-clear", turbo_frame: "nav-conversations" },
+              class: "underline" %>
           </p>
         <% end %>
       <% end %>

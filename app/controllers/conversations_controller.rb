@@ -9,19 +9,19 @@ class ConversationsController < ApplicationController
 
   def index
     @query = params[:query]
-    @pinned_conversations = Conversation.pinned_nav_for_user(Current.user, @query)
-    @nav_conversations = Conversation.nav_for_user(Current.user, @query)
+    @show = funnel_show
+    assign_sidebar_lists
   end
 
   # The bookmarks view reuses the index template with a bookmark filter: exactly the user's
   # bookmarked conversations in display order (pins are not split out here), narrowed by the
   # search query when one is present. No pinned section — a partial pin list must never expose
-  # drag, same rationale as the filtered-list guard.
+  # drag, same rationale as the filtered-list guard. Legacy entry to the funnel (KTD8/R13):
+  # forces the same @show state the funnel menu sets, so one mechanism serves both.
   def bookmarks
     @query = params[:query]
-    @bookmarks_view = true
-    @pinned_conversations = Conversation.none
-    @nav_conversations = Conversation.bookmarked_nav_for_user(Current.user, @query)
+    @show = "bookmarked"
+    assign_sidebar_lists
     render :index
   end
 
@@ -29,12 +29,11 @@ class ConversationsController < ApplicationController
   # user reacted to — directly or on one of its messages — newest touching reaction first (pins
   # are not split out here), narrowed by the search query when one is present. No pinned
   # section — a partial pin list must never expose drag, same rationale as the filtered-list
-  # guard.
+  # guard. Legacy entry to the funnel (KTD8/R13): same @show state as the funnel menu.
   def reactions
     @query = params[:query]
-    @reactions_view = true
-    @pinned_conversations = Conversation.none
-    @nav_conversations = Conversation.reacted_nav_for_user(Current.user, @query)
+    @show = "reacted"
+    assign_sidebar_lists
     render :index
   end
 
@@ -134,13 +133,47 @@ class ConversationsController < ApplicationController
   # the bounced-back view params), so icons flip and rows move with no reload and no scroll
   # loss. Card-page toggles (page_context bounced back from _conversation_card) answer a
   # card-replacement stream instead: the grid updates without reload, mirroring the sidebar
-  # morph contract. Plain requests still answer 204.
+  # morph contract. Plain requests still answer 204. Funnel scope (show, plus legacy
+  # nav_view) bounces back the same way so toggles never reset an active filter.
   def render_sidebar
     return render_card_toggle if params[:page_context].in?(%w[pinned bookmarked reacted])
 
     @query = params[:query]
-    @bookmarks_view = params[:nav_view] == "bookmarks"
-    @reactions_view = params[:nav_view] == "reactions"
+    @show = funnel_show
+    assign_sidebar_lists
+
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.update("nav-conversations", partial: "conversations/nav") }
+      format.html { head :no_content }
+    end
+  end
+
+  # Funnel state (U9 minimal slice, KTD6-KTD8). Canonical Show scope for the sidebar filter:
+  # the explicit show param wins, legacy nav_view maps onto it, legacy routes force it in
+  # their actions. No persistence — scope lives in frame params/query and resets on reload
+  # (R14). No Show-Pinned scope: the pinned strip covers that surface (R9).
+  def funnel_show
+    show = params[:show].to_s
+    return show if %w[all bookmarked reacted].include?(show)
+
+    case params[:nav_view].to_s
+    when "bookmarks" then "bookmarked"
+    when "reactions" then "reacted"
+    else "all"
+    end
+  end
+
+  # Single scope-plumbing choke point for index/bookmarks/reactions/render_sidebar (KTD8):
+  # reuses bookmarked_nav_for_user/reacted_nav_for_user/pinned_nav_for_user unchanged.
+  # Strip suppression and the flat-list guard keep reading @bookmarks_view/@reactions_view,
+  # which mirror @show, so filtered scopes stay flat, undraggable, and strip-free (R11).
+  # Once-visible rule (R12/AE7): under an exclusive filter, params[:new_id] prepends one
+  # unmarked conversation without clearing scope; the param is transient so a reload drops
+  # it and the scope resets (R14).
+  def assign_sidebar_lists
+    @bookmarks_view = (@show == "bookmarked")
+    @reactions_view = (@show == "reacted")
+
     if @bookmarks_view
       @pinned_conversations = Conversation.none
       @nav_conversations = Conversation.bookmarked_nav_for_user(Current.user, @query)
@@ -152,10 +185,14 @@ class ConversationsController < ApplicationController
       @nav_conversations = Conversation.nav_for_user(Current.user, @query)
     end
 
-    respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.update("nav-conversations", partial: "conversations/nav") }
-      format.html { head :no_content }
-    end
+    new_id = params[:new_id].presence
+    return if new_id.blank? || @show == "all"
+
+    fresh = Current.user.conversations.find_by(id: new_id)
+    return if fresh.nil?
+    return if @nav_conversations.map(&:id).include?(fresh.id)
+
+    @nav_conversations = [fresh] + @nav_conversations.to_a
   end
 
   def set_conversation
