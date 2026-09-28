@@ -28,11 +28,11 @@ import { Controller } from '@hotwired/stimulus'
 // button's reacted state — then flips that chip's count optimistically. Both endpoints
 // answer 204 No Content, so the page never navigates away.
 //
-// Two notes on the markup. The panel lives with the row it reacts to: message rows are never
-// sortable items, so the sortable ghost clone — which strips ids and Stimulus wiring from its
-// scenery copy — can never detach this controller. Do not place this markup inside a
-// data-sortable-target row: sidebar conversation rows render counts only, with a plain form
-// toggle and no Stimulus wiring. And the toggle stops propagation so the document-level close
+// Two notes on the markup. The panel lives with the row it reacts to, including inside a
+// sortable item: the sortable ghost clone strips ids and Stimulus wiring from its scenery
+// copy only, so the row's own controller stays connected through drags and morphs like any
+// other row controller. Sidebar conversation rows carry this full picker with counts beside
+// it, same partial as messages. And the toggle stops propagation so the document-level close
 // does not shut the panel in the same click that opened it.
 
 export default class extends Controller {

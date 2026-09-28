@@ -1,8 +1,10 @@
 require "application_system_test_case"
 
-# The message picker opens on demand and posts the chosen emoji without navigating: the row it
-# lives on is never a sortable item, so the sortable ghost clone can never strip its wiring.
-# Sidebar conversation rows render counts only (see the controller tests for the endpoints).
+# The picker opens on demand and posts the chosen emoji without navigating: it may live
+# inside a sortable row, since the sortable ghost clone strips Stimulus wiring from its
+# scenery copy only and the row's own controller stays connected through drags and morphs.
+# Sidebar conversation rows carry the full picker with counts beside it, same partial as
+# messages (see the controller tests for the endpoints).
 class ReactionsTest < ApplicationSystemTestCase
   test "picker opens on a message and selecting an emoji reacts without navigating" do
     user = users(:keith)
