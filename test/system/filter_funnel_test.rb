@@ -123,6 +123,25 @@ class FilterFunnelTest < ApplicationSystemTestCase
     assert_no_selector("[data-role='filter-clear-button']")
   end
 
+  test "X keeps the query while resetting Show" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    conversation.bookmark!(user)
+
+    login_as(user)
+    visit conversations_path(show: "bookmarked", query: "Samantha")
+
+    clear = find("[data-role='filter-clear-button']")
+    assert_match(/query=/, clear[:href], "X must keep the narrowing query")
+    assert_no_match(/show=/, clear[:href], "X must reset Show in one tap")
+    clear.click
+
+    assert_selector("#conversation_#{conversation.id}")
+    # Search context must survive the one-tap clear.
+    assert_field("search-input", with: "Samantha")
+    assert_no_selector("[data-role='filter-label']")
+  end
+
   private
 
   def open_funnel

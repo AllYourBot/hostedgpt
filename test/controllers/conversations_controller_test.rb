@@ -11,7 +11,29 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "index lists unpinned conversations in recency groups with pins excluded and drag in both sections" do
+  test "index lists unpinned conversations in recency groups with drag in both sections" do
+    user = @conversation.user
+    old = conversations(:ruby_version)
+    old.update_column(:updated_at, 1.month.ago)
+
+    get conversations_url
+
+    assert_response :success
+    nav_ids = assigns(:nav_conversations).map(&:id)
+    assert_equal user.conversations.unpinned_for(user).order(updated_at: :desc, id: :desc).pluck(:id), nav_ids
+
+    body = response.body
+    assert_no_match(/id="pinned-conversations".*data-role="pinned-header"/m, body)
+    assert_match(/data-role="time-group"/, body)
+    assert body.index("Today") < body.index("This Month"), "groups should render in recency order"
+    assert body.index("This Month") < body.index(old.title), "stale conversation should render under its group"
+
+    unpinned_block = body[/<turbo-frame id="conversations".*?<\/turbo-frame>/m]
+    assert_match(/pointerdown->sortable#press/, unpinned_block)
+    assert_match(/data-sortable-zone="unpinned"/, unpinned_block)
+  end
+
+  test "index goes flat under Recent once any pin exists, groups return when unpinned" do
     user = @conversation.user
     old = conversations(:ruby_version)
     old.update_column(:updated_at, 1.month.ago)
@@ -27,10 +49,10 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     body = response.body
     assert_match(/id="pinned-conversations"/, body)
-    assert_match(/data-role="time-group"/, body)
-    assert body.index(pinned.title) < body.index("Today"), "pinned section should render above the groups"
-    assert body.index("Today") < body.index("This Month"), "groups should render in recency order"
-    assert body.index("This Month") < body.index(old.title), "stale conversation should render under its group"
+    assert_match(/data-role="pinned-header"/, body)
+    assert_match(/data-role="recent-header"/, body)
+    assert_no_match(/data-role="time-group"/, body)
+    assert body.index(pinned.title) < body.index("Recent"), "pinned section should render above the flat list"
 
     pinned_block = body[/<turbo-frame id="pinned-conversations".*?<\/turbo-frame>/m]
     assert_match(/pointerdown->sortable#press/, pinned_block)
@@ -38,6 +60,27 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     unpinned_block = body[/<turbo-frame id="conversations".*?<\/turbo-frame>/m]
     assert_match(/pointerdown->sortable#press/, unpinned_block)
     assert_match(/data-sortable-zone="unpinned"/, unpinned_block)
+
+    pinned.unpin!(user)
+
+    get conversations_url
+
+    assert_match(/data-role="time-group"/, response.body)
+    assert_no_match(/data-role="recent-header"/, response.body)
+  end
+
+  test "pinning every conversation leaves Recent headerless with pins alone" do
+    user = @conversation.user
+    user.conversations.find_each { |c| c.pin!(user) }
+
+    get conversations_url
+
+    assert_response :success
+    assert_empty assigns(:nav_conversations)
+    body = response.body
+    assert_match(/data-role="pinned-header"/, body)
+    assert_no_match(/data-role="recent-header"/, body)
+    assert_no_match(/data-role="time-group"/, body)
   end
 
   test "a search-filtered sidebar stays flat and is not drag-reorderable" do
@@ -944,5 +987,24 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     get conversations_url(show: "bookmarked"), headers: { "Accept" => "application/json" }
 
     assert_response :success
+  end
+
+  test "pinned section keeps hand order regardless of recency" do
+    user = @conversation.user
+    first = conversations(:greeting)
+    second = conversations(:attachment)
+    first.pin!(user)
+    second.pin!(user)
+    Conversation.reposition(user, [second.id, first.id])
+    # Make recency disagree with hand order so a recency leak would show.
+    second.update_column(:updated_at, 1.month.ago)
+    first.update_column(:updated_at, Time.current)
+
+    get conversations_url
+
+    assert_response :success
+    assert_equal [second.id, first.id], assigns(:pinned_conversations).map(&:id)
+    body = response.body
+    assert body.index(second.title) < body.index(first.title), "rendered pinned order must follow hand order"
   end
 end

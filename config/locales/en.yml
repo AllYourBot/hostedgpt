@@ -365,6 +365,7 @@ en:
         reactions: "Reactions"
         all_conversations: "All conversations"
         pinned: "Pinned"
+        recent: "Recent"
         no_bookmarks_yet: "No bookmarks yet — hover a conversation and click the bookmark icon."
         no_reactions_yet: "No reactions yet — open the smiley on any row and pick an emoji."
         filter: "Filter conversations"

@@ -145,6 +145,28 @@ class SidebarDragTest < ApplicationSystemTestCase
     assert unpinned_row_titles.include?("PinToggleTarget")
   end
 
+  test "pinning the first chat retires the date groups for Recent, unpinning restores them" do
+    user = users(:keith)
+    conversation = user.conversations.create!(assistant: assistants(:samantha), title: "GroupRetireTarget")
+
+    login_as(user)
+    visit root_path
+    assert_selector("[data-role='time-group']")
+    assert_no_selector("[data-role='recent-header']")
+
+    pin_row(conversation).hover
+    pin_row(conversation).find("[data-role='pin']").click
+    assert_selector("#conversation_#{conversation.id} [data-role='unpin']")
+    assert_selector("[data-role='recent-header']", text: "Recent")
+    assert_no_selector("[data-role='time-group']")
+
+    pin_row(conversation).hover
+    pin_row(conversation).find("[data-role='unpin']").click
+    assert_selector("#conversation_#{conversation.id} [data-role='pin']")
+    assert_selector("[data-role='time-group']")
+    assert_no_selector("[data-role='recent-header']")
+  end
+
   test "dragging across sections pins and unpins" do
     user = users(:keith)
     pinned = user.conversations.create!(assistant: assistants(:samantha), title: "ZonePinned")

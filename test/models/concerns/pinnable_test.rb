@@ -26,6 +26,27 @@ class PinnableTest < ActiveSupport::TestCase
     assert_includes Conversation.unpinned_for(@keith).map(&:id), conversation.id
   end
 
+  test "pin, unpin, and reposition never touch recency: date groups follow activity alone" do
+    first = conversations(:greeting)
+    second = conversations(:attachment)
+    first.pin!(@keith)
+    second.pin!(@keith)
+    before = [first.reload.updated_at, second.reload.updated_at]
+
+    # Pin order claims top slots in pin sequence (second lands above first), so
+    # repositioning to the reverse proves the call ran — otherwise this is vacuous.
+    assert_no_changes -> { [first.reload.updated_at, second.reload.updated_at] } do
+      Conversation.reposition(@keith, [first.id, second.id])
+      first.unpin!(@keith)
+      second.unpin!(@keith)
+    end
+
+    # The reposition above really ran (positions persist through unpins), so the
+    # no-changes assertion is not vacuous.
+    assert_operator Conversation.find(first.id).position, :<, Conversation.find(second.id).position
+    assert_equal before, [first.reload.updated_at, second.reload.updated_at]
+  end
+
   test "double pin is idempotent" do
     conversation = conversations(:greeting)
     conversation.pin!(@keith)
