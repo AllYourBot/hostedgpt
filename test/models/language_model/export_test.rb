@@ -71,6 +71,21 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     assert users(:rob).language_models.find_by(api_name: "new-model")
   end
 
+  test "import_from_file skips models whose api service the user does not have" do
+    models = [{
+      api_name: "new-model",
+      name: "new model",
+      api_service_name: "Nonexistent Service",
+    }]
+    path = Rails.root.join("tmp/newmodels.yml")
+    File.write(path, { "models" => models }.to_yaml)
+    assert_no_difference "LanguageModel.count", "No model should be created without its api service" do
+      assert_output("", "") do
+        LanguageModel.import_from_file(path:, users: users(:rob))
+      end
+    end
+  end
+
   test "import_from_file with existing models by api_name" do
     user = users(:rob)
     api_name = "gpt-4o"
