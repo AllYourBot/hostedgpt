@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "rubyllm": {
+      "source": "crmne/ruby_llm",
+      "sourceType": "github",
+      "skillPath": "skills/rubyllm/SKILL.md",
+      "computedHash": "af85e2623b1e23049867ba049b543f21ba6929ef985880df2b196249237e5638"
+    }
+  }
+}
