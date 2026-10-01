@@ -104,6 +104,20 @@ class Assistant::ExportTest < ActiveSupport::TestCase
     assert_equal "Brand New Assistant", new_assistant.name
   end
 
+  test "import_from_file skips assistants whose language model the user does not have" do
+    assistants = [{
+      name: "Brand New Assistant",
+      slug: "completely-new-slug",
+      language_model_api_name: "nonexistent-model"
+    }]
+    path = Rails.root.join("tmp/missing_model.yml")
+    File.write(path, { "assistants" => assistants }.to_yaml)
+
+    assert_no_difference "Assistant.count", "No assistant should be created without its language model" do
+      Assistant.import_from_file(path:, users: [users(:keith)])
+    end
+  end
+
   test "import_from_file with only new models" do
     user = users(:keith)
     user.assistants.destroy_all

@@ -42,6 +42,8 @@ module Assistant::Export
       assistants.each do |assistant|
         assistant = assistant.with_indifferent_access
         users.each do |user|
+          api_name = assistant["language_model_api_name"]
+          next if api_name && !LanguageModel.for_user(user).exists?(api_name:)
           asst = user.assistants.find_or_create_by(slug: assistant["slug"])
           asst.assign_attributes(assistant.except("slug")) if asst.deleted_at.nil?
           asst.save!
