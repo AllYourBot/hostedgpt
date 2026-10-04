@@ -5,6 +5,8 @@ class AIBackend::RubyLLM < AIBackend
   class ConfigurationError < AIBackend::ConfigurationError; end
   class ToolCallIntercepted < StandardError; end
 
+  IMAGE_MODEL = "gpt-image-2.5-flare"
+
   CONFIGURATION_ERRORS = [
     ::RubyLLM::UnauthorizedError, ::RubyLLM::ConfigurationError,
     ::RubyLLM::BadRequestError, ::RubyLLM::ForbiddenError,
@@ -68,6 +70,33 @@ class AIBackend::RubyLLM < AIBackend
     end
   rescue ::Faraday::Error => e
     "Error: #{e.message}"
+  end
+
+  # Always paints through the user's OpenAI service, even for an Anthropic or Gemini assistant.
+  def self.generate_image(prompt:, user:)
+    # Scoped by URL, not driver alone: Groq and OpenRouter also ride driver :openai.
+    openai_service = user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
+    token = openai_service&.effective_token
+
+    # Context-free on purpose: Toolbox::Image#generate_with_error_context appends which assistant asked.
+    raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services" if openai_service.nil? || token.blank?
+
+    context = client.context { |c| c.openai_api_key = token }
+    image = begin
+      context.paint(
+        prompt,
+        model: IMAGE_MODEL,
+        provider: :openai,
+        assume_model_exists: true,
+        size: "1024x1024",
+      )
+    rescue *CONFIGURATION_ERRORS => e
+      raise ConfigurationError, e.message
+    rescue *RATE_LIMIT_ERRORS => e
+      raise ::Faraday::TooManyRequestsError, e.message
+    end
+
+    { b64_json: image.data, model: IMAGE_MODEL, provider: "OpenAI" }
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)

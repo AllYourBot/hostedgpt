@@ -53,6 +53,13 @@ class Document < ApplicationRecord
     end
   end
 
+  def image_link_url(variant)
+    return nil unless has_image?
+    return fully_processed_url(variant) if Rails.application.config.x.app_url.present? && has_file_variant_processed?(variant)
+
+    redirect_to_processed_path(variant)
+  end
+
   def has_file_variant_processed?(variant)
     return false unless file.attached? && file.content_type&.start_with?("image/")
 
@@ -87,18 +94,8 @@ class Document < ApplicationRecord
   def file_base64(variant = :large)
     return nil if !file.attached?
 
-    if file.content_type&.start_with?("image/")
-      variant_obj = image_variant(variant)
-      return nil unless variant_obj
-
-      wait_for_file_variant_to_process!(variant.to_sym)
-      file_contents = variant_obj.processed.download
-    else
-      # For non-image files, just return the raw file content
-      file_contents = file.download
-    end
-
-    Base64.strict_encode64(file_contents)
+    @file_base64 ||= {}
+    @file_base64[variant.to_sym] ||= encode_file_base64(variant)
   end
 
   def has_document_pdf?
@@ -155,6 +152,21 @@ class Document < ApplicationRecord
   end
 
   private
+
+  def encode_file_base64(variant)
+    if file.content_type&.start_with?("image/")
+      variant_obj = image_variant(variant)
+      return nil unless variant_obj
+
+      wait_for_file_variant_to_process!(variant.to_sym)
+      file_contents = variant_obj.processed.download
+    else
+      # For non-image files, just return the raw file content
+      file_contents = file.download
+    end
+
+    Base64.strict_encode64(file_contents)
+  end
 
   def file_data_url(variant = :large)
     "data:#{file.blob.content_type};base64,#{file_base64(variant)}"

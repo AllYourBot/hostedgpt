@@ -81,7 +81,7 @@ end %>
             <div class="flex flex-wrap gap-2 my-1" data-role="document-attachments">
               <% message.documents.each do |document| %>
                 <% if document.has_image? %>
-                  <div data-controller="modal">
+                  <div data-controller="modal" data-modal-image-loader-outlet="[data-image-modal='<%= dom_id(document) %>']">
                     <%= button_tag type: "button",
                       class: "w-full h-auto flex focus:outline-none",
                       data: {
@@ -116,11 +116,13 @@ end %>
                         <article
                           class="flex flex-col md:flex-row justify-center"
                           data-controller="image-loader"
+                          data-image-modal="<%= dom_id(document) %>"
                           data-image-loader-message-scroller-outlet="[data-role='inner-message']"
-                          data-image-loader-url-value="<%= document.image_url(:large) %>"
+                          data-image-loader-url-value="<%= document.image_link_url(:large) %>"
+                          data-image-loader-lazy-value="true"
                           data-turbo-permanent
                         >
-                          <%= image_tag document.image_url(:large, fallback: ""),
+                          <%= image_tag "",
                             class: "w-full h-auto",
                             data: {
                               image_loader_target: "image",

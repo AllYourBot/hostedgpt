@@ -4,6 +4,8 @@ import { Controller } from "@hotwired/stimulus"
 // It's important that you set the img src to an empty string and let the stimulus controller swap out the url, otherwise
 // the browser might request it and fail before the stimulus controller has had a chance to initialize.
 //
+// Set data-image-loader-lazy-value="true" to wait until something calls load(), e.g. a modal opening.
+//
 // Example:
 //
 // <div data-controller="image-loader" data-image-loader-url-class="http://image.com/picture.jpg">
@@ -19,8 +21,10 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [ "image", "loader" ]
-  static values = { url: String }
+  static values = { url: String, lazy: Boolean }
   static outlets = [ "message-scroller" ]
+
+  #loadStarted = false
 
   connect() {
     this.retryCount = 0
@@ -29,6 +33,13 @@ export default class extends Controller {
     this.imageKey = Math.round(Math.random()*100000000000)
 
     window.imageLoadingForSystemTestsToCheck ||= {}
+
+    if (!this.lazyValue) this.load()
+  }
+
+  load() {
+    if (this.#loadStarted) return
+    this.#loadStarted = true
 
     if (this.imageTarget.src == "")
       window.imageLoadingForSystemTestsToCheck[this.imageKey] = 'loading'
