@@ -5,7 +5,7 @@ class AIBackend::RubyLLM < AIBackend
   class ConfigurationError < AIBackend::ConfigurationError; end
   class ToolCallIntercepted < StandardError; end
 
-  IMAGE_MODEL = "gpt-image-1"
+  IMAGE_MODEL = "gpt-image-2.5-flare"
 
   CONFIGURATION_ERRORS = [
     ::RubyLLM::UnauthorizedError, ::RubyLLM::ConfigurationError,

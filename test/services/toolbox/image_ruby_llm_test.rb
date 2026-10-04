@@ -18,14 +18,14 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
         recorded = TestClient::RubyLLM::ContextDouble.last_paint_call
         assert_equal @prompt, recorded[:prompt]
         assert_equal "abc-secret", recorded[:openai_api_key]
-        assert_equal "gpt-image-1", recorded[:kwargs][:model]
+        assert_equal AIBackend::RubyLLM::IMAGE_MODEL, recorded[:kwargs][:model]
         assert_equal :openai, recorded[:kwargs][:provider]
         assert_equal "1024x1024", recorded[:kwargs][:size]
 
         assert_equal @prompt, result[:prompt_given]
         assert_equal "RUBYLLM_BASE64_IMAGE_DATA", result[:json_of_generated_image]
         assert_includes result[:note_to_assistant], "image"
-        assert_equal "Image created by tool using OpenAI model gpt-image-1", result[:message_to_user]
+        assert_equal "Image created by tool using OpenAI model #{AIBackend::RubyLLM::IMAGE_MODEL}", result[:message_to_user]
       end
     end
   end
@@ -39,7 +39,7 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
         assert_equal "RUBYLLM_BASE64_IMAGE_DATA", result[:json_of_generated_image]
-        assert_equal "Image created by tool using OpenAI model gpt-image-1", result[:message_to_user]
+        assert_equal "Image created by tool using OpenAI model #{AIBackend::RubyLLM::IMAGE_MODEL}", result[:message_to_user]
       end
     end
   end
