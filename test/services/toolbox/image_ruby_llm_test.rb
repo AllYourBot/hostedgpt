@@ -52,6 +52,7 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
       Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
         error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
         assert_includes error.message, "OpenAI API key not found"
+        assert_equal 1, error.message.scan(/to use image generation with/).length
       end
     end
   end
@@ -63,6 +64,7 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
       Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
         error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
         assert_includes error.message, "OpenAI API key not found"
+        assert_equal 1, error.message.scan(/to use image generation with/).length
       end
     end
   end
@@ -75,6 +77,19 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
       Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
         error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
         assert_includes error.message, "OpenAI API key not found"
+        assert_equal 1, error.message.scan(/to use image generation with/).length
+      end
+    end
+  end
+
+  test "flag on: a paint failure maps into the unified error contract and surfaces with the toolbox context" do
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::ContextDouble.paint_error_to_raise = ::RubyLLM::UnauthorizedError.new("401 bad key")
+
+      Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
+        error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
+        assert_includes error.message, "401 bad key"
+        assert_equal 1, error.message.scan(/to use image generation with/).length
       end
     end
   end

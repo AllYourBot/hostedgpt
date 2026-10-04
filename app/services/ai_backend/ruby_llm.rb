@@ -78,25 +78,33 @@ class AIBackend::RubyLLM < AIBackend
   # Anthropic/Gemini) — same provider, different client. The flag-off path
   # keeps using AIBackend::OpenAI.generate_image until Phase 7.
   def self.generate_image(prompt:, user:)
-    # Uses name "OpenAI" to avoid picking up Groq (also driver: :openai).
-    openai_service = user.api_services.find_by(name: "OpenAI", driver: :openai)
+    # Scoped by canonical URL (#797) — the same selection the flag-off path
+    # uses — so Groq/OpenRouter (also driver: :openai) can't be mistaken for
+    # the OpenAI image service. Inlined rather than delegated to
+    # AIBackend::OpenAI#canonical_service_for so this survives Phase 7.
+    openai_service = user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
     token = openai_service&.effective_token
 
-    if openai_service.nil? || token.blank?
-      current_backend = Current.message&.assistant&.language_model&.api_service&.name || "current AI backend"
-      raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services to use image generation with #{current_backend}."
-    end
+    # Context-free on purpose: Toolbox::Image#generate_with_error_context appends
+    # "to use image generation with ..." itself — same contract as the flag-off path.
+    raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services" if openai_service.nil? || token.blank?
 
     context = client.context { |c| c.openai_api_key = token }
-    image = context.paint(
-      prompt,
-      model: IMAGE_MODEL,
-      provider: :openai,
-      assume_model_exists: true,
-      size: "1024x1024",
-    )
+    image = begin
+      context.paint(
+        prompt,
+        model: IMAGE_MODEL,
+        provider: :openai,
+        assume_model_exists: true,
+        size: "1024x1024",
+      )
+    rescue *CONFIGURATION_ERRORS => e
+      raise ConfigurationError, e.message
+    rescue *RATE_LIMIT_ERRORS => e
+      raise ::Faraday::TooManyRequestsError, e.message
+    end
 
-    { b64_json: image.data, model: IMAGE_MODEL }
+    { b64_json: image.data, model: IMAGE_MODEL, provider: "OpenAI" }
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)

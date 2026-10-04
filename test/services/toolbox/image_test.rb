@@ -19,6 +19,24 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
     end
   end
 
+  test "flag off: dispatch routes through ai_backend to the SDK backend" do
+    stub_features(use_ruby_llm: false) do
+      Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
+        received = nil
+        AIBackend::OpenAI.stub :generate_image, ->(prompt:, user:) {
+          received = { called: true }
+          { b64_json: "BASE64_IMAGE_DATA", model: "gpt-image-1", provider: "OpenAI" }
+        } do
+          result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
+
+          assert received[:called]
+          assert_equal "BASE64_IMAGE_DATA", result[:json_of_generated_image]
+          assert_equal "Image created by tool using OpenAI model gpt-image-1", result[:message_to_user]
+        end
+      end
+    end
+  end
+
   test "the provider label follows the backend that actually generated the image" do
     Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
       AIBackend::OpenAI.stub :generate_image, { b64_json: "BASE64_IMAGE_DATA", model: "acme-image-2", provider: "Acme" } do
