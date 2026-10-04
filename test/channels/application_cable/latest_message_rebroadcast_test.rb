@@ -14,12 +14,12 @@ module ApplicationCable
           channel_class: "Turbo::StreamsChannel", identifier: @identifier)
       end
 
-      assert_equal [@conversation.latest_message_for_version], broadcasted
+      assert_equal [@conversation.latest_message_for_version], broadcasted, "The latest message should be re-broadcast exactly once"
     end
 
     test "other channels are ignored" do
       GetNextAIMessageJob.stub :broadcast_updated_message, ->(_) { flunk "should not re-broadcast" } do
-        assert_nil LatestMessageRebroadcast.call(channel_class: "OtherChannel", identifier: @identifier)
+        assert_nil LatestMessageRebroadcast.call(channel_class: "OtherChannel", identifier: @identifier), "A non-Turbo channel should be skipped"
       end
     end
   end

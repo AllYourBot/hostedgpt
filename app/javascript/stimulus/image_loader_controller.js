@@ -24,6 +24,8 @@ export default class extends Controller {
   static values = { url: String, lazy: Boolean }
   static outlets = [ "message-scroller" ]
 
+  #loadStarted = false
+
   connect() {
     this.retryCount = 0
     this.maxRetries = 12
@@ -36,8 +38,8 @@ export default class extends Controller {
   }
 
   load() {
-    if (this.loadStarted) return
-    this.loadStarted = true
+    if (this.#loadStarted) return
+    this.#loadStarted = true
 
     if (this.imageTarget.src == "")
       window.imageLoadingForSystemTestsToCheck[this.imageKey] = 'loading'

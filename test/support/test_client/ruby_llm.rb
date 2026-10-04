@@ -156,8 +156,6 @@ module TestClient
         :openai_api_base, :anthropic_api_base, :gemini_api_base,
         :openai_use_system_role
 
-      # Mirrors the real RubyLLM::Context#paint: records the call and returns an
-      # Image-shaped double. Used to exercise AIBackend::RubyLLM.generate_image.
       def paint(prompt, **kwargs)
         raise self.class.paint_error_to_raise if self.class.paint_error_to_raise
 

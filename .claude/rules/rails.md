@@ -19,3 +19,7 @@ def self.high_frequency_schedule?(string) = interval_for(string) <= HIGH_FREQUEN
 # Good — inline the literal; promote to a constant only when a second caller appears
 def self.high_frequency_schedule?(string) = interval_for(string) <= 1.hour
 ```
+
+## `ActiveSupport::Notifications.subscribe` belongs in an initializer
+
+A subscription is process-wide and lives until it is unsubscribed, so subscribing inside per-request or per-connection code (`Connection#connect`, a controller action, a job) adds another listener every call and each event then runs once per call ever made. Subscribe once at boot in `config/initializers/` and keep the handler's logic in a class it calls, as `action_cable_rebroadcast.rb` does.

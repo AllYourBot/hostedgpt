@@ -91,27 +91,27 @@ class DocumentTest < ActiveSupport::TestCase
     2.times { document.file_base64(:small) }
     2.times { document.file_base64(:large) }
 
-    assert_equal 2, downloads
+    assert_equal 2, downloads, "Each variant should be downloaded once, however often it is encoded"
   ensure
     ActiveSupport::Notifications.unsubscribe(counter)
   end
 
-  test "image_link_url is a redirect path rather than a data url when app_url is not set" do
+  test "image_link_url is a redirect path when app_url IS NOT SET" do
     stub_custom_config_value(:app_url, "") do
-      assert documents(:cat_photo).image_link_url(:large).starts_with?("/rails/active_storage/representations/redirect/")
+      assert documents(:cat_photo).image_link_url(:large).starts_with?("/rails/active_storage/representations/redirect/"), "Without an app_url the link should be a redirect path, not a data URL"
     end
   end
 
-  test "image_link_url is the processed url once the variant exists and app_url is set" do
+  test "image_link_url is the processed url when app_url IS SET and the variant exists" do
     documents(:cat_photo).send(:wait_for_file_variant_to_process!, :large)
 
     stub_custom_config_value(:app_url, "https://example.com") do
-      assert documents(:cat_photo).image_link_url(:large).starts_with?("https://example.com/rails/active_storage/postgresql/")
+      assert documents(:cat_photo).image_link_url(:large).starts_with?("https://example.com/rails/active_storage/postgresql/"), "A processed variant should link straight to the file"
     end
   end
 
-  test "image_link_url is nil for a document without an image" do
-    assert_nil documents(:background).image_link_url(:large)
+  test "image_link_url is nil for a document WITHOUT an image" do
+    assert_nil documents(:background).image_link_url(:large), "A document without an image has nothing to link"
   end
 
   test "has_file_variant_processed?" do

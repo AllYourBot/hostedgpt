@@ -72,21 +72,13 @@ class AIBackend::RubyLLM < AIBackend
     "Error: #{e.message}"
   end
 
-  # Image generation: the flag routes here via api_service.ai_backend instead
-  # of the base AIBackend → AIBackend::OpenAI delegation. Image generation
-  # always rides the user's OpenAI service (even when the chat backend is
-  # Anthropic/Gemini) — same provider, different client. The flag-off path
-  # keeps using AIBackend::OpenAI.generate_image until Phase 7.
+  # Always paints through the user's OpenAI service, even for an Anthropic or Gemini assistant.
   def self.generate_image(prompt:, user:)
-    # Scoped by canonical URL (#797) — the same selection the flag-off path
-    # uses — so Groq/OpenRouter (also driver: :openai) can't be mistaken for
-    # the OpenAI image service. Inlined rather than delegated to
-    # AIBackend::OpenAI#canonical_service_for so this survives Phase 7.
+    # Scoped by URL, not driver alone: Groq and OpenRouter also ride driver :openai.
     openai_service = user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
     token = openai_service&.effective_token
 
-    # Context-free on purpose: Toolbox::Image#generate_with_error_context appends
-    # "to use image generation with ..." itself — same contract as the flag-off path.
+    # Context-free on purpose: Toolbox::Image#generate_with_error_context appends which assistant asked.
     raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services" if openai_service.nil? || token.blank?
 
     context = client.context { |c| c.openai_api_key = token }

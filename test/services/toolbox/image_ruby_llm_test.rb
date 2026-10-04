@@ -16,16 +16,16 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
         recorded = TestClient::RubyLLM::ContextDouble.last_paint_call
-        assert_equal @prompt, recorded[:prompt]
-        assert_equal "abc-secret", recorded[:openai_api_key]
-        assert_equal AIBackend::RubyLLM::IMAGE_MODEL, recorded[:kwargs][:model]
-        assert_equal :openai, recorded[:kwargs][:provider]
-        assert_equal "1024x1024", recorded[:kwargs][:size]
+        assert_equal @prompt, recorded[:prompt], "The prompt should be passed to paint unchanged"
+        assert_equal "abc-secret", recorded[:openai_api_key], "Paint should use the user's OpenAI key"
+        assert_equal AIBackend::RubyLLM::IMAGE_MODEL, recorded[:kwargs][:model], "Paint should use the RubyLLM image model"
+        assert_equal :openai, recorded[:kwargs][:provider], "Paint should target the OpenAI provider"
+        assert_equal "1024x1024", recorded[:kwargs][:size], "Paint should request a square image"
 
-        assert_equal @prompt, result[:prompt_given]
-        assert_equal "RUBYLLM_BASE64_IMAGE_DATA", result[:json_of_generated_image]
-        assert_includes result[:note_to_assistant], "image"
-        assert_equal "Image created by tool using OpenAI model #{AIBackend::RubyLLM::IMAGE_MODEL}", result[:message_to_user]
+        assert_equal @prompt, result[:prompt_given], "The tool result should echo the prompt"
+        assert_equal "RUBYLLM_BASE64_IMAGE_DATA", result[:json_of_generated_image], "The painted image data should come back to the job"
+        assert_includes result[:note_to_assistant], "image", "The note should tell the assistant about the image"
+        assert_equal "Image created by tool using OpenAI model #{AIBackend::RubyLLM::IMAGE_MODEL}", result[:message_to_user], "The user should see which model made the image"
       end
     end
   end
@@ -38,8 +38,8 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
       Current.set(user: users(:keith), message: anthropic_message) do
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
-        assert_equal "RUBYLLM_BASE64_IMAGE_DATA", result[:json_of_generated_image]
-        assert_equal "Image created by tool using OpenAI model #{AIBackend::RubyLLM::IMAGE_MODEL}", result[:message_to_user]
+        assert_equal "RUBYLLM_BASE64_IMAGE_DATA", result[:json_of_generated_image], "The painted image data should come back to the job"
+        assert_equal "Image created by tool using OpenAI model #{AIBackend::RubyLLM::IMAGE_MODEL}", result[:message_to_user], "The user should see which model made the image"
       end
     end
   end
@@ -51,8 +51,8 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
 
       Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
         error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
-        assert_includes error.message, "OpenAI API key not found"
-        assert_equal 1, error.message.scan(/to use image generation with/).length
+        assert_includes error.message, "OpenAI API key not found", "A missing OpenAI key should be reported"
+        assert_equal 1, error.message.scan(/to use image generation with/).length, "The assistant context should be appended exactly once"
       end
     end
   end
@@ -63,8 +63,8 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
 
       Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
         error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
-        assert_includes error.message, "OpenAI API key not found"
-        assert_equal 1, error.message.scan(/to use image generation with/).length
+        assert_includes error.message, "OpenAI API key not found", "A missing OpenAI key should be reported"
+        assert_equal 1, error.message.scan(/to use image generation with/).length, "The assistant context should be appended exactly once"
       end
     end
   end
@@ -76,8 +76,8 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
 
       Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
         error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
-        assert_includes error.message, "OpenAI API key not found"
-        assert_equal 1, error.message.scan(/to use image generation with/).length
+        assert_includes error.message, "OpenAI API key not found", "A missing OpenAI key should be reported"
+        assert_equal 1, error.message.scan(/to use image generation with/).length, "The assistant context should be appended exactly once"
       end
     end
   end
@@ -88,8 +88,8 @@ class Toolbox::ImageRubyLLMTest < ActiveSupport::TestCase
 
       Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
         error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
-        assert_includes error.message, "401 bad key"
-        assert_equal 1, error.message.scan(/to use image generation with/).length
+        assert_includes error.message, "401 bad key", "The provider's error should reach the user"
+        assert_equal 1, error.message.scan(/to use image generation with/).length, "The assistant context should be appended exactly once"
       end
     end
   end

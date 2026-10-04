@@ -60,13 +60,13 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     TestClient::OpenAI.stub :function, "image_generate_an_image" do
       TestClient::OpenAI.stub :arguments, { image_generation_prompt: "A cartoon dog" } do
         AIBackend::OpenAI.stub :get_tool_messages_by_calling, tool_messages do
-          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id), "The job should finish"
         end
       end
     end
 
     assistant_reply = @conversation.messages.reload.order(:index).last
-    assert_equal ["PNG call_dog_1", "PNG call_dog_2"], assistant_reply.documents.map { |document| document.file.download }.sort
+    assert_equal ["PNG call_dog_1", "PNG call_dog_2"], assistant_reply.documents.map { |document| document.file.download }.sort, "Both generated images should be attached to the reply"
   end
 
   test "populates a tool response call from the assistant and creates additional tool messages" do

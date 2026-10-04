@@ -5,10 +5,6 @@ class Toolbox::Image < Toolbox
   S
 
   def generate_an_image(image_generation_prompt_s:)
-    # Image generation follows the same transport dispatch as chat: the user's
-    # flag/choice (per identity) picks RubyLLM or the SDK backend. Error
-    # context stays local — only this tool knows which assistant wanted the
-    # image.
     api_service = Current.message&.assistant&.language_model&.api_service
     result = generate_with_error_context(api_service&.ai_backend || AIBackend, api_service, image_generation_prompt_s)
 
@@ -24,8 +20,7 @@ class Toolbox::Image < Toolbox
 
   # The backend raises a context-free key error because it cannot know which
   # assistant wanted the image; this tool can, so the context is appended here.
-  # StandardError (not just RuntimeError) so mapped RubyLLM transport errors
-  # (ConfigurationError, Faraday::TooManyRequestsError) get the context too.
+  # StandardError, not RuntimeError: RubyLLM maps paint failures to ConfigurationError and Faraday errors.
   def generate_with_error_context(backend, api_service, prompt)
     backend.generate_image(prompt: prompt, user: Current.user)
   rescue StandardError => e

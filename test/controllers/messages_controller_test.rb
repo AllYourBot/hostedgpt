@@ -238,10 +238,10 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_equal images.size, downloads
-    assert_select "[data-image-modal][data-image-loader-lazy-value='true']", images.size
-    assert_select "[data-image-modal][data-image-loader-url-value^='/rails/active_storage/representations/redirect/']", images.size
-    assert_select "[data-image-modal] img[src='']", images.size
+    assert_equal images.size, downloads, "Only each image's thumbnail should be downloaded"
+    assert_select "[data-image-modal][data-image-loader-lazy-value='true']", { count: images.size }, "Every modal image should wait to be opened"
+    assert_select "[data-image-modal][data-image-loader-url-value^='/rails/active_storage/representations/redirect/']", { count: images.size }, "Every modal image should be a link, not a data URL"
+    assert_select "[data-image-modal] img[src='']", { count: images.size }, "No modal image should start loading on render"
   ensure
     ActiveSupport::Notifications.unsubscribe(counter)
   end
