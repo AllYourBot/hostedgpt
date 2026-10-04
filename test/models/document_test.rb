@@ -83,6 +83,37 @@ class DocumentTest < ActiveSupport::TestCase
     end
   end
 
+  test "file_base64 downloads each variant only once per document" do
+    document = documents(:cat_photo)
+    downloads = 0
+    counter = ActiveSupport::Notifications.subscribe("service_download.active_storage") { downloads += 1 }
+
+    2.times { document.file_base64(:small) }
+    2.times { document.file_base64(:large) }
+
+    assert_equal 2, downloads
+  ensure
+    ActiveSupport::Notifications.unsubscribe(counter)
+  end
+
+  test "image_link_url is a redirect path rather than a data url when app_url is not set" do
+    stub_custom_config_value(:app_url, "") do
+      assert documents(:cat_photo).image_link_url(:large).starts_with?("/rails/active_storage/representations/redirect/")
+    end
+  end
+
+  test "image_link_url is the processed url once the variant exists and app_url is set" do
+    documents(:cat_photo).send(:wait_for_file_variant_to_process!, :large)
+
+    stub_custom_config_value(:app_url, "https://example.com") do
+      assert documents(:cat_photo).image_link_url(:large).starts_with?("https://example.com/rails/active_storage/postgresql/")
+    end
+  end
+
+  test "image_link_url is nil for a document without an image" do
+    assert_nil documents(:background).image_link_url(:large)
+  end
+
   test "has_file_variant_processed?" do
     refute documents(:cat_photo).has_file_variant_processed?(:small)
   end

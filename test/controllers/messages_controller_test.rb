@@ -225,6 +225,27 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-role="retry"]', false
   end
 
+  test "without an app_url, index embeds only the thumbnails and leaves each modal image to load when opened" do
+    conversation = conversations(:attachments)
+    images = conversation.messages.flat_map(&:documents).select(&:has_image?)
+    images.each { |document| document.send(:wait_for_file_variant_to_process!, :small) }
+
+    downloads = 0
+    counter = ActiveSupport::Notifications.subscribe("service_download.active_storage") { downloads += 1 }
+
+    stub_custom_config_value(:app_url, nil) do
+      get conversation_messages_url(conversation, version: 1)
+    end
+
+    assert_response :success
+    assert_equal images.size, downloads
+    assert_select "[data-image-modal][data-image-loader-lazy-value='true']", images.size
+    assert_select "[data-image-modal][data-image-loader-url-value^='/rails/active_storage/representations/redirect/']", images.size
+    assert_select "[data-image-modal] img[src='']", images.size
+  ensure
+    ActiveSupport::Notifications.unsubscribe(counter)
+  end
+
   test "messages can still be viewed when attached to a soft-deleted assistant" do
     @assistant.deleted!
     get conversation_messages_url(@conversation, version: 1)
