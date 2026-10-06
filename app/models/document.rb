@@ -1,6 +1,7 @@
 class Document < ApplicationRecord
   belongs_to :user
   belongs_to :assistant, optional: true
+  belongs_to :collection, optional: true
   belongs_to :message, optional: true
 
   has_one_attached :file
@@ -173,7 +174,7 @@ class Document < ApplicationRecord
   end
 
   def set_default_user
-    self.user ||= assistant&.user || message&.conversation&.user
+    self.user ||= assistant&.user || collection&.user || message&.conversation&.user
   end
 
   def set_default_filename

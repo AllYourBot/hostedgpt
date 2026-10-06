@@ -1,7 +1,7 @@
 class Assistant < ApplicationRecord
   include Export, Slug, Context
 
-  MAX_LIST_DISPLAY = 5
+  MAX_LIST_DISPLAY = 4
 
   belongs_to :user
 

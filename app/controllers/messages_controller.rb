@@ -7,6 +7,7 @@ class MessagesController < ApplicationController
   before_action :set_assistant,             only: [:index, :new, :edit, :create]
   before_action :set_message,               only: [:show, :edit, :update]
   before_action :set_nav_assistants,        only: [:index, :new]
+  before_action :set_nav_collections,       only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
 
   def index
@@ -46,6 +47,7 @@ class MessagesController < ApplicationController
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan
       set_nav_assistants
+      set_nav_collections
       @new_message = @assistant.messages.new
 
       render :new, status: :unprocessable_content

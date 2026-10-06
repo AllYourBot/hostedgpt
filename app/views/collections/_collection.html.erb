@@ -1,0 +1,10 @@
+<div id="<%= dom_id(collection) %>" class="relative flex items-start space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
+  <%= icon "folder", variant: :outline, size: 28, class: "text-gray-900" %>
+  <div class="min-w-0 flex-1">
+    <%= link_to edit_collection_path(collection), data: { turbo_frame: "_top" } do %>
+      <span class="absolute inset-0" aria-hidden="true"></span>
+      <p class="text-sm font-medium text-gray-900" data-role="name"><%= collection.name %></p>
+      <p class="text-sm text-gray-500" data-role="description"><%= collection.description %></p>
+    <% end %>
+  </div>
+</div>

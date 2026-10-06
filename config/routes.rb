@@ -8,6 +8,10 @@ Rails.application.routes.draw do
     post :reorder, on: :collection
   end
 
+  resources :collections, except: :show do
+    resources :documents, only: [:create, :destroy], module: :collections
+  end
+
   resources :conversations, only: [:index, :show, :edit, :update, :destroy] do
     resources :messages, only: [:index]
   end
