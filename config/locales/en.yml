@@ -34,6 +34,7 @@ en:
       settings: "Settings"
       logout: "Logout"
       assistants: "Assistants"
+      collections: "Collections"
     settings:
       title: "Settings"
       home: "Home"
@@ -296,6 +297,31 @@ en:
         new: "New"
         more: "More"
         show_all: "Show All"
+    collections:
+      index_title: "Collections"
+      new_title: "New Collection"
+      edit_title: "Edit Collection"
+      delete: "Delete"
+      confirm_delete: "Are you sure?"
+      cancel: "Cancel"
+      form:
+        name: "Name"
+        description: "Description"
+        save: "Save"
+        saving: "Saving..."
+        errors_title:
+          one: "%{count} error prohibited this collection from being saved:"
+          other: "%{count} errors prohibited this collection from being saved:"
+      files:
+        title: "Files"
+        hint: "Text, PDF, and image files uploaded here are kept in this collection."
+        none: "No files uploaded yet."
+        upload: "Upload file"
+        remove: "Remove"
+        confirm_remove: "Remove this file?"
+      ui:
+        more: "More"
+        show_all: "Show All"
     conversations:
       editing_title: "Editing conversation"
       show_title: "Show this conversation"
@@ -413,6 +439,10 @@ en:
         tested: "Tested: %{answer}"
         deleted: "Deleted"
         not_found: "The API Service could not be found"
+      collections:
+        saved: "Saved"
+        deleted: "Deleted"
+        deleted_full: "The collection was deleted"
       memories:
         forgotten: "Forgotten"
         cleared: "Cleared memory"

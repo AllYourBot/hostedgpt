@@ -5,6 +5,7 @@ de:
       settings: "Einstellungen"
       logout: "Abmelden"
       assistants: "Assistenten"
+      collections: "Sammlungen"
     settings:
       title: "Einstellungen"
       home: "Startseite"
@@ -267,6 +268,31 @@ de:
         new: "Neu"
         more: "Mehr"
         show_all: "Alle anzeigen"
+    collections:
+      index_title: "Sammlungen"
+      new_title: "Neue Sammlung"
+      edit_title: "Sammlung bearbeiten"
+      delete: "Löschen"
+      confirm_delete: "Sind Sie sicher?"
+      cancel: "Abbrechen"
+      form:
+        name: "Name"
+        description: "Beschreibung"
+        save: "Speichern"
+        saving: "Speichere..."
+        errors_title:
+          one: "%{count} Fehler hat das Speichern dieser Sammlung verhindert:"
+          other: "%{count} Fehler haben das Speichern dieser Sammlung verhindert:"
+      files:
+        title: "Dateien"
+        hint: "Hier hochgeladene Text-, PDF- und Bilddateien werden in dieser Sammlung aufbewahrt."
+        none: "Noch keine Dateien hochgeladen."
+        upload: "Datei hochladen"
+        remove: "Entfernen"
+        confirm_remove: "Diese Datei entfernen?"
+      ui:
+        more: "Mehr"
+        show_all: "Alle anzeigen"
     conversations:
       editing_title: "Konversation bearbeiten"
       show_title: "Diese Konversation anzeigen"
@@ -380,6 +406,10 @@ de:
         tested: "Getestet: %{answer}"
         deleted: "Gelöscht"
         not_found: "Der API-Dienst konnte nicht gefunden werden"
+      collections:
+        saved: "Gespeichert"
+        deleted: "Gelöscht"
+        deleted_full: "Die Sammlung wurde gelöscht"
       memories:
         forgotten: "Vergessen"
         cleared: "Speicher gelöscht"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -112,6 +112,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
     t.index ["token"], name: "index_clients_on_token", unique: true
   end
 
+  create_table "collections", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_collections_on_user_id"
+  end
+
   create_table "conversations", force: :cascade do |t|
     t.bigint "assistant_id", null: false
     t.datetime "created_at", null: false
@@ -154,6 +163,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
   create_table "documents", force: :cascade do |t|
     t.bigint "assistant_id"
     t.integer "bytes", null: false
+    t.bigint "collection_id"
     t.datetime "created_at", null: false
     t.string "filename", null: false
     t.bigint "message_id"
@@ -161,6 +171,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["assistant_id"], name: "index_documents_on_assistant_id"
+    t.index ["collection_id"], name: "index_documents_on_collection_id"
     t.index ["message_id"], name: "index_documents_on_message_id"
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
@@ -440,11 +451,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
   add_foreign_key "authentications", "credentials"
   add_foreign_key "chats", "users"
   add_foreign_key "clients", "people"
+  add_foreign_key "collections", "users"
   add_foreign_key "conversations", "assistants"
   add_foreign_key "conversations", "messages", column: "last_assistant_message_id"
   add_foreign_key "conversations", "users"
   add_foreign_key "credentials", "users"
   add_foreign_key "documents", "assistants"
+  add_foreign_key "documents", "collections"
   add_foreign_key "documents", "messages"
   add_foreign_key "documents", "users"
   add_foreign_key "language_models", "api_services"

@@ -1,0 +1,42 @@
+<%= form_with(model: collection, class: "contents") do |form| %>
+  <% if collection.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= t("app.collections.form.errors_title", count: collection.errors.count) %></h2>
+
+      <ul>
+        <% collection.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :name, t("app.collections.form.name") %>
+    <%= form.text_field :name,
+      autofocus: collection.new_record?,
+      class: %|
+        block w-full
+        border border-gray-200 outline-none
+        shadow rounded-md
+        px-3 py-2 mt-2
+        dark:text-black
+      | %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :description, t("app.collections.form.description") %>
+    <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+  </div>
+
+  <%= form.submit t("app.collections.form.save"),
+    class: %|
+      inline-block font-bold
+      bg-gray-200 dark:bg-gray-900
+      border border-gray-400
+      rounded-lg py-3 px-5
+      cursor-pointer
+    |,
+    data: { turbo_submits_with: t("app.collections.form.saving") }
+  %>
+<% end %>
