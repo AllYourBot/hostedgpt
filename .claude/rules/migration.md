@@ -13,7 +13,7 @@ The fork: if any code looks the column up by value — including a uniqueness va
 
 ## `schema.rb` captures your whole local DB, not just this branch's migrations
 
-`bin/rails db:migrate` dumps `schema.rb` from the *current state of your dev DB*. Migrate on branch A, switch to branch B, migrate again, and A's tables/columns are still applied — so they get dumped into `schema.rb` on B even though their migration files don't exist there. The result is a `schema.rb` that diverges from `db/migrate` and breaks fresh setup (`db:prepare` loads `schema.rb`), with no failing test to catch it. After any migrate, check `git diff db/schema.rb`: every added table/column/index must trace to a migration on THIS branch. If a stray one appears, strip it from the dump, or rebase onto the branch where it legitimately landed.
+`bin/rails db:migrate` dumps `schema.rb` from the *current state of your dev DB*. Migrate on branch A, switch to branch B, migrate again, and A's tables/columns are still applied — so they get dumped into `schema.rb` on B even though their migration files don't exist there. The result is a `schema.rb` that diverges from `db/migrate` and breaks fresh setup (`db:prepare` loads `schema.rb`), with no failing test to catch it. After any migrate, check `git diff db/schema.rb`: every added table/column/index must trace to a migration on THIS branch. If a stray one appears, strip it from the dump, or rebase onto the branch where it legitimately landed. A newer local Postgres also re-quotes the `where:` clauses of the partial `credentials` indexes on every dump; restore those lines from `main` rather than committing the churn.
 
 ## Prefer a migration-local model in a data backfill
 

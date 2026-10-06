@@ -1,7 +1,6 @@
 class CollectionsController < ApplicationController
-  before_action :set_nav_conversations
-  before_action :set_nav_assistants
-  before_action :set_nav_collections
+  before_action :set_nav_assistants, except: :destroy
+  before_action :set_nav_collections, except: :destroy
   before_action :set_collection, only: [:edit, :update, :destroy]
 
   def index

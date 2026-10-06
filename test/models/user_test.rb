@@ -41,6 +41,10 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Memory, users(:keith).memories.first
   end
 
+  test "has associated collections" do
+    assert_instance_of Collection, users(:keith).collections.first
+  end
+
   test "has a last_cancelled_message but can be nil" do
     assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
     assert_nil users(:rob).last_cancelled_message
@@ -62,7 +66,9 @@ class UserTest < ActiveSupport::TestCase
           assert_difference "Conversation.count", -users(:keith).conversations.count do
             assert_difference "Credential.count", -users(:keith).credentials.count do
               assert_difference "Memory.count", -users(:keith).memories.count do
-                users(:keith).destroy
+                assert_difference "Collection.count", -users(:keith).collections.count do
+                  users(:keith).destroy
+                end
               end
             end
           end

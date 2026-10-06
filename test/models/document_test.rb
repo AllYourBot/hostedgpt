@@ -15,6 +15,10 @@ class DocumentTest < ActiveSupport::TestCase
     assert_instance_of Assistant, documents(:background).assistant
   end
 
+  test "has an associated collection" do
+    assert_instance_of Collection, documents(:lasagna_recipe).collection
+  end
+
   test "has an associated message" do
     assert_instance_of Message, documents(:cat_photo).message
   end
@@ -43,6 +47,13 @@ class DocumentTest < ActiveSupport::TestCase
     end
 
     assert document.file.attached?
+  end
+
+  test "defaults the user to the collection's user when attached to a COLLECTION" do
+    file = Rack::Test::UploadedFile.new(file_fixture("test_document.txt"), "text/plain")
+    document = Document.create!(collection: collections(:taxes), file: file)
+
+    assert_equal collections(:taxes).user, document.user, "The document should belong to whoever owns the collection"
   end
 
   test "defaults the user to the assistant's user when attached to an assistant" do

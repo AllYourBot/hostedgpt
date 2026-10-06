@@ -15,11 +15,11 @@ class Collections::DocumentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     document = @collection.documents.order(:created_at).last
-    assert_equal "test_document.txt", document.filename
-    assert_equal @user, document.user
-    assert document.file.attached?
+    assert_equal "test_document.txt", document.filename, "The filename should come from the upload"
+    assert_equal @user, document.user, "The document should belong to the collection's owner"
+    assert document.file.attached?, "The uploaded file should be attached"
     assert_redirected_to edit_collection_url(@collection)
-    assert flash[:notice].present?
+    assert flash[:notice].present?, "A success notice should be shown"
   end
 
   test "should show an error when NO FILE is chosen" do
@@ -28,7 +28,7 @@ class Collections::DocumentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to edit_collection_url(@collection)
-    assert flash[:alert].present?
+    assert flash[:alert].present?, "An error alert should be shown"
   end
 
   test "should not upload to ANOTHER USER'S collection" do
