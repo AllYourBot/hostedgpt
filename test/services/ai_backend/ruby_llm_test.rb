@@ -380,6 +380,37 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     end
   end
 
+  test "test_execute builds the chat with a context carrying the token and base URL" do
+    captured = nil
+    original_new = TestClient::RubyLLM::Chat.method(:new)
+    capture = ->(**kwargs) { captured = kwargs; original_new.call(**kwargs) }
+
+    TestClient::RubyLLM::Chat.stub :new, capture do
+      TestClient::RubyLLM::Chat.stub :text, "Hi" do
+        AIBackend::RubyLLM.test_execute(APIService::URL_GROQ, "groq-key", "llama-3")
+      end
+    end
+
+    assert_equal "llama-3", captured[:model], "The chat should be built for the model under test"
+    assert_equal :openai, captured[:provider], "Groq should ride the openai-compatible provider"
+    assert_equal "groq-key", captured[:context].openai_api_key, "The context should carry the service token"
+    assert_equal APIService::URL_GROQ, captured[:context].openai_api_base, "The context should point at the service URL"
+  end
+
+  test "test_execute returns an error string when RubyLLM rejects the key" do
+    TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::UnauthorizedError.new("401 bad key") do
+      assert_equal "Error: 401 bad key", AIBackend::RubyLLM.test_execute(APIService::URL_OPEN_AI, "bad", "gpt-4o"),
+        "A rejected key should come back as an error string, not raise"
+    end
+  end
+
+  test "test_execute returns an error string when RubyLLM rejects the model" do
+    TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::BadRequestError.new("400 model not found") do
+      assert_equal "Error: 400 model not found", AIBackend::RubyLLM.test_execute(APIService::URL_ANTHROPIC, "abc", "claude-retired"),
+        "A rejected model should come back as an error string, not raise"
+    end
+  end
+
   test "ruby_llm_context sets anthropic_api_key for anthropic driver" do
     @assistant.language_model.api_service.update!(driver: "anthropic")
     backend = AIBackend::RubyLLM.new(@user, @assistant)

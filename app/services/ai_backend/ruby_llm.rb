@@ -56,19 +56,13 @@ class AIBackend::RubyLLM < AIBackend
 
   def self.test_execute(url, token, api_name)
     provider = provider_for_url(url)
-    if Rails.env.test?
-      chat = TestClient::RubyLLM::Chat.new(model: api_name, provider: provider, assume_model_exists: true)
-      chat.add_message({ role: "user", content: "Hello!" })
-      chat.complete.content
-    else
-      Rails.logger.info "Connecting to AI API server at #{url} with access token of length #{token.to_s.length}"
-      Rails.logger.info "Testing using model #{api_name} for provider #{provider}"
-      context = RubyLLM.context { |c| configure_context(c, provider: provider, url: url, token: token) }
-      chat = RubyLLM::Chat.new(model: api_name, provider: provider, assume_model_exists: true, context: context)
-      chat.add_message({ role: "user", content: "Hello!" })
-      chat.complete.content
-    end
-  rescue ::Faraday::Error => e
+    Rails.logger.info "Connecting to AI API server at #{url} with access token of length #{token.to_s.length}"
+    Rails.logger.info "Testing using model #{api_name} for provider #{provider}"
+    context = client.context { |c| configure_context(c, provider: provider, url: url, token: token) }
+    chat = gem_class.new(model: api_name, provider: provider, assume_model_exists: true, context: context)
+    chat.add_message({ role: "user", content: "Hello!" })
+    chat.complete.content
+  rescue ::RubyLLM::Error, ::Faraday::Error => e
     "Error: #{e.message}"
   end
 

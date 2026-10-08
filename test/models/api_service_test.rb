@@ -129,6 +129,27 @@ class APIServiceTest < ActiveSupport::TestCase
     end
   end
 
+  test "the Test button reports a RubyLLM error instead of raising" do
+    service = api_services(:keith_openai_service)
+
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::UnauthorizedError.new("401 bad key") do
+        assert_equal "Error: 401 bad key", service.test_api_service,
+          "Every model failing should surface the last error string to the Test button"
+      end
+    end
+  end
+
+  test "the Test button answers through RubyLLM when the flag is on" do
+    service = api_services(:keith_openai_service)
+
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :text, "Hi from RubyLLM" do
+        assert_equal "Hi from RubyLLM", service.test_api_service, "The Test button should return the model's reply"
+      end
+    end
+  end
+
   test "both ai_backends can be specified for user models" do
     assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
     assert_equal AIBackend::OpenAI, language_models(:guanaco).ai_backend
