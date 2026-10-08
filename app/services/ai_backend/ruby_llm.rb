@@ -54,9 +54,6 @@ class AIBackend::RubyLLM < AIBackend
     end
   end
 
-  # Goes through client and gem_class like build_chat, so tests exercise the
-  # same path production runs. Inside this class a bare `RubyLLM` resolves to
-  # AIBackend::RubyLLM, not the gem.
   def self.test_execute(url, token, api_name)
     provider = provider_for_url(url)
     Rails.logger.info "Connecting to AI API server at #{url} with access token of length #{token.to_s.length}"
