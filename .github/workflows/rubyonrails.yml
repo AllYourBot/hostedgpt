@@ -187,4 +187,4 @@ jobs:
           bundler-cache: true
       - name: exhale
         shell: bash
-        run: bin/exhale dry --introduced-only--base origin/${{ github.base_ref || 'main' }} | tee -a "$GITHUB_STEP_SUMMARY"
+        run: bin/exhale dry --introduced-only --base origin/${{ github.base_ref || 'main' }} | tee -a "$GITHUB_STEP_SUMMARY"
