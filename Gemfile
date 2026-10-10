@@ -66,6 +66,7 @@ group :development, :test do
   # minitest 6.0.6 (Minitest.load became private). Pin minitest to 5.x until that's fixed upstream.
   gem "minitest", "~> 5.0"
   gem "minitest-skip"
+  gem "exhale", require: false
 end
 
 group :development do
@@ -78,7 +79,7 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 
-  gem "byebug", platforms: %i[mri mingw x64_mingw]
+  gem "byebug", platforms: %i[mri mingw]
   gem "standard"
   gem "rubocop-rails"
   gem "rubocop-capybara"
