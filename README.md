@@ -2,7 +2,7 @@
 
 # HostedGPT
 
-HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.  Your assistant will do web searches if you get a free Brave Search API key.
+HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.  Your assistant will also do web searches itself if you get a free Brave Search API key.
 
 You can also switch providers and models in the middle of a conversation, so it is great for comparing different models!
 
@@ -12,8 +12,9 @@ This project is led by an experienced rails developer, but we're actively lookin
 
 ## Top features of HostedGPT
 
-- **Use GPT-5, Claude 5, Gemini 3.6 (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage.  There are hosting costs if not running locally.
-- **A polished interface with mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen". German localization included.
+- **Use OpenAI, Anthropic Claude, Google Gemini, Ollama models (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage to use the latest models.  There are hosting costs if not running locally.
+- **A polished interface with mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
+- **German localization included.**
 - **You will rarely hit the '_You've reached the current usage cap_' errors**.
 - **Collect and easily search and share all of your conversions** You can search across conversations and providers.
 
@@ -26,12 +27,11 @@ This project is led by an experienced rails developer, but we're actively lookin
 - [Top features of HostedGPT](#top-features-of-hostedgpt)
   - [Watch a short demo](#watch-a-short-demo)
 - [Deploy the app on Render](#deploy-the-app-on-render)
-  - [Troubleshooting Render](#troubleshooting-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
 - [Deploy on your own server](#deploy-on-your-own-server)
 - [Running locally on your computer](#running-locally-on-your-computer)
-  - [Alternatively, you can run outside of Docker](#alternatively-you-can-run-outside-of-docker)]
+  - [Alternatively, you can run outside of Docker](#alternatively-you-can-run-outside-of-docker)
 - [Configure optional features](#configure-optional-features)
   - [Give assistant access to your Google apps](#configuring-google-tools)
   - [Authentication](#authentication)
@@ -44,7 +44,9 @@ This project is led by an experienced rails developer, but we're actively lookin
 
 ## Deploy the app on Render
 
-For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free (with caveats). This free app works for 90 days and then the database will stop working. The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid service in Render, which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
+For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working.
+
+UPDATE: The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid service in Render, which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
@@ -176,7 +178,7 @@ The easiest way to get up and running is to use the provided Docker compose work
 Every time you pull new changes down, kill docker (if it's running) and re-run:
 `docker compose up --build` This will ensure your local app picks up changes to Gemfile, migrations, and docker config.
 
-If you are doing development see [Running the test suite](#running-the-test-suite).
+If you are doing development see https://github.com/allyourbot/hostedgpt/blob/main/CONTRIBUTING.md for running the test suite.
 
 If you need to make changes to the Docker configuration, see the [Understanding the Docker configuration](#understanding-the-docker-configuration).
 
@@ -211,7 +213,7 @@ HostedGPT requires these services to be running:
 
 Every time you pull new changes down, kill `bin/dev` and then re-run it. This will ensure your local app picks up changes to Gemfile and migrations.
 
-If you are doing development see [Running the test suite](#running-the-test-suite).
+If you are doing development see https://github.com/allyourbot/hostedgpt/blob/main/CONTRIBUTING.md for running the test suite.
 
 If you want to run your LLM locally so the app has no online dependencies, see [Running an LLM on your computer](https://github.com/AllYourBot/hostedgpt/discussions/471).
 

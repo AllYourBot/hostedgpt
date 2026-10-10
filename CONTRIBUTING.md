@@ -6,7 +6,7 @@ Get your development environment set up by running the Rails app directly on you
 
 ### Development workflow
 
-Work on your feature, committing as you go. Run the tests relevant to your changes before each commit. When you're ready:
+Work on your feature, committing as you go. Run the tests relevant to your changes before each commit. If using Claude Code, when you're ready:
 
 1. `/pr-review` — reviews the branch against project guidelines, fixes issues, runs the tests, and keeps `.claude/rules/` fresh
 2. `/pr` — rebases onto `upstream/main`, pushes the branch, and creates or updates the pull request
@@ -19,6 +19,7 @@ Each skill is independent — run them in order or individually as needed. GitHu
 If you're set up with Docker you run `docker compose run base rails test`. Note that the system tests, which use a headless browser, are not able to run in Docker. They will be run automatically for you if you create a Pull Request against the project.
 
 If you set up the app outside of Docker, then run the usual `bin/rails test` and `bin/rails test:system`.
+You should also run `bin/exhale dry` to identify code duplication, etc.
 
 ### Understanding the Docker configuration
 
