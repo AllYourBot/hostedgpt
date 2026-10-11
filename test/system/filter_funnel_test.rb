@@ -26,7 +26,6 @@ class FilterFunnelTest < ApplicationSystemTestCase
 
     assert_selector("[data-role='open-bookmarks-page']")
     assert_no_selector("[data-role='filter-label']")
-    assert_no_selector("[data-role='filter-label']")
   end
 
   test "AE5 empty bookmarked scope suppresses the strip and offers one-tap clear" do
@@ -79,7 +78,6 @@ class FilterFunnelTest < ApplicationSystemTestCase
 
     assert_selector("[data-role='open-bookmarks-page']")
     assert_no_selector("[data-role='filter-label']")
-    assert_no_selector("[data-role='filter-label']")
     assert_selector("[data-role='filter-announcement']", visible: :all)
   end
 
@@ -121,7 +119,6 @@ class FilterFunnelTest < ApplicationSystemTestCase
 
     assert_selector("[data-role='open-bookmarks-page']")
     assert_no_selector("[data-role='filter-label']")
-    assert_no_selector("[data-role='filter-label']")
     assert_no_selector("[data-role='filter-clear-button']")
   end
 
@@ -142,12 +139,5 @@ class FilterFunnelTest < ApplicationSystemTestCase
     # Search context must survive the one-tap clear.
     assert_field("search-input", with: "Samantha")
     assert_no_selector("[data-role='filter-label']")
-  end
-
-  private
-
-  def open_funnel
-    find("[data-role='filter-button']").click
-    assert_selector("[data-role='filter-menu']")
   end
 end

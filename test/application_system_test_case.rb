@@ -12,6 +12,11 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     attr_accessor :pointer_primed
   end
 
+  def open_funnel
+    find("[data-role='filter-button']").click
+    assert_selector("[data-role='filter-menu']")
+  end
+
   def login_as(user_or_person, password = "secret")
     user = if user_or_person.is_a?(Person)
       user_or_person.user

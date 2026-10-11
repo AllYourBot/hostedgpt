@@ -51,11 +51,4 @@ class BookmarksTest < ApplicationSystemTestCase
     assert_selector("[data-role='filter-button']")
     assert_no_selector("[data-role='filter-label']")
   end
-
-  private
-
-  def open_funnel
-    find("[data-role='filter-button']").click
-    assert_selector("[data-role='filter-menu']")
-  end
 end

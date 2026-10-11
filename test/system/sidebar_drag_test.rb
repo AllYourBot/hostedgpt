@@ -233,18 +233,23 @@ class SidebarDragTest < ApplicationSystemTestCase
       .map(&:text).grep(/^DragTouch\d/)
   end
 
+  # Title-quarter grab shared by the finger and mouse title drags: the open picker
+  # panel covers the row's right end, so both press left-of-center where only the
+  # title link (which intentionally still arms) sits.
+  def title_grab_point(record)
+    rect = rect_of(find_row(record))
+    [(rect[:x] + rect[:width] / 4).to_i, (rect[:y] + rect[:height] / 2).to_i]
+  end
+
   # Finger drag through CDP touch input: press and hold still past the controller's
   # still-hold threshold (an early move reads as scroll and cancels), then travel in
   # small steps to the target's bottom half and release. Coordinates are viewport
   # integers; the touch id stays constant across the gesture.
   def touch_drag_row(source_record, onto: nil)
-    source = find_row(source_record)
     target = find_row(onto)
     scroll_row_into_view(source_record)
 
-    rect = rect_of(source)
-    sx = (rect[:x] + rect[:width] / 4).to_i
-    sy = (rect[:y] + rect[:height] / 2).to_i
+    sx, sy = title_grab_point(source_record)
     target_rect = rect_of(target)
     ty = (target_rect[:y] + target_rect[:height] * 0.75).to_i
 
@@ -341,13 +346,10 @@ class SidebarDragTest < ApplicationSystemTestCase
   # row center: with a picker panel open over the row's right end, a center grab lands on the
   # panel — a button, which never arms a drag — while the title intentionally still arms.
   def drag_row_by_title(source_record, onto: nil)
-    source = find_row(source_record)
     target = find_row(onto)
     scroll_row_into_view(source_record)
 
-    rect = rect_of(source)
-    sx = (rect[:x] + rect[:width] / 4).to_i
-    sy = (rect[:y] + rect[:height] / 2).to_i
+    sx, sy = title_grab_point(source_record)
     target_rect = rect_of(target)
     ty = target_rect[:y] + 4
     ty_height = target_rect[:height]
