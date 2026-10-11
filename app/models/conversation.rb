@@ -87,7 +87,9 @@ class Conversation < ApplicationRecord
       when range_end.nil?
         ..range_start
       else
-        range_end..range_start
+        # Half-open: consecutive intervals share their midnight boundary, and an inclusive
+        # upper bound would list a conversation updated exactly at midnight in both groups.
+        range_end...range_start
       end
 
       nav_conversations.where(updated_at: range)

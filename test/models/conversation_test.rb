@@ -167,6 +167,19 @@ class ConversationTest < ActiveSupport::TestCase
     end
   end
 
+  test "a conversation updated exactly at a group boundary lives in one group only" do
+    Timecop.freeze(Time.current.beginning_of_day + 12.hours) do
+      user = User.create!(first_name: "Jane", last_name: "Doe")
+      edge = user.conversations.create!(assistant: assistants(:samantha))
+      edge.update_column(:updated_at, Date.current.beginning_of_day)
+
+      grouped = Conversation.grouped_by_increasing_time_interval_for_user(user)
+      hits = grouped.select { |_, rel| rel.map(&:id).include?(edge.id) }.keys
+
+      assert_equal ["Today"], hits
+    end
+  end
+
   test "nav_for_user orders unpinned conversations by recency, not hand position" do
     user = users(:keith)
     old = conversations(:greeting)
