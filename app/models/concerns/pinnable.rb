@@ -36,7 +36,6 @@ module Pinnable
     claim_top_position unless already_pinned || !position_bearing?
   end
 
-  # Membership only — the position value stays where pinning left it.
   def unpin!(pinning_user = user)
     pins.where(user: pinning_user).destroy_all
   end

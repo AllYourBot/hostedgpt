@@ -22,7 +22,6 @@ module Reactable
     end
   end
 
-  # Membership only — unreacting a clear emoji destroys nothing.
   def unreact!(emoji, reacting_user = user)
     reactions.where(user: reacting_user, emoji: emoji).destroy_all
   end

@@ -22,7 +22,6 @@ module Bookmarkable
     end
   end
 
-  # Membership only — unbookmarking a clear conversation destroys nothing.
   def unbookmark!(bookmarking_user = user)
     bookmarks.where(user: bookmarking_user).destroy_all
   end
