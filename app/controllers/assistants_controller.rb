@@ -11,7 +11,9 @@ class AssistantsController < ApplicationController
   end
 
   def reorder
-    Assistant.reposition(Current.user, params[:ids] || [])
+    scope_ids = Assistant.reorder_scope(Current.user).ordered.pluck(:id)
+    posted = Reorderable.normalize_ids(params[:ids]) & scope_ids
+    Assistant.reposition(Current.user, posted | (scope_ids - posted))
     head :no_content
   end
 end

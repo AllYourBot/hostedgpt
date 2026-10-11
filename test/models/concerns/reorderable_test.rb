@@ -74,4 +74,32 @@ class ReorderableTest < ActiveSupport::TestCase
     assert_equal [ids.first, ids.second, ids.third], @keith.assistants.ordered.first(3).pluck(:id)
     assert_equal (0...ids.length).to_a, @keith.assistants.ordered.pluck(:position).sort
   end
+
+  test "reposition numbers only posted ids, leaving the rest at their slots" do
+    ids = @keith.assistants.ordered.pluck(:id)
+    rest_before = Assistant.where(id: ids - [ids[2], ids[0]]).pluck(:id, :position).to_h
+
+    Assistant.reposition(@keith, [ids[2], ids[0]])
+
+    assert_equal 0, Assistant.find(ids[2]).position
+    assert_equal 1, Assistant.find(ids[0]).position
+    assert_equal rest_before, Assistant.where(id: ids - [ids[2], ids[0]]).pluck(:id, :position).to_h
+  end
+
+  test "reposition drops non-scalar ids instead of raising" do
+    ids = @keith.assistants.ordered.pluck(:id)
+
+    Assistant.reposition(@keith, { search: "x" })
+    Assistant.reposition(@keith, ["not-a-number", nil, ids.first])
+
+    assert_equal ids.first, @keith.assistants.ordered.first.id
+    assert_equal (0...ids.length).to_a, @keith.assistants.ordered.pluck(:position).sort
+  end
+
+  test "duplicate positions break ties by id desc" do
+    ids = @keith.assistants.ordered.pluck(:id)
+    Assistant.where(id: ids.first(2)).update_all(position: 0)
+
+    assert_equal ids.first(2).sort.reverse, @keith.assistants.ordered.first(2).pluck(:id)
+  end
 end

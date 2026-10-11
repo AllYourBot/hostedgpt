@@ -285,6 +285,21 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal unpinned_before, Conversation.unpinned_for(user).ordered.pluck(:id, :position)
   end
 
+  test "reorder with a partial pinned post keeps posted order up front without collisions" do
+    user = @conversation.user
+    pinned = user.conversations.ordered.limit(3).to_a
+    pinned.each { |c| c.pin!(user) }
+    Conversation.reposition(user, pinned.map(&:id))
+    unpinned_before = Conversation.unpinned_for(user).ordered.pluck(:id, :position)
+
+    post reorder_conversations_url, params: { ids: [pinned[2].id] }
+
+    assert_response :no_content
+    assert_equal [pinned[2].id, pinned[0].id, pinned[1].id], Conversation.pinned_for(user).pluck(:id)
+    assert_equal [0, 1, 2], Conversation.pinned_for(user).pluck(:position).sort
+    assert_equal unpinned_before, Conversation.unpinned_for(user).ordered.pluck(:id, :position)
+  end
+
   test "index renders the pinned section first with drag across both sections" do
     user = @conversation.user
     pinned = user.conversations.ordered.limit(2).to_a

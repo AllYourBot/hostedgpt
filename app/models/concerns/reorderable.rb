@@ -12,13 +12,23 @@ module Reorderable
     before_create :assign_default_position
   end
 
-  # Renumbers the user's collection to match the order of ids, which is how the sidebar hands back
-  # a list the user has dragged into shape. The user is part of the call on purpose: the
-  # renumbering is confined to reorder_scope(user), so no caller — however lazy — can renumber
-  # anyone else's records. Ids outside that scope are ignored and consume no slot.
+  # Request ids normalized once for every caller: plain arrays pass through, a missing
+  # param becomes empty, and non-scalar junk (a crafted hash param, symbols) is dropped
+  # instead of raising — it must ignore its way out, never 500.
+  def self.normalize_ids(ids)
+    Array(ids).flatten.filter_map { |v| v.to_s.to_i if v.is_a?(String) || v.is_a?(Numeric) }.uniq
+  end
+
+  # Renumbers the records named by ids, in the order posted, densely from zero — which is
+  # how the sidebar hands back a list the user has dragged into shape. The user is part of
+  # the call on purpose: the renumbering is confined to reorder_scope(user), so no caller —
+  # however lazy — can renumber anyone else's records. Ids outside that scope are ignored
+  # and consume no slot. Callers pass the complete ordered set for their list (each reorder
+  # action completes a partial post against its own universe first), so untouched records
+  # simply are not named here.
   class_methods do
     def reposition(user, ids)
-      ids = Array(ids).map(&:to_i).uniq
+      ids = Reorderable.normalize_ids(ids)
       records = reorder_scope(user).where(id: ids).index_by(&:id)
 
       transaction do

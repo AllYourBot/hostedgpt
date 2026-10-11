@@ -55,12 +55,15 @@ class ConversationsController < ApplicationController
     @reacted_conversations = Conversation.reacted_nav_for_user(Current.user)
   end
 
-  # Hand order lives only in the pinned section, so only pinned ids are renumbered: a subset
-  # post (stale JS, replayed fetch, curl) can never overwrite the untouched remainder. Answers
+  # Hand order lives only in the pinned section: the posted ids intersect the pinned set,
+  # and pinned ids the post omits (stale JS, replayed fetch, curl) keep their current relative
+  # order behind the posted ones — a subset post completes to the full set, so it can never
+  # overwrite the untouched remainder with colliding positions. Answers
   # the re-rendered sidebar to stream requests so drags land on server truth with no reload.
   def reorder
     pinned_ids = Current.user.conversations.pinned_for(Current.user).pluck(:id)
-    Conversation.reposition(Current.user, Array(params[:ids]).map(&:to_i) & pinned_ids)
+    posted = Reorderable.normalize_ids(params[:ids]) & pinned_ids
+    Conversation.reposition(Current.user, posted | (pinned_ids - posted))
     render_sidebar
   end
 
