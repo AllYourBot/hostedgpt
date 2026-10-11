@@ -36,6 +36,8 @@ Rails.application.routes.draw do
     post :unreact, on: :member
     post :pin, on: :member
     post :unpin, on: :member
+    post :bookmark, on: :member
+    post :unbookmark, on: :member
   end
 
   resource :speech, only: :create

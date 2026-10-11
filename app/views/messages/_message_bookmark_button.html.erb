@@ -1,0 +1,17 @@
+<%# locals: (message:) -%>
+<%# Re-rendered in place by the bookmark toggle's turbo-stream response, so the icon
+    flips without a reload. Bookmarked state is computed inside, keeping the response
+    a pure re-render. Mirrors message_pin_button without the section stream: bookmarks
+    are per-message state with no conversation section to refresh. %>
+<% message_bookmarked = message.bookmarked?(Current.user) %>
+<%= button_to message_bookmarked ? unbookmark_message_path(message) : bookmark_message_path(message),
+  method: :post,
+  data: { role: message_bookmarked ? "unbookmark-message" : "bookmark-message" },
+  form: { class: "flex items-center", data: { turbo_frame: "_top" } },
+  class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+  title: message_bookmarked ? "Unbookmark message" : "Bookmark message" do %>
+  <%= icon "bookmark",
+    variant: message_bookmarked ? :solid : :outline,
+    size: 18
+  %>
+<% end %>

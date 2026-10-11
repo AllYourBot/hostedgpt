@@ -444,6 +444,58 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_not @message.reload.pinned?(@user)
   end
 
+  test "bookmark persists on a message" do
+    assert_not @message.bookmarked?(@user)
+
+    post bookmark_message_url(@message)
+
+    assert_response :no_content
+    assert @message.reload.bookmarked?(@user)
+    assert_includes Message.bookmarked_for(@user).map(&:id), @message.id
+  end
+
+  test "message bookmark answers a button morph to Turbo requests" do
+    post bookmark_message_url(@message),
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_match(/action="update" target="message_#{@message.id}-bookmark"/, response.body)
+    assert_match(/data-role="unbookmark-message"/, response.body)
+    assert @message.reload.bookmarked?(@user)
+  end
+
+  test "unbookmark removes a message bookmark" do
+    @message.bookmark!(@user)
+    assert @message.bookmarked?(@user)
+
+    post unbookmark_message_url(@message)
+
+    assert_response :no_content
+    assert_not @message.reload.bookmarked?(@user)
+    assert_not_includes Message.bookmarked_for(@user).map(&:id), @message.id
+  end
+
+  test "double bookmark on a message is idempotent" do
+    post bookmark_message_url(@message)
+    assert_response :no_content
+
+    assert_no_difference "Bookmark.count" do
+      post bookmark_message_url(@message)
+    end
+
+    assert_response :no_content
+    assert @message.reload.bookmarked?(@user)
+  end
+
+  test "unbookmark on a clear message is a no-op" do
+    assert_no_difference "Bookmark.count" do
+      post unbookmark_message_url(@message)
+    end
+
+    assert_response :no_content
+    assert_not @message.reload.bookmarked?(@user)
+  end
+
   test "pin on another user's message is unauthorized" do
     foreign = messages(:filter_map)
     assert_not_equal @user, foreign.conversation.user
@@ -467,6 +519,29 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
+  test "bookmark on another user's message is unauthorized" do
+    foreign = messages(:filter_map)
+    assert_not_equal @user, foreign.conversation.user
+
+    assert_no_difference "Bookmark.count" do
+      post bookmark_message_url(foreign)
+    end
+
+    assert_response :unauthorized
+    assert_not foreign.reload.bookmarked?(@user)
+  end
+
+  test "unbookmark on another user's message is unauthorized" do
+    foreign = messages(:filter_map)
+    assert_not_equal @user, foreign.conversation.user
+
+    assert_no_difference "Bookmark.count" do
+      post unbookmark_message_url(foreign)
+    end
+
+    assert_response :unauthorized
+  end
+
   test "pin on a message requires authentication" do
     get logout_path
 
@@ -479,6 +554,22 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     get logout_path
 
     post unpin_message_url(@message)
+
+    assert_redirected_to login_url
+  end
+
+  test "bookmark on a message requires authentication" do
+    get logout_path
+
+    post bookmark_message_url(@message)
+
+    assert_redirected_to login_url
+  end
+
+  test "unbookmark on a message requires authentication" do
+    get logout_path
+
+    post unbookmark_message_url(@message)
 
     assert_redirected_to login_url
   end

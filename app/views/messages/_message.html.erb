@@ -241,6 +241,12 @@ end %>
           <span id="<%= dom_id(message) %>-pin" class="flex items-center">
             <%= render "messages/message_pin_button", message: message %>
           </span>
+          <%# Twitter-style per-message bookmark with a stable morph target, mirroring the
+              pin button above it but with no section stream: the toggle response re-renders
+              this span alone, no reload. %>
+          <span id="<%= dom_id(message) %>-bookmark" class="flex items-center">
+            <%= render "messages/message_bookmark_button", message: message %>
+          </span>
 
         <%# display:contents: no box of its own, so the bar stays single-row; the invisible
             gate inherits into the version/edit children. %>

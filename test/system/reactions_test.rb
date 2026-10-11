@@ -146,6 +146,27 @@ class ReactionsTest < ApplicationSystemTestCase
     assert_not message.reload.pinned?(user)
   end
 
+  test "bookmarking a message flips the icon without a reload" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    message = messages(:im_a_bot)
+
+    login_as(user)
+    visit_and_scroll_wait conversation_messages_path(conversation, version: 1)
+
+    row = find("#message_#{message.id}")
+    row.hover
+    row.find("[data-role='bookmark-message']").click
+
+    assert_selector("#message_#{message.id} [data-role='unbookmark-message']")
+    assert message.reload.bookmarked?(user)
+
+    find("#message_#{message.id} [data-role='unbookmark-message']").click
+
+    assert_selector("#message_#{message.id} [data-role='bookmark-message']")
+    assert_not message.reload.bookmarked?(user)
+  end
+
   test "message action buttons line up in one horizontal row" do
     user = users(:keith)
     conversation = conversations(:greeting)
@@ -155,12 +176,12 @@ class ReactionsTest < ApplicationSystemTestCase
     visit_and_scroll_wait conversation_messages_path(conversation, version: 1)
 
     tops = page.evaluate_script(
-      "(function(){ return ['react', 'pin-message', 'clipboard', 'regenerate'].map(function(role){" \
+      "(function(){ return ['react', 'pin-message', 'bookmark-message', 'clipboard', 'regenerate'].map(function(role){" \
       "var el = document.querySelector('#message_#{message.id} [data-role=\"' + role + '\"]');" \
       "return el ? Math.round(el.getBoundingClientRect().top) : -1; }); }).call(this)".gsub('#{message.id}', message.id.to_s)
     )
 
-    assert_not_includes tops, -1, "expected all four action buttons to render"
+    assert_not_includes tops, -1, "expected all five action buttons to render"
     assert_operator tops.max - tops.min, :<=, 10, "expected one horizontal row, got tops #{tops.inspect}"
   end
 end

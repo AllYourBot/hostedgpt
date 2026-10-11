@@ -5,7 +5,7 @@ class MessagesController < ApplicationController
   before_action :set_version,               only: [:index, :update]
   before_action :set_conversation,          only: [:index]
   before_action :set_assistant,             only: [:index, :new, :edit, :create]
-  before_action :set_message,               only: [:show, :edit, :update, :react, :unreact, :pin, :unpin]
+  before_action :set_message,               only: [:show, :edit, :update, :react, :unreact, :pin, :unpin, :bookmark, :unbookmark]
   before_action :set_nav_assistants,        only: [:index, :new]
   before_action :set_nav_collections,       only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
@@ -90,6 +90,16 @@ class MessagesController < ApplicationController
     render_message_pin
   end
 
+  def bookmark
+    @message.bookmark!(Current.user)
+    render_message_bookmark
+  end
+
+  def unbookmark
+    @message.unbookmark!(Current.user)
+    render_message_bookmark
+  end
+
   private
 
   # Message pins answer with two streams — the pinned-messages section (replaced whole, so its
@@ -105,6 +115,18 @@ class MessagesController < ApplicationController
           turbo_stream.replace("pinned-messages", partial: "messages/pinned_messages"),
           turbo_stream.update("#{helpers.dom_id(@message)}-pin", partial: "messages/message_pin_button", locals: { message: @message })
         ]
+      end
+      format.html { head :no_content }
+    end
+  end
+
+  # Message bookmarks answer with one stream — the row's own bookmark button — since
+  # bookmarks are per-message state with no section to refresh (unlike pins). Plain
+  # requests still answer 204.
+  def render_message_bookmark
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update("#{helpers.dom_id(@message)}-bookmark", partial: "messages/message_bookmark_button", locals: { message: @message })
       end
       format.html { head :no_content }
     end
