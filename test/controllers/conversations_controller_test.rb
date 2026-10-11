@@ -33,6 +33,20 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/data-sortable-zone="unpinned"/, unpinned_block)
   end
 
+  test "index renders translated group headers under the German locale" do
+    old = conversations(:ruby_version)
+    old.update_column(:updated_at, 1.month.ago)
+
+    get conversations_url(locale: :de)
+
+    assert_response :success
+    body = response.body
+    assert_match(/data-role="time-group"/, body)
+    assert body.index("Heute") < body.index("Diesen Monat"), "groups should render in recency order"
+    assert body.index("Diesen Monat") < body.index(old.title), "stale conversation should render under its group"
+    assert_no_match(/>Today</, body)
+  end
+
   test "index goes flat under Recent once any pin exists, groups return when unpinned" do
     user = @conversation.user
     old = conversations(:ruby_version)

@@ -303,6 +303,13 @@ de:
       delete: "Löschen"
       shared_conversation: "Geteilte Konversation"
       shared_by: "Geteilt von %{name}"
+      time_groups:
+        today: "Heute"
+        yesterday: "Gestern"
+        this_week: "Diese Woche"
+        this_month: "Diesen Monat"
+        last_month: "Letzten Monat"
+        older: "Älter"
       cost_summary:
         conversation_approx: "Konversation ~"
         input: "Eingabe"
