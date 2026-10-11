@@ -175,13 +175,16 @@ class ReactionsTest < ApplicationSystemTestCase
     login_as(user)
     visit_and_scroll_wait conversation_messages_path(conversation, version: 1)
 
-    tops = page.evaluate_script(
-      "(function(){ return ['react', 'pin-message', 'bookmark-message', 'clipboard', 'regenerate'].map(function(role){" \
-      "var el = document.querySelector('#message_#{message.id} [data-role=\"' + role + '\"]');" \
-      "return el ? Math.round(el.getBoundingClientRect().top) : -1; }); }).call(this)".gsub('#{message.id}', message.id.to_s)
-    )
+    # A single bounding-rect snapshot can catch mid-paint layout, so sample inside the
+    # polling assert until all five buttons render within one row's tolerance together.
+    assert_true "expected all five action buttons to render in one horizontal row" do
+      tops = page.evaluate_script(
+        "(function(){ return ['react', 'pin-message', 'bookmark-message', 'clipboard', 'regenerate'].map(function(role){" \
+        "var el = document.querySelector('#message_#{message.id} [data-role=\"' + role + '\"]');" \
+        "return el ? Math.round(el.getBoundingClientRect().top) : -1; }); }).call(this)".gsub('#{message.id}', message.id.to_s)
+      )
 
-    assert_not_includes tops, -1, "expected all five action buttons to render"
-    assert_operator tops.max - tops.min, :<=, 10, "expected one horizontal row, got tops #{tops.inspect}"
+      !tops.include?(-1) && tops.max - tops.min <= 10
+    end
   end
 end
