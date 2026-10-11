@@ -217,6 +217,73 @@ class SidebarDragTest < ApplicationSystemTestCase
     assert unpinned_row_titles.include?(bottom_pin.title)
   end
 
+  test "a same-zone unpinned drag snaps back with no commit" do
+    user = users(:keith)
+    convs = 3.times.map { |i| user.conversations.create!(assistant: assistants(:samantha), title: "SnapBack#{i}") }
+
+    login_as(user)
+    visit root_path
+
+    first_before = settled_row_id("#conversations", :first)
+    last_before = settled_row_id("#conversations", :last)
+    positions_before = convs.map { |c| c.reload.position }
+
+    source = find("#nav-conversations [data-sortable-id='#{convs[0].id}']")
+    target = find("#nav-conversations [data-sortable-id='#{convs[2].id}']")
+    scroll_row_into_view(convs[0])
+    sx, sy = center_of(source)
+    tx, ty = center_of(target)
+
+    # Same-zone unpinned drops never persist (recency rules): the rows slide back and
+    # nothing commits. The full lift-time order restores, including unpinned rows the
+    # drag slid out of place.
+    assert_no_difference "Pin.count" do
+      perform_drop do
+        page.driver.browser.action
+          .move_to_location(sx, sy).click_and_hold
+          .move_by(0, 10)
+          .move_to_location(tx, ty)
+          .pause
+          .release
+          .perform
+      end
+    end
+
+    assert_equal first_before, settled_row_id("#conversations", :first)
+    assert_equal last_before, settled_row_id("#conversations", :last)
+    assert_equal positions_before, convs.map { |c| c.reload.position }
+  end
+
+  test "pressing a row button never arms a drag" do
+    user = users(:keith)
+    convs = 2.times.map { |i| user.conversations.create!(assistant: assistants(:samantha), title: "BtnNoDrag#{i}") }
+    convs.each { |c| c.pin!(user) }
+
+    login_as(user)
+    visit root_path
+
+    toggle = find("#pinned-conversations [data-sortable-id='#{convs[0].id}'] [data-role='unpin']")
+    toggle = toggle.tag_name == "button" ? toggle : toggle.first("button")
+    r = rect_of(toggle)
+    positions_before = convs.map { |c| c.reload.position }
+
+    # A press starting on a toggle must never arm: no commit path runs, so the settle
+    # flag stays down, the pin survives (the release lands off-button, submitting nothing),
+    # and positions never move.
+    page.evaluate_script("window.dropSettledForSystemTestsToCheck = false")
+    page.driver.browser.action
+      .move_to_location((r[:x] + r[:width] / 2).to_i, (r[:y] + r[:height] / 2).to_i)
+      .click_and_hold
+      .move_by(0, 30)
+      .pause
+      .release
+      .perform
+
+    assert_equal false, page.evaluate_script("window.dropSettledForSystemTestsToCheck")
+    assert convs[0].reload.pinned?(user)
+    assert_equal positions_before, convs.map { |c| c.reload.position }
+  end
+
   private
 
   def pin_row(record)

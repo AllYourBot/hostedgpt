@@ -121,15 +121,10 @@ export default class extends Controller {
   // recency rules, never the drag. Cross-zone drops flip membership, then persist or re-render
   // server truth. Drops outside every list never commit.
   async #commitDrop(fromZone, toZone, movedId) {
-    if (fromZone == null && toZone == null) {
-      if (this.#orderedIds.join() !== this.orderAtDragStart.join()) {
-        await this.#persist().finally(() => this.#replayHeldRefresh())
-      } else {
-        this.#replayHeldRefresh()
-      }
-      return
-    }
-    if (fromZone === "pinned" && toZone === "pinned") {
+    // Zoneless lists and same-zone pinned drops share one rule: persist the visible order
+    // when it moved, otherwise just replay anything held mid-drag.
+    if ((fromZone == null && toZone == null) ||
+        (fromZone === "pinned" && toZone === "pinned")) {
       if (this.#orderedIds.join() !== this.orderAtDragStart.join()) {
         await this.#persist().finally(() => this.#replayHeldRefresh())
       } else {
@@ -323,13 +318,15 @@ export default class extends Controller {
 
   // Puts every row back where the drag found it, each in its own home list: a restore that
   // appended everything to one container would fuse two sections that must stay apart.
+  // Iterates the full lift-time parent map — not just the pinned ids persist tracks — so a
+  // cancelled drag also puts back unpinned rows it slid out of place.
   #restoreOrder() {
-    this.orderAtDragStart.forEach(id => {
-      const item = this.itemTargets.find(target => String(target.dataset.sortableId) === String(id))
-      const home = this.itemParents?.get(String(id))
+    if (!this.itemParents) return
+    for (const [id, home] of this.itemParents) {
+      const item = this.itemTargets.find(target => String(target.dataset.sortableId) === id)
       if (item && home?.isConnected) home.appendChild(item)
       else if (item) this.element.appendChild(item)
-    })
+    }
   }
 
   #releaseTracking() {
@@ -416,10 +413,6 @@ export default class extends Controller {
   #itemUnder(element) {
     const item = element.closest?.('[data-sortable-target="item"]')
     return this.itemTargets.includes(item) ? item : null
-  }
-
-  get #ids() {
-    return this.itemTargets.map(item => item.dataset.sortableId)
   }
 
   get #csrfToken() {
