@@ -31,6 +31,10 @@ class Conversation < ApplicationRecord
       select("DISTINCT conversations.*")
   }
 
+  # Rows render their assistant, pin, bookmark, and reaction state — one shared list so the
+  # next toggle association (or rename) touches one place, not every nav scope.
+  NAV_PRELOADS = %i[assistant pins bookmarks reactions].freeze
+
   # The sidebar's conversation list: every conversation for the user in display order, optionally
   # narrowed by the search query. The blank case bypasses the join on purpose — an empty search
   # must still return conversations that have no messages yet. Rows render their assistant, pin,
@@ -41,9 +45,9 @@ class Conversation < ApplicationRecord
   # (updated_at desc) so a reply bubbles its conversation to the top. Pins carry the only hand
   # order — position is ignored here.
   def self.nav_for_user(user, query = nil)
-    return user.conversations.preload(:assistant, :pins, :bookmarks, :reactions).matching_query(query) if query.present?
+    return user.conversations.preload(*NAV_PRELOADS).matching_query(query) if query.present?
 
-    user.conversations.preload(:assistant, :pins, :bookmarks, :reactions).unpinned_for(user).order(updated_at: :desc, id: :desc)
+    user.conversations.preload(*NAV_PRELOADS).unpinned_for(user).order(updated_at: :desc, id: :desc)
   end
 
   # The sidebar's pinned section for the user, in hand order (conversations.position). Hidden
@@ -51,7 +55,7 @@ class Conversation < ApplicationRecord
   def self.pinned_nav_for_user(user, query = nil)
     return none if query.present?
 
-    user.conversations.preload(:assistant, :pins, :bookmarks, :reactions).pinned_for(user)
+    user.conversations.preload(*NAV_PRELOADS).pinned_for(user)
   end
 
   # Builds a hash of date interval keys and the unpinned conversations (pins live in their own
@@ -106,7 +110,7 @@ class Conversation < ApplicationRecord
   # list. The search narrows first through the shared matching_query, then membership applies:
   # the other order raises a structurally-incompatible `or` inside matching_query.
   def self.bookmarked_nav_for_user(user, query = nil)
-    scope = user.conversations.preload(:assistant, :pins, :bookmarks, :reactions).order(updated_at: :desc, id: :desc)
+    scope = user.conversations.preload(*NAV_PRELOADS).order(updated_at: :desc, id: :desc)
     scope = scope.matching_query(query) if query.present?
     scope.bookmarked_for(user)
   end
@@ -132,7 +136,7 @@ class Conversation < ApplicationRecord
     return none if latest_by_conversation.empty?
 
     ordered_ids = latest_by_conversation.sort_by { |_, at| at }.reverse.map(&:first)
-    user.conversations.preload(:assistant, :pins, :bookmarks, :reactions).where(id: ordered_ids).in_order_of(:id, ordered_ids)
+    user.conversations.preload(*NAV_PRELOADS).where(id: ordered_ids).in_order_of(:id, ordered_ids)
   end
 
   def generate_shareable_url(request)
