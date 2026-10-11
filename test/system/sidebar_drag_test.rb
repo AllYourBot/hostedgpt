@@ -34,6 +34,27 @@ class SidebarDragTest < ApplicationSystemTestCase
     assert_equal ["DragTarget1", "DragTarget2", "DragTarget0"], drag_targets
   end
 
+  # Touch path: a still finger hold lifts the row where an early move would scroll
+  # instead. Driven through CDP touch input (no mobile emulation needed — desktop
+  # layout, touch pointer events), asserting the same commit + persistence contract.
+  test "a still touch hold drag reorders pins and the order persists" do
+    user = users(:keith)
+    convs = 3.times.map { |i| user.conversations.create!(assistant: assistants(:samantha), title: "DragTouch#{i}") }
+    convs.each { |c| c.pin!(user) }
+    Conversation.reposition(user, convs.map(&:id)) # normalize pins to 0..2 in creation order
+
+    login_as(user)
+    visit root_path
+    assert_equal ["DragTouch0", "DragTouch1", "DragTouch2"], drag_touch_targets
+
+    touch_drag_row(convs[0], onto: convs[1])
+    assert_equal ["DragTouch1", "DragTouch0", "DragTouch2"], drag_touch_targets
+    assert_equal [1, 0, 2], convs.map { |c| c.reload.position }
+
+    visit root_path # a fresh server render: the dropped order must have been saved, not just slid on screen
+    assert_equal ["DragTouch1", "DragTouch0", "DragTouch2"], drag_touch_targets
+  end
+
   # Picker-row contract: the sidebar picker lives inside the draggable row, and the sortable
   # ghost clone strips Stimulus wiring from its scenery copy only — so the row's own picker
   # controller stays connected through a committing drag, with counts intact and still usable.
@@ -205,6 +226,44 @@ class SidebarDragTest < ApplicationSystemTestCase
   def drag_targets
     all("#pinned-conversations [data-role='conversation'] [data-role='title']")
       .map(&:text).grep(/^DragTarget\d/)
+  end
+
+  def drag_touch_targets
+    all("#pinned-conversations [data-role='conversation'] [data-role='title']")
+      .map(&:text).grep(/^DragTouch\d/)
+  end
+
+  # Finger drag through CDP touch input: press and hold still past the controller's
+  # still-hold threshold (an early move reads as scroll and cancels), then travel in
+  # small steps to the target's bottom half and release. Coordinates are viewport
+  # integers; the touch id stays constant across the gesture.
+  def touch_drag_row(source_record, onto: nil)
+    source = find_row(source_record)
+    target = find_row(onto)
+    scroll_row_into_view(source_record)
+
+    rect = rect_of(source)
+    sx = (rect[:x] + rect[:width] / 4).to_i
+    sy = (rect[:y] + rect[:height] / 2).to_i
+    target_rect = rect_of(target)
+    ty = (target_rect[:y] + target_rect[:height] * 0.75).to_i
+
+    perform_drop do
+      touch(:touchStart, x: sx, y: sy)
+      sleep 0.4
+      steps = 4
+      steps.times do |i|
+        y = sy + ((ty - sy) * (i + 1) / steps)
+        touch(:touchMove, x: sx, y: y)
+        sleep 0.05
+      end
+      touch(:touchEnd)
+    end
+  end
+
+  def touch(type, x: nil, y: nil)
+    points = (type == :touchEnd) ? [] : [{ x: x.to_i, y: y.to_i, id: 1 }]
+    page.driver.browser.execute_cdp("Input.dispatchTouchEvent", type: type.to_s, touchPoints: points)
   end
 
   def drag_picker_targets
