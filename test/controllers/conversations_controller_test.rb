@@ -471,7 +471,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/data-role="pinned-header"/, response.body)
   end
 
-  test "bookmarks view exposes a link back and the sidebar links to it" do
+  test "bookmarks view exposes a link back and the sidebar links to its page" do
     get bookmarks_conversations_url
 
     assert_response :success
@@ -480,7 +480,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     get conversations_url
 
     assert_response :success
-    assert_match(%r{href="/conversations/bookmarks"}, response.body)
+    assert_match(%r{href="/bookmarks"}, response.body)
   end
 
   test "react persists with counts and leaves order alone" do
@@ -630,7 +630,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [@conversation.id], assigns(:nav_conversations).map(&:id)
   end
 
-  test "reactions view exposes a link back and the sidebar links to it" do
+  test "reactions view exposes a link back and the sidebar links to its page" do
     get reactions_conversations_url
 
     assert_response :success
@@ -639,7 +639,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     get conversations_url
 
     assert_response :success
-    assert_match(%r{href="/conversations/reactions"}, response.body)
+    assert_match(%r{href="/reactions"}, response.body)
   end
 
   test "reactions view includes a pinned conversation once, outside the pinned section" do

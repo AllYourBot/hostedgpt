@@ -24,7 +24,8 @@ class FilterFunnelTest < ApplicationSystemTestCase
     assert_no_match(/show=/, all_link[:href], "All returns to the unfiltered list in one tap")
     all_link.click
 
-    assert_selector("[data-role='bookmarks-link']")
+    assert_selector("[data-role='open-bookmarks-page']")
+    assert_no_selector("[data-role='filter-label']")
     assert_no_selector("[data-role='filter-label']")
   end
 
@@ -41,7 +42,8 @@ class FilterFunnelTest < ApplicationSystemTestCase
     assert_no_selector("[data-role='pinned-header']")
     find("[data-role='filter-clear']").click
 
-    assert_selector("[data-role='bookmarks-link']")
+    assert_selector("[data-role='open-bookmarks-page']")
+    assert_no_selector("[data-role='filter-label']")
   end
 
   test "R13 legacy bookmarks entry drives the same funnel state" do
@@ -50,9 +52,7 @@ class FilterFunnelTest < ApplicationSystemTestCase
     conversation.bookmark!(user)
 
     login_as(user)
-    visit root_path
-
-    find("[data-role='bookmarks-link']").click
+    visit bookmarks_conversations_path
 
     assert_selector("#conversation_#{conversation.id}")
     # Wait for the frame swap first: the pre-click button node is detached by the
@@ -77,7 +77,8 @@ class FilterFunnelTest < ApplicationSystemTestCase
 
     page.refresh
 
-    assert_selector("[data-role='bookmarks-link']")
+    assert_selector("[data-role='open-bookmarks-page']")
+    assert_no_selector("[data-role='filter-label']")
     assert_no_selector("[data-role='filter-label']")
     assert_selector("[data-role='filter-announcement']", visible: :all)
   end
@@ -118,7 +119,8 @@ class FilterFunnelTest < ApplicationSystemTestCase
     assert_no_match(/show=/, clear[:href], "X must reset Show in one tap")
     clear.click
 
-    assert_selector("[data-role='bookmarks-link']")
+    assert_selector("[data-role='open-bookmarks-page']")
+    assert_no_selector("[data-role='filter-label']")
     assert_no_selector("[data-role='filter-label']")
     assert_no_selector("[data-role='filter-clear-button']")
   end

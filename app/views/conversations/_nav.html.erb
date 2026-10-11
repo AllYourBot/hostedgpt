@@ -1,3 +1,36 @@
+  <%# Page destinations sit above the search: they navigate away to full card grids
+      and never filter in place — filtering belongs to the funnel alone, so one
+      control never duplicates the other. %>
+  <div class="flex items-center mr-5">
+    <%= link_to bookmarked_page_path,
+      data: { role: "open-bookmarks-page", turbo_frame: "_top" },
+      class: %|
+        flex items-center flex-1
+        mb-1 p-1 pl-2 pr-2
+        rounded-lg
+        text-sm
+        hover:bg-gray-100 dark:hover:bg-gray-700
+      |,
+      title: t("app.conversations.ui.open_page") do %>
+      <%= icon "bookmark", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
+      <span class="ml-2"><%= t("app.conversations.ui.bookmarks") %></span>
+    <% end %>
+  </div>
+  <div class="flex items-center mr-5">
+    <%= link_to reacted_page_path,
+      data: { role: "open-reactions-page", turbo_frame: "_top" },
+      class: %|
+        flex items-center flex-1
+        mb-1 p-1 pl-2 pr-2
+        rounded-lg
+        text-sm
+        hover:bg-gray-100 dark:hover:bg-gray-700
+      |,
+      title: t("app.conversations.ui.open_page") do %>
+      <%= icon "face-smile", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
+      <span class="ml-2"><%= t("app.conversations.ui.reactions") %></span>
+    <% end %>
+  </div>
   <section id="search" class="pt-6 text-gray-950 dark:text-gray-100 select-none">
     <%= form_with(url: conversations_path,
       data: { turbo_frame: "nav-conversations", controller: "search" },
@@ -131,50 +164,9 @@
         <%= icon "chat-bubble-left-ellipsis", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
         <span class="ml-2"><%= t("app.conversations.ui.all_conversations") %></span>
       <% end %>
-    <% else %>
-      <div class="flex items-center mr-5">
-        <%= link_to bookmarks_conversations_path,
-          data: { role: "bookmarks-link", turbo_frame: "nav-conversations" },
-          class: %|
-            flex items-center flex-1
-            mb-1 p-1 pl-2 pr-2
-            rounded-lg
-            text-sm
-            hover:bg-gray-100 dark:hover:bg-gray-700
-          | do %>
-          <%= icon "bookmark", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
-          <span class="ml-2"><%= t("app.conversations.ui.bookmarks") %></span>
-        <% end %>
-        <%# Full-page card grid, not frame-scoped: _top escapes the nav-conversations frame so
-            the page navigates instead of swapping the sidebar list. %>
-        <%= link_to bookmarked_page_path,
-          data: { role: "open-bookmarks-page", turbo_frame: "_top" },
-          class: "p-1 mb-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700",
-          title: t("app.conversations.ui.open_page") do %>
-          <%= icon "arrow-top-right-on-square", variant: :outline, size: 14, class: "text-gray-500 dark:text-gray-300" %>
-        <% end %>
-      </div>
-      <div class="flex items-center mr-5">
-        <%= link_to reactions_conversations_path,
-          data: { role: "reactions-link", turbo_frame: "nav-conversations" },
-          class: %|
-            flex items-center flex-1
-            mb-1 p-1 pl-2 pr-2
-            rounded-lg
-            text-sm
-            hover:bg-gray-100 dark:hover:bg-gray-700
-          | do %>
-          <%= icon "face-smile", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
-          <span class="ml-2"><%= t("app.conversations.ui.reactions") %></span>
-        <% end %>
-        <%= link_to reacted_page_path,
-          data: { role: "open-reactions-page", turbo_frame: "_top" },
-          class: "p-1 mb-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700",
-          title: t("app.conversations.ui.open_page") do %>
-          <%= icon "arrow-top-right-on-square", variant: :outline, size: 14, class: "text-gray-500 dark:text-gray-300" %>
-        <% end %>
-      </div>
     <% end %>
+    <%# The All-conversations link is the only in-view return path; everywhere else,
+        the funnel button and its X own scope state. %>
     <% if main_view %>
       <% if @pinned_conversations.present? %>
         <header class="mx-2 mt-6 mb-2 mr-5 flex items-center justify-between text-xs font-semibold text-gray-300 text-opacity-1 dark:text-gray-500" data-role="pinned-header">
