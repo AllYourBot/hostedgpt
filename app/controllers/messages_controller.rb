@@ -18,9 +18,9 @@ class MessagesController < ApplicationController
       end
     end
 
-    # Rows render pin and reaction state, so those ride along preloaded instead of one query
-    # per row — same treatment the sidebar nav scopes give toggle state.
-    @messages = @conversation.messages.preload(:pins, :reactions).for_conversation_version(@version)
+    # Rows render pin, bookmark, and reaction state, so those ride along preloaded instead
+    # of one query per row — same treatment the sidebar nav scopes give toggle state.
+    @messages = @conversation.messages.preload(:pins, :bookmarks, :reactions).for_conversation_version(@version)
     # Slack-style pins tab: the conversation's pinned messages in display order (message pins
     # carry no hand order). Scoped to the conversation through the association, so another
     # user's pins can never leak in — same Current.user scoping as the other toggles.
@@ -113,7 +113,7 @@ class MessagesController < ApplicationController
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.replace("pinned-messages", partial: "messages/pinned_messages"),
-          turbo_stream.update("#{helpers.dom_id(@message)}-pin", partial: "messages/message_pin_button", locals: { message: @message })
+          turbo_stream.update("#{helpers.dom_id(@message)}-pin", partial: "messages/message_toggle_button", locals: { message: @message, type: :pin })
         ]
       end
       format.html { head :no_content }
@@ -126,7 +126,7 @@ class MessagesController < ApplicationController
   def render_message_bookmark
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.update("#{helpers.dom_id(@message)}-bookmark", partial: "messages/message_bookmark_button", locals: { message: @message })
+        render turbo_stream: turbo_stream.update("#{helpers.dom_id(@message)}-bookmark", partial: "messages/message_toggle_button", locals: { message: @message, type: :bookmark })
       end
       format.html { head :no_content }
     end

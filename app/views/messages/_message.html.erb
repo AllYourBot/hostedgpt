@@ -239,13 +239,13 @@ end %>
               only (no hand order) and scoped per user, mirroring the conversation pin icon but
               with message-scoped roles so the two never collide on the conversation view. %>
           <span id="<%= dom_id(message) %>-pin" class="flex items-center">
-            <%= render "messages/message_pin_button", message: message %>
+            <%= render "messages/message_toggle_button", message: message, type: :pin %>
           </span>
           <%# Twitter-style per-message bookmark with a stable morph target, mirroring the
               pin button above it but with no section stream: the toggle response re-renders
               this span alone, no reload. %>
           <span id="<%= dom_id(message) %>-bookmark" class="flex items-center">
-            <%= render "messages/message_bookmark_button", message: message %>
+            <%= render "messages/message_toggle_button", message: message, type: :bookmark %>
           </span>
 
         <%# display:contents: no box of its own, so the bar stays single-row; the invisible

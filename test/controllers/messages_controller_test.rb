@@ -409,6 +409,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_match(/data-role="pinned-message"/, response.body)
     assert_match(/action="update" target="message_#{@message.id}-pin"/, response.body)
     assert_match(/data-role="unpin-message"/, response.body)
+    assert_match(/title="Unpin message"/, response.body)
     assert @message.reload.pinned?(@user)
   end
 
@@ -461,6 +462,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match(/action="update" target="message_#{@message.id}-bookmark"/, response.body)
     assert_match(/data-role="unbookmark-message"/, response.body)
+    assert_match(/title="Unbookmark message"/, response.body)
     assert @message.reload.bookmarked?(@user)
   end
 
