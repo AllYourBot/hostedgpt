@@ -410,7 +410,25 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_match(/action="update" target="message_#{@message.id}-pin"/, response.body)
     assert_match(/data-role="unpin-message"/, response.body)
     assert_match(/title="Unpin message"/, response.body)
+    assert response.body.index('action="replace" target="pinned-messages"') < response.body.index("action=\"update\" target=\"message_#{@message.id}-pin\""),
+      "section replace should stream before the button morph"
     assert @message.reload.pinned?(@user)
+  end
+
+  test "message unpin answers section and button morphs to Turbo requests" do
+    @message.pin!(@user)
+
+    post unpin_message_url(@message),
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_match(/action="replace" target="pinned-messages"/, response.body)
+    assert_match(/action="update" target="message_#{@message.id}-pin"/, response.body)
+    assert_match(/data-role="pin-message"/, response.body)
+    assert_match(/title="Pin message"/, response.body)
+    assert response.body.index('action="replace" target="pinned-messages"') < response.body.index("action=\"update\" target=\"message_#{@message.id}-pin\""),
+      "section replace should stream before the button morph"
+    assert_not @message.reload.pinned?(@user)
   end
 
   test "unpin removes a message pin" do
@@ -641,6 +659,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_empty assigns(:pinned_messages)
     assert_match(/id="pinned-messages"/, response.body)
+    assert_match(/id="pinned-messages"[^>]*class="[^"]*hidden/, response.body)
     assert_no_match(/data-role="pinned-message"/, response.body)
   end
 

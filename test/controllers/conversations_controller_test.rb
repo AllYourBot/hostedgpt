@@ -220,6 +220,40 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert @conversation.reload.pinned?(@conversation.user)
   end
 
+  test "unpin answers a nav morph to Turbo requests" do
+    @conversation.pin!(@conversation.user)
+
+    post unpin_conversation_url(@conversation),
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_match(/action="update" target="nav-conversations"/, response.body)
+    assert_match(/data-role="pin"/, response.body)
+    assert_not @conversation.reload.pinned?(@conversation.user)
+  end
+
+  test "bookmark answers a nav morph to Turbo requests" do
+    post bookmark_conversation_url(@conversation),
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_match(/action="update" target="nav-conversations"/, response.body)
+    assert_match(/data-role="unbookmark"/, response.body)
+    assert @conversation.reload.bookmarked?(@conversation.user)
+  end
+
+  test "unbookmark answers a nav morph to Turbo requests" do
+    @conversation.bookmark!(@conversation.user)
+
+    post unbookmark_conversation_url(@conversation),
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+
+    assert_response :success
+    assert_match(/action="update" target="nav-conversations"/, response.body)
+    assert_match(/data-role="bookmark"/, response.body)
+    assert_not @conversation.reload.bookmarked?(@conversation.user)
+  end
+
   test "unpin persists and returns the conversation to recency order" do
     @conversation.pin!(@conversation.user)
     assert @conversation.pinned?(@conversation.user)
