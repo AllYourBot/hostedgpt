@@ -372,10 +372,31 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
+  test "unreact on another user's message is unauthorized" do
+    foreign = messages(:filter_map)
+    assert_not_equal @user, foreign.conversation.user
+    foreign.react!("👍", foreign.conversation.user)
+
+    assert_no_difference "Reaction.count" do
+      post unreact_message_url(foreign), params: { emoji: "👍" }
+    end
+
+    assert_response :unauthorized
+    assert foreign.reload.user_reacted?("👍", foreign.conversation.user)
+  end
+
   test "react on a message requires authentication" do
     get logout_path
 
     post react_message_url(@message), params: { emoji: "👍" }
+
+    assert_redirected_to login_url
+  end
+
+  test "unreact on a message requires authentication" do
+    get logout_path
+
+    post unreact_message_url(@message), params: { emoji: "👍" }
 
     assert_redirected_to login_url
   end

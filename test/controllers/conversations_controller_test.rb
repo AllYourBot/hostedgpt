@@ -290,6 +290,42 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_empty Conversation.pinned_for(@conversation.user)
   end
 
+  test "unpin leaves another user's pin alone" do
+    foreign = conversations(:debugging)
+    foreign.pin!(foreign.user)
+
+    assert_no_difference "Pin.count" do
+      post unpin_conversation_url(foreign)
+    end
+
+    assert_response :no_content
+    assert foreign.reload.pinned?(foreign.user)
+  end
+
+  test "unbookmark leaves another user's bookmark alone" do
+    foreign = conversations(:debugging)
+    foreign.bookmark!(foreign.user)
+
+    assert_no_difference "Bookmark.count" do
+      post unbookmark_conversation_url(foreign)
+    end
+
+    assert_response :no_content
+    assert foreign.reload.bookmarked?(foreign.user)
+  end
+
+  test "unreact leaves another user's reaction alone" do
+    foreign = conversations(:debugging)
+    foreign.react!("👍", foreign.user)
+
+    assert_no_difference "Reaction.count" do
+      post unreact_conversation_url(foreign), params: { emoji: "👍" }
+    end
+
+    assert_response :no_content
+    assert foreign.reload.user_reacted?("👍", foreign.user)
+  end
+
   test "pin requires authentication" do
     get logout_path
 
@@ -435,6 +471,15 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :no_content
     assert_not @conversation.reload.bookmarked?(@conversation.user)
+  end
+
+  test "unpin when clear is a no-op" do
+    assert_no_difference "Pin.count" do
+      post unpin_conversation_url(@conversation)
+    end
+
+    assert_response :no_content
+    assert_not @conversation.reload.pinned?(@conversation.user)
   end
 
   test "bookmark ignores a conversation the user does not own" do
