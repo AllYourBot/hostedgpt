@@ -422,6 +422,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     get conversations_url(query: "test")
 
     assert_response :success
+    assert_not_empty assigns(:nav_conversations), "an empty result would pass the no-drag assert vacuously"
     assert_no_match(/pointerdown->sortable#press/, response.body)
   end
 
@@ -584,11 +585,14 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match(%r{href="/conversations"}, response.body)
+    assert_match(/data-role="all-conversations"/, response.body)
+    assert_match(/All conversations/, response.body)
 
     get conversations_url
 
     assert_response :success
     assert_match(%r{href="/bookmarks"}, response.body)
+    assert_match(/data-role="open-bookmarks-page"/, response.body)
   end
 
   test "react persists with counts and leaves order alone" do
@@ -770,7 +774,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match(/data-role="reaction-counts"/, response.body)
-    assert_match(/👍/, response.body)
+    assert_match(/data-emoji-chip="👍">👍 1<\/span>/, response.body)
   end
 
   test "funnel defaults to All with an inactive button with no label" do
@@ -785,6 +789,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/data-role="filter-menu"/, body)
     assert_match(/data-role="filter-announcement"/, body)
     assert_match(/aria-live="polite"/, body)
+    assert_match(/Showing all conversations/, body)
   end
 
   test "funnel show bookmarked filters to bookmarks with active labeled button and suppressed strip" do
@@ -806,6 +811,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/data-role="filter-label"/, body)
     assert_no_match(/data-role="pinned-header"/, body)
     assert_no_match(/data-role="time-group"/, body)
+    assert_match(/Showing bookmarked conversations/, body)
   end
 
   test "funnel show reacted filters to reacted with active labeled button and suppressed strip" do
@@ -824,6 +830,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/aria-pressed="true"/, body)
     assert_match(/data-role="filter-label"/, body)
     assert_no_match(/data-role="pinned-header"/, body)
+    assert_match(/Showing reacted conversations/, body)
   end
 
   test "funnel rejects an invalid show by falling back to All" do
@@ -878,6 +885,9 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/data-role="pinned-header"/, body)
     assert_match(/data-role="empty-reactions"/, body)
     assert_match(/data-role="filter-clear"/, body)
+    clear_link = body[/<a[^>]*data-role="filter-clear"[^>]*>/]
+    assert_not_nil clear_link
+    assert_no_match(/show=/, clear_link, "clear returns to All in one tap")
   end
 
   test "AE6 All from scope returns full list in Last activity order in one tap" do
@@ -1095,6 +1105,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     get conversations_url(show: "bookmarked"), headers: { "Accept" => "application/json" }
 
     assert_response :success
+    assert_equal [@conversation.id], response.parsed_body["nav_conversations"].map { |c| c["id"] }
   end
 
   test "pinned section keeps hand order regardless of recency" do

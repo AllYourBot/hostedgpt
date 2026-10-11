@@ -20,6 +20,38 @@ class CollectionPagesTest < ApplicationSystemTestCase
     assert conversation.reload.bookmarked?(user)
   end
 
+  test "card unpin on the pinned page removes the card without a reload" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    conversation.pin!(user)
+
+    login_as(user)
+    visit pinned_page_path
+    path_before = current_path
+
+    find("#card_conversation_#{conversation.id} [data-role='unpin']").click
+
+    assert_no_selector("#card_conversation_#{conversation.id}")
+    assert_equal path_before, current_path
+    assert_not conversation.reload.pinned?(user)
+  end
+
+  test "card unbookmark on the bookmarked page removes the card without a reload" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    conversation.bookmark!(user)
+
+    login_as(user)
+    visit bookmarked_page_path
+    path_before = current_path
+
+    find("#card_conversation_#{conversation.id} [data-role='unbookmark']").click
+
+    assert_no_selector("#card_conversation_#{conversation.id}")
+    assert_equal path_before, current_path
+    assert_not conversation.reload.bookmarked?(user)
+  end
+
   test "sidebar open-page buttons navigate to their pages" do
     user = users(:keith)
     conversations(:greeting).pin!(user)

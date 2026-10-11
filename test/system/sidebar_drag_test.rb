@@ -95,9 +95,7 @@ class SidebarDragTest < ApplicationSystemTestCase
     end
 
     moved.find("[data-role='react-emoji-conversation']", text: "❤️").click
-    assert_true "the sidebar chip should render after the drag" do
-      find("#conversation_#{convs[0].id}").find("[data-role='reaction-counts']").text.include?("❤️ 1")
-    end
+    assert_selector("#conversation_#{convs[0].id} [data-role='reaction-counts']", text: "❤️ 1")
     assert_true "the reaction should persist" do
       convs[0].reload.user_reacted?("❤️", user)
     end
@@ -121,7 +119,9 @@ class SidebarDragTest < ApplicationSystemTestCase
     row = find("#conversation_#{pinned.id}")
     assert_includes row.find("[data-role='reaction-counts']").text, "🎉 1"
     row.find("[data-role='react-conversation']").click
-    assert row.find("[data-emoji-picker-target='panel']").visible?
+    within("#conversation_#{pinned.id}") do
+      assert_selector("[data-emoji-picker-target='panel']")
+    end
 
     # Title grab again: the open panel would swallow a center press (see above).
     drag_boundary(pinned, zone: "unpinned", grab: :title)

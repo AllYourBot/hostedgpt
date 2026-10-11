@@ -144,6 +144,7 @@ class ConversationPagesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match(/action="remove" target="card_conversation_#{@conversation.id}"/, response.body)
+    assert_not @conversation.reload.bookmarked?(user)
   end
 
   test "card pin toggle on the bookmarked page replaces the card in place" do
@@ -157,6 +158,8 @@ class ConversationPagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     card_id = "card_conversation_#{@conversation.id}"
     assert_match(/action="replace" target="#{card_id}"/, response.body)
+    assert_match(/data-role="unpin"/, response.body)
+    assert @conversation.reload.pinned?(user)
 
     get bookmarked_page_url
     assert_match(/id="#{card_id}"/, response.body)
@@ -173,6 +176,8 @@ class ConversationPagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     card_id = "card_conversation_#{@conversation.id}"
     assert_match(/action="replace" target="#{card_id}"/, response.body)
+    assert_match(/data-role="unpin"/, response.body)
+    assert @conversation.reload.pinned?(user)
 
     get reacted_page_url
     assert_match(/id="#{card_id}"/, response.body)

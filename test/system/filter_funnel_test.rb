@@ -26,6 +26,9 @@ class FilterFunnelTest < ApplicationSystemTestCase
 
     assert_selector("[data-role='open-bookmarks-page']")
     assert_no_selector("[data-role='filter-label']")
+    assert_selector("[data-role='filter-announcement']", visible: :all, text: "Showing all conversations")
+    assert_selector("#conversation_#{conversations(:attachment).id}")
+    assert_selector("[data-role='time-group']")
   end
 
   test "AE5 empty bookmarked scope suppresses the strip and offers one-tap clear" do
@@ -39,10 +42,12 @@ class FilterFunnelTest < ApplicationSystemTestCase
 
     assert_selector("[data-role='empty-bookmarks']")
     assert_no_selector("[data-role='pinned-header']")
+    assert_selector("[data-role='filter-announcement']", visible: :all, text: "Showing bookmarked conversations")
     find("[data-role='filter-clear']").click
 
     assert_selector("[data-role='open-bookmarks-page']")
     assert_no_selector("[data-role='filter-label']")
+    assert_selector("#conversation_#{conversations(:attachment).id}")
   end
 
   test "R13 legacy bookmarks entry drives the same funnel state" do
@@ -59,7 +64,7 @@ class FilterFunnelTest < ApplicationSystemTestCase
     assert_selector("[data-role='filter-label']", text: "Bookmarked")
     button = find("[data-role='filter-button']")
     assert_equal "true", button["aria-pressed"]
-    assert_selector("[data-role='filter-announcement']", visible: :all)
+    assert_selector("[data-role='filter-announcement']", visible: :all, text: "Showing bookmarked conversations")
   end
 
   test "R14 scope resets on reload and changes are announced" do
@@ -73,12 +78,13 @@ class FilterFunnelTest < ApplicationSystemTestCase
     open_funnel
     find("[data-role='filter-show-bookmarked']").click
     assert_selector("[data-role='filter-label']", text: "Bookmarked")
+    assert_selector("[data-role='filter-announcement']", visible: :all, text: "Showing bookmarked conversations")
 
     page.refresh
 
     assert_selector("[data-role='open-bookmarks-page']")
     assert_no_selector("[data-role='filter-label']")
-    assert_selector("[data-role='filter-announcement']", visible: :all)
+    assert_selector("[data-role='filter-announcement']", visible: :all, text: "Showing all conversations")
   end
 
   test "AE7 new unmarked chat appears once under filter without clearing scope" do
