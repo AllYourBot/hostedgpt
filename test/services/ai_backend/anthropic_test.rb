@@ -439,6 +439,16 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     end
   end
 
+  test "one-off reads the text block when a thinking block comes first" do
+    TestClient::Anthropic.stub :thinking, "" do
+      TestClient::Anthropic.stub :text, "{\"topic\":\"Weekend plans\"}" do
+        reply = @anthropic.get_oneoff_message("Extract a topic.", ["Here is chat text."], json: true)
+
+        assert_equal "Weekend plans", JSON.parse(reply)["topic"], "the reply should come from the text block, not the thinking block before it"
+      end
+    end
+  end
+
   test "key_error_message returns the recorded Anthropic copy" do
     assert_equal "(You need to enter a valid API key for Anthropic to use Claude. Click your Profile in the bottom " +
       "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)",

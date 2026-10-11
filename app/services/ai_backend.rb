@@ -53,8 +53,17 @@ class AIBackend
       @client.send(client_method_name, ** @client_config)
     end
 
-    response.dig("content", 0, "text") ||
+    self.class.content_text(response) ||
       response.dig("choices", 0, "message", "content")
+  end
+
+  # The text of an Anthropic-style response. Models that think by default can put
+  # a thinking block first, so this looks for the text block rather than taking the first one.
+  def self.content_text(response)
+    content = response["content"]
+    return nil unless content.is_a?(Array)
+
+    content.find { |block| block["type"] == "text" }&.dig("text")
   end
 
   def stream_next_conversation_message(&chunk_handler)
