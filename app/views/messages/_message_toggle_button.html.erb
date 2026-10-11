@@ -13,7 +13,7 @@
   data: { role: "#{verb}#{noun}-message" },
   form: { class: "flex items-center", data: { turbo_frame: "_top" } },
   class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
-  title: "#{verb}#{noun} message".capitalize do %>
+  title: t("app.conversations.ui.#{verb}#{noun}_message") do %>
   <%= icon type == :pin ? "map-pin" : "bookmark",
     variant: toggled ? :solid : :outline,
     size: 18

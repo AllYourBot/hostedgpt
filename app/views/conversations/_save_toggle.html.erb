@@ -23,7 +23,7 @@
   data: { role: pinned ? "unpin" : "pin" },
   form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
   class: "p-1 leading-none",
-  title: pinned ? "Unpin" : "Pin" do
+  title: pinned ? t("app.conversations.ui.unpin") : t("app.conversations.ui.pin") do
 %>
   <%= icon "map-pin",
     variant: pinned ? :solid : :outline,
@@ -37,7 +37,7 @@
   data: { role: bookmarked ? "unbookmark" : "bookmark" },
   form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
   class: "p-1 leading-none",
-  title: bookmarked ? "Unbookmark" : "Bookmark" do
+  title: bookmarked ? t("app.conversations.ui.unbookmark") : t("app.conversations.ui.bookmark") do
 %>
   <%= icon "bookmark",
     variant: bookmarked ? :solid : :outline,

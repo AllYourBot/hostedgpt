@@ -8,7 +8,7 @@
   <% if @pinned_messages.present? %>
       <header class="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-200">
         <%= icon "map-pin", variant: :solid, size: 16 %>
-        Pinned messages
+        <%= t("app.conversations.ui.pinned_messages_heading") %>
       </header>
       <% @pinned_messages.each do |pinned_message| %>
         <div
@@ -27,7 +27,7 @@
             data: { role: "unpin-message" },
             form: { class: "flex items-center" },
             class: "cursor-pointer text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white flex items-center",
-            title: "Unpin message" do %>
+            title: t("app.conversations.ui.unpin_message") do %>
             <%= icon "map-pin", variant: :solid, size: 16 %>
           <% end %>
         </div>

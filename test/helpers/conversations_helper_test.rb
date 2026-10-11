@@ -37,4 +37,25 @@ class ConversationsHelperTest < ActionView::TestCase
       end
     end
   end
+
+  # Every user-visible toggle/header string the sidebar and message rows render must resolve
+  # in both locales — hardcoded English tooltips shipped here before, invisible to tests
+  # running under the default locale.
+  TOGGLE_KEYS = %w[
+    pin unpin bookmark unbookmark
+    pin_message unpin_message bookmark_message unbookmark_message
+    pinned_messages_heading react
+  ].freeze
+
+  test "toggle and header copy resolves in English and German" do
+    [:en, :de].each do |locale|
+      I18n.with_locale(locale) do
+        TOGGLE_KEYS.each do |key|
+          value = I18n.t("app.conversations.ui.#{key}", raise: true)
+          assert_no_match(/translation missing/i, value)
+        end
+        assert_no_match(/translation missing/i, I18n.t("app.conversations.ui.ago", time: "x", raise: true))
+      end
+    end
+  end
 end

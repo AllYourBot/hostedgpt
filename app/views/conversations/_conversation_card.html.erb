@@ -16,7 +16,7 @@
       class: "block" do %>
       <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= conversation.title.presence || t("app.conversations.new_chat") %></p>
       <p class="truncate text-sm text-gray-500 dark:text-gray-300"><%= conversation.assistant.name %></p>
-      <p class="text-xs text-gray-400 dark:text-gray-400" data-role="recency"><%= time_ago_in_words(conversation.updated_at) %> ago</p>
+      <p class="text-xs text-gray-400 dark:text-gray-400" data-role="recency"><%= t("app.conversations.ui.ago", time: time_ago_in_words(conversation.updated_at)) %></p>
     <% end %>
   </div>
   <div class="flex items-center pr-1">
@@ -40,7 +40,7 @@
           action: "click->emoji-picker#toggle",
           emoji_picker_target: "button",
         },
-        title: "React" do %>
+        title: t("app.conversations.ui.react") do %>
         <%= icon "face-smile", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
       <% end %>
       <div data-emoji-picker-target="panel"
