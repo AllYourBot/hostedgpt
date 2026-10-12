@@ -207,6 +207,19 @@ class ConversationTest < ActiveSupport::TestCase
     assert_equal old.id, Conversation.nav_for_user(user).first.id
   end
 
+  test "pin, reorder, bookmark, and react never touch updated_at" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    stamp = conversation.updated_at
+
+    conversation.pin!(user)
+    Conversation.reposition(user, [conversation.id])
+    conversation.bookmark!(user)
+    conversation.react!("👍", user)
+
+    assert_equal stamp, conversation.reload.updated_at
+  end
+
   test "a reply in a pinned conversation leaves pin order unchanged" do
     user = users(:keith)
     first = conversations(:greeting)
