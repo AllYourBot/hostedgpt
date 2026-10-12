@@ -7,6 +7,12 @@ class AIBackend::RubyLLM < AIBackend
 
   IMAGE_MODEL = "gpt-image-2.5-flare"
 
+  # "high" is the API's own default effort. Thinking counts toward max_tokens, so
+  # the 4096 RubyLLM falls back to for an assumed model can be spent before the
+  # answer starts.
+  THINKING_EFFORT = "high"
+  THINKING_MAX_TOKENS = 16_000
+
   CONFIGURATION_ERRORS = [
     ::RubyLLM::UnauthorizedError, ::RubyLLM::ConfigurationError,
     ::RubyLLM::BadRequestError, ::RubyLLM::ForbiddenError,
@@ -124,6 +130,7 @@ class AIBackend::RubyLLM < AIBackend
     chat.with_instructions(conversation_instructions(instructions)) if instructions.present?
     preceding_conversation_messages.each { |msg| chat.add_message(msg) }
     chat.with_tools(*tool_instances) if tools_enabled?
+    chat.with_adaptive_thinking(effort: THINKING_EFFORT, max_tokens: THINKING_MAX_TOKENS) if thinking_enabled?
 
     begin
       chat.complete { |chunk| stream_handler.call(chunk, chunk_handler) }
@@ -176,6 +183,13 @@ class AIBackend::RubyLLM < AIBackend
         @message.output_token_count = output_tokens
       end
 
+      thinking = chunk.respond_to?(:thinking) ? chunk.thinking : nil
+      if thinking
+        @message.thinking_text = "#{@message.thinking_text}#{thinking.text}" if thinking.text.present?
+        @message.thinking_signature ||= thinking.signature.presence
+        chunk_handler.call("") # lets the job broadcast the thinking so far and check for a cancel
+      end
+
       if chunk.respond_to?(:content) && chunk.content.present?
         @stream_response_text += chunk.content
         chunk_handler.call(chunk.content)
@@ -206,14 +220,27 @@ class AIBackend::RubyLLM < AIBackend
           role: :assistant,
           content: sanitize_content(message),
           tool_calls: tool_calls_hash(message),
-        }
+          thinking: thinking_for(message),
+        }.compact
       else
         {
           role: message.role,
           content: sanitize_content(message),
-        }
+          thinking: (thinking_for(message) if message.assistant?),
+        }.compact
       end
     end.compact
+  end
+
+  # Anthropic needs the thinking that preceded a tool call sent back unchanged when
+  # the conversation continues with the tool's result, and it verifies the
+  # signature. Thinking cut off before its signature arrived (a cancelled
+  # response) can't be verified, so it isn't replayed. RubyLLM only sends these
+  # blocks while thinking is enabled for the request.
+  def thinking_for(message)
+    return if message.thinking_signature.blank?
+
+    ::RubyLLM::Thinking.build(text: message.thinking_text, signature: message.thinking_signature)
   end
 
   # RubyLLM formats each attachment for the provider: a PDF becomes Anthropic's document block,
@@ -279,6 +306,10 @@ class AIBackend::RubyLLM < AIBackend
     # LanguageModel#supports_tools? already consults the identity's backend,
     # so Groq's pinned denial holds no matter which transport serves the call.
     @assistant.language_model.supports_tools?
+  end
+
+  def thinking_enabled?
+    provider_slug == :anthropic && @assistant.language_model.supports_thinking?
   end
 
   def tool_instances

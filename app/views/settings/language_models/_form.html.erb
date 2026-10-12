@@ -63,6 +63,10 @@
     <%= form.label :supports_tools, t("app.settings.language_models.form.supports_tools") %>
   </div>
   <div class="my-5">
+    <%= form.check_box :supports_thinking %>
+    <%= form.label :supports_thinking, t("app.settings.language_models.form.supports_thinking") %>
+  </div>
+  <div class="my-5">
     <%= form.check_box :supports_system_message %>
     <%= form.label :supports_system_message, t("app.settings.language_models.form.supports_system_message") %>
   </div>

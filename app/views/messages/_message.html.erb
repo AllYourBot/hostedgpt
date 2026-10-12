@@ -73,6 +73,14 @@ end %>
           data-thinking="<%= !!thinking %>"
         ><%= format_for_speaking message.content_text %></div>
 
+        <% if message.assistant? && message.thinking_text.present? %>
+          <%# open while the reply streams in, collapsed once it is done %>
+          <details data-role="thinking-text" class="mb-2 text-sm text-gray-500 dark:text-gray-400" <%= "open" if thinking %>>
+            <summary class="cursor-pointer select-none"><%= t("app.messages.thinking") %></summary>
+            <div class="mt-1 pl-3 border-l-2 border-gray-200 dark:border-gray-600 whitespace-pre-wrap break-words"><%= message.thinking_text %></div>
+          </details>
+        <% end %>
+
         <div
           data-role="content-text"
           class="prose break-words leading-normal dark:[&_*]:text-gray-100 dark:marker:text-gray-100"

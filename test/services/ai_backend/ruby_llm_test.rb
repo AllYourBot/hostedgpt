@@ -1025,4 +1025,156 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
 
     AIBackend::RubyLLM.new(@user, assistant, conversation, reply)
   end
+
+  # Extended thinking
+
+  def thinking_message
+    @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+  end
+
+  test "stream_next_conversation_message turns on adaptive thinking for an Anthropic model that supports it" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: false, supports_thinking: true)
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, thinking_message)
+    TestClient::RubyLLM::Chat.stub :text, "Claude streaming" do
+      backend.stream_next_conversation_message { |_| }
+    end
+
+    assert_equal({ effort: "high", max_tokens: 16_000 }, TestClient::RubyLLM::Chat.thinking_config)
+  end
+
+  test "stream_next_conversation_message leaves thinking off for a model that doesn't support it" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: false, supports_thinking: false)
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, thinking_message)
+    TestClient::RubyLLM::Chat.stub :text, "Claude streaming" do
+      backend.stream_next_conversation_message { |_| }
+    end
+
+    assert_nil TestClient::RubyLLM::Chat.thinking_config
+  end
+
+  test "stream_next_conversation_message leaves thinking off for a provider other than Anthropic" do
+    @assistant.language_model.update!(supports_tools: false, supports_thinking: true)
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, thinking_message)
+    TestClient::RubyLLM::Chat.stub :text, "GPT streaming" do
+      backend.stream_next_conversation_message { |_| }
+    end
+
+    assert_nil TestClient::RubyLLM::Chat.thinking_config
+  end
+
+  test "stream_next_conversation_message keeps thinking out of the content and stores it with its signature" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: false, supports_thinking: true)
+    message = thinking_message
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    thinking = ::RubyLLM::Thinking.build(text: "Let me work through this...", signature: "sig-abc")
+    chunks = []
+    TestClient::RubyLLM::Chat.stub :thinking, thinking do
+      TestClient::RubyLLM::Chat.stub :text, "The answer is 42." do
+        backend.stream_next_conversation_message { |c| chunks << c }
+      end
+    end
+
+    assert_equal ["", "The answer is 42."], chunks
+    assert_equal "Let me work through this...", message.thinking_text
+    assert_equal "sig-abc", message.thinking_signature
+  end
+
+  test "stream_handler appends thinking deltas and keeps the first signature" do
+    message = thinking_message
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    backend.instance_variable_set(:@stream_response_text, "")
+    handler = backend.send(:stream_handler)
+
+    chunks = []
+    handler.call(OpenStruct.new(content: nil, thinking: ::RubyLLM::Thinking.build(text: "Let me ")), ->(c) { chunks << c })
+    handler.call(OpenStruct.new(content: nil, thinking: ::RubyLLM::Thinking.build(text: "think.")), ->(c) { chunks << c })
+    handler.call(OpenStruct.new(content: nil, thinking: ::RubyLLM::Thinking.build(signature: "sig-abc")), ->(c) { chunks << c })
+    handler.call(OpenStruct.new(content: "Done.", thinking: nil), ->(c) { chunks << c })
+
+    assert_equal "Let me think.", message.thinking_text
+    assert_equal "sig-abc", message.thinking_signature
+    assert_equal ["", "", "", "Done."], chunks
+  end
+
+  test "stream_next_conversation_message keeps the thinking that preceded a tool call" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: true, supports_thinking: true)
+    message = thinking_message
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    thinking = ::RubyLLM::Thinking.build(text: "I should look up the weather.", signature: "sig-tool")
+    result = nil
+    TestClient::RubyLLM::Chat.stub :thinking, thinking do
+      TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+        result = backend.stream_next_conversation_message { |_| }
+      end
+    end
+
+    assert_equal "helloworld_hi", result.first.dig(:function, :name)
+    assert_equal "I should look up the weather.", message.thinking_text
+    assert_equal "sig-tool", message.thinking_signature
+  end
+
+  test "preceding_conversation_messages replays signed thinking on a tool call and on a text reply" do
+    @assistant.language_model.update!(supports_tools: true)
+    @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      thinking_text: "I should look it up.",
+      thinking_signature: "sig-tool",
+      content_tool_calls: [
+        { type: "function", id: "call_123", function: { name: "helloworld_hi", arguments: '{"name":"Keith"}' } },
+      ]
+    )
+    @conversation.messages.create!(
+      role: :assistant,
+      content_text: "Hi Keith",
+      assistant: @assistant,
+      thinking_text: "Now I can answer.",
+      thinking_signature: "sig-text"
+    )
+    follow_up = @conversation.messages.create!(role: :assistant, content_text: nil, assistant: @assistant, version: :latest)
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, follow_up)
+    msgs = backend.send(:preceding_conversation_messages)
+
+    tool_call_replay = msgs.find { |m| m[:role] == :assistant && m[:tool_calls].present? }
+    assert_equal "I should look it up.", tool_call_replay[:thinking].text
+    assert_equal "sig-tool", tool_call_replay[:thinking].signature
+
+    text_replay = msgs.find { |m| m[:content] == "Hi Keith" }
+    assert_equal "sig-text", text_replay[:thinking].signature
+  end
+
+  test "preceding_conversation_messages doesn't replay thinking that never got its signature" do
+    @conversation.messages.create!(
+      role: :assistant,
+      content_text: "Partial",
+      assistant: @assistant,
+      thinking_text: "Cut off before the signature",
+      thinking_signature: nil
+    )
+    follow_up = @conversation.messages.create!(role: :assistant, content_text: nil, assistant: @assistant, version: :latest)
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, follow_up)
+    msgs = backend.send(:preceding_conversation_messages)
+
+    replay = msgs.find { |m| m[:content] == "Partial" }
+    refute replay.key?(:thinking)
+    msgs.each { |m| refute m.key?(:thinking) }
+  end
 end

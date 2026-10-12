@@ -148,6 +148,7 @@ en:
           api_service: "API Service"
           supports_images: "Supports Images?"
           supports_tools: "Supports Tools (Function Calling)?"
+          supports_thinking: "Supports Extended Thinking (Anthropic)?"
           supports_system_message: "Supports System Message (Instructions)?"
           supports_pdf: "Supports PDFs?"
           test: "Test"
@@ -238,6 +239,7 @@ en:
       next_version: "Next"
       read_aloud: "Read aloud"
       pdf_document: "PDF Document - Click to open"
+      thinking: "Thinking"
       editing_title: "Editing message"
       form:
         save_and_submit: "Save & Submit (⌘ RETURN)"

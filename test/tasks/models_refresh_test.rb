@@ -206,6 +206,23 @@ class ModelsRefreshTest < ActiveSupport::TestCase
     end
   end
 
+  test "models:refresh marks Anthropic models that take adaptive thinking" do
+    registry = RubyLLM::Models.new([
+      registry_model("claude-opus-5-5", "Claude Opus 5.5", "anthropic", input: %w[text]),
+      registry_model("claude-haiku-4-5", "Claude Haiku 4.5", "anthropic", input: %w[text]),
+      registry_model("claude-opus-5-5", "Claude Opus 5.5 via OpenRouter", "openrouter", input: %w[text]),
+    ])
+
+    with_registry(registry) do
+      assert_output(/Added/, //) { invoke_refresh_task }
+    end
+
+    models = users(:keith).language_models
+    assert models.find_by!(api_service: api_services(:keith_anthropic_service), api_name: "claude-opus-5-5").supports_thinking?
+    refute models.find_by!(api_service: api_services(:keith_anthropic_service), api_name: "claude-haiku-4-5").supports_thinking?
+    refute models.find_by!(api_service: api_services(:keith_openrouter_service), api_name: "claude-opus-5-5").supports_thinking?
+  end
+
   private
 
   def registry_model(id, name, provider, input:, capabilities: [])

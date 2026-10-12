@@ -7,6 +7,7 @@ module LanguageModel::Export
     api_service_name
     supports_images
     supports_tools
+    supports_thinking
     supports_system_message
     supports_pdf
   ]

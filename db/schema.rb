@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -186,6 +186,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.boolean "supports_images", null: false
     t.boolean "supports_pdf", default: false, null: false
     t.boolean "supports_system_message", default: false
+    t.boolean "supports_thinking", default: false, null: false
     t.boolean "supports_tools", default: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
@@ -224,6 +225,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_130000) do
     t.string "role", null: false
     t.bigint "run_id"
     t.boolean "spoken", default: false, null: false
+    t.text "thinking_signature"
+    t.text "thinking_text"
     t.string "tool_call_id"
     t.datetime "updated_at", null: false
     t.integer "version", null: false

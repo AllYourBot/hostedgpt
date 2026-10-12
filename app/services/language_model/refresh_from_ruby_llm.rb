@@ -58,7 +58,8 @@ class LanguageModel::RefreshFromRubyLLM
         supports_images: model.modalities.input.include?("image"),
         supports_pdf: model.modalities.input.include?("pdf"),
         supports_system_message: true,
-        supports_tools: model.supports_functions?
+        supports_tools: model.supports_functions?,
+        supports_thinking: provider == "anthropic" && LanguageModel.adaptive_thinking?(model.id)
       )
 
       existing_api_names << model.id

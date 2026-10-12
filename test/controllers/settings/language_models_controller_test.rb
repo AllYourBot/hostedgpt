@@ -131,6 +131,17 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert language_model.reload.supports_tools?
   end
 
+  test "should update supports_thinking" do
+    refute @language_model.supports_thinking?
+    patch settings_language_model_url(@language_model), params: { language_model: { supports_thinking: true } }
+    assert @language_model.reload.supports_thinking?
+  end
+
+  test "edit should have a supports_thinking checkbox" do
+    get edit_settings_language_model_url(@language_model)
+    assert_select 'input[name="language_model[supports_thinking]"]'
+  end
+
   test "should not update other user's language_model" do
     original_params = language_models(:alpaca).slice(:api_name, :name)
     params = {"api_name": "New Name", "name": "New Desc"}
