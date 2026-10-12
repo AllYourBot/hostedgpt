@@ -6,6 +6,7 @@ class AIBackend::RubyLLM::InterceptedChatTest < ActiveSupport::TestCase
   ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 
   setup do
+    WebMock.enable!
     @requests = []
     stub_request(:post, ANTHROPIC_URL).to_return do |request|
       @requests << JSON.parse(request.body)

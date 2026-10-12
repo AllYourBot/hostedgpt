@@ -13,6 +13,12 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
     @open_meteo = Toolbox::OpenMeteo.new
   end
 
+  # The live API tests below turn WebMock off; turn it back on so it doesn't stay
+  # off for every test that runs after them in the same process.
+  teardown do
+    WebMock.enable!
+  end
+
   test "filter_by_country filters locations by country with a fuzzy match" do
     filtered_locations = @open_meteo.send(:filter_by_country, "US", locations: @locations)
 
