@@ -29,6 +29,23 @@ class AIBackend::RubyLLM < AIBackend
     Rails.env.test? ? ::TestClient::RubyLLM : ::RubyLLM
   end
 
+  # Error-detail parity with the SDK transports, whose failures name the model.
+  ERROR_BODY_EXCERPT_LENGTH = 200
+  API_KEY_LIKE = /(sk-|gsk_|gsk-|AIza)[\w\-]+/.freeze
+
+  def self.error_detail(error, model:)
+    detail = +"model: #{model}"
+    if (response = error.try(:response)) && response.respond_to?(:status)
+      body = response.body.to_s.gsub(API_KEY_LIKE, '\1' + "*" * 40).slice(0, ERROR_BODY_EXCERPT_LENGTH)
+      detail << ", status: #{response.status}, body: #{body}"
+    end
+    detail
+  end
+
+  def self.mapped_error(error, model:, as:)
+    as.new("#{error.message} (#{error_detail(error, model: model)})")
+  end
+
   def self.gem_class
     Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::AIBackend::RubyLLM::InterceptedChat
   end
@@ -85,9 +102,9 @@ class AIBackend::RubyLLM < AIBackend
         size: "1024x1024",
       )
     rescue *CONFIGURATION_ERRORS => e
-      raise ConfigurationError, e.message
+      raise mapped_error(e, model: IMAGE_MODEL, as: ConfigurationError)
     rescue *RATE_LIMIT_ERRORS => e
-      raise ::Faraday::TooManyRequestsError, e.message
+      raise mapped_error(e, model: IMAGE_MODEL, as: ::Faraday::TooManyRequestsError)
     end
 
     { b64_json: image.data, model: IMAGE_MODEL, provider: "OpenAI" }
@@ -111,9 +128,9 @@ class AIBackend::RubyLLM < AIBackend
     chat.with_params(**params) if params.present?
     chat.complete.content
   rescue *CONFIGURATION_ERRORS => e
-    raise ConfigurationError, e.message
+    raise self.class.mapped_error(e, model: @api_name, as: ConfigurationError)
   rescue *RATE_LIMIT_ERRORS => e
-    raise ::Faraday::TooManyRequestsError, e.message
+    raise self.class.mapped_error(e, model: @api_name, as: ::Faraday::TooManyRequestsError)
   end
 
   def stream_next_conversation_message(&chunk_handler)
@@ -133,9 +150,9 @@ class AIBackend::RubyLLM < AIBackend
 
       raise ::Faraday::ParsingError
     rescue *CONFIGURATION_ERRORS => e
-      raise ConfigurationError, e.message
+      raise self.class.mapped_error(e, model: @api_name, as: ConfigurationError)
     rescue *RATE_LIMIT_ERRORS => e
-      raise ::Faraday::TooManyRequestsError, e.message
+      raise self.class.mapped_error(e, model: @api_name, as: ::Faraday::TooManyRequestsError)
     end
 
     raise ::Faraday::ParsingError if @stream_response_text.blank?
@@ -150,7 +167,7 @@ class AIBackend::RubyLLM < AIBackend
 
   def build_chat
     chat = self.class.gem_class.new(model: @api_name, provider: provider_slug, assume_model_exists: true, context: ruby_llm_context)
-    chat.with_headers(**AIBackend::OpenRouter.attribution_headers) if @api_service.provider_identity == :openrouter
+    chat.with_headers(**AIBackend::Policy::OpenRouter.attribution_headers) if @api_service.provider_identity == :openrouter
     chat
   end
 
@@ -183,9 +200,9 @@ class AIBackend::RubyLLM < AIBackend
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
       raise e
     rescue *CONFIGURATION_ERRORS => e
-      raise ConfigurationError, e.message
+      raise self.class.mapped_error(e, model: @api_name, as: ConfigurationError)
     rescue *RATE_LIMIT_ERRORS => e
-      raise ::Faraday::TooManyRequestsError, e.message
+      raise self.class.mapped_error(e, model: @api_name, as: ::Faraday::TooManyRequestsError)
     rescue => e
       Rails.logger.info "\nUnhandled error in AIBackend::RubyLLM response handler: #{e.message}"
       Rails.logger.info e.backtrace.join("\n")
@@ -276,7 +293,7 @@ class AIBackend::RubyLLM < AIBackend
 
   def tools_enabled?
     # The provider's tool policy is a provider fact, not a transport one:
-    # LanguageModel#supports_tools? already consults the identity's backend,
+    # LanguageModel#supports_tools? already consults the identity's policy,
     # so Groq's pinned denial holds no matter which transport serves the call.
     @assistant.language_model.supports_tools?
   end
