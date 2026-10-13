@@ -1,0 +1,20 @@
+<%# locals: (conversation:, type:, toggled:, toggle_params:) %>
+<%# One pin/bookmark toggle button for the sidebar row and the card, re-rendered in
+    place by its toggle's turbo-stream response. The two differ only in path, role,
+    title, and icon — same shape, same morph contract — so one partial serves both,
+    mirroring the message row's message_toggle_button precedent. %>
+<% path = type == :pin ? (toggled ? unpin_conversation_path(conversation) : pin_conversation_path(conversation)) : (toggled ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation)) %>
+<%= button_to path,
+  method: :post,
+  params: toggle_params,
+  data: { role: toggled ? "un#{type}" : type.to_s },
+  form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
+  class: "p-1 leading-none",
+  title: t("app.conversations.ui.#{toggled ? "un" : ""}#{type}") do
+%>
+  <%= icon type == :pin ? "map-pin" : "bookmark",
+    variant: toggled ? :solid : :outline,
+    size: 16,
+    class: "text-gray-500 dark:text-gray-300"
+  %>
+<% end %>

@@ -17,31 +17,5 @@
        show: (funnel_show unless funnel_show == "all")
      }.compact
    end %>
-<%= button_to pinned ? unpin_conversation_path(conversation) : pin_conversation_path(conversation),
-  method: :post,
-  params: toggle_params,
-  data: { role: pinned ? "unpin" : "pin" },
-  form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
-  class: "p-1 leading-none",
-  title: pinned ? t("app.conversations.ui.unpin") : t("app.conversations.ui.pin") do
-%>
-  <%= icon "map-pin",
-    variant: pinned ? :solid : :outline,
-    size: 16,
-    class: "text-gray-500 dark:text-gray-300"
-  %>
-<% end %>
-<%= button_to bookmarked ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
-  method: :post,
-  params: toggle_params,
-  data: { role: bookmarked ? "unbookmark" : "bookmark" },
-  form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
-  class: "p-1 leading-none",
-  title: bookmarked ? t("app.conversations.ui.unbookmark") : t("app.conversations.ui.bookmark") do
-%>
-  <%= icon "bookmark",
-    variant: bookmarked ? :solid : :outline,
-    size: 16,
-    class: "text-gray-500 dark:text-gray-300"
-  %>
-<% end %>
+<%= render "conversations/save_toggle_button", conversation: conversation, type: :pin, toggled: pinned, toggle_params: toggle_params %>
+<%= render "conversations/save_toggle_button", conversation: conversation, type: :bookmark, toggled: bookmarked, toggle_params: toggle_params %>
