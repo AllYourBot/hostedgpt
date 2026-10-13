@@ -2,34 +2,14 @@
       and never filter in place — filtering belongs to the funnel alone, so one
       control never duplicates the other. %>
   <div class="flex items-center mr-5">
-    <%= link_to bookmarked_page_path,
-      data: { role: "open-bookmarks-page", turbo_frame: "_top" },
-      class: %|
-        flex items-center flex-1
-        mb-1 p-1 pl-2 pr-2
-        rounded-lg
-        text-sm
-        hover:bg-gray-100 dark:hover:bg-gray-700
-      |,
-      title: t("app.conversations.ui.open_page") do %>
-      <%= icon "bookmark", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
-      <span class="ml-2"><%= t("app.conversations.ui.bookmarks") %></span>
-    <% end %>
+    <%= render "conversations/page_link", path: bookmarked_page_path, role: "open-bookmarks-page",
+      icon: "bookmark", label_key: "bookmarks",
+      link_class: "flex items-center flex-1 mb-1 p-1 pl-2 pr-2 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700" %>
   </div>
   <div class="flex items-center mr-5">
-    <%= link_to reacted_page_path,
-      data: { role: "open-reactions-page", turbo_frame: "_top" },
-      class: %|
-        flex items-center flex-1
-        mb-1 p-1 pl-2 pr-2
-        rounded-lg
-        text-sm
-        hover:bg-gray-100 dark:hover:bg-gray-700
-      |,
-      title: t("app.conversations.ui.open_page") do %>
-      <%= icon "face-smile", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
-      <span class="ml-2"><%= t("app.conversations.ui.reactions") %></span>
-    <% end %>
+    <%= render "conversations/page_link", path: reacted_page_path, role: "open-reactions-page",
+      icon: "face-smile", label_key: "reactions",
+      link_class: "flex items-center flex-1 mb-1 p-1 pl-2 pr-2 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700" %>
   </div>
   <section id="search" class="pt-6 text-gray-950 dark:text-gray-100 select-none">
     <%= form_with(url: conversations_path,
@@ -106,24 +86,16 @@
       <menu tabindex="0" data-role="filter-menu" aria-label="<%= t("app.conversations.ui.filter") %>"
         class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
         <li class="menu-title"><span><%= t("app.conversations.ui.filter_show") %></span></li>
-        <li>
-          <%= link_to t("app.conversations.ui.filter_show_all"),
-            conversations_path(query: funnel_query),
-            data: { role: "filter-show-all", turbo_frame: "nav-conversations" },
-            aria: ({ current: "true" } if funnel_show == "all") %>
-        </li>
-        <li>
-          <%= link_to t("app.conversations.ui.filter_show_bookmarked"),
-            conversations_path(show: "bookmarked", query: funnel_query),
-            data: { role: "filter-show-bookmarked", turbo_frame: "nav-conversations" },
-            aria: ({ current: "true" } if funnel_show == "bookmarked") %>
-        </li>
-        <li>
-          <%= link_to t("app.conversations.ui.filter_show_reacted"),
-            conversations_path(show: "reacted", query: funnel_query),
-            data: { role: "filter-show-reacted", turbo_frame: "nav-conversations" },
-            aria: ({ current: "true" } if funnel_show == "reacted") %>
-        </li>
+        <%# One item shape per scope: label, role, and the show param it sets. A nil show
+            param drops out of the URL, so All links back to the unfiltered list. %>
+        <% [["filter_show_all", "filter-show-all", nil, "all"], ["filter_show_bookmarked", "filter-show-bookmarked", "bookmarked", "bookmarked"], ["filter_show_reacted", "filter-show-reacted", "reacted", "reacted"]].each do |label_key, role, show, scope| %>
+          <li>
+            <%= link_to t("app.conversations.ui.#{label_key}"),
+              conversations_path(query: funnel_query, show: show),
+              data: { role: role, turbo_frame: "nav-conversations" },
+              aria: ({ current: "true" } if funnel_show == scope) %>
+          </li>
+        <% end %>
       </menu>
     </div>
     <% if funnel_active %>
@@ -171,12 +143,8 @@
       <% if @pinned_conversations.present? %>
         <header class="mx-2 mt-6 mb-2 mr-5 flex items-center justify-between text-xs font-semibold text-gray-300 text-opacity-1 dark:text-gray-500" data-role="pinned-header">
           <span><%= t("app.conversations.ui.pinned") %></span>
-          <%= link_to pinned_page_path,
-            data: { role: "open-pinned-page", turbo_frame: "_top" },
-            class: "p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700",
-            title: t("app.conversations.ui.open_page") do %>
-            <%= icon "arrow-top-right-on-square", variant: :outline, size: 14, class: "text-gray-500 dark:text-gray-300" %>
-          <% end %>
+          <%= render "conversations/page_link", path: pinned_page_path, role: "open-pinned-page",
+            icon: "arrow-top-right-on-square", icon_size: 14 %>
         </header>
       <% end %>
       <turbo-frame id="pinned-conversations"
@@ -217,17 +185,12 @@
       <% else %>
         <% if @nav_conversations.present? %>
           <%= render @nav_conversations %>
-        <% elsif @bookmarks_view %>
-          <p class="mx-2 mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="empty-bookmarks">
-            <%= t("app.conversations.ui.no_bookmarks_yet") %>
-            <%= link_to t("app.conversations.ui.filter_clear"),
-              conversations_path(query: @query.presence),
-              data: { role: "filter-clear", turbo_frame: "nav-conversations" },
-              class: "underline" %>
-          </p>
-        <% elsif @reactions_view %>
-          <p class="mx-2 mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="empty-reactions">
-            <%= t("app.conversations.ui.no_reactions_yet") %>
+        <% elsif @bookmarks_view || @reactions_view %>
+          <%# One empty state for both filtered scopes: role and copy follow the view. %>
+          <% empty_role = @bookmarks_view ? "empty-bookmarks" : "empty-reactions" %>
+          <% empty_key = @bookmarks_view ? "no_bookmarks_yet" : "no_reactions_yet" %>
+          <p class="mx-2 mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="<%= empty_role %>">
+            <%= t("app.conversations.ui.#{empty_key}") %>
             <%= link_to t("app.conversations.ui.filter_clear"),
               conversations_path(query: @query.presence),
               data: { role: "filter-clear", turbo_frame: "nav-conversations" },
