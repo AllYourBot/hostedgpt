@@ -26,10 +26,6 @@
     <%= render "conversations/save_toggle", conversation: conversation, pinned: pinned, bookmarked: bookmarked, page_context: page_context %>
     <%# Counts plus picker, same optimistic fetch contract as the sidebar row: the endpoints
         answer 204, so no card stream is involved here. %>
-    <%= render "reactions/picker", reactable: conversation,
-      react_url: react_conversation_path(conversation),
-      unreact_url: unreact_conversation_path(conversation),
-      button_role: "react-conversation", emoji_role: "react-emoji-conversation",
-      icon_size: 16, icon_class: "text-gray-500 dark:text-gray-300" %>
+    <%= render "reactions/conversation_picker", conversation: conversation %>
   </div>
 </div>

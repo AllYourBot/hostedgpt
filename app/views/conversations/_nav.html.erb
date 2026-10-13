@@ -1,16 +1,15 @@
   <%# Page destinations sit above the search: they navigate away to full card grids
       and never filter in place — filtering belongs to the funnel alone, so one
       control never duplicates the other. %>
+  <%# One row shape for both page links: path, role, icon, and label differ, the frame
+      and styling do not. %>
+  <% [["bookmarked", "open-bookmarks-page", "bookmark", "bookmarks"], ["reacted", "open-reactions-page", "face-smile", "reactions"]].each do |page, role, icon, label_key| %>
   <div class="flex items-center mr-5">
-    <%= render "conversations/page_link", path: bookmarked_page_path, role: "open-bookmarks-page",
-      icon: "bookmark", label_key: "bookmarks",
+    <%= render "conversations/page_link", path: public_send("#{page}_page_path"), role: role,
+      icon: icon, label_key: label_key,
       link_class: "flex items-center flex-1 mb-1 p-1 pl-2 pr-2 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700" %>
   </div>
-  <div class="flex items-center mr-5">
-    <%= render "conversations/page_link", path: reacted_page_path, role: "open-reactions-page",
-      icon: "face-smile", label_key: "reactions",
-      link_class: "flex items-center flex-1 mb-1 p-1 pl-2 pr-2 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700" %>
-  </div>
+  <% end %>
   <section id="search" class="pt-6 text-gray-950 dark:text-gray-100 select-none">
     <%= form_with(url: conversations_path,
       data: { turbo_frame: "nav-conversations", controller: "search" },

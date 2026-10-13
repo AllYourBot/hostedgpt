@@ -47,11 +47,7 @@
       <%# Full picker on the sidebar row: the ghost clone strips Stimulus wiring from its
           scenery copy only, so the row's own controller stays connected through drags and
           morphs like any other row controller. Counts render beside it, same partial as messages. %>
-      <%= render "reactions/picker", reactable: conversation,
-        react_url: react_conversation_path(conversation),
-        unreact_url: unreact_conversation_path(conversation),
-        button_role: "react-conversation", emoji_role: "react-emoji-conversation",
-        icon_size: 16, icon_class: "text-gray-500 dark:text-gray-300" %>
+      <%= render "reactions/conversation_picker", conversation: conversation %>
     </div>
     <%# Always laid out (invisible, not hidden): revealing on hover must not reflow the row,
         or the icons shift out from under the cursor and clicks land on the menu instead. %>
