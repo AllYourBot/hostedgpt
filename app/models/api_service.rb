@@ -24,12 +24,13 @@ class APIService < ApplicationRecord
 
   scope :ordered, -> { order(:name) }
 
-  # The per-provider backend registry: one identity -> one backend class that
-  # owns that provider's wire dialect, error copy, and provider policy, whatever
-  # transport (SDK or RubyLLM) ultimately serves the request. A service's
-  # identity collapses the driver plus, for openai-dialect vendors, the
-  # canonical URL into that one key: choices, RubyLLM support, and error facts
-  # all resolve through it, never through the raw driver alone.
+  # The per-provider transport registry: one identity -> one backend class
+  # that owns that provider's wire dialect, whatever transport (SDK or
+  # RubyLLM) ultimately serves the request. Its policy and facts (error copy,
+  # billing URLs, display names, tool policy) live in AIBackend::Policy. A
+  # service's identity collapses the driver plus, for openai-dialect vendors,
+  # the canonical URL into that one key: choices, RubyLLM support, and error
+  # facts all resolve through it, never through the raw driver alone.
   #
   # Built as a method (not a class-body constant) so backend autoloading stays
   # as lazy as the dispatch it replaced. Adding a provider? Add its entry here
@@ -46,11 +47,11 @@ class APIService < ApplicationRecord
   end
 
   def self.chat_provider_identities
-    sdk_backends.keys
+    AIBackend::Policy.chat_provider_identities
   end
 
   def self.identity_display_name(identity)
-    sdk_backends[identity.to_sym]&.name&.demodulize || identity.to_s.humanize
+    AIBackend::Policy.display_name_for(identity)
   end
 
   DIRECT_DRIVERS = %w[openai anthropic gemini].freeze
@@ -80,19 +81,19 @@ class APIService < ApplicationRecord
     choice.present? ? choice == "ruby_llm" : Feature.use_ruby_llm?
   end
 
-  # Error facts resolve through the identity's own backend class, so a Groq
+  # Error facts resolve through the identity's policy class, so a Groq
   # or OpenRouter conversation served by RubyLLM still speaks Groq's or
   # OpenRouter's copy and billing URL, never the generic ones.
   def key_error_message
-    sdk_backend&.key_error_message || AIBackend.key_error_message
+    AIBackend::Policy.key_error_message_for(provider_identity)
   end
 
   def billing_url
-    sdk_backend&.billing_url
+    AIBackend::Policy.billing_url_for(provider_identity)
   end
 
   def provider_name
-    sdk_backend&.name&.demodulize || "AI"
+    AIBackend::Policy.for_identity(provider_identity)&.display_name || "AI"
   end
 
   def requires_token?

@@ -25,9 +25,9 @@ class LanguageModel < ApplicationRecord
   end
 
   def supports_tools?
-    # The identity's backend owns the provider policy (Groq's denial, say),
+    # The identity's policy owns the provider policy (Groq's denial, say),
     # regardless of whether the SDK or RubyLLM transport serves the request.
-    attributes["supports_tools"] && api_service.sdk_backend&.supports_tools?
+    attributes["supports_tools"] && AIBackend::Policy.for_identity(api_service.provider_identity)&.supports_tools?
   end
 
   def logo_filename
