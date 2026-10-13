@@ -54,6 +54,15 @@ class ApplicationController < ActionController::Base
     @nav_collections = Current.user.collections.ordered
   end
 
+  # Both toggle surfaces answer emoji reacts identically: 204 on toggle, 422 on a
+  # blank emoji. One helper so the two one-line actions cannot drift apart.
+  def answer_react(record)
+    record&.react!(params[:emoji], Current.user)
+    head :no_content
+  rescue ActiveRecord::RecordInvalid
+    head :unprocessable_content
+  end
+
   def set_system_ivars
     @system_ivars = public_ivars
   end

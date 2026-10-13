@@ -69,10 +69,7 @@ class MessagesController < ApplicationController
   end
 
   def react
-    @message.react!(params[:emoji], Current.user)
-    head :no_content
-  rescue ActiveRecord::RecordInvalid
-    head :unprocessable_content
+    answer_react(@message)
   end
 
   def unreact

@@ -88,10 +88,7 @@ class ConversationsController < ApplicationController
   end
 
   def react
-    @conversation&.react!(params[:emoji], Current.user)
-    head :no_content
-  rescue ActiveRecord::RecordInvalid
-    head :unprocessable_content
+    answer_react(@conversation)
   end
 
   def unreact
