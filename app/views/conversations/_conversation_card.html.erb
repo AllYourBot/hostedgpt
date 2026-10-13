@@ -26,40 +26,10 @@
     <%= render "conversations/save_toggle", conversation: conversation, pinned: pinned, bookmarked: bookmarked, page_context: page_context %>
     <%# Counts plus picker, same optimistic fetch contract as the sidebar row: the endpoints
         answer 204, so no card stream is involved here. %>
-    <% user_emojis = conversation.user_emojis(Current.user) %>
-    <div data-controller="emoji-picker"
-      data-emoji-picker-react-url-value="<%= react_conversation_path(conversation) %>"
-      data-emoji-picker-unreact-url-value="<%= unreact_conversation_path(conversation) %>"
-      data-action="click@document->emoji-picker#close"
-      class="relative flex items-center gap-1"
-    >
-      <%= button_tag type: "button",
-        class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
-        data: {
-          role: "react-conversation",
-          action: "click->emoji-picker#toggle",
-          emoji_picker_target: "button",
-        },
-        title: t("app.conversations.ui.react") do %>
-        <%= icon "face-smile", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
-      <% end %>
-      <div data-emoji-picker-target="panel"
-        class="hidden absolute bottom-6 left-0 z-10 flex gap-1 p-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl"
-      >
-        <% %w[👍 ❤️ 🎉 😄 🤔 👎].each do |emoji| %>
-          <%= button_tag type: "button",
-            data: {
-              role: "react-emoji-conversation",
-              action: "click->emoji-picker#select",
-              emoji: emoji,
-              reacted: user_emojis.include?(emoji).to_s,
-            },
-            class: "cursor-pointer px-1 hover:scale-125" do %><%= emoji %><% end %>
-        <% end %>
-      </div>
-      <span data-emoji-picker-target="counts" class="flex items-center">
-        <%= render "reactions/counts", reactable: conversation %>
-      </span>
-    </div>
+    <%= render "reactions/picker", reactable: conversation,
+      react_url: react_conversation_path(conversation),
+      unreact_url: unreact_conversation_path(conversation),
+      button_role: "react-conversation", emoji_role: "react-emoji-conversation",
+      icon_size: 16, icon_class: "text-gray-500 dark:text-gray-300" %>
   </div>
 </div>

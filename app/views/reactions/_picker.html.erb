@@ -1,0 +1,41 @@
+<%# locals: (reactable:, react_url:, unreact_url:, button_role:, emoji_role:, icon_size:, icon_class: nil) %>
+<%# One emoji picker shape for the sidebar row, the card, and the message row: the same
+    panel, the same optimistic fetch contract, the same counts beside it. Only the
+    endpoints, roles, and icon size differ per surface. Rendered DOM is unchanged, so
+    the sortable ghost contract (the clone strips Stimulus wiring from its scenery
+    copy while the row's own controller stays connected) and all role-based tests hold. %>
+<% user_emojis = reactable.user_emojis(Current.user) %>
+<div data-controller="emoji-picker"
+  data-emoji-picker-react-url-value="<%= react_url %>"
+  data-emoji-picker-unreact-url-value="<%= unreact_url %>"
+  data-action="click@document->emoji-picker#close"
+  class="relative flex items-center gap-1"
+>
+  <%= button_tag type: "button",
+    class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+    data: {
+      role: button_role,
+      action: "click->emoji-picker#toggle",
+      emoji_picker_target: "button",
+    },
+    title: t("app.conversations.ui.react") do %>
+    <%= icon "face-smile", variant: :outline, size: icon_size, class: icon_class %>
+  <% end %>
+  <div data-emoji-picker-target="panel"
+    class="hidden absolute bottom-6 left-0 z-10 flex gap-1 p-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl"
+  >
+    <% %w[👍 ❤️ 🎉 😄 🤔 👎].each do |emoji| %>
+      <%= button_tag type: "button",
+        data: {
+          role: emoji_role,
+          action: "click->emoji-picker#select",
+          emoji: emoji,
+          reacted: user_emojis.include?(emoji).to_s,
+        },
+        class: "cursor-pointer px-1 hover:scale-125" do %><%= emoji %><% end %>
+    <% end %>
+  </div>
+  <span data-emoji-picker-target="counts" class="flex items-center">
+    <%= render "reactions/counts", reactable: reactable %>
+  </span>
+</div>
