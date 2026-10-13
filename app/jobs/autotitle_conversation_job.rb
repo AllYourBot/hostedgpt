@@ -50,7 +50,7 @@ class AutotitleConversationJob < ApplicationJob
       return nil
     end
 
-    document = JSON.parse(response)
+    document = JSON.parse(unfenced(response))
     topic = document.is_a?(Hash) ? document["topic"] : nil
 
     if topic.is_a?(String) && topic.present?
@@ -62,6 +62,12 @@ class AutotitleConversationJob < ApplicationJob
   rescue JSON::ParserError, TypeError, NoMethodError => e
     Rails.logger.warn("[AutotitleConversationJob] Unusable reply for conversation #{@conversation.id}: #{e.class}")
     nil
+  end
+
+  def unfenced(text)
+    return text unless text.is_a?(String)
+
+    text[/```(?:json)?\s*(.*?)\s*```/m, 1] || text
   end
 
   def system_message

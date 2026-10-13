@@ -25,11 +25,12 @@ class LanguageModel < ApplicationRecord
   end
 
   def supports_tools?
-    attributes["supports_tools"] && api_service.ai_backend&.supports_tools?
+    # The identity's backend owns the provider policy (Groq's denial, say),
+    # regardless of whether the SDK or RubyLLM transport serves the request.
+    attributes["supports_tools"] && api_service.sdk_backend&.supports_tools?
   end
 
   def logo_filename
-    return "meta_ai_logo.svg" if api_name.match?(/llama/i)
     api_service.logo_filename
   end
 

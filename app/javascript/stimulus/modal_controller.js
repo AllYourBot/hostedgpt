@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [ "dialog" ]
+  static outlets = [ "image-loader" ]
 
   open() {
     let element
@@ -12,6 +13,7 @@ export default class extends Controller {
       element = this.element
 
     element.showModal()
+    this.imageLoaderOutlets.forEach(loader => loader.load())
   }
 
   keydownQuestionOpen(event) {

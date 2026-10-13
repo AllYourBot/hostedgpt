@@ -173,18 +173,23 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
       end
     end
 
-    assert_equal AIBackend::RubyLLM.key_error_message, @message.reload.content_text
+    # The facts resolve through the identity's backend even though RubyLLM is
+    # dispatched, so the user sees OpenAI's copy, not the generic one.
+    assert_equal AIBackend::OpenAI.key_error_message, @message.reload.content_text
     assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
   end
 
-  test "a rate limit error renders the quota message and marks the message failed" do
+  test "a rate limit error renders the quota message with the identity's billing URL and marks the message failed" do
     stub_features(use_ruby_llm: true) do
       TestClient::RubyLLM::Chat.stub :error_to_raise, Faraday::TooManyRequestsError.new("quota exceeded") do
         assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       end
     end
 
+    # The dispatched transport is RubyLLM but the quota copy speaks for the
+    # service's identity: OpenAI's name and billing URL, not "RubyLLM" and nil.
     assert_includes @message.reload.content_text, "a quota error"
+    assert_includes @message.content_text, "You are using OpenAI so go here https://platform.openai.com/account/billing/overview"
     assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
   end
 end

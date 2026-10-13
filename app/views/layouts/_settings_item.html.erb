@@ -24,7 +24,7 @@
     data: { role: "name" } do
   %>
     <% if item.is_a?(Assistant) %>
-      <div id="profile" class="mr-2 w-7 h-7 bg-blue-200 rounded-full"></div>
+      <%= render partial: "layouts/assistant_avatar", locals: { assistant: item, size: 7, classes: "mr-2" } %>
     <% end %>
 
     <span class="<%= !item.is_a?(Assistant) && "ml-1 text-base" %>">

@@ -21,6 +21,54 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     assert_equal "Hello", @conversation.latest_message_for_version(:latest).content_text
   end
 
+  test "an image tool call attaches the generated image and redacts the base64 payload" do
+    @assistant.language_model.update!(supports_tools: true)
+
+    assert_difference "@conversation.messages.reload.length", 2 do
+      TestClient::OpenAI.stub :function, "image_generate_an_image" do
+        TestClient::OpenAI.stub :arguments, { image_generation_prompt: "A cartoon cat" } do
+          AIBackend::OpenAI.stub :generate_image, { b64_json: "BASE64_IMAGE_PAYLOAD", model: "gpt-image-1", provider: "OpenAI" } do
+            assert_enqueued_with(job: GetNextAIMessageJob) do
+              assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+            end
+          end
+        end
+      end
+    end
+
+    tool_message, assistant_reply = @conversation.messages.reload.order(:index).last(2)
+    assert_equal "tool", tool_message.role
+    assert_includes tool_message.content_text, "prompt_given"
+    refute_includes tool_message.content_text, "BASE64_IMAGE_PAYLOAD" # the payload is redacted from the saved tool message
+
+    document = assistant_reply.documents.sole
+    assert_equal "generated.png", document.filename
+    assert_equal "image/png", document.file.content_type
+  end
+
+  test "several image tool calls in one turn attach every generated image to the reply" do
+    @assistant.language_model.update!(supports_tools: true)
+    tool_messages = %w[call_dog_1 call_dog_2].map do |tool_call_id|
+      {
+        role: "tool",
+        tool_call_id:,
+        content_tool_calls: { id: tool_call_id, function: { name: "image_generate_an_image", arguments: { image_generation_prompt: "A cartoon dog" } } },
+        content: { prompt_given: "A cartoon dog", json_of_generated_image: Base64.strict_encode64("PNG #{tool_call_id}") }.to_json,
+      }
+    end
+
+    TestClient::OpenAI.stub :function, "image_generate_an_image" do
+      TestClient::OpenAI.stub :arguments, { image_generation_prompt: "A cartoon dog" } do
+        AIBackend::OpenAI.stub :get_tool_messages_by_calling, tool_messages do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id), "The job should finish"
+        end
+      end
+    end
+
+    assistant_reply = @conversation.messages.reload.order(:index).last
+    assert_equal ["PNG call_dog_1", "PNG call_dog_2"], assistant_reply.documents.map { |document| document.file.download }.sort, "Both generated images should be attached to the reply"
+  end
+
   test "populates a tool response call from the assistant and creates additional tool messages" do
     @assistant.language_model.update!(supports_tools: true)
 

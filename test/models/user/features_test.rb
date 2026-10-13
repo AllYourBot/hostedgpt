@@ -39,22 +39,25 @@ class User::FeaturesTest < ActiveSupport::TestCase
     assert_raises(KeyError) { @user.features[:voic] = true }
   end
 
-  test "RubyLLM is available for all three drivers in Phase 3" do
-    assert User::Features.ruby_llm_available?("openai")
-    assert User::Features.ruby_llm_available?("anthropic")
-    assert User::Features.ruby_llm_available?("gemini")
+  test "RubyLLM is available for every chat provider identity" do
+    assert User::Features.ruby_llm_available?(:openai)
+    assert User::Features.ruby_llm_available?(:anthropic)
+    assert User::Features.ruby_llm_available?(:gemini)
+    assert User::Features.ruby_llm_available?(:groq)
+    assert User::Features.ruby_llm_available?(:openrouter)
+    refute User::Features.ruby_llm_available?(:brave)
   end
 
-  test "derived backend names are valid and non-chat drivers are not" do
-    @user.features[:openai_ai_backend] = "ruby_llm"
+  test "derived backend names cover every chat provider identity, and nothing outside it" do
+    assert_equal %i[openai_ai_backend anthropic_ai_backend groq_ai_backend openrouter_ai_backend gemini_ai_backend],
+      User::Features.derived_backend_names
+
+    @user.features[:groq_ai_backend] = "sdk"
     @user.reload
-    assert_equal "ruby_llm", @user.features[:openai_ai_backend]
+    assert_equal "sdk", @user.features[:groq_ai_backend]
 
     error = assert_raises(KeyError) { @user.features[:brave_ai_backend] = "sdk" }
     assert_match "Did you typo a feature name?", error.message
-
-    assert_raises(KeyError) { @user.features[:groq_ai_backend] = "sdk" }
-    refute_includes User::Features.derived_backend_names, :groq_ai_backend
   end
 
   test "openrouter has its own backend choice row even though it rides the openai driver" do
@@ -63,34 +66,6 @@ class User::FeaturesTest < ActiveSupport::TestCase
     @user.features[:openrouter_ai_backend] = "sdk"
     @user.reload
     assert_equal "sdk", @user.features[:openrouter_ai_backend]
-  end
-
-  test "an explicit per-driver choice overrides an off site default, per driver" do
-    original = Feature.features_hash
-    Feature.features_hash = Feature.features.merge(use_ruby_llm: false)
-    Current.reset
-    @user.features[:openai_ai_backend] = "ruby_llm"
-    @user.reload
-
-    assert_equal "ruby_llm", @user.ruby_llm?("openai")
-    assert_equal false, @user.ruby_llm?("anthropic")
-  ensure
-    Feature.features_hash = original
-    Current.reset
-  end
-
-  test "an explicit per-driver choice overrides an on site default, per driver" do
-    original = Feature.features_hash
-    Feature.features_hash = Feature.features.merge(use_ruby_llm: true)
-    Current.reset
-    @user.features[:openai_ai_backend] = "sdk"
-    @user.reload
-
-    assert_equal "sdk", @user.ruby_llm?("openai")
-    assert_equal true, @user.ruby_llm?("gemini")
-  ensure
-    Feature.features_hash = original
-    Current.reset
   end
 
   test "choices written here are visible to Feature.enabled? after reload, and unset falls back to the site default" do

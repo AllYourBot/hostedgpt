@@ -1,6 +1,11 @@
 require "./lib/markdown_renderer"
 
 module MessagesHelper
+  # Every model can take a PDF (as extracted text if nothing else), but only some can see images.
+  def attachment_types_for(assistant)
+    assistant.supports_images? ? "image/*,.pdf" : ".pdf"
+  end
+
   def render_avatar_for(message)
     if message.user?
       render partial: "layouts/user_avatar",      locals: { user: Current.user,           size: 7, classes: "mt-1" }
@@ -27,25 +32,28 @@ module MessagesHelper
   end
 
   def format_for_display(message, append_inside_tag: nil)
-    if message_to_user_from_tool_call?(message)
+    parsed_tool_result = message_to_user_hash(message)
+    if parsed_tool_result
       function_name = message.content_tool_calls.dig(:function, :name)
-      message_to_user = JSON.parse(message.content_text)["message_to_user"]
+      message_to_user = parsed_tool_result["message_to_user"]
 
+      # Tools own their deep links: the tool result carries the URL itself.
+      # Only https URLs render; the sink is guarded because future tools may
+      # carry externally influenced URLs and link_to does not filter schemes.
+      if (link_url = safe_tool_link_url(parsed_tool_result["link_url"]))
+        return tool_result_link_to(message_to_user, link_url)
+      end
+
+      # The two search cases below are legacy fallbacks for rows persisted
+      # before tools carried link_url. The memory case is permanent: it links
+      # to an internal page no tool result carries.
       case function_name
       when "memory_remember_detail_about_user"
         return link_to message_to_user,
         settings_memories_path,
         { data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
-      when "googlesearch_google_search" # kept so old messages still render as a link
-        query = message_to_user.partition(":").last
-        return link_to message_to_user,
-        "https://www.google.com/search?q=#{URI.encode_www_form_component(query)}",
-        { target: :_blank, data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
-      when "bravesearch_brave_search"
-        query = message_to_user.partition(":").last
-        return link_to message_to_user,
-        "https://search.brave.com/search?q=#{URI.encode_www_form_component(query)}",
-        { target: :_blank, data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
+      when *LEGACY_SEARCH_TOOL_NAMES
+        return tool_result_link_to(message_to_user, legacy_search_url(function_name, message_to_user))
       else
         return content_tag(:span, message_to_user, class: "text-gray-400 dark:!text-gray-500")
       end
@@ -85,14 +93,42 @@ module MessagesHelper
   end
 
   def message_to_user_from_tool_call?(message)
-    return false if message.content_text.blank?
-    msg_hash = JSON.parse(message.content_text)
-    msg_hash.is_a?(Hash) && msg_hash["message_to_user"].present?
-  rescue JSON::ParserError
-    false
+    message_to_user_hash(message).present?
   end
 
   private
+
+  # Rows persisted before tools carried link_url still render as links, built
+  # exactly as they always were.
+  LEGACY_SEARCH_TOOL_NAMES = %w[googlesearch_google_search bravesearch_brave_search].freeze
+
+  def legacy_search_url(function_name, message_to_user)
+    query = message_to_user.partition(":").last
+    return Toolbox::BraveSearch.search_url(query) if function_name == "bravesearch_brave_search"
+
+    "https://www.google.com/search?q=#{URI.encode_www_form_component(query)}"
+  end
+
+  def message_to_user_hash(message)
+    @message_to_user_hashes ||= {}
+    @message_to_user_hashes[message.content_text] ||= begin
+      return nil if message.content_text.blank?
+      hash = JSON.parse(message.content_text)
+      hash.is_a?(Hash) && hash["message_to_user"].present? ? hash : nil
+    rescue JSON::ParserError
+      nil
+    end
+  end
+
+  # Tool-result deep links are https-only. Anything else (javascript:, data:,
+  # malformed) falls back to plain text rather than rendering as an anchor.
+  def safe_tool_link_url(url)
+    url.to_s.start_with?("https://") && url
+  end
+
+  def tool_result_link_to(text, url)
+    link_to text, url, target: :_blank, data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline"
+  end
 
   def block_code
     ->(code, language) do

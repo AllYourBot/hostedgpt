@@ -16,8 +16,15 @@ class Toolbox::BraveSearch < Toolbox
 
     {
       message_to_user: "Web query: #{query_s}",
-      query_results: results.presence || "No results found."
+      query_results: results.presence || "No results found.",
+      link_url: self.class.search_url(query_s)
     }
+  end
+
+  # The one builder for Brave search deep links; the message helper's legacy
+  # fallback for pre-link_url rows uses it too.
+  def self.search_url(query_s)
+    "https://search.brave.com/search?q=#{URI.encode_www_form_component(query_s)}"
   end
 
   private

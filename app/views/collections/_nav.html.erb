@@ -1,0 +1,53 @@
+<%# locals: (collections:) %>
+<section
+  id="collections"
+  data-controller="transition"
+  data-transition-toggle-class="hidden"
+  class="flex flex-col mt-4"
+>
+  <div class="flex justify-between items-center mb-1 pl-2 pr-2 mr-5 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 focus-within:bg-gray-100 dark:focus-within:bg-gray-700 group">
+    <%= link_to collections_path, class: "flex-1 flex items-center py-1", data: { role: "collections" } do %>
+      <%= icon "folder", variant: :outline, size: 18, class: "text-gray-950 dark:text-gray-100" %>
+      <span class="ml-2 font-semibold"><%= t("app.navigation.collections") %></span>
+    <% end %>
+    <div class="self-stretch inline-flex items-center outline-none dropdown dropdown-end">
+      <%= icon "ellipsis-horizontal",
+        tabindex: 0,
+        role: :button,
+        variant: :micro,
+        size: 18,
+        class: "outline-none text-gray-950 dark:text-gray-100 invisible group-hover:visible group-focus-within:visible cursor-pointer",
+        data: { controller: "nested-pointer" },
+        title: t("app.collections.ui.more")
+      %>
+      <menu tabindex="0" class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 top-full dark:!bg-gray-700" data-controller="nested-pointer">
+        <li><%= link_to new_collection_path, data: { role: "new-collection" } do %><%= icon "plus", variant: :outline, size: 18 %><%= t("app.collections.new_title") %><% end %></li>
+      </menu>
+    </div>
+  </div>
+
+  <% collections.each_with_index do |collection, index| %>
+    <% visible = index < Collection::MAX_LIST_DISPLAY %>
+    <%= link_to collection.name, edit_collection_path(collection),
+      id: dom_id(collection),
+      class: class_names(
+        "mb-1 py-1 pl-9 pr-2 mr-5 rounded-lg text-sm text-gray-950 dark:text-gray-100 truncate hover:bg-gray-100 dark:hover:bg-gray-700",
+        hidden: !visible
+      ),
+      data: { role: "collection", transition_target: !visible && "transitionable" } %>
+  <% end %>
+
+  <%= button_tag type: "button",
+    class: class_names(
+      "flex text-sm rounded-lg mb-1 p-1 pl-2 pr-2 mr-5 hover:bg-gray-100 dark:hover:bg-gray-700 pointer",
+      hidden: collections.size <= Collection::MAX_LIST_DISPLAY
+    ),
+    data: {
+      role: "show-all-collections",
+      transition_target: "transitionable",
+      action: "transition#toggleClass"
+    } do %>
+    <%= icon "chevron-down", variant: :mini, class: "text-gray-500 ml-[2px] mr-[14px]" %>
+    <%= t("app.collections.ui.show_all") %>
+  <% end %>
+</section>

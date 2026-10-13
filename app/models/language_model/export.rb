@@ -8,6 +8,7 @@ module LanguageModel::Export
     supports_images
     supports_tools
     supports_system_message
+    supports_pdf
   ]
 
   DEFAULT_MODEL_FILE = "models.yml"
@@ -42,8 +43,11 @@ module LanguageModel::Export
       models.each do |model|
         model = model.with_indifferent_access
         users.each do |user|
+          if model[:api_service_name]
+            api_service = user.api_services.find_by(name: model[:api_service_name]) or next
+          end
           lm = user.language_models.find_or_initialize_by(api_name: model[:api_name])
-          lm.api_service = user.api_services.find_by(name: model[:api_service_name]) if model[:api_service_name]
+          lm.api_service = api_service if api_service
           lm.assign_attributes(model.except(:api_service_name))
           lm.save!
         rescue ActiveRecord::RecordInvalid => e

@@ -4,8 +4,8 @@
 <% if user.has_profile_picture? && user.profile_picture.variable? %>
   <picture
     class="
-      rounded-full
-      w-<%= size %> h-<%= size %>
+      block rounded-full
+      <%= square_size_classes(size) %>
       overflow-hidden
       border border-gray-200 dark:border-gray-600
       <%= classes %>
@@ -19,7 +19,7 @@
   <picture
     class="
       rounded-full
-      w-<%= size %> h-<%= size %>
+      <%= square_size_classes(size) %>
       bg-green-200 text-black
       flex justify-center items-center
       <%= text_size %>

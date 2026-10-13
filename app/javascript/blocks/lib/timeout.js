@@ -19,6 +19,21 @@ g.runEvery = (timeInSec, func) => {
   return timeout
 }
 
+// Like runEvery but each wait is a random length between minSec and maxSec, so repeated sounds don't feel mechanical
+g.runEveryBetween = (minSec, maxSec, func) => {
+  const timeout = new TimeoutService('setTimeout')
+  const scheduleNext = () => {
+    timeout.handler = setTimeout(timeout.func, (minSec + Math.random() * (maxSec - minSec)) * 1000)
+  }
+  timeout.func = () => {
+    timeout.executed = true
+    func()
+    if (!timeout.cleared) scheduleNext()
+  }
+  scheduleNext()
+  return timeout
+}
+
 g.sleep = async(s) => {
   return await new Promise(r => setTimeout(r, s*1000))
 }

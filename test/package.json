@@ -1,0 +1,10 @@
+{
+  "name": "hostedgpt-javascript-tests",
+  "private": true,
+  "scripts": {
+    "test": "cd .. && bin/blocks test"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

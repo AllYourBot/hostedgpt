@@ -35,6 +35,17 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     assert_equal "Claude Summary", conversation.reload.title
   end
 
+  test "a topic wrapped in a markdown json fence is still used" do
+    conversation = conversations(:hello_claude)
+    conversation.update!(title: nil)
+
+    TestClient::Anthropic.stub :text, "```json\n{ \"topic\": \"Vermont's capital\" }\n```" do
+      AutotitleConversationJob.perform_now(conversation.id)
+    end
+
+    assert_equal "Vermont's capital", conversation.reload.title, "The fence should be stripped before parsing the JSON"
+  end
+
   test "gemini conversations are titled through the same intent path" do
     conversation = conversations(:gemini_conversation)
     conversation.update!(title: nil)

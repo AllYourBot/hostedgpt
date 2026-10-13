@@ -37,6 +37,7 @@ module TestClient
       @@instruction = nil
       @@parameters = nil
       Images.parameters = nil
+      Audio.parameters = nil
     end
 
     def self.api_oneoff_response
@@ -136,6 +137,29 @@ module TestClient
 
     def images
       self.class.images
+    end
+
+    def self.audio
+      @audio ||= Audio.new
+    end
+
+    def audio
+      self.class.audio
+    end
+
+    class Audio
+      class << self
+        attr_accessor :parameters
+      end
+
+      def parameters
+        self.class.parameters
+      end
+
+      def speech(parameters:)
+        self.class.parameters = parameters
+        "TEST_WAV_BYTES"
+      end
     end
 
     class Images

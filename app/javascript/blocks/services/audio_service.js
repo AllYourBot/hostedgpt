@@ -14,17 +14,27 @@ export default class extends Service {
   }
 
   playEvery(interval, audio) {
+    stopLooping()
     $.loopHandler = runEvery(interval, () => _doThePlaying(audio))
+  }
+
+  playRandomlyEvery(minInterval, maxInterval, sounds) {
+    stopLooping()
+    $.loopHandler = runEveryBetween(minInterval, maxInterval, () => _doThePlaying(sounds.sample(), null, 0.9 + Math.random() * 0.2))
+  }
+
+  stopLooping() {
+    $.loopHandler?.end()
   }
 
   async play(audioUrlOrName, onEnd) {
     if (!$.player) return
-    $.loopHandler?.end()
+    stopLooping()
 
     await _doThePlaying(audioUrlOrName, onEnd)
   }
 
-  async _doThePlaying(audioUrlOrName, onEnd) {
+  async _doThePlaying(audioUrlOrName, onEnd, rate = 1) {
     $.playing = true
     try {
       if ($.playerSource) {
@@ -41,6 +51,7 @@ export default class extends Service {
 
       $.playerSource = $.player.createBufferSource()
       $.playerSource.buffer = audioBuffer
+      $.playerSource.playbackRate.value = rate
       $.playerSource.connect($.player.destination)
 
       gainNode = $.player.createGain()
@@ -53,14 +64,19 @@ export default class extends Service {
         if (onEnd) onEnd()
       }
 
+      if ($.player.state == 'suspended') await $.player.resume() // a suspended context never plays, so onended would never fire
       $.playerSource.start()
     } catch(e) {
-      console.log(e)
-      // one cause of exception is if we pause immediately after calling play
+      // e.g. audio that can't be decoded, or pausing immediately after calling play. Finish anyway: a caller
+      // waiting on onEnd would otherwise wait forever, leaving the speaker busy and the transcriber covered.
+      log(`audio play failed ${e}`)
+      $.playing = false
+      if (onEnd) onEnd()
     }
   }
 
   stop() {
+    stopLooping()
     if ($.playerSource) {
       $.playerSource.onended = null
       $.playerSource.stop()

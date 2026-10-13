@@ -89,3 +89,28 @@ test('runEvery type is correct', async() => {
   timeout = runEvery(1, () => {})
   expect(timeout.type).toBe('setInterval')
 })
+
+// runEveryBetween
+
+test('runEveryBetween keeps running at intervals within the range until ended', async() => {
+  let counter = 0
+  timeout = runEveryBetween(0.1, 0.2, () => { counter += 1 })
+
+  await sleep(0.7)
+  expect(counter).toBeGreaterThanOrEqual(3)
+  expect(counter).toBeLessThanOrEqual(7)
+
+  timeout.end()
+  const counterWhenEnded = counter
+  await sleep(0.4)
+  expect(counter).toBe(counterWhenEnded)
+})
+
+test('runEveryBetween stops rescheduling when ended from within its own function', async() => {
+  let counter = 0
+  timeout = runEveryBetween(0.05, 0.1, () => { counter += 1; timeout.end() })
+
+  await sleep(0.4)
+  expect(counter).toBe(1)
+  expect(timeout.cleared).toStrictEqual(true)
+})

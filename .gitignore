@@ -60,3 +60,4 @@
 /client/.idea/*
 vendor/bundle
 .kamal/
+/test/node_modules

@@ -5,6 +5,14 @@ class AIBackend
 
   class ConfigurationError < StandardError; end
 
+  VOICE_INSTRUCTIONS = <<~TEXT.squish
+    The user is speaking to you out loud and your reply will be read aloud by a text-to-speech voice.
+    Reply the way a person would talk in conversation: keep it brief, usually a few sentences, and let the user ask for more.
+    Do not use markdown, bullet points, numbered lists, headings, tables, emoji, or code blocks.
+    Write out anything that is awkward to hear, such as symbols, abbreviations, and URLs.
+    If the user asks for code or something long, summarize it in a sentence or two and offer to type out the details.
+  TEXT
+
   attr :client
 
   def self.oneoff_timeout_seconds
@@ -45,8 +53,17 @@ class AIBackend
       @client.send(client_method_name, ** @client_config)
     end
 
-    response.dig("content", 0, "text") ||
+    self.class.content_text(response) ||
       response.dig("choices", 0, "message", "content")
+  end
+
+  # The text of an Anthropic-style response. Models that think by default can put
+  # a thinking block first, so this looks for the text block rather than taking the first one.
+  def self.content_text(response)
+    content = response["content"]
+    return nil unless content.is_a?(Array)
+
+    content.find { |block| block["type"] == "text" }&.dig("text")
   end
 
   def stream_next_conversation_message(&chunk_handler)
@@ -141,6 +158,28 @@ class AIBackend
     raise NotImplementedError
   end
 
+  def conversation_history
+    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).to_a
+  end
+
+  # The current time rides on the newest message the user wrote rather than in the system prompt,
+  # so the instructions and the history before that message stay a stable prefix providers can cache.
+  def latest_user_message(history)
+    history.select(&:user?).last
+  end
+
+  # On the first message rather than the latest, so the attachments stay in the prefix providers cache.
+  def documents_for(message, history)
+    first_user_message = history.find(&:user?)
+    return message.documents.to_a unless message == first_user_message
+
+    @assistant.context_attachments + message.documents.to_a
+  end
+
+  def current_time_note
+    "For the user, the current time is #{DateTime.current.strftime("%-l:%M%P")}; the current date is #{DateTime.current.strftime("%A, %B %-d, %Y")}"
+  end
+
   def full_instructions
     s = @assistant.instructions.to_s
 
@@ -149,7 +188,11 @@ class AIBackend
       s += @user.memories.pluck(:detail).join("\n")
     end
 
-    s += "\n\nFor the user, the current time is #{DateTime.current.strftime("%-l:%M%P")}; the current date is #{DateTime.current.strftime("%A, %B %-d, %Y")}"
+    if (context = @assistant.context_prompt).present?
+      s += "\n\n#{context}"
+    end
+
+    s += "\n\n#{VOICE_INSTRUCTIONS}" if @message&.replying_to_speech?
     s.strip
   end
 end

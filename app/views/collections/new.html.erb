@@ -1,0 +1,7 @@
+<%= render layout: "page" do %>
+  <div class="mx-auto md:w-2/3 w-full">
+    <h1 class="text-3xl"><%= t("app.collections.new_title") %></h1>
+
+    <%= render "form", collection: @collection %>
+  </div>
+<% end %>

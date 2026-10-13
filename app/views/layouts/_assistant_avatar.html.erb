@@ -1,6 +1,6 @@
 <%# locals: (assistant:, size:, classes: nil) -%>
 <% initials_font_size = assistant.initials.to_s.length > 1 ? "text-[10px] tracking-tighter" : (size > 6 ? "text-sm" : "text-xs") %>
-<% shared_classes = "rounded-full w-#{size} h-#{size} #{classes}" %>
+<% shared_classes = "rounded-full #{square_size_classes(size)} #{classes}" %>
 <% logo = assistant.logo_filename %>
 
 <% if logo %>

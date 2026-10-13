@@ -20,6 +20,7 @@ class Toolbox::BraveSearchTest < ActiveSupport::TestCase
         result = @tool.brave_search(query_s: "Sandi Metz POODR")
 
         assert_equal "Web query: Sandi Metz POODR", result[:message_to_user]
+        assert_equal "https://search.brave.com/search?q=Sandi+Metz+POODR", result[:link_url]
         assert_equal (
           "POODR (https://www.poodr.com): Practical Object-Oriented Design in Ruby by Sandi Metz.\n" \
           "Sandi Metz (https://www.sandimetz.com): Sandi Metz's home page."

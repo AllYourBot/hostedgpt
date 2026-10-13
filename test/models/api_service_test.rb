@@ -43,9 +43,9 @@ class APIServiceTest < ActiveSupport::TestCase
   test "logo_filename" do
     assert_equal "openai_logo.svg", api_services(:keith_openai_service).logo_filename
     assert_equal "claude_logo.svg", api_services(:keith_anthropic_service).logo_filename
+    assert_equal "groq_logo.svg", api_services(:keith_groq_service).logo_filename
+    assert_equal "openrouter_logo.png", api_services(:keith_openrouter_service).logo_filename
     assert_equal "google_gemini_logo.svg", api_services(:keith_gemini_service).logo_filename
-    assert_nil api_services(:keith_groq_service).logo_filename
-    assert_nil api_services(:keith_openrouter_service).logo_filename
     assert_nil api_services(:keith_other_service).logo_filename
   end
 
@@ -54,13 +54,59 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
   end
 
-  test "backends resolve by driver, with Groq picked by the driver and URL pair" do
+  test "backends resolve by provider identity: the driver plus, for openai-dialect vendors, the canonical URL" do
     assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
     assert_equal AIBackend::Groq, language_models(:llama_3_3_70b_versatile).ai_backend
     assert_equal AIBackend::OpenRouter, language_models(:openrouter_gpt5).ai_backend
     assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
     assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
     assert_equal AIBackend::Gemini, language_models(:gemini_flash_1_5).ai_backend
+  end
+
+  test "provider identities resolve through the canonical URL, not the raw driver" do
+    assert_equal :openai, api_services(:keith_openai_service).provider_identity
+    assert_equal :groq, api_services(:keith_groq_service).provider_identity
+    assert_equal :openrouter, api_services(:keith_openrouter_service).provider_identity
+    assert_equal :anthropic, api_services(:keith_anthropic_service).provider_identity
+    assert_equal :gemini, api_services(:keith_gemini_service).provider_identity
+    assert_nil api_services(:keith_brave_service).provider_identity
+    assert_equal :openai, api_services(:keith_other_service).provider_identity # custom-URL openai-dialect service
+  end
+
+  test "error facts resolve through the identity's own backend, whatever transport serves the request" do
+    groq = api_services(:keith_groq_service)
+    openrouter = api_services(:keith_openrouter_service)
+
+    assert_equal AIBackend::Groq.key_error_message, groq.key_error_message
+    assert_equal "https://console.groq.com/keys", groq.billing_url
+    assert_equal "Groq", groq.provider_name
+    assert_equal AIBackend::OpenRouter.key_error_message, openrouter.key_error_message
+    assert_equal "https://openrouter.ai/credits", openrouter.billing_url
+
+    stub_features(use_ruby_llm: true) do
+      # RubyLLM is dispatched, but the facts still speak Groq and OpenRouter.
+      assert_equal AIBackend::RubyLLM, groq.ai_backend
+      assert_equal AIBackend::Groq.key_error_message, groq.key_error_message
+      assert_equal "https://console.groq.com/keys", groq.billing_url
+      assert_equal "Groq", groq.provider_name
+      assert_equal AIBackend::OpenRouter.billing_url, openrouter.reload.billing_url
+    end
+  end
+
+  test "an explicit choice overrides the site default at dispatch, per identity" do
+    user = api_services(:keith_openai_service).user
+
+    stub_features(use_ruby_llm: false) do
+      user.features[:openai_ai_backend] = "ruby_llm"
+      assert_equal AIBackend::RubyLLM, api_services(:keith_openai_service).reload.ai_backend
+      assert_equal AIBackend::Anthropic, api_services(:keith_anthropic_service).ai_backend
+    end
+
+    stub_features(use_ruby_llm: true) do
+      user.features[:openai_ai_backend] = "sdk"
+      assert_equal AIBackend::OpenAI, api_services(:keith_openai_service).reload.ai_backend
+      assert_equal AIBackend::RubyLLM, api_services(:keith_anthropic_service).ai_backend
+    end
   end
 
   test "openai-dialect services with custom URLs keep the OpenAI backend" do
@@ -80,6 +126,27 @@ class APIServiceTest < ActiveSupport::TestCase
 
     stub_features(default_llm_keys: false) do
       assert_equal "Error: API key (token) is blank", service.test_api_service
+    end
+  end
+
+  test "the Test button reports a RubyLLM error instead of raising" do
+    service = api_services(:keith_openai_service)
+
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::UnauthorizedError.new("401 bad key") do
+        assert_equal "Error: 401 bad key", service.test_api_service,
+          "Every model failing should surface the last error string to the Test button"
+      end
+    end
+  end
+
+  test "the Test button answers through RubyLLM when the flag is on" do
+    service = api_services(:keith_openai_service)
+
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :text, "Hi from RubyLLM" do
+        assert_equal "Hi from RubyLLM", service.test_api_service, "The Test button should return the model's reply"
+      end
     end
   end
 
@@ -160,6 +227,20 @@ class APIServiceTest < ActiveSupport::TestCase
 
   test "test_api_service returns a friendly error for drivers without an ai_backend" do
     assert_equal "Error: Testing is not supported for this API service.", api_services(:keith_brave_service).test_api_service
+  end
+
+  test "every chat provider identity maps to an sdk backend" do
+    {
+      openai: [ :openai, APIService::URL_OPEN_AI ],
+      anthropic: [ :anthropic, APIService::URL_ANTHROPIC ],
+      groq: [ :openai, APIService::URL_GROQ ],
+      openrouter: [ :openai, APIService::URL_OPENROUTER ],
+      gemini: [ :gemini, APIService::URL_GEMINI ],
+    }.each do |identity, (driver, url)|
+      service = APIService.new(driver: driver, url: url)
+      assert_equal identity, service.provider_identity
+      assert_not_nil service.sdk_backend, "identity #{identity} must map to a backend"
+    end
   end
 
   private

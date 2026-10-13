@@ -8,13 +8,41 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
 
   test "generate_an_image asks the current backend and composes the payload" do
     Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
-      AIBackend::OpenAI.stub :generate_image, { b64_json: "BASE64_IMAGE_DATA", model: "gpt-image-1" } do
+      AIBackend::OpenAI.stub :generate_image, { b64_json: "BASE64_IMAGE_DATA", model: "gpt-image-1", provider: "OpenAI" } do
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
         assert_equal @prompt, result[:prompt_given]
         assert_equal "BASE64_IMAGE_DATA", result[:json_of_generated_image]
         assert_includes result[:note_to_assistant], "image"
         assert_equal "Image created by tool using OpenAI model gpt-image-1", result[:message_to_user]
+      end
+    end
+  end
+
+  test "flag off: dispatch routes through ai_backend to the SDK backend" do
+    stub_features(use_ruby_llm: false) do
+      Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
+        called = false
+        AIBackend::OpenAI.stub :generate_image, ->(prompt:, user:) {
+          called = true
+          { b64_json: "BASE64_IMAGE_DATA", model: "gpt-image-1", provider: "OpenAI" }
+        } do
+          result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
+
+          assert called, "With the flag off, AIBackend::OpenAI should generate the image"
+          assert_equal "BASE64_IMAGE_DATA", result[:json_of_generated_image], "The generated image data should come back to the job"
+          assert_equal "Image created by tool using OpenAI model gpt-image-1", result[:message_to_user], "The user should see which model made the image"
+        end
+      end
+    end
+  end
+
+  test "the provider label follows the backend that actually generated the image" do
+    Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
+      AIBackend::OpenAI.stub :generate_image, { b64_json: "BASE64_IMAGE_DATA", model: "acme-image-2", provider: "Acme" } do
+        result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
+
+        assert_equal "Image created by tool using Acme model acme-image-2", result[:message_to_user]
       end
     end
   end
@@ -27,7 +55,7 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
       openai_received = nil
       AIBackend::OpenAI.stub :generate_image, ->(prompt:, user:) {
         openai_received = { prompt: prompt, user: user }
-        { b64_json: "BASE64_IMAGE_DATA_ANTHROPIC", model: "gpt-image-1" }
+        { b64_json: "BASE64_IMAGE_DATA_ANTHROPIC", model: "gpt-image-1", provider: "OpenAI" }
       } do
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
@@ -38,12 +66,14 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
     end
   end
 
-  test "generate_an_image surfaces the backend error when no OpenAI service is configured" do
+  test "generate_an_image appends the current assistant context to the backend key error" do
     users(:keith).api_services.update_all(deleted_at: Time.current) # rubocop:disable Rails/SkipsModelValidations
 
     Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
       error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
+      expected_backend = messages(:image_generation_tool_call).assistant.language_model.api_service.name
       assert_includes error.message, "OpenAI API key not found"
+      assert_includes error.message, "to use image generation with #{expected_backend}."
     end
   end
 end

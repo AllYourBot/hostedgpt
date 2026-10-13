@@ -21,10 +21,6 @@
   <%= javascript_tag do %>
     iosPWASplash('/apple-touch-icon.png', '#ffffff')
   <% end %>
-  <%= javascript_tag do %>
-    // HACK: Fix before we default-enable the voice Feature
-    openAIKey = "<%= Feature.voice? && Current.user&.api_services&.openai&.with_token&.first&.token %>"
-  <% end %>
   <!-- /ios-pwa-splash screen-->
   <!-- /PWA -->
   <%= render "application/head/favicons" %>

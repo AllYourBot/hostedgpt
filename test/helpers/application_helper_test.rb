@@ -30,6 +30,18 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "pQ", at_most_two_initials("p v Q")
   end
 
+  test "square_size_classes spells out the width and height so tailwind can find them" do
+    assert_equal "w-7 h-7", square_size_classes(7)
+  end
+
+  test "square_size_classes raises on a size tailwind would not have generated" do
+    assert_raises(KeyError) { square_size_classes(99) }
+  end
+
+  test "spinner is sized through square_size_classes" do
+    assert_includes spinner(size: 6), "w-6 h-6"
+  end
+
   # Profile picture helper tests
   test "user_avatar_image_tag returns nil when user has no profile picture" do
     user = users(:keith)

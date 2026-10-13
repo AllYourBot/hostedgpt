@@ -5,6 +5,7 @@ de:
       settings: "Einstellungen"
       logout: "Abmelden"
       assistants: "Assistenten"
+      collections: "Sammlungen"
     settings:
       title: "Einstellungen"
       home: "Startseite"
@@ -78,6 +79,13 @@ de:
         cancel: "Abbrechen"
         menu:
           new: "Neuer Assistent"
+        context:
+          title: "Kontext"
+          hint: "Hier hochgeladene Text- und PDF-Dateien werden in jeder Unterhaltung in die Anweisungen dieses Assistenten aufgenommen."
+          none: "Noch keine Dateien hochgeladen."
+          upload: "Datei hochladen"
+          remove: "Entfernen"
+          confirm_remove: "Diese Datei entfernen?"
         form:
           name: "Name"
           slug: "Slug"
@@ -158,13 +166,13 @@ de:
             light: "Hell"
             system: "System"
           ai_backends: "KI-Backends"
-          ai_backends_description: "Welche Implementierung jeden Anbieter bedient. Standard folgt der globalen Einstellung (aktuell %{current}). RubyLLM wird wählbar, sobald es ausgerollt ist."
+          ai_backends_description: "Welche Implementierung jeden Anbieter bedient. Standard folgt der globalen Einstellung (aktuell %{current})."
           backend_choice_default: "Standard"
           backend_choice_ruby_llm: "RubyLLM"
           backend_choice_sdk: "Integriertes SDK"
-          backend_choice_aria_default: "%{driver}: Standard"
-          backend_choice_aria_ruby_llm: "%{driver}: RubyLLM"
-          backend_choice_aria_sdk: "%{driver}: integriertes SDK"
+          backend_choice_aria_default: "%{provider}: Standard"
+          backend_choice_aria_ruby_llm: "%{provider}: RubyLLM"
+          backend_choice_aria_sdk: "%{provider}: integriertes SDK"
           enable_tools: "Tools für Assistenten aktivieren"
           enable_tools_note: "Hinweis für Entwickler: Die entsprechende API (Gmail, Google Tasks) muss auch in der Google Cloud Console für das Projekt hinter dem OAuth-Client dieser App aktiviert sein, sonst schlägt die Verbindung fehl."
           gmail_section: "Gmail:"
@@ -258,6 +266,31 @@ de:
       index_title: "Assistenten"
       ui:
         new: "Neu"
+        more: "Mehr"
+        show_all: "Alle anzeigen"
+    collections:
+      index_title: "Sammlungen"
+      new_title: "Neue Sammlung"
+      edit_title: "Sammlung bearbeiten"
+      delete: "Löschen"
+      confirm_delete: "Sind Sie sicher?"
+      cancel: "Abbrechen"
+      form:
+        name: "Name"
+        description: "Beschreibung"
+        save: "Speichern"
+        saving: "Speichere..."
+        errors_title:
+          one: "%{count} Fehler hat das Speichern dieser Sammlung verhindert:"
+          other: "%{count} Fehler haben das Speichern dieser Sammlung verhindert:"
+      files:
+        title: "Dateien"
+        hint: "Hier hochgeladene Text-, PDF- und Bilddateien werden in dieser Sammlung aufbewahrt."
+        none: "Noch keine Dateien hochgeladen."
+        upload: "Datei hochladen"
+        remove: "Entfernen"
+        confirm_remove: "Diese Datei entfernen?"
+      ui:
         more: "Mehr"
         show_all: "Alle anzeigen"
     conversations:
@@ -373,10 +406,16 @@ de:
         tested: "Getestet: %{answer}"
         deleted: "Gelöscht"
         not_found: "Der API-Dienst konnte nicht gefunden werden"
+      collections:
+        saved: "Gespeichert"
+        deleted: "Gelöscht"
+        deleted_full: "Die Sammlung wurde gelöscht"
       memories:
         forgotten: "Vergessen"
         cleared: "Speicher gelöscht"
       documents:
+        uploaded: "Datei hochgeladen"
+        removed: "Datei entfernt"
         created: "Dokument wurde erfolgreich erstellt."
         updated: "Dokument wurde erfolgreich aktualisiert."
         destroyed: "Dokument wurde erfolgreich gelöscht."

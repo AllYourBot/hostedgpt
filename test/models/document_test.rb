@@ -15,6 +15,10 @@ class DocumentTest < ActiveSupport::TestCase
     assert_instance_of Assistant, documents(:background).assistant
   end
 
+  test "has an associated collection" do
+    assert_instance_of Collection, documents(:lasagna_recipe).collection
+  end
+
   test "has an associated message" do
     assert_instance_of Message, documents(:cat_photo).message
   end
@@ -45,6 +49,42 @@ class DocumentTest < ActiveSupport::TestCase
     assert document.file.attached?
   end
 
+  test "defaults the user to the collection's user when attached to a COLLECTION" do
+    file = Rack::Test::UploadedFile.new(file_fixture("test_document.txt"), "text/plain")
+    document = Document.create!(collection: collections(:taxes), file: file)
+
+    assert_equal collections(:taxes).user, document.user, "The document should belong to whoever owns the collection"
+  end
+
+  test "defaults the user to the assistant's user when attached to an assistant" do
+    file = Rack::Test::UploadedFile.new(file_fixture("test_document.txt"), "text/plain")
+    document = Document.create!(assistant: assistants(:samantha), file: file)
+
+    assert_equal assistants(:samantha).user, document.user
+    assert_equal "test_document.txt", document.filename
+  end
+
+  test "text_content returns the contents of a plain text file" do
+    file = Rack::Test::UploadedFile.new(file_fixture("test_document.txt"), "text/plain")
+    document = Document.create!(assistant: assistants(:samantha), file: file)
+
+    assert document.has_text?
+    assert_includes document.text_content, "This is a text document"
+  end
+
+  test "text_content is nil for an image" do
+    file = Rack::Test::UploadedFile.new(file_fixture("cat.png"), "image/png")
+    document = Document.create!(assistant: assistants(:samantha), file: file)
+
+    refute document.has_text?
+    assert_nil document.text_content
+  end
+
+  test "text_content is nil when no file is attached" do
+    refute documents(:background).has_text?
+    assert_nil documents(:background).text_content
+  end
+
   test "image_url returns data url when app_url is not set" do
     stub_custom_config_value(:app_url, "") do
       url = documents(:cat_photo).image_url(:small)
@@ -52,6 +92,37 @@ class DocumentTest < ActiveSupport::TestCase
       assert url.starts_with?("data:image/png;base64,")
       assert url.length > 40000
     end
+  end
+
+  test "file_base64 downloads each variant only once per document" do
+    document = documents(:cat_photo)
+    downloads = 0
+    counter = ActiveSupport::Notifications.subscribe("service_download.active_storage") { downloads += 1 }
+
+    2.times { document.file_base64(:small) }
+    2.times { document.file_base64(:large) }
+
+    assert_equal 2, downloads, "Each variant should be downloaded once, however often it is encoded"
+  ensure
+    ActiveSupport::Notifications.unsubscribe(counter)
+  end
+
+  test "image_link_url is a redirect path when app_url IS NOT SET" do
+    stub_custom_config_value(:app_url, "") do
+      assert documents(:cat_photo).image_link_url(:large).starts_with?("/rails/active_storage/representations/redirect/"), "Without an app_url the link should be a redirect path, not a data URL"
+    end
+  end
+
+  test "image_link_url is the processed url when app_url IS SET and the variant exists" do
+    documents(:cat_photo).send(:wait_for_file_variant_to_process!, :large)
+
+    stub_custom_config_value(:app_url, "https://example.com") do
+      assert documents(:cat_photo).image_link_url(:large).starts_with?("https://example.com/rails/active_storage/postgresql/"), "A processed variant should link straight to the file"
+    end
+  end
+
+  test "image_link_url is nil for a document WITHOUT an image" do
+    assert_nil documents(:background).image_link_url(:large), "A document without an image has nothing to link"
   end
 
   test "has_file_variant_processed?" do

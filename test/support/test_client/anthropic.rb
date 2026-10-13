@@ -9,6 +9,12 @@ module TestClient
       nil
     end
 
+    # Stub with a string to put a thinking block before the text, as models that
+    # think by default (Claude Opus 5, Sonnet 5 and later) can return.
+    def self.thinking
+      nil
+    end
+
     def self.function
       raise "Attempting to return a function response but .function method is not stubbed."
     end
@@ -40,6 +46,7 @@ module TestClient
       @@messages_args = args
       model = args.dig(:model) || "no model"
       system_message = args.dig(:system)
+      system_message = system_message.pluck(:text).join if system_message.is_a?(Array)
       tools = args.dig(:parameters, :tools)
 
       if proc = args.dig(:parameters, :stream)
@@ -67,8 +74,11 @@ module TestClient
           "type"=>"message",
           "role"=>"assistant",
           "content"=>
-            [{"type"=>"text",
-              "text"=> self.class.text || self.class.default_text(model, system_message)}],
+            [
+              *([{"type"=>"thinking", "thinking"=>self.class.thinking, "signature"=>"sig"}] if self.class.thinking),
+              {"type"=>"text",
+                "text"=> self.class.text || self.class.default_text(model, system_message)}
+            ],
           "model"=> model,
           "stop_reason"=>"end_turn",
           "stop_sequence"=>nil,

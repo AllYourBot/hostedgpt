@@ -90,7 +90,6 @@ export default class extends Controller {
   }
 
   async doPermissionPrompts() {
-    await Listener.$.screenService.start()
     // await Approve.Microphone.access() - this version doesn't return true or false
     let micApproved = await Approve.Transcriber.access()
     if (!micApproved) return false

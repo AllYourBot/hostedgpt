@@ -126,30 +126,30 @@
       </p>
       <div class="pl-3 mt-2">
         <div class="flex items-center gap-8 mb-1 text-sm text-gray-500 dark:text-gray-400">
-          <span class="w-28"></span>
-          <span class="w-32"><%= t("app.settings.people.form.backend_choice_default") %></span>
-          <span class="w-32"><%= t("app.settings.people.form.backend_choice_ruby_llm") %></span>
-          <span class="w-32"><%= t("app.settings.people.form.backend_choice_sdk") %></span>
+          <span class="w-28 shrink-0"></span>
+          <span class="flex-1 text-center"><%= t("app.settings.people.form.backend_choice_default") %></span>
+          <span class="flex-1 text-center"><%= t("app.settings.people.form.backend_choice_ruby_llm") %></span>
+          <span class="flex-1 text-center"><%= t("app.settings.people.form.backend_choice_sdk") %></span>
         </div>
         <% User::Features.derived_backend_names.each do |choice| %>
           <% backend = choice.to_s.delete_suffix("_ai_backend") %>
-          <% display_name = { "openai" => "OpenAI", "openrouter" => "OpenRouter" }.fetch(backend) { backend.humanize } %>
+          <% display_name = APIService.identity_display_name(backend) %>
           <% current_choice = Current.person.user.features[choice] %>
           <div class="flex items-center gap-8 py-1">
-            <span class="w-28 dark:text-gray-400"><%= display_name %></span>
-            <span class="w-32">
+            <span class="w-28 shrink-0 dark:text-gray-400"><%= display_name %></span>
+            <label class="flex-1 flex justify-center">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "", current_choice.blank?,
-                    aria: { label: t("app.settings.people.form.backend_choice_aria_default", driver: display_name) } %>
-            </span>
-            <span class="w-32">
+                    aria: { label: t("app.settings.people.form.backend_choice_aria_default", provider: display_name) } %>
+            </label>
+            <label class="flex-1 flex justify-center">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "ruby_llm", current_choice == "ruby_llm",
                     disabled: !User::Features.ruby_llm_available?(backend),
-                    aria: { label: t("app.settings.people.form.backend_choice_aria_ruby_llm", driver: display_name) } %>
-            </span>
-            <span class="w-32">
+                    aria: { label: t("app.settings.people.form.backend_choice_aria_ruby_llm", provider: display_name) } %>
+            </label>
+            <label class="flex-1 flex justify-center">
               <%= radio_button_tag "person[backend_choices][#{choice}]", "sdk", current_choice == "sdk",
-                    aria: { label: t("app.settings.people.form.backend_choice_aria_sdk", driver: display_name) } %>
-            </span>
+                    aria: { label: t("app.settings.people.form.backend_choice_aria_sdk", provider: display_name) } %>
+            </label>
           </div>
         <% end %>
       </div>

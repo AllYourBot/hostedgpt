@@ -1,6 +1,7 @@
 class Document < ApplicationRecord
   belongs_to :user
   belongs_to :assistant, optional: true
+  belongs_to :collection, optional: true
   belongs_to :message, optional: true
 
   has_one_attached :file
@@ -53,6 +54,13 @@ class Document < ApplicationRecord
     end
   end
 
+  def image_link_url(variant)
+    return nil unless has_image?
+    return fully_processed_url(variant) if Rails.application.config.x.app_url.present? && has_file_variant_processed?(variant)
+
+    redirect_to_processed_path(variant)
+  end
+
   def has_file_variant_processed?(variant)
     return false unless file.attached? && file.content_type&.start_with?("image/")
 
@@ -87,22 +95,36 @@ class Document < ApplicationRecord
   def file_base64(variant = :large)
     return nil if !file.attached?
 
-    if file.content_type&.start_with?("image/")
-      variant_obj = image_variant(variant)
-      return nil unless variant_obj
-
-      wait_for_file_variant_to_process!(variant.to_sym)
-      file_contents = variant_obj.processed.download
-    else
-      # For non-image files, just return the raw file content
-      file_contents = file.download
-    end
-
-    Base64.strict_encode64(file_contents)
+    @file_base64 ||= {}
+    @file_base64[variant.to_sym] ||= encode_file_base64(variant)
   end
 
   def has_document_pdf?
     file.attached? && file.content_type == "application/pdf"
+  end
+
+  TEXT_CONTENT_TYPES = %w[application/json application/xml application/x-yaml application/yaml application/javascript].freeze
+
+  def has_text?
+    return false unless file.attached?
+
+    file.content_type.to_s.start_with?("text/") || TEXT_CONTENT_TYPES.include?(file.content_type)
+  end
+
+  # The file's contents as a string the model can read, or nil for files we cannot turn into text (images, binaries).
+  def text_content
+    return extract_pdf_text if has_document_pdf?
+    return nil unless has_text?
+
+    file.download.force_encoding(Encoding::UTF_8).scrub
+  end
+
+  # The PDF as a labeled block of text, for a model that cannot read the PDF itself.
+  def pdf_as_text
+    text = extract_pdf_text
+    return "[PDF Document: #{filename} - Unable to extract text from this PDF]" if text.blank?
+
+    "[PDF Document: #{filename}]\n#{text}"
   end
 
   def extract_pdf_text
@@ -132,12 +154,27 @@ class Document < ApplicationRecord
 
   private
 
+  def encode_file_base64(variant)
+    if file.content_type&.start_with?("image/")
+      variant_obj = image_variant(variant)
+      return nil unless variant_obj
+
+      wait_for_file_variant_to_process!(variant.to_sym)
+      file_contents = variant_obj.processed.download
+    else
+      # For non-image files, just return the raw file content
+      file_contents = file.download
+    end
+
+    Base64.strict_encode64(file_contents)
+  end
+
   def file_data_url(variant = :large)
     "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
   end
 
   def set_default_user
-    self.user ||= message.conversation.user
+    self.user ||= assistant&.user || collection&.user || message&.conversation&.user
   end
 
   def set_default_filename

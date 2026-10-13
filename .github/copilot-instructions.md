@@ -15,7 +15,7 @@ HostedGPT is a Ruby on Rails 8.1 application providing a multi‑provider conver
 - Rails MVC + Hotwire (Turbo + Stimulus), Tailwind for styling.
 - Background job queue: SolidQueue (runs in Puma with `RUN_SOLID_QUEUE_IN_PUMA=true`).
 - Streaming tokens: ActionCable (PostgreSQL enhanced adapter).
-- AI abstraction: `AIBackend::<Provider>` classes in `app/services/ai_backend/` selected via `APIService#driver`.
+- AI abstraction: `AIBackend::<Provider>` classes in `app/services/ai_backend/`, dispatched by **provider identity** (`APIService#provider_identity`: driver + canonical URL for openai-dialect vendors) to the identity's `sdk_backend`, with `AIBackend::RubyLLM` as an alternative transport selected by per-identity choices or the `use_ruby_llm` flag.
 - Dynamic model & assistant provisioning: YAML seeds (`models.yml`, `assistants.yml`) imported per user on registration (`User::Registerable`).
 - Feature flags & settings: `config/options.yml` accessed through `Feature.*` / `Setting.*` helpers.
 - Message flow: `MessagesController` creates user messages; async job fetches assistant reply; streaming handled in backend-specific service.
@@ -33,10 +33,10 @@ HostedGPT is a Ruby on Rails 8.1 application providing a multi‑provider conver
 - `test/` – Minitest (system + unit); some provider calls mocked
 
 ## Supported Providers & Notes
-OpenAI, Anthropic, Groq (OpenAI-compatible), Google Gemini. Provider selection logic: `APIService#ai_backend`. Tools/function calling gated by both provider support and `language_model.supports_tools?` (Groq tools temporarily disabled inside that predicate).
+OpenAI, Anthropic, Groq (OpenAI-compatible), Google Gemini, OpenRouter. Provider selection logic: `APIService#ai_backend` (identity → `sdk_backend`, or `AIBackend::RubyLLM` per choice/flag). Tools/function calling gated by both provider support and `language_model.supports_tools?` (Groq's denial is pinned in `AIBackend::Groq.supports_tools?` and flows through the identity's backend regardless of transport).
 
 ## Adding a New AI Provider (Guideline)
-1. Add enum value to `APIService.driver` and constants for base URL.
+1. Add a base URL constant and map the provider in `APIService#provider_identity`, add an `sdk_backend` arm, and register it in `APIService.chat_provider_identities` (an unmapped driver silently yields nil backends).
 2. Implement `AIBackend::<NewProvider>` (model naming & streaming semantics similar to existing backends). Reuse shared utility methods in base `AIBackend` class.
 3. Handle test client stub for deterministic tests.
 4. Extend seeding (user registration hook) if you want automatic creation.

@@ -48,7 +48,7 @@ export default class extends Controller {
   }
 
   #persistColumn(form, open) {
-    const field = form?.elements["user[nav_closed]"]
+    const field = form?.elements["user[preferences][nav_closed]"]
     if (!field) return
 
     field.value = !open

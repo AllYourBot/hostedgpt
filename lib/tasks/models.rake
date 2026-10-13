@@ -18,6 +18,15 @@ namespace :models do
     users = User.all
     LanguageModel.import_from_file(path: args[:path], users:)
   end
+
+  desc "Refresh missing language models from the RubyLLM registry"
+  task refresh: :environment do
+    result = LanguageModel::RefreshFromRubyLLM.new.call
+    puts "Added #{result.added_count} language models from the RubyLLM registry"
+    if result.missing_provider_identities.any?
+      warn "No chat models found in the RubyLLM registry for: #{result.missing_provider_identities.join(', ')}"
+    end
+  end
 end
 
 Rake::Task["db:prepare"].enhance do

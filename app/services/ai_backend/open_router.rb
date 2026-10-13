@@ -14,6 +14,12 @@
 #   only when a concrete need arrives outside OpenAI compatibility (fallback
 #   chains, per-generation cost display)
 class AIBackend::OpenRouter < AIBackend::OpenAI
+  # OpenRouter attributes requests to this app in its rankings. Both the SDK
+  # transport (initialize) and the RubyLLM transport send these.
+  def self.attribution_headers
+    { "HTTP-Referer" => Rails.application.config.x.app_url.to_s, "X-Title" => Setting.product_name.to_s }
+  end
+
   def self.key_error_message
     "(You need to enter a valid API key for OpenRouter to use its models. Click your Profile in the bottom " +
       "left and then Settings and then **API Services**. You will find OpenRouter Key instructions.)"
@@ -25,11 +31,7 @@ class AIBackend::OpenRouter < AIBackend::OpenAI
 
   def initialize(user, assistant, conversation = nil, message = nil)
     super
-    # OpenRouter attributes requests to this app for its rankings. The headers
-    # are optional; TestClient::OpenAI mirrors add_headers so tests can assert them.
-    @client.add_headers(
-      "HTTP-Referer" => Rails.application.config.x.app_url.to_s,
-      "X-Title" => Setting.product_name.to_s
-    )
+    # TestClient::OpenAI mirrors add_headers so tests can assert them.
+    @client.add_headers(self.class.attribution_headers)
   end
 end

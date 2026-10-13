@@ -153,6 +153,10 @@ GEM
       ffi (>= 1.15.0)
       logger
     event_stream_parser (1.0.0)
+    exhale (0.2.0)
+      bigdecimal (~> 3.1)
+      herb (~> 0.11)
+      prism (~> 1.9)
     faraday (2.14.3)
       faraday-net_http (>= 2.0, < 3.5)
       json
@@ -194,6 +198,14 @@ GEM
     hashery (2.1.2)
     hashie (5.1.0)
       logger
+    herb (0.11.0-aarch64-linux-gnu)
+    herb (0.11.0-aarch64-linux-musl)
+    herb (0.11.0-arm-linux-gnu)
+    herb (0.11.0-arm-linux-musl)
+    herb (0.11.0-arm64-darwin)
+    herb (0.11.0-x86_64-darwin)
+    herb (0.11.0-x86_64-linux-gnu)
+    herb (0.11.0-x86_64-linux-musl)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
     image_processing (1.13.0)
@@ -615,6 +627,7 @@ DEPENDENCIES
   capybara
   debug
   dockerfile-rails (>= 1.6)
+  exhale
   ffi (~> 1.15.5)
   gemini-ai (~> 4.2.0)
   image_processing (~> 1.13.0)

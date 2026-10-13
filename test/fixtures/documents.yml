@@ -36,3 +36,9 @@ single_dog_photo:
   message: two_attachments
   filename: single_dog_photo.png
   bytes: 400
+
+lasagna_recipe:
+  <<: *DEFAULTS
+  collection: recipes
+  filename: lasagna.pdf
+  bytes: 2048

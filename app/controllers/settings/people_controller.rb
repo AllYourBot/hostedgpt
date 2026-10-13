@@ -35,8 +35,17 @@ class Settings::PeopleController < Settings::ApplicationController
                    .dig(:person, :backend_choices)
     return if choices.blank?
 
+    updates = {}
+    choices.each do |name, value|
+      value = value.presence
+      next if value.present? && !value.in?(User::Features::BACKEND_CHOICES) # the tri-state is enforced server-side, not just by the radios
+
+      updates[name.to_sym] = value
+    end
+    return if updates.empty?
+
     user = Current.person.reload.user   # merge against fresh state, not a stale session copy
-    choices.each { |name, value| user.features[name.to_sym] = value.presence }
+    User::Features.batch_merge(user, updates)
   end
 
   def check_personable_id

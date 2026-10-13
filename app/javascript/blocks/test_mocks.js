@@ -52,7 +52,8 @@ g.w = {
       disconnect: jest.fn(),
       start: jest.fn(),
       stop: jest.fn(),
-      buffer: null
+      buffer: null,
+      playbackRate: {value: 1},
     }),
 
     createGain: jest.fn().mockReturnValue({

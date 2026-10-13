@@ -20,6 +20,7 @@ class User < ApplicationRecord
   has_many :conversations, dependent: :destroy
   has_many :credentials, dependent: :destroy
   has_many :memories, dependent: :destroy
+  has_many :collections, dependent: :destroy
 
   has_one :password_credential, -> { type_is("PasswordCredential") }, class_name: "Credential", inverse_of: :user
   has_one :google_credential, -> { type_is("GoogleCredential") }, class_name: "Credential", inverse_of: :user
@@ -54,15 +55,6 @@ class User < ApplicationRecord
 
   def features
     User::Features.new(self)
-  end
-
-  def ai_backend(driver)
-    features[:"#{driver}_ai_backend"]
-  end
-
-  # @todo: generalize into a per-flag opinion API if other features ever need per-user values (#740)
-  def ruby_llm?(driver)
-    ai_backend(driver).presence || use_ruby_llm?
   end
 
   # Profile picture helper methods
@@ -114,9 +106,5 @@ class User < ApplicationRecord
     return false unless credential = credentials.first
 
     !credential.persisted? && credential.type == "GoogleCredential"
-  end
-
-  def use_ruby_llm?
-    Feature.raw_features.key?(:use_ruby_llm) ? Feature.use_ruby_llm? : false
   end
 end

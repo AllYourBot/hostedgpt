@@ -7,48 +7,64 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     @conversation = conversations(:attachments)
     @assistant = assistants(:keith_gpt4)
     @user = @conversation.user
-    @openai_service = api_services(:keith_openai_service)
-    @anthropic_service = api_services(:keith_anthropic_service)
-    @gemini_service = api_services(:keith_gemini_service)
   end
 
-  # Phase 1 — updated for Phase 3 driver support
+  # Provider identity support
 
-  test "supports_driver? returns true for all backends in Phase 3" do
-    assert AIBackend::RubyLLM.supports_driver?("openai")
-    assert AIBackend::RubyLLM.supports_driver?("anthropic")
-    assert AIBackend::RubyLLM.supports_driver?("gemini")
+  test "supports_identity? covers every chat provider identity and nothing else" do
+    assert AIBackend::RubyLLM.supports_identity?(:openai)
+    assert AIBackend::RubyLLM.supports_identity?(:anthropic)
+    assert AIBackend::RubyLLM.supports_identity?(:gemini)
+    assert AIBackend::RubyLLM.supports_identity?(:groq)      # openai-compatible path
+    assert AIBackend::RubyLLM.supports_identity?(:openrouter) # native provider
+    refute AIBackend::RubyLLM.supports_identity?(:brave)
+    refute AIBackend::RubyLLM.supports_identity?(nil)
   end
 
-  test "APIService#ai_backend returns old OpenAI class when feature flag is off" do
+  test "APIService#ai_backend returns the identity's SDK class when the flag is off" do
     stub_features(use_ruby_llm: false) do
-      assert_equal AIBackend::OpenAI, @openai_service.ai_backend
+      assert_equal AIBackend::OpenAI, api_services(:keith_openai_service).ai_backend
+      assert_equal AIBackend::Anthropic, api_services(:keith_anthropic_service).ai_backend
+      assert_equal AIBackend::Gemini, api_services(:keith_gemini_service).ai_backend
+      assert_equal AIBackend::Groq, api_services(:keith_groq_service).ai_backend
+      assert_equal AIBackend::OpenRouter, api_services(:keith_openrouter_service).ai_backend
+      assert_nil api_services(:keith_brave_service).ai_backend
     end
   end
 
-  test "APIService#ai_backend returns old Anthropic class when feature flag is off" do
-    stub_features(use_ruby_llm: false) do
-      assert_equal AIBackend::Anthropic, @anthropic_service.ai_backend
-    end
-  end
-
-  test "APIService#ai_backend returns old Gemini class when feature flag is off" do
-    stub_features(use_ruby_llm: false) do
-      assert_equal AIBackend::Gemini, @gemini_service.ai_backend
-    end
-  end
-
-  test "APIService#ai_backend returns RubyLLM when flag on and driver is openai" do
+  test "APIService#ai_backend returns RubyLLM for every chat identity when the flag is on" do
     stub_features(use_ruby_llm: true) do
-      assert_equal AIBackend::RubyLLM, @openai_service.ai_backend
+      assert_equal AIBackend::RubyLLM, api_services(:keith_openai_service).ai_backend
+      assert_equal AIBackend::RubyLLM, api_services(:keith_anthropic_service).ai_backend
+      assert_equal AIBackend::RubyLLM, api_services(:keith_gemini_service).ai_backend
+      assert_equal AIBackend::RubyLLM, api_services(:keith_groq_service).ai_backend
+      assert_equal AIBackend::RubyLLM, api_services(:keith_openrouter_service).ai_backend
     end
   end
 
-  test "APIService#ai_backend returns RubyLLM for all drivers when flag is on in Phase 3" do
+  test "an explicit sdk choice beats an on site default and an explicit ruby_llm choice beats an off one" do
     stub_features(use_ruby_llm: true) do
-      assert_equal AIBackend::RubyLLM, @openai_service.ai_backend
-      assert_equal AIBackend::RubyLLM, @anthropic_service.ai_backend
-      assert_equal AIBackend::RubyLLM, @gemini_service.ai_backend
+      api_services(:keith_openai_service).user.features[:openai_ai_backend] = "sdk"
+      assert_equal AIBackend::OpenAI, api_services(:keith_openai_service).reload.ai_backend
+    end
+
+    api_services(:keith_openai_service).user.features[:openai_ai_backend] = nil
+    stub_features(use_ruby_llm: false) do
+      api_services(:keith_groq_service).user.features[:groq_ai_backend] = "ruby_llm"
+      assert_equal AIBackend::RubyLLM, api_services(:keith_groq_service).reload.ai_backend
+    end
+  end
+
+  test "an explicit choice is honored per identity, not per driver" do
+    stub_features(use_ruby_llm: true) do
+      user = api_services(:keith_openai_service).user
+      user.features[:openai_ai_backend] = "sdk"
+
+      # openai rides the same driver as groq and openrouter; only the openai
+      # identity's choice should flip it back to the SDK.
+      assert_equal AIBackend::OpenAI, api_services(:keith_openai_service).reload.ai_backend
+      assert_equal AIBackend::RubyLLM, api_services(:keith_groq_service).ai_backend
+      assert_equal AIBackend::RubyLLM, api_services(:keith_openrouter_service).ai_backend
     end
   end
 
@@ -293,12 +309,22 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_instance_of AIBackend::RubyLLM, backend
   end
 
-  test "ruby_llm_context sets openai_api_base for Groq" do
+  test "ruby_llm_context sets openai_api_base and the system role for Groq" do
     @assistant.language_model.api_service.update!(url: APIService::URL_GROQ, driver: "openai")
     backend = AIBackend::RubyLLM.new(@user, @assistant)
 
     context = backend.send(:ruby_llm_context)
     assert_equal APIService::URL_GROQ, context.openai_api_base
+    assert_equal true, context.openai_use_system_role # compat vendors expect system, not OpenAI's developer role
+  end
+
+  test "ruby_llm_context sets openai_api_base and the system role for OpenRouter" do
+    @assistant.language_model.api_service.update!(url: APIService::URL_OPENROUTER, driver: "openai")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    context = backend.send(:ruby_llm_context)
+    assert_equal APIService::URL_OPENROUTER, context.openai_api_base
+    assert_equal true, context.openai_use_system_role
   end
 
   test "ruby_llm_context does not set openai_api_base for canonical OpenAI URL" do
@@ -307,6 +333,19 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
 
     context = backend.send(:ruby_llm_context)
     assert_nil context.openai_api_base
+    assert_nil context.openai_use_system_role
+  end
+
+  test "build_chat sends OpenRouter attribution headers only for the OpenRouter identity" do
+    @assistant.language_model.api_service.update!(url: APIService::URL_OPENROUTER, driver: "openai")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    chat = backend.send(:build_chat)
+    assert_equal({ "HTTP-Referer" => Rails.application.config.x.app_url.to_s, "X-Title" => Setting.product_name.to_s }, chat.headers)
+
+    @assistant.language_model.api_service.update!(url: APIService::URL_OPEN_AI)
+    chat = backend.send(:build_chat)
+    assert_empty chat.headers
   end
 
   # Phase 3 — Anthropic + Gemini/Groq text chat
@@ -338,6 +377,37 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     TestClient::RubyLLM::Chat.stub :text, "Hallo" do
       result = AIBackend::RubyLLM.test_execute(APIService::URL_GEMINI, "abc", "gemini-pro")
       assert_equal "Hallo", result
+    end
+  end
+
+  test "test_execute builds the chat with a context carrying the token and base URL" do
+    captured = nil
+    original_new = TestClient::RubyLLM::Chat.method(:new)
+    capture = ->(**kwargs) { captured = kwargs; original_new.call(**kwargs) }
+
+    TestClient::RubyLLM::Chat.stub :new, capture do
+      TestClient::RubyLLM::Chat.stub :text, "Hi" do
+        AIBackend::RubyLLM.test_execute(APIService::URL_GROQ, "groq-key", "llama-3")
+      end
+    end
+
+    assert_equal "llama-3", captured[:model], "The chat should be built for the model under test"
+    assert_equal :openai, captured[:provider], "Groq should ride the openai-compatible provider"
+    assert_equal "groq-key", captured[:context].openai_api_key, "The context should carry the service token"
+    assert_equal APIService::URL_GROQ, captured[:context].openai_api_base, "The context should point at the service URL"
+  end
+
+  test "test_execute returns an error string when RubyLLM rejects the key" do
+    TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::UnauthorizedError.new("401 bad key") do
+      assert_equal "Error: 401 bad key", AIBackend::RubyLLM.test_execute(APIService::URL_OPEN_AI, "bad", "gpt-4o"),
+        "A rejected key should come back as an error string, not raise"
+    end
+  end
+
+  test "test_execute returns an error string when RubyLLM rejects the model" do
+    TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::BadRequestError.new("400 model not found") do
+      assert_equal "Error: 400 model not found", AIBackend::RubyLLM.test_execute(APIService::URL_ANTHROPIC, "abc", "claude-retired"),
+        "A rejected model should come back as an error string, not raise"
     end
   end
 
@@ -460,44 +530,82 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_empty msgs_with_attachments, "Should not have any Content objects when supports_images is false"
   end
 
-  test "preceding_conversation_messages inlines PDF text when supports_images is true" do
-    pdf_content = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n/Contents 4 0 R\n>>\nendobj\n4 0 obj\n<<\n/Length 44\n>>\nstream\nBT\n/F1 12 Tf\n72 720 Td\n(Hello World) Tj\nET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000200 00000 n \ntrailer\n<<\n/Size 5\n/Root 1 0 R\n>>\nstartxref\n294\n%%EOF"
-
-    test_file = Tempfile.new(["test", ".pdf"])
-    test_file.write(pdf_content)
-    test_file.rewind
-
+  test "preceding_conversation_messages attaches the assistant's context images to the first user message only" do
     assistant = assistants(:keith_claude35)
     assistant.language_model.update!(supports_images: true, supports_tools: false)
+    assistant.documents.create!(file: Rack::Test::UploadedFile.new(file_fixture("cat.png"), "image/png"))
+    conversation = conversations(:hello_claude)
 
-    conversation = Conversation.create!(user: @user, assistant: assistant, title: "PDF Test")
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, conversation.latest_message_for_version(:latest))
+    first_user, _reply, newest_user = backend.send(:preceding_conversation_messages)
 
-    pdf_message = conversation.messages.create!(
-      role: "user",
-      content_text: "Check this document",
-      assistant: assistant
-    )
-    pdf_message.documents.create!(
-      file: fixture_file_upload(test_file.path, "application/pdf"),
-      filename: "test.pdf"
-    )
+    assert_instance_of ::RubyLLM::Content, first_user[:content], "The first user message should carry attachments"
+    assert_equal [:image], first_user[:content].attachments.map(&:type), "The context image should be attached"
+    assert_instance_of String, newest_user[:content], "Later messages should stay text-only"
+  end
 
-    message = conversation.messages.create!(
-      role: "assistant",
-      content_text: "Let me check",
-      assistant: assistant
-    )
+  test "preceding_conversation_messages attaches a PDF natively when the model supports PDFs" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_pdf: true, supports_tools: false)
 
-    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
-    msgs = backend.send(:preceding_conversation_messages)
+    content = backend_replying_to_pdf(assistant, "quarterly.pdf", file_fixture("quarterly.pdf").binread).send(:preceding_conversation_messages).first[:content]
 
-    pdf_entry = msgs.find { |m| m[:role] == "user" && m[:content].to_s.include?("PDF Document: test.pdf") }
-    assert pdf_entry, "Should include PDF content reference"
-    assert pdf_entry[:content].to_s.include?("PDF Document: test.pdf"), "Should include PDF document reference"
-    assert pdf_entry[:content].to_s.include?("Unable to extract text from this PDF"), "Should include error for failed extraction"
-  ensure
-    test_file&.close
-    test_file&.unlink
+    assert_instance_of ::RubyLLM::Content, content
+    assert_equal [:pdf], content.attachments.map(&:type)
+    refute_includes content.text, "PDF Document"
+  end
+
+  test "preceding_conversation_messages inlines a PDF's text for a model without PDF or image support" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_pdf: false, supports_images: false, supports_tools: false)
+
+    content = backend_replying_to_pdf(assistant, "quarterly.pdf", file_fixture("quarterly.pdf").binread).send(:preceding_conversation_messages).first[:content]
+
+    assert_instance_of String, content
+    assert_includes content, "[PDF Document: quarterly.pdf]\nQuarterly numbers"
+  end
+
+  test "preceding_conversation_messages says so when a PDF's text cannot be extracted" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_pdf: false, supports_tools: false)
+
+    content = backend_replying_to_pdf(assistant, "corrupted.pdf", "%PDF-1.4\ncorrupted content").send(:preceding_conversation_messages).first[:content]
+
+    assert_includes content, "[PDF Document: corrupted.pdf - Unable to extract text from this PDF]"
+  end
+
+  test "preceding_conversation_messages appends the current time to the newest user message only" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_tools: false)
+    conversation = Conversation.create!(user: @user, assistant: assistant, title: "Time")
+    conversation.messages.create!(role: "user", content_text: "First", assistant: assistant) # each user message gets a blank reply
+    conversation.messages.create!(role: "user", content_text: "Second", assistant: assistant)
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversation, conversation.messages.ordered.last)
+
+    msgs = backend.stub(:current_time_note, "NOTE") { backend.send(:preceding_conversation_messages) }
+
+    assert_equal ["First", "", "Second\n\nNOTE"], msgs.pluck(:content)
+  end
+
+  test "stream_next_conversation_message marks the system prompt cacheable for Anthropic" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_tools: false)
+    backend = AIBackend::RubyLLM.new(@user, assistant, conversations(:hello_claude), conversations(:hello_claude).latest_message_for_version(:latest))
+
+    TestClient::RubyLLM::Chat.stub(:text, "Hi") { backend.stream_next_conversation_message { |chunk| } }
+
+    instructions = TestClient::RubyLLM::Chat.instructions
+    assert_instance_of ::RubyLLM::Content::Raw, instructions
+    assert_equal({ type: "ephemeral" }, instructions.value.first[:cache_control])
+  end
+
+  test "stream_next_conversation_message leaves the system prompt as text for OpenAI" do
+    @assistant.language_model.update!(supports_tools: false)
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, @conversation.latest_message_for_version(:latest))
+
+    TestClient::RubyLLM::Chat.stub(:text, "Hi") { backend.stream_next_conversation_message { |chunk| } }
+
+    assert_instance_of String, TestClient::RubyLLM::Chat.instructions
   end
 
   test "sanitize_content removes json_of_generated_image from JSON content" do
@@ -752,6 +860,72 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     end
   end
 
+  # Gemini 3 rejects a functionCall replayed without the thought signature it
+  # issued, so the signature has to survive the round trip through the database.
+
+  test "stream_next_conversation_message keeps the thought signature on a tool call" do
+    @assistant.language_model.update!(supports_tools: true)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+      TestClient::RubyLLM::Chat.stub :thought_signature, "sig-abc" do
+        result = backend.stream_next_conversation_message { |c| }
+        assert_equal "sig-abc", result[0][:thought_signature]
+      end
+    end
+  end
+
+  test "stream_next_conversation_message omits the thought signature when the provider issues none" do
+    @assistant.language_model.update!(supports_tools: true)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+      result = backend.stream_next_conversation_message { |c| }
+      refute_includes result[0].keys, :thought_signature
+    end
+  end
+
+  test "preceding_conversation_messages replays the stored thought signature" do
+    @assistant.language_model.update!(supports_tools: true)
+    conversation = @conversation
+
+    conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      content_tool_calls: [
+        { type: "function", id: "call_123", thought_signature: "sig-abc",
+          function: { name: "helloworld_hi", arguments: '{"name":"Keith"}' } },
+      ]
+    )
+    follow_up = conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, conversation, follow_up)
+    msgs = backend.send(:preceding_conversation_messages)
+
+    assistant_replay = msgs.find { |m| m[:role] == :assistant && m[:tool_calls].present? }
+    assert_equal "sig-abc", assistant_replay[:tool_calls]["call_123"].thought_signature
+  end
+
   test "preceding_conversation_messages replays tool calls and tool results" do
     @assistant.language_model.update!(supports_tools: true)
     conversation = @conversation
@@ -840,5 +1014,15 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
         backend.get_oneoff_message("Extract a topic", ["Hello"])
       end
     end
+  end
+  private
+
+  def backend_replying_to_pdf(assistant, filename, pdf_bytes)
+    conversation = Conversation.create!(user: @user, assistant: assistant, title: "PDF Test")
+    message = conversation.messages.create!(role: "user", content_text: "Check this document", assistant: assistant)
+    message.documents.create!(file: { io: StringIO.new(pdf_bytes), filename:, content_type: "application/pdf" })
+    reply = conversation.messages.create!(role: "assistant", content_text: "Let me check", assistant: assistant)
+
+    AIBackend::RubyLLM.new(@user, assistant, conversation, reply)
   end
 end

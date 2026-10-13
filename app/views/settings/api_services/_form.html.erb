@@ -39,9 +39,8 @@
     <%= form.label :url, t("app.settings.api_services.table.url") %>
     <span>
       <% if api_service.persisted? && !brave?(api_service) %>
-        <% link_url = settings_api_services_path + "/" + api_service.id.to_s + "/test" %>
-        <%= link_to t("app.settings.api_services.test"), link_url,
-          data: { testing_target: "test", turbo_stream: true, action: "click->testing#update_link_api_service" },
+        <%= link_to t("app.settings.api_services.test"), settings_api_service_test_path(api_service),
+          data: { testing_target: "test", action: "click->testing#test_api_service" },
           class: "underline text-blue-600"
         %>
       <% end %>

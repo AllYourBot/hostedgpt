@@ -66,6 +66,12 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal @conversation.id, Message.last.conversation_id
   end
 
+  test "should create message marked as spoken when it came from voice" do
+    post assistant_messages_url(@assistant), params: { message: { conversation_id: @message.conversation_id, content_text: "Hello", spoken: true } }
+
+    assert @conversation.messages.user.order(:created_at).last.spoken?
+  end
+
   test "should create message AND create conversation when conversation_id is nil" do
     assert_difference "Message.count", 2 do
       assert_difference "Conversation.count", 1 do
@@ -219,6 +225,27 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-role="retry"]', false
   end
 
+  test "without an app_url, index embeds only the thumbnails and leaves each modal image to load when opened" do
+    conversation = conversations(:attachments)
+    images = conversation.messages.flat_map(&:documents).select(&:has_image?)
+    images.each { |document| document.send(:wait_for_file_variant_to_process!, :small) }
+
+    downloads = 0
+    counter = ActiveSupport::Notifications.subscribe("service_download.active_storage") { downloads += 1 }
+
+    stub_custom_config_value(:app_url, nil) do
+      get conversation_messages_url(conversation, version: 1)
+    end
+
+    assert_response :success
+    assert_equal images.size, downloads, "Only each image's thumbnail should be downloaded"
+    assert_select "[data-image-modal][data-image-loader-lazy-value='true']", { count: images.size }, "Every modal image should wait to be opened"
+    assert_select "[data-image-modal][data-image-loader-url-value^='/rails/active_storage/representations/redirect/']", { count: images.size }, "Every modal image should be a link, not a data URL"
+    assert_select "[data-image-modal] img[src='']", { count: images.size }, "No modal image should start loading on render"
+  ensure
+    ActiveSupport::Notifications.unsubscribe(counter)
+  end
+
   test "messages can still be viewed when attached to a soft-deleted assistant" do
     @assistant.deleted!
     get conversation_messages_url(@conversation, version: 1)
@@ -234,15 +261,16 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "div#composer.hidden", false
   end
 
-  test "when assistant supports images the image upload function is available" do
+  test "when assistant supports images the attachment picker offers images and PDFs" do
     get conversation_messages_url(@conversation, version: 1)
-    assert_select "div#composer"
-    assert_select "div#composer.relationship", false
+    assert_select "#attach-button"
+    assert_select "input#attachment_picker[accept=?]", "image/*,.pdf"
   end
 
-  test "when assistant doesn't support images the image upload function is not available" do
+  test "when assistant doesn't support images the attachment picker still offers PDFs" do
     get conversation_messages_url(conversations(:trees), version: 1)
-    assert_select "div#composer.relationship"
+    assert_select "#attach-button"
+    assert_select "input#attachment_picker[accept=?]", ".pdf"
   end
 
   test "the composer is hidden when viewing a list of messages attached to an assistant that has been soft-deleted" do

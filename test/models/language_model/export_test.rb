@@ -21,7 +21,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     assert File.exist?(path)
     storage = JSON.load_file(path)
     models = storage["models"]
-    assert_equal models.first.keys.sort, %w[api_name name supports_images supports_tools supports_system_message api_service_name].sort
+    assert_equal models.first.keys.sort, %w[api_name name supports_images supports_tools supports_system_message supports_pdf api_service_name].sort
   end
 
   test "export_to_file yaml" do
@@ -30,7 +30,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     assert File.exist?(path)
     storage = YAML.load_file(path)
     models = storage["models"]
-    assert_equal models.first.keys.sort, %w[api_name name supports_images supports_tools supports_system_message api_service_name].sort
+    assert_equal models.first.keys.sort, %w[api_name name supports_images supports_tools supports_system_message supports_pdf api_service_name].sort
   end
 
   test "import_from_file with only new models" do
@@ -69,6 +69,21 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
       LanguageModel.import_from_file(path:, users: users(:rob))
     end
     assert users(:rob).language_models.find_by(api_name: "new-model")
+  end
+
+  test "import_from_file skips models whose api service the user does not have" do
+    models = [{
+      api_name: "new-model",
+      name: "new model",
+      api_service_name: "Nonexistent Service",
+    }]
+    path = Rails.root.join("tmp/newmodels.yml")
+    File.write(path, { "models" => models }.to_yaml)
+    assert_no_difference "LanguageModel.count", "No model should be created without its api service" do
+      assert_output("", "") do
+        LanguageModel.import_from_file(path:, users: users(:rob))
+      end
+    end
   end
 
   test "import_from_file with existing models by api_name" do

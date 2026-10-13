@@ -1,0 +1,17 @@
+<% content_for :nav_column do %>
+  <%= render "messages/nav_column" %>
+<% end %>
+
+<div class="flex flex-col flex-1 min-w-0">
+  <header id="narrow-header" class="flex-none text-lg h-14 md:hidden">
+    <div class="flex items-center flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
+      <%= render "layouts/nav_toggle" %>
+    </div>
+  </header>
+
+  <section class="flex flex-col flex-grow overflow-y-auto overflow-x-clip">
+    <div class="w-full md:max-w-none lg:max-w-[700px] xl:max-w-[810px] mx-auto mt-2 py-7 px-5 md:px-10 md:pr-14">
+      <%= yield %>
+    </div>
+  </section>
+</div>

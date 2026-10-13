@@ -212,12 +212,26 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_equal "dark", @user.dark_mode
   end
 
-  test "the settings form renders an OpenRouter backend choice row" do
+  test "the settings form renders choice rows for every chat provider, all selectable" do
     get edit_settings_person_url
     assert_response :success
-    assert_select "span", text: "OpenRouter"
-    assert_select "input[type=radio][name='person[backend_choices][openrouter_ai_backend]'][value='sdk']"
-    assert_select "input[type=radio][name='person[backend_choices][openrouter_ai_backend]'][value='ruby_llm'][disabled]"
+
+    %w[openai anthropic groq openrouter gemini].each do |identity|
+      assert_select "input[type=radio][name='person[backend_choices][#{identity}_ai_backend]'][value='sdk']"
+      assert_select "input[type=radio][name='person[backend_choices][#{identity}_ai_backend]'][value='ruby_llm']:not([disabled])"
+    end
+    assert_select "input[type=radio][name='person[backend_choices][brave_ai_backend]']", count: 0
+  end
+
+  test "backend choice values outside the tri-state are rejected server-side" do
+    params = person_params
+    params["backend_choices"] = { "openai_ai_backend" => "bogus" }
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+
+    @user.reload
+    assert_nil @user.features[:openai_ai_backend]
   end
 
   private

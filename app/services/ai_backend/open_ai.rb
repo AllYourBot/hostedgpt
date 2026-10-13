@@ -2,6 +2,8 @@ class AIBackend::OpenAI < AIBackend
   include Tools
 
   IMAGE_MODEL = "gpt-image-1"
+  SPEECH_MODEL = "tts-1"
+  SPEECH_VOICE = "nova"
 
   # Rails system tests don't seem to allow mocking because the server and the
   # test are in separate processes.
@@ -40,11 +42,12 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def self.generate_image(prompt:, user:)
-    openai_service = user.api_services.find_by(driver: :openai)
+    openai_service = canonical_service_for(user)
 
     if openai_service.nil? || openai_service.effective_token.blank?
-      current_backend = Current.message&.assistant&.language_model&.api_service&.name || "current AI backend"
-      raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services to use image generation with #{current_backend}."
+      # Context-free on purpose: the toolbox that reaches this method knows the
+      # current assistant and appends "to use image generation with ..." itself.
+      raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services"
     end
 
     response = client.new(access_token: openai_service.effective_token).images.generate(
@@ -58,8 +61,35 @@ class AIBackend::OpenAI < AIBackend
     )
 
     b64_json = response.dig("data", 0, "b64_json") || response.dig(:data, 0, :b64_json)
-    { b64_json: b64_json, model: IMAGE_MODEL }
+    # The provider label is this implementation's own identity, stated as a
+    # literal: subclasses inherit this method (Groq, OpenRouter), and self in
+    # an inherited class method is the receiver, which would mislabel an
+    # OpenAI-generated image with the vendor's name. A backend that ships
+    # native image generation overrides this method and reports itself.
+    { b64_json: b64_json, model: IMAGE_MODEL, provider: "OpenAI" }
   end
+
+  def self.generate_speech(text:, user:)
+    openai_service = canonical_service_for(user)
+    raise AIBackend::ConfigurationError if openai_service.nil? || openai_service.effective_token.blank?
+
+    client.new(access_token: openai_service.effective_token).audio.speech(
+      parameters: {
+        model: SPEECH_MODEL,
+        input: text,
+        voice: SPEECH_VOICE,
+        response_format: "wav",
+        speed: 1.0
+      }
+    )
+  end
+
+  # Scoped to the canonical OpenAI URL: Groq and OpenRouter services also
+  # carry driver :openai, and their tokens are invalid at api.openai.com.
+  def self.canonical_service_for(user)
+    user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
+  end
+  private_class_method :canonical_service_for
 
   def self.key_error_message
     "(You need to enter a valid API key for OpenAI to use GPT. Click your Profile in the bottom " +
@@ -138,6 +168,8 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def system_message(content)
+    return [] if content.blank?
+
     [{
       role: "system",
       content:,
@@ -145,36 +177,12 @@ class AIBackend::OpenAI < AIBackend
   end
 
   def preceding_conversation_messages
-    @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).collect do |message|
-      if @assistant.supports_images? && message.documents.present? && message.role == "user"
-        # Handle mixed content (images and PDFs)
-        content_with_media = [{ type: "text", text: message.content_text }]
+    history = conversation_history
+    latest_user_message = latest_user_message(history)
 
-        message.documents.each do |document|
-          if document.has_image?
-            content_with_media << { type: "image_url", image_url: { url: document.image_url(:large) }}
-          elsif document.has_document_pdf?
-            # Extract text from PDF and include it in the conversation
-            pdf_text = document.extract_pdf_text
-            if pdf_text.present?
-              content_with_media << {
-                type: "text",
-                text: "\n\n[PDF Document: #{document.filename}]\n#{pdf_text}"
-              }
-            else
-              content_with_media << {
-                type: "text",
-                text: "\n[PDF Document: #{document.filename} - Unable to extract text from this PDF]"
-              }
-            end
-          end
-        end
-
-        {
-          role: message.role,
-          name: message.name_for_api,
-          content: content_with_media,
-        }.compact
+    history.collect do |message|
+      if message.user?
+        user_message(message, documents_for(message, history), with_time: message == latest_user_message)
       else
         begin
           parsed = JSON.parse(message.content_text)
@@ -195,6 +203,35 @@ class AIBackend::OpenAI < AIBackend
           tool_call_id: message.tool_call_id,     # only for tool messages
         }.compact.except( message.content_tool_calls.blank? && :tool_calls )
       end
+    end
+  end
+
+  def user_message(message, documents, with_time:)
+    content = [{ type: "text", text: message.content_text || "" }]
+    content += documents.filter_map { |document| document_part(document) }
+    content << { type: "text", text: current_time_note } if with_time
+
+    {
+      role: message.role,
+      name: message.name_for_api,
+      content: text_only_as_string(content),
+    }.compact
+  end
+
+  # Some OpenAI-compatible servers (Groq, local models) only accept string content for text-only models.
+  def text_only_as_string(content)
+    return content unless content.all? { |part| part[:type] == "text" }
+
+    content.pluck(:text).join("\n\n")
+  end
+
+  def document_part(document)
+    if document.has_image?
+      { type: "image_url", image_url: { url: document.image_url(:large) }} if @assistant.supports_images?
+    elsif document.has_document_pdf?
+      return { type: "text", text: document.pdf_as_text } unless @assistant.supports_pdf?
+
+      { type: "file", file: { filename: document.filename, file_data: "data:application/pdf;base64,#{document.file_base64}" }}
     end
   end
 

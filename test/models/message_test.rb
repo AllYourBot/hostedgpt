@@ -267,4 +267,23 @@ class MessageTest < ActiveSupport::TestCase
     message.update!(output_token_count: 5, input_token_cost: 1)
     assert_equal 1, message.input_token_cost
   end
+
+  test "replying_to_speech? is false when the user typed the message being replied to" do
+    refute messages(:yes_i_do).replying_to_speech?
+  end
+
+  test "replying_to_speech? is true when the user spoke the message being replied to" do
+    messages(:hear_me).update!(spoken: true)
+    assert messages(:yes_i_do).replying_to_speech?
+  end
+
+  test "replying_to_speech? looks past tool messages back to the user's message" do
+    messages(:check_weather).update!(spoken: true)
+    assert messages(:weather_explained).replying_to_speech?
+  end
+
+  test "replying_to_speech? only considers the most recent user message" do
+    messages(:hear_me).update!(spoken: true)
+    refute messages(:photo_identified).replying_to_speech?
+  end
 end

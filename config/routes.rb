@@ -8,6 +8,10 @@ Rails.application.routes.draw do
     post :reorder, on: :collection
   end
 
+  resources :collections, except: :show do
+    resources :documents, only: [:create, :destroy], module: :collections
+  end
+
   resources :conversations, only: [:index, :show, :edit, :update, :destroy] do
     resources :messages, only: [:index]
   end
@@ -16,14 +20,18 @@ Rails.application.routes.draw do
 
   resources :messages, only: [:show, :update]
 
+  resource :speech, only: :create
+
   namespace :settings do
-    resources :assistants, except: [:index, :show]
+    resources :assistants, except: [:index, :show] do
+      resources :documents, only: [:create, :destroy]
+    end
     resource :person, only: [:edit, :update]
     resources :language_models do
       get :test, to: "language_models#test"
     end
     resources :api_services, except: [:show]  do
-      get :test, to: "api_services#test"
+      post :test, to: "api_services#test"
     end
     resources :memories, only: [:index, :destroy] do
       delete :destroy, to: "memories#destroy_all", on: :collection

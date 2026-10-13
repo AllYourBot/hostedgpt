@@ -13,6 +13,7 @@ HostedGPT is a Ruby on Rails 8.1 app providing a multi-provider conversational A
 - Full suite: `bin/rails test` and `bin/rails test:system` (system tests need a real browser and do not run inside Docker; they run automatically on PRs).
 - Single file: `bin/rails test test/models/message_test.rb`
 - Single test by line: `bin/rails test test/models/message_test.rb:42`
+- JavaScript (voice mode `app/javascript/blocks/`) tests use Jest, pinned in `test/package.json`: run `(cd test && npm install)` once, then `bin/blocks test` from the repo root. Accepts a file or `file.test.js:LINE` for a single test, and `-d` to debug. CI runs `npm test` in `test/`, which calls the same script.
 - Docker equivalent: `docker compose run base rails test`
 - Load sample data (users/conversations/etc.) into dev DB: `bin/rails db:fixtures:load`
 
@@ -23,15 +24,15 @@ HostedGPT is a Ruby on Rails 8.1 app providing a multi-provider conversational A
 - Similar `rails assistants:import` / `assistants:export[path]` tasks exist for `assistants.yml`.
 
 ### Linting
-- RuboCop is configured (`.rubocop.yml`, target Ruby 3.3, Rails cops enabled).
+- RuboCop is configured (`.rubocop.yml`, parser target Ruby 3.4 while the app runs Ruby 4.0, Rails cops enabled).
 
 ## Architecture
 
 ### AI provider abstraction
-- `AIBackend::<Provider>` classes in `app/services/ai_backend/` (`open_ai.rb`, `anthropic.rb`, `gemini.rb`) implement a shared interface for talking to each provider — the base module holds `tools.rb` (function-calling helpers) and `utilities.rb` (shared logic).
-- `APIService#driver` (enum: `openai`/`anthropic`/`gemini`; Groq rides the `openai` driver against a different base URL) selects the backend class via `APIService#ai_backend`.
+- `AIBackend::<Provider>` classes in `app/services/ai_backend/` (`open_ai.rb`, `anthropic.rb`, `gemini.rb`, plus OpenAI-dialect subclasses `groq.rb` and `open_router.rb`) implement a shared interface for talking to each provider — the base module holds `tools.rb` (function-calling helpers) and `utilities.rb` (shared logic). `AIBackend::RubyLLM` is an alternative transport that serves every chat provider identity through the `ruby_llm` gem.
+- A service's **provider identity** (`APIService#provider_identity`: the driver plus, for openai-dialect vendors, the canonical URL — so Groq and OpenRouter are distinct identities riding the `openai` driver) resolves its SDK backend via `APIService#sdk_backend`. `APIService#ai_backend` dispatches to `AIBackend::RubyLLM` or the SDK backend: an explicit per-identity choice (`user.features[:"#{identity}_ai_backend"]`) wins, otherwise the `use_ruby_llm` site flag applies. Error facts (`key_error_message`, `billing_url`, `provider_name`) always resolve through the identity's SDK backend, whatever transport serves the request.
 - `APIService#effective_token` falls back to a shared default key (`Setting.default_*_key`) when `Feature.default_llm_keys?` is enabled and the user hasn't set their own token.
-- Adding a new provider: add an `APIService.driver` enum value + base URL constant, implement `AIBackend::<NewProvider>` mirroring an existing backend's method names (`set_client_config`, `client_method_name`, `test_execute`), add a deterministic test client stub under `test/support/test_client/`, and add default models to `models.yml`.
+- Adding a new provider: add a base URL constant, map it in `APIService#provider_identity`, add an `sdk_backend` arm and register it in `APIService.chat_provider_identities` (an unmapped driver silently yields nil backends), implement `AIBackend::<NewProvider>` mirroring an existing backend's method names (`set_client_config`, `client_method_name`, `test_execute`; build each user message from `documents_for(message, history)`, not `message.documents`, or the assistant's context images and PDFs are silently dropped), add a deterministic test client stub under `test/support/test_client/`, and add default models to `models.yml`.
 
 ### Message generation flow
 - `MessagesController` creates the user's message, then enqueues `GetNextAIMessageJob` to fetch the assistant's reply asynchronously (SolidQueue, optionally run in-process via `RUN_SOLID_QUEUE_IN_PUMA=true`).

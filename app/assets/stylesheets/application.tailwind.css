@@ -256,6 +256,12 @@ input:focus {
     -moz-osx-font-smoothing: grayscale;
     min-height: -webkit-fill-available;
   }
+  /* A percentage, not px, so a user's larger browser font size still scales the page. */
+  @screen lg {
+    html {
+      font-size: 87.5%;
+    }
+  }
   body {
     @apply h-full font-sans text-gray-950 dark:text-gray-100 flex overflow-y-auto;
     -webkit-overflow-scrolling: touch;
