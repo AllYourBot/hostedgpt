@@ -71,7 +71,8 @@ class ReactionsTest < ApplicationSystemTestCase
     assert_includes second_panel[:class], "hidden"
   end
 
-  test "reacting to an emoji with an existing count increments it" do    user = users(:keith)
+  test "reacting to an emoji with an existing count increments it" do
+    user = users(:keith)
     other = users(:rob)
     conversation = conversations(:greeting)
     message = messages(:im_a_bot)
@@ -94,7 +95,8 @@ class ReactionsTest < ApplicationSystemTestCase
     end
   end
 
-  test "sidebar picker reacts on a pinned row and pin order survives" do    user = users(:keith)
+  test "sidebar picker reacts on a pinned row and pin order survives" do
+    user = users(:keith)
     conversation = conversations(:greeting)
     conversation.pin!(user)
 
