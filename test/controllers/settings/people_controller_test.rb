@@ -177,6 +177,26 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "turning off show_thinking keeps the other preferences" do
+    @user.update!(dark_mode: "dark", nav_closed: true)
+
+    params = person_params
+    params["personable_attributes"]["show_thinking"] = "0"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+
+    @user.reload
+    refute @user.show_thinking?
+    assert_equal "dark", @user.dark_mode
+    assert_equal true, @user.nav_closed
+  end
+
+  test "the settings form shows the show_thinking checkbox checked by default" do
+    get edit_settings_person_url
+    assert_select "input[type=checkbox][name='person[personable_attributes][show_thinking]'][checked]"
+  end
+
   test "updating dark_mode leaves nav_closed and feature opinions intact" do
     @user.update!(nav_closed: true)
     @user.update!(preferences: @user.preferences.merge(feature: { openai_backend: "sdk" }))

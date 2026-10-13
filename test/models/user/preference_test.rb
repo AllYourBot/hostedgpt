@@ -39,6 +39,18 @@ class User::PreferenceTest < ActiveSupport::TestCase
     assert_equal "system", new_user.dark_mode
   end
 
+  test "show_thinking defaults to on and takes a form checkbox value" do
+    user = User.create!(first_name: "First", last_name: "Last")
+    assert user.show_thinking?
+
+    user.update!(show_thinking: "0")
+    refute user.reload.show_thinking?
+    assert_equal false, user.preferences[:show_thinking]
+
+    user.update!(show_thinking: "1")
+    assert user.reload.show_thinking?
+  end
+
   test "accessor writes persist through the reworked preferences getter" do
     user = User.create!(first_name: "First", last_name: "Last")
     assert_nil user.preferences[:dark_mode]

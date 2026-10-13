@@ -73,7 +73,7 @@ end %>
           data-thinking="<%= !!thinking %>"
         ><%= format_for_speaking message.content_text %></div>
 
-        <% if message.assistant? && message.thinking_text.present? %>
+        <% if message.assistant? && message.thinking_text.present? && conversation.user.show_thinking? %>
           <%# open while the reply streams in, collapsed once it is done %>
           <details data-role="thinking-text" class="mb-2 text-sm text-gray-500 dark:text-gray-400" <%= "open" if thinking %>>
             <summary class="cursor-pointer select-none"><%= t("app.messages.thinking") %></summary>

@@ -232,11 +232,8 @@ class AIBackend::RubyLLM < AIBackend
     end.compact
   end
 
-  # Anthropic needs the thinking that preceded a tool call sent back unchanged when
-  # the conversation continues with the tool's result, and it verifies the
-  # signature. Thinking cut off before its signature arrived (a cancelled
-  # response) can't be verified, so it isn't replayed. RubyLLM only sends these
-  # blocks while thinking is enabled for the request.
+  # Anthropic verifies replayed thinking by its signature, so thinking without one
+  # (a cancelled response) is left out.
   def thinking_for(message)
     return if message.thinking_signature.blank?
 
