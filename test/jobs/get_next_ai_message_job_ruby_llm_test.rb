@@ -192,4 +192,23 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     assert_includes @message.content_text, "You are using OpenAI so go here https://platform.openai.com/account/billing/overview"
     assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
   end
+
+  test "saves the thinking and its signature alongside the reply" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_thinking: true)
+    thinking = ::RubyLLM::Thinking.build(text: "Let me work through this...", signature: "sig-abc")
+
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :thinking, thinking do
+        TestClient::RubyLLM::Chat.stub :text, "The answer is 42." do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+        end
+      end
+    end
+
+    @message.reload
+    assert_equal "The answer is 42.", @message.content_text
+    assert_equal "Let me work through this...", @message.thinking_text
+    assert_equal "sig-abc", @message.thinking_signature
+  end
 end

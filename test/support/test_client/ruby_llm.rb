@@ -5,6 +5,7 @@ module TestClient
 
       def initialize(model:, provider: nil, assume_model_exists: nil, context: nil)
         @@model = model
+        self.class.instance_variable_set(:@thinking_config, nil)
         @headers = {}
         @messages = []
         @last_response = nil
@@ -25,6 +26,11 @@ module TestClient
         self
       end
 
+      def with_adaptive_thinking(effort:, max_tokens:)
+        self.class.instance_variable_set(:@thinking_config, { effort:, max_tokens: })
+        self
+      end
+
       def with_tools(*tools)
         self.class.instance_variable_set(:@tools, tools)
         self
@@ -37,6 +43,9 @@ module TestClient
 
       def complete(&block)
         raise self.class.error_to_raise if self.class.error_to_raise
+
+        # Like the real stream, thinking arrives before the text or the tool call.
+        block.call(OpenStruct.new(content: nil, thinking: self.class.thinking)) if block && self.class.thinking
 
         if self.class.function
           simulate_tool_calls
@@ -122,6 +131,12 @@ module TestClient
         nil
       end
 
+      # A ::RubyLLM::Thinking streamed ahead of the response; nil means the model
+      # didn't think. Stub this to simulate extended thinking.
+      def self.thinking
+        nil
+      end
+
       def self.default_text
         "Hello this is model #{@@model}! How can I assist you today?"
       end
@@ -147,7 +162,7 @@ module TestClient
       end
 
       class << self
-        attr_reader :instructions, :params, :tools
+        attr_reader :instructions, :params, :tools, :thinking_config
       end
     end
 

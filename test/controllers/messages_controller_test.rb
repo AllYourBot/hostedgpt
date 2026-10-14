@@ -220,6 +220,28 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-controller~="stream-watchdog"]'
   end
 
+  test "index shows an assistant's thinking collapsed once the reply is done" do
+    latest_message = @conversation.latest_message_for_version(:latest)
+    latest_message.update! thinking_text: "Let me work through this...", thinking_signature: "sig-abc"
+
+    get conversation_messages_url(@conversation, version: latest_message.version)
+    assert_select "details[data-role='thinking-text']:not([open])", text: /Let me work through this\.\.\./
+  end
+
+  test "index hides an assistant's thinking when the user turned it off" do
+    latest_message = @conversation.latest_message_for_version(:latest)
+    latest_message.update! thinking_text: "Let me work through this...", thinking_signature: "sig-abc"
+    @conversation.user.update!(show_thinking: false)
+
+    get conversation_messages_url(@conversation, version: latest_message.version)
+    assert_select "details[data-role='thinking-text']", false
+  end
+
+  test "index shows no thinking block for a message without thinking" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select "details[data-role='thinking-text']", false
+  end
+
   test "index shows no retry button for a message which generated successfully" do
     get conversation_messages_url(@conversation, version: 1)
     assert_select '[data-role="retry"]', false

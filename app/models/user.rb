@@ -39,7 +39,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :credentials
   serialize :preferences, coder: JsonSerializer
-  store_accessor :preferences, :dark_mode, :nav_closed
+  store_accessor :preferences, :dark_mode, :nav_closed, :show_thinking
 
   def preferences
     attributes["preferences"] || {}
@@ -50,6 +50,14 @@ class User < ApplicationRecord
   end
 
   def nav_closed=(value)
+    super(value.nil? ? nil : value.to_b)
+  end
+
+  def show_thinking?
+    show_thinking.nil? || show_thinking.to_b
+  end
+
+  def show_thinking=(value)
     super(value.nil? ? nil : value.to_b)
   end
 

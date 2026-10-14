@@ -119,6 +119,7 @@ de:
           api_service: "API-Dienst"
           supports_images: "Unterstützt Bilder?"
           supports_tools: "Unterstützt Tools (Function Calling)?"
+          supports_thinking: "Unterstützt erweitertes Denken (Anthropic)?"
           supports_system_message: "Unterstützt Systemnachricht (Anweisungen)?"
           supports_pdf: "Unterstützt PDFs?"
           test: "Test"
@@ -165,6 +166,7 @@ de:
             dark: "Dunkel"
             light: "Hell"
             system: "System"
+          show_thinking: "Erweitertes Denken von Claude anzeigen"
           ai_backends: "KI-Backends"
           ai_backends_description: "Welche Implementierung jeden Anbieter bedient. Standard folgt der globalen Einstellung (aktuell %{current})."
           backend_choice_default: "Standard"
@@ -209,6 +211,7 @@ de:
       next_version: "Nächste"
       read_aloud: "Vorlesen"
       pdf_document: "PDF-Dokument - Zum Öffnen klicken"
+      thinking: "Denkprozess"
       editing_title: "Nachricht bearbeiten"
       form:
         save_and_submit: "Speichern & Senden (⌘ RETURN)"

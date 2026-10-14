@@ -118,6 +118,11 @@
       </div>
     </div>
 
+    <div class="my-5 flex items-center gap-2">
+      <%= user_fields.check_box :show_thinking, checked: person.personable.show_thinking? %>
+      <%= user_fields.label :show_thinking, t("app.settings.people.form.show_thinking") %>
+    </div>
+
     <div class="my-5">
       <span class="block mb-2"><%= t("app.settings.people.form.ai_backends") %></span>
       <p class="text-sm text-gray-500 dark:text-gray-400">

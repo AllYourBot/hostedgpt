@@ -2,6 +2,16 @@
 class LanguageModel < ApplicationRecord
   include Export
 
+  # Claude models that take adaptive thinking on the Anthropic API.
+  ADAPTIVE_THINKING_PREFIXES = %w[
+    claude-opus-4-6 claude-sonnet-4-6 claude-opus-4-7 claude-opus-4-8
+    claude-opus-5 claude-sonnet-5 claude-haiku-5 claude-fable-5
+  ].freeze
+
+  def self.adaptive_thinking?(api_name)
+    api_name.to_s.start_with?(*ADAPTIVE_THINKING_PREFIXES)
+  end
+
   belongs_to :user
   belongs_to :api_service
 
