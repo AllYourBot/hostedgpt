@@ -1,40 +1,15 @@
 <%= form_with(model: document, class: "contents") do |form| %>
-  <% if document.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= t("app.documents.form.errors_title", count: document.errors.count) %></h2>
+  <%= render "layouts/form_errors", record: document, title: t("app.documents.form.errors_title", count: document.errors.count) %>
 
-      <ul>
-        <% document.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= labeled_text_field form, :user_id, t("app.documents.form.user_id"), value: User.last.id %>
 
-  <div class="my-5">
-    <%= form.label :user_id, t("app.documents.form.user_id") %>
-    <%= form.text_field :user_id, value: User.last.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
+  <%= labeled_text_field form, :assistant_id, t("app.documents.form.assistant_id"), value: Assistant.last.id %>
 
-  <div class="my-5">
-    <%= form.label :assistant_id, t("app.documents.form.assistant_id") %>
-    <%= form.text_field :assistant_id, value: Assistant.last.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
+  <%= labeled_text_field form, :message_id, t("app.documents.form.message_id"), value: Message.last.id %>
 
-  <div class="my-5">
-    <%= form.label :message_id, t("app.documents.form.message_id") %>
-    <%= form.text_field :message_id, value: Message.last.id, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
+  <%= labeled_text_field form, :filename, t("app.documents.fields.filename") %>
 
-  <div class="my-5">
-    <%= form.label :filename, t("app.documents.fields.filename") %>
-    <%= form.text_field :filename, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :purpose, t("app.documents.fields.purpose") %>
-    <%= form.text_field :purpose, value: "assistants", class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
+  <%= labeled_text_field form, :purpose, t("app.documents.fields.purpose"), value: "assistants" %>
 
   <div class="my-5">
     <%= form.label :bytes, t("app.documents.fields.bytes") %>

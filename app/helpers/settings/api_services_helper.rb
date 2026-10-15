@@ -27,5 +27,10 @@ module Settings
     def brave?(api_service)
       api_service.url == APIService::URL_BRAVE
     end
+
+    def instruction_step(key, link_text, url)
+      tag.li t("app.settings.api_services.instructions.#{key}",
+        link: link_to(link_text, url, class: "underline text-blue-600", target: "_blank"))
+    end
   end
 end

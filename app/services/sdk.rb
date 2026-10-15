@@ -1,45 +1,20 @@
 class SDK
-  def get(url, token = nil)
-    SDK::Get.new(
-      url:,
-      bearer_token: token || bearer_token,
-      expected_status:,
-      header:,
-      calling_method: calling_method(__method__),
-    )
-  end
-
-  def post(url, token = nil)
-    SDK::Post.new(
-      url:,
-      bearer_token: token || bearer_token,
-      expected_status:,
-      header:,
-      calling_method: calling_method(__method__),
-    )
-  end
-
-  def patch(url, token = nil)
-    SDK::Patch.new(
-      url:,
-      bearer_token: token || bearer_token,
-      expected_status:,
-      header:,
-      calling_method: calling_method(__method__),
-    )
-  end
-
-  def delete(url, token = nil)
-    SDK::Delete.new(
-      url:,
-      bearer_token: token || bearer_token,
-      expected_status:,
-      header:,
-      calling_method: calling_method(__method__),
-    )
-  end
+  def get(url, token = nil)    = request(SDK::Get, url, token, __method__)
+  def post(url, token = nil)   = request(SDK::Post, url, token, __method__)
+  def patch(url, token = nil)  = request(SDK::Patch, url, token, __method__)
+  def delete(url, token = nil) = request(SDK::Delete, url, token, __method__)
 
   private
+
+  def request(verb_class, url, token, verb)
+    verb_class.new(
+      url:,
+      bearer_token: token || bearer_token,
+      expected_status:,
+      header:,
+      calling_method: calling_method(verb),
+    )
+  end
 
   def calling_method(verb)
     # Find the method that called get/post/patch/delete

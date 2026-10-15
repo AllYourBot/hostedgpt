@@ -44,13 +44,11 @@ class Toolbox::Gmail::Message
   end
 
   def body
-    str = @message.payload.parts.find { |p| p.mimeType == "text/plain" }&.body&.data&.gsub(/-/, "+")&.gsub(/_/, "/")
-    str && Base64.decode64(str)
+    decoded_part("text/plain")
   end
 
   def body_html
-    str = @message.payload.parts.find { |p| p.mimeType == "text/html" }&.body&.data&.gsub(/-/, "+")&.gsub(/_/, "/")
-    str && Base64.decode64(str)
+    decoded_part("text/html")
   end
 
   def to_h
@@ -72,5 +70,12 @@ class Toolbox::Gmail::Message
 
   def inspect
     "#<Message id:#{id} from:#{from_email} to:#{to_email} subject:#{subject}>"
+  end
+
+  private
+
+  def decoded_part(mime_type)
+    str = @message.payload.parts.find { |p| p.mimeType == mime_type }&.body&.data&.gsub(/-/, "+")&.gsub(/_/, "/")
+    str && Base64.decode64(str)
   end
 end

@@ -5,16 +5,7 @@
   </td>
   <td>
     <%= button_to settings_memory_path(memory), method: :delete, class: "inline-block cursor-pointer py-1 pt-0 align-middle" do %>
-      <%= icon "trash",
-        variant: :outline,
-        size: 22,
-        class: %|
-          stroke-2
-          text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white
-        |,
-        title: t("app.settings.memories.forget"),
-        tooltip: :bottom
-      %>
+      <%= action_icon "trash", title: t("app.settings.memories.forget"), tooltip: :bottom %>
     <% end %>
   </td>
 </tr>

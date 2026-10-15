@@ -1,6 +1,6 @@
 require "test_helper"
 
-class Settings::APIServicesHelperTest < ActiveSupport::TestCase
+class Settings::APIServicesHelperTest < ActionView::TestCase
 
   include Settings::APIServicesHelper
 
@@ -31,5 +31,11 @@ class Settings::APIServicesHelperTest < ActiveSupport::TestCase
   test "openrouter? is false for non-OpenRouter URLs" do
     refute openrouter?(api_services(:keith_openai_service))
     refute openrouter?(api_services(:keith_groq_service))
+  end
+
+  test "instruction_step renders a translated step whose link opens in a new tab" do
+    html = instruction_step("openai.step1_html", "Platform", "https://platform.openai.com/")
+    assert html.start_with?("<li>"), "the step should be a list item"
+    assert_includes html, '<a class="underline text-blue-600" target="_blank" href="https://platform.openai.com/">Platform</a>', "the link should be interpolated unescaped"
   end
 end

@@ -1,6 +1,8 @@
 require "test_helper"
 
 class ApplicationHelperTest < ActionView::TestCase
+  include RailsHeroicon::Helper
+
 
   test "only at most 2 initials" do
     assert_equal "jz", at_most_two_initials("jdz")
@@ -40,6 +42,28 @@ class ApplicationHelperTest < ActionView::TestCase
 
   test "spinner is sized through square_size_classes" do
     assert_includes spinner(size: 6), "w-6 h-6"
+  end
+
+  test "action_icon renders an outline icon in the muted zinc style" do
+    html = action_icon("x-mark", title: "Close")
+    assert_includes html, "text-zinc-600", "action_icon should apply the default muted classes"
+    assert_includes html, "width: 22px", "action_icon should default to size 22"
+    assert_includes html, 'data-tip="Close"', "action_icon should pass the title through as a tooltip"
+  end
+
+  test "action_icon lets the caller override the class" do
+    html = action_icon("x-mark", class: "stroke-2 text-red-500")
+    assert_includes html, "text-red-500", "a caller's class should be used"
+    refute_includes html, "text-zinc-600", "a caller's class should replace the default rather than add to it"
+  end
+
+  test "labeled_text_field wraps a label and a styled text field" do
+    form = ActionView::Helpers::FormBuilder.new(:assistant, assistants(:samantha), self, {})
+    html = labeled_text_field(form, :name, "Name", autofocus: true)
+    assert_includes html, '<div class="my-5">', "the field should sit in the spaced wrapper"
+    assert_includes html, '<label for="assistant_name">Name</label>', "the label should use the given text"
+    assert_includes html, 'autofocus="autofocus"', "extra options should reach the text field"
+    assert_includes html, "dark:text-black", "the text field should get the shared input classes"
   end
 
   # Profile picture helper tests

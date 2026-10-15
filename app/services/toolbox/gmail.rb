@@ -13,12 +13,7 @@ class Toolbox::Gmail < Toolbox
     end
     to = Current.user.gmail_credential.oauth_email
 
-    draft = create_draft(to: to, subject: subject, body: body)
-    raise "Could not send message for an unknown reason." if !draft&.id
-    send_draft(draft.id)
-    # message_send(from: to, to: to, subject: subject, body: body)
-
-    "Email has been sent"
+    send_email(to:, subject:, body:)
   end
 
   describe :send_email_to_address, <<~S
@@ -29,15 +24,7 @@ class Toolbox::Gmail < Toolbox
   S
 
   def send_email_to_address(email_address_s:, subject_s:, message_s:)
-    draft = create_draft(
-      to: email_address_s,
-      subject: subject_s,
-      body: message_s
-    )
-    raise "Could not send message for an unknown reason." if !draft&.id
-    send_draft(draft.id)
-
-    "Email has been sent"
+    send_email(to: email_address_s, subject: subject_s, body: message_s)
   end
 
   describe :check_inbox, <<~S
@@ -67,6 +54,14 @@ class Toolbox::Gmail < Toolbox
     refresh_token_if_needed do
       get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/profile").no_params
     end
+  end
+
+  def send_email(to:, subject:, body:)
+    draft = create_draft(to:, subject:, body:)
+    raise "Could not send message for an unknown reason." if !draft&.id
+    send_draft(draft.id)
+
+    "Email has been sent"
   end
 
   def create_draft(to:, subject:, body:)

@@ -63,4 +63,16 @@ class ToolboxTest < ActiveSupport::TestCase
   test "call executes a tool" do
     assert_equal "Hello, World!", Toolbox.call("helloworld_hi", { name: "World" })
   end
+
+  test "best_match_index picks the closest option, the earliest winning a tie" do
+    toolbox = Toolbox.new
+    assert_equal 1, toolbox.send(:best_match_index, "Groceries", ["Work", "Groceries", "Grocery"]), "The exact match should win"
+    assert_equal 0, toolbox.send(:best_match_index, "x", ["Same", "Same"]), "A tie should go to the earliest option"
+  end
+
+  test "best_match_index is nil when nothing scores above the threshold" do
+    toolbox = Toolbox.new
+    assert_nil toolbox.send(:best_match_index, "Groceries", ["Work"], threshold: 0.7), "A weak match should not count"
+    assert_nil toolbox.send(:best_match_index, "Groceries", []), "No options should mean no match"
+  end
 end

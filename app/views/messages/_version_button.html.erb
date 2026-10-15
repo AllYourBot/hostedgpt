@@ -1,0 +1,17 @@
+<%= button_to message_path(message, version:),
+  method: :patch,
+  params: { message: { id: message.id } },
+  class: "#{margin} cursor-pointer hover:text-gray-900 dark:hover:text-white disabled:opacity-25",
+  disabled: version.nil?,
+  form: {
+    class: "flex items-center",
+    data: {
+      turbo_frame: "_top",
+      turbo_action: "replace",
+    }
+  },
+  data: {
+    role:,
+} do %>
+  <%= icon icon_name, variant: :micro, title: version.present? && title %>
+<% end %>

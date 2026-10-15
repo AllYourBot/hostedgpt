@@ -1,20 +1,7 @@
 <%= form_with(model: [:settings, language_model], class: "contents", data: { controller: "testing" }) do |form| %>
-  <% if language_model.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= t("app.settings.language_models.form.errors_title", count: language_model.errors.count) %></h2>
+  <%= render "layouts/form_errors", record: language_model, title: t("app.settings.language_models.form.errors_title", count: language_model.errors.count) %>
 
-      <ul>
-        <% language_model.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="my-5">
-    <%= form.label :name, t("app.settings.language_models.form.name") %>
-    <%= form.text_field :name, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
-  </div>
+  <%= labeled_text_field form, :name, t("app.settings.language_models.form.name") %>
 
   <div class="my-5 inline-block w-full">
     <%= form.label :api_name, t("app.settings.language_models.form.api_name") %>
