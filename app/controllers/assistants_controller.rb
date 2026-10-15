@@ -1,7 +1,6 @@
 class AssistantsController < ApplicationController
   before_action :set_nav_conversations
   before_action :set_nav_assistants
-  before_action :set_nav_collections
 
   def index
     unless Feature.assistants_page? && !mobile_device?

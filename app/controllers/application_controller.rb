@@ -54,10 +54,6 @@ class ApplicationController < ActionController::Base
     @nav_assistants = Current.user.assistants.ordered
   end
 
-  def set_nav_collections
-    @nav_collections = Current.user.collections.ordered
-  end
-
   def set_system_ivars
     @system_ivars = public_ivars
   end
