@@ -23,4 +23,14 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     assert_includes html, "$5"
     refute_includes html, "MATHSPAN"
   end
+
+  test "fenced code language is preserved for block_code" do
+    captured = nil
+    html = MarkdownRenderer.render_for_display(
+      "```ruby\nputs 1\n```",
+      block_code: ->(code, lang) { captured = lang; "<pre>#{code}</pre>" }
+    )
+    assert_equal "ruby", captured
+    assert_includes html, "<pre>"
+  end
 end
