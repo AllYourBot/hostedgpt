@@ -79,6 +79,16 @@ class MessagesHelperTest < ActionView::TestCase
     refute_includes html, "<a "
   end
 
+  test "assistant HTML is escaped but math delimiters survive" do
+    message = Message.new(role: :assistant, content_text: '<script>alert(1)</script> math \\(x^2\\) here')
+
+    html = view.format_for_display(message)
+
+    refute_includes html, "<script>"
+    assert_includes html, "&lt;script&gt;"
+    assert_includes html, '\\(x^2\\)'
+  end
+
   private
 
   def tool_result_message(function_name:, result:)
