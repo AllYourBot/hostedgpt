@@ -97,8 +97,8 @@ class MarkdownRendererDisplayTest < ActiveSupport::TestCase
 
     formatted = <<~HTML
       <p>This is sql:</p>
-      <pre lang="sql"><code>SELECT * FROM users;
-      </code></pre>
+      <pre lang="sql" style="background-color:#2b303b;"><code><span style="color:#b48ead;">SELECT </span><span style="color:#c0c5ce;">* </span><span style="color:#b48ead;">FROM</span><span style="color:#c0c5ce;"> users;
+      </span></code></pre>
       <p>Line after.</p>
     HTML
 
@@ -116,8 +116,8 @@ class MarkdownRendererDisplayTest < ActiveSupport::TestCase
 
     formatted = <<~HTML
       <p>This is sql:</p>
-      <pre lang="sql"><code>SELECT * FROM users;
-      </code></pre>
+      <pre lang="sql" style="background-color:#2b303b;"><code><span style="color:#b48ead;">SELECT </span><span style="color:#c0c5ce;">* </span><span style="color:#b48ead;">FROM</span><span style="color:#c0c5ce;"> users;
+      </span></code></pre>
       <p>Line after.</p>
     HTML
 
@@ -137,8 +137,8 @@ class MarkdownRendererDisplayTest < ActiveSupport::TestCase
 
     formatted = <<~HTML
       <p>This is sql:</p>
-      <code lang="sql">SELECT * FROM users;
-      </code>
+      <code lang="sql"><span style="color:#b48ead;">SELECT </span><span style="color:#c0c5ce;">* </span><span style="color:#b48ead;">FROM</span><span style="color:#c0c5ce;"> users;
+      </span></code>
       <p>Line after.</p>
     HTML
 

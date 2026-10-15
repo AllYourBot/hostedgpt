@@ -28,8 +28,7 @@ class MarkdownRenderer
       markdown = markdown.dup.force_encoding(Encoding::UTF_8).scrub
       html = Commonmarker.to_html(
         markdown,
-        options: { extension: COMMONMARKER_EXTENSIONS },
-        plugins: { syntax_highlighter: nil }
+        options: { extension: COMMONMARKER_EXTENSIONS }
       )
       html = apply_block_code_proc(html, block_code_proc) if block_code_proc
       restore_math_spans(html, math_spans)
