@@ -21,7 +21,7 @@ class MarkdownRenderer
 
       markdown = ensure_blank_line_before_code_block_start(markdown)
       math_spans = []
-      markdown = markdown.gsub(/\\\(.+?\\\)/m) do |m|
+      markdown = markdown.gsub(/\\\(.+?\\\)|\\\[.+?\\\]/m) do |m|
         math_spans << m
         "MATHSPAN#{math_spans.size - 1}XYZ"
       end
