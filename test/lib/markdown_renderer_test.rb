@@ -98,4 +98,29 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     assert_includes html, "footnote"
     assert_includes html, "The source."
   end
+
+  test "mermaid fence keeps its language so the client can preview it" do
+    captured = nil
+    html = MarkdownRenderer.render_for_display(
+      "```mermaid\ngraph TD;\n```\n",
+      block_code: ->(code, lang) { captured = lang; "<pre>#{code}</pre>" }
+    )
+    assert_equal "mermaid", captured
+    assert_includes html, "graph TD;"
+  end
+
+  test "pre-escaped entities in fenced code are not double-escaped" do
+    html = MarkdownRenderer.render_for_display(
+      "```\na--&gt;b\n```\n",
+      block_code: ->(code, lang) { "<pre>#{code}</pre>" }
+    )
+    assert_includes html, "a--&gt;b"
+    refute_includes html, "&amp;gt;"
+  end
+
+  test "pre-escaped entities in inline code spans are not double-escaped" do
+    html = MarkdownRenderer.render_for_display("x `foo &lt;= 3` y")
+    assert_includes html, "<code>foo &lt;= 3</code>"
+    refute_includes html, "&amp;"
+  end
 end

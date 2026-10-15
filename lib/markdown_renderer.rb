@@ -31,7 +31,7 @@ class MarkdownRenderer
         markdown,
         options: { extension: COMMONMARKER_EXTENSIONS }
       )
-      html = apply_block_code_proc(html, block_code_proc) if block_code_proc
+      html = apply_block_code_proc(html, block_code_proc)
       restore_math_spans(html, math_spans)
     end
 
@@ -78,18 +78,34 @@ class MarkdownRenderer
 
     # Commonmarker has no block_code callback, so the helper's copy-header
     # structure is applied as a post-process: each <pre> is replaced by
-    # whatever the proc returns for its (code_html, language).
+    # whatever the proc returns for its (code_html, language). Code content
+    # arrives double-protected (escaped once upstream, once by comrak), so
+    # text nodes get decoded twice wherever no proc/fragment round-trip
+    # provides the second unwrap.
     def apply_block_code_proc(html, block_code_proc)
-      return html unless html.include?("<pre")
+      return html unless html.include?("<code")
 
       doc = Nokogiri::HTML.fragment(html)
       doc.css("pre").each do |pre|
         code = pre.at_css("code") || pre
         language = pre["lang"] || code["class"].to_s[/language-(\S+)/, 1]
+        decode_code_text_nodes(code)
         code_html = (code == pre ? pre.inner_html : code.inner_html)
-        pre.replace(Nokogiri::HTML.fragment(block_code_proc.call(code_html.html_safe, language)))
+        if block_code_proc
+          pre.replace(Nokogiri::HTML.fragment(block_code_proc.call(code_html.html_safe, language)))
+        else
+          decode_code_text_nodes(code)
+        end
+      end
+      doc.xpath(".//code[not(ancestor::pre)]").each do |code|
+        decode_code_text_nodes(code)
+        decode_code_text_nodes(code)
       end
       doc.to_html
+    end
+
+    def decode_code_text_nodes(code)
+      code.xpath(".//text()").each { |node| node.content = CGI.unescapeHTML(node.content) }
     end
 
     def ensure_blank_line_before_code_block_start(markdown)
