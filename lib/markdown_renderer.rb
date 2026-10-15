@@ -20,7 +20,16 @@ class MarkdownRenderer
       )
 
       markdown = ensure_blank_line_before_code_block_start(markdown)
-      formatter.render(markdown)
+      math_spans = []
+      markdown = markdown.gsub(/\\\(.+?\\\)/m) do |m|
+        math_spans << m
+        "MATHSPAN#{math_spans.size - 1}XYZ"
+      end
+      html = formatter.render(markdown)
+      math_spans.each_with_index do |m, i|
+        html = html.gsub("MATHSPAN#{i}XYZ", m)
+      end
+      html
     end
 
     private
