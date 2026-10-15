@@ -1,4 +1,4 @@
-class Redcarpet::CustomSpeakingRenderer # can't get redcarpet working, just using regex
+class CustomSpeakingRenderer # regex-only, no markdown gem involved
   def render(markdown)
     not_needing_suffix = %w[javascript jsx typescript css html json markdown yaml]
 

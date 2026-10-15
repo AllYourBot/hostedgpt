@@ -1,6 +1,6 @@
 require "test_helper"
 
-class CustomDisplayRendererTest < ActiveSupport::TestCase
+class MarkdownRendererDisplayTest < ActiveSupport::TestCase
   setup do
     @renderer = MarkdownRenderer
   end
@@ -25,10 +25,8 @@ class CustomDisplayRendererTest < ActiveSupport::TestCase
 
     formatted = <<~HTML
       <p>This is the first paragraph</p>
-
-      <p>This is a second paragraph<br>
+      <p>This is a second paragraph<br />
       with a line break.</p>
-
       <p>This is a third paragraph</p>
     HTML
 
@@ -78,8 +76,8 @@ class CustomDisplayRendererTest < ActiveSupport::TestCase
   end
 
   test "ensure_blank_line_before_code_block_start keeps a block indented if it is indented" do
-    # TODO: Notably, if a block is indented right after a bullet such that it's intended to be included within the bullet,
-    # redcarpet is not including the block within the bullet: https://github.com/allyourbot/hostedgpt/issues/323
+    # TODO: if a code block is indented right after a bullet such that it is intended to be included
+    # within the bullet, the renderer does not include the block within the bullet: https://github.com/allyourbot/hostedgpt/issues/323
 
     markdown = "Text before code block\n\n  ```  ruby\n  code block\n  ```"
     expected = "Text before code block\n\n  ```  ruby\n  code block\n  ```"
@@ -99,10 +97,8 @@ class CustomDisplayRendererTest < ActiveSupport::TestCase
 
     formatted = <<~HTML
       <p>This is sql:</p>
-
-      <pre><code class="sql">SELECT * FROM users;
+      <pre lang="sql"><code>SELECT * FROM users;
       </code></pre>
-
       <p>Line after.</p>
     HTML
 
@@ -120,10 +116,8 @@ class CustomDisplayRendererTest < ActiveSupport::TestCase
 
     formatted = <<~HTML
       <p>This is sql:</p>
-
-      <pre><code class="sql">SELECT * FROM users;
+      <pre lang="sql"><code>SELECT * FROM users;
       </code></pre>
-
       <p>Line after.</p>
     HTML
 
@@ -143,8 +137,8 @@ class CustomDisplayRendererTest < ActiveSupport::TestCase
 
     formatted = <<~HTML
       <p>This is sql:</p>
-      <CODE lang="sql">SELECT * FROM users;
-      </CODE>
+      <code lang="sql">SELECT * FROM users;
+      </code>
       <p>Line after.</p>
     HTML
 

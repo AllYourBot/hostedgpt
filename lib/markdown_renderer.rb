@@ -1,30 +1,37 @@
-Dir[File.join(File.dirname(__FILE__), "redcarpet", "*.rb")].each { |file| require file }
+require "commonmarker"
+require "nokogiri"
 
 class MarkdownRenderer
+  COMMONMARKER_EXTENSIONS = {
+    strikethrough: true,
+    tagfilter: true,
+    table: true,
+    autolink: true,
+    tasklist: true,
+    alerts: true,
+    underline: true,
+  }.freeze
+
   class << self
     def render_for_speaking(markdown)
-      Redcarpet::CustomSpeakingRenderer.new.render(markdown.to_s)
+      CustomSpeakingRenderer.new.render(markdown.to_s)
     end
 
     def render_for_display(markdown, options = {})
       # Input contract: content arrives HTML-escaped once upstream (the XSS
       # contract lives at the helper). This layer parses markdown; it does
       # not escape raw markup itself.
-      renderer  = create_renderer_for_display(options)
-      formatter = Redcarpet::Markdown.new(renderer,
-        autolink: true,
-        tables: true,
-        space_after_headers: true,
-        strikethrough: true,
-        underline: true,
-        no_intra_emphasis: true,
-        fenced_code_blocks: true,
-        disable_indented_code_blocks: true
-      )
+      block_code_proc = options.delete(:block_code)
 
       markdown = ensure_blank_line_before_code_block_start(markdown)
       markdown, math_spans = extract_math_spans(markdown)
-      html = formatter.render(markdown)
+      markdown = markdown.dup.force_encoding(Encoding::UTF_8).scrub
+      html = Commonmarker.to_html(
+        markdown,
+        options: { extension: COMMONMARKER_EXTENSIONS },
+        plugins: { syntax_highlighter: nil }
+      )
+      html = apply_block_code_proc(html, block_code_proc) if block_code_proc
       restore_math_spans(html, math_spans)
     end
 
@@ -69,20 +76,20 @@ class MarkdownRenderer
       "\uE000"
     end
 
-    def create_renderer_for_display(options)
-      render_class = Redcarpet::CustomDisplayRenderer
+    # Commonmarker has no block_code callback, so the helper's copy-header
+    # structure is applied as a post-process: each <pre> is replaced by
+    # whatever the proc returns for its (code_html, language).
+    def apply_block_code_proc(html, block_code_proc)
+      return html unless html.include?("<pre")
 
-      block_code_proc = options.delete(:block_code)
-      if block_code_proc
-        render_class = Class.new(Redcarpet::CustomDisplayRenderer)
-        render_class.instance_eval do
-          define_method(:block_code) do |code, language|
-            block_code_proc.call(code.html_safe, language)
-          end
-        end
+      doc = Nokogiri::HTML.fragment(html)
+      doc.css("pre").each do |pre|
+        code = pre.at_css("code") || pre
+        language = pre["lang"] || code["class"].to_s[/language-(\S+)/, 1]
+        code_html = (code == pre ? pre.inner_html : code.inner_html)
+        pre.replace(Nokogiri::HTML.fragment(block_code_proc.call(code_html.html_safe, language)))
       end
-
-      render_class.new(safe_links_only: true)
+      doc.to_html
     end
 
     def ensure_blank_line_before_code_block_start(markdown)
