@@ -13,12 +13,6 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
     @open_meteo = Toolbox::OpenMeteo.new
   end
 
-  # The live API tests below turn WebMock off; turn it back on so it doesn't stay
-  # off for every test that runs after them in the same process.
-  teardown do
-    WebMock.enable!
-  end
-
   test "filter_by_country filters locations by country with a fuzzy match" do
     filtered_locations = @open_meteo.send(:filter_by_country, "US", locations: @locations)
 
@@ -31,25 +25,69 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
     assert_equal @locations[1], location
   end
 
-  test "get_current_and_todays_weather hits the API and doesn't fail" do
-    WebMock.disable!
+  test "get_current_and_todays_weather summarizes the location's forecast" do
+    stub_weather_api do
+      result = @open_meteo.get_current_and_todays_weather(city_s: "Austin", state_province_or_region_s: "Texas")
 
-    allow_request(:get, :get_location) do
-      allow_request(:get, :get_current_and_todays_weather) do
-        result = @open_meteo.get_current_and_todays_weather(city_s: "Austin", state_province_or_region_s: "Texas")
-        assert result.values.all? { |value| value.present? }
-      end
+      assert result.values.all? { |value| value.present? }
+      assert_equal "Austin, Texas, United States", result[:in]
+      assert_equal "72 degrees fahrenheit", result[:right_now]
+      assert_equal "+3.0 degrees fahrenheit", result[:today_high_change_from_yesterday]
+      assert_equal "Currently in Austin there are scattered clouds and it's 72 degrees. Today there's a forecasted low of 61 degrees and a high of 84 degrees.", result[:good_summary]
     end
   end
 
   test "get_current_and_todays_weather works as a tool call" do
-    WebMock.disable!
+    stub_weather_api do
+      result = Toolbox.call("openmeteo_get_current_and_todays_weather", city: "Austin", state_province_or_region: "Texas")
 
-    allow_request(:get, :get_location) do
-      allow_request(:get, :get_current_and_todays_weather) do
-        result = Toolbox.call("openmeteo_get_current_and_todays_weather", city: "Austin", state_province_or_region: "Texas")
-        assert result.values.all? { |value| value.present? }
-      end
+      assert result.values.all? { |value| value.present? }
+      assert_equal "Austin, Texas, United States", result[:in]
     end
+  end
+
+  private
+
+  def stub_weather_api(&block)
+    stub_get_response(:get_location, status: 200, response: locations_data) do
+      stub_get_response(:get_current_and_todays_weather, status: 200, response: forecast_data, &block)
+    end
+  end
+
+  def locations_data
+    {
+      results: [
+        { name: "Austin", latitude: 43.66, longitude: -92.97, timezone: "America/Chicago", country: "United States", admin1: "Minnesota" },
+        { name: "Austin", latitude: 30.27, longitude: -97.74, timezone: "America/Chicago", country: "United States", admin1: "Texas" },
+      ]
+    }
+  end
+
+  def forecast_data
+    {
+      current_units: { temperature_2m: "°F", precipitation: "inch" },
+      current: {
+        temperature_2m: 72.4,
+        apparent_temperature: 73.1,
+        precipitation: 0.0,
+        rain: 0.0,
+        showers: 0.0,
+        snowfall: 0.0,
+        cloud_cover: 40,
+        weather_code: 2,
+      },
+      daily: {
+        weather_code: [ 3, 2 ],
+        temperature_2m_max: [ 81.0, 84.0 ],
+        temperature_2m_min: [ 60.0, 61.0 ],
+        apparent_temperature_max: [ 82.0, 85.0 ],
+        apparent_temperature_min: [ 59.0, 60.0 ],
+        precipitation_sum: [ 0.1, 0.0 ],
+        rain_sum: [ 0.1, 0.0 ],
+        showers_sum: [ 0.0, 0.0 ],
+        snowfall_sum: [ 0.0, 0.0 ],
+        precipitation_probability_max: [ 20, 10 ],
+      }
+    }
   end
 end
