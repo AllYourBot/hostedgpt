@@ -17,4 +17,10 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     html = MarkdownRenderer.render_for_display('math \\[x^2\\] here')
     assert_includes html, '\\[x^2\\]'
   end
+
+  test "$5 currency stays literal, not math" do
+    html = MarkdownRenderer.render_for_display("Price is $5 here")
+    assert_includes html, "$5"
+    refute_includes html, "MATHSPAN"
+  end
 end
