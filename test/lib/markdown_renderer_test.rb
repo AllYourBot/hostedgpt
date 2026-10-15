@@ -93,4 +93,9 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     html = MarkdownRenderer.render_for_display("plain ascii text")
     assert_includes html, "plain ascii text"
   end
+  test "footnotes render as linked notes, not literal [^1]" do
+    html = MarkdownRenderer.render_for_display("Claim[^1].\n\n[^1]: The source.\n")
+    assert_includes html, "footnote"
+    assert_includes html, "The source."
+  end
 end

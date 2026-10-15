@@ -9,6 +9,7 @@ class MarkdownRenderer
     autolink: true,
     tasklist: true,
     alerts: true,
+    footnotes: true,
     underline: true,
   }.freeze
 
