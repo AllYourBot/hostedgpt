@@ -33,4 +33,13 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     assert_equal "ruby", captured
     assert_includes html, "<pre>"
   end
+
+  test "math delimiters inside fenced code stay code, not math" do
+    html = MarkdownRenderer.render_for_display(
+      "```tex\n\\(a^2\\) and $$x$$ here\n```",
+      block_code: ->(code, lang) { "<pre>#{code}</pre>" }
+    )
+    assert_includes html, "<pre>"
+    refute_includes html, "MATHSPAN"
+  end
 end
