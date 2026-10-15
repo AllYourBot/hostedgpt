@@ -36,3 +36,5 @@ end.each do |file|
 end
 pin "tailwindcss-safe-area" # @0.5.1
 pin "tailwindcss/plugin", to: "tailwindcss--plugin.js" # @3.4.4
+pin "katex", to: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.mjs", integrity: "sha384-jedKqQ2avB8pVdicoYScbJrLo+QCOkeNRKJl9vYz9vRHjP4VYoJFGCelkRVBCZAe"
+pin "katex-auto-render", to: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/contrib/auto-render.mjs", integrity: "sha384-TVzn2BhpYt3oVSkcw7UsqrtOiRjYZclHsyRByxnksSdM08YtpNkb7RLhhACRu3OA"
