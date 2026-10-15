@@ -1,0 +1,9 @@
+<%# locals: (conversation:) %>
+<%# The sidebar row and the card carry the identical picker: same endpoints, same roles,
+    same icon. One call site so the two surfaces cannot drift apart; the message row
+    keeps its own picker call with its own roles and icon size. %>
+<%= render "reactions/picker", reactable: conversation,
+  react_url: react_conversation_path(conversation),
+  unreact_url: unreact_conversation_path(conversation),
+  button_role: "react-conversation", emoji_role: "react-emoji-conversation",
+  icon_size: 16, icon_class: "text-gray-500 dark:text-gray-300" %>

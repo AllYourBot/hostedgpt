@@ -1,5 +1,8 @@
 class Message < ApplicationRecord
   include DocumentImage, Version, Cancellable, Toolable
+  include Reactable
+  include Pinnable
+  include Bookmarkable
 
   belongs_to :assistant
   belongs_to :conversation, inverse_of: :messages
@@ -24,6 +27,7 @@ class Message < ApplicationRecord
 
   after_create :start_assistant_reply, if: :user?
   after_create :set_last_assistant_message, if: :assistant?
+  after_create :bump_conversation_recency
   after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
 
   scope :ordered, -> { latest_version_for_conversation }
@@ -74,6 +78,14 @@ class Message < ApplicationRecord
 
   def set_last_assistant_message
     conversation.update!(last_assistant_message: self)
+  end
+
+  # Bubble-up for the recency-ordered sidebar: every new message moves its conversation to the
+  # top of the most recent group. update_column moves updated_at and nothing else — a touch
+  # would fire Conversation's after_touch autotitle path and enqueue extra title jobs, while the
+  # streaming job's wrap-up touch already owns that path.
+  def bump_conversation_recency
+    conversation.update_column(:updated_at, Time.current)
   end
 
   def update_assistant_on_conversation

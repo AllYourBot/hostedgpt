@@ -13,6 +13,7 @@
 ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
@@ -92,6 +93,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.index ["credential_id"], name: "index_authentications_on_credential_id"
   end
 
+  create_table "bookmarks", force: :cascade do |t|
+    t.bigint "bookmarkable_id", null: false
+    t.string "bookmarkable_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["bookmarkable_type", "bookmarkable_id"], name: "index_bookmarks_on_bookmarkable"
+    t.index ["user_id", "bookmarkable_type", "bookmarkable_id"], name: "index_bookmarks_on_user_and_bookmarkable", unique: true
+    t.index ["user_id"], name: "index_bookmarks_on_user_id"
+  end
+
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -128,6 +140,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.integer "input_token_total_count", default: 0, null: false
     t.bigint "last_assistant_message_id"
     t.integer "output_token_total_count", default: 0, null: false
+    t.integer "position"
     t.string "share_token"
     t.string "title"
     t.datetime "updated_at", null: false
@@ -136,7 +149,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
     t.index ["share_token"], name: "index_conversations_on_share_token"
+    t.index ["title"], name: "index_conversations_on_title", opclass: :gin_trgm_ops, using: :gin
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
+    t.index ["user_id", "position"], name: "index_conversations_on_user_id_and_position"
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end
 
@@ -232,6 +247,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.integer "version", null: false
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
     t.index ["content_document_id"], name: "index_messages_on_content_document_id"
+    t.index ["content_text"], name: "index_messages_on_content_text", opclass: :gin_trgm_ops, using: :gin
     t.index ["conversation_id", "index", "version"], name: "index_messages_on_conversation_id_and_index_and_version", unique: true
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["index"], name: "index_messages_on_index"
@@ -258,6 +274,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_people_on_email", unique: true
     t.index ["personable_type", "personable_id"], name: "index_people_on_personable"
+  end
+
+  create_table "pins", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "pinnable_id", null: false
+    t.string "pinnable_type", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["pinnable_type", "pinnable_id"], name: "index_pins_on_pinnable"
+    t.index ["user_id", "pinnable_type", "pinnable_id"], name: "index_pins_on_user_id_and_pinnable_type_and_pinnable_id", unique: true
+    t.index ["user_id"], name: "index_pins_on_user_id"
+  end
+
+  create_table "reactions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "emoji", null: false
+    t.bigint "reactable_id", null: false
+    t.string "reactable_type", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["reactable_type", "reactable_id"], name: "index_reactions_on_reactable"
+    t.index ["user_id", "reactable_type", "reactable_id", "emoji"], name: "index_reactions_on_user_and_reactable_and_emoji", unique: true
+    t.index ["user_id"], name: "index_reactions_on_user_id"
   end
 
   create_table "replies", force: :cascade do |t|
@@ -452,6 +491,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   add_foreign_key "assistants", "users"
   add_foreign_key "authentications", "clients"
   add_foreign_key "authentications", "credentials"
+  add_foreign_key "bookmarks", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "clients", "people"
   add_foreign_key "collections", "users"
@@ -472,6 +512,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   add_foreign_key "messages", "documents", column: "content_document_id"
   add_foreign_key "messages", "runs"
   add_foreign_key "notes", "chats"
+  add_foreign_key "pins", "users"
+  add_foreign_key "reactions", "users"
   add_foreign_key "replies", "notes"
   add_foreign_key "runs", "assistants"
   add_foreign_key "runs", "conversations"

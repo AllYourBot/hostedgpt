@@ -1,0 +1,12 @@
+<%# locals: (path:, role:, icon:, label_key: nil, icon_size: 16, frame: "_top", link_class: nil, title_key: "app.conversations.ui.open_page") %>
+<%# One shape for the sidebar's page links: the labeled Bookmarks/Reactions rows above
+    the search and the compact open-page icon in the pinned header. Same frame break-out,
+    same icon treatment; the label row carries its row styling and label, the compact
+    form carries just the icon. %>
+<%= link_to path,
+  data: { role: role, turbo_frame: frame },
+  class: link_class || "p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700",
+  title: t(title_key) do %>
+  <%= icon icon, variant: :outline, size: icon_size, class: "text-gray-500 dark:text-gray-300" %>
+  <% if label_key %><span class="ml-2"><%= t("app.conversations.ui.#{label_key}") %></span><% end %>
+<% end %>

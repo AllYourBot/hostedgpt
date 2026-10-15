@@ -1,0 +1,31 @@
+<%# locals: (conversation:, page_context: nil) %>
+<%# Assistant-style card for the /pinned, /bookmarks, and /reactions pages. The outer id is
+    the card dom-id (dom_id(conversation, :card)), distinct from the sidebar row id, so both
+    can share a page and toggle streams can replace/remove exactly this card. %>
+<% page_context ||= @page_context %>
+<% pinned = conversation.pinned?(Current.user) %>
+<% bookmarked = conversation.bookmarked?(Current.user) %>
+<div
+  id="<%= dom_id(conversation, :card) %>"
+  data-role="conversation-card"
+  class="relative flex items-start space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:bg-gray-700 dark:border-gray-600"
+>
+  <div class="min-w-0 flex-1">
+    <%= link_to conversation_messages_path(conversation),
+      data: { role: "title" },
+      class: "block" do %>
+      <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= conversation.title.presence || t("app.conversations.new_chat") %></p>
+      <p class="truncate text-sm text-gray-500 dark:text-gray-300"><%= conversation.assistant.name %></p>
+      <p class="text-xs text-gray-400 dark:text-gray-400" data-role="recency"><%= t("app.conversations.ui.ago", time: time_ago_in_words(conversation.updated_at)) %></p>
+    <% end %>
+  </div>
+  <div class="flex items-center pr-1">
+    <%# Pin/bookmark toggles share the save_toggle partial with the sidebar row.
+        page_context bounces the page back so the response replaces or removes
+        exactly this card instead of resetting the view. %>
+    <%= render "conversations/save_toggle", conversation: conversation, pinned: pinned, bookmarked: bookmarked, page_context: page_context %>
+    <%# Counts plus picker, same optimistic fetch contract as the sidebar row: the endpoints
+        answer 204, so no card stream is involved here. %>
+    <%= render "reactions/conversation_picker", conversation: conversation %>
+  </div>
+</div>

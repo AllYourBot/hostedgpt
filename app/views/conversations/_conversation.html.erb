@@ -1,7 +1,14 @@
 <%# locals: (conversation:, settings: true) %>
 <% selected = conversation == @conversation %>
+<% pinned = conversation.pinned?(Current.user) %>
+<% bookmarked = conversation.bookmarked?(Current.user) %>
+<%# Drag spans both sections in the main view only: a filtered list shows a subset, and dragging
+    a subset would corrupt the saved order of the rest. The drop position decides membership —
+    landing in the pinned area pins, landing below unpins. %>
+<% sortable = @query.blank? && !@bookmarks_view && !@reactions_view %>
 
 <div
+  id="<%= dom_id(conversation) %>"
   class="
     rounded-lg mr-5 cursor-pointer group
     hover:bg-gray-100 dark:hover:bg-gray-700
@@ -9,6 +16,12 @@
     mb-px
     <%= selected && "relationship" %>
   "
+  <% if sortable %>
+    data-sortable-target="item"
+    data-sortable-id="<%= conversation.id %>"
+    data-sortable-zone="<%= pinned ? "pinned" : "unpinned" %>"
+    data-action="pointerdown->sortable#press"
+  <% end %>
   data-role="conversation"
   data-radio-behavior-target="radio"
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
@@ -17,6 +30,7 @@
     <%= link_to conversation.title.presence || t("app.conversations.new_chat"),
       conversation_messages_path(conversation),
       class: "flex-1 pl-2 py-2 truncate text-sm text-opacity-1 w-5 radio-behavior",
+      draggable: "false", # so dragging the title reorders the row rather than dragging the link
       data: {
         turbo_frame: "conversation",
         action: "radio-behavior#select nav#closeDrawer",
@@ -24,7 +38,20 @@
       }
     %>
 
-    <div class="items-center hidden gap-2 pl-2 relationship:flex group-hover:flex">
+    <div class="flex items-center pr-1">
+      <%# Pin/bookmark toggles share the save_toggle partial with the card (see partial
+          for the _top break-out and morph contract). nav_view + query bounce the
+          current view back so the response re-renders the list the user is looking at. %>
+      <% nav_view = @bookmarks_view ? "bookmarks" : (@reactions_view ? "reactions" : nil) %>
+      <%= render "conversations/save_toggle", conversation: conversation, pinned: pinned, bookmarked: bookmarked, nav_view: nav_view, query: @query %>
+      <%# Full picker on the sidebar row: the ghost clone strips Stimulus wiring from its
+          scenery copy only, so the row's own controller stays connected through drags and
+          morphs like any other row controller. Counts render beside it, same partial as messages. %>
+      <%= render "reactions/conversation_picker", conversation: conversation %>
+    </div>
+    <%# Always laid out (invisible, not hidden): revealing on hover must not reflow the row,
+        or the icons shift out from under the cursor and clicks land on the menu instead. %>
+    <div class="flex items-center invisible gap-2 pl-2 relationship:visible group-hover:visible">
       <div class="dropdown !inline-flex dropdown-end outline-none pr-2">
         <%= icon "ellipsis-horizontal",
           tabindex: 0,

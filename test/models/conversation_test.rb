@@ -95,68 +95,338 @@ class ConversationTest < ActiveSupport::TestCase
     end
   end
 
-  test "#grouped_by_increasing_time_interval_for_user" do
+  test "#matching_query matches titles and message content" do
+    user = users(:keith)
+
+    found = user.conversations.matching_query("test").map(&:id).sort
+
+    assert_equal [
+      conversations(:attachment).id,  # matches title
+      conversations(:attachments).id, # matches title
+      conversations(:ruby_version).id # matches "test" inside "latest" in message content
+    ].sort, found
+  end
+
+  test "#matching_query treats % and _ as literal characters, not patterns" do
+    user = users(:keith)
+    percent = user.conversations.create!(assistant: assistants(:samantha), title: "100% coverage")
+    underscore = user.conversations.create!(assistant: assistants(:samantha), title: "plain")
+    underscore.messages.create!(assistant: assistants(:samantha), role: :user, content_text: "snake_case notes")
+    plain = user.conversations.create!(assistant: assistants(:samantha), title: "plain alpha beta")
+
+    assert_includes user.conversations.matching_query("%").map(&:id), percent.id
+    assert_not_includes user.conversations.matching_query("%").map(&:id), plain.id
+    assert_includes user.conversations.matching_query("_").map(&:id), underscore.id
+    assert_not_includes user.conversations.matching_query("_").map(&:id), plain.id
+  end
+
+  test ".reacted_nav_for_user is empty when the user reacted to nothing" do
+    user = User.create!(first_name: "John", last_name: "Doe")
+
+    assert_empty Conversation.reacted_nav_for_user(user)
+  end
+
+  test "ordered follows position once conversations have been dragged into shape" do
+    user = users(:keith)
+    ids = user.conversations.ordered.pluck(:id).rotate
+    Conversation.reposition(user, ids)
+
+    assert_equal ids, user.conversations.ordered.pluck(:id)
+  end
+
+  test "#grouped_by_increasing_time_interval_for_user restores the six recency groups with pins excluded" do
     Timecop.freeze(Time.current.beginning_of_day + 12.hours) do
       user = User.create!(first_name: "John", last_name: "Doe")
-
-      # Create 3 conversations in each of these intervals
-      [
-        Time.zone.today,
-        1.week.ago.in_time_zone,
-        1.month.ago.in_time_zone,
-        1.year.ago.in_time_zone
-      ].each do |timestamp|
-        3.times do
-          Conversation.create!(
-            user: user,
-            assistant: assistants(:samantha),
-            created_at: timestamp,
-            updated_at: timestamp
-          )
-        end
+      stamp_for = {
+        "Today" => Time.current,
+        "Yesterday" => 1.day.ago,
+        "This Week" => 3.days.ago,
+        "This Month" => 2.weeks.ago,
+        "Last Month" => 6.weeks.ago,
+        "Older" => 1.year.ago
+      }
+      by_group = stamp_for.transform_values do |at|
+        conversation = user.conversations.create!(assistant: assistants(:samantha))
+        conversation.update_column(:updated_at, at)
+        conversation
       end
 
-      grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user)
+      grouped = Conversation.grouped_by_increasing_time_interval_for_user(user)
 
-      # Creating a user automatically creates a conversation
-      assert_equal 3, grouped_conversations["Today"].count
-      assert_equal 3, grouped_conversations["This Week"].count
-      assert_equal 3, grouped_conversations["This Month"].count
-      assert_equal 3, grouped_conversations["Older"].count
+      assert_equal stamp_for.keys, grouped.keys
+      stamp_for.each_key do |group|
+        assert_equal [by_group[group].id], grouped[group].map(&:id), "expected only this conversation in #{group}"
+      end
+
+      by_group["Today"].pin!(user)
+
+      regrouped = Conversation.grouped_by_increasing_time_interval_for_user(user)
+      assert_not_includes regrouped.keys, "Today"
+      assert_not_includes regrouped.values.flat_map { |rel| rel.map(&:id) }, by_group["Today"].id
+      assert_includes Conversation.pinned_for(user).map(&:id), by_group["Today"].id
     end
   end
 
-  test "#grouped_by_increasing_time_interval_for_user with a query returning a single conversation title" do
-    user = users(:keith)
-    query = "Ruby"
+  test "a conversation updated exactly at a group boundary lives in one group only" do
+    Timecop.freeze(Time.current.beginning_of_day + 12.hours) do
+      user = User.create!(first_name: "Jane", last_name: "Doe")
+      edge = user.conversations.create!(assistant: assistants(:samantha))
+      edge.update_column(:updated_at, Date.current.beginning_of_day)
 
-    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query).values.flatten
+      grouped = Conversation.grouped_by_increasing_time_interval_for_user(user)
+      hits = grouped.select { |_, rel| rel.map(&:id).include?(edge.id) }.keys
 
-    assert_equal 1, grouped_conversations.count
-    assert_equal conversations(:ruby_version), grouped_conversations.first, "Should have returned this conversation based on title"
+      assert_equal ["Today"], hits
+    end
   end
 
-  test "#grouped_by_increasing_time_interval_for_user with a query returning a single conversation message" do
+  test "nav_for_user orders unpinned conversations by recency, not hand position" do
     user = users(:keith)
-    query = "alive"
+    old = conversations(:greeting)
+    newer = conversations(:ruby_version)
+    old.update_column(:updated_at, 1.month.ago)
+    newer.update_column(:updated_at, 1.day.ago)
+    old.update_column(:position, -9999) # top by hand order, stale by recency
 
-    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query).values.flatten
+    ids = Conversation.nav_for_user(user).map(&:id)
 
-    assert_equal 1, grouped_conversations.count
-    assert_equal conversations(:greeting), grouped_conversations.first, "Should have returned this conversation based on message content"
+    assert ids.index(newer.id) < ids.index(old.id), "expected recency order, not position order"
   end
 
-  test "#grouped_by_increasing_time_interval_for_user with a query returning matching conversation titles and a message" do
+  test "a reply moves its conversation to the top of the most recent group" do
     user = users(:keith)
-    query = "test"
+    old = conversations(:greeting)
+    old.update_column(:updated_at, 1.month.ago)
+    assert_not_equal old.id, Conversation.nav_for_user(user).first.id
 
-    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(user, query).values.flatten
+    Current.user = user
+    old.messages.create!(assistant: old.assistant, role: :user, content_text: "still thinking about this")
 
-    assert_equal 3, grouped_conversations.count
-    assert_equal [
-      conversations(:attachment).id, # matches title
-      conversations(:attachments).id, # matches title
-      conversations(:ruby_version).id # matches "latest" in messages
-    ].sort, grouped_conversations.map(&:id).sort, "Should have returned these conversations based on title and message content"
+    grouped = Conversation.grouped_by_increasing_time_interval_for_user(user)
+    assert_equal old.id, grouped["Today"].first.id
+    assert_equal old.id, Conversation.nav_for_user(user).first.id
+  end
+
+  test "pin, reorder, bookmark, and react never touch updated_at" do
+    user = users(:keith)
+    conversation = conversations(:greeting)
+    stamp = conversation.updated_at
+
+    conversation.pin!(user)
+    Conversation.reposition(user, [conversation.id])
+    conversation.bookmark!(user)
+    conversation.react!("👍", user)
+
+    assert_equal stamp, conversation.reload.updated_at
+  end
+
+  test "a reply in a pinned conversation leaves pin order unchanged" do
+    user = users(:keith)
+    first = conversations(:greeting)
+    second = conversations(:ruby_version)
+    first.pin!(user)
+    second.pin!(user)
+    order_before = Conversation.pinned_for(user).pluck(:id, :position)
+
+    Current.user = user
+    second.messages.create!(assistant: second.assistant, role: :user, content_text: "hello again")
+
+    assert_equal order_before, Conversation.pinned_for(user).pluck(:id, :position)
+  end
+
+  test "sidebar nav scopes preload toggle state with no per-row queries" do
+    user = users(:keith)
+    other = users(:rob)
+    pinned = conversations(:greeting)
+    bookmarked = conversations(:ruby_version)
+    pinned.pin!(user)
+    bookmarked.bookmark!(user)
+    pinned.react!("❤️", user)
+    pinned.react!("👍", other)
+
+    scopes = {
+      "unpinned list" => Conversation.nav_for_user(user),
+      "pinned section" => Conversation.pinned_nav_for_user(user),
+      "bookmarks view" => Conversation.bookmarked_nav_for_user(user),
+      "reactions view" => Conversation.reacted_nav_for_user(user),
+      "search" => Conversation.nav_for_user(user, "test")
+    }
+
+    scopes.each do |name, scope|
+      rows = scope.to_a
+      assert_not_empty rows, "expected rows for #{name}"
+
+      assert_no_queries do
+        rows.each do |conversation|
+          conversation.pinned?(user)
+          conversation.bookmarked?(user)
+          conversation.user_reacted?("❤️", user)
+          conversation.reaction_counts
+          conversation.user_emojis(user)
+        end
+      end
+    end
+
+    # The preloaded answers match the database answers.
+    assert_not_includes Conversation.nav_for_user(user).map(&:id), pinned.id
+    assert_includes Conversation.pinned_nav_for_user(user).map(&:id), pinned.id
+
+    preloaded_pin = Conversation.pinned_nav_for_user(user).find(pinned.id)
+    assert preloaded_pin.pinned?(user)
+    assert_not preloaded_pin.bookmarked?(user)
+    assert preloaded_pin.user_reacted?("❤️", user)
+    assert_not preloaded_pin.user_reacted?("❤️", other)
+    assert_equal({ "❤️" => 1, "👍" => 1 }, preloaded_pin.reaction_counts)
+    assert_equal Set["❤️"], preloaded_pin.user_emojis(user)
+    assert_equal Set["👍"], preloaded_pin.user_emojis(other)
+
+    preloaded_bookmark = Conversation.bookmarked_nav_for_user(user).find(bookmarked.id)
+    assert preloaded_bookmark.bookmarked?(user)
+    assert_not preloaded_bookmark.pinned?(user)
+  end
+
+  test "sidebar nav scopes preload toggle associations instead of includes" do
+    user = users(:keith)
+    pinned = conversations(:greeting)
+    bookmarked = conversations(:ruby_version)
+    pinned.pin!(user)
+    bookmarked.bookmark!(user)
+    pinned.react!("❤️", user)
+    bookmarked.react!("❤️", user)
+
+    scopes = {
+      "unpinned list" => Conversation.nav_for_user(user),
+      "pinned section" => Conversation.pinned_nav_for_user(user),
+      "bookmarks view" => Conversation.bookmarked_nav_for_user(user),
+      "reactions view" => Conversation.reacted_nav_for_user(user),
+      "search" => Conversation.nav_for_user(user, "test"),
+      "bookmarks search" => Conversation.bookmarked_nav_for_user(user, "test"),
+      "reactions search" => Conversation.reacted_nav_for_user(user, "test")
+    }
+
+    scopes.each do |name, scope|
+      assert_not_empty scope.to_a, "expected rows for #{name}"
+      assert_empty scope.includes_values, "expected no includes on #{name} (preload keeps the DISTINCT shape)"
+      %w[assistant pins bookmarks reactions].each do |association|
+        assert_includes scope.preload_values.map(&:to_s), association, "expected #{association} preloaded on #{name}"
+      end
+    end
+  end
+
+  test "bookmarked_nav_for_user narrows by search before applying membership" do
+    user = users(:keith)
+    token = "ProbeTokenXYZBookmark"
+    match = user.conversations.create!(assistant: assistants(:samantha), title: "Bookmark probe alpha #{token}")
+    other = user.conversations.create!(assistant: assistants(:samantha), title: "Bookmark probe unrelated nomatch456")
+    match.bookmark!(user)
+    other.bookmark!(user)
+
+    found = Conversation.bookmarked_nav_for_user(user, token).map(&:id)
+
+    assert_equal [match.id], found
+  end
+
+  test "reacted_nav_for_user narrows by search before applying membership" do
+    user = users(:keith)
+    token = "ProbeTokenXYZReaction"
+    match = user.conversations.create!(assistant: assistants(:samantha), title: "Reaction probe alpha #{token}")
+    other = user.conversations.create!(assistant: assistants(:samantha), title: "Reaction probe unrelated nomatch789")
+    match.react!("❤️", user)
+    other.react!("❤️", user)
+
+    found = Conversation.reacted_nav_for_user(user, token).map(&:id)
+
+    assert_equal [match.id], found
+  end
+
+  test "pinned_nav_for_user is empty during search even with pins present" do
+    user = users(:keith)
+    pinned = conversations(:greeting)
+    pinned.pin!(user)
+    token = "ProbeTokenXYZPin"
+    token_pinned = user.conversations.create!(assistant: assistants(:samantha), title: "Pinned probe #{token}")
+    token_pinned.pin!(user)
+
+    assert_includes Conversation.pinned_nav_for_user(user).map(&:id), pinned.id
+    assert_includes Conversation.pinned_nav_for_user(user).map(&:id), token_pinned.id
+    assert_empty Conversation.pinned_nav_for_user(user, "test")
+    assert_empty Conversation.pinned_nav_for_user(user, "Meeting")
+    assert_empty Conversation.pinned_nav_for_user(user, token)
+  end
+
+  test "sidebar nav query shape stays constant as lists grow" do
+    user = users(:keith)
+
+    # Seed filtered views so baselines exercise the toggle preloads.
+    seed_pinned = user.conversations.create!(assistant: assistants(:samantha), title: "Growth seed pinned")
+    seed_pinned.pin!(user)
+    seed_bookmarked = user.conversations.create!(assistant: assistants(:samantha), title: "Growth seed bookmarked")
+    seed_bookmarked.bookmark!(user)
+    seed_reacted = user.conversations.create!(assistant: assistants(:samantha), title: "Growth seed reacted")
+    seed_reacted.react!("❤️", user)
+
+    baseline = count_sidebar_queries(user, nil)
+    baseline_search = count_sidebar_queries(user, "test")
+    baseline_pinned = count_sidebar_queries(user, nil, :pinned_nav_for_user)
+    baseline_bookmarked = count_sidebar_queries(user, nil, :bookmarked_nav_for_user)
+    baseline_reacted = count_sidebar_queries(user, nil, :reacted_nav_for_user)
+    baseline_bookmarked_search = count_sidebar_queries(user, "test", :bookmarked_nav_for_user)
+    baseline_reacted_search = count_sidebar_queries(user, "test", :reacted_nav_for_user)
+    baseline_pinned_search = count_sidebar_queries(user, "test", :pinned_nav_for_user)
+
+    5.times do |i|
+      user.conversations.create!(assistant: assistants(:samantha), title: "Growth probe #{i}")
+      bookmarked = user.conversations.create!(
+        assistant: assistants(:samantha), title: "Growth bookmarked probe #{i}"
+      )
+      bookmarked.bookmark!(user)
+      reacted = user.conversations.create!(
+        assistant: assistants(:samantha), title: "Growth reacted probe #{i}"
+      )
+      reacted.react!("❤️", user)
+      pinned = user.conversations.create!(
+        assistant: assistants(:samantha), title: "Growth pinned probe #{i}"
+      )
+      pinned.pin!(user)
+    end
+
+    assert_equal baseline, count_sidebar_queries(user, nil),
+      "expected constant query shape as the list grows"
+    assert_equal baseline_search, count_sidebar_queries(user, "test"),
+      "expected constant query shape as the list grows"
+    assert_equal baseline_pinned, count_sidebar_queries(user, nil, :pinned_nav_for_user),
+      "expected constant pinned query shape as the list grows"
+    assert_equal baseline_bookmarked, count_sidebar_queries(user, nil, :bookmarked_nav_for_user),
+      "expected constant bookmarked query shape as the list grows"
+    assert_equal baseline_reacted, count_sidebar_queries(user, nil, :reacted_nav_for_user),
+      "expected constant reacted query shape as the list grows"
+    assert_equal baseline_bookmarked_search,
+      count_sidebar_queries(user, "test", :bookmarked_nav_for_user),
+      "expected constant bookmarked search shape as the list grows"
+    assert_equal baseline_reacted_search,
+      count_sidebar_queries(user, "test", :reacted_nav_for_user),
+      "expected constant reacted search shape as the list grows"
+    assert_equal baseline_pinned_search,
+      count_sidebar_queries(user, "test", :pinned_nav_for_user),
+      "expected constant pinned search shape as the list grows"
+  end
+
+  private
+
+  def count_sidebar_queries(user, query, scope_method = :nav_for_user)
+    counter = 0
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      counter += 1 unless payload[:cached] || payload[:name] == "SCHEMA"
+    end
+    Conversation.public_send(scope_method, user, query).to_a.each do |conversation|
+      conversation.pinned?(user)
+      conversation.bookmarked?(user)
+      conversation.user_reacted?("❤️", user)
+      conversation.reaction_counts
+      conversation.user_emojis(user)
+    end
+    counter
+  ensure
+    ActiveSupport::Notifications.unsubscribe(subscriber)
   end
 end

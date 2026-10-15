@@ -14,11 +14,31 @@ Rails.application.routes.draw do
 
   resources :conversations, only: [:index, :show, :edit, :update, :destroy] do
     resources :messages, only: [:index]
+    post :reorder, on: :collection
+    get :bookmarks, on: :collection
+    get :reactions, on: :collection
+    post :pin, on: :member
+    post :unpin, on: :member
+    post :bookmark, on: :member
+    post :unbookmark, on: :member
+    post :react, on: :member
+    post :unreact, on: :member
   end
 
   get "share/:share_token", to: "conversations#public_show", as: :public_conversation
 
-  resources :messages, only: [:show, :update]
+  get "/pinned", to: "conversations#pinned_page", as: :pinned_page
+  get "/bookmarks", to: "conversations#bookmarked_page", as: :bookmarked_page
+  get "/reactions", to: "conversations#reacted_page", as: :reacted_page
+
+  resources :messages, only: [:show, :update] do
+    post :react, on: :member
+    post :unreact, on: :member
+    post :pin, on: :member
+    post :unpin, on: :member
+    post :bookmark, on: :member
+    post :unbookmark, on: :member
+  end
 
   resource :speech, only: :create
 

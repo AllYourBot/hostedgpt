@@ -24,7 +24,7 @@ class AssistantTest < ActiveSupport::TestCase
 
   test "ordered sorts by position" do
     keith = users(:keith)
-    keith.assistants.reposition(keith.assistants.pluck(:id).shuffle)
+    Assistant.reposition(keith, keith.assistants.pluck(:id).shuffle)
 
     assert_equal keith.assistants.order(:position).pluck(:id), keith.assistants.ordered.pluck(:id)
   end
@@ -33,7 +33,7 @@ class AssistantTest < ActiveSupport::TestCase
     keith = users(:keith)
     ids = keith.assistants.ordered.pluck(:id).rotate
 
-    keith.assistants.reposition(ids.map(&:to_s)) # the ids arrive from the browser as strings
+    Assistant.reposition(keith, ids.map(&:to_s)) # the ids arrive from the browser as strings
 
     assert_equal ids, keith.assistants.ordered.pluck(:id)
     assert_equal (0...ids.length).to_a, keith.assistants.ordered.pluck(:position)
@@ -43,14 +43,14 @@ class AssistantTest < ActiveSupport::TestCase
     keith = users(:keith)
     rob_assistant = assistants(:rob_gpt4)
 
-    keith.assistants.reposition([rob_assistant.id] + keith.assistants.ordered.pluck(:id))
+    Assistant.reposition(keith, [rob_assistant.id] + keith.assistants.ordered.pluck(:id))
 
     assert_nil rob_assistant.reload.position
   end
 
   test "a new assistant goes to the top of the list" do
     keith = users(:keith)
-    keith.assistants.reposition(keith.assistants.ordered.pluck(:id))
+    Assistant.reposition(keith, keith.assistants.ordered.pluck(:id))
 
     assistant = keith.assistants.create!(name: "Newcomer", language_model: language_models(:gpt_4o))
 

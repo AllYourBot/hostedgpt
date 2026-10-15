@@ -6,6 +6,8 @@
 
   <%= turbo_stream_from @conversation %>
 
+  <%= render "pinned_messages" %>
+
   <div
     class="min-w-full"
     data-controller="keyboard"

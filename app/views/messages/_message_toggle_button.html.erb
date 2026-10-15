@@ -1,0 +1,21 @@
+<%# locals: (message:, type:) -%>
+<%# Shared pin/bookmark toggle button for message rows, re-rendered in place by its
+    toggle's turbo-stream response so the icon flips with no reload. The two differ
+    only in path, role, title, and icon — same shape, same morph-target pattern
+    (dom_id plus type suffix) — so one partial serves both, mirroring the sidebar's
+    save_toggle precedent. Toggled state is computed inside, keeping responses pure. %>
+<% toggled = type == :pin ? message.pinned?(Current.user) : message.bookmarked?(Current.user) %>
+<% verb = toggled ? "un" : "" %>
+<% noun = type == :pin ? "pin" : "bookmark" %>
+<% path = type == :pin ? (toggled ? unpin_message_path(message) : pin_message_path(message)) : (toggled ? unbookmark_message_path(message) : bookmark_message_path(message)) %>
+<%= button_to path,
+  method: :post,
+  data: { role: "#{verb}#{noun}-message" },
+  form: { class: "flex items-center", data: { turbo_frame: "_top" } },
+  class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+  title: t("app.conversations.ui.#{verb}#{noun}_message") do %>
+  <%= icon type == :pin ? "map-pin" : "bookmark",
+    variant: toggled ? :solid : :outline,
+    size: 18
+  %>
+<% end %>

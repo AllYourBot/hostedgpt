@@ -1,0 +1,21 @@
+<%# locals: (conversation:, pinned:, bookmarked:, nav_view: nil, query: nil, page_context: nil) %>
+<%# Shared pin/bookmark toggles for the sidebar row (_conversation) and the card
+    (_conversation_card). Row bounces nav_view + query plus the funnel show; card
+    bounces page_context.
+    Toggle forms break out to _top: nested inside a turbo-frame, a frame-scoped
+    submission would swallow the turbo-stream response (the frame looks for a matching
+    frame, finds a stream, renders nothing). At _top the streams execute at page level:
+    the sidebar answer morphs the nav list, the card answer replaces or removes the card.
+    Same partial as reactions/counts: one shape reused across both surfaces. %>
+<% funnel_show = @show.presence || "all" %>
+<% toggle_params = if page_context.present?
+     { page_context: page_context }
+   else
+     {
+       nav_view: nav_view,
+       query: query.presence,
+       show: (funnel_show unless funnel_show == "all")
+     }.compact
+   end %>
+<%= render "conversations/save_toggle_button", conversation: conversation, type: :pin, toggled: pinned, toggle_params: toggle_params %>
+<%= render "conversations/save_toggle_button", conversation: conversation, type: :bookmark, toggled: bookmarked, toggle_params: toggle_params %>

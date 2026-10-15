@@ -1,0 +1,201 @@
+  <%# Page destinations sit above the search: they navigate away to full card grids
+      and never filter in place — filtering belongs to the funnel alone, so one
+      control never duplicates the other. %>
+  <%# One row shape for both page links: path, role, icon, and label differ, the frame
+      and styling do not. %>
+  <% [["bookmarked", "open-bookmarks-page", "bookmark", "bookmarks"], ["reacted", "open-reactions-page", "face-smile", "reactions"]].each do |page, role, icon, label_key| %>
+  <div class="flex items-center mr-5">
+    <%= render "conversations/page_link", path: public_send("#{page}_page_path"), role: role,
+      icon: icon, label_key: label_key,
+      link_class: "flex items-center flex-1 mb-1 p-1 pl-2 pr-2 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700" %>
+  </div>
+  <% end %>
+  <section id="search" class="pt-6 text-gray-950 dark:text-gray-100 select-none">
+    <%= form_with(url: conversations_path,
+      data: { turbo_frame: "nav-conversations", controller: "search" },
+      class: "contents",
+      method: :get
+    ) do |form| %>
+      <div class="relative ml-2 mr-5">
+        <%# Preserve locale when submitting/clearing the search so the placeholder stays localized %>
+        <%= hidden_field_tag :locale, I18n.locale unless I18n.locale == I18n.default_locale %>
+        <%# Preserve funnel scope so a search narrows within the active filter (R11 + query). %>
+        <% if (@show.presence || "all") != "all" %>
+          <%= hidden_field_tag :show, @show %>
+        <% end %>
+        <%= form.text_field :query,
+          value: @query,
+          placeholder: t("app.conversations.ui.search_placeholder"),
+          id: "search-input",
+          autofocus: !@query.nil?,
+          class: %|
+            w-full
+            p-2 py-1
+            border border-gray-200 rounded-lg
+            text-black dark:text-gray-200
+            placeholder-gray-300 dark:placeholder-gray-500
+            bg-transparent
+          |,
+          data: {
+            search_target: "input",
+            action: %|
+              blur->search#unfocus
+              input->search#search
+            |
+          }
+        %>
+        <%= icon "x-circle",
+          variant: :mini,
+          size: 18,
+          class: "cursor-pointer text-gray-800 absolute right-1 top-1/2 transform -translate-y-1/2",
+          data: { search_target: "clear", action: "click->search#clear" }
+        %>
+      </div>
+    <% end %>
+  </section>
+
+  <%# Funnel minimal slice (R8-R14, KTD6-KTD8): self-announcing filter with a labeled
+      button, Show menu (All, Bookmarked, Reacted — no Show-Pinned, the strip covers it),
+      suppressed strip in scopes, scoped empty states with one-tap clear, and an aria-live
+      announcement. Scope lives in frame params/query and resets on reload (R14). Order is
+      always Last-activity-desc; pins carry the only hand order. %>
+  <% funnel_show = @show.presence || "all" %>
+  <% funnel_active = funnel_show != "all" %>
+  <% funnel_query = @query.presence %>
+  <%# Main view means the full sidebar: no search narrowing, no bookmark/reaction filter.
+      The pinned strip and the unpinned frame both key off it, so it lives here once. %>
+  <% main_view = @query.blank? && !@bookmarks_view && !@reactions_view %>
+  <section data-role="filter" class="ml-2 mr-5 mt-2 text-gray-950 dark:text-gray-100 select-none">
+    <%# The clear X sits beside the dropdown, never inside it: a click inside would match
+        :focus-within and pop the menu open over the freshly cleared list. Same one-tap
+        semantics as All — drops the Show scope, keeps the query. %>
+    <div class="flex items-center">
+    <div class="dropdown">
+      <div tabindex="0" role="button"
+        data-role="filter-button"
+        aria-pressed="<%= funnel_active %>"
+        aria-haspopup="menu"
+        aria-label="<%= t("app.conversations.ui.filter") %><%= funnel_show != "all" ? ": #{t("app.conversations.ui.filter_show_#{funnel_show}")}" : "" %>"
+        class="flex items-center mb-1 p-1 pl-2 pr-2 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 <%= "bg-gray-200 dark:bg-gray-700" if funnel_active %>">
+        <%= icon "funnel", variant: (funnel_active ? :solid : :outline), size: 16, class: "text-gray-500 dark:text-gray-300" %>
+        <% if funnel_show != "all" %>
+          <span data-role="filter-label" class="ml-2"><%= t("app.conversations.ui.filter_show_#{funnel_show}") %></span>
+        <% end %>
+      </div>
+      <menu tabindex="0" data-role="filter-menu" aria-label="<%= t("app.conversations.ui.filter") %>"
+        class="dropdown-content z-10 menu p-2 shadow-xl bg-base-100 rounded-box w-52 dark:!bg-gray-700">
+        <li class="menu-title"><span><%= t("app.conversations.ui.filter_show") %></span></li>
+        <%# One item shape per scope: label, role, and the show param it sets. A nil show
+            param drops out of the URL, so All links back to the unfiltered list. %>
+        <% [["filter_show_all", "filter-show-all", nil, "all"], ["filter_show_bookmarked", "filter-show-bookmarked", "bookmarked", "bookmarked"], ["filter_show_reacted", "filter-show-reacted", "reacted", "reacted"]].each do |label_key, role, show, scope| %>
+          <li>
+            <%= link_to t("app.conversations.ui.#{label_key}"),
+              conversations_path(query: funnel_query, show: show),
+              data: { role: role, turbo_frame: "nav-conversations" },
+              aria: ({ current: "true" } if funnel_show == scope) %>
+          </li>
+        <% end %>
+      </menu>
+    </div>
+    <% if funnel_active %>
+      <%= link_to conversations_path(query: funnel_query),
+        data: { role: "filter-clear-button", turbo_frame: "nav-conversations" },
+        title: t("app.conversations.ui.filter_clear"),
+        aria: { label: t("app.conversations.ui.filter_clear") },
+        class: "p-1 mb-1 ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" do %>
+        <%= icon "x-mark", variant: :outline, size: 14, class: "text-gray-500 dark:text-gray-300" %>
+      <% end %>
+    <% end %>
+    </div>
+    <p class="sr-only" aria-live="polite" data-role="filter-announcement"><%= t("app.conversations.ui.filter_announcement_#{funnel_show}") %></p>
+  </section>
+
+  <%# One sortable list spans the pinned and unpinned sections so drops can cross between
+      them; rows opt in per-row (main view only), so the controller idles in filtered views. %>
+  <section class="text-gray-950 dark:text-gray-100 select-none"
+    data-controller="radio-behavior sortable"
+    data-radio-behavior-selected-class="relationship"
+    data-sortable-url-value="<%= reorder_conversations_path %>"
+    data-sortable-pin-prefix-value="/conversations/"
+    data-sortable-pin-suffix-value="/pin"
+    data-sortable-unpin-prefix-value="/conversations/"
+    data-sortable-unpin-suffix-value="/unpin"
+    data-sortable-dragging-class="opacity-0"
+  >
+    <% if @bookmarks_view || @reactions_view %>
+      <%= link_to conversations_path,
+        data: { role: "all-conversations", turbo_frame: "nav-conversations" },
+        class: %|
+          flex items-center
+          mb-1 p-1 pl-2 pr-2 mr-5
+          rounded-lg
+          text-sm
+          hover:bg-gray-100 dark:hover:bg-gray-700
+        | do %>
+        <%= icon "chat-bubble-left-ellipsis", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
+        <span class="ml-2"><%= t("app.conversations.ui.all_conversations") %></span>
+      <% end %>
+    <% end %>
+    <%# The All-conversations link is the only in-view return path; everywhere else,
+        the funnel button and its X own scope state. %>
+    <% if main_view %>
+      <% if @pinned_conversations.present? %>
+        <header class="mx-2 mt-6 mb-2 mr-5 flex items-center justify-between text-xs font-semibold text-gray-300 text-opacity-1 dark:text-gray-500" data-role="pinned-header">
+          <span><%= t("app.conversations.ui.pinned") %></span>
+          <%= render "conversations/page_link", path: pinned_page_path, role: "open-pinned-page",
+            icon: "arrow-top-right-on-square", icon_size: 14 %>
+        </header>
+      <% end %>
+      <turbo-frame id="pinned-conversations"
+        target="conversation"
+        data-sortable-zone="pinned"
+        class="block"
+      >
+        <%= render @pinned_conversations %>
+      </turbo-frame>
+    <% end %>
+    <turbo-frame id="conversations"
+      target="conversation"
+      data-sortable-zone="unpinned"
+      class="block mb-24" <%# ensures the last conversation's menu has room to open %>
+    >
+      <% if main_view %>
+        <%# Hand-ordering retires the date buckets: once any pin exists the user places
+            chats by hand, so Today/Yesterday headers would label positions the user chose.
+            The unpinned list goes flat under one neutral header instead; with no pins the
+            recency groups return. %>
+        <% if @pinned_conversations.present? %>
+          <% if @nav_conversations.present? %>
+            <header class="mx-2 mt-6 mb-2 text-xs font-semibold text-gray-300 text-opacity-1 dark:text-gray-500" data-role="recent-header">
+              <%= t("app.conversations.ui.recent") %>
+            </header>
+
+            <%= render @nav_conversations %>
+          <% end %>
+        <% else %>
+          <% Conversation.grouped_by_increasing_time_interval_for_user(Current.user).each do |named_time_span, conversations| %>
+            <header class="mx-2 mt-6 mb-2 text-xs font-semibold text-gray-300 text-opacity-1 dark:text-gray-500" data-role="time-group">
+              <%= translated_time_span(named_time_span) %>
+            </header>
+
+            <%= render conversations %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <% if @nav_conversations.present? %>
+          <%= render @nav_conversations %>
+        <% elsif @bookmarks_view || @reactions_view %>
+          <%# One empty state for both filtered scopes: role and copy follow the view. %>
+          <% empty_role = @bookmarks_view ? "empty-bookmarks" : "empty-reactions" %>
+          <% empty_key = @bookmarks_view ? "no_bookmarks_yet" : "no_reactions_yet" %>
+          <p class="mx-2 mt-6 text-sm text-gray-400 dark:text-gray-500" data-role="<%= empty_role %>">
+            <%= t("app.conversations.ui.#{empty_key}") %>
+            <%= link_to t("app.conversations.ui.filter_clear"),
+              conversations_path(query: @query.presence),
+              data: { role: "filter-clear", turbo_frame: "nav-conversations" },
+              class: "underline" %>
+          </p>
+        <% end %>
+      <% end %>
+    </turbo-frame>
+  </section>

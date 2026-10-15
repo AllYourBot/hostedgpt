@@ -194,13 +194,43 @@ end %>
           </div>
         <% end %>
 
+        <%# display:contents keeps one visual bar: children join the outer flex directly. %>
         <div class="
           flex justify-start
           gap-2
           text-gray-600 dark:text-gray-300
           h-[19px]
-          <%= !last_message && done_thinking && "invisible" %> group-tap:visible
+          <%= (!last_message && done_thinking) ? "invisible" : "" %> group-hover:visible group-tap:visible
         ">
+        <%# React and pin offer on every row on hover, Slack-style; version nav, edit, playback,
+            and copy below hide on non-last rows behind their own gate, and the same row
+            hover reveals them. The row carries `group`, so group-hover reveals these
+            on any message. %>
+          <%# Message rows are never sortable items, so this picker lives here rather than on the
+              sidebar row: the sortable ghost clone strips Stimulus wiring from its scenery copy. %>
+          <%= render "reactions/picker", reactable: message,
+            react_url: react_message_path(message),
+            unreact_url: unreact_message_path(message),
+            button_role: "react", emoji_role: "react-emoji", icon_size: 18 %>
+          <%# Slack-style pin with a stable morph target: the toggle response re-renders this
+              span plus the pinned-messages section, no reload. Message pins are membership
+              only (no hand order) and scoped per user, mirroring the conversation pin icon but
+              with message-scoped roles so the two never collide on the conversation view. %>
+          <span id="<%= dom_id(message) %>-pin" class="flex items-center">
+            <%= render "messages/message_toggle_button", message: message, type: :pin %>
+          </span>
+          <%# Twitter-style per-message bookmark with a stable morph target, mirroring the
+              pin button above it but with no section stream: the toggle response re-renders
+              this span alone, no reload. %>
+          <span id="<%= dom_id(message) %>-bookmark" class="flex items-center">
+            <%= render "messages/message_toggle_button", message: message, type: :bookmark %>
+          </span>
+
+        <%# display:contents: no box of its own, so the bar stays single-row; the invisible
+            gate inherits into the version/edit children, and hover lifts it exactly like
+            the outer bar — without this the row hover reveals the trio but the gated
+            actions stay hidden, breaking hover-to-edit on any non-last message. %>
+        <div class="contents <%= !last_message && done_thinking && "invisible" %> group-hover:visible group-tap:visible">
           <% if message.versions.length > 1 %>
             <%= button_to message_path(message, version: previous_version),
               method: :patch,
@@ -321,6 +351,7 @@ end %>
             </div>
           <% end %>
         </div>
+      </div>
       </turbo-frame>
     </div>
   </div>
