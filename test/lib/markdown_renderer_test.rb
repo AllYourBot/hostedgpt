@@ -42,4 +42,35 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     assert_includes html, "<pre>"
     refute_includes html, "MATHSPAN"
   end
+
+  test "LaTeX backslash sequences round-trip through placeholders untouched" do
+    html = MarkdownRenderer.render_for_display('\\(a \\\\ b \\& c\\)')
+    assert_includes html, '\\(a \\\\ b \\& c\\)'
+    refute_includes html, [0xE000].pack("U")
+  end
+
+  test "$$ display math survives markdown that would mangle it" do
+    html = MarkdownRenderer.render_for_display("$$a*b*c$$ and $$x_1 + y_2$$")
+    assert_includes html, "$$a*b*c$$"
+    assert_includes html, "$$x_1 + y_2$$"
+    refute_includes html, "<em>"
+    refute_includes html, "<del>"
+  end
+
+  test "doubled-backslash delimiters from models normalize to the single form" do
+    html = MarkdownRenderer.render_for_display('Before \\\\(x+1\\\\) after')
+    assert_includes html, "\\(x+1\\)"
+    refute_includes html, "\\\\("
+  end
+
+  test "unbalanced \\( that would devour a fence stays raw" do
+    html = MarkdownRenderer.render_for_display("```\n\\(foo\n```\nbar\\)")
+    assert_includes html, "<pre"
+    assert_includes html, "<p>bar"
+  end
+
+  test "math spans carrying escaped markup cannot smuggle it into output" do
+    html = MarkdownRenderer.render_for_display('\\(&lt;script&gt;alert(1)&lt;/script&gt;\\)')
+    refute_includes html, "<script"
+  end
 end
