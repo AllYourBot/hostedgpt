@@ -8,6 +8,7 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     login_as @user
     @conversation = conversations(:greeting)
     messages(:im_a_bot).update!(content_text: DIAGRAM_CONTENT)
+    @stream_msg = @conversation.messages.create! assistant: @conversation.assistant, content_text: "Stub: ", role: :assistant
     visit_and_scroll_wait conversation_messages_path(@conversation)
   end
 
@@ -25,5 +26,12 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     msg = find("#message_#{messages(:im_a_bot).id}")
     msg.assert_no_selector(".mermaid-preview svg")
     assert_includes msg.text, "not a diagram"
+  end
+
+  test "streamed diagram previews after a turbo broadcast" do
+    @stream_msg.update!(content_text: DIAGRAM_CONTENT)
+    GetNextAIMessageJob.broadcast_updated_message(@stream_msg)
+
+    assert_selector "#message_#{@stream_msg.id} .mermaid-preview svg"
   end
 end
