@@ -45,8 +45,6 @@
   <% end %>
 </section>
 
-<%= render "collections/nav", collections: @nav_collections %>
-
 <turbo-frame id="nav-conversations"
   src="<%= conversations_path(conversation_id: @conversation&.id) %>"
   refresh="morph"
