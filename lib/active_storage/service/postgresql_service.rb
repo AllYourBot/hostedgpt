@@ -152,17 +152,7 @@ module ActiveStorage
         return url_opts if url_opts.is_a?(Hash)
       end
 
-      if Rails.application.config.x.app_url.present?
-        {
-          protocol: Rails.application.config.x.app_url_protocol,
-          host: Rails.application.config.x.app_url_host,
-          port: Rails.application.config.x.app_url_port,
-        }
-      else
-        {
-          only_path: true, # This fixes an exception with attachment URL generation from a worker: https://github.com/AllYourBot/hostedgpt/pull/398#issuecomment-2168135853
-        }
-      end
+      AppURL.options
     end
   end
 end

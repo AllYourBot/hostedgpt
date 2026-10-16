@@ -90,6 +90,12 @@ class AIBackend
     end
   end
 
+  def self.test_client(url, token, api_name)
+    Rails.logger.info "Connecting to #{name.demodulize} API server at #{url} with access token of length #{token.to_s.length}"
+    Rails.logger.info "Testing using model #{api_name}"
+    client.new(uri_base: url, access_token: token)
+  end
+
   def self.test_language_model(language_model, api_name = nil)
     api_name ||= language_model.api_name
     url = language_model.api_service.url

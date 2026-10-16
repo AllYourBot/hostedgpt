@@ -17,14 +17,7 @@ class AIBackend::Anthropic < AIBackend
   end
 
   def self.test_execute(url, token, api_name)
-    Rails.logger.info "Connecting to Anthropic API server at #{url} with access token of length #{token.to_s.length}"
-    client = ::Anthropic::Client.new(
-      uri_base: url,
-      access_token: token
-    )
-
-    Rails.logger.info "Testing using model #{api_name}"
-    response = client.messages(
+    response = test_client(url, token, api_name).messages(
       parameters: {
         model: api_name,
         messages: [

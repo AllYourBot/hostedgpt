@@ -1,0 +1,12 @@
+<%= button_tag type: "button",
+  class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{"opacity-50 cursor-not-allowed" unless conversation&.persisted?}",
+  onclick: conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
+  disabled: !conversation&.persisted? do %>
+  <%= icon "arrow-up-tray",
+    variant: :outline,
+    size: 20,
+    class: "text-gray-950 dark:text-gray-100",
+    title: conversation&.persisted? ? t("app.conversations.ui.share") : t("app.conversations.ui.share_unavailable"),
+    tooltip: :bottom
+  %>
+<% end %>

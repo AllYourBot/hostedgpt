@@ -1,0 +1,14 @@
+<div
+  id="<%= side %>-handle"
+  class="
+    flex-1 <%= visibility %> h-full
+    items-center justify-center
+    tooltip tooltip-right hover:tooltip-open
+  "
+  data-tip="<%= tip %>"
+>
+  <div id="<%= side %>" class="flex-col w-1 h-5 opacity-70">
+    <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full <%= top_tilt %> group-hover:bg-black dark:group-hover:bg-white"></div>
+    <div class="w-1 h-3 bg-gray-400 rounded-full <%= bottom_tilt %> group-hover:bg-black dark:group-hover:bg-white"></div>
+  </div>
+</div>

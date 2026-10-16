@@ -1,0 +1,10 @@
+<figure class="flex py-2">
+  <figcaption class="flex-grow flex items-center">
+    <%= label %>
+  </figcaption>
+  <kbd class="w-50 text-right flex flex-row gap-1">
+    <% keys.each do |key| %>
+      <div class="key"><%= key %></div>
+    <% end %>
+  </kbd>
+</figure>

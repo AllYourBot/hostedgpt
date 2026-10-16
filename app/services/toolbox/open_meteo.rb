@@ -195,28 +195,14 @@ class Toolbox::OpenMeteo < Toolbox
 
   def filter_by_country(country_s, locations:)
     countries = locations.map(&:country)
-    country = countries[ pick_best_index(input: country_s, options: countries) ]
+    country = countries[ best_match_index(country_s, countries) ]
 
     locations.select { |l| l.country == country }
   end
 
   def pick_by_region(region_s, locations:)
-    best_index = pick_best_index(input: region_s, options: locations.map(&:admin1).map(&:to_s))
+    best_index = best_match_index(region_s, locations.map(&:admin1).map(&:to_s))
     locations[best_index]
-  end
-
-  def pick_best_index(input:, options: [])
-    input = Amatch::JaroWinkler.new(input)
-    options_hash = options.each_with_index.to_h { |value, index| [index, value] }
-    options_hash.each do |index, option|
-      options_hash[index] = input.match(option)
-    end
-
-    highest_match_sort_with_lowest_index_tiebreaker = options_hash.sort do |a,b|
-      [b.second, a.first] <=> [a.second, b.first]
-    end
-
-    highest_match_sort_with_lowest_index_tiebreaker.first.first # returns the index
   end
 
   def extract_data_from(response)

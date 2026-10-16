@@ -15,19 +15,11 @@ class Settings::APIServicesController < Settings::ApplicationController
   def create
     @api_service = Current.user.api_services.new(api_service_params)
 
-    if @api_service.save
-      redirect_to settings_api_services_path, notice: I18n.t("app.flashes.api_services.saved"), status: :see_other
-    else
-      render :new, status: :unprocessable_content
-    end
+    redirect_or_render(@api_service.save, notice: I18n.t("app.flashes.api_services.saved"), template: :new) { settings_api_services_path }
   end
 
   def update
-    if @api_service.update(api_service_params)
-      redirect_to settings_api_services_path, notice: I18n.t("app.flashes.api_services.saved"), status: :see_other
-    else
-      render :edit, status: :unprocessable_content
-    end
+    redirect_or_render(@api_service.update(api_service_params), notice: I18n.t("app.flashes.api_services.saved"), template: :edit) { settings_api_services_path }
   end
 
   def test

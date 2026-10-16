@@ -1,0 +1,25 @@
+<% scope = "app.settings.#{record.model_name.route_key}" %>
+<div class="mx-auto md:w-2/3 w-full">
+  <h1 class="text-3xl">
+    <%= title %>
+  </h1>
+
+  <%= render "form", record.model_name.param_key.to_sym => record %>
+
+  <%= button_to t("#{scope}.delete"), [:settings, record],
+      method: :delete,
+      data: { turbo_confirm: t("#{scope}.confirm_delete") },
+      form: { class: "inline-block" },
+      class: %|
+        ml-5 py-3 px-5
+        bg-white dark:bg-gray-500
+        border border-gray-300 dark:border-gray-500
+        rounded-lg
+        font-medium
+      |
+  %>
+
+  <p class="float-right inline-block ml-5">
+    <%= link_to t("#{scope}.back"), [:settings, record.class], class: "float-right inline-block ml-5 py-3" %>
+  </p>
+</div>

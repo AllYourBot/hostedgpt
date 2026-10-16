@@ -29,35 +29,10 @@
       |,
   } do
   %>
-    <div
-      id="left-handle"
-      class="
-        flex-1 hidden nav-open:!flex h-full
-        items-center justify-center
-        tooltip tooltip-right hover:tooltip-open
-      "
-      data-tip="<%= t("app.conversations.ui.close_sidebar") %>"
-    >
-      <div id="left" class="flex-col w-1 h-5 opacity-70">
-        <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full group-hover:rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
-        <div class="w-1 h-3 bg-gray-400 rounded-full group-hover:-rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
-      </div>
-    </div>
-
-    <div
-      id="right-handle"
-      class="
-        flex-1 flex nav-open:!hidden h-full
-        items-center justify-center
-        tooltip tooltip-right hover:tooltip-open
-      "
-      data-tip="<%= t("app.conversations.ui.open_sidebar") %>"
-    >
-      <div id="right" class="flex-col w-1 h-5 opacity-70">
-        <div class="w-1 h-3 -mb-1 bg-gray-400 rounded-full -rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
-        <div class="w-1 h-3 bg-gray-400 rounded-full rotate-12 group-hover:bg-black dark:group-hover:bg-white"></div>
-      </div>
-    </div>
+    <%= render "messages/main_column/sidebar_handle", side: "left", visibility: "hidden nav-open:!flex", tip: t("app.conversations.ui.close_sidebar"),
+      top_tilt: "group-hover:rotate-12", bottom_tilt: "group-hover:-rotate-12" %>
+    <%= render "messages/main_column/sidebar_handle", side: "right", visibility: "flex nav-open:!hidden", tip: t("app.conversations.ui.open_sidebar"),
+      top_tilt: "-rotate-12", bottom_tilt: "rotate-12" %>
   <% end %>
 
   <!-- Only one of these headers is visible at a time, depending on width -->
@@ -65,18 +40,7 @@
     <%= render "messages/main_column/assistant_header" %>
 
     <div class="flex items-center gap-2">
-      <%= button_tag type: "button",
-        class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{"opacity-50 cursor-not-allowed" unless @conversation&.persisted?}",
-        onclick: @conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
-        disabled: !@conversation&.persisted? do %>
-        <%= icon "arrow-up-tray",
-          variant: :outline,
-          size: 20,
-          class: "text-gray-950 dark:text-gray-100",
-          title: @conversation&.persisted? ? t("app.conversations.ui.share") : t("app.conversations.ui.share_unavailable"),
-          tooltip: :bottom
-        %>
-      <% end %>
+      <%= render "messages/main_column/share_button", conversation: @conversation %>
 
       <%= link_to new_assistant_message_path(@assistant),
         target: "_top",
@@ -103,18 +67,7 @@
       <%= render "messages/main_column/assistant_header" %>
 
       <div class="flex items-center gap-2">
-        <%= button_tag type: "button",
-          class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{"opacity-50 cursor-not-allowed" unless @conversation&.persisted?}",
-          onclick: @conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
-          disabled: !@conversation&.persisted? do %>
-          <%= icon "arrow-up-tray",
-            variant: :outline,
-            size: 20,
-            class: "text-gray-950 dark:text-gray-100",
-            title: @conversation&.persisted? ? t("app.conversations.ui.share") : t("app.conversations.ui.share_unavailable"),
-            tooltip: :bottom
-          %>
-        <% end %>
+        <%= render "messages/main_column/share_button", conversation: @conversation %>
 
         <%= link_to new_assistant_message_path(@assistant), target: "_top", class: "block cursor-pointer inline-flex mr-1 px-2 group", data: { role: "new" } do %>
           <%= icon "pencil-square", variant: :outline, size: 22, class: "stroke-2 text-gray-950 dark:text-gray-100", title: t("app.conversations.new_chat"), tooltip: :left %>
@@ -174,16 +127,7 @@
               class: "absolute left-11 bottom-[26px] w-[23px] h-[23px]",
               data: { action: "image-upload#choose" } do
         %>
-          <%= icon "paper-clip",
-                variant: :mini,
-                size: 23,
-                class: %|
-                  text-black dark:text-white
-                  cursor-pointer stroke-2
-                |,
-                title: t("app.conversations.ui.attach"),
-                tooltip: :top
-          %>
+          <%= icon "paper-clip", variant: :mini, size: 23, class: "text-black dark:text-white cursor-pointer stroke-2", title: t("app.conversations.ui.attach"), tooltip: :top %>
         <% end %>
 
         <div id="document-previews" class="absolute hidden flex-wrap gap-3 max-w-[280px] left-9 top-3 show-previews:preview-container" data-image-upload-target="previewList">
@@ -460,79 +404,17 @@
     </header>
     <article class="flex flex-col md:flex-row">
       <section class="flex-1 pr-0 md:pr-5">
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <%= t("app.conversations.shortcuts.open_new") %>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">Ctrl or ⌘</div>
-            <div class="key">J</div>
-          </kbd>
-        </figure>
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <%= t("app.conversations.shortcuts.focus_input") %>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">/</div>
-          </kbd>
-        </figure>
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <%= t("app.conversations.shortcuts.unfocus_input") %>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">ESC</div>
-          </kbd>
-        </figure>
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <%= t("app.conversations.shortcuts.toggle_microphone") %>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">Ctrl or ⌘</div>
-            <div class="key">M</div>
-          </kbd>
-        </figure>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.open_new"), keys: ["Ctrl or ⌘", "J"] %>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.focus_input"), keys: ["/"] %>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.unfocus_input"), keys: ["ESC"] %>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.toggle_microphone"), keys: ["Ctrl or ⌘", "M"] %>
 
       </section>
       <section class="flex-1 pl-0 md:pl-5">
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <span><%= t("app.conversations.shortcuts.stop_streaming") %></span>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">Ctrl or ⌘</div>
-            <div class="key">ESC</div>
-          </kbd>
-        </figure>
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <span><%= t("app.conversations.shortcuts.copy_last") %></span>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">Shift</div>
-            <div class="key">Ctrl or ⌘</div>
-            <div class="key">C</div>
-          </kbd>
-        </figure>
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <%= t("app.conversations.shortcuts.toggle_sidebar") %>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">Ctrl or ⌘</div>
-            <div class="key">.</div>
-          </kbd>
-        </figure>
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <%= t("app.conversations.shortcuts.show_shortcuts") %>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">?</div>
-          </kbd>
-        </figure>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.stop_streaming"), keys: ["Ctrl or ⌘", "ESC"] %>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.copy_last"), keys: ["Shift", "Ctrl or ⌘", "C"] %>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.toggle_sidebar"), keys: ["Ctrl or ⌘", "."] %>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.show_shortcuts"), keys: ["?"] %>
       </section>
     </article>
     <header class="font-semibold text-lg my-5 pb-1 border-b-2 border-gray-100">
@@ -540,32 +422,11 @@
     </header>
     <article class="flex flex-col md:flex-row">
       <section class="flex-1 pr-0 md:pr-5">
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <%= t("app.conversations.shortcuts.submit_chat") %>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">RETURN</div>
-          </kbd>
-        </figure>
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <%= t("app.conversations.shortcuts.edit_previous") %>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">↑</div>
-          </kbd>
-        </figure>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.submit_chat"), keys: ["RETURN"] %>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.edit_previous"), keys: ["↑"] %>
       </section>
       <section class="flex-1 pl-0 md:pl-5">
-        <figure class="flex py-2">
-          <figcaption class="flex-grow flex items-center">
-            <span><%= t("app.conversations.shortcuts.unfocus_input") %></span>
-          </figcaption>
-          <kbd class="w-50 text-right flex flex-row gap-1">
-            <div class="key">ESC</div>
-          </kbd>
-        </figure>
+        <%= render "messages/main_column/shortcut", label: t("app.conversations.shortcuts.unfocus_input"), keys: ["ESC"] %>
       </section>
     </article>
   </div>

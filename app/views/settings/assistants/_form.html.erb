@@ -1,42 +1,10 @@
 <%= form_with(model: [:settings, assistant], class: "contents") do |form| %>
-  <% if assistant.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= t("app.settings.assistants.form.errors_title", count: assistant.errors.count) %></h2>
+  <%= render "layouts/form_errors", record: assistant, title: t("app.settings.assistants.form.errors_title", count: assistant.errors.count) %>
 
-      <ul>
-        <% assistant.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="my-5">
-    <%= form.label :name, t("app.settings.assistants.form.name") %>
-    <%= form.text_field :name,
-      autofocus: assistant.new_record?,
-      class: %|
-        block w-full
-        border border-gray-200 outline-none
-        shadow rounded-md
-        px-3 py-2 mt-2
-        dark:text-black
-      | %>
-  </div>
+  <%= labeled_text_field form, :name, t("app.settings.assistants.form.name"), autofocus: assistant.new_record? %>
 
   <% unless assistant.new_record? %>
-    <div class="my-5">
-      <%= form.label :slug, t("app.settings.assistants.form.slug") %>
-      <%= form.text_field :slug,
-        autofocus: assistant.new_record?,
-        class: %|
-          block w-full
-          border border-gray-200 outline-none
-          shadow rounded-md
-          px-3 py-2 mt-2
-          dark:text-black
-        | %>
-    </div>
+    <%= labeled_text_field form, :slug, t("app.settings.assistants.form.slug") %>
   <% end %>
 
   <div class="my-5">
@@ -54,10 +22,7 @@
       | %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :description, t("app.settings.assistants.form.description") %>
-    <%= form.text_field :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
-  </div>
+  <%= labeled_text_field form, :description, t("app.settings.assistants.form.description") %>
 
   <div class="my-5">
     <%= form.label :instructions, t("app.settings.assistants.form.instructions") %>

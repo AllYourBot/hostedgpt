@@ -188,18 +188,7 @@ class Toolbox::GoogleTasks < Toolbox
   end
 
   def pick_best(input:, options: [], key:, error_type:)
-    option_names = options.map { |o| o.send(key) }
-    input_matcher = Amatch::JaroWinkler.new(input)
-    options_hash = option_names.each_with_index.to_h { |value, index| [index, value] }
-    options_hash.each do |index, option|
-      options_hash[index] = input_matcher.match(option)
-    end
-
-    highest_match_sort_with_lowest_index_tiebreaker = options_hash.sort do |a,b|
-      [b.second, a.first] <=> [a.second, b.first]
-    end
-
-    index = highest_match_sort_with_lowest_index_tiebreaker.filter { |pair| pair.second > 0.7 }&.first&.first # returns the index
+    index = best_match_index(input, options.map { |o| o.send(key) }, threshold: 0.7)
     raise "Unable to find a #{error_type} with the name '#{input}'" if index.nil?
     options[index]
   end

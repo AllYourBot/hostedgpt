@@ -23,15 +23,7 @@ module Assistant::Export
 
   class_methods do
     def export_to_file(path: Rails.root.join(DEFAULT_ASSISTANT_FILE), assistants:, only: DEFAULT_EXPORT_ONLY)
-      path = path.to_s
-      storage = {
-        "assistants" => assistants.as_json(only:).map(&:compact)
-      }
-      if path.ends_with?(".json")
-        File.write(path, storage.to_json)
-      else
-        File.write(path, storage.to_yaml)
-      end
+      ExportFile.write(path, "assistants" => assistants.as_json(only:).map(&:compact))
     end
 
     def import_from_file(path: Rails.root.join(DEFAULT_ASSISTANT_FILE), users: User.all)

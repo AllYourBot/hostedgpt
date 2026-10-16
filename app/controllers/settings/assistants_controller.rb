@@ -13,19 +13,11 @@ class Settings::AssistantsController < Settings::ApplicationController
   def create
     @assistant = Current.user.assistants.new(assistant_params)
 
-    if @assistant.save
-      redirect_to edit_settings_assistant_path(@assistant), notice: I18n.t("app.flashes.assistants.saved"), status: :see_other
-    else
-      render :new, status: :unprocessable_content
-    end
+    redirect_or_render(@assistant.save, notice: I18n.t("app.flashes.assistants.saved"), template: :new) { edit_settings_assistant_path(@assistant) }
   end
 
   def update
-    if @assistant.update(assistant_params)
-      redirect_to edit_settings_assistant_path(@assistant), notice: I18n.t("app.flashes.assistants.saved"), status: :see_other
-    else
-      render :edit, status: :unprocessable_content
-    end
+    redirect_or_render(@assistant.update(assistant_params), notice: I18n.t("app.flashes.assistants.saved"), template: :edit) { edit_settings_assistant_path(@assistant) }
   end
 
   def destroy

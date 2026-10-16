@@ -51,48 +51,14 @@ module Scopes::Lib
           d = d.to_date
           send("#{label}_between", d.beginning_of_day, d.end_of_day)
         }, column: column.name
-        @ar_class.auto_scope "#{label}_after", -> (t) {
-          where("#{table_column} > ?", input_to_time(t)).where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_less_than_this_long_ago", -> (t) {
-          where("#{table_column} > ?", input_to_time(t)).where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_less_than", -> (t) {
-          where("#{table_column} > ?", input_to_time(t)).where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_after_or_equal", -> (t) {
-          where("#{table_column} >= ?", input_to_time(t)).where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_less_than_or_equal_to_this_long_ago", -> (t) {
-          where("#{table_column} >= ?", input_to_time(t)).where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_less_than_or_equal_to", -> (t) {
-          where("#{table_column} >= ?", input_to_time(t)).where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_before", -> (t) {
-          where("#{table_column} < ?", input_to_time(t)).
-            where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_more_than_this_long_ago", -> (t) {
-          where("#{table_column} < ?", input_to_time(t)).
-            where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_more_than", -> (t) {
-          where("#{table_column} < ?", input_to_time(t)).
-            where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_before_or_equal", -> (t) {
-          where("#{table_column} <= ?", input_to_time(t)).
-            where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_more_than_or_equal_to_this_long_ago", -> (t) {
-          where("#{table_column} <= ?", input_to_time(t)).
-            where("#{table_column} IS NOT NULL")
-        }, column: column.name
-        @ar_class.auto_scope "#{label}_more_than_or_equal_to", -> (t) {
-          where("#{table_column} <= ?", input_to_time(t)).
-            where("#{table_column} IS NOT NULL")
-        }, column: column.name
+        {
+          ">"  => %w[after less_than_this_long_ago less_than],
+          ">=" => %w[after_or_equal less_than_or_equal_to_this_long_ago less_than_or_equal_to],
+          "<"  => %w[before more_than_this_long_ago more_than],
+          "<=" => %w[before_or_equal more_than_or_equal_to_this_long_ago more_than_or_equal_to]
+        }.each do |operator, suffixes|
+          suffixes.each { |suffix| add_time_comparison_scope(column, "#{label}_#{suffix}", table_column, operator) }
+        end
         @ar_class.auto_scope "#{label}_between", -> (a, b) {
           where("#{table_column} >= ?", input_to_time(a)).
             where("#{table_column} <= ?", input_to_time(b)).
@@ -105,6 +71,12 @@ module Scopes::Lib
           send("#{label}_after_or_equal", d.to_date.beginning_of_day)
         }, column: column.name
       end
+    end
+
+    def add_time_comparison_scope(column, name, table_column, operator)
+      @ar_class.auto_scope name, -> (t) {
+        where("#{table_column} #{operator} ?", input_to_time(t)).where("#{table_column} IS NOT NULL")
+      }, column: column.name
     end
 
     def add_date_related_column_scopes
@@ -145,14 +117,13 @@ module Scopes::Lib
       date_and_time_columns.each do |column|
         label = column.name.gsub(/(_at|_on)$/, "")
         table_column = "#{@ar_class.table_name}.#{column.name}"
+        now = current_time_for(column)
 
         @ar_class.auto_scope "#{label}", -> {
-          now = column.type == :date ? Date.current : Time.current
-          where("#{table_column} is not null and #{table_column} <= ?", now)
+          where("#{table_column} is not null and #{table_column} <= ?", now.call)
         }, column: column.name
         @ar_class.auto_scope "not_#{label}", -> {
-          now = column.type == :date ? Date.current : Time.current
-          where("#{table_column} is null or #{table_column} > ?", now)
+          where("#{table_column} is null or #{table_column} > ?", now.call)
         }, column: column.name
 
         # .less_than(5.days.ago)
@@ -168,24 +139,26 @@ module Scopes::Lib
     def add_date_and_time_helper_methods
       date_and_time_columns.each do |column|
         label = column.name.gsub(/(_at|_on)$/, "")
+        now = current_time_for(column)
 
         @ar_class.define_method "#{label}?" do
-          now = column.type == :date ? Date.current : Time.current
-          send(column.name).present? && send(column.name) <= now
+          send(column.name).present? && send(column.name) <= now.call
         end
 
         @ar_class.define_method "not_#{label}?" do
-          now = column.type == :date ? Date.current : Time.current
-          send(column.name).blank? || send(column.name) > now
+          send(column.name).blank? || send(column.name) > now.call
         end
 
         @ar_class.define_method "#{label}!" do
           return if send(column.name)
 
-          now = column.type == :date ? Date.current : Time.current
-          update!(column.name => now)
+          update!(column.name => now.call)
         end
       end
+    end
+
+    def current_time_for(column)
+      column.type == :date ? -> { Date.current } : -> { Time.current }
     end
 
     def time_related_columns(klass=nil)

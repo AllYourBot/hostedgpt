@@ -69,22 +69,27 @@ module ApplicationHelper
     end
   end
 
-  def span_tag(content_or_options_with_block = nil, options = nil, &block)
-    if block_given?
-      options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)
-      content_tag(:span, options, &block)
-    else
-      content_tag(:span, content_or_options_with_block, options)
+  def action_icon(name, **opts)
+    icon name, {
+      variant: :outline,
+      size: 22,
+      class: "stroke-2 text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white"
+    }.merge(opts)
+  end
+
+  def labeled_text_field(form, attribute, label, **options)
+    div_tag class: "my-5" do
+      form.label(attribute, label) +
+        form.text_field(attribute, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black", **options)
     end
   end
 
+  def span_tag(content_or_options_with_block = nil, options = nil, &block)
+    tag_with_content_or_block(:span, content_or_options_with_block, options, &block)
+  end
+
   def div_tag(content_or_options_with_block = nil, options = nil, &block)
-    if block_given?
-      options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)
-      content_tag(:div, options, &block)
-    else
-      content_tag(:div, content_or_options_with_block, options)
-    end
+    tag_with_content_or_block(:div, content_or_options_with_block, options, &block)
   end
 
   def meta_tag(name, content)
@@ -122,5 +127,16 @@ module ApplicationHelper
   def user_avatar_url(user, variant: :small, fallback: nil)
     return fallback unless user&.has_profile_picture?
     user.profile_picture_url(variant) || fallback
+  end
+
+  private
+
+  def tag_with_content_or_block(name, content_or_options_with_block, options, &block)
+    if block_given?
+      options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)
+      content_tag(name, options, &block)
+    else
+      content_tag(name, content_or_options_with_block, options)
+    end
   end
 end

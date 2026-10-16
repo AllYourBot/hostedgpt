@@ -138,4 +138,15 @@ class Toolbox < SDK
     end
     @@argument_to_parameter[method][argument]
   end
+
+  private
+
+  # The index of the option closest to input, the earliest winning a tie; nil
+  # when even the closest doesn't score above threshold.
+  def best_match_index(input, options, threshold: nil)
+    matcher = Amatch::JaroWinkler.new(input)
+    scores = options.map { |option| matcher.match(option) }
+    index = scores.each_index.max_by { |i| [scores[i], -i] }
+    index unless index.nil? || (threshold && scores[index] <= threshold)
+  end
 end

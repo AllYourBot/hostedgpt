@@ -63,8 +63,6 @@ class Document < ApplicationRecord
   end
 
   def has_file_variant_processed?(variant)
-    return false unless file.attached? && file.content_type&.start_with?("image/")
-
     variant_obj = image_variant(variant)
     return false unless variant_obj
 
@@ -73,8 +71,6 @@ class Document < ApplicationRecord
   end
 
   def fully_processed_url(variant)
-    return nil unless file.attached? && file.content_type&.start_with?("image/")
-
     variant_obj = image_variant(variant)
     return nil unless variant_obj
 
@@ -191,8 +187,6 @@ class Document < ApplicationRecord
   end
 
   def wait_for_file_variant_to_process!(variant)
-    return false unless file&.attached? && file.content_type&.start_with?("image/")
-
     variant_obj = image_variant(variant)
     return false unless variant_obj
 
