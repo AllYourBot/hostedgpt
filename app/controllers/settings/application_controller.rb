@@ -5,6 +5,14 @@ class Settings::ApplicationController < ApplicationController
 
   private
 
+  def redirect_or_render(saved, notice:, template:)
+    if saved
+      redirect_to yield, notice:, status: :see_other
+    else
+      render template, status: :unprocessable_content
+    end
+  end
+
   def set_settings_menu
     # controller_name => array of items
     @settings_menu = {

@@ -19,19 +19,11 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   def create
     @language_model = Current.user.language_models.new(language_model_params)
 
-    if @language_model.save
-      redirect_to settings_language_models_path, notice: I18n.t("app.flashes.language_models.saved"), status: :see_other
-    else
-      render :new, status: :unprocessable_content
-    end
+    redirect_or_render(@language_model.save, notice: I18n.t("app.flashes.language_models.saved"), template: :new) { settings_language_models_path }
   end
 
   def update
-    if @language_model.update(language_model_params)
-      redirect_to settings_language_models_path, notice: I18n.t("app.flashes.language_models.saved"), status: :see_other
-    else
-      render :edit, status: :unprocessable_content
-    end
+    redirect_or_render(@language_model.update(language_model_params), notice: I18n.t("app.flashes.language_models.saved"), template: :edit) { settings_language_models_path }
   end
 
   def test
