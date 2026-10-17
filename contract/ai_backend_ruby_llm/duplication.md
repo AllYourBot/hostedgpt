@@ -8,19 +8,3 @@ Both chat entry points rescue the same RubyLLM error lists at the `chat.complete
 AIBackend::RubyLLM#get_oneoff_message
 AIBackend::RubyLLM#stream_next_conversation_message
 ```
-
-# Deliberate duplication in views
-
-## The new templates and the two create/test controller actions: these are standard Rails scaffolding. Sharing them would add indirection without much benefit.
- 
- Both would add indirection without much benefit.
-
-```parallel
-views/settings/language_models/new.html.erb
-views/settings/api_services/new.html.erb
-views/documents/new.html.erb
-Settings::LanguageModelsController#test
-Settings::APIServicesController#test
-Settings::LanguageModelsController#test
-Settings::APIServicesController#test
-```
