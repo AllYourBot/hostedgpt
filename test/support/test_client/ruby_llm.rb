@@ -16,18 +16,19 @@ module TestClient
         self
       end
 
-      def with_instructions(instructions)
+      def with_instructions(instructions, cache_until_here: false)
         self.class.instance_variable_set(:@instructions, instructions)
+        self.class.instance_variable_set(:@cache_until_here, cache_until_here)
         self
       end
 
-      def with_params(**params)
-        self.class.instance_variable_set(:@params, params)
+      def with_provider_options(**options)
+        self.class.instance_variable_set(:@provider_options, options)
         self
       end
 
-      def with_adaptive_thinking(effort:, max_tokens:)
-        self.class.instance_variable_set(:@thinking_config, { effort:, max_tokens: })
+      def with_thinking(**options)
+        self.class.instance_variable_set(:@thinking_config, options)
         self
       end
 
@@ -41,17 +42,29 @@ module TestClient
         self
       end
 
-      def complete(&block)
+      # Mirrors the real 2.0 generate: streams chunks to the block, never
+      # executes tools, and returns the assistant message with tool_calls
+      # populated (nil tool_calls for a text reply).
+      def generate(&block)
         raise self.class.error_to_raise if self.class.error_to_raise
 
         # Like the real stream, thinking arrives before the text or the tool call.
-        block.call(OpenStruct.new(content: nil, thinking: self.class.thinking)) if block && self.class.thinking
+        block&.call(OpenStruct.new(content: nil, tokens: nil, thinking: self.class.thinking)) if self.class.thinking
 
         if self.class.function
-          simulate_tool_calls
-        elsif block
-          response = self.class.api_streaming_response
-          block.call(response) if response.content.present?
+          return simulate_tool_calls
+        end
+
+        response = self.class.api_streaming_response
+        block&.call(response) if response.content.present?
+        message_double(content: response.content, tool_calls: nil)
+      end
+
+      def complete(&block)
+        raise self.class.error_to_raise if self.class.error_to_raise
+
+        if block
+          generate(&block)
         else
           @last_response = self.class.api_oneoff_response.dig("choices", 0, "message", "content")
         end
@@ -69,9 +82,9 @@ module TestClient
 
       private
 
-      # Mirrors the real RubyLLM::Chat tool flow: the assistant message carrying
-      # the tool calls is appended to messages before the intercepted execute
-      # raises, so the backend can read chat.messages.last.tool_calls.
+      # Mirrors the real 2.0 tool flow: generate appends the assistant message
+      # carrying the tool calls to messages and returns it — without executing
+      # anything — so the backend reads tool_calls off the returned message.
       def simulate_tool_calls
         tool_calls = Array.new(self.class.num_tool_calls) do |i|
           ::RubyLLM::ToolCall.new(
@@ -81,8 +94,13 @@ module TestClient
             thought_signature: self.class.thought_signature
           )
         end
-        @messages << OpenStruct.new(role: :assistant, content: nil, tool_calls: tool_calls.to_h { |tc| [tc.id, tc] })
-        raise AIBackend::RubyLLM::ToolCallIntercepted
+        message = message_double(content: nil, tool_calls: tool_calls.to_h { |tc| [tc.id, tc] })
+        @messages << message
+        message
+      end
+
+      def message_double(content:, tool_calls:)
+        OpenStruct.new(role: :assistant, content:, tool_calls:)
       end
 
       def self.api_oneoff_response
@@ -106,8 +124,7 @@ module TestClient
         t = tokens
         OpenStruct.new(
           content: content_text,
-          input_tokens: t[:input_tokens],
-          output_tokens: t[:output_tokens]
+          tokens: OpenStruct.new(input: t[:input], output: t[:output])
         )
       end
 
@@ -150,7 +167,7 @@ module TestClient
       end
 
       def self.tokens
-        { input_tokens: 8, output_tokens: 9 }
+        { input: 8, output: 9 }
       end
 
       def self.arguments
@@ -162,7 +179,7 @@ module TestClient
       end
 
       class << self
-        attr_reader :instructions, :params, :tools, :thinking_config
+        attr_reader :instructions, :cache_until_here, :provider_options, :tools, :thinking_config
       end
     end
 
@@ -178,8 +195,16 @@ module TestClient
         OpenStruct.new(data: self.class.image_data, url: self.class.image_url, mime_type: "image/png")
       end
 
+      def speak(text, **kwargs)
+        raise self.class.speak_error_to_raise if self.class.speak_error_to_raise
+
+        self.class.last_speak_call = { text: text, kwargs: kwargs, openai_api_key: openai_api_key }
+        SpeechBytes.new(self.class.speech_data || "RUBYLLM_WAV_BYTES")
+      end
+
       class << self
-        attr_accessor :image_url, :paint_error_to_raise, :last_paint_call
+        attr_accessor :image_url, :paint_error_to_raise, :last_paint_call,
+          :speech_data, :speak_error_to_raise, :last_speak_call
 
         def image_data
           @image_data || "RUBYLLM_BASE64_IMAGE_DATA"
@@ -190,7 +215,17 @@ module TestClient
           @image_data = nil
           @image_url = nil
           @paint_error_to_raise = nil
+          @last_speak_call = nil
+          @speech_data = nil
+          @speak_error_to_raise = nil
         end
+      end
+    end
+
+    # Mirrors RubyLLM::Speech#to_blob for the fake: carries the raw audio bytes.
+    SpeechBytes = Struct.new(:data) do
+      def to_blob
+        data
       end
     end
 

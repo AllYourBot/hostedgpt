@@ -106,7 +106,7 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
     # y/z padding around the key (separated by spaces) exercises the excerpt
     # cap: the full body never survives.
     body = ("y" * 100) + " Error: bad key sk-abc123def456ghi789jkl012mno345pqr678stu901 " + ("z" * 300)
-    error = ::RubyLLM::UnauthorizedError.new(Faraday::Response.new(status: 401, body: body))
+    error = ::RubyLLM::UnauthorizedError.new("Unauthorized", response: Faraday::Response.new(status: 401, body: body))
 
     detail = AIBackend::RubyLLM.error_detail(error, model: "claude-bad")
 
@@ -118,7 +118,7 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
   end
 
   test "error_detail redacts Groq and Gemini key shapes too" do
-    error = ::RubyLLM::UnauthorizedError.new(Faraday::Response.new(status: 401, body: "denied gsk_ABCDEF123xyz AIzaABCDEF123xyz"))
+    error = ::RubyLLM::UnauthorizedError.new("Unauthorized", response: Faraday::Response.new(status: 401, body: "denied gsk_ABCDEF123xyz AIzaABCDEF123xyz"))
 
     detail = AIBackend::RubyLLM.error_detail(error, model: "m")
 
@@ -138,7 +138,7 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
     @assistant = assistants(:keith_claude3)
     @user = @assistant.user
     long_body = "y" * 300
-    error = ::RubyLLM::UnauthorizedError.new(Faraday::Response.new(status: 401, body: long_body), "Invalid API key - check your credentials")
+    error = ::RubyLLM::UnauthorizedError.new("Invalid API key - check your credentials", response: Faraday::Response.new(status: 401, body: long_body))
 
     backend = AIBackend::RubyLLM.new(@user, @assistant)
     TestClient::RubyLLM::Chat.stub :error_to_raise, error do

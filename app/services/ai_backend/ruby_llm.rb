@@ -3,9 +3,10 @@ class AIBackend::RubyLLM < AIBackend
   # `rescue AIBackend::ConfigurationError` catches bad-key failures and renders
   # key_error_message, instead of falling through to the generic 3x-retry path.
   class ConfigurationError < AIBackend::ConfigurationError; end
-  class ToolCallIntercepted < StandardError; end
 
   IMAGE_MODEL = "gpt-image-2.5-flare"
+  SPEECH_MODEL = "tts-1"
+  SPEECH_VOICE = "nova"
 
   # "high" is the API's own default effort. Thinking counts toward max_tokens, so
   # the 4096 RubyLLM falls back to for an assumed model can be spent before the
@@ -53,7 +54,7 @@ class AIBackend::RubyLLM < AIBackend
   end
 
   def self.gem_class
-    Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::AIBackend::RubyLLM::InterceptedChat
+    Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::RubyLLM::Chat
   end
 
   # One stanza per provider credential: the key plus, for openai-compatible
@@ -65,6 +66,13 @@ class AIBackend::RubyLLM < AIBackend
       context.openai_api_base = url
       context.openai_use_system_role = true
     end
+  end
+
+  # The canonical-URL token, not the driver alone: Groq and OpenRouter also
+  # ride driver :openai, and their tokens are invalid at api.openai.com.
+  def self.canonical_openai_token(user)
+    service = user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
+    service&.effective_token
   end
 
   def self.provider_for_url(url)
@@ -91,12 +99,10 @@ class AIBackend::RubyLLM < AIBackend
 
   # Always paints through the user's OpenAI service, even for an Anthropic or Gemini assistant.
   def self.generate_image(prompt:, user:)
-    # Scoped by URL, not driver alone: Groq and OpenRouter also ride driver :openai.
-    openai_service = user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
-    token = openai_service&.effective_token
+    token = canonical_openai_token(user)
 
     # Context-free on purpose: Toolbox::Image#generate_with_error_context appends which assistant asked.
-    raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services" if openai_service.nil? || token.blank?
+    raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services" if token.blank?
 
     context = client.context { |c| c.openai_api_key = token }
     image = begin
@@ -116,6 +122,43 @@ class AIBackend::RubyLLM < AIBackend
     { b64_json: image.data, model: IMAGE_MODEL, provider: "OpenAI" }
   end
 
+  # Always speaks through the user's OpenAI service, even for an Anthropic or
+  # Gemini assistant — the same key-scoping image generation uses.
+  def self.generate_speech(text:, user:)
+    token = canonical_openai_token(user)
+
+    # Context-free on purpose: the controller, not the Toolbox, renders the
+    # policy key message for speech.
+    raise ConfigurationError if token.blank?
+
+    context = client.context { |c| c.openai_api_key = token }
+    speech = begin
+      context.speak(
+        text,
+        model: SPEECH_MODEL,
+        provider: :openai,
+        assume_model_exists: true,
+        voice: SPEECH_VOICE,
+        format: "wav",
+        provider_options: { speed: 1.0 },
+      )
+    rescue ::RubyLLM::BadRequestError => e
+      # A request rejection (e.g. text over the TTS cap) is not a key problem:
+      # land it on the controller's 502 rescue, like the legacy path does.
+      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::BadRequestError)
+    rescue *CONFIGURATION_ERRORS => e
+      raise mapped_error(e, model: SPEECH_MODEL, as: ConfigurationError)
+    rescue *RATE_LIMIT_ERRORS => e
+      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::TooManyRequestsError)
+    rescue ::RubyLLM::Error => e
+      # Fallback so an unmapped upstream 5xx lands on the controller's 502
+      # rescue instead of a bare 500 — today every upstream failure does.
+      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::ServerError)
+    end
+
+    speech.to_blob
+  end
+
   def initialize(user, assistant, conversation = nil, message = nil)
     super
     @api_service = assistant.api_service
@@ -131,7 +174,7 @@ class AIBackend::RubyLLM < AIBackend
     chat = build_chat
     chat.with_instructions(instructions)
     preceding_messages(messages).each { |msg| chat.add_message(msg) }
-    chat.with_params(**params) if params.present?
+    chat.with_provider_options(**params) if params.present?
     chat.complete.content
   rescue *CONFIGURATION_ERRORS => e
     raise self.class.mapped_error(e, model: @api_name, as: ConfigurationError)
@@ -144,23 +187,31 @@ class AIBackend::RubyLLM < AIBackend
 
     chat = build_chat
     instructions = full_instructions
-    chat.with_instructions(conversation_instructions(instructions)) if instructions.present?
+    # Anthropic caches only what it is told to, so mark the stable system
+    # prompt as the cache boundary. OpenAI and Gemini cache a repeated prefix
+    # on their own.
+    chat.with_instructions(instructions, cache_until_here: provider_slug == :anthropic) if instructions.present?
     preceding_conversation_messages.each { |msg| chat.add_message(msg) }
     chat.with_tools(*tool_instances) if tools_enabled?
-    chat.with_adaptive_thinking(effort: THINKING_EFFORT, max_tokens: THINKING_MAX_TOKENS) if thinking_enabled?
+    if thinking_enabled?
+      chat.with_thinking(effort: THINKING_EFFORT, display: "summarized")
+      chat.with_provider_options(max_tokens: THINKING_MAX_TOKENS)
+    end
 
     begin
-      chat.complete { |chunk| stream_handler.call(chunk, chunk_handler) }
-    rescue ToolCallIntercepted
-      tool_calls = chat.messages.last&.tool_calls
-      return format_tool_calls(tool_calls) if tool_calls.present?
-
-      raise ::Faraday::ParsingError
+      # `generate` streams chunks and never executes tools — the tool calls come
+      # back on the returned message for the job to run through Toolbox.call.
+      response = chat.generate { |chunk| stream_handler.call(chunk, chunk_handler) }
     rescue *CONFIGURATION_ERRORS => e
       raise self.class.mapped_error(e, model: @api_name, as: ConfigurationError)
     rescue *RATE_LIMIT_ERRORS => e
       raise self.class.mapped_error(e, model: @api_name, as: ::Faraday::TooManyRequestsError)
     end
+
+    # Tool calls win over the blank-response check: the job's `not_finished?`
+    # gate depends on the call array arriving even without streamed text.
+    tool_calls = response.tool_calls
+    return format_tool_calls(tool_calls) if tool_calls.present?
 
     raise ::Faraday::ParsingError if @stream_response_text.blank?
     nil
@@ -178,22 +229,15 @@ class AIBackend::RubyLLM < AIBackend
     chat
   end
 
-  # Anthropic caches only what it is told to, so mark the stable system prompt the way the SDK
-  # backend does. OpenAI and Gemini cache a repeated prefix on their own.
-  def conversation_instructions(instructions)
-    return instructions unless provider_slug == :anthropic
-
-    ::RubyLLM::Content::Raw.new([{ type: "text", text: instructions, cache_control: AIBackend::Anthropic::CACHE_CONTROL }])
-  end
-
   def ruby_llm_context
     self.class.client.context { |c| self.class.configure_context(c, provider: provider_slug, url: @api_service.url, token: @token) }
   end
 
   def stream_handler
     proc do |chunk, chunk_handler|
-      input_tokens = chunk.respond_to?(:input_tokens) ? chunk.input_tokens : nil
-      output_tokens = chunk.respond_to?(:output_tokens) ? chunk.output_tokens : nil
+      tokens = chunk.respond_to?(:tokens) ? chunk.tokens : nil
+      input_tokens = tokens&.input
+      output_tokens = tokens&.output
 
       if input_tokens && output_tokens
         @message.input_token_count = input_tokens
@@ -264,7 +308,9 @@ class AIBackend::RubyLLM < AIBackend
     pdf_texts = documents.select { |document| document.has_document_pdf? && !@assistant.supports_pdf? }.map(&:pdf_as_text)
     text = [message.content_text, *pdf_texts, (current_time_note if with_time)].compact.join("\n\n")
 
-    { role: message.role, content: attachments.any? ? ::RubyLLM::Content.new(text, attachments) : text }
+    msg = { role: message.role, content: text }
+    msg[:attachments] = attachments if attachments.any?
+    msg
   end
 
   # Reconstructs the stored OpenAI-shaped content_tool_calls (serialized via
@@ -328,10 +374,10 @@ class AIBackend::RubyLLM < AIBackend
 
   def tool_instances
     Toolbox.tools.map do |tool|
-      AIBackend::RubyLLM::InterceptedTool.new(
+      AIBackend::RubyLLM::ToolSchema.new(
         name: tool.dig(:function, :name),
         description: tool.dig(:function, :description),
-        params_schema: tool.dig(:function, :parameters),
+        parameters_schema: tool.dig(:function, :parameters),
       )
     end
   end
@@ -345,7 +391,7 @@ class AIBackend::RubyLLM < AIBackend
   end
 
   # RubyLLM returns tool calls already separated, so these defensive identities
-  # satisfy the AIBackend::Tools contract even though the overridden
+  # satisfy the AIBackend::Tools contract even though
   # stream_next_conversation_message never calls them.
   def format_parallel_tool_calls(content_tool_calls)
     content_tool_calls

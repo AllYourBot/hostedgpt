@@ -226,7 +226,7 @@ class ModelsRefreshTest < ActiveSupport::TestCase
   private
 
   def registry_model(id, name, provider, input:, capabilities: [])
-    RubyLLM::Model::Info.new(
+    RubyLLM::Model.new(
       id:,
       name:,
       provider:,
@@ -238,7 +238,7 @@ class ModelsRefreshTest < ActiveSupport::TestCase
   def with_registry(registry, refresh: nil, &block)
     refresh ||= -> {}
     RubyLLM.stub :models, registry do
-      registry.stub :refresh!, refresh, &block
+      registry.stub :refresh, refresh, &block
     end
   end
 

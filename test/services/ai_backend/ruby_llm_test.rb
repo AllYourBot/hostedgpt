@@ -72,6 +72,11 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_equal TestClient::RubyLLM, AIBackend::RubyLLM.client
   end
 
+  test "the OpenAI protocol pin keeps traffic on Chat Completions" do
+    # Pins config/initializers/ruby_llm.rb's openai_protocol = :chat_completions.
+    assert_equal :chat_completions, RubyLLM.config.openai_protocol
+  end
+
   # Phase 2 — plain text chat, OpenAI only
 
   test "get_oneoff_message returns text content" do
@@ -94,7 +99,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     TestClient::RubyLLM::Chat.stub :text, "Test" do
       backend.get_oneoff_message("You are helpful", ["Hi"], { temperature: 0.5 })
     end
-    assert_equal({ temperature: 0.5 }, TestClient::RubyLLM::Chat.params)
+    assert_equal({ temperature: 0.5 }, TestClient::RubyLLM::Chat.provider_options)
   end
 
   test "get_oneoff_message adds preceding messages" do
@@ -145,8 +150,8 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend.instance_variable_set(:@stream_response_text, "")
     handler = backend.send(:stream_handler)
 
-    chunk1 = OpenStruct.new(content: "Hello ", input_tokens: nil, output_tokens: nil)
-    chunk2 = OpenStruct.new(content: "world!", input_tokens: 10, output_tokens: 3)
+    chunk1 = OpenStruct.new(content: "Hello ", tokens: nil)
+    chunk2 = OpenStruct.new(content: "world!", tokens: OpenStruct.new(input: 10, output: 3))
 
     chunks = []
     handler.call(chunk1, ->(c) { chunks << c })
@@ -171,7 +176,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend.instance_variable_set(:@stream_response_text, "")
     handler = backend.send(:stream_handler)
 
-    token_chunk = OpenStruct.new(content: "Hi", input_tokens: 100, output_tokens: 50)
+    token_chunk = OpenStruct.new(content: "Hi", tokens: OpenStruct.new(input: 100, output: 50))
     handler.call(token_chunk, ->(c) { })
 
     assert_equal 100, message.input_token_count
@@ -211,8 +216,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
 
     error_chunk = OpenStruct.new
     error_chunk.define_singleton_method(:content) { raise ::RubyLLM::UnauthorizedError, "Unauthorized" }
-    error_chunk.define_singleton_method(:input_tokens) { nil }
-    error_chunk.define_singleton_method(:output_tokens) { nil }
+    error_chunk.define_singleton_method(:tokens) { nil }
 
     assert_raises(AIBackend::RubyLLM::ConfigurationError) do
       handler.call(error_chunk, ->(c) { })
@@ -234,8 +238,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
 
     error_chunk = OpenStruct.new
     error_chunk.define_singleton_method(:content) { raise ::RubyLLM::RateLimitError, "Rate limited" }
-    error_chunk.define_singleton_method(:input_tokens) { nil }
-    error_chunk.define_singleton_method(:output_tokens) { nil }
+    error_chunk.define_singleton_method(:tokens) { nil }
 
     assert_raises(Faraday::TooManyRequestsError) do
       handler.call(error_chunk, ->(c) { })
@@ -257,8 +260,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
 
     error_chunk = OpenStruct.new
     error_chunk.define_singleton_method(:content) { raise GetNextAIMessageJob::ResponseCancelled }
-    error_chunk.define_singleton_method(:input_tokens) { nil }
-    error_chunk.define_singleton_method(:output_tokens) { nil }
+    error_chunk.define_singleton_method(:tokens) { nil }
 
     assert_raises(GetNextAIMessageJob::ResponseCancelled) do
       handler.call(error_chunk, ->(c) { })
@@ -506,9 +508,9 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     msgs = backend.send(:preceding_conversation_messages)
 
-    message_with_attachments = msgs.find { |m| m[:content].is_a?(::RubyLLM::Content) }
-    assert message_with_attachments, "Should find a message with RubyLLM::Content for image attachments"
-    assert message_with_attachments[:content].attachments.any?, "Content should have attachments"
+    message_with_attachments = msgs.find { |m| m[:attachments].present? }
+    assert message_with_attachments, "Should find a message with attachments for image attachments"
+    assert message_with_attachments[:attachments].any?, "The message should have attachments"
   end
 
   test "preceding_conversation_messages does not include attachments when supports_images is false" do
@@ -526,8 +528,8 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     msgs = backend.send(:preceding_conversation_messages)
 
-    msgs_with_attachments = msgs.filter_map { |m| m if m[:content].is_a?(::RubyLLM::Content) }
-    assert_empty msgs_with_attachments, "Should not have any Content objects when supports_images is false"
+    msgs_with_attachments = msgs.filter_map { |m| m if m[:attachments].present? }
+    assert_empty msgs_with_attachments, "Should not have any attachments when supports_images is false"
   end
 
   test "preceding_conversation_messages attaches the assistant's context images to the first user message only" do
@@ -539,8 +541,8 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, conversation.latest_message_for_version(:latest))
     first_user, _reply, newest_user = backend.send(:preceding_conversation_messages)
 
-    assert_instance_of ::RubyLLM::Content, first_user[:content], "The first user message should carry attachments"
-    assert_equal [:image], first_user[:content].attachments.map(&:type), "The context image should be attached"
+    assert first_user[:attachments].present?, "The first user message should carry attachments"
+    assert_equal [:image], first_user[:attachments].map(&:type), "The context image should be attached"
     assert_instance_of String, newest_user[:content], "Later messages should stay text-only"
   end
 
@@ -548,21 +550,21 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assistant = assistants(:keith_claude35)
     assistant.language_model.update!(supports_pdf: true, supports_tools: false)
 
-    content = backend_replying_to_pdf(assistant, "quarterly.pdf", file_fixture("quarterly.pdf").binread).send(:preceding_conversation_messages).first[:content]
+    content = backend_replying_to_pdf(assistant, "quarterly.pdf", file_fixture("quarterly.pdf").binread).send(:preceding_conversation_messages).first
 
-    assert_instance_of ::RubyLLM::Content, content
-    assert_equal [:pdf], content.attachments.map(&:type)
-    refute_includes content.text, "PDF Document"
+    assert_equal [:pdf], content[:attachments].map(&:type)
+    refute_includes content[:content], "PDF Document"
   end
 
   test "preceding_conversation_messages inlines a PDF's text for a model without PDF or image support" do
     assistant = assistants(:keith_claude35)
     assistant.language_model.update!(supports_pdf: false, supports_images: false, supports_tools: false)
 
-    content = backend_replying_to_pdf(assistant, "quarterly.pdf", file_fixture("quarterly.pdf").binread).send(:preceding_conversation_messages).first[:content]
+    content = backend_replying_to_pdf(assistant, "quarterly.pdf", file_fixture("quarterly.pdf").binread).send(:preceding_conversation_messages).first
 
-    assert_instance_of String, content
-    assert_includes content, "[PDF Document: quarterly.pdf]\nQuarterly numbers"
+    assert_instance_of String, content[:content]
+    refute content[:attachments].present?
+    assert_includes content[:content], "[PDF Document: quarterly.pdf]\nQuarterly numbers"
   end
 
   test "preceding_conversation_messages says so when a PDF's text cannot be extracted" do
@@ -595,17 +597,18 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     TestClient::RubyLLM::Chat.stub(:text, "Hi") { backend.stream_next_conversation_message { |chunk| } }
 
     instructions = TestClient::RubyLLM::Chat.instructions
-    assert_instance_of ::RubyLLM::Content::Raw, instructions
-    assert_equal({ type: "ephemeral" }, instructions.value.first[:cache_control])
+    assert_instance_of String, instructions
+    assert_equal true, TestClient::RubyLLM::Chat.cache_until_here
   end
 
-  test "stream_next_conversation_message leaves the system prompt as text for OpenAI" do
+  test "stream_next_conversation_message leaves the system prompt as unmarked text for OpenAI" do
     @assistant.language_model.update!(supports_tools: false)
     backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, @conversation.latest_message_for_version(:latest))
 
     TestClient::RubyLLM::Chat.stub(:text, "Hi") { backend.stream_next_conversation_message { |chunk| } }
 
     assert_instance_of String, TestClient::RubyLLM::Chat.instructions
+    assert_equal false, TestClient::RubyLLM::Chat.cache_until_here
   end
 
   test "sanitize_content removes json_of_generated_image from JSON content" do
@@ -760,10 +763,10 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     msgs = backend.send(:preceding_conversation_messages)
 
-    mixed_msg = msgs.find { |m| m[:content].is_a?(::RubyLLM::Content) }
+    mixed_msg = msgs.find { |m| m[:attachments].present? }
     assert mixed_msg, "Should find a message with mixed content"
-    assert mixed_msg[:content].text.present?, "Content text should be preserved alongside attachments"
-    assert mixed_msg[:content].attachments.any?, "Attachments should be present"
+    assert mixed_msg[:content].present?, "Content text should be preserved alongside attachments"
+    assert mixed_msg[:attachments].any?, "Attachments should be present"
   end
 
   # Phase 5 — Tool/function calling parity
@@ -788,11 +791,11 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     refute_includes TestClient::RubyLLM::Chat.instructions, "Respond with ONLY valid JSON"
   end
 
-  test "tool_instances maps each Toolbox tool to an InterceptedTool" do
+  test "tool_instances maps each Toolbox tool to a ToolSchema" do
     backend = AIBackend::RubyLLM.new(@user, @assistant)
     instances = backend.send(:tool_instances)
 
-    assert instances.all? { |i| i.is_a?(AIBackend::RubyLLM::InterceptedTool) }
+    assert instances.all? { |i| i.is_a?(AIBackend::RubyLLM::ToolSchema) }
     assert_includes instances.map(&:name), "helloworld_hi"
     assert_includes instances.map(&:name), "openmeteo_get_current_and_todays_weather"
   end
@@ -1015,6 +1018,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
       end
     end
   end
+
   private
 
   def backend_replying_to_pdf(assistant, filename, pdf_bytes)
@@ -1047,7 +1051,8 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
       backend.stream_next_conversation_message { |_| }
     end
 
-    assert_equal({ effort: "high", max_tokens: 16_000 }, TestClient::RubyLLM::Chat.thinking_config)
+    assert_equal({ effort: "high", display: "summarized" }, TestClient::RubyLLM::Chat.thinking_config)
+    assert_equal({ max_tokens: 16_000 }, TestClient::RubyLLM::Chat.provider_options)
   end
 
   test "stream_next_conversation_message leaves thinking off for a model that doesn't support it" do
