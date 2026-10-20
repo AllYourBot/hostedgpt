@@ -61,7 +61,7 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
 
   test "when the connection drops mid-stream, the message is marked failed" do
     stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub_any_instance :complete, proc { |*| raise Faraday::ConnectionFailed, "connection reset by peer" } do
+      TestClient::RubyLLM::Chat.stub_any_instance :generate, proc { |*| raise Faraday::ConnectionFailed, "connection reset by peer" } do
         assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       end
     end

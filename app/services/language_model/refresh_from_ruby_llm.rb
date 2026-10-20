@@ -14,7 +14,7 @@ class LanguageModel::RefreshFromRubyLLM
   end
 
   def call
-    @registry.refresh!
+    @registry.refresh
     models_by_provider = @registry.chat_models.all.group_by(&:provider)
     api_services = APIService.not_deleted.includes(:user).select do |api_service|
       canonical_chat_service?(api_service)
@@ -58,7 +58,7 @@ class LanguageModel::RefreshFromRubyLLM
         supports_images: model.modalities.input.include?("image"),
         supports_pdf: model.modalities.input.include?("pdf"),
         supports_system_message: true,
-        supports_tools: model.supports_functions?,
+        supports_tools: model.supports?(:function_calling),
         supports_thinking: provider == "anthropic" && LanguageModel.adaptive_thinking?(model.id)
       )
 
