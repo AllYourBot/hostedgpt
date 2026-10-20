@@ -15,6 +15,9 @@ Dockerfile
 /config/master.key
 /config/credentials/*.key
 
+# Ignore Kamal's deploy secrets (gitignored too; must never enter a build context).
+/.kamal
+
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*

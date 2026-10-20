@@ -86,6 +86,22 @@ EXPOSE 3000
 
 #### END of FLY ####
 
+#### START of KAMAL ####
+
+# Child of fly-production, not a standalone build: it inherits the lean
+# runtime image (jemalloc, YJIT, non-root user, entrypoint) instead of
+# repeating the DEV/RENDER rebuild-everything pattern. The entrypoint's
+# db:prepare branch matches the `rails server` CMD, and PORT must match
+# proxy.app_port in config/deploy.yml. render-production below must remain
+# the LAST stage.
+FROM fly-production AS kamal-production
+
+ENV PORT=8080
+
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+
+#### END of KAMAL ####
+
 #### START of DEV ####
 
 # RUBY_VERSION is the only thing used from anything above
