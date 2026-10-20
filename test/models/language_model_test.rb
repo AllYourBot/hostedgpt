@@ -114,6 +114,18 @@ class LanguageModelTest < ActiveSupport::TestCase
     end
   end
 
+  test "models.yml does not seed the OpenAI models shut down on 2026-10-23" do
+    retired = %w[
+      gpt-4-turbo gpt-4-turbo-2024-04-09 gpt-4-1106-preview
+      gpt-4 gpt-4-0613
+      gpt-3.5-turbo gpt-3.5-turbo-0125
+      gpt-4o-2024-05-13
+    ]
+    seeded = YAML.load_file(Rails.root.join("models.yml"))["models"].map { |m| m["api_name"] }
+
+    assert_empty retired & seeded
+  end
+
   test "for_user scope" do
     list = LanguageModel.for_user(users(:keith)).all.pluck(:api_name)
     assert list.include?("camel")
