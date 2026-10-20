@@ -1,7 +1,7 @@
 class AIBackend::OpenAI < AIBackend
   include Tools
 
-  IMAGE_MODEL = "gpt-image-1"
+  IMAGE_MODEL = "gpt-image-2.5-flare"
   SPEECH_MODEL = "tts-1"
   SPEECH_VOICE = "nova"
 
