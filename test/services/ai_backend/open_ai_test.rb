@@ -372,12 +372,12 @@ class AIBackend::OpenAIImageTest < ActiveSupport::TestCase
     response = AIBackend::OpenAI.generate_image(prompt: "A cartoon cat", user: users(:keith))
 
     assert_equal "TEST_BASE64_IMAGE_DATA", response[:b64_json]
-    assert_equal "gpt-image-1", response[:model]
+    assert_equal "gpt-image-2.5-flare", response[:model]
     assert_equal "OpenAI", response[:provider]
 
     params = TestClient::OpenAI.images.parameters
     assert_equal "A cartoon cat", params[:prompt]
-    assert_equal "gpt-image-1", params[:model]
+    assert_equal "gpt-image-2.5-flare", params[:model]
     assert_equal 1, params[:n]
     assert_equal "1024x1024", params[:size]
     assert_equal "auto", params[:quality]
