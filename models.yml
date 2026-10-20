@@ -51,27 +51,6 @@ models:
   supports_system_message: true
   supports_pdf: true
   api_service_name: OpenAI
-- api_name: gpt-4o-2024-05-13
-  name: GPT-4o Omni Multimodal (2024-05-13)
-  supports_images: true
-  supports_tools: true
-  supports_system_message: true
-  supports_pdf: true
-  api_service_name: OpenAI
-- api_name: gpt-4-turbo
-  name: GPT-4 Turbo with Vision (latest)
-  supports_images: true
-  supports_tools: true
-  supports_system_message: true
-  supports_pdf: false
-  api_service_name: OpenAI
-- api_name: gpt-4-turbo-2024-04-09
-  name: GPT-4 Turbo with Vision (2024-04-09)
-  supports_images: true
-  supports_tools: true
-  supports_system_message: true
-  supports_pdf: false
-  api_service_name: OpenAI
 - api_name: gpt-4-turbo-preview
   name: GPT-4 Turbo Preview
   supports_images: false
@@ -81,13 +60,6 @@ models:
   api_service_name: OpenAI
 - api_name: gpt-4-0125-preview
   name: GPT-4 Turbo Preview (2024-01-25)
-  supports_images: false
-  supports_tools: true
-  supports_system_message: true
-  supports_pdf: false
-  api_service_name: OpenAI
-- api_name: gpt-4-1106-preview
-  name: GPT-4 Turbo Preview (2023-11-06)
   supports_images: false
   supports_tools: true
   supports_system_message: true
@@ -103,34 +75,6 @@ models:
 - api_name: gpt-4-1106-vision-preview
   name: GPT-4 Turbo with Vision Preview (2023-11-06)
   supports_images: true
-  supports_tools: true
-  supports_system_message: true
-  supports_pdf: false
-  api_service_name: OpenAI
-- api_name: gpt-4
-  name: GPT-4 (latest)
-  supports_images: false
-  supports_tools: true
-  supports_system_message: true
-  supports_pdf: false
-  api_service_name: OpenAI
-- api_name: gpt-4-0613
-  name: GPT-4 Snapshot improved function calling (2023-06-13)
-  supports_images: false
-  supports_tools: true
-  supports_system_message: true
-  supports_pdf: false
-  api_service_name: OpenAI
-- api_name: gpt-3.5-turbo
-  name: GPT-3.5 Turbo (latest)
-  supports_images: false
-  supports_tools: true
-  supports_system_message: true
-  supports_pdf: false
-  api_service_name: OpenAI
-- api_name: gpt-3.5-turbo-0125
-  name: GPT-3.5 Turbo (2022-01-25)
-  supports_images: false
   supports_tools: true
   supports_system_message: true
   supports_pdf: false
