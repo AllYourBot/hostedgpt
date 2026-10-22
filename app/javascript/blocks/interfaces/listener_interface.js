@@ -37,9 +37,9 @@ export default class extends Interface {
   async Disable()     { if ($.processing != null) {
                           log('Disabled')
                           $.processing = null
-                          Hush.Speaker()
+                          Stop.Speaker()
                           await Flip.Transcriber.off()
-                          await Play.Speaker.sound('pip') // this aborts any speaking that was mid-sentence
+                          await Play.Speaker.sound('pip')
                         }
                       }
 
