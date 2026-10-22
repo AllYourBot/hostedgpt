@@ -15,9 +15,8 @@ export default class extends Controller {
     this.playClicked = false // not quite an actual state, it's a very short-duration flag, so not elevating this to a value
   }
 
-  // Each streamed chunk re-renders the button, which comes back showing play
-  transitionOutletConnected(button) {
-    if (this.#speaking) button.toggleClassOn()
+  transitionOutletConnected(buttonRerenderedByStreamedChunk) {
+    if (this.#speaking) buttonRerenderedByStreamedChunk.toggleClassOn()
   }
 
   toggleSpeakingMessage() {
@@ -127,10 +126,9 @@ export default class extends Controller {
     Speaker.onBusyDone = () => { this.#speakerFinished(); existingBusyDone() }
   }
 
-  // In voice mode the speaker goes quiet whenever it catches up with a reply that is still streaming
   #speakerFinished() {
-    const moreToRead = !this.playClicked && Listener.enabled && !this.#promptedEverything
-    if (moreToRead) return
+    const caughtUpWithStreamingReply = !this.playClicked && Listener.enabled && !this.#promptedEverything
+    if (caughtUpWithStreamingReply) return
 
     if (this.playClicked)
       this.clickedStop()
