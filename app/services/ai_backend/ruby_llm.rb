@@ -143,8 +143,9 @@ class AIBackend::RubyLLM < AIBackend
     context = client.context { |c| c.public_send("#{provider}_api_key=", token) }
     context.speak(text, model:, provider:, assume_model_exists: true, **options).to_blob
   rescue ::RubyLLM::BadRequestError => e
-    # Before CONFIGURATION_ERRORS, which also holds BadRequestError: text over the TTS cap is a 502, not a key problem
-    raise mapped_error(e, model:, as: ::Faraday::BadRequestError)
+    # Before CONFIGURATION_ERRORS, which also holds BadRequestError: text over the TTS cap is a 502, not a key
+    # problem, but Gemini rejects a bad key with a 400 too
+    raise mapped_error(e, model:, as: e.message.match?(/api key/i) ? ConfigurationError : ::Faraday::BadRequestError)
   rescue *CONFIGURATION_ERRORS => e
     raise mapped_error(e, model:, as: ConfigurationError)
   rescue *RATE_LIMIT_ERRORS => e
