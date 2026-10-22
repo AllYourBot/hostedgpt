@@ -12,7 +12,7 @@ export default class extends Service {
   }
 
   async queueRequest(index, text) {
-    let audioUrl
+    let audioUrl, lastError
 
     for (let i = 1; i <= 3; i++) {
       if (! $.queue[index]) break
@@ -23,6 +23,7 @@ export default class extends Service {
         $.queue[index].request = request
         audioUrl = await request.audioFromOpenAI(text)
       } catch (error) {
+        lastError = error
         log(`  error fetching job ${index} attempt ${i}${i == 3 ? ` - giving up (${text})` : ''}`)
         await sleep(0.5)
       }
@@ -31,9 +32,10 @@ export default class extends Service {
     }
     if (! $.queue[index]) return
 
-    if (audioUrl == undefined)
+    if (audioUrl == undefined) {
       $.queue[index].errored = true
-    else {
+      $.queue[index].error = lastError?.message
+    } else {
       $.queue[index].audioUrl = audioUrl
       $.queue[index].generated = true
     }
@@ -48,6 +50,14 @@ export default class extends Service {
       item.request?.cancel()
     })
     $.queue = []
+  }
+
+  get requestsInFlight() {
+    return $.queue.filter(job => job.requested && !job.generated && !job.errored).length
+  }
+
+  get nextUnrequested() {
+    return $.queue.find(job => !job.requested)
   }
 
   get all() {

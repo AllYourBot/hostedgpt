@@ -33,6 +33,7 @@ export default class extends Controller {
 
     // Ensure composer is re-enabled/refocused after the conversation frame morphs
     document.addEventListener('turbo:frame-render', this.boundHandleConversationRendered)
+    document.addEventListener('turbo:click', this.boundTurnOffMicrophoneWhenLeavingFromNav)
 
     this.determineMicButton()
   }
@@ -42,6 +43,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:visit', this.boundDetermineMicButton)
     document.removeEventListener('turbo:frame-render', this.boundDetermineMicButton)
     document.removeEventListener('turbo:frame-render', this.boundHandleConversationRendered)
+    document.removeEventListener('turbo:click', this.boundTurnOffMicrophoneWhenLeavingFromNav)
   }
 
   cursorToEnd() {
@@ -115,6 +117,16 @@ export default class extends Controller {
       // This will hide overlay, clear form, and focus input
       this.resetForm()
     }
+  }
+
+  // Only link clicks fire turbo:click, so the redirect after a spoken message is sent keeps the mic on.
+  // Renaming a conversation stays on the page, so it keeps the mic on too.
+  boundTurnOffMicrophoneWhenLeavingFromNav = (event) => { this.turnOffMicrophoneWhenLeavingFromNav(event) }
+  turnOffMicrophoneWhenLeavingFromNav(event) {
+    if (Listener.disabled) return
+    if (!event.target.closest('#nav-column') || event.target.closest('[data-role="edit"]')) return
+
+    this.disableMicrophone(true)
   }
 
   async enableMicrophone() {

@@ -80,6 +80,24 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     end
   end
 
+  test "arriving at a conversation from the sidebar, asking a question plays back just that answer" do
+    stub_features(voice: true) do
+      visit conversation_messages_path(conversations(:greeting))
+      find("#conversation-#{@conversation.id} a[data-role='title']").click
+      assert_text @conversation.title
+
+      enable_mic.click
+      disable_mic.visible?
+
+      user_speaks "You there?"
+      stream_ai_reply "Yes, I'm here. Are you there?"
+
+      assert_finished_speaking Message.last
+      assert_spoke_to_sentence "2", assistant_messages.last
+      assert_spoke_to_sentence "0", assistant_messages.first
+    end
+  end
+
   test "while speaking a long reply if you click stop it stops speaking right away even though more streams in, and when re-enabled it does not play the existing message." do
     stub_features(voice: true) do
       visit conversation_messages_path(@conversation)

@@ -81,6 +81,7 @@ export default class extends Service {
       $.playerSource.onended = null
       $.playerSource.stop()
     }
+    _cancelSkipNotice()
     _resetQueue()
     $.speaking = false
     $.playing = false
@@ -103,21 +104,31 @@ export default class extends Service {
       words: words,
       request: null,
       audioUrl: null,
+      requested: false,
       generated: false,
       played: false,
       errored: false,
     })
+    $.busy = true
 
-    void _queueWordsToSay(index)
+    _requestAudioWithinLimit()
+  }
+
+  // Each request's deadline starts when it's sent, so sending every sentence at once would count time spent waiting on the server
+  _requestAudioWithinLimit() {
+    while ($.queue.requestsInFlight < 2) {
+      const job = $.queue.nextUnrequested
+      if (!job) return
+
+      job.requested = true
+      void _queueWordsToSay(job.index)
+    }
   }
 
   async _queueWordsToSay(index) {
-    const text = $.queue.at(index).words
-    let audioUrl
-    $.busy = true
+    await $.queue.queueRequest(index, $.queue.at(index).words)
 
-    await $.queue.queueRequest(index, text)
-
+    _requestAudioWithinLimit()
     void _speakingLoop('generation')
   }
 
@@ -131,10 +142,10 @@ export default class extends Service {
     if (jobsToPlay.length > 0) {
       const job = jobsToPlay[0]
 
-      if (job.generated && !$.speaking && job.errored) {
-        log(`  speak #${job.index} skipped because of generating error`)
+      if (job.errored && !$.speaking) {
+        log(`  speak #${job.index} skipped because of generating error: ${job.error}`)
         job.spoken = true
-        _speakingLoop('playback')
+        _sayOnceThatPartWasSkipped(() => _speakingLoop('playback'))
         return
       } else if (job.generated && !$.speaking && !job.errored) {
         job.spoken = true
@@ -168,6 +179,25 @@ export default class extends Service {
     }, words)
   }
 
+  // Uses the browser's own voice: the /speech endpoint that just failed would likely fail for this too
+  _sayOnceThatPartWasSkipped(onEnd) {
+    if ($.skipNotice !== undefined || !w.speechSynthesis) return onEnd()
+
+    $.speaking = true
+    $.skipNotice = new SpeechSynthesisUtterance("Sorry, I couldn't read part of that.")
+    $.skipNotice.onend = $.skipNotice.onerror = () => {
+      $.speaking = false
+      onEnd()
+    }
+    w.speechSynthesis.speak($.skipNotice)
+  }
+
+  _cancelSkipNotice() {
+    if (!$.skipNotice) return
+    $.skipNotice.onend = $.skipNotice.onerror = null
+    w.speechSynthesis.cancel()
+  }
+
   log_doneSpeaking
   _doneSpeaking() {
     $.playing = false
@@ -176,6 +206,7 @@ export default class extends Service {
   }
 
   _resetQueue() {
+    $.skipNotice = undefined
     $.queue.reset()
     $.queue = new QueueService()
   }

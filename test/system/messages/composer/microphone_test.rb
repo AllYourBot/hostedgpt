@@ -75,6 +75,34 @@ class MessagesComposerMicrophoneTest < ApplicationSystemTestCase
     end
   end
 
+  test "switching to another conversation in the sidebar turns the mic off" do
+    stub_features(voice: true) do
+      visit conversation_messages_path(conversations(:greeting))
+      enable_mic.click
+      assert disable_mic.visible?, "The mic should be on before leaving the conversation"
+
+      find("#conversation-#{conversations(:attachment).id} a[data-role='title']").click
+
+      assert_text "Testing one attachment"
+      assert_true("The listener should be disabled after switching conversations") { page.evaluate_script("Listener.disabled") }
+      assert_selector "#composer [data-composer-target='microphoneEnable'] button"
+      assert_no_selector "#composer [data-composer-target='microphoneDisable']"
+    end
+  end
+
+  test "sending a spoken message keeps the mic on" do
+    stub_features(voice: true) do
+      visit new_assistant_message_path(assistants(:samantha))
+      enable_mic.click
+
+      page.execute_script("Listener.$.consideration = 'What time is it?'")
+
+      assert_text "What time is it?"
+      assert_selector "#composer [data-composer-target='microphoneDisable']"
+      refute page.evaluate_script("Listener.disabled"), "The listener should stay enabled after sending a spoken message"
+    end
+  end
+
   test "typed messages are not spoken messages" do
     stub_features(voice: true) do
       visit new_assistant_message_path(assistants(:samantha))
