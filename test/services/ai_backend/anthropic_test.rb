@@ -191,6 +191,27 @@ class AIBackend::AnthropicTest < ActiveSupport::TestCase
     assert_equal [], result
   end
 
+  test "stream_handler counts cached prompt tokens in the input token count" do
+    @anthropic.instance_variable_set(:@stream_response_text, "")
+    @anthropic.instance_variable_set(:@stream_response_tool_calls, {})
+    message = @anthropic.instance_variable_get(:@message)
+
+    handler = @anthropic.send(:stream_handler) { |chunk| }
+    handler.call({
+      "type" => "message_start",
+      "message" => { "usage" => {
+        "input_tokens" => 12,
+        "cache_creation_input_tokens" => 300,
+        "cache_read_input_tokens" => 4000,
+        "output_tokens" => 1
+      } }
+    }, 0)
+    handler.call({ "type" => "message_delta", "usage" => { "output_tokens" => 25 } }, 0)
+
+    assert_equal 4312, message.input_token_count
+    assert_equal 25, message.output_token_count
+  end
+
   test "handle_tool_use_streaming initializes tool call on content_block_start" do
     @anthropic.instance_variable_set(:@stream_response_tool_calls, {})
 

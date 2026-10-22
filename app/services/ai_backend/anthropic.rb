@@ -171,9 +171,12 @@ class AIBackend::Anthropic < AIBackend
 
       handle_tool_use_streaming(intermediate_response)
 
-      if (input_tokens = intermediate_response.dig("message", "usage", "input_tokens"))
+      if (usage = intermediate_response.dig("message", "usage")) && usage["input_tokens"]
         # https://docs.anthropic.com/en/api/messages-streaming
-        @message.input_token_count = input_tokens
+        # input_tokens only counts what comes after the last cache breakpoint, and we cache the
+        # instructions and the conversation prefix, so add the cache writes and reads to get the prompt size
+        @message.input_token_count = usage["input_tokens"] +
+          usage["cache_creation_input_tokens"].to_i + usage["cache_read_input_tokens"].to_i
       end
       if (output_tokens = intermediate_response.dig("usage", "output_tokens"))
         @message.output_token_count = output_tokens # no += because an early token count is partial, but the final one is the total
