@@ -23,8 +23,53 @@ class AIBackend::RubyLLM::SpeechTest < ActiveSupport::TestCase
     assert_equal api_services(:keith_openai_service).effective_token, call[:openai_api_key]
   end
 
-  test "generate_speech raises ConfigurationError without a canonical OpenAI service" do
+  test "generate_speech falls back to the user's Gemini service and wraps its PCM as a WAV" do
     api_services(:keith_openai_service).update!(deleted_at: Time.current)
+    TestClient::RubyLLM::ContextDouble.speech_data = "PCM"
+
+    audio = AIBackend::RubyLLM.generate_speech(text: "Hello there", user: @user)
+
+    assert_equal WavAudio.from_pcm("PCM"), audio
+    call = TestClient::RubyLLM::ContextDouble.last_speak_call
+    assert_equal "Hello there", call[:text]
+    assert_equal AIBackend::RubyLLM::GEMINI_SPEECH_MODEL, call[:kwargs][:model]
+    assert_equal :gemini, call[:kwargs][:provider]
+    assert_equal api_services(:keith_gemini_service).effective_token, call[:gemini_api_key]
+    assert_nil call[:openai_api_key]
+  end
+
+  test "generate_speech prefers OpenAI when the user has both services" do
+    AIBackend::RubyLLM.generate_speech(text: "Hello there", user: @user)
+
+    assert_equal :openai, TestClient::RubyLLM::ContextDouble.last_speak_call[:kwargs][:provider]
+  end
+
+  test "generate_speech names the Gemini model when Gemini rejects the key" do
+    api_services(:keith_openai_service).update!(deleted_at: Time.current)
+    TestClient::RubyLLM::ContextDouble.speak_error_to_raise =
+      ::RubyLLM::UnauthorizedError.new("API key not valid", response: Faraday::Response.new(status: 400, body: "denied"))
+
+    raised = assert_raises(AIBackend::RubyLLM::ConfigurationError) do
+      AIBackend::RubyLLM.generate_speech(text: "Hello there", user: @user)
+    end
+
+    assert_includes raised.message, AIBackend::RubyLLM::GEMINI_SPEECH_MODEL
+  end
+
+  test "generate_speech maps Gemini's 400 for a bad key to ConfigurationError, not the 502 contract" do
+    api_services(:keith_openai_service).update!(deleted_at: Time.current)
+    TestClient::RubyLLM::ContextDouble.speak_error_to_raise =
+      ::RubyLLM::BadRequestError.new("API key not valid. Please pass a valid API key.",
+        response: Faraday::Response.new(status: 400, body: "INVALID_ARGUMENT"))
+
+    assert_raises(AIBackend::RubyLLM::ConfigurationError) do
+      AIBackend::RubyLLM.generate_speech(text: "Hello there", user: @user)
+    end
+  end
+
+  test "generate_speech raises ConfigurationError without an OpenAI or Gemini service" do
+    api_services(:keith_openai_service).update!(deleted_at: Time.current)
+    api_services(:keith_gemini_service).update!(deleted_at: Time.current)
 
     assert_raises(AIBackend::RubyLLM::ConfigurationError) do
       AIBackend::RubyLLM.generate_speech(text: "Hello there", user: @user)

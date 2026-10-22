@@ -84,6 +84,7 @@ export default class extends Controller {
   micDisabled() {
     this.waitingForNextPlaybackValue = false
     this.playedbackIdValue = this.lastPlaybackId
+    this.playbackOutlets.forEach(playback => playback.discontinueSpeakingMessage())
   }
 
   // Utilities
