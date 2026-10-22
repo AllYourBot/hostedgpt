@@ -7,6 +7,8 @@ export default class extends Controller {
   }
   static outlets = [ "playback" ]
 
+  #pendingPlayback
+
   // In auto-speaker mode (i.e. where the mic button was activated) then this controller always decides when
   // to call into playback_controller to initiate playing back the next thing.
   //
@@ -39,7 +41,7 @@ export default class extends Controller {
 
     if (this.waitingForNextPlaybackValue && Listener.enabled) {
       console.log(`playbackOutletConnected(${playback.idValue}) and ready to play()`)
-      runAfter(0, () => this.playAndStopOthers(playback.idValue))
+      this.#playLatestOnceConnected()
     } else if (Listener.enabled) {
       console.log(`playbackOutletConnected(${playback.idValue}) but not ready to play yet`)
       // Previous playback is still finishing prompting, do nothing
@@ -114,5 +116,16 @@ export default class extends Controller {
     // FIXME: Eventually rails will have an official solution. Check this issue: https://github.com/hotwired/turbo/issues/1210
     if (e.target == this.element && e.detail.attributeName == 'data-speaker-playedback-id-value') e.preventDefault()
     if (e.target == this.element && e.detail.attributeName == 'data-speaker-waiting-for-next-playback-value') e.preventDefault()
+  }
+
+  // A full page render connects every assistant message on the page, oldest first. Playing each as it connects
+  // queues all of their sentences, so wait until they've all connected and play only the newest.
+  #playLatestOnceConnected() {
+    if (this.#pendingPlayback) return
+
+    this.#pendingPlayback = runAfter(0, () => {
+      this.#pendingPlayback = null
+      this.playAndStopOthers(this.lastPlaybackId)
+    })
   }
 }
