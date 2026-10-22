@@ -36,6 +36,7 @@ export default class extends Service {
 
   async _doThePlaying(audioUrlOrName, onEnd, rate = 1) {
     $.playing = true
+    _cancelBrowserVoice()
     try {
       if ($.playerSource) {
         $.playerSource.onended = null
@@ -194,10 +195,12 @@ export default class extends Service {
   _sayWithBrowserVoice(words, onEnd) {
     if (!w.speechSynthesis) return onEnd()
 
+    stopLooping()
     log(`Speaking with the browser voice: ${words}`)
     $.speaking = true
     $.utterance = new SpeechSynthesisUtterance(words)
     $.utterance.onend = $.utterance.onerror = () => {
+      $.utterance = undefined
       $.speaking = false
       onEnd()
     }
@@ -207,6 +210,7 @@ export default class extends Service {
   _cancelBrowserVoice() {
     if (!$.utterance) return
     $.utterance.onend = $.utterance.onerror = null
+    $.utterance = undefined
     w.speechSynthesis.cancel()
   }
 
