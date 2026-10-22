@@ -26,3 +26,19 @@ test('reset clears the array', async () => {
   expect(queue.length).toEqual(0)
   expect(queue.all).toEqual([])
 })
+
+test('queueRequest marks a job errored with the last failure after three attempts', async () => {
+  const originalSpeechService = SpeechService
+  let attempts = 0
+  SpeechService = class { async audioFromOpenAI() { attempts++; throw new Error('Service is currently unavailable') } }
+
+  try {
+    await queue.queueRequest(0, "Keith")
+  } finally {
+    SpeechService = originalSpeechService
+  }
+
+  expect(attempts).toEqual(3)
+  expect(obj0.errored).toStrictEqual(true)
+  expect(obj0.error).toEqual('Service is currently unavailable')
+})

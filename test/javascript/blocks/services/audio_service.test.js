@@ -80,3 +80,73 @@ test('a suspended audio context is resumed before playing', async() => {
   await audio._doThePlaying('pop')
   expect(resumed).toStrictEqual(true)
 })
+
+test('a sentence whose audio failed to generate is skipped so the rest still play', async() => {
+  const spoken = []
+  audio._speakThenLoop = (index) => spoken.push(index)
+  audio.$.queue.push({ index: 0, words: 'First. ', errored: true, generated: false, error: 'Service is currently unavailable' })
+  audio.$.queue.push({ index: 1, words: 'Second.', audioUrl: 'blob:second', errored: false, generated: true })
+
+  await audio._speakingLoop('generation')
+
+  expect(spoken).toStrictEqual([1])
+})
+
+describe('when a sentence is skipped', () => {
+  let said, utterances
+
+  beforeEach(() => {
+    said = []
+    utterances = []
+    audio._speakThenLoop = () => {}
+    global.SpeechSynthesisUtterance = class { constructor(text) { this.text = text } }
+    w.speechSynthesis = {
+      speak: (utterance) => { said.push(utterance.text); utterances.push(utterance) },
+      cancel: () => {}
+    }
+  })
+
+  afterEach(() => {
+    delete w.speechSynthesis
+    delete global.SpeechSynthesisUtterance
+  })
+
+  test('the browser voice says part of the reply could not be read, then the rest plays', async() => {
+    const spoken = []
+    audio._speakThenLoop = (index) => spoken.push(index)
+    audio.$.queue.push({ index: 0, words: 'First. ', errored: true })
+    audio.$.queue.push({ index: 1, words: 'Second.', audioUrl: 'blob:second', generated: true, errored: false })
+
+    await audio._speakingLoop('generation')
+    expect(said).toStrictEqual(["Sorry, I couldn't read part of that."])
+    expect(spoken).toStrictEqual([])
+
+    utterances[0].onend()
+    await sleep(0.05)
+    expect(spoken).toStrictEqual([1])
+  })
+
+  test('the notice is said only once per reply', async() => {
+    audio.$.queue.push({ index: 0, words: 'First. ', errored: true })
+    audio.$.queue.push({ index: 1, words: 'Second.', errored: true })
+
+    await audio._speakingLoop('generation')
+    utterances[0].onend()
+    await sleep(0.05)
+
+    expect(said.length).toEqual(1)
+  })
+
+  test('stopping cancels the notice without resuming the reply', async() => {
+    let cancelled = false
+    w.speechSynthesis.cancel = () => { cancelled = true }
+    audio.$.queue.push({ index: 0, words: 'First. ', errored: true })
+
+    await audio._speakingLoop('generation')
+    const notice = utterances[0]
+    audio.stop()
+
+    expect(cancelled).toStrictEqual(true)
+    expect(notice.onend).toBeNull()
+  })
+})

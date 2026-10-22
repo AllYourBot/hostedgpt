@@ -81,6 +81,7 @@ export default class extends Service {
       $.playerSource.onended = null
       $.playerSource.stop()
     }
+    _cancelSkipNotice()
     _resetQueue()
     $.speaking = false
     $.playing = false
@@ -131,10 +132,10 @@ export default class extends Service {
     if (jobsToPlay.length > 0) {
       const job = jobsToPlay[0]
 
-      if (job.generated && !$.speaking && job.errored) {
-        log(`  speak #${job.index} skipped because of generating error`)
+      if (job.errored && !$.speaking) {
+        log(`  speak #${job.index} skipped because of generating error: ${job.error}`)
         job.spoken = true
-        _speakingLoop('playback')
+        _sayOnceThatPartWasSkipped(() => _speakingLoop('playback'))
         return
       } else if (job.generated && !$.speaking && !job.errored) {
         job.spoken = true
@@ -168,6 +169,25 @@ export default class extends Service {
     }, words)
   }
 
+  // Uses the browser's own voice: the /speech endpoint that just failed would likely fail for this too
+  _sayOnceThatPartWasSkipped(onEnd) {
+    if ($.skipNotice !== undefined || !w.speechSynthesis) return onEnd()
+
+    $.speaking = true
+    $.skipNotice = new SpeechSynthesisUtterance("Sorry, I couldn't read part of that.")
+    $.skipNotice.onend = $.skipNotice.onerror = () => {
+      $.speaking = false
+      onEnd()
+    }
+    w.speechSynthesis.speak($.skipNotice)
+  }
+
+  _cancelSkipNotice() {
+    if (!$.skipNotice) return
+    $.skipNotice.onend = $.skipNotice.onerror = null
+    w.speechSynthesis.cancel()
+  }
+
   log_doneSpeaking
   _doneSpeaking() {
     $.playing = false
@@ -176,6 +196,7 @@ export default class extends Service {
   }
 
   _resetQueue() {
+    $.skipNotice = undefined
     $.queue.reset()
     $.queue = new QueueService()
   }

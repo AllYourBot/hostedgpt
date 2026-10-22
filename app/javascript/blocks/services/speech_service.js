@@ -8,7 +8,7 @@ export default class extends Service {
     const ttsAbortController = new AbortController()
     let ttsResponse
 
-    $.apiTimeoutHandler = runAfter(3, () => ttsAbortController.abort())
+    $.apiTimeoutHandler = runAfter(15, () => ttsAbortController.abort())
 
     try {
       ttsResponse = await fetch("/speech", {
