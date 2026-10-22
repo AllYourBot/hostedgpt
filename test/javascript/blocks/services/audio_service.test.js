@@ -151,6 +151,50 @@ describe('when a sentence is skipped', () => {
   })
 })
 
+describe('when the server has no voice to speak with', () => {
+  let said, utterances
+
+  beforeEach(() => {
+    said = []
+    utterances = []
+    global.SpeechSynthesisUtterance = class { constructor(text) { this.text = text } }
+    w.speechSynthesis = {
+      speak: (utterance) => { said.push(utterance.text); utterances.push(utterance) },
+      cancel: () => {}
+    }
+  })
+
+  afterEach(() => {
+    delete w.speechSynthesis
+    delete global.SpeechSynthesisUtterance
+  })
+
+  test('each sentence is read by the browser voice, in order', async() => {
+    audio.$.queue.push({ index: 0, words: 'First. ', browserVoice: true, generated: true, errored: false })
+    audio.$.queue.push({ index: 1, words: 'Second.', browserVoice: true, generated: true, errored: false })
+
+    await audio._speakingLoop('generation')
+    expect(said).toStrictEqual(['First. '])
+
+    utterances[0].onend()
+    await sleep(0.05)
+    expect(said).toStrictEqual(['First. ', 'Second.'])
+  })
+
+  test('stopping cancels the browser voice without resuming the reply', async() => {
+    let cancelled = false
+    w.speechSynthesis.cancel = () => { cancelled = true }
+    audio.$.queue.push({ index: 0, words: 'First. ', browserVoice: true, generated: true, errored: false })
+
+    await audio._speakingLoop('generation')
+    const utterance = utterances[0]
+    audio.stop()
+
+    expect(cancelled).toStrictEqual(true)
+    expect(utterance.onend).toBeNull()
+  })
+})
+
 test('only two sentences are fetched at a time so later ones are not timed out while waiting on the server', async() => {
   const originalSpeechService = SpeechService
   const pending = []
