@@ -104,21 +104,31 @@ export default class extends Service {
       words: words,
       request: null,
       audioUrl: null,
+      requested: false,
       generated: false,
       played: false,
       errored: false,
     })
+    $.busy = true
 
-    void _queueWordsToSay(index)
+    _requestAudioWithinLimit()
+  }
+
+  // Each request's deadline starts when it's sent, so sending every sentence at once would count time spent waiting on the server
+  _requestAudioWithinLimit() {
+    while ($.queue.requestsInFlight < 2) {
+      const job = $.queue.nextUnrequested
+      if (!job) return
+
+      job.requested = true
+      void _queueWordsToSay(job.index)
+    }
   }
 
   async _queueWordsToSay(index) {
-    const text = $.queue.at(index).words
-    let audioUrl
-    $.busy = true
+    await $.queue.queueRequest(index, $.queue.at(index).words)
 
-    await $.queue.queueRequest(index, text)
-
+    _requestAudioWithinLimit()
     void _speakingLoop('generation')
   }
 

@@ -52,6 +52,14 @@ export default class extends Service {
     $.queue = []
   }
 
+  get requestsInFlight() {
+    return $.queue.filter(job => job.requested && !job.generated && !job.errored).length
+  }
+
+  get nextUnrequested() {
+    return $.queue.find(job => !job.requested)
+  }
+
   get all() {
     return $.queue
   }

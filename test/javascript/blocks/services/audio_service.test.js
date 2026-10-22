@@ -150,3 +150,25 @@ describe('when a sentence is skipped', () => {
     expect(notice.onend).toBeNull()
   })
 })
+
+test('only two sentences are fetched at a time so later ones are not timed out while waiting on the server', async() => {
+  const originalSpeechService = SpeechService
+  const pending = []
+  SpeechService = class {
+    audioFromOpenAI(text) { return new Promise(resolve => pending.push({ text, resolve })) }
+    cancel() {}
+  }
+  audio._speakThenLoop = () => {}
+
+  try {
+    ['One. ', 'Two. ', 'Three. ', 'Four.'].forEach(words => audio.speakNext(words))
+    expect(pending.map(p => p.text)).toStrictEqual(['One. ', 'Two. '])
+
+    pending[0].resolve('blob:one')
+    await sleep(0.05)
+    expect(pending.map(p => p.text)).toStrictEqual(['One. ', 'Two. ', 'Three. '])
+  } finally {
+    SpeechService = originalSpeechService
+    audio.stop()
+  }
+})
