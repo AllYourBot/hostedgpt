@@ -7,6 +7,8 @@ class AIBackend::RubyLLM < AIBackend
   IMAGE_MODEL = "gpt-image-2.5-flare"
   SPEECH_MODEL = "tts-1"
   SPEECH_VOICE = "nova"
+  GEMINI_SPEECH_MODEL = "gemini-3.1-flash-tts-preview"
+  GEMINI_SPEECH_VOICE = "Kore"
 
   # "high" is the API's own default effort. Thinking counts toward max_tokens, so
   # the 4096 RubyLLM falls back to for an assumed model can be spent before the
@@ -75,6 +77,10 @@ class AIBackend::RubyLLM < AIBackend
     service&.effective_token
   end
 
+  def self.canonical_gemini_token(user)
+    user.api_services.find_by(driver: :gemini, url: APIService::URL_GEMINI)&.effective_token
+  end
+
   def self.provider_for_url(url)
     if url&.include?("api.anthropic.com")
       :anthropic
@@ -122,41 +128,29 @@ class AIBackend::RubyLLM < AIBackend
     { b64_json: image.data, model: IMAGE_MODEL, provider: "OpenAI" }
   end
 
-  # Always speaks through the user's OpenAI service, even for an Anthropic or
-  # Gemini assistant — the same key-scoping image generation uses.
   def self.generate_speech(text:, user:)
-    token = canonical_openai_token(user)
-
-    # Context-free on purpose: the controller, not the Toolbox, renders the
-    # policy key message for speech.
-    raise ConfigurationError if token.blank?
-
-    context = client.context { |c| c.openai_api_key = token }
-    speech = begin
-      context.speak(
-        text,
-        model: SPEECH_MODEL,
-        provider: :openai,
-        assume_model_exists: true,
-        voice: SPEECH_VOICE,
-        format: "wav",
-        provider_options: { speed: 1.0 },
-      )
-    rescue ::RubyLLM::BadRequestError => e
-      # A request rejection (e.g. text over the TTS cap) is not a key problem:
-      # land it on the controller's 502 rescue, like the legacy path does.
-      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::BadRequestError)
-    rescue *CONFIGURATION_ERRORS => e
-      raise mapped_error(e, model: SPEECH_MODEL, as: ConfigurationError)
-    rescue *RATE_LIMIT_ERRORS => e
-      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::TooManyRequestsError)
-    rescue ::RubyLLM::Error => e
-      # Fallback so an unmapped upstream 5xx lands on the controller's 502
-      # rescue instead of a bare 500 — today every upstream failure does.
-      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::ServerError)
+    if (token = canonical_openai_token(user)).present?
+      speak(text, provider: :openai, token:, model: SPEECH_MODEL, voice: SPEECH_VOICE,
+        format: "wav", provider_options: { speed: 1.0 })
+    elsif (token = canonical_gemini_token(user)).present?
+      WavAudio.from_pcm(speak(text, provider: :gemini, token:, model: GEMINI_SPEECH_MODEL, voice: GEMINI_SPEECH_VOICE))
+    else
+      raise ConfigurationError # message-free: the controller renders the key message
     end
+  end
 
-    speech.to_blob
+  def self.speak(text, provider:, token:, model:, **options)
+    context = client.context { |c| c.public_send("#{provider}_api_key=", token) }
+    context.speak(text, model:, provider:, assume_model_exists: true, **options).to_blob
+  rescue ::RubyLLM::BadRequestError => e
+    # Before CONFIGURATION_ERRORS, which also holds BadRequestError: text over the TTS cap is a 502, not a key problem
+    raise mapped_error(e, model:, as: ::Faraday::BadRequestError)
+  rescue *CONFIGURATION_ERRORS => e
+    raise mapped_error(e, model:, as: ConfigurationError)
+  rescue *RATE_LIMIT_ERRORS => e
+    raise mapped_error(e, model:, as: ::Faraday::TooManyRequestsError)
+  rescue ::RubyLLM::Error => e
+    raise mapped_error(e, model:, as: ::Faraday::ServerError)
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)

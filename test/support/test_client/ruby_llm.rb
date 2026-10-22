@@ -198,7 +198,7 @@ module TestClient
       def speak(text, **kwargs)
         raise self.class.speak_error_to_raise if self.class.speak_error_to_raise
 
-        self.class.last_speak_call = { text: text, kwargs: kwargs, openai_api_key: openai_api_key }
+        self.class.last_speak_call = { text: text, kwargs: kwargs, openai_api_key: openai_api_key, gemini_api_key: gemini_api_key }
         SpeechBytes.new(self.class.speech_data || "RUBYLLM_WAV_BYTES")
       end
 

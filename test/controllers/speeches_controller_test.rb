@@ -94,8 +94,22 @@ class SpeechesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Failed to generate audio", response.parsed_body["message"]
   end
 
-  test "create with RubyLLM dispatch explains a missing key when the user has no canonical OpenAI service" do
+  test "create with RubyLLM dispatch speaks through Gemini when the user has no OpenAI service" do
     api_services(:keith_openai_service).update!(deleted_at: Time.current)
+    TestClient::RubyLLM::ContextDouble.speech_data = "PCM"
+
+    stub_features(voice: true, use_ruby_llm: true) do
+      post speech_url, params: { text: "Hello there" }, as: :json
+    end
+
+    assert_response :success
+    assert_equal "audio/wav", response.media_type
+    assert_equal WavAudio.from_pcm("PCM"), response.body.b
+  end
+
+  test "create with RubyLLM dispatch explains a missing key when the user has no OpenAI or Gemini service" do
+    api_services(:keith_openai_service).update!(deleted_at: Time.current)
+    api_services(:keith_gemini_service).update!(deleted_at: Time.current)
 
     stub_features(voice: true, use_ruby_llm: true) do
       post speech_url, params: { text: "Hello there" }, as: :json
