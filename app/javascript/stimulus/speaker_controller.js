@@ -118,8 +118,7 @@ export default class extends Controller {
     if (e.target == this.element && e.detail.attributeName == 'data-speaker-waiting-for-next-playback-value') e.preventDefault()
   }
 
-  // A full page render connects every assistant message on the page, oldest first. Playing each as it connects
-  // queues all of their sentences, so wait until they've all connected and play only the newest.
+  // Starting each message as it connects would queue every one's sentences, not just the newest
   #playLatestOnceConnected() {
     if (this.#pendingPlayback) return
 
