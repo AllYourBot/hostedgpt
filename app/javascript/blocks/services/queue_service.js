@@ -5,6 +5,7 @@ export default class extends Service {
 
   new(arr = []) {
     $.queue = arr
+    $.serverVoiceUnavailable = false
   }
 
   push(obj) {
@@ -24,7 +25,10 @@ export default class extends Service {
         audioUrl = await request.audioFromOpenAI(text)
       } catch (error) {
         lastError = error
-        if (error.serverVoiceUnavailable) { $.serverVoiceUnavailable = true; break }
+        if (error.serverVoiceUnavailable) {
+          $.serverVoiceUnavailable = true
+          break
+        }
         log(`  error fetching job ${index} attempt ${i}${i == 3 ? ` - giving up (${text})` : ''}`)
         await sleep(0.5)
       }
@@ -36,6 +40,7 @@ export default class extends Service {
     if ($.serverVoiceUnavailable) {
       $.queue[index].browserVoice = true
       $.queue[index].generated = true
+      $.queue[index].error = lastError?.message
     } else if (audioUrl == undefined) {
       $.queue[index].errored = true
       $.queue[index].error = lastError?.message
@@ -54,6 +59,7 @@ export default class extends Service {
       item.request?.cancel()
     })
     $.queue = []
+    $.serverVoiceUnavailable = false
   }
 
   get requestsInFlight() {
