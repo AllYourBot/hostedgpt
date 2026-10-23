@@ -135,10 +135,7 @@ class AIBackend::OpenAI < AIBackend
       end
 
       if tool_calls_chunk && tool_calls_chunk.is_a?(Array)
-        tool_calls_chunk.each_with_index do |tool_call, i|
-          @stream_response_tool_calls[i] ||= {}
-          @stream_response_tool_calls[i] = deep_streaming_merge(@stream_response_tool_calls[i], tool_call)
-        end
+        tool_calls_chunk.each { |tool_call| merge_streamed_tool_call(tool_call) }
       end
 
     rescue ::GetNextAIMessageJob::ResponseCancelled => e
@@ -216,6 +213,38 @@ class AIBackend::OpenAI < AIBackend
       return { type: "text", text: document.pdf_as_text } unless @assistant.supports_pdf?
 
       { type: "file", file: { filename: document.filename, file_data: "data:application/pdf;base64,#{document.file_base64}" }}
+    end
+  end
+
+  # A delta carries one fragment of a call, tagged with the call's index: the first
+  # fragment brings id and name, the rest only argument text. Parallel calls arrive
+  # interleaved, so each fragment is matched to its call by index, not by position in
+  # the chunk. Without an index, a new id starts a call and a bare fragment extends
+  # the latest one.
+  def merge_streamed_tool_call(fragment)
+    index = fragment["index"]
+    call = @stream_response_tool_calls.find do |c|
+      if index.nil?
+        fragment["id"].blank? && c.equal?(@stream_response_tool_calls.last)
+      else
+        c["index"] == index && (fragment["id"].blank? || c["id"].blank? || c["id"] == fragment["id"])
+      end
+    end
+
+    if call.nil?
+      call = {}
+      @stream_response_tool_calls << call
+    end
+
+    fragment.each do |key, value|
+      if key == "function" && value.is_a?(Hash)
+        function = (call["function"] ||= {})
+        value.each do |k, v|
+          function[k] = k == "arguments" && function.key?(k) ? function[k] + v : (function[k] || v)
+        end
+      else
+        call[key] ||= value
+      end
     end
   end
 
