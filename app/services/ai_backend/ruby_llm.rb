@@ -298,13 +298,20 @@ class AIBackend::RubyLLM < AIBackend
   # RubyLLM formats each attachment for the provider: a PDF becomes Anthropic's document block,
   # OpenAI's file part, or Gemini's inline data.
   def user_message(message, documents, with_time:)
-    attachments = documents.select { |document| @assistant.natively_readable?(document) }.map { |document| ::RubyLLM::Attachment.new(document.file) }
+    attachments = documents.select { |document| @assistant.natively_readable?(document) }.map { |document| attachment_for(document) }
     pdf_texts = documents.select { |document| document.has_document_pdf? && !@assistant.supports_pdf? }.map(&:pdf_as_text)
     text = [message.content_text, *pdf_texts, (current_time_note if with_time)].compact.join("\n\n")
 
     msg = { role: message.role, content: text }
     msg[:attachments] = attachments if attachments.any?
     msg
+  end
+
+  # Images go as the :large variant, as the SDK backends send them: an original photo can
+  # exceed a provider's limit (5 MB for Anthropic), and the history resends it every turn.
+  def attachment_for(document)
+    file = document.has_image? ? document.image_variant(:large).processed.image : document.file
+    ::RubyLLM::Attachment.new(file)
   end
 
   # Reconstructs the stored OpenAI-shaped content_tool_calls (serialized via

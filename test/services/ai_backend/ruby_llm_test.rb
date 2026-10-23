@@ -513,6 +513,21 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert message_with_attachments[:attachments].any?, "The message should have attachments"
   end
 
+  test "preceding_conversation_messages attaches an image SHRUNK to its large variant" do
+    assistant = assistants(:keith_claude35)
+    assistant.language_model.update!(supports_images: true, supports_tools: false)
+    conversation = Conversation.create!(user: @user, assistant: assistant, title: "Photo Test")
+    message = conversation.messages.create!(role: "user", content_text: "What car is this?", assistant: assistant)
+    message.documents.create!(file: Rack::Test::UploadedFile.new(file_fixture("racecar.jpg"), "image/jpeg"))
+    reply = conversation.messages.create!(role: "assistant", content_text: "Let me look", assistant: assistant)
+
+    attachment = AIBackend::RubyLLM.new(@user, assistant, conversation, reply).send(:preceding_conversation_messages).first[:attachments].sole
+    image = MiniMagick::Image.read(attachment.content)
+
+    assert_equal [1200, 800], image.dimensions, "The 4104x2736 upload should be sent resized to fit 1200x900"
+    assert_equal "image/jpeg", attachment.mime_type, "The resized image should keep its type"
+  end
+
   test "preceding_conversation_messages does not include attachments when supports_images is false" do
     assistant = assistants(:keith_claude35)
     assistant.language_model.update!(supports_images: false, supports_tools: false)
