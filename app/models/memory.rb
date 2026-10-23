@@ -1,4 +1,6 @@
 class Memory < ApplicationRecord
   belongs_to :user
-  belongs_to :message
+  belongs_to :message, optional: true
+
+  validates :detail, presence: true
 end

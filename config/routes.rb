@@ -29,7 +29,7 @@ Rails.application.routes.draw do
     resources :api_services, except: [:show]  do
       post :test, to: "api_services#test"
     end
-    resources :memories, only: [:index, :destroy] do
+    resources :memories, only: [:index, :create, :destroy] do
       delete :destroy, to: "memories#destroy_all", on: :collection
     end
   end
