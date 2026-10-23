@@ -161,6 +161,14 @@ en:
         menu:
           title: "Assistant Memories"
         description: "These are the things remembered from all past conversations. All assistants share this memory."
+        form:
+          detail: "Add a memory"
+          placeholder: "e.g. I prefer metric units"
+          add: "Remember"
+          adding: "Remembering..."
+          errors_title:
+            one: "%{count} error prohibited this memory from being saved:"
+            other: "%{count} errors prohibited this memory from being saved:"
         none: "No memories"
         clear_all: "Clear All Memories"
         confirm_clear: "Are you sure?"
@@ -417,6 +425,7 @@ en:
         deleted: "Deleted"
         not_found: "The API Service could not be found"
       memories:
+        remembered: "Remembered"
         forgotten: "Forgotten"
         cleared: "Cleared memory"
       documents:

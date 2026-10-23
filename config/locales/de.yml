@@ -132,6 +132,14 @@ de:
         menu:
           title: "Assistenten-Erinnerungen"
         description: "Dies sind die Dinge, die aus allen vergangenen Konversationen gemerkt wurden. Alle Assistenten teilen sich diese Erinnerung."
+        form:
+          detail: "Erinnerung hinzufügen"
+          placeholder: "z. B. Ich bevorzuge metrische Einheiten"
+          add: "Merken"
+          adding: "Merke..."
+          errors_title:
+            one: "%{count} Fehler hat das Speichern dieser Erinnerung verhindert:"
+            other: "%{count} Fehler haben das Speichern dieser Erinnerung verhindert:"
         none: "Keine Erinnerungen"
         clear_all: "Alle Erinnerungen löschen"
         confirm_clear: "Sind Sie sicher?"
@@ -384,6 +392,7 @@ de:
         deleted: "Gelöscht"
         not_found: "Der API-Dienst konnte nicht gefunden werden"
       memories:
+        remembered: "Gemerkt"
         forgotten: "Vergessen"
         cleared: "Speicher gelöscht"
       documents:
