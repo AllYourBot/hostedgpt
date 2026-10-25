@@ -162,6 +162,29 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_equal 3, message.output_token_count
   end
 
+  test "stream_handler keeps whitespace-only deltas" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    backend.instance_variable_set(:@stream_response_text, "")
+    handler = backend.send(:stream_handler)
+
+    chunks = []
+    handler.call(OpenStruct.new(content: "puts", tokens: nil), ->(c) { chunks << c })
+    handler.call(OpenStruct.new(content: "\n", tokens: nil), ->(c) { chunks << c })
+    handler.call(OpenStruct.new(content: "puts 2", tokens: nil), ->(c) { chunks << c })
+
+    assert_equal ["puts", "\n", "puts 2"], chunks
+    assert_equal "puts\nputs 2", backend.instance_variable_get(:@stream_response_text)
+  end
+
   test "stream_handler captures token counts on first occurrence" do
     @assistant.language_model.update!(supports_tools: false)
     message = @conversation.messages.create!(
