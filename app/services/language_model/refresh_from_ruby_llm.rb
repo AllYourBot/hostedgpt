@@ -59,7 +59,7 @@ class LanguageModel::RefreshFromRubyLLM
         supports_pdf: model.modalities.input.include?("pdf"),
         supports_system_message: true,
         supports_tools: model.supports?(:function_calling),
-        supports_thinking: provider == "anthropic" && LanguageModel.adaptive_thinking?(model.id)
+        supports_thinking: LanguageModel.supports_thinking?(provider, model.id)
       )
 
       existing_api_names << model.id

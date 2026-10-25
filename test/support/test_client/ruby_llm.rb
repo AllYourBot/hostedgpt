@@ -6,6 +6,7 @@ module TestClient
       def initialize(model:, provider: nil, assume_model_exists: nil, context: nil)
         @@model = model
         self.class.instance_variable_set(:@thinking_config, nil)
+        self.class.instance_variable_set(:@provider_options, nil)
         @headers = {}
         @messages = []
         @last_response = nil

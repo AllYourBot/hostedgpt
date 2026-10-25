@@ -8,8 +8,19 @@ class LanguageModel < ApplicationRecord
     claude-opus-5 claude-sonnet-5 claude-haiku-5 claude-fable-5
   ].freeze
 
+  REASONING_SUMMARY_PREFIXES = {
+    openai: %w[gpt-5 o1 o3 o4],
+    gemini: %w[gemini-2.5 gemini-3],
+  }.freeze
+
   def self.adaptive_thinking?(api_name)
     api_name.to_s.start_with?(*ADAPTIVE_THINKING_PREFIXES)
+  end
+
+  def self.supports_thinking?(provider, api_name)
+    return adaptive_thinking?(api_name) if provider.to_s == "anthropic"
+
+    REASONING_SUMMARY_PREFIXES.fetch(provider.to_sym, []).any? { |prefix| api_name.to_s.start_with?(prefix) }
   end
 
   belongs_to :user

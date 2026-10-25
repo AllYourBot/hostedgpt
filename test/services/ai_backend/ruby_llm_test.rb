@@ -1082,7 +1082,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_nil TestClient::RubyLLM::Chat.thinking_config
   end
 
-  test "stream_next_conversation_message leaves thinking off for a provider other than Anthropic" do
+  test "stream_next_conversation_message requests summarized thinking for supported OpenAI models" do
     @assistant.language_model.update!(supports_tools: false, supports_thinking: true)
 
     backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, thinking_message)
@@ -1090,7 +1090,21 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
       backend.stream_next_conversation_message { |_| }
     end
 
-    assert_nil TestClient::RubyLLM::Chat.thinking_config
+    assert_equal({ effort: "high", display: "summarized" }, TestClient::RubyLLM::Chat.thinking_config)
+    assert_nil TestClient::RubyLLM::Chat.provider_options
+  end
+
+  test "stream_next_conversation_message requests summarized thinking for supported Gemini models" do
+    @assistant.language_model.api_service.update!(driver: "gemini")
+    @assistant.language_model.update!(api_name: "gemini-2.5-pro", supports_tools: false, supports_thinking: true)
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, thinking_message)
+    TestClient::RubyLLM::Chat.stub :text, "GPT streaming" do
+      backend.stream_next_conversation_message { |_| }
+    end
+
+    assert_equal({ budget: 16_000, display: "summarized" }, TestClient::RubyLLM::Chat.thinking_config)
+    assert_nil TestClient::RubyLLM::Chat.provider_options
   end
 
   test "stream_next_conversation_message keeps thinking out of the content and stores it with its signature" do

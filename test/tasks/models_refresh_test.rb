@@ -206,11 +206,15 @@ class ModelsRefreshTest < ActiveSupport::TestCase
     end
   end
 
-  test "models:refresh marks Anthropic models that take adaptive thinking" do
+  test "models:refresh marks supported Anthropic, OpenAI, and Gemini thinking models" do
     registry = RubyLLM::Models.new([
       registry_model("claude-opus-5-5", "Claude Opus 5.5", "anthropic", input: %w[text]),
       registry_model("claude-haiku-4-5", "Claude Haiku 4.5", "anthropic", input: %w[text]),
       registry_model("claude-opus-5-5", "Claude Opus 5.5 via OpenRouter", "openrouter", input: %w[text]),
+      registry_model("gpt-5", "GPT-5", "openai", input: %w[text]),
+      registry_model("gpt-4o", "GPT-4o", "openai", input: %w[text]),
+      registry_model("gemini-2.5-pro", "Gemini 2.5 Pro", "gemini", input: %w[text]),
+      registry_model("gemini-2.0-flash", "Gemini 2 Flash", "gemini", input: %w[text]),
     ])
 
     with_registry(registry) do
@@ -221,6 +225,10 @@ class ModelsRefreshTest < ActiveSupport::TestCase
     assert models.find_by!(api_service: api_services(:keith_anthropic_service), api_name: "claude-opus-5-5").supports_thinking?
     refute models.find_by!(api_service: api_services(:keith_anthropic_service), api_name: "claude-haiku-4-5").supports_thinking?
     refute models.find_by!(api_service: api_services(:keith_openrouter_service), api_name: "claude-opus-5-5").supports_thinking?
+    assert models.find_by!(api_service: api_services(:keith_openai_service), api_name: "gpt-5").supports_thinking?
+    refute models.find_by!(api_service: api_services(:keith_openai_service), api_name: "gpt-4o").supports_thinking?
+    assert models.find_by!(api_service: api_services(:keith_gemini_service), api_name: "gemini-2.5-pro").supports_thinking?
+    refute models.find_by!(api_service: api_services(:keith_gemini_service), api_name: "gemini-2.0-flash").supports_thinking?
   end
 
   private
