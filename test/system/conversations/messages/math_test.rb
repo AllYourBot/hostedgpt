@@ -24,4 +24,13 @@ class ConversationMessagesMathTest < ApplicationSystemTestCase
 
     assert_selector "#message_#{@stream_msg.id} .katex"
   end
+
+  test "mid-stream broadcast leaves math as readable source" do
+    @stream_msg.update!(content_text: MATH_CONTENT)
+    GetNextAIMessageJob.broadcast_updated_message(@stream_msg, thinking: true)
+
+    msg = find("#message_#{@stream_msg.id}")
+    msg.assert_no_selector(".katex")
+    msg.assert_text("$$e^{i\\pi}+1=0$$")
+  end
 end
