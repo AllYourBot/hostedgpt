@@ -16,8 +16,7 @@ const RENDERED_DIAGRAMS_LIMIT = 25
 // state with them.
 export default class extends Controller {
   connect() {
-    this.load()
-    this.render()
+    this.scheduleRender()
     this.observer = new MutationObserver(() => this.scheduleRender())
     this.observer.observe(this.element, { childList: true, characterData: true, subtree: true })
   }
@@ -33,15 +32,22 @@ export default class extends Controller {
   }
 
   async render() {
+    // Mid-stream the fence is unclosed: rendering a partial diagram gets a
+    // parse error (and mermaid's own error graphic) flashing on every
+    // chunk. Leave readable source until the settle broadcast.
+    if (this.element.dataset.streaming === "true") return
+
     for (const pre of this.element.querySelectorAll('pre[lang="mermaid"], pre.language-mermaid')) {
       if (pre.dataset.diagramRendered) continue
       const code = pre.querySelector("code")
       const source = code ? code.textContent : pre.textContent
       if (!source || (!source.includes("\n") && !/-->|---/.test(source))) continue
+      const id = `mermaid-${++renderCounter}`
       try {
         let svg = renderedDiagrams.get(source)
         if (!svg) {
-          const result = await mermaid.render(`mermaid-${++renderCounter}`, source)
+          this.load()
+          const result = await mermaid.render(id, source)
           svg = result.svg
           if (renderedDiagrams.size >= RENDERED_DIAGRAMS_LIMIT) {
             renderedDiagrams.delete(renderedDiagrams.keys().next().value)
@@ -63,6 +69,8 @@ export default class extends Controller {
         pre.replaceWith(preview, details)
       } catch (error) {
         console.warn("mermaid render skipped", error?.message)
+        // Mermaid inserts its own error graphic before throwing; clean it up.
+        document.getElementById(id)?.remove()
       }
     }
   }

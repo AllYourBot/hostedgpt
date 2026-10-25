@@ -27,6 +27,13 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     msg.assert_no_selector(".mermaid-preview svg")
     assert_includes msg.text, "not a diagram"
   end
+  test "mid-stream broadcast leaves readable source and no flashing preview" do
+    @stream_msg.update!(content_text: DIAGRAM_CONTENT)
+    GetNextAIMessageJob.broadcast_updated_message(@stream_msg, thinking: true)
+
+    assert_no_selector "#message_#{@stream_msg.id} .mermaid-preview svg"
+    assert_includes last_message.text, "A-->B"
+  end
 
   test "streamed diagram previews after a turbo broadcast" do
     @stream_msg.update!(content_text: DIAGRAM_CONTENT)
