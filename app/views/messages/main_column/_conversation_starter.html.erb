@@ -1,7 +1,7 @@
 <%
-  content_text = conversation_starter.join(" ") + "."
   title = conversation_starter[0]
   description = conversation_starter[1]
+  content_text = description.present? ? "#{title} #{description}." : title
 %>
 
 <%= button_to assistant_messages_path(@assistant),
@@ -15,8 +15,12 @@
 %>
   <div class="text-sm">
     <div class="flex flex-col flex-1 min-w-0">
-      <span class="font-semibold truncate"><%= title %></span>
-      <span class="truncate opacity-50"><%= description %></span>
+      <% if description.present? %>
+        <span class="font-semibold truncate"><%= title %></span>
+        <span class="truncate opacity-50"><%= description %></span>
+      <% else %>
+        <span class="font-semibold line-clamp-2"><%= title %></span>
+      <% end %>
     </div>
 
     <div class="p-1.5 bg-white dark:bg-gray-800 rounded-lg hidden group-hover:block absolute right-2 top-1/2 transform -translate-y-1/2">

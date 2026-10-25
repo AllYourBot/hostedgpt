@@ -86,6 +86,43 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_equal params, @assistant.reload.slice(:name, :description, :instructions)
   end
 
+  test "should update conversation_starters, DROPPING the fields left blank" do
+    params = { conversation_starters: ["What should I cook tonight?", "", "Plan my week", ""] }
+    patch settings_assistant_url(@assistant), params: { assistant: params }
+
+    assert_redirected_to edit_settings_assistant_url(@assistant)
+    assert_equal ["What should I cook tonight?", "Plan my week"], @assistant.reload.conversation_starters, "Only the filled-in starters should be saved"
+  end
+
+  test "should CLEAR conversation_starters when every field is blank" do
+    @assistant.update!(conversation_starters: ["What should I cook tonight?"])
+
+    patch settings_assistant_url(@assistant), params: { assistant: { conversation_starters: ["", "", "", ""] } }
+
+    assert_redirected_to edit_settings_assistant_url(@assistant)
+    assert_equal [], @assistant.reload.conversation_starters, "Blanking every field should bring back the default suggestions"
+  end
+
+  test "should show error when updating conversation_starters with TOO MANY questions" do
+    params = { conversation_starters: Array.new(Assistant::MAX_CONVERSATION_STARTERS + 1) { |index| "Question #{index}" } }
+    patch settings_assistant_url(@assistant), params: { assistant: params }
+
+    assert_response :unprocessable_content
+    assert_contains_text "main", "Conversation starters can have at most #{Assistant::MAX_CONVERSATION_STARTERS} questions"
+    assert_equal [], @assistant.reload.conversation_starters, "Nothing should have been saved"
+  end
+
+  test "edit should show a field for each conversation starter, filled with the saved ones" do
+    @assistant.update!(conversation_starters: ["What should I cook tonight?"])
+
+    get edit_settings_assistant_url(@assistant)
+    assert_response :success
+
+    assert_select "input[name=?]", "assistant[conversation_starters][]", { count: Assistant::MAX_CONVERSATION_STARTERS }, "There should be a field for every starter"
+    assert_select "input#assistant_conversation_starters_0[value=?]", "What should I cook tonight?", { count: 1 }, "The saved starter should fill the first field"
+    assert_select "input#assistant_conversation_starters_1:not([value])", { count: 1 }, "The fields past the saved starters should be empty"
+  end
+
   test "destroy should soft-delete assistant" do
     assert_difference "Assistant.count", 0 do
       delete settings_assistant_url(@assistant)
