@@ -50,6 +50,6 @@ export default class extends Service {
     if (!text) return []
     text = text.replace(". . .", "...")
     const thoughts = text.split(/(?<=[^ ][\.:!\?;…] |[\n，。．！？；：])/)
-    return thoughts.reject(t => t.strip().empty()).map(t => t.replace(/''/g, "'"))
+    return thoughts.reject(t => t.strip().empty())
   }
 }
