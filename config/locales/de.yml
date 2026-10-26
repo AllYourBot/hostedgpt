@@ -91,6 +91,9 @@ de:
           language_model: "Sprachmodell"
           description: "Beschreibung"
           instructions: "Eigene Anweisungen"
+          conversation_starters: "Gesprächseinstiege"
+          conversation_starters_hint: "Bis zu %{count} Fragen, die vorgeschlagen werden, wenn Sie eine neue Konversation mit diesem Assistenten beginnen. Lassen Sie alle leer, um die Standardvorschläge zu erhalten."
+          conversation_starter: "Gesprächseinstieg %{number}"
           save: "Speichern"
           saving: "Speichere..."
           errors_title:
@@ -439,6 +442,8 @@ de:
           attributes:
             slug:
               taken: "ist bereits vergeben"
+            conversation_starters:
+              too_long: "darf höchstens %{count} Fragen enthalten"
       person:
         errors:
           personable_id:

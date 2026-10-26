@@ -4,6 +4,11 @@ module HasConversationStarter
   private
 
   def set_conversation_starters
+    if @assistant.conversation_starters.any?
+      @conversation_starters = @assistant.conversation_starters.map { |question| [question, nil] }
+      return
+    end
+
     starters = I18n.t("app.conversations.starters")
     image_starters = I18n.t("app.conversations.image_starters")
   # Ensure we have an array of hashes with title/description

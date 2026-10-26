@@ -120,6 +120,9 @@ en:
           language_model: "Language model"
           description: "Description"
           instructions: "Custom Instructions"
+          conversation_starters: "Conversation starters"
+          conversation_starters_hint: "Up to %{count} questions to suggest when you start a new conversation with this assistant. Leave them all blank to get the default suggestions."
+          conversation_starter: "Conversation starter %{number}"
           save: "Save"
           saving: "Saving..."
           errors_title:
@@ -472,6 +475,8 @@ en:
           attributes:
             slug:
               taken: "has already been taken"
+            conversation_starters:
+              too_long: "can have at most %{count} questions"
       person:
         errors:
           personable_id:

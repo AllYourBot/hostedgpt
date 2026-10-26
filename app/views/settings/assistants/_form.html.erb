@@ -47,6 +47,21 @@
     %>
   </div>
 
+  <fieldset class="my-5">
+    <legend><%= t("app.settings.assistants.form.conversation_starters") %></legend>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t("app.settings.assistants.form.conversation_starters_hint", count: Assistant::MAX_CONVERSATION_STARTERS) %></p>
+
+    <% Assistant::MAX_CONVERSATION_STARTERS.times do |index| %>
+      <% id = "assistant_conversation_starters_#{index}" %>
+      <%= form.label :conversation_starters, t("app.settings.assistants.form.conversation_starter", number: index + 1), for: id, class: "sr-only" %>
+      <%= form.text_field :conversation_starters,
+        multiple: true,
+        value: assistant.conversation_starters[index],
+        id:,
+        class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+    <% end %>
+  </fieldset>
+
   <%= form.submit t("app.settings.assistants.form.save"),
     class: %|
       inline-block font-bold
