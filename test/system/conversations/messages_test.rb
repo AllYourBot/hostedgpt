@@ -54,6 +54,32 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_current_path conversation_messages_path(@conversation, version: 2)
   end
 
+  test "regenerate menu keeps every assistant reachable when it is taller than the space above a short conversation" do
+    6.times { |i| @user.assistants.create!(name: "Extra Assistant #{i + 1}", language_model: language_models(:gpt_4o)) }
+    top_assistant = @user.assistants.ordered.first
+    visit_and_scroll_wait conversation_messages_path(conversations(:ruby_version))
+
+    hover_last_message.find_role("regenerate").click
+    assert_text "Using #{top_assistant.name}"
+
+    clipped = page.evaluate_script(<<~JS)
+      (() => {
+        const messages = document.getElementById("messages").getBoundingClientRect()
+        return [...document.querySelectorAll("#messages menu.dropdown-content button")].filter((button) => {
+          button.scrollIntoView({ block: "nearest" })
+          const rect = button.getBoundingClientRect()
+          return rect.top < messages.top || rect.bottom > messages.bottom
+        }).map((button) => button.textContent.trim())
+      })()
+    JS
+    assert_empty clipped, "Every assistant in the regenerate menu should scroll into view inside the messages pane"
+
+    click_text "Using #{top_assistant.name}"
+    assert_true "Regenerating with the first assistant in the menu should work" do
+      last_message.find_role("from").text == top_assistant.name
+    end
+  end
+
   test "a failed response shows a retry button which regenerates the reply" do
     ask_a_question
     latest_message.update! content_text: "(I received a blank response.)", failed_at: Time.current
