@@ -4,6 +4,7 @@ keith_openai_service:
   url: https://api.openai.com/v1/
   token: abc-secret
   driver: openai
+  service_type: AI
 
 keith_anthropic_service:
   name: Anthropic
@@ -11,6 +12,7 @@ keith_anthropic_service:
   url: https://api.anthropic.com/
   token: abc-secret
   driver: anthropic
+  service_type: AI
 
 keith_groq_service:
   name: Groq
@@ -18,6 +20,7 @@ keith_groq_service:
   url: https://api.groq.com/openai/v1/
   token: abc-secret
   driver: openai
+  service_type: AI
 
 keith_openrouter_service:
   name: OpenRouter
@@ -25,6 +28,7 @@ keith_openrouter_service:
   url: https://openrouter.ai/api/v1/
   token: abc-secret
   driver: openai
+  service_type: AI
 
 keith_other_service:
   name: Keith Server
@@ -32,6 +36,7 @@ keith_other_service:
   url: http://test.com/models
   token: abc-secret
   driver: openai
+  service_type: AI
 
 
 rob_openai_service:
@@ -40,6 +45,7 @@ rob_openai_service:
   url: https://api.openai.com/v1/
   token: rob-secret
   driver: openai
+  service_type: AI
 
 keith_gemini_service:
   name: Google Gemini
@@ -47,6 +53,7 @@ keith_gemini_service:
   url: https://generativelanguage.googleapis.com/v1beta/
   token: keith-secret
   driver: gemini
+  service_type: AI
 
 rob_anthropic_service:
   name: Anthropic
@@ -54,6 +61,7 @@ rob_anthropic_service:
   url: https://api.anthropic.com/
   token: rob-secret
   driver: anthropic
+  service_type: AI
 
 rob_other_service:
   name: Rob Server
@@ -61,6 +69,7 @@ rob_other_service:
   url: http://rob-test.com/models
   token: rob-secret
   driver: anthropic
+  service_type: AI
 
 
 taylor_anthropic_service:
@@ -69,6 +78,7 @@ taylor_anthropic_service:
   url: http://taylor.org/doit
   token: ta-secret
   driver: anthropic
+  service_type: AI
 
 taylor_openai_service:
   name: Taylor OpenAI Server
@@ -76,6 +86,7 @@ taylor_openai_service:
   url: http://taylor.org/doit-open
   token: open-secret
   driver: openai
+  service_type: AI
 
 keith_brave_service:
   name: Brave
@@ -83,3 +94,4 @@ keith_brave_service:
   url: https://api.search.brave.com/res/v1/
   token: abc-secret
   driver: brave
+  service_type: Search

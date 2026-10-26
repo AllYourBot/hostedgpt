@@ -57,6 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_120000) do
     t.datetime "updated_at", null: false
     t.string "url", null: false
     t.bigint "user_id", null: false
+    t.string "service_type", null: false
     t.index ["user_id", "deleted_at"], name: "index_api_services_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_api_services_on_user_id"
   end

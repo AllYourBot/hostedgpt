@@ -18,6 +18,7 @@ de:
         table:
           name: "Name"
           url: "URL"
+          service_type: "Diensttyp"
           driver: "Treiber"
         new_title: "Neuer API-Dienst"
         back: "Zurück"

@@ -15,6 +15,8 @@ class APIService < ApplicationRecord
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
   validates :name, :url, presence: true
 
+  before_validation :set_type
+
   normalizes :url, with: -> url { url.strip }
   encrypts :token
 
@@ -121,6 +123,10 @@ class APIService < ApplicationRecord
   end
 
   private
+
+  def set_type
+    self.service_type = url == URL_BRAVE ? "Search" : "AI"
+  end
 
   def default_token
     return Setting.default_brave_key if url == URL_BRAVE
