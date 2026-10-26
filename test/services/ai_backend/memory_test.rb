@@ -63,6 +63,29 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
     refute full_instructions.include? "Austin, Texas"
   end
 
+  test "full_instructions INCLUDES the memories saved for this assistant" do
+    backend = AIBackend.new(users(:keith), assistants(:keith_gpt3))
+    full_instructions = backend.send(:full_instructions)
+
+    assert_includes full_instructions, memories(:haiku).detail, "The assistant's own memory should be included"
+    assert_includes full_instructions, memories(:location).detail, "Shared memories should still be included"
+  end
+
+  test "full_instructions EXCLUDES the memories saved for another assistant" do
+    backend = AIBackend.new(users(:keith), assistants(:samantha))
+    full_instructions = backend.send(:full_instructions)
+
+    refute_includes full_instructions, memories(:haiku).detail, "Another assistant's memory should be left out"
+    assert_includes full_instructions, memories(:location).detail, "Shared memories should still be included"
+  end
+
+  test "full_instructions does NOT INCLUDE the memories heading when only another assistant has memories" do
+    users(:keith).memories.where(assistant: nil).delete_all
+    backend = AIBackend.new(users(:keith), assistants(:samantha))
+
+    refute_includes backend.send(:full_instructions), "been told and remembered", "There are no memories for this assistant to note"
+  end
+
   test "full_instructions INCLUDES the assistant's context files after memories" do
     file = Rack::Test::UploadedFile.new(file_fixture("test_document.txt"), "text/plain")
     assistants(:samantha).documents.create!(file: file)

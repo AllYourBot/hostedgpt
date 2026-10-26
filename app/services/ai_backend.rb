@@ -189,9 +189,9 @@ class AIBackend
   def full_instructions
     s = @assistant.instructions.to_s
 
-    if @user.memories.present?
+    if (memories = @user.memories.for_assistant(@assistant).pluck(:detail)).present?
       s += "\n\nNote these additional items that you've been told and remembered:\n\n"
-      s += @user.memories.pluck(:detail).join("\n")
+      s += memories.join("\n")
     end
 
     if (context = @assistant.context_prompt).present?

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -197,11 +197,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
   end
 
   create_table "memories", force: :cascade do |t|
+    t.bigint "assistant_id"
     t.datetime "created_at", null: false
     t.string "detail"
     t.bigint "message_id"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["assistant_id"], name: "index_memories_on_assistant_id"
     t.index ["message_id"], name: "index_memories_on_message_id"
     t.index ["user_id"], name: "index_memories_on_user_id"
   end
@@ -466,6 +468,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
   add_foreign_key "documents", "users"
   add_foreign_key "language_models", "api_services"
   add_foreign_key "language_models", "users"
+  add_foreign_key "memories", "assistants"
   add_foreign_key "memories", "messages"
   add_foreign_key "memories", "users"
   add_foreign_key "messages", "assistants"

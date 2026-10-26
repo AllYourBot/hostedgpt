@@ -163,20 +163,23 @@ en:
         title: "Assistant Memories"
         menu:
           title: "Assistant Memories"
-        description: "These are the things remembered from all past conversations. All assistants share this memory."
+        description: "These are the things remembered from all past conversations. All assistants share a memory unless it was saved for just one of them."
         form:
           detail: "Add a memory"
           placeholder: "e.g. I prefer metric units"
+          assistant: "Remember for"
           add: "Remember"
           adding: "Remembering..."
           errors_title:
             one: "%{count} error prohibited this memory from being saved:"
             other: "%{count} errors prohibited this memory from being saved:"
+        all_assistants: "All assistants"
         none: "No memories"
         clear_all: "Clear All Memories"
         confirm_clear: "Are you sure?"
         table:
           memory: "Memory"
+          assistant: "Assistant"
         forget: "Forget"
       people:
         menu:
