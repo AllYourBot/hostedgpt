@@ -173,7 +173,7 @@ de:
             dark: "Dunkel"
             light: "Hell"
             system: "System"
-          show_thinking: "Erweitertes Denken von Claude anzeigen"
+          show_thinking: "Erweitertes Denken anzeigen"
           ai_backends: "KI-Backends"
           ai_backends_description: "Welche Implementierung jeden Anbieter bedient. Standard folgt der globalen Einstellung (aktuell %{current})."
           backend_choice_default: "Standard"

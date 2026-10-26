@@ -202,7 +202,7 @@ en:
             dark: "Dark"
             light: "Light"
             system: "System"
-          show_thinking: "Show Claude's extended thinking"
+          show_thinking: "Show extended thinking"
           ai_backends: "AI backends"
           ai_backends_description: "Which implementation handles each provider. Default follows the site-wide setting (currently %{current})."
           backend_choice_default: "Default"
