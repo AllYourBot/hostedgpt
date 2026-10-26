@@ -219,6 +219,39 @@ class AIBackend::OpenAITest < ActiveSupport::TestCase
     end
   end
 
+  test "stream_next_conversation_message keeps interleaved parallel calls to different tools apart" do
+    @assistant.language_model.update!(supports_tools: true)
+    delta = ->(tool_call) { { "choices" => [{ "delta" => { "tool_calls" => [tool_call] } }] } }
+    chunks = [
+      delta.({ "index" => 0, "id" => "call_aaa", "type" => "function", "function" => { "name" => "weather", "arguments" => "" } }),
+      delta.({ "index" => 1, "id" => "call_bbb", "type" => "function", "function" => { "name" => "search", "arguments" => "" } }),
+      delta.({ "index" => 0, "function" => { "arguments" => "{\"city\":" } }),
+      delta.({ "index" => 1, "function" => { "arguments" => "{\"query\":\"rain\"}" } }),
+      delta.({ "index" => 0, "function" => { "arguments" => "\"Austin\"}" } }),
+    ]
+
+    @openai.client.stub :chat, ->(**args) { chunks.each { |chunk| args.dig(:parameters, :stream).call(chunk) } } do
+      function_calls = @openai.stream_next_conversation_message { |chunk| }
+
+      assert_equal [0, 1], function_calls.map { |f| f[:index] || f["index"] }
+      assert_equal ["call_aaa", "call_bbb"], function_calls.map { |f| f[:id] || f["id"] }
+      assert_equal ["weather", "search"], function_calls.map { |f| (f[:function] || f["function"]).values_at(:name, "name").compact.first }
+      assert_equal ['{"city":"Austin"}', '{"query":"rain"}'], function_calls.map { |f| (f[:function] || f["function"]).values_at(:arguments, "arguments").compact.first }
+    end
+  end
+
+  test "stream_next_conversation_message splits parallel calls that all arrive with the same index" do
+    @assistant.language_model.update!(supports_tools: true)
+    delta = ->(id, name, args) { { "choices" => [{ "delta" => { "tool_calls" => [{ "index" => 0, "id" => id, "type" => "function", "function" => { "name" => name, "arguments" => args } }] } }] } }
+    chunks = [delta.("call_aaa", "weather", "{}"), delta.("call_bbb", "search", "{}")]
+
+    @openai.client.stub :chat, ->(**args) { chunks.each { |chunk| args.dig(:parameters, :stream).call(chunk) } } do
+      function_calls = @openai.stream_next_conversation_message { |chunk| }
+
+      assert_equal ["call_aaa", "call_bbb"], function_calls.map { |f| f[:id] || f["id"] }
+    end
+  end
+
   test "preceding_conversation_messages constructs a proper response and pivots on images" do
     preceding_conversation_messages = @openai.send(:preceding_conversation_messages)
     history = @conversation.messages.ordered.to_a[0...-1]
