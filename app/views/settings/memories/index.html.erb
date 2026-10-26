@@ -28,6 +28,7 @@
     <thead>
       <tr class="bg-gray-200 dark:bg-gray-900">
         <th><%= t("app.settings.memories.table.memory") %></th>
+        <th><%= t("app.settings.memories.table.assistant") %></th>
         <th></th>
       </tr>
     </thead>
@@ -38,6 +39,21 @@
     <%= render "layouts/form_errors", record: @memory, title: t("app.settings.memories.form.errors_title", count: @memory.errors.count) %>
 
     <%= labeled_text_field form, :detail, t("app.settings.memories.form.detail"), placeholder: t("app.settings.memories.form.placeholder") %>
+
+    <div class="my-5">
+      <%= form.label :assistant_id, t("app.settings.memories.form.assistant") %><br/>
+      <%= form.select :assistant_id,
+        @assistants.map { |assistant| [assistant.name, assistant.id] },
+        { include_blank: t("app.settings.memories.all_assistants") },
+        class: %|
+          block
+          border border-gray-200 outline-none
+          shadow rounded-md
+          px-3 py-2 mt-2
+          w-full
+          dark:text-black
+        | %>
+    </div>
 
     <%= form.submit t("app.settings.memories.form.add"),
       class: %|

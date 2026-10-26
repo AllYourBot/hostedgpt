@@ -131,20 +131,23 @@ de:
         title: "Assistenten-Erinnerungen"
         menu:
           title: "Assistenten-Erinnerungen"
-        description: "Dies sind die Dinge, die aus allen vergangenen Konversationen gemerkt wurden. Alle Assistenten teilen sich diese Erinnerung."
+        description: "Dies sind die Dinge, die aus allen vergangenen Konversationen gemerkt wurden. Alle Assistenten teilen sich eine Erinnerung, es sei denn, sie wurde nur für einen von ihnen gespeichert."
         form:
           detail: "Erinnerung hinzufügen"
           placeholder: "z. B. Ich bevorzuge metrische Einheiten"
+          assistant: "Merken für"
           add: "Merken"
           adding: "Merke..."
           errors_title:
             one: "%{count} Fehler hat das Speichern dieser Erinnerung verhindert:"
             other: "%{count} Fehler haben das Speichern dieser Erinnerung verhindert:"
+        all_assistants: "Alle Assistenten"
         none: "Keine Erinnerungen"
         clear_all: "Alle Erinnerungen löschen"
         confirm_clear: "Sind Sie sicher?"
         table:
           memory: "Erinnerung"
+          assistant: "Assistent"
         forget: "Vergessen"
       people:
         menu:
