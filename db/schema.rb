@@ -62,6 +62,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_120000) do
   end
 
   create_table "assistants", force: :cascade do |t|
+    t.jsonb "conversation_starters", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "deleted_at", precision: nil
     t.string "description"

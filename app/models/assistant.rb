@@ -1,5 +1,5 @@
 class Assistant < ApplicationRecord
-  include Export, Slug, Context
+  include Export, Slug, Context, ConversationStarters
 
   MAX_LIST_DISPLAY = 4
 

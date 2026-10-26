@@ -44,6 +44,20 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, (starter_titles & image_starter_titles).size
   end
 
+  test "should get new WITH the assistant's own conversation starters in place of the default ones" do
+    questions = ["What should I cook tonight?", "Plan my week"]
+    @assistant.update!(conversation_starters: questions)
+
+    get new_assistant_message_url(@assistant)
+    assert_response :success
+
+    assert_equal questions, assigns(:conversation_starters).map(&:first), "The assistant's starters should be shown in the order they were saved"
+    questions.each do |question|
+      assert_select "form[action=?] input[name=?][value=?]", assistant_messages_path(@assistant), "message[content_text]", question,
+        { count: 1 }, "Clicking a starter should send its question as written"
+    end
+  end
+
   test "should NOT show message when not owned by the logged in user" do
     message_not_owned_by_user = messages(:filter_map)
     assert_not_equal @user, message_not_owned_by_user.conversation.user
