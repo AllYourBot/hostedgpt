@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import mermaid from "mermaid"
 
 let initializedTheme
-let renderCounter
+let renderCounter = 0
 const renderedDiagrams = new Map()
 const RENDERED_DIAGRAMS_LIMIT = 25
 
@@ -69,8 +69,10 @@ export default class extends Controller {
         pre.replaceWith(preview, details)
       } catch (error) {
         console.warn("mermaid render skipped", error?.message)
-        // Mermaid inserts its own error graphic before throwing; clean it up.
+        // Mermaid inserts its own error graphic before throwing inside a temp
+        // wrapper (d${id}); clean up both so nothing lingers in the DOM.
         document.getElementById(id)?.remove()
+        document.getElementById(`d${id}`)?.remove()
       }
     }
   }

@@ -25,8 +25,18 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
 
     msg = find("#message_#{messages(:im_a_bot).id}")
     msg.assert_no_selector(".mermaid-preview svg")
-    assert_includes msg.text, "not a diagram"
+    assert_includes msg.text, "not a diagram", "the broken fence stays as readable source"
+
+    # Out of the render window itself (debounce + first mermaid warm-up):
+    # any mermaid error artifacts would still be in the DOM now and the
+    # catch-side cleanup removes them.
+    sleep 1.5
+    leftovers = page.evaluate_script(
+      "document.querySelectorAll(\"div[id^='dmermaid-'], svg[id^='mermaid-']\").length"
+    )
+    assert_equal 0, leftovers, "mermaid's failed-render artifacts must not linger outside the message"
   end
+
   test "mid-stream broadcast leaves readable source and no flashing preview" do
     @stream_msg.update!(content_text: DIAGRAM_CONTENT)
     GetNextAIMessageJob.broadcast_updated_message(@stream_msg, thinking: true)
@@ -39,6 +49,7 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     @stream_msg.update!(content_text: DIAGRAM_CONTENT)
     GetNextAIMessageJob.broadcast_updated_message(@stream_msg)
 
-    assert_selector "#message_#{@stream_msg.id} .mermaid-preview svg"
+    assert page.has_selector?("#message_#{@stream_msg.id} .mermaid-preview svg"),
+      "the settled diagram previews as a diagram"
   end
 end
