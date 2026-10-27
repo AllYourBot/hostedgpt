@@ -21,53 +21,6 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     refute AIBackend::RubyLLM.supports_identity?(nil)
   end
 
-  test "APIService#ai_backend returns the identity's SDK class when the flag is off" do
-    stub_features(use_ruby_llm: false) do
-      assert_equal AIBackend::OpenAI, api_services(:keith_openai_service).ai_backend
-      assert_equal AIBackend::Anthropic, api_services(:keith_anthropic_service).ai_backend
-      assert_equal AIBackend::Gemini, api_services(:keith_gemini_service).ai_backend
-      assert_equal AIBackend::Groq, api_services(:keith_groq_service).ai_backend
-      assert_equal AIBackend::OpenRouter, api_services(:keith_openrouter_service).ai_backend
-      assert_nil api_services(:keith_brave_service).ai_backend
-    end
-  end
-
-  test "APIService#ai_backend returns RubyLLM for every chat identity when the flag is on" do
-    stub_features(use_ruby_llm: true) do
-      assert_equal AIBackend::RubyLLM, api_services(:keith_openai_service).ai_backend
-      assert_equal AIBackend::RubyLLM, api_services(:keith_anthropic_service).ai_backend
-      assert_equal AIBackend::RubyLLM, api_services(:keith_gemini_service).ai_backend
-      assert_equal AIBackend::RubyLLM, api_services(:keith_groq_service).ai_backend
-      assert_equal AIBackend::RubyLLM, api_services(:keith_openrouter_service).ai_backend
-    end
-  end
-
-  test "an explicit sdk choice beats an on site default and an explicit ruby_llm choice beats an off one" do
-    stub_features(use_ruby_llm: true) do
-      api_services(:keith_openai_service).user.features[:openai_ai_backend] = "sdk"
-      assert_equal AIBackend::OpenAI, api_services(:keith_openai_service).reload.ai_backend
-    end
-
-    api_services(:keith_openai_service).user.features[:openai_ai_backend] = nil
-    stub_features(use_ruby_llm: false) do
-      api_services(:keith_groq_service).user.features[:groq_ai_backend] = "ruby_llm"
-      assert_equal AIBackend::RubyLLM, api_services(:keith_groq_service).reload.ai_backend
-    end
-  end
-
-  test "an explicit choice is honored per identity, not per driver" do
-    stub_features(use_ruby_llm: true) do
-      user = api_services(:keith_openai_service).user
-      user.features[:openai_ai_backend] = "sdk"
-
-      # openai rides the same driver as groq and openrouter; only the openai
-      # identity's choice should flip it back to the SDK.
-      assert_equal AIBackend::OpenAI, api_services(:keith_openai_service).reload.ai_backend
-      assert_equal AIBackend::RubyLLM, api_services(:keith_groq_service).ai_backend
-      assert_equal AIBackend::RubyLLM, api_services(:keith_openrouter_service).ai_backend
-    end
-  end
-
   test "client returns TestClient::RubyLLM in test environment" do
     assert_equal TestClient::RubyLLM, AIBackend::RubyLLM.client
   end
@@ -338,6 +291,32 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_nil context.openai_use_system_role
   end
 
+  test "ruby_llm_context sets the service URL as anthropic_api_base for a proxy" do
+    @assistant.language_model.api_service.update!(url: "https://anthropic-gateway.example.com/", driver: "anthropic")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    context = backend.send(:ruby_llm_context)
+    assert_equal "https://anthropic-gateway.example.com/", context.anthropic_api_base
+  end
+
+  test "ruby_llm_context sets the service URL as gemini_api_base for a proxy" do
+    @assistant.language_model.api_service.update!(url: "https://gemini-gateway.example.com/", driver: "gemini")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    context = backend.send(:ruby_llm_context)
+    assert_equal "https://gemini-gateway.example.com/", context.gemini_api_base
+  end
+
+  test "ruby_llm_context leaves the base URLs unset for canonical URLs" do
+    @assistant.language_model.api_service.update!(url: APIService::URL_ANTHROPIC, driver: "anthropic")
+    context = AIBackend::RubyLLM.new(@user, @assistant).send(:ruby_llm_context)
+    assert_nil context.anthropic_api_base
+
+    @assistant.language_model.api_service.update!(url: APIService::URL_GEMINI, driver: "gemini")
+    context = AIBackend::RubyLLM.new(@user, @assistant).send(:ruby_llm_context)
+    assert_nil context.gemini_api_base
+  end
+
   test "build_chat sends OpenRouter attribution headers only for the OpenRouter identity" do
     @assistant.language_model.api_service.update!(url: APIService::URL_OPENROUTER, driver: "openai")
     backend = AIBackend::RubyLLM.new(@user, @assistant)
@@ -397,6 +376,36 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_equal :openai, captured[:provider], "Groq should ride the openai-compatible provider"
     assert_equal "groq-key", captured[:context].openai_api_key, "The context should carry the service token"
     assert_equal APIService::URL_GROQ, captured[:context].openai_api_base, "The context should point at the service URL"
+  end
+
+  test "test_execute probes a proxy URL in the service row's dialect" do
+    captured = nil
+    original_new = TestClient::RubyLLM::Chat.method(:new)
+    capture = ->(**kwargs) { captured = kwargs; original_new.call(**kwargs) }
+
+    TestClient::RubyLLM::Chat.stub :new, capture do
+      TestClient::RubyLLM::Chat.stub :text, "Hi" do
+        AIBackend::RubyLLM.test_execute("https://anthropic-gateway.example.com/", "tok", "claude-mini", driver: "anthropic")
+      end
+    end
+
+    assert_equal :anthropic, captured[:provider], "The row's driver, not the URL, picks the dialect"
+    assert_equal "tok", captured[:context].anthropic_api_key
+    assert_equal "https://anthropic-gateway.example.com/", captured[:context].anthropic_api_base
+  end
+
+  test "test_execute keeps the URL guess for rows that don't carry a driver" do
+    captured = nil
+    original_new = TestClient::RubyLLM::Chat.method(:new)
+    capture = ->(**kwargs) { captured = kwargs; original_new.call(**kwargs) }
+
+    TestClient::RubyLLM::Chat.stub :new, capture do
+      TestClient::RubyLLM::Chat.stub :text, "Hi" do
+        AIBackend::RubyLLM.test_execute("https://anthropic-gateway.example.com/", "tok", "claude-mini")
+      end
+    end
+
+    assert_equal :openai, captured[:provider], "Without a driver the URL-substring guess stands in"
   end
 
   test "test_execute returns an error string when RubyLLM rejects the key" do
@@ -834,6 +843,33 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     @assistant.language_model.update!(supports_tools: true)
     backend = AIBackend::RubyLLM.new(@user, @assistant)
     assert backend.send(:tools_enabled?)
+  end
+
+  test "stream_next_conversation_message registers the toolbox tools on the chat only when they're enabled" do
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    @assistant.language_model.update!(supports_tools: true)
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.instance_variable_set(:@tools, nil)
+    TestClient::RubyLLM::Chat.stub :text, "Hello" do
+      backend.stream_next_conversation_message { |c| }
+    end
+    assert_includes TestClient::RubyLLM::Chat.tools.map(&:name), "helloworld_hi",
+      "The chat should carry the toolbox schemas so the provider can request tools"
+
+    @assistant.language_model.update!(supports_tools: false)
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.instance_variable_set(:@tools, nil)
+    TestClient::RubyLLM::Chat.stub :text, "Hello" do
+      backend.stream_next_conversation_message { |c| }
+    end
+    assert_nil TestClient::RubyLLM::Chat.tools, "No with_tools call should reach the chat when tools are disabled"
   end
 
   test "stream_next_conversation_message returns a formatted tool call when the model requests one" do

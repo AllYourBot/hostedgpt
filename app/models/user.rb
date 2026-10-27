@@ -60,10 +60,6 @@ class User < ApplicationRecord
     super(value.nil? ? nil : value.to_b)
   end
 
-  def features
-    User::Features.new(self)
-  end
-
   # Profile picture helper methods
   def has_profile_picture?
     profile_picture.attached?

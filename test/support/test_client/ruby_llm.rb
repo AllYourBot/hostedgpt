@@ -134,7 +134,7 @@ module TestClient
       end
 
       # Returns the name of the tool the model "requested"; nil means the model
-      # responds with text instead. Mirrors TestClient::OpenAI#function.
+      # responds with text instead.
       def self.function
         nil
       end

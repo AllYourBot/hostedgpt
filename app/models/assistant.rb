@@ -1,5 +1,5 @@
 class Assistant < ApplicationRecord
-  include Export, Slug, Context
+  include Export, Slug, Context, ConversationStarters
 
   MAX_LIST_DISPLAY = 4
 
@@ -10,6 +10,7 @@ class Assistant < ApplicationRecord
   has_many :runs, dependent: :destroy
   has_many :steps, dependent: :destroy
   has_many :messages, dependent: :destroy
+  has_many :memories, dependent: :destroy
 
   delegate :supports_images?, to: :language_model
   delegate :supports_pdf?, to: :language_model

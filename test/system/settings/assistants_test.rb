@@ -29,6 +29,23 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     assert_alert "Saved"
   end
 
+  test "conversation starters saved on the Assistant update page are suggested on a new conversation" do
+    visit edit_settings_assistant_url(@assistant)
+
+    fill_in "Conversation starter 1", with: "What should I cook tonight?"
+    fill_in "Conversation starter 2", with: "Plan my week"
+    click_text "Save"
+    assert_alert "Saved"
+    assert_field "Conversation starter 1", with: "What should I cook tonight?"
+
+    visit new_assistant_message_url(@assistant)
+    assert_text "What should I cook tonight?"
+    click_text "Plan my week"
+
+    assert_no_current_path new_assistant_message_path(@assistant)
+    assert @assistant.messages.exists?(role: "user", content_text: "Plan my week"), "Clicking a starter should send its question as written"
+  end
+
   test "a second save to the Assistant update page should show the notification again and it should properly dismiss itself when X is clicked" do
     visit edit_settings_assistant_url(@assistant)
     click_text "Save"

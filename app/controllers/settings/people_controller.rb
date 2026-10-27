@@ -7,7 +7,6 @@ class Settings::PeopleController < Settings::ApplicationController
 
   def update
     Current.person.update!(person_params)
-    apply_backend_choices!
     redirect_to edit_settings_person_path, notice: I18n.t("app.flashes.assistants.saved"), status: :see_other
   rescue
     @person = Current.person
@@ -19,33 +18,11 @@ class Settings::PeopleController < Settings::ApplicationController
   def person_params
     h = params.require(:person).permit(:email, personable_attributes: [
       :id, :first_name, :last_name, :password, :profile_picture, :remove_profile_picture,
-      :dark_mode, :show_thinking, preferences: [feature: [:use_ruby_llm]],
+      :dark_mode, :show_thinking,
       credentials_attributes: [ :id, :type, :password ]
     ]).to_h
 
-    if (prefs = h.dig("personable_attributes", "preferences")).present? && (user = Current.person.user)
-      h["personable_attributes"]["preferences"] = user.preferences.deep_merge(prefs.deep_symbolize_keys)
-    end
-
     format_and_strip_all_but_first_valid_credential(h)
-  end
-
-  def apply_backend_choices!
-    choices = params.permit(person: { backend_choices: User::Features.derived_backend_names })
-                   .dig(:person, :backend_choices)
-    return if choices.blank?
-
-    updates = {}
-    choices.each do |name, value|
-      value = value.presence
-      next if value.present? && !value.in?(User::Features::BACKEND_CHOICES) # the tri-state is enforced server-side, not just by the radios
-
-      updates[name.to_sym] = value
-    end
-    return if updates.empty?
-
-    user = Current.person.reload.user   # merge against fresh state, not a stale session copy
-    User::Features.batch_merge(user, updates)
   end
 
   def check_personable_id

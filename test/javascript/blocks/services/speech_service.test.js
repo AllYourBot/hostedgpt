@@ -18,6 +18,10 @@ test('spaced out ellipsis with space before', async() => {
   expect(SpeechService.splitIntoThoughts("The quick brown fox . . . He jumped over the lazy dog.")).toEqual(["The quick brown fox ... ", "He jumped over the lazy dog."])
 })
 
+test('single quotes are kept as written', async() => {
+  expect(SpeechService.splitIntoThoughts("It's empty. Write '' for an empty string.")).toEqual(["It's empty. ", "Write '' for an empty string."])
+})
+
 describe('audioFromOpenAI when the server rejects the request', () => {
   let status
 

@@ -39,16 +39,4 @@ module AIBackend::Tools
       raise ::Faraday::ParsingError
     end
   end
-
-  included do
-    private
-
-    def format_parallel_tool_calls(content_tool_calls)
-      raise NotImplementedError
-    end
-
-    def parallel_tool_calls(content_tool_calls)
-      raise NotImplementedError
-    end
-  end
 end

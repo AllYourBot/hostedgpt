@@ -39,7 +39,7 @@ class AIBackend::RubyLLM < AIBackend
     Rails.env.test? ? ::TestClient::RubyLLM : ::RubyLLM
   end
 
-  # Error-detail parity with the SDK transports, whose failures name the model.
+  # Error details name the model and include a redacted body excerpt so failures are diagnosable.
   ERROR_BODY_EXCERPT_LENGTH = 200
   API_KEY_LIKE = /(sk-|gsk_|gsk-|AIza)[\w\-]+/.freeze
 
@@ -60,14 +60,18 @@ class AIBackend::RubyLLM < AIBackend
     Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::RubyLLM::Chat
   end
 
-  # One stanza per provider credential: the key plus, for openai-compatible
-  # vendors (anything not the canonical OpenAI URL), the base URL override and
-  # the traditional system role those servers expect.
+  # One stanza per provider credential: the key plus, when the service URL is
+  # not the provider's canonical one, the base URL override (and, for
+  # openai-compatible vendors, the traditional system role those servers expect).
   def self.configure_context(context, provider:, url:, token:)
     context.public_send("#{provider}_api_key=", token)
     if provider == :openai && url != APIService::URL_OPEN_AI
       context.openai_api_base = url
       context.openai_use_system_role = true
+    elsif provider == :anthropic && url != APIService::URL_ANTHROPIC
+      context.anthropic_api_base = url
+    elsif provider == :gemini && url != APIService::URL_GEMINI
+      context.gemini_api_base = url
     end
   end
 
@@ -92,8 +96,8 @@ class AIBackend::RubyLLM < AIBackend
     end
   end
 
-  def self.test_execute(url, token, api_name)
-    provider = provider_for_url(url)
+  def self.test_execute(url, token, api_name, driver: nil)
+    provider = test_provider(driver, url)
     Rails.logger.info "Connecting to AI API server at #{url} with access token of length #{token.to_s.length}"
     Rails.logger.info "Testing using model #{api_name} for provider #{provider}"
     context = client.context { |c| configure_context(c, provider: provider, url: url, token: token) }
@@ -102,6 +106,15 @@ class AIBackend::RubyLLM < AIBackend
     chat.complete.content
   rescue ::RubyLLM::Error, ::Faraday::Error => e
     "Error: #{e.message}"
+  end
+
+  # The service row's driver is the dialect's source of truth, so a proxy URL
+  # on an anthropic or gemini row is probed in its own dialect; the URL
+  # substring guess only stands in for rows that don't say (blank or unknown drivers).
+  def self.test_provider(driver, url)
+    return driver.to_sym if APIService::DIRECT_DRIVERS.include?(driver)
+
+    provider_for_url(url)
   end
 
   # Always paints through the user's OpenAI service, even for an Anthropic or Gemini assistant.
@@ -308,8 +321,8 @@ class AIBackend::RubyLLM < AIBackend
     msg
   end
 
-  # Images go as the :large variant, as the SDK backends send them: an original photo can
-  # exceed a provider's limit (5 MB for Anthropic), and the history resends it every turn.
+  # Images go as the :large variant: an original photo can exceed a provider's
+  # limit (5 MB for Anthropic), and the history resends it every turn.
   def attachment_for(document)
     file = document.has_image? ? document.image_variant(:large).processed.image : document.file
     ::RubyLLM::Attachment.new(file)
@@ -351,18 +364,6 @@ class AIBackend::RubyLLM < AIBackend
     end
   end
 
-  def client_method_name
-    raise NotImplementedError
-  end
-
-  def configuration_error
-    raise NotImplementedError
-  end
-
-  def set_client_config(*)
-    raise NotImplementedError
-  end
-
   def tools_enabled?
     # The provider's tool policy is a provider fact, not a transport one:
     # LanguageModel#supports_tools? already consults the identity's policy,
@@ -396,16 +397,5 @@ class AIBackend::RubyLLM < AIBackend
         thought_signature: tc.thought_signature,
         function: { name: tc.name, arguments: tc.arguments.to_json } }.compact
     end
-  end
-
-  # RubyLLM returns tool calls already separated, so these defensive identities
-  # satisfy the AIBackend::Tools contract even though
-  # stream_next_conversation_message never calls them.
-  def format_parallel_tool_calls(content_tool_calls)
-    content_tool_calls
-  end
-
-  def parallel_tool_calls(content_tool_calls)
-    content_tool_calls
   end
 end

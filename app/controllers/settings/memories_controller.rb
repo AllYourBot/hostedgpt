@@ -1,5 +1,6 @@
 class Settings::MemoriesController < Settings::ApplicationController
   before_action :set_memories, only: [:index, :create]
+  before_action :set_assistants, only: [:index, :create]
   before_action :set_memory, only: :destroy
 
   def index
@@ -25,7 +26,11 @@ class Settings::MemoriesController < Settings::ApplicationController
   private
 
   def set_memories
-    @memories = Current.user.memories.includes(:message)
+    @memories = Current.user.memories.includes(:message, :assistant)
+  end
+
+  def set_assistants
+    @assistants = Current.user.assistants.ordered
   end
 
   def set_memory
@@ -33,6 +38,6 @@ class Settings::MemoriesController < Settings::ApplicationController
   end
 
   def memory_params
-    params.require(:memory).permit(:detail)
+    params.require(:memory).permit(:detail, :assistant_id)
   end
 end

@@ -49,18 +49,15 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_nil api_services(:keith_other_service).logo_filename
   end
 
-  test "both ai_backends are specified for language models" do
-    assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
-    assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
-  end
-
-  test "backends resolve by provider identity: the driver plus, for openai-dialect vendors, the canonical URL" do
-    assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
-    assert_equal AIBackend::Groq, language_models(:llama_3_3_70b_versatile).ai_backend
-    assert_equal AIBackend::OpenRouter, language_models(:openrouter_gpt5).ai_backend
-    assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
-    assert_equal AIBackend::Anthropic, language_models(:claude_best).ai_backend
-    assert_equal AIBackend::Gemini, language_models(:gemini_flash_1_5).ai_backend
+  test "RubyLLM is the backend for every chat provider identity, and none for brave" do
+    assert_equal AIBackend::RubyLLM, language_models(:gpt_best).ai_backend
+    assert_equal AIBackend::RubyLLM, language_models(:llama_3_3_70b_versatile).ai_backend
+    assert_equal AIBackend::RubyLLM, language_models(:openrouter_gpt5).ai_backend
+    assert_equal AIBackend::RubyLLM, language_models(:alpaca).ai_backend
+    assert_equal AIBackend::RubyLLM, language_models(:claude_best).ai_backend
+    assert_equal AIBackend::RubyLLM, language_models(:gemini_flash_1_5).ai_backend
+    assert_equal AIBackend::RubyLLM, language_models(:guanaco).ai_backend
+    assert_nil api_services(:keith_brave_service).ai_backend
   end
 
   test "provider identities resolve through the canonical URL, not the raw driver" do
@@ -73,44 +70,16 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal :openai, api_services(:keith_other_service).provider_identity # custom-URL openai-dialect service
   end
 
-  test "error facts resolve through the identity's own backend, whatever transport serves the request" do
+  test "error facts resolve through the identity's own policy class, whatever transport serves the request" do
     groq = api_services(:keith_groq_service)
     openrouter = api_services(:keith_openrouter_service)
 
-    assert_equal AIBackend::Groq.key_error_message, groq.key_error_message
+    assert_equal AIBackend::Policy::Groq.key_error_message, groq.key_error_message
     assert_equal "https://console.groq.com/keys", groq.billing_url
     assert_equal "Groq", groq.provider_name
-    assert_equal AIBackend::OpenRouter.key_error_message, openrouter.key_error_message
+    assert_equal AIBackend::Policy::OpenRouter.key_error_message, openrouter.key_error_message
     assert_equal "https://openrouter.ai/credits", openrouter.billing_url
-
-    stub_features(use_ruby_llm: true) do
-      # RubyLLM is dispatched, but the facts still speak Groq and OpenRouter.
-      assert_equal AIBackend::RubyLLM, groq.ai_backend
-      assert_equal AIBackend::Groq.key_error_message, groq.key_error_message
-      assert_equal "https://console.groq.com/keys", groq.billing_url
-      assert_equal "Groq", groq.provider_name
-      assert_equal AIBackend::OpenRouter.billing_url, openrouter.reload.billing_url
-    end
-  end
-
-  test "an explicit choice overrides the site default at dispatch, per identity" do
-    user = api_services(:keith_openai_service).user
-
-    stub_features(use_ruby_llm: false) do
-      user.features[:openai_ai_backend] = "ruby_llm"
-      assert_equal AIBackend::RubyLLM, api_services(:keith_openai_service).reload.ai_backend
-      assert_equal AIBackend::Anthropic, api_services(:keith_anthropic_service).ai_backend
-    end
-
-    stub_features(use_ruby_llm: true) do
-      user.features[:openai_ai_backend] = "sdk"
-      assert_equal AIBackend::OpenAI, api_services(:keith_openai_service).reload.ai_backend
-      assert_equal AIBackend::RubyLLM, api_services(:keith_anthropic_service).ai_backend
-    end
-  end
-
-  test "openai-dialect services with custom URLs keep the OpenAI backend" do
-    assert_equal AIBackend::OpenAI, language_models(:guanaco).ai_backend
+    assert_equal "OpenRouter", openrouter.reload.provider_name
   end
 
   test "official providers require a token and custom URLs do not" do
@@ -132,27 +101,36 @@ class APIServiceTest < ActiveSupport::TestCase
   test "the Test button reports a RubyLLM error instead of raising" do
     service = api_services(:keith_openai_service)
 
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::UnauthorizedError.new("401 bad key") do
-        assert_equal "Error: 401 bad key", service.test_api_service,
-          "Every model failing should surface the last error string to the Test button"
-      end
+    TestClient::RubyLLM::Chat.stub :error_to_raise, ::RubyLLM::UnauthorizedError.new("401 bad key") do
+      assert_equal "Error: 401 bad key", service.test_api_service,
+        "Every model failing should surface the last error string to the Test button"
     end
   end
 
-  test "the Test button answers through RubyLLM when the flag is on" do
+  test "the Test button answers through RubyLLM" do
     service = api_services(:keith_openai_service)
 
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub :text, "Hi from RubyLLM" do
-        assert_equal "Hi from RubyLLM", service.test_api_service, "The Test button should return the model's reply"
-      end
+    TestClient::RubyLLM::Chat.stub :text, "Hi from RubyLLM" do
+      assert_equal "Hi from RubyLLM", service.test_api_service, "The Test button should return the model's reply"
     end
   end
 
-  test "both ai_backends can be specified for user models" do
-    assert_equal AIBackend::Anthropic, language_models(:alpaca).ai_backend
-    assert_equal AIBackend::OpenAI, language_models(:guanaco).ai_backend
+  test "the Test button probes a proxy URL in the service row's dialect" do
+    service = api_services(:keith_anthropic_service)
+    service.update!(url: "https://anthropic-gateway.example.com/")
+
+    captured = nil
+    original_new = TestClient::RubyLLM::Chat.method(:new)
+    capture = ->(**kwargs) { captured = kwargs; original_new.call(**kwargs) }
+
+    TestClient::RubyLLM::Chat.stub :new, capture do
+      TestClient::RubyLLM::Chat.stub :text, "Hi" do
+        service.test_api_service
+      end
+    end
+
+    assert_equal :anthropic, captured[:provider], "The Test button should match the chat path's dialect"
+    assert_equal "https://anthropic-gateway.example.com/", captured[:context].anthropic_api_base
   end
 
   test "cannot create record without user" do
@@ -229,7 +207,7 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal "Error: Testing is not supported for this API service.", api_services(:keith_brave_service).test_api_service
   end
 
-  test "every chat provider identity maps to an sdk backend" do
+  test "every chat provider identity maps to a RubyLLM backend" do
     {
       openai: [ :openai, APIService::URL_OPEN_AI ],
       anthropic: [ :anthropic, APIService::URL_ANTHROPIC ],
@@ -239,7 +217,7 @@ class APIServiceTest < ActiveSupport::TestCase
     }.each do |identity, (driver, url)|
       service = APIService.new(driver: driver, url: url)
       assert_equal identity, service.provider_identity
-      assert_not_nil service.sdk_backend, "identity #{identity} must map to a backend"
+      assert_equal AIBackend::RubyLLM, service.ai_backend, "identity #{identity} must be served by RubyLLM"
     end
   end
 
