@@ -70,8 +70,16 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     @stream_msg.update!(content_text: DIAGRAM_CONTENT)
     GetNextAIMessageJob.broadcast_updated_message(@stream_msg, thinking: true)
 
-    assert_no_selector "#message_#{@stream_msg.id} .mermaid-preview svg"
-    assert_includes last_message.text, "A-->B"
+    msg = find("#message_#{@stream_msg.id}")
+    assert msg.has_selector?("[data-role='content-text'][data-streaming='true']"),
+      "the streamed message flags its content div as streaming"
+
+    # Out of the observer debounce: an ungated render would have run by now.
+    sleep 0.6
+    assert_equal 0, page.evaluate_script(
+      "document.querySelectorAll('#message_#{@stream_msg.id} .mermaid-preview, #message_#{@stream_msg.id} [data-diagram-rendered]').length"
+    ), "the diagram preview must not render while the reply streams"
+    assert msg.has_text?("A-->B"), "the diagram source stays readable mid-stream"
   end
 
   test "streamed diagram previews after a turbo broadcast" do
@@ -80,5 +88,7 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
 
     assert page.has_selector?("#message_#{@stream_msg.id} .mermaid-preview svg"),
       "the settled diagram previews as a diagram"
+    assert page.has_selector?("#message_#{@stream_msg.id} [data-role='content-text'][data-streaming='false']"),
+      "the settle broadcast flips the render gate back off"
   end
 end

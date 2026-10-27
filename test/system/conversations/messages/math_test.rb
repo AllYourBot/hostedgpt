@@ -22,7 +22,10 @@ class ConversationMessagesMathTest < ApplicationSystemTestCase
     @stream_msg.update!(content_text: MATH_CONTENT)
     GetNextAIMessageJob.broadcast_updated_message(@stream_msg)
 
-    assert_selector "#message_#{@stream_msg.id} .katex"
+    assert page.has_selector?("#message_#{@stream_msg.id} .katex"),
+      "the settled math typesets"
+    assert page.has_selector?("#message_#{@stream_msg.id} [data-role='content-text'][data-streaming='false']"),
+      "the settle broadcast flips the render gate back off"
   end
 
   test "mid-stream broadcast leaves math as readable source" do
@@ -30,7 +33,14 @@ class ConversationMessagesMathTest < ApplicationSystemTestCase
     GetNextAIMessageJob.broadcast_updated_message(@stream_msg, thinking: true)
 
     msg = find("#message_#{@stream_msg.id}")
-    msg.assert_no_selector(".katex")
-    msg.assert_text("$$e^{i\\pi}+1=0$$")
+    assert msg.has_selector?("[data-role='content-text'][data-streaming='true']"),
+      "the streamed message flags its content div as streaming"
+
+    # Out of the observer debounce: an ungated typeset would have run by now.
+    sleep 0.6
+    assert_equal 0, page.evaluate_script(
+      "document.querySelectorAll('#message_#{@stream_msg.id} .katex').length"
+    ), "KaTeX must not re-typeset while the reply streams"
+    assert msg.has_text?("$$e^{i\\pi}+1=0$$"), "the math source stays readable mid-stream"
   end
 end
