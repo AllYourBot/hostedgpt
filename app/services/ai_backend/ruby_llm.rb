@@ -14,6 +14,7 @@ class AIBackend::RubyLLM < AIBackend
   # the 4096 RubyLLM falls back to for an assumed model can be spent before the
   # answer starts.
   THINKING_EFFORT = "high"
+  THINKING_BUDGET = 16_000
   THINKING_MAX_TOKENS = 16_000
 
   CONFIGURATION_ERRORS = [
@@ -201,8 +202,8 @@ class AIBackend::RubyLLM < AIBackend
     preceding_conversation_messages.each { |msg| chat.add_message(msg) }
     chat.with_tools(*tool_instances) if tools_enabled?
     if thinking_enabled?
-      chat.with_thinking(effort: THINKING_EFFORT, display: "summarized")
-      chat.with_provider_options(max_tokens: THINKING_MAX_TOKENS)
+      chat.with_thinking(**thinking_options)
+      chat.with_provider_options(max_tokens: THINKING_MAX_TOKENS) if provider_slug == :anthropic
     end
 
     begin
@@ -371,7 +372,13 @@ class AIBackend::RubyLLM < AIBackend
   end
 
   def thinking_enabled?
-    provider_slug == :anthropic && @assistant.language_model.supports_thinking?
+    @assistant.language_model.supports_thinking?
+  end
+
+  def thinking_options
+    return { budget: THINKING_BUDGET, display: "summarized" } if provider_slug == :gemini && @api_name.start_with?("gemini-2.5")
+
+    { effort: THINKING_EFFORT, display: "summarized" }
   end
 
   def tool_instances
