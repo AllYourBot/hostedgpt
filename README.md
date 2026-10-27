@@ -2,11 +2,13 @@
 
 # HostedGPT
 
-HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.  Your assistant will also do web searches itself if you get a free Brave Search API key.
+HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.
+
+You can have multiple users so it is great for a family or group.
 
 You can also switch providers and models in the middle of a conversation, so it is great for comparing different models!
 
-And you can attach your Google email and tasks account and manipulate them in your conversation. Calendar soon.
+And you can attach your Google email and tasks account and manipulate them in your conversation. Your assistant can also do web searches itself if you get a free Brave Search API key.
 
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
@@ -14,6 +16,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 
 - **Use OpenAI, Anthropic Claude, Google Gemini, Ollama models (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage to use the latest models.  There are hosting costs if not running locally.
 - **A polished interface with mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
+- **Multiple users for family or group use.**
 - **German localization included.**
 - **You will rarely hit the '_You've reached the current usage cap_' errors**.
 - **Collect and easily search and share all of your conversions** You can search across conversations and providers.
@@ -47,7 +50,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 
 For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working.
 
-UPDATE: The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid service in Render, which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
+UPDATE: The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid service in Render, which is currently $7 / month. Alternatively, you can run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
@@ -61,7 +64,7 @@ UPDATE: The free service appears to not have enough memory HostedGPT, so you wil
 7. You should see two "Service Names" called "hostedgpt-..." (the name you picked), click the one that is of type **Web Service**
 8. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
 
-**NOTE: After 15 minutes of not using the app with the free service your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. You probably need to upgrade $7 per month anyway:**
+**NOTE: After 15 minutes of not using the app with the free service your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. You probably need to upgrade to $7 per month anyway (see above), which won't have the pause:**
 
 1. To upgrade, go to your [Render Dashboard](https://dashboard.render.com/)
 2. Click "HostedGPT" or whatever you named your Web Service
@@ -302,16 +305,14 @@ There are a number of optional feature flags that can be set and settings that c
   - `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
   - `CLOUDFLARE_SECRET_ACCESS_KEY` - Your Cloudflare Secret Access Key
   - `CLOUDFLARE_BUCKET` - The name of the bucket you created
-- `GOOGLE_TOOLS_FEATURE` is `false` by default because this feature is still in development. Set this to `true` if you would like to try the experimental feature where your assistant can access your Gmail, Google Tasks, and soon Google Calendar. After enabling, you need to set up Google OAuth and include the apps as part of the consent flow. See [Configure Google Tools](#configuring-google-tools). After this is done, when each user goes to Settings within the app, there will be a button to explicitly connect their account to Gmail, Google Tasks, and/or Google Calendar. Review `gmail.rb` and `google_tasks.rb` in the directory `app/services/toolbox/` to see what capabilities have currently been built.
-- `VOICE_FEATURE` is `false` by default. This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
+- `GOOGLE_TOOLS_FEATURE` is `true` by default. Set this to `false` if you would not like this feature where your assistant can access your Gmail, Google Tasks, and soon Google Calendar. If enabled, you need to set up Google OAuth and include the apps as part of the consent flow. See [Configure Google Tools](#configuring-google-tools). After this is done, when each user goes to Settings within the app, there will be a button to explicitly connect their account to Gmail, Google Tasks, and/or Google Calendar. Review `gmail.rb` and `google_tasks.rb` in the directory `app/services/toolbox/` to see what capabilities have currently been built.
+- `VOICE_FEATURE` is `true` by default. This feature provides a microphone icon for spoken conversation with your assistant.
 - `PASSWORD_AUTHENTICATION_FEATURE` is `true` by default, see the [Authentication](#authentication) section for more details.
 - `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
 - `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
 - `ASSISTANTS_PAGE_FEATURE` is true by default. Is shows the word Assistants obove the list of Assistants, which when clicked on shows a page with all of the Assistants in square boxes. Turn this off by setting it to `false`.
 
 ### Configuring Google Tools
-
-**NOTE: Some users experience failures with this feature.  Expected to be fixed next version**
 
 You first need to follow all the steps in the [Google OAuth instructions](#google-oauth-authentication). The only step that is optional is that you can leave `GOOGLE_AUTHENTICATION_FEATURE` set to false, which means you don't have to enable new users to register with Google. However, following all the steps will also set up Google Auth so you can connect Google Tools to your assistants. After, you complete those steps, here is the additional configuration you need to do in order to enable the Google tools:
 
@@ -323,7 +324,7 @@ You first need to follow all the steps in the [Google OAuth instructions](#googl
      - https://www.googleapis.com/auth/gmail.modify (then click "Add To Table")
      - https://www.googleapis.com/auth/tasks (then click "Add To Table")
 
-2. **Finally, set `GOOGLE_TOOLS_FEATURE` to true**
+2. **Finally, make sure `GOOGLE_TOOLS_FEATURE` is true**
 
 ### Authentication
 
