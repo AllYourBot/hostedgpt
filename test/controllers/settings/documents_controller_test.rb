@@ -64,4 +64,17 @@ class Settings::DocumentsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
   end
+
+  test "should NOT remove an image the assistant generated in a conversation" do
+    message = messages(:image_generation_explained)
+    GeneratedImage.new(Base64.strict_encode64(file_fixture("cat.png").binread)).attach_to!(message)
+    document = message.documents.last
+    assert_equal @assistant, document.assistant, "The generated image should record the assistant that made it"
+
+    assert_no_difference("Document.count") do
+      delete settings_assistant_document_url(@assistant, document)
+    end
+
+    assert_response :not_found, "Only context files can be removed from the assistant's settings"
+  end
 end

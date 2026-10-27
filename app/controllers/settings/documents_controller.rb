@@ -12,7 +12,7 @@ class Settings::DocumentsController < Settings::ApplicationController
   end
 
   def destroy
-    @assistant.documents.find(params[:id]).destroy!
+    @assistant.context_documents.find(params[:id]).destroy!
     redirect_to edit_settings_assistant_path(@assistant), notice: I18n.t("app.flashes.documents.removed"), status: :see_other
   end
 
