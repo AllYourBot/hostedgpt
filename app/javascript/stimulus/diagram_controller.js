@@ -9,9 +9,10 @@ const RENDERED_DIAGRAMS_LIMIT = 25
 // Renders ```mermaid fences as diagram previews. The original <pre> is
 // moved intact (copy button included) into a "Diagram source" disclosure,
 // so nothing is ever destroyed: invalid syntax or a mid-stream partial
-// simply leaves readable source. Re-runs debounced on DOM mutations so
-// streamed Turbo updates preview once the fence closes. Finished diagrams
-// render once and are reused from a bounded source-keyed cache, because
+// simply leaves readable source. While a reply streams (the content div's
+// data-streaming flag) rendering holds off; the settle broadcast previews
+// once the fence closes. Finished diagrams render once and are reused
+// from a bounded source-keyed cache that re-keys on a theme flip, because
 // streamed broadcasts replace the message DOM and take any per-element
 // state with them.
 export default class extends Controller {
@@ -44,9 +45,9 @@ export default class extends Controller {
       if (!source || (!source.includes("\n") && !/-->|---/.test(source))) continue
       const id = `mermaid-${++renderCounter}`
       try {
+        this.load()
         let svg = renderedDiagrams.get(source)
         if (!svg) {
-          this.load()
           const result = await mermaid.render(id, source)
           svg = result.svg
           if (renderedDiagrams.size >= RENDERED_DIAGRAMS_LIMIT) {

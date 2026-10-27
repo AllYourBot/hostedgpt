@@ -37,6 +37,35 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     assert_equal 0, leftovers, "mermaid's failed-render artifacts must not linger outside the message"
   end
 
+  test "a cached diagram re-renders under the current theme after a flip" do
+    msg = find("#message_#{messages(:im_a_bot).id}")
+    assert msg.has_selector?(".mermaid-preview svg"), "the first render produced a preview"
+    first_id = msg.find(".mermaid-preview svg")[:id]
+
+    # Module-level mermaid state survives Turbo visits, so an in-app theme
+    # flip (settings turbo form, page never reloads) must re-key the cache.
+    # Choose the flip direction from the browser's preferred scheme so the
+    # effective mermaid theme definitely changes. Removing classes and
+    # clearing the render flags is itself the DOM mutation that schedules
+    # the next render pass.
+    if page.evaluate_script("matchMedia('(prefers-color-scheme: dark)').matches")
+      page.execute_script(
+        "document.documentElement.classList.remove('dark','system');" \
+        "document.body.classList.remove('dark','system')"
+      )
+    else
+      page.execute_script("document.documentElement.classList.add('dark'); document.body.classList.add('dark')")
+    end
+    page.execute_script(
+      "document.querySelectorAll('[data-diagram-rendered]').forEach(n => delete n.dataset.diagramRendered);" \
+      "document.querySelectorAll('.mermaid-preview').forEach(n => n.remove())"
+    )
+
+    fresh = page.find("#message_#{messages(:im_a_bot).id} .mermaid-preview svg", visible: :all, wait: 5)
+    assert_not_equal first_id, fresh[:id],
+      "a theme flip must evict the cache so cached diagrams re-render under the current theme"
+  end
+
   test "mid-stream broadcast leaves readable source and no flashing preview" do
     @stream_msg.update!(content_text: DIAGRAM_CONTENT)
     GetNextAIMessageJob.broadcast_updated_message(@stream_msg, thinking: true)
