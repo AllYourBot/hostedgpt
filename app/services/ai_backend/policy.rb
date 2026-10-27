@@ -1,6 +1,5 @@
 module AIBackend::Policy
-  # Strings, constantized lazily at call time — the same laziness
-  # APIService.sdk_backends preserves for the transport registry. Adding a
+  # Strings, constantized lazily at call time. Adding a
   # provider: add its policy class and an entry in this map.
   POLICY_CLASSES = {
     openai: "AIBackend::Policy::OpenAI",
@@ -25,10 +24,6 @@ module AIBackend::Policy
 
     def billing_url_for(identity)
       for_identity(identity)&.billing_url
-    end
-
-    def display_name_for(identity)
-      for_identity(identity)&.display_name || identity.to_s.humanize
     end
   end
 end

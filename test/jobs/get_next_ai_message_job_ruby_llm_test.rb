@@ -11,11 +11,9 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
   end
 
   test "populates the latest message from the assistant via RubyLLM" do
-    stub_features(use_ruby_llm: true) do
-      assert_no_difference "@conversation.messages.reload.length" do
-        TestClient::RubyLLM::Chat.stub :text, "Hello from RubyLLM" do
-          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-        end
+    assert_no_difference "@conversation.messages.reload.length" do
+      TestClient::RubyLLM::Chat.stub :text, "Hello from RubyLLM" do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       end
     end
 
@@ -23,36 +21,26 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
   end
 
   test "returns early if the message id was invalid" do
-    stub_features(use_ruby_llm: true) do
-      refute GetNextAIMessageJob.perform_now(@user.id, 0, @assistant.id)
-    end
+    refute GetNextAIMessageJob.perform_now(@user.id, 0, @assistant.id)
   end
 
   test "returns early if the assistant id was invalid" do
-    stub_features(use_ruby_llm: true) do
-      refute GetNextAIMessageJob.perform_now(@user.id, @message.id, 0)
-    end
+    refute GetNextAIMessageJob.perform_now(@user.id, @message.id, 0)
   end
 
   test "returns early if the message was already generated" do
     @message.update!(content_text: "Hello")
-    stub_features(use_ruby_llm: true) do
-      refute GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-    end
+    refute GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
   end
 
   test "returns early if the user has replied after this" do
     @conversation.messages.create! role: :user, content_text: "Ignore that, new question:", assistant: @assistant
-    stub_features(use_ruby_llm: true) do
-      refute GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-    end
+    refute GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
   end
 
   test "when API response is empty, a nice error message is displayed and the message is marked failed" do
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub :text, "" do
-        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      end
+    TestClient::RubyLLM::Chat.stub :text, "" do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
@@ -60,10 +48,8 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
   end
 
   test "when the connection drops mid-stream, the message is marked failed" do
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub_any_instance :generate, proc { |*| raise Faraday::ConnectionFailed, "connection reset by peer" } do
-        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      end
+    TestClient::RubyLLM::Chat.stub_any_instance :generate, proc { |*| raise Faraday::ConnectionFailed, "connection reset by peer" } do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     assert_includes @message.reload.content_text, "connection error"
@@ -71,10 +57,8 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
   end
 
   test "a message which generated successfully is not marked failed" do
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub :text, "Hello" do
-        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      end
+    TestClient::RubyLLM::Chat.stub :text, "Hello" do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     assert @message.reload.not_failed?
@@ -84,11 +68,9 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
 
   test "populates the latest message from the assistant via RubyLLM with anthropic driver" do
     @assistant.language_model.api_service.update!(driver: "anthropic")
-    stub_features(use_ruby_llm: true) do
-      assert_no_difference "@conversation.messages.reload.length" do
-        TestClient::RubyLLM::Chat.stub :text, "Hello from Claude via RubyLLM" do
-          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-        end
+    assert_no_difference "@conversation.messages.reload.length" do
+      TestClient::RubyLLM::Chat.stub :text, "Hello from Claude via RubyLLM" do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       end
     end
 
@@ -97,11 +79,9 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
 
   test "populates the latest message from the assistant via RubyLLM with gemini driver" do
     @assistant.language_model.api_service.update!(driver: "gemini")
-    stub_features(use_ruby_llm: true) do
-      assert_no_difference "@conversation.messages.reload.length" do
-        TestClient::RubyLLM::Chat.stub :text, "Hello from Gemini via RubyLLM" do
-          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-        end
+    assert_no_difference "@conversation.messages.reload.length" do
+      TestClient::RubyLLM::Chat.stub :text, "Hello from Gemini via RubyLLM" do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       end
     end
 
@@ -110,10 +90,8 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
 
   test "when API response is empty with anthropic driver, a nice error message is displayed" do
     @assistant.language_model.api_service.update!(driver: "anthropic")
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub :text, "" do
-        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      end
+    TestClient::RubyLLM::Chat.stub :text, "" do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
@@ -122,10 +100,8 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
 
   test "when API response is empty with gemini driver, a nice error message is displayed" do
     @assistant.language_model.api_service.update!(driver: "gemini")
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub :text, "" do
-        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-      end
+    TestClient::RubyLLM::Chat.stub :text, "" do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
     end
 
     assert_includes @conversation.latest_message_for_version(:latest).content_text, "a blank response"
@@ -138,11 +114,9 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     @assistant.language_model.update!(supports_tools: true)
 
     assert_difference "@conversation.messages.reload.length", 2 do
-      stub_features(use_ruby_llm: true) do
-        TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
-          TestClient::RubyLLM::Chat.stub :arguments, { name: "Keith" }.to_json do
-            assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-          end
+      TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+        TestClient::RubyLLM::Chat.stub :arguments, { name: "Keith" }.to_json do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
         end
       end
     end
@@ -165,29 +139,109 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     assert second_new_message.content_text.nil?
   end
 
+  test "the assistant's tool-call signature persists for replay on the follow-up request" do
+    @assistant.language_model.update!(supports_tools: true)
+
+    TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+      TestClient::RubyLLM::Chat.stub :arguments, { name: "Keith" }.to_json do
+        TestClient::RubyLLM::Chat.stub :thought_signature, "sig-gemini-42" do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+        end
+      end
+    end
+
+    assert_equal "sig-gemini-42", @message.reload.content_tool_calls.dig(0, :thought_signature),
+      "The signature must be persisted so it can be replayed on the follow-up request"
+  end
+
+  test "an image tool call attaches the generated image and redacts the base64 payload" do
+    @assistant.language_model.update!(supports_tools: true)
+
+    assert_difference "@conversation.messages.reload.length", 2 do
+      TestClient::RubyLLM::Chat.stub :function, "image_generate_an_image" do
+        TestClient::RubyLLM::Chat.stub :arguments, { image_generation_prompt: "A cartoon cat" }.to_json do
+          AIBackend::RubyLLM.stub :generate_image, { b64_json: "BASE64_IMAGE_PAYLOAD", model: "gpt-image-1", provider: "OpenAI" } do
+            assert_enqueued_with(job: GetNextAIMessageJob) do
+              assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+            end
+          end
+        end
+      end
+    end
+
+    tool_message, assistant_reply = @conversation.messages.reload.order(:index).last(2)
+    assert_equal "tool", tool_message.role
+    assert_includes tool_message.content_text, "prompt_given"
+    refute_includes tool_message.content_text, "BASE64_IMAGE_PAYLOAD" # the payload is redacted from the saved tool message
+
+    document = assistant_reply.documents.sole
+    assert_equal "generated.png", document.filename
+    assert_equal "image/png", document.file.content_type
+  end
+
+  test "several image tool calls in one turn attach every generated image to the reply" do
+    @assistant.language_model.update!(supports_tools: true)
+    tool_messages = %w[call_dog_1 call_dog_2].map do |tool_call_id|
+      {
+        role: "tool",
+        tool_call_id:,
+        content_tool_calls: { id: tool_call_id, function: { name: "image_generate_an_image", arguments: { image_generation_prompt: "A cartoon dog" } } },
+        content: { prompt_given: "A cartoon dog", json_of_generated_image: Base64.strict_encode64("PNG #{tool_call_id}") }.to_json,
+      }
+    end
+
+    TestClient::RubyLLM::Chat.stub :function, "image_generate_an_image" do
+      TestClient::RubyLLM::Chat.stub :arguments, { image_generation_prompt: "A cartoon dog" }.to_json do
+        AIBackend::RubyLLM.stub :get_tool_messages_by_calling, tool_messages do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id), "The job should finish"
+        end
+      end
+    end
+
+    assistant_reply = @conversation.messages.reload.order(:index).last
+    assert_equal ["PNG call_dog_1", "PNG call_dog_2"], assistant_reply.documents.map { |document| document.file.download }.sort, "Both generated images should be attached to the reply"
+  end
+
   test "a config error renders key_error_message and marks the message failed" do
-    stub_features(use_ruby_llm: true, default_llm_keys: false) do
+    stub_features(default_llm_keys: false) do
       @assistant.language_model.api_service.update!(token: "")
       assert_no_enqueued_jobs only: GetNextAIMessageJob do
         assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       end
     end
 
-    # The facts resolve through the identity's backend even though RubyLLM is
-    # dispatched, so the user sees OpenAI's copy, not the generic one.
-    assert_equal AIBackend::OpenAI.key_error_message, @message.reload.content_text
+    # The facts come from the identity's policy class (Policy::OpenAI), not the
+    # transport class, so the user sees OpenAI's copy, not the generic one.
+    assert_equal AIBackend::Policy::OpenAI.key_error_message, @message.reload.content_text
     assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
   end
 
-  test "a rate limit error renders the quota message with the identity's billing URL and marks the message failed" do
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub :error_to_raise, Faraday::TooManyRequestsError.new("quota exceeded") do
-        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+  test "a Groq identity conversation renders Groq's key error copy and marks the message failed" do
+    conversation = conversations(:hello_groq)
+    conversation.messages.create! role: :user, content_text: "Still there?", assistant: conversation.assistant
+    message = conversation.latest_message_for_version(:latest)
+
+    stub_features(default_llm_keys: false) do
+      conversation.assistant.language_model.api_service.update!(token: "")
+
+      assert_no_enqueued_jobs only: GetNextAIMessageJob do
+        assert GetNextAIMessageJob.perform_now(conversation.user.id, message.id, conversation.assistant.id)
       end
     end
 
-    # The dispatched transport is RubyLLM but the quota copy speaks for the
-    # service's identity: OpenAI's name and billing URL, not "RubyLLM" and nil.
+    # The facts come from the identity's policy class (Policy::Groq), not the transport.
+    assert_equal AIBackend::Policy::Groq.key_error_message, conversation.latest_message_for_version(:latest).content_text
+    assert message.reload.failed?, "The message should have been marked failed so a Retry button is offered"
+    assert_equal 0, message.input_token_count.to_i + message.output_token_count.to_i
+  end
+
+  test "a rate limit error renders the quota message with the identity's billing URL and marks the message failed" do
+    TestClient::RubyLLM::Chat.stub :error_to_raise, Faraday::TooManyRequestsError.new("quota exceeded") do
+      assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+    end
+
+    # The quota copy speaks for the service's identity (Policy::OpenAI), not the
+    # transport: OpenAI's name and billing URL, not "RubyLLM" and nil.
     assert_includes @message.reload.content_text, "a quota error"
     assert_includes @message.content_text, "You are using OpenAI so go here https://platform.openai.com/account/billing/overview"
     assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
@@ -198,11 +252,9 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     @assistant.language_model.update!(supports_thinking: true)
     thinking = ::RubyLLM::Thinking.build(text: "Let me work through this...", signature: "sig-abc")
 
-    stub_features(use_ruby_llm: true) do
-      TestClient::RubyLLM::Chat.stub :thinking, thinking do
-        TestClient::RubyLLM::Chat.stub :text, "The answer is 42." do
-          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
-        end
+    TestClient::RubyLLM::Chat.stub :thinking, thinking do
+      TestClient::RubyLLM::Chat.stub :text, "The answer is 42." do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
       end
     end
 

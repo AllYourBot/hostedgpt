@@ -7,21 +7,6 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     login_as @person
   end
 
-  test "preferences merge preserves unrelated keys when updating dark_mode" do
-    @user.preferences = { dark_mode: "light", feature: { use_ruby_llm: true } }
-    @user.save!
-
-    params = person_params
-    params["personable_attributes"]["dark_mode"] = "dark"
-
-    patch settings_person_url, params: { person: params }
-    assert_redirected_to edit_settings_person_url
-    @user.reload
-
-    assert_equal "dark", @user.dark_mode
-    assert_equal({ use_ruby_llm: true }, @user.preferences[:feature])
-  end
-
   test "should get edit with password field VISIBLE" do
     assert @user.password_credential.present?
     get edit_settings_person_url
@@ -199,7 +184,7 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
 
   test "updating dark_mode leaves nav_closed and feature opinions intact" do
     @user.update!(nav_closed: true)
-    @user.update!(preferences: @user.preferences.merge(feature: { openai_backend: "sdk" }))
+    @user.update!(preferences: @user.preferences.merge(feature: { some_custom_feature: "sdk" }))
 
     params = person_params
     params["personable_attributes"]["dark_mode"] = "dark"
@@ -211,47 +196,7 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     @user.reload
     assert_equal "dark", @user.dark_mode
     assert_equal true, @user.nav_closed
-    assert_equal "sdk", @user.preferences[:feature][:openai_backend]
-  end
-
-  test "stores and inherits backend choices without touching other preferences" do
-    @user.update!(dark_mode: "dark", nav_closed: true)
-
-    params = person_params
-    params["backend_choices"] = { "openai_ai_backend" => "ruby_llm", "gemini_ai_backend" => "", "openrouter_ai_backend" => "sdk" }
-
-    patch settings_person_url, params: { person: params }
-    assert_redirected_to edit_settings_person_url
-    assert_nil flash[:error]
-
-    @user.reload
-    assert_equal "ruby_llm", @user.features[:openai_ai_backend]
-    assert_nil @user.features[:gemini_ai_backend]
-    assert_equal "sdk", @user.features[:openrouter_ai_backend]
-    assert_equal true, @user.nav_closed
-    assert_equal "dark", @user.dark_mode
-  end
-
-  test "the settings form renders choice rows for every chat provider, all selectable" do
-    get edit_settings_person_url
-    assert_response :success
-
-    %w[openai anthropic groq openrouter gemini].each do |identity|
-      assert_select "input[type=radio][name='person[backend_choices][#{identity}_ai_backend]'][value='sdk']"
-      assert_select "input[type=radio][name='person[backend_choices][#{identity}_ai_backend]'][value='ruby_llm']:not([disabled])"
-    end
-    assert_select "input[type=radio][name='person[backend_choices][brave_ai_backend]']", count: 0
-  end
-
-  test "backend choice values outside the tri-state are rejected server-side" do
-    params = person_params
-    params["backend_choices"] = { "openai_ai_backend" => "bogus" }
-
-    patch settings_person_url, params: { person: params }
-    assert_redirected_to edit_settings_person_url
-
-    @user.reload
-    assert_nil @user.features[:openai_ai_backend]
+    assert_equal "sdk", @user.preferences[:feature][:some_custom_feature]
   end
 
   private

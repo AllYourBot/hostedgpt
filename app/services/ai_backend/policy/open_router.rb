@@ -1,6 +1,6 @@
 class AIBackend::Policy::OpenRouter < AIBackend::Policy::Base
-  # OpenRouter attributes requests to this app in its rankings. Both the SDK
-  # transport and the RubyLLM transport send these.
+  # OpenRouter attributes requests to this app in its rankings; these headers
+  # ride on every chat built for the openrouter identity.
   def self.attribution_headers
     { "HTTP-Referer" => Rails.application.config.x.app_url.to_s, "X-Title" => Setting.product_name.to_s }
   end
