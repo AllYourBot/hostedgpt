@@ -246,7 +246,7 @@ class AIBackend::RubyLLM < AIBackend
 
       thinking = chunk.respond_to?(:thinking) ? chunk.thinking : nil
       if thinking
-        @message.thinking_text = "#{@message.thinking_text}#{thinking.text}" if thinking.text.present?
+        @message.thinking_text = "#{@message.thinking_text}#{thinking.text}" if thinking.text
         @message.thinking_signature ||= thinking.signature.presence
         chunk_handler.call("") # lets the job broadcast the thinking so far and check for a cancel
       end

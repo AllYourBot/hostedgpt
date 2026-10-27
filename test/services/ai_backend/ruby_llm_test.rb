@@ -181,8 +181,35 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     handler.call(OpenStruct.new(content: "\n", tokens: nil), ->(c) { chunks << c })
     handler.call(OpenStruct.new(content: "puts 2", tokens: nil), ->(c) { chunks << c })
 
-    assert_equal ["puts", "\n", "puts 2"], chunks
-    assert_equal "puts\nputs 2", backend.instance_variable_get(:@stream_response_text)
+    assert_equal ["puts", "\n", "puts 2"], chunks,
+      "the transport must forward whitespace-only deltas to the broadcast"
+    assert_equal "puts\nputs 2", backend.instance_variable_get(:@stream_response_text),
+      "the accumulator must keep whitespace-only deltas or fences glue onto their first line"
+  end
+
+  test "stream_handler keeps whitespace-only thinking deltas" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    backend.instance_variable_set(:@stream_response_text, "")
+    handler = backend.send(:stream_handler)
+
+    chunks = []
+    handler.call(OpenStruct.new(content: nil, thinking: OpenStruct.new(text: "derive", tokens: nil), tokens: nil), ->(c) { chunks << c })
+    handler.call(OpenStruct.new(content: nil, thinking: OpenStruct.new(text: "\n", tokens: nil), tokens: nil), ->(c) { chunks << c })
+    handler.call(OpenStruct.new(content: nil, thinking: OpenStruct.new(text: "derive 2", tokens: nil), tokens: nil), ->(c) { chunks << c })
+
+    assert_equal ["", "", ""], chunks,
+      "thinking chunks broadcast nul the settle-checker but the text still accumulates"
+    assert_equal "derive\nderive 2", message.thinking_text,
+      "whitespace-only thinking deltas must accumulate or thinking paragraphs run together"
   end
 
   test "stream_handler captures token counts on first occurrence" do
