@@ -1,6 +1,6 @@
 require "test_helper"
 
-class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
+class GetNextAIMessageJobTest < ActiveJob::TestCase
   setup do
     @conversation = conversations(:greeting)
     @user = @conversation.user
@@ -8,7 +8,6 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     @assistant.language_model.update!(supports_tools: false)
     @conversation.messages.create! role: :user, content_text: "Are you still there?", assistant: @assistant
     @message = @conversation.latest_message_for_version(:latest)
-    @test_client = TestClient::OpenAI.new(access_token: "abc")
   end
 
   test "if a new message is created BEFORE job starts, it does not process" do
@@ -35,7 +34,7 @@ class GetNextAIMessageJobOpenaiTest < ActiveJob::TestCase
     false_on_first_run = 0
     job = GetNextAIMessageJob.new
     job.stub(:message_cancelled?, -> { false_on_first_run += 1; false_on_first_run != 1 }) do
-      TestClient::OpenAI.stub :text, "Hello" do
+      TestClient::RubyLLM::Chat.stub :text, "Hello" do
         assert_changes "@message.content_text", from: nil, to: "Hello" do
           assert_changes "@message.reload.cancelled_at", from: nil do
             assert job.perform(@user.id, @message.id, @assistant.id)

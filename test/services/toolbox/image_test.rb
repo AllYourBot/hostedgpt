@@ -8,7 +8,7 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
 
   test "generate_an_image asks the current backend and composes the payload" do
     Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
-      AIBackend::OpenAI.stub :generate_image, { b64_json: "BASE64_IMAGE_DATA", model: "gpt-image-1", provider: "OpenAI" } do
+      AIBackend::RubyLLM.stub :generate_image, { b64_json: "BASE64_IMAGE_DATA", model: "gpt-image-1", provider: "OpenAI" } do
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
         assert_equal @prompt, result[:prompt_given]
@@ -19,27 +19,9 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
     end
   end
 
-  test "flag off: dispatch routes through ai_backend to the SDK backend" do
-    stub_features(use_ruby_llm: false) do
-      Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
-        called = false
-        AIBackend::OpenAI.stub :generate_image, ->(prompt:, user:) {
-          called = true
-          { b64_json: "BASE64_IMAGE_DATA", model: "gpt-image-1", provider: "OpenAI" }
-        } do
-          result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
-
-          assert called, "With the flag off, AIBackend::OpenAI should generate the image"
-          assert_equal "BASE64_IMAGE_DATA", result[:json_of_generated_image], "The generated image data should come back to the job"
-          assert_equal "Image created by tool using OpenAI model gpt-image-1", result[:message_to_user], "The user should see which model made the image"
-        end
-      end
-    end
-  end
-
   test "the provider label follows the backend that actually generated the image" do
     Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
-      AIBackend::OpenAI.stub :generate_image, { b64_json: "BASE64_IMAGE_DATA", model: "acme-image-2", provider: "Acme" } do
+      AIBackend::RubyLLM.stub :generate_image, { b64_json: "BASE64_IMAGE_DATA", model: "acme-image-2", provider: "Acme" } do
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
         assert_equal "Image created by tool using Acme model acme-image-2", result[:message_to_user]
@@ -47,20 +29,20 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
     end
   end
 
-  test "generate_an_image works with an Anthropic assistant by delegating through its backend to OpenAI" do
+  test "generate_an_image works with an Anthropic assistant by dispatching through ai_backend to RubyLLM" do
     anthropic_message = messages(:image_generation_tool_call).dup
     anthropic_message.assistant = assistants(:keith_claude3)
 
     Current.set(user: users(:keith), message: anthropic_message) do
-      openai_received = nil
-      AIBackend::OpenAI.stub :generate_image, ->(prompt:, user:) {
-        openai_received = { prompt: prompt, user: user }
+      ruby_llm_received = nil
+      AIBackend::RubyLLM.stub :generate_image, ->(prompt:, user:) {
+        ruby_llm_received = { prompt: prompt, user: user }
         { b64_json: "BASE64_IMAGE_DATA_ANTHROPIC", model: "gpt-image-1", provider: "OpenAI" }
       } do
         result = @tool.generate_an_image(image_generation_prompt_s: @prompt)
 
-        assert_equal @prompt, openai_received[:prompt]
-        assert_equal users(:keith), openai_received[:user]
+        assert_equal @prompt, ruby_llm_received[:prompt]
+        assert_equal users(:keith), ruby_llm_received[:user]
         assert_equal "BASE64_IMAGE_DATA_ANTHROPIC", result[:json_of_generated_image]
       end
     end

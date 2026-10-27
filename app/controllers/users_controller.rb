@@ -61,6 +61,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(preferences: [:nav_closed, :dark_mode, feature: [:use_ruby_llm]])
+    params.require(:user).permit(preferences: [:nav_closed, :dark_mode])
   end
 end

@@ -1,5 +1,3 @@
-require "timeout"
-
 class AIBackend
   include Utilities, Tools
 
@@ -13,87 +11,11 @@ class AIBackend
     If the user asks for code or something long, summarize it in a sentence or two and offer to type out the details.
   TEXT
 
-  attr :client
-
-  def self.oneoff_timeout_seconds
-    30
-  end
-
-  def self.key_error_message
-    "(There is a configuration error with this API Service. Maybe you have an invalid API key? " +
-      "Click your Profile in the bottom left and then Settings and then **API Services**.)"
-  end
-
-  def self.billing_url
-  end
-
-  # New backends: override this to deny tool calls — a backend whose tool
-  # support is not yet proven should pin it to false.
-  def self.supports_tools?
-    true
-  end
-
   def initialize(user, assistant, conversation = nil, message = nil)
     @user = user
     @assistant = assistant
     @conversation = conversation
     @message = message # required for streaming responses
-    @client_config = {}
-    @response_handler = nil
-  end
-
-  def get_oneoff_message(instructions, messages, params = {}, json: false)
-    set_client_config(
-      instructions:,
-      messages: preceding_messages(messages),
-      params:,
-      json:,
-    )
-    response = Timeout.timeout(self.class.oneoff_timeout_seconds) do
-      @client.send(client_method_name, ** @client_config)
-    end
-
-    self.class.content_text(response) ||
-      response.dig("choices", 0, "message", "content")
-  end
-
-  # The text of an Anthropic-style response. Models that think by default can put
-  # a thinking block first, so this looks for the text block rather than taking the first one.
-  def self.content_text(response)
-    content = response["content"]
-    return nil unless content.is_a?(Array)
-
-    content.find { |block| block["type"] == "text" }&.dig("text")
-  end
-
-  def stream_next_conversation_message(&chunk_handler)
-    @stream_response_text = ""
-    @stream_response_tool_calls = []
-    @response_handler = block_given? ? stream_handler(&chunk_handler) : nil
-
-    set_client_config(
-      instructions: full_instructions,
-      messages: preceding_conversation_messages,
-      streaming: true,
-    )
-
-    begin
-      response = @client.send(client_method_name, ** @client_config)
-    rescue ::Faraday::UnauthorizedError
-      raise AIBackend::ConfigurationError
-    end
-
-    if @stream_response_tool_calls.present?
-      return format_parallel_tool_calls(@stream_response_tool_calls)
-    elsif @stream_response_text.blank?
-      raise ::Faraday::ParsingError
-    end
-  end
-
-  def self.test_client(url, token, api_name)
-    Rails.logger.info "Connecting to #{name.demodulize} API server at #{url} with access token of length #{token.to_s.length}"
-    Rails.logger.info "Testing using model #{api_name}"
-    client.new(uri_base: url, access_token: token)
   end
 
   def self.test_language_model(language_model, api_name = nil)
@@ -102,7 +24,7 @@ class AIBackend
     token = language_model.api_service.effective_token
     return "Error: API key (token) is blank" if language_model.api_service.requires_token? && token.blank?
 
-    test_execute(url, token, api_name)
+    test_execute(url, token, api_name, driver: language_model.api_service.driver)
   end
 
   def self.test_api_service(api_service, url = nil, token = nil)
@@ -117,37 +39,13 @@ class AIBackend
     # whichever language model happens to be first; walk newest-first until one answers.
     result = nil
     language_models.each do |language_model|
-      result = test_execute(url, token, language_model.api_name)
+      result = test_execute(url, token, language_model.api_name, driver: api_service.driver)
       break unless result.start_with?("Error:")
     end
     result
   end
 
-  # New backends: override this or accept OpenAI delegation — until a provider
-  # ships native image generation, OpenAI covers the capability for everyone.
-  def self.generate_image(prompt:, user:)
-    AIBackend::OpenAI.generate_image(prompt:, user:)
-  end
-
   private
-
-  def client_method_name
-    raise NotImplementedError
-  end
-
-  def set_client_config(config)
-    if config[:streaming] && @response_handler.nil?
-      raise "You configured streaming: true but did not define @response_handler"
-    end
-  end
-
-  def get_response
-    raise NotImplementedError
-  end
-
-  def stream_response
-    raise NotImplementedError
-  end
 
   def preceding_messages(messages = [])
     messages.map.with_index do |msg, i|
