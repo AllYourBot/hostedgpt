@@ -261,6 +261,30 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-role="retry"]', false
   end
 
+  test "index shows a continue button for the latest reply when it WAS CUT OFF at the token limit" do
+    latest_message = @conversation.latest_message_for_version(:latest)
+    latest_message.update! truncated_at: Time.current
+
+    get conversation_messages_url(@conversation, version: latest_message.version)
+    assert_select '[data-role="continue"]', 1, "The cut-off reply should offer Continue"
+    assert_select '[data-role="continue-button"]', 1, "The Continue button should be rendered"
+    assert_select '[data-role="retry"]', false, "A cut-off reply did not fail, so it should not offer Retry"
+  end
+
+  test "index shows no continue button for a cut-off reply which IS NO LONGER the latest message" do
+    latest_message = @conversation.latest_message_for_version(:latest)
+    latest_message.update! truncated_at: Time.current
+    @conversation.messages.create! role: :user, content_text: "Never mind", assistant: @assistant
+
+    get conversation_messages_url(@conversation, version: latest_message.version)
+    assert_select '[data-role="continue"]', false, "Continue only makes sense on the conversation's latest reply"
+  end
+
+  test "index shows no continue button for a reply which finished on its own" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select '[data-role="continue"]', false, "A complete reply should not offer Continue"
+  end
+
   test "without an app_url, index embeds only the thumbnails and leaves each modal image to load when opened" do
     conversation = conversations(:attachments)
     images = conversation.messages.flat_map(&:documents).select(&:has_image?)

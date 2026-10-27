@@ -243,6 +243,9 @@ en:
       retry:
         interrupted: "The response was interrupted."
         button: "Retry"
+      continue:
+        truncated: "The response reached its length limit."
+        button: "Continue"
       edit: "Edit"
       copy: "Copy"
       copied: "Copied!"

@@ -214,6 +214,9 @@ de:
       retry:
         interrupted: "Die Antwort wurde unterbrochen."
         button: "Erneut versuchen"
+      continue:
+        truncated: "Die Antwort hat ihre Längenbegrenzung erreicht."
+        button: "Weiter"
       edit: "Bearbeiten"
       copy: "Kopieren"
       copied: "Kopiert!"

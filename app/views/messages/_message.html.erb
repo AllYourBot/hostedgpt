@@ -185,6 +185,10 @@ end %>
           <%= render "messages/retry", message: message, failed: message.failed? %>
         <% end %>
 
+        <% if message.assistant? && message.assistant.not_deleted? && message.truncated? && last_message %>
+          <%= render "messages/continue", message: message %>
+        <% end %>
+
         <% if debug_tool_message && message.content_tool_calls.present? %>
           <div
             data-role="content-text"
