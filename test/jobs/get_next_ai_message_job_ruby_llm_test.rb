@@ -64,6 +64,30 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     assert @message.reload.not_failed?
   end
 
+  test "a reply cut off at the output token limit is saved and marked truncated" do
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :text, "The first half of a long answer" do
+        TestClient::RubyLLM::Chat.stub :finish_reason, :max_tokens do
+          assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+        end
+      end
+    end
+
+    assert_equal "The first half of a long answer", @message.reload.content_text, "The partial reply should still be saved"
+    assert @message.truncated?, "The message should have been marked truncated so a Continue button is offered"
+    assert @message.not_failed?, "A truncated reply is not a failure, so it should not offer Retry"
+  end
+
+  test "a reply which finished on its own is not marked truncated" do
+    stub_features(use_ruby_llm: true) do
+      TestClient::RubyLLM::Chat.stub :text, "Hello" do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)
+      end
+    end
+
+    assert @message.reload.not_truncated?, "A reply which ended normally should not offer Continue"
+  end
+
   # Phase 3 — Anthropic + Gemini/Groq text chat
 
   test "populates the latest message from the assistant via RubyLLM with anthropic driver" do

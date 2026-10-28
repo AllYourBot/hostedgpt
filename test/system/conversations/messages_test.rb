@@ -94,6 +94,21 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_current_path conversation_messages_path(@conversation, version: 2)
   end
 
+  test "a reply cut off at the token limit shows a continue button which asks the assistant to keep going" do
+    latest_message.update! truncated_at: Time.current
+    visit_and_scroll_wait conversation_messages_path(@conversation)
+
+    continue_button = last_message.find_role("continue-button")
+    assert continue_button.visible?, "A cut-off reply should offer Continue without having to hover it"
+
+    continue_button.click
+
+    assert_true "Continue should send a follow-up message asking the assistant to keep going" do
+      find_messages[-2].text.include?("Continue")
+    end
+    assert_selector "[data-role='continue']", count: 0
+  end
+
   test "a stalled response shows a retry button once the stream goes quiet" do
     ask_a_question # the assistant's reply is created blank and is never filled in
     visit_and_scroll_wait conversation_messages_path(@conversation)

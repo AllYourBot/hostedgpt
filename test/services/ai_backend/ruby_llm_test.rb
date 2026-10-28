@@ -89,6 +89,44 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     end
   end
 
+  test "stream_next_conversation_message marks the message truncated when the reply stops at the output token limit" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "A long answer that stops" do
+      TestClient::RubyLLM::Chat.stub :finish_reason, :max_tokens do
+        backend.stream_next_conversation_message { |c| }
+      end
+    end
+
+    assert message.truncated?, "A reply stopped by the token limit should be marked truncated"
+  end
+
+  test "stream_next_conversation_message leaves a reply which stopped on its own untruncated" do
+    @assistant.language_model.update!(supports_tools: false)
+    message = @conversation.messages.create!(
+      role: :assistant,
+      content_text: nil,
+      assistant: @assistant,
+      index: @conversation.messages.maximum(:index).to_i + 1,
+      version: :latest
+    )
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "A complete answer" do
+      backend.stream_next_conversation_message { |c| }
+    end
+
+    assert message.not_truncated?, "A reply which ended normally should not be marked truncated"
+  end
+
   test "stream_handler accumulates multiple chunks and captures tokens" do
     @assistant.language_model.update!(supports_tools: false)
     message = @conversation.messages.create!(

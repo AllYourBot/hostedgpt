@@ -58,7 +58,7 @@ module TestClient
 
         response = self.class.api_streaming_response
         block&.call(response) if response.content.present?
-        message_double(content: response.content, tool_calls: nil)
+        message_double(content: response.content, tool_calls: nil, finish_reason: self.class.finish_reason)
       end
 
       def complete(&block)
@@ -95,13 +95,13 @@ module TestClient
             thought_signature: self.class.thought_signature
           )
         end
-        message = message_double(content: nil, tool_calls: tool_calls.to_h { |tc| [tc.id, tc] })
+        message = message_double(content: nil, tool_calls: tool_calls.to_h { |tc| [tc.id, tc] }, finish_reason: :tool_calls)
         @messages << message
         message
       end
 
-      def message_double(content:, tool_calls:)
-        OpenStruct.new(role: :assistant, content:, tool_calls:)
+      def message_double(content:, tool_calls:, finish_reason:)
+        OpenStruct.new(role: :assistant, content:, tool_calls:, finish_reason:, max_tokens?: finish_reason == :max_tokens)
       end
 
       def self.api_oneoff_response
@@ -161,6 +161,12 @@ module TestClient
 
       def self.blank_response
         false
+      end
+
+      # Why the model stopped; :max_tokens means it hit its output token limit.
+      # Stub this to simulate a reply cut off at that limit.
+      def self.finish_reason
+        :stop
       end
 
       def self.error_to_raise

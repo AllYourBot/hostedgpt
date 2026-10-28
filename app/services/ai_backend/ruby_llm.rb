@@ -222,6 +222,10 @@ class AIBackend::RubyLLM < AIBackend
     return format_tool_calls(tool_calls) if tool_calls.present?
 
     raise ::Faraday::ParsingError if @stream_response_text.blank?
+
+    # The provider stopped at its output token limit, so the reply ends mid-thought
+    # and the view offers a Continue button.
+    @message.truncated_at = Time.current if response.max_tokens?
     nil
   end
 
