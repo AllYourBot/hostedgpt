@@ -32,7 +32,7 @@ class AIBackend::RubyLLM::SpeechTest < ActiveSupport::TestCase
     assert_equal WavAudio.from_pcm("PCM"), audio
     call = TestClient::RubyLLM::ContextDouble.last_speak_call
     assert_equal "Hello there", call[:text]
-    assert_equal AIBackend::RubyLLM::GEMINI_SPEECH_MODEL, call[:kwargs][:model]
+    assert_equal "gemini-3.8-flash-tts", call[:kwargs][:model]
     assert_equal :gemini, call[:kwargs][:provider]
     assert_equal api_services(:keith_gemini_service).effective_token, call[:gemini_api_key]
     assert_nil call[:openai_api_key]

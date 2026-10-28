@@ -7,7 +7,7 @@ class AIBackend::RubyLLM < AIBackend
   IMAGE_MODEL = "gpt-image-2.5-flare"
   SPEECH_MODEL = "tts-1"
   SPEECH_VOICE = "nova"
-  GEMINI_SPEECH_MODEL = "gemini-3.1-flash-tts-preview"
+  GEMINI_SPEECH_MODEL = "gemini-3.8-flash-tts"
   GEMINI_SPEECH_VOICE = "Kore"
 
   # "high" is the API's own default effort. Thinking counts toward max_tokens, so
