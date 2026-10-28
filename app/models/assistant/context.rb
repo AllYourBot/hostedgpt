@@ -10,15 +10,17 @@ module Assistant::Context
     context_documents.select { |document| natively_readable?(document) }
   end
 
+  # The files uploaded on the assistant's settings page. Documents that belong to a message, like the
+  # images the assistant generates in a conversation, also record the assistant but are not context.
+  def context_documents
+    documents.where(message: nil).order(:created_at)
+  end
+
   def natively_readable?(document)
     (document.has_image? && supports_images?) || (document.has_document_pdf? && supports_pdf?)
   end
 
   private
-
-  def context_documents
-    documents.order(:created_at)
-  end
 
   def context_files_section
     files = context_documents.reject { |document| natively_readable?(document) }.filter_map do |document|

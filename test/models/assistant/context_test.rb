@@ -66,6 +66,18 @@ class Assistant::ContextTest < ActiveSupport::TestCase
     assert_equal [image, pdf], @assistant.context_attachments, "Text files stay in the prompt; images and PDFs are attached in upload order"
   end
 
+  test "context_documents leaves out the images the assistant generated in its conversations" do
+    @assistant.language_model.update!(supports_images: true)
+    image = attach "cat.png", "image/png"
+    message = messages(:image_generation_explained)
+    GeneratedImage.new(Base64.strict_encode64(file_fixture("cat.png").binread)).attach_to!(message)
+    assert_equal @assistant, message.documents.last.assistant, "The generated image should still record the assistant that made it"
+
+    assert_equal [documents(:background), image], @assistant.context_documents, "Only the files uploaded as context should be listed"
+    assert_equal [image], @assistant.context_attachments, "A generated image should not be attached to every new conversation"
+    refute_includes @assistant.context_prompt, "generated.png", "A generated image should not be named as context"
+  end
+
   private
 
   def attach(filename, content_type)

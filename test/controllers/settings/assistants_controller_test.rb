@@ -123,6 +123,20 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input#assistant_conversation_starters_1:not([value])", { count: 1 }, "The fields past the saved starters should be empty"
   end
 
+  test "edit should list the context files but NOT the images the assistant generated in its conversations" do
+    message = messages(:image_generation_explained)
+    GeneratedImage.new(Base64.strict_encode64(file_fixture("cat.png").binread)).attach_to!(message)
+    generated_image = message.documents.last
+    assert_equal @assistant, generated_image.assistant, "The generated image should record the assistant that made it"
+
+    get edit_settings_assistant_url(@assistant)
+    assert_response :success
+
+    assert_select "#context li", { count: 1 }, "Only the uploaded context file should be listed"
+    assert_select "#context li#document_#{documents(:background).id}", { count: 1 }, "The uploaded context file should be listed"
+    assert_select "#context li#document_#{generated_image.id}", { count: 0 }, "The generated image should not be listed as a context file"
+  end
+
   test "destroy should soft-delete assistant" do
     assert_difference "Assistant.count", 0 do
       delete settings_assistant_url(@assistant)
