@@ -188,14 +188,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
   end
 
   test "stream_handler keeps whitespace-only thinking deltas" do
-    @assistant.language_model.update!(supports_tools: false)
-    message = @conversation.messages.create!(
-      role: :assistant,
-      content_text: nil,
-      assistant: @assistant,
-      index: @conversation.messages.maximum(:index).to_i + 1,
-      version: :latest
-    )
+    message = thinking_message
 
     backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
     backend.instance_variable_set(:@stream_response_text, "")
@@ -207,7 +200,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     handler.call(OpenStruct.new(content: nil, thinking: OpenStruct.new(text: "derive 2", tokens: nil), tokens: nil), ->(c) { chunks << c })
 
     assert_equal ["", "", ""], chunks,
-      "thinking chunks broadcast nul the settle-checker but the text still accumulates"
+      "each thinking chunk broadcasts an empty string while its text accumulates"
     assert_equal "derive\nderive 2", message.thinking_text,
       "whitespace-only thinking deltas must accumulate or thinking paragraphs run together"
   end

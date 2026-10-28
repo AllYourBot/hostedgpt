@@ -12,9 +12,10 @@ const RENDERED_DIAGRAMS_LIMIT = 25
 // simply leaves readable source. While a reply streams (the content div's
 // data-streaming flag) rendering holds off; the settle broadcast previews
 // once the fence closes. Finished diagrams render once and are reused
-// from a bounded source-keyed cache that re-keys on a theme flip, because
-// streamed broadcasts replace the message DOM and take any per-element
-// state with them.
+// from a bounded source-keyed cache; every render pass checks the current
+// theme and, after a mid-session flip (module state survives Turbo
+// visits), re-initializes mermaid and clears the cache so cached diagrams
+// re-render under the new theme.
 export default class extends Controller {
   connect() {
     this.scheduleRender()

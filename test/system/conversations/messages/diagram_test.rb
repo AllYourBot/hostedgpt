@@ -27,12 +27,16 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     msg.assert_no_selector(".mermaid-preview svg")
     assert_includes msg.text, "not a diagram", "the broken fence stays as readable source"
 
-    # Out of the render window itself (debounce + first mermaid warm-up):
-    # any mermaid error artifacts would still be in the DOM now and the
-    # catch-side cleanup removes them.
-    sleep 1.5
+    # Out of the failed-render window (debounce + first mermaid warm-up):
+    # mermaid's temp wrapper (a direct body child) and the message-scoped
+    # error svg would still be in the DOM now if the catch-path cleanup
+    # missed them. Direct-body-child scoping keeps valid preview svgs on
+    # other messages out of this count.
+    sleep 2.5
+    message_scope = "#message_#{messages(:im_a_bot).id}"
     leftovers = page.evaluate_script(
-      "document.querySelectorAll(\"div[id^='dmermaid-'], svg[id^='mermaid-']\").length"
+      "document.querySelectorAll(\"body > div[id^='dmermaid-']\").length" \
+      " + document.querySelectorAll(\"#{message_scope} .mermaid-preview svg\").length"
     )
     assert_equal 0, leftovers, "mermaid's failed-render artifacts must not linger outside the message"
   end
@@ -45,9 +49,10 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     # Module-level mermaid state survives Turbo visits, so an in-app theme
     # flip (settings turbo form, page never reloads) must re-key the cache.
     # Choose the flip direction from the browser's preferred scheme so the
-    # effective mermaid theme definitely changes. Removing classes and
-    # clearing the render flags is itself the DOM mutation that schedules
-    # the next render pass.
+    # effective mermaid theme definitely changes. The preview-removal below
+    # is the actual DOM mutation the observer sees (attribute and flag
+    # changes are unobserved); it schedules a fresh theme-checked render
+    # pass, which must mint a new svg id instead of reusing the cached one.
     if page.evaluate_script("matchMedia('(prefers-color-scheme: dark)').matches")
       page.execute_script(
         "document.documentElement.classList.remove('dark','system');" \
