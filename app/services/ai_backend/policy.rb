@@ -6,6 +6,7 @@ module AIBackend::Policy
     anthropic: "AIBackend::Policy::Anthropic",
     groq: "AIBackend::Policy::Groq",
     openrouter: "AIBackend::Policy::OpenRouter",
+    cheaper_inference: "AIBackend::Policy::CheaperInference",
     gemini: "AIBackend::Policy::Gemini",
   }.freeze
 

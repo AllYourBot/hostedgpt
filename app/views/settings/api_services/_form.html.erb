@@ -111,6 +111,21 @@
       <li><%= t('app.settings.api_services.instructions.openrouter.step3_html', name: Setting.product_name) %></li>
       <%= instruction_step "openrouter.step4_html", t("app.settings.api_services.instructions.take_me_to_billing"), "https://openrouter.ai/credits" %>
     </ol>
+    <ol id="cheaper-inference-instructions"
+      data-transition-target="<%= cheaper_inference?(api_service) && 'transitionable' %>"
+      class="
+        list-decimal
+        my-3 p-2 pl-8
+        border border-gray-200
+        bg-gray-50 dark:bg-transparent
+        hidden
+      "
+    >
+      <%= instruction_step "cheaper_inference.step1_html", "Cheaper Inference", "https://cheaperinference.com/" %>
+      <%= instruction_step "cheaper_inference.step2_html", t("app.settings.api_services.instructions.cheaper_inference.docs"), "https://cheaperinference.com/docs" %>
+      <li><%= t('app.settings.api_services.instructions.cheaper_inference.step3_html', name: Setting.product_name) %></li>
+      <li><%= t("app.settings.api_services.instructions.cheaper_inference.step4") %></li>
+    </ol>
     <ol id="gemini-instructions"
       data-transition-target="<%= gemini?(api_service) && "transitionable" %>"
       class="

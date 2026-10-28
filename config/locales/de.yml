@@ -55,6 +55,12 @@ de:
             step2_html: "Klicken Sie links auf \"Keys\" (oder %{link})."
             step3_html: "Klicken Sie auf \"Create Key\", benennen Sie ihn zum Beispiel \"%{name}\" und fügen Sie ihn unten ein."
             step4_html: "Fügen Sie Ihrem Konto Guthaben hinzu, indem Sie auf \"Credits\" klicken (oder %{link}). OpenRouter verwendet ein Guthabensystem, kein Abonnement."
+          cheaper_inference:
+            docs: "Dokumentation"
+            step1_html: "Erstellen Sie ein Konto auf %{link} und melden Sie sich an."
+            step2_html: "Erstellen Sie einen API-Schlüssel (Hilfe finden Sie in der %{link})."
+            step3_html: "Benennen Sie ihn zum Beispiel \"%{name}\" und fügen Sie ihn unten ein. Schlüssel beginnen mit \"ci_live_\"."
+            step4: "Laden Sie Guthaben auf Ihr Konto. Cheaper Inference verwendet ein Prepaid-Guthaben, kein Abonnement."
           gemini:
             step1: "Stellen Sie sicher, dass Sie ein Google-/Gmail-Konto haben und angemeldet sind."
             step2_html: "Besuchen Sie %{link}."

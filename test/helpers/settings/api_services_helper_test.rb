@@ -33,6 +33,19 @@ class Settings::APIServicesHelperTest < ActionView::TestCase
     refute openrouter?(api_services(:keith_groq_service))
   end
 
+  test "cheaper inference is official" do
+    assert official?(api_services(:keith_cheaper_inference_service))
+  end
+
+  test "cheaper_inference? is true for Cheaper Inference URL" do
+    assert cheaper_inference?(api_services(:keith_cheaper_inference_service))
+  end
+
+  test "cheaper_inference? is false for other URLs" do
+    refute cheaper_inference?(api_services(:keith_openai_service))
+    refute cheaper_inference?(api_services(:keith_openrouter_service))
+  end
+
   test "instruction_step renders a translated step whose link opens in a new tab" do
     html = instruction_step("openai.step1_html", "Platform", "https://platform.openai.com/")
     assert html.start_with?("<li>"), "the step should be a list item"

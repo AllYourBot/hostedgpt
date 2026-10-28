@@ -41,7 +41,7 @@ class AIBackend::RubyLLM < AIBackend
 
   # Error details name the model and include a redacted body excerpt so failures are diagnosable.
   ERROR_BODY_EXCERPT_LENGTH = 200
-  API_KEY_LIKE = /(sk-|gsk_|gsk-|AIza)[\w\-]+/.freeze
+  API_KEY_LIKE = /(sk-|gsk_|gsk-|AIza|ci_live_)[\w\-]+/.freeze
 
   def self.error_detail(error, model:)
     detail = +"model: #{model}"

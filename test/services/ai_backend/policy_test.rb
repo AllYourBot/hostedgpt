@@ -4,8 +4,8 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
   # The policy registry is the sole owner of provider facts; the copy and URL
   # assertions below characterize the exact strings users see.
 
-  test "the registry lists the five chat provider identities" do
-    assert_equal [:openai, :anthropic, :groq, :openrouter, :gemini], AIBackend::Policy.chat_provider_identities
+  test "the registry lists the six chat provider identities" do
+    assert_equal [:openai, :anthropic, :groq, :openrouter, :cheaper_inference, :gemini], AIBackend::Policy.chat_provider_identities
   end
 
   test "APIService.chat_provider_identities re-bases on the registry, brave excluded" do
@@ -39,6 +39,11 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
         "left and then Settings and then **API Services**. You will find OpenRouter Key instructions.)",
       api_services(:keith_openrouter_service).key_error_message
     )
+    assert_equal(
+      "(You need to enter a valid API key for Cheaper Inference to use its models. Click your Profile in the bottom " +
+        "left and then Settings and then **API Services**. You will find Cheaper Inference Key instructions.)",
+      api_services(:keith_cheaper_inference_service).key_error_message
+    )
   end
 
   BASE_KEY_ERROR_MESSAGE = "(There is a configuration error with this API Service. Maybe you have an invalid API key? " +
@@ -58,6 +63,7 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
     assert_equal "https://aistudio.google.com/app/apikey", api_services(:keith_gemini_service).billing_url
     assert_equal "https://console.groq.com/keys", api_services(:keith_groq_service).billing_url
     assert_equal "https://openrouter.ai/credits", api_services(:keith_openrouter_service).billing_url
+    assert_equal "https://cheaperinference.com/", api_services(:keith_cheaper_inference_service).billing_url
     assert_nil api_services(:keith_brave_service).billing_url
   end
 
@@ -73,6 +79,7 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
     assert AIBackend::Policy::Anthropic.supports_tools?
     assert AIBackend::Policy::Gemini.supports_tools?
     assert AIBackend::Policy::OpenRouter.supports_tools?
+    assert AIBackend::Policy::CheaperInference.supports_tools?
   end
 
   test "LanguageModel#supports_tools? reads the identity's policy" do
@@ -118,6 +125,15 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
     assert_not_includes detail, "AIzaABCDEF123xyz"
     assert_includes detail, "gsk_#{ "*" * 40 }"
     assert_includes detail, "AIza#{ "*" * 40 }"
+  end
+
+  test "error_detail redacts Cheaper Inference key shapes too" do
+    error = ::RubyLLM::UnauthorizedError.new("Unauthorized", response: Faraday::Response.new(status: 401, body: "denied ci_live_ABCDEF123xyz"))
+
+    detail = AIBackend::RubyLLM.error_detail(error, model: "m")
+
+    assert_not_includes detail, "ci_live_ABCDEF123xyz"
+    assert_includes detail, "ci_live_#{ "*" * 40 }"
   end
 
   test "error_detail names the model even when the error carries no response" do
