@@ -21,6 +21,15 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "index puts a New Assistant link beside the Assistants heading in the nav column" do
+    stub_features(assistants_page: true) do
+      get assistants_url
+    end
+    assert_response :success
+    assert_select "a[href=?]", assistants_path, { text: I18n.t("app.navigation.assistants") }, "The Assistants heading should still link to the assistants page"
+    assert_select "a[data-role='new-assistant'][href=?] [data-tip=?]", new_settings_assistant_path, I18n.t("app.settings.assistants.menu.new"), { count: 1 }, "The Assistants heading should have a pencil icon that opens the New Assistant page"
+  end
+
   test "index redirects to conversation on a mobile device even if assistants_page is enabled" do
     stub_features(assistants_page: true) do
       get assistants_url, headers: { "User-Agent" => "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1" }

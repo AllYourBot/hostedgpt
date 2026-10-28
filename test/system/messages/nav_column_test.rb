@@ -36,6 +36,22 @@ class NavColumnTest < ApplicationSystemTestCase
     end
   end
 
+  test "hovering the Assistants heading shows a pencil that opens the New Assistant page" do
+    with_assistants_page(true) do
+      login_as @user
+      visit root_url
+      assert_current_path root_path
+
+      pencil = find("#nav-scrollable a[data-role='new-assistant']", visible: :all)
+      refute pencil.find(".icon", visible: :all).visible?, "The pencil should stay hidden until the Assistants heading is hovered"
+
+      find_link(I18n.t("app.navigation.assistants")).hover
+      assert_shows_tooltip pencil, I18n.t("app.settings.assistants.menu.new")
+      click_element pencil
+      assert_current_path new_settings_assistant_path
+    end
+  end
+
   test "clicking conversations in the left side updates the right column and path when assistants page is enabled" do
     with_assistants_page(true) do
       assistant = @user.assistants.ordered.first

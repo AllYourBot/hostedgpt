@@ -1,16 +1,26 @@
 <% if Feature.assistants_page? && !mobile_device? %>
   <div class="sticky top-0 pt-2 z-40 bg-gray-50 dark:bg-gray-900">
-    <%= link_to assistants_path,
-      class: %|
-        flex
-        mb-1 p-1 pl-2 pr-2 mr-5
-        rounded-lg
-        text-sm
-        hover:bg-gray-100 dark:hover:bg-gray-700
-      | do %>
-      <%= image_tag "logo.svg", width: 24, height: 24, alt: "", class: "dark:invert" %>
-      <span class="ml-2 font-semibold"><%= t("app.navigation.assistants") %></span>
-    <% end %>
+    <div class="
+      flex items-center
+      mb-1 pl-2 pr-2 mr-5
+      rounded-lg
+      text-sm
+      hover:bg-gray-100 dark:hover:bg-gray-700
+      group
+    ">
+      <%= link_to assistants_path, class: "flex-1 flex py-1" do %>
+        <%= image_tag "logo.svg", width: 24, height: 24, alt: "", class: "dark:invert" %>
+        <span class="ml-2 font-semibold"><%= t("app.navigation.assistants") %></span>
+      <% end %>
+      <%= link_to new_settings_assistant_path, class: "inline-flex", data: { role: "new-assistant" } do %>
+        <%= icon "pencil-square",
+          variant: :outline,
+          size: 18,
+          class: "text-gray-950 dark:text-gray-100 cursor-pointer invisible group-hover:visible group-focus-within:visible",
+          title: t("app.settings.assistants.menu.new")
+        %>
+      <% end %>
+    </div>
   </div>
 <% end %>
 
