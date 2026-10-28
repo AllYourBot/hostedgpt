@@ -47,7 +47,7 @@ en:
         table:
           name: "Name"
           url: "URL"
-          service_type: "Service Type"
+          service_type: "Type"
           driver: "Driver"
         new_title: "New API Service"
         back: "Back"

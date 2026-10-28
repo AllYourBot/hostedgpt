@@ -5,6 +5,7 @@ class APIService < ApplicationRecord
   URL_OPENROUTER = "https://openrouter.ai/api/v1/"
   URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/"
   URL_BRAVE = "https://api.search.brave.com/res/v1/"
+  SERVICE_TYPES = %w[AI Search Other].freeze
 
   belongs_to :user
 
@@ -14,6 +15,7 @@ class APIService < ApplicationRecord
 
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
   validates :name, :url, presence: true
+  validates :service_type, inclusion: { in: SERVICE_TYPES }
 
   before_validation :set_type
 
@@ -125,6 +127,8 @@ class APIService < ApplicationRecord
   private
 
   def set_type
+    return if service_type.present?
+
     self.service_type = url == URL_BRAVE ? "Search" : "AI"
   end
 

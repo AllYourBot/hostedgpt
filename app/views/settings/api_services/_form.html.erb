@@ -4,6 +4,22 @@
   <%= labeled_text_field form, :name, t("app.settings.api_services.table.name") %>
 
   <div class="my-5">
+    <%= form.label :service_type, t("app.settings.api_services.table.service_type") %>
+    <%= form.select :service_type,
+      APIService::SERVICE_TYPES,
+      {},
+      class: %|
+        block
+        border border-gray-200 outline-none
+        shadow rounded-md
+        px-3 py-2 mt-2
+        w-full
+        dark:text-black
+      |
+    %>
+  </div>
+
+  <div class="my-5">
     <%= form.label :driver, t("app.settings.api_services.table.driver") %>
     <%= form.select :driver,
       APIService.drivers.keys,
