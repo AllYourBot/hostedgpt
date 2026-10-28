@@ -41,6 +41,12 @@
         } do %>
       <%= render partial: "layouts/assistant_avatar", locals: { assistant:, size: 7, classes: "mr-2" } %>
       <%= assistant.name %>
+      <% if assistant.context_documents.any? %>
+        <% context_files = t("app.assistants.ui.context_files") %>
+        <span class="ml-1.5 flex-shrink-0 text-gray-500 dark:text-gray-400" role="img" aria-label="<%= context_files %>" title="<%= context_files %>" data-role="context-files">
+          <%= icon "book-open", variant: :micro %>
+        </span>
+      <% end %>
     <% end %>
     <div class="hidden self-stretch items-center gap-3 pl-2 relationship:flex group-hover:flex group-focus-within:flex">
       <% if settings %>
