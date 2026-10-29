@@ -317,6 +317,7 @@ en:
         new: "New"
         more: "More"
         show_all: "Show All"
+        context_files: "Context files are added to every conversation"
     conversations:
       editing_title: "Editing conversation"
       show_title: "Show this conversation"

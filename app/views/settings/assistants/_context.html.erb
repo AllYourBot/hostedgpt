@@ -1,5 +1,8 @@
 <div class="my-5" id="context">
-  <h2 class="font-medium"><%= t("app.settings.assistants.context.title") %></h2>
+  <h2 class="font-medium flex items-center gap-1">
+    <%= t("app.settings.assistants.context.title") %>
+    <%= icon "paper-clip", variant: :micro %>
+  </h2>
   <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t("app.settings.assistants.context.hint") %></p>
 
   <% if assistant.context_documents.any? %>

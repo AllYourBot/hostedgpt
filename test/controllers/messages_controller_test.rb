@@ -28,6 +28,26 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "new should mark the assistants that HAVE context files in the nav column" do
+    get new_assistant_message_url(@assistant)
+    assert_response :success
+
+    assert_select "#assistant_#{assistants(:samantha).id} [data-role='context-files'][title=?]", I18n.t("app.assistants.ui.context_files"), { count: 1 },
+      "The assistant with an uploaded context file should show the context files icon"
+    assert_select "#assistants [data-role='context-files']", { count: 1 }, "Assistants without context files should not show the icon"
+  end
+
+  test "new should NOT mark an assistant whose only documents are the images it generated" do
+    documents(:background).destroy!
+    GeneratedImage.new(Base64.strict_encode64(file_fixture("cat.png").binread)).attach_to!(messages(:image_generation_explained))
+    assert_equal assistants(:samantha), messages(:image_generation_explained).documents.last.assistant, "The generated image should record the assistant that made it"
+
+    get new_assistant_message_url(@assistant)
+    assert_response :success
+
+    assert_select "#assistants [data-role='context-files']", { count: 0 }, "A generated image is not a context file, so no assistant should show the icon"
+  end
+
   test "should show message" do
     get message_url(@message)
     assert_response :success

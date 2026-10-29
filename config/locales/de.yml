@@ -288,6 +288,7 @@ de:
         new: "Neu"
         more: "Mehr"
         show_all: "Alle anzeigen"
+        context_files: "Kontextdateien werden jeder Unterhaltung hinzugefügt"
     conversations:
       editing_title: "Konversation bearbeiten"
       show_title: "Diese Konversation anzeigen"
