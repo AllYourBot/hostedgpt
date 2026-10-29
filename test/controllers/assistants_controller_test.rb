@@ -27,7 +27,7 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :success
     assert_select "a[href=?]", assistants_path, { text: I18n.t("app.navigation.assistants") }, "The Assistants heading should still link to the assistants page"
-    assert_select "a[data-role='new-assistant'][href=?] [data-tip=?]", new_settings_assistant_path, I18n.t("app.settings.assistants.menu.new"), { count: 1 }, "The Assistants heading should have a pencil icon that opens the New Assistant page"
+    assert_select "a[data-role='new-assistant'][href=?] [data-tip=?]", new_settings_assistant_path, I18n.t("app.settings.assistants.menu.new"), { count: 1 }, "The Assistants heading should have a plus icon that opens the New Assistant page"
   end
 
   test "index redirects to conversation on a mobile device even if assistants_page is enabled" do
