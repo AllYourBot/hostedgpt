@@ -2,9 +2,10 @@ class Toolbox::GoogleTasks < Toolbox
   include GoogleApp, APIHelpers
   include ActionView::Helpers::DateHelper
 
-  # This Tool assumes you have two special Google Tasks lists: "My Tasks" and "Snoozed". You may have any other additional lists. When a task
-  # from My Tasks gets a future due date set, it's automatically moved to Snoozed and it will come back to My Tasks on that date. Tasks on any
-  # other lists will always stay on that list regardless of the due date set.
+  # This Tool assumes you have a Google Tasks list named "My Tasks" and optionally one named "Snoozed". You may have any other additional lists.
+  # If you have a Snoozed list, when a task from My Tasks gets a future due date set, it's automatically moved to Snoozed and it will come back
+  # to My Tasks on that date. Without a Snoozed list, tasks on My Tasks keep their due date and stay put. Tasks on any other lists will always
+  # stay on that list regardless of the due date set.
 
   # Manual test plan
   #
@@ -37,7 +38,7 @@ class Toolbox::GoogleTasks < Toolbox
   S
 
   def create_task_on_list(title_s:, notes_s: nil, due_date_s: nil, list_s: "My Tasks")
-    if list_s == "My Tasks" && format_time(due_date_s).present? && Date.parse(format_time(due_date_s)) > Time.zone.today
+    if list_s == "My Tasks" && snoozed_list && format_time(due_date_s).present? && Date.parse(format_time(due_date_s)) > Time.zone.today
       list = snoozed_list
     else
       list = pick_best(input: list_s, options: get_lists, key: :title, error_type: "task list")
@@ -119,7 +120,7 @@ class Toolbox::GoogleTasks < Toolbox
       completed: is_completed && Time.current,
     )
 
-    if (list.title == "My Tasks" && format_time(due_date_s).present? && updated_task.try(:due)&.to_date > Date.current)
+    if (list.title == "My Tasks" && snoozed_list && format_time(due_date_s).present? && updated_task.try(:due)&.to_date > Date.current)
       updated_task = move_task_to_list(updated_task, snoozed_list)
       list = snoozed_list
     end
@@ -170,6 +171,8 @@ class Toolbox::GoogleTasks < Toolbox
   private
 
   def refresh_tasks # this should happen on a cron interval instead
+    return if snoozed_list.nil?
+
     loop do
       tasks_to_snooze = get_tasks_for_list(default_list, due_min: Date.tomorrow)
       tasks_to_snooze.each do |task|

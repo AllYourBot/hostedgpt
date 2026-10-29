@@ -21,8 +21,8 @@ module Toolbox::GoogleTasks::APIHelpers
     @default_list ||= get_list("My Tasks")
   end
 
-  def snoozed_list
-    @snoozed_list ||= get_list("Snoozed")
+  def snoozed_list # optional, so nil when the user doesn't have one
+    @snoozed_list ||= get_lists&.find { |l| l.title == "Snoozed" }
   end
 
   def get_tasks_for_list(list, due_min: nil, due_max: nil)

@@ -2,7 +2,6 @@ require "test_helper"
 
 class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
   setup do
-    skip
     @google_tasks = Toolbox::GoogleTasks.new
   end
 
@@ -68,6 +67,20 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
       assert_task_equal input, response[:task]
       assert response[:undo_by].starts_with?("remove_or_restore_task")
       assert response[:undo_by].include?('list: "Snoozed"')
+    end
+  end
+
+  test "create_task_on_list with a future date KEEPS the item on the main list when there is no snoozed list" do
+    input = {
+      title: "do this",
+      due: 1.week.from_now.strftime("%Y-%m-%dT00:00:00.000Z"),
+    }
+    stub_create_task_on_list(input, lists: lists_data_without_snoozed) do
+      response = @google_tasks.create_task_on_list(title_s: input[:title], due_date_s: input[:due])
+      input[:status] = "needsAction"
+
+      assert_task_equal input, response[:task]
+      assert_not response[:undo_by].include?("list:"), "The undo should target the main list"
     end
   end
 
@@ -216,6 +229,20 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
     end
   end
 
+  test "change_task KEEPS a task on the main list when due is set and there is no snoozed list" do
+    input = {
+      id: "mockid",
+      due: 1.week.from_now.strftime("%Y-%m-%dT00:00:00.000Z"),
+    }
+    stub_change_task(input, lists: lists_data_without_snoozed) do
+      response = @google_tasks.change_task(task_id_or_position_s: input[:id], due_date_s: input[:due])
+
+      assert_equal input[:due], response[:task][:due], "The due date should have been set"
+      assert_equal "My Tasks", response[:task][:list], "The task should stay on the main list"
+      assert_equal 'change_task(task_id_or_position: "mockid", due_date: "clear")', response[:undo_by]
+    end
+  end
+
   test "change_task moves back to main when clearing due on a snoozed task" do
     input = {
       id: "mockid",
@@ -257,7 +284,7 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
   end
 
   test "change_task errors when attempting to un-complete something by specifying the task position" do
-    stub_change_task(completed: false) do
+    stub_change_task({ completed: false }) do
       error = assert_raises do
         @google_tasks.change_task(task_id_or_position_s: 1, is_completed: false)
       end
@@ -291,10 +318,19 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
     end
   end
 
+  test "get_tasks returns tasks for the main list when there is no snoozed list" do
+    stub_get_tasks(lists: lists_data_without_snoozed) do
+      response = @google_tasks.get_tasks
+
+      assert_equal "You have 0 items on your 'My Tasks' list.", response[:good_summary]
+      assert_equal [], response[:tasks], "There should be no tasks"
+    end
+  end
+
   private
 
-  def stub_create_task_on_list(hash, &block)
-    stub_get_response(:get_lists, status: 200, response: lists_data) do
+  def stub_create_task_on_list(hash, lists: lists_data, &block)
+    stub_get_response(:get_lists, status: 200, response: lists) do
       stub_post_response(:create_task_for_list, status: 200, response: create_data(**hash.except(:list))) do
         Current.set(user: users(:keith)) do
           yield
@@ -331,8 +367,8 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
     end
   end
 
-  def stub_change_task(hash, &block)
-    stub_get_response(:get_lists, status: 200, response: lists_data) do
+  def stub_change_task(hash, lists: lists_data, &block)
+    stub_get_response(:get_lists, status: 200, response: lists) do
       stub_get_response(:get_task_for_list_id, status: 200, response: task_data) do
         stub_get_response(:get_tasks_for_list, status: 200, response: tasks_data) do
           stub_patch_response(:update_task, status: 200, response: task_data(**hash.except(:id, :deleted, :list))) do
@@ -349,8 +385,8 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
     end
   end
 
-  def stub_get_tasks(&block)
-    stub_get_response(:get_lists, status: 200, response: lists_data) do
+  def stub_get_tasks(lists: lists_data, &block)
+    stub_get_response(:get_lists, status: 200, response: lists) do
       stub_get_response(:get_tasks_for_list, status: 200, response: tasks_data.merge(items: [])) do
         Current.set(user: users(:keith)) do
           yield
@@ -385,6 +421,10 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
         :updated=>"2024-06-18T18:38:04.054Z",
         :selfLink=>"https://www.googleapis.com/tasks/v1/users/@me/lists/dl9HUXZxYkp2R3FEaHg5QQ"}
     ]}
+  end
+
+  def lists_data_without_snoozed
+    { items: lists_data[:items].reject { |l| l[:title] == "Snoozed" } }
   end
 
   def task_data(title: "Title of task", notes: "notes for task", deleted: false, due: nil, completed: false)
