@@ -132,6 +132,7 @@ class AIBackend::RubyLLM < AIBackend
         provider: :openai,
         assume_model_exists: true,
         size: "1024x1024",
+        provider_options: { quality: "high" },
       )
     rescue *CONFIGURATION_ERRORS => e
       raise mapped_error(e, model: IMAGE_MODEL, as: ConfigurationError)
