@@ -1,0 +1,7 @@
+<%# locals: (assistant:) %>
+<% if assistant.context_documents.any? %>
+  <% context_files = t("app.assistants.ui.context_files") %>
+  <span class="ml-1.5 flex-shrink-0 text-gray-500 dark:text-gray-400" role="img" aria-label="<%= context_files %>" title="<%= context_files %>" data-role="context-files">
+    <%= icon "paper-clip", variant: :micro %>
+  </span>
+<% end %>
