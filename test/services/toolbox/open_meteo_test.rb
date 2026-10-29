@@ -46,6 +46,23 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
     end
   end
 
+  test "get_historical_weather reports the day's minimum as the low" do
+    stub_get_response(:get_location, status: 200, response: locations_data) do
+      stub_get_response(:get_historical_weather, status: 200, response: historical_data) do
+        result = @open_meteo.get_historical_weather(
+          city_s: "Austin",
+          state_province_or_region_s: "Texas",
+          date_span_begin_s: "2020-01-01",
+          date_span_end_s: "2020-01-02",
+        )
+
+        assert_equal [ 50.0, 52.0 ], result.map { |day| day[:temp_high] }
+        assert_equal [ 31.0, 33.0 ], result.map { |day| day[:temp_low] }
+        assert_equal [ "31 degrees fahrenheit", "33 degrees fahrenheit" ], result.map { |day| day[:temp_low_formatted] }
+      end
+    end
+  end
+
   private
 
   def stub_weather_api(&block)
@@ -60,6 +77,23 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
         { name: "Austin", latitude: 43.66, longitude: -92.97, timezone: "America/Chicago", country: "United States", admin1: "Minnesota" },
         { name: "Austin", latitude: 30.27, longitude: -97.74, timezone: "America/Chicago", country: "United States", admin1: "Texas" },
       ]
+    }
+  end
+
+  def historical_data
+    {
+      daily_units: { temperature_2m_max: "°F", precipitation_sum: "inch" },
+      daily: {
+        time: [ "2020-01-01", "2020-01-02" ],
+        weather_code: [ 3, 2 ],
+        temperature_2m_max: [ 50.0, 52.0 ],
+        temperature_2m_min: [ 31.0, 33.0 ],
+        apparent_temperature_max: [ 49.0, 51.0 ],
+        apparent_temperature_min: [ 28.0, 30.0 ],
+        precipitation_sum: [ 0.1, 0.0 ],
+        rain_sum: [ 0.1, 0.0 ],
+        snowfall_sum: [ 0.0, 0.0 ],
+      }
     }
   end
 
