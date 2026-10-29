@@ -16,23 +16,23 @@ class Toolbox::Gmail::Message
   end
 
   def from
-    @message.payload.headers.find { |h| h.name == "From" }.value
+    header("From")
   end
 
   def from_email
-    from.match?(/\A<([^>]*)>/) ? $1 : from
+    from&.match?(/\A<([^>]*)>/) ? $1 : from
   end
 
   def to
-    @message.payload.headers.find { |h| h.name == "To" }.value
+    header("To")
   end
 
   def to_email
-    to.match?(/\A<([^>]*)>/) ? $1 : to
+    to&.match?(/\A<([^>]*)>/) ? $1 : to
   end
 
   def subject
-    @message.payload.headers.find { |h| h.name == "Subject" }.value
+    header("Subject")
   end
 
   def snippet
@@ -40,7 +40,7 @@ class Toolbox::Gmail::Message
   end
 
   def date
-    @message.payload.headers.find { |h| h.name == "Date" }.value
+    header("Date")
   end
 
   def body
@@ -74,8 +74,24 @@ class Toolbox::Gmail::Message
 
   private
 
+  def header(name)
+    @message.payload.headers.find { |h| h.name.casecmp?(name) }&.value
+  end
+
   def decoded_part(mime_type)
-    str = @message.payload.parts.find { |p| p.mimeType == mime_type }&.body&.data&.gsub(/-/, "+")&.gsub(/_/, "/")
-    str && Base64.decode64(str)
+    data = find_part(@message.payload, mime_type)&.body&.try(:data)
+    data && Base64.urlsafe_decode64(data).force_encoding(Encoding::UTF_8).scrub
+  end
+
+  # A single-part message keeps its body on the payload itself, and one with attachments
+  # nests the text a level down inside multipart/alternative, so search the whole tree.
+  def find_part(part, mime_type)
+    return part if part.mimeType == mime_type
+
+    part.try(:parts)&.each do |child|
+      found = find_part(child, mime_type)
+      return found if found
+    end
+    nil
   end
 end
