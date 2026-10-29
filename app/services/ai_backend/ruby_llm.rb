@@ -259,12 +259,13 @@ class AIBackend::RubyLLM < AIBackend
 
       thinking = chunk.respond_to?(:thinking) ? chunk.thinking : nil
       if thinking
-        @message.thinking_text = "#{@message.thinking_text}#{thinking.text}" if thinking.text.present?
+        # Plain truthiness, not present?: whitespace-only deltas ("\n") must accumulate.
+        @message.thinking_text = "#{@message.thinking_text}#{thinking.text}" if thinking.text
         @message.thinking_signature ||= thinking.signature.presence
         chunk_handler.call("") # lets the job broadcast the thinking so far and check for a cancel
       end
 
-      if chunk.respond_to?(:content) && chunk.content.present?
+      if chunk.respond_to?(:content) && chunk.content
         @stream_response_text += chunk.content
         chunk_handler.call(chunk.content)
       end

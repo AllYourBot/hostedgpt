@@ -76,3 +76,7 @@ When an element has multiple Stimulus attributes, put each on its own line:
   ...
 </section>
 ```
+
+## Controllers that transform message content must hold off while it streams
+
+During a reply, `messages/_message` re-renders on every chunk, so a controller that rewrites `[data-role="content-text"]` (KaTeX, mermaid) sees half-finished input each time and flashes errors or churns. Return early while that div's `data-streaming` is `"true"`. The settle broadcast re-renders it with `"false"`, and a `MutationObserver` re-runs the transform then, as `math_controller.js` and `diagram_controller.js` do.
