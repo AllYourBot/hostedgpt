@@ -118,22 +118,23 @@ class Toolbox::Gmail < Toolbox
   def get_threads(h = {})
     refresh_token_if_needed do
       get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/threads").param(h)
-    end&.threads
+    end&.threads || [] # Gmail omits the key when nothing matches
   end
 
   def get_messages(h = {})
     refresh_token_if_needed do
       get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages").param(h)
-    end&.messages
+    end&.messages || [] # Gmail omits the key when nothing matches
   end
 
   def get_message(id)
     case id
     when :latest
-      id = get_messages(q: "in:inbox", maxResults: 1).first.id
+      id = get_messages(q: "in:inbox", maxResults: 1).first&.id
     when :latest_sent
-      id = get_messages(q: "in:sent", maxResults: 1).first.id
+      id = get_messages(q: "in:sent", maxResults: 1).first&.id
     end
+    return if id.nil?
 
     data = refresh_token_if_needed do
       get("https://gmail.googleapis.com/gmail/v1/users/#{uid}/messages/#{id}").param(

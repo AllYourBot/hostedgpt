@@ -1,9 +1,8 @@
 require "test_helper"
 
 class AIBackend::PolicyTest < ActiveSupport::TestCase
-  # The policy registry is the sole owner of provider facts. The copy and URL
-  # assertions below are characterization: they pin the exact strings the SDK
-  # backends carried, so relocation causes no copy drift.
+  # The policy registry is the sole owner of provider facts; the copy and URL
+  # assertions below characterize the exact strings users see.
 
   test "the registry lists the five chat provider identities" do
     assert_equal [:openai, :anthropic, :groq, :openrouter, :gemini], AIBackend::Policy.chat_provider_identities
@@ -42,8 +41,12 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
     )
   end
 
+  BASE_KEY_ERROR_MESSAGE = "(There is a configuration error with this API Service. Maybe you have an invalid API key? " +
+    "Click your Profile in the bottom left and then Settings and then **API Services**.)"
+
   test "an identity without its own policy gets the base fallback copy" do
-    assert_equal AIBackend::Policy::Base.key_error_message, api_services(:keith_brave_service).key_error_message
+    assert_equal BASE_KEY_ERROR_MESSAGE, api_services(:keith_brave_service).key_error_message
+    assert_equal BASE_KEY_ERROR_MESSAGE, AIBackend::Policy::Base.key_error_message
     # A custom-URL openai-dialect service has the openai identity, so it gets
     # OpenAI's copy, not the base fallback.
     assert_equal AIBackend::Policy::OpenAI.key_error_message, api_services(:keith_other_service).key_error_message
@@ -56,16 +59,6 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
     assert_equal "https://console.groq.com/keys", api_services(:keith_groq_service).billing_url
     assert_equal "https://openrouter.ai/credits", api_services(:keith_openrouter_service).billing_url
     assert_nil api_services(:keith_brave_service).billing_url
-  end
-
-  test "identity_display_name output is unchanged for all five identities" do
-    assert_equal "OpenAI", APIService.identity_display_name(:openai)
-    assert_equal "Anthropic", APIService.identity_display_name(:anthropic)
-    assert_equal "Groq", APIService.identity_display_name(:groq)
-    assert_equal "OpenRouter", APIService.identity_display_name(:openrouter)
-    assert_equal "Gemini", APIService.identity_display_name(:gemini)
-    assert_equal "OpenAI", APIService.identity_display_name("openai")
-    assert_equal "", APIService.identity_display_name(nil)
   end
 
   test "provider_name keeps the AI fallback for identities without a policy" do
@@ -95,7 +88,6 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
   end
 
   test "OpenRouter attribution headers are identical to today's output" do
-    assert_equal AIBackend::OpenRouter.attribution_headers, AIBackend::Policy::OpenRouter.attribution_headers
     assert_equal %w[HTTP-Referer X-Title], AIBackend::Policy::OpenRouter.attribution_headers.keys
     assert_empty AIBackend::Policy::OpenAI.attribution_headers
   end

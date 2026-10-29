@@ -40,7 +40,8 @@
           overflow_expand_popout_class: "bg-gray-100 dark:bg-gray-700 rounded-lg shadow-xl pr-4",
         } do %>
       <%= render partial: "layouts/assistant_avatar", locals: { assistant:, size: 7, classes: "mr-2" } %>
-      <%= assistant.name %>
+      <span class="truncate"><%= assistant.name %></span>
+      <%= render "assistants/context_files_icon", assistant: %>
     <% end %>
     <div class="hidden self-stretch items-center gap-3 pl-2 relationship:flex group-hover:flex group-focus-within:flex">
       <% if settings %>

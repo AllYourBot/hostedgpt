@@ -20,3 +20,22 @@ class Toolbox::GmailTest < ActiveSupport::TestCase
     { emailAddress: "krschacht@gmail.com", messagesTotal: 876831, threadsTotal: 537585, historyId: 74273500 }
   end
 end
+
+class Toolbox::GmailEmptyMailboxTest < ActiveSupport::TestCase
+  # Gmail leaves out the "threads" and "messages" keys when nothing matches the query.
+  test "check_inbox on an empty mailbox with no sent mail" do
+    gmail = Toolbox::Gmail.new
+
+    empty_response = ->(*) { OpenStruct.new }
+
+    gmail.stub(:refresh_token_if_needed, empty_response) do
+      result = gmail.check_inbox
+
+      assert_equal 0, result[:messages_in_inbox]
+      assert_equal 0, result[:unread_messages_in_inbox]
+      assert_equal 0, result[:read_messages_in_inbox]
+      assert_equal({}, result[:most_recent_message])
+      assert_equal({}, result[:last_sent_message])
+    end
+  end
+end

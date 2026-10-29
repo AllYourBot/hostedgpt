@@ -5,6 +5,7 @@ class APIService < ApplicationRecord
   URL_OPENROUTER = "https://openrouter.ai/api/v1/"
   URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/"
   URL_BRAVE = "https://api.search.brave.com/res/v1/"
+  SERVICE_TYPES = %w[AI Search Other].freeze
 
   belongs_to :user
 
@@ -14,6 +15,9 @@ class APIService < ApplicationRecord
 
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), if: -> { url.present? }
   validates :name, :url, presence: true
+  validates :service_type, inclusion: { in: SERVICE_TYPES }
+
+  before_validation :set_type
 
   normalizes :url, with: -> url { url.strip }
   encrypts :token
@@ -24,34 +28,8 @@ class APIService < ApplicationRecord
 
   scope :ordered, -> { order(:name) }
 
-  # The per-provider transport registry: one identity -> one backend class
-  # that owns that provider's wire dialect, whatever transport (SDK or
-  # RubyLLM) ultimately serves the request. Its policy and facts (error copy,
-  # billing URLs, display names, tool policy) live in AIBackend::Policy. A
-  # service's identity collapses the driver plus, for openai-dialect vendors,
-  # the canonical URL into that one key: choices, RubyLLM support, and error
-  # facts all resolve through it, never through the raw driver alone.
-  #
-  # Built as a method (not a class-body constant) so backend autoloading stays
-  # as lazy as the dispatch it replaced. Adding a provider? Add its entry here
-  # and map it in provider_identity. An unmapped driver yields a nil identity
-  # and therefore nil backends, silently.
-  def self.sdk_backends
-    {
-      openai: AIBackend::OpenAI,
-      anthropic: AIBackend::Anthropic,
-      groq: AIBackend::Groq,
-      openrouter: AIBackend::OpenRouter,
-      gemini: AIBackend::Gemini,
-    }
-  end
-
   def self.chat_provider_identities
     AIBackend::Policy.chat_provider_identities
-  end
-
-  def self.identity_display_name(identity)
-    AIBackend::Policy.display_name_for(identity)
   end
 
   DIRECT_DRIVERS = %w[openai anthropic gemini].freeze
@@ -62,27 +40,14 @@ class APIService < ApplicationRecord
     return driver.to_sym if DIRECT_DRIVERS.include?(driver)
   end
 
-  def sdk_backend
-    self.class.sdk_backends[provider_identity]
-  end
-
+  # RubyLLM is the transport for every chat provider identity. An identity
+  # it can't serve (brave, or a nil driver) yields nil, silently.
   def ai_backend
-    use_ruby_llm? ? AIBackend::RubyLLM : sdk_backend
-  end
-
-  # An explicit per-identity choice ("ruby_llm" / "sdk") always wins; silent
-  # users follow the site-wide flag, gated on RubyLLM actually supporting the
-  # identity.
-  def use_ruby_llm?
-    identity = provider_identity
-    return false unless AIBackend::RubyLLM.supports_identity?(identity)
-
-    choice = user.features[User::Features.backend_choice_name(identity)]
-    choice.present? ? choice == "ruby_llm" : Feature.use_ruby_llm?
+    AIBackend::RubyLLM.supports_identity?(provider_identity) ? AIBackend::RubyLLM : nil
   end
 
   # Error facts resolve through the identity's policy class, so a Groq
-  # or OpenRouter conversation served by RubyLLM still speaks Groq's or
+  # or OpenRouter conversation still speaks Groq's or
   # OpenRouter's copy and billing URL, never the generic ones.
   def key_error_message
     AIBackend::Policy.key_error_message_for(provider_identity)
@@ -121,6 +86,12 @@ class APIService < ApplicationRecord
   end
 
   private
+
+  def set_type
+    return if service_type.present?
+
+    self.service_type = url == URL_BRAVE ? "Search" : "AI"
+  end
 
   def default_token
     return Setting.default_brave_key if url == URL_BRAVE

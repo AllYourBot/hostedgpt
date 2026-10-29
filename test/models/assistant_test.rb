@@ -48,6 +48,12 @@ class AssistantTest < ActiveSupport::TestCase
     assert_nil rob_assistant.reload.position
   end
 
+  test "memories saved for the assistant are destroyed upon destroy" do
+    assert_difference "Memory.count", -assistants(:keith_gpt3).memories.count do
+      assistants(:keith_gpt3).destroy
+    end
+  end
+
   test "a new assistant goes to the top of the list" do
     keith = users(:keith)
     keith.assistants.reposition(keith.assistants.ordered.pluck(:id))

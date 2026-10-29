@@ -211,7 +211,7 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "test should return success and a message" do
-    TestClient::OpenAI.stub :text, "Success." do
+    TestClient::RubyLLM::Chat.stub :text, "Success." do
       get settings_language_model_test_url(format: :turbo_stream, language_model_id: language_models(:guanaco).id, model: "gpt-4o")
       assert_response :success
       assert_contains_text "div#test_result", "Success."

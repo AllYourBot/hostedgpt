@@ -26,7 +26,6 @@ class AutotitleConversationJob < ApplicationJob
 
     @conversation.update!(title: topic)
   rescue Faraday::Error,
-         ::Timeout::Error,
          AIBackend::ConfigurationError => e
     Rails.logger.warn("[AutotitleConversationJob] Provider failure for conversation #{@conversation.id}: #{e.class}")
     true

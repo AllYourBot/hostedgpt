@@ -158,12 +158,12 @@ class Toolbox::OpenMeteo < Toolbox
 
         temp_high: day[:temperature_2m_max],
         temp_high_feels_like: day[:apparent_temperature_max],
-        temp_low: day[:temperature_2m_max],
+        temp_low: day[:temperature_2m_min],
         temp_low_feels_like: day[:apparent_temperature_min],
 
         temp_high_formatted: format(day[:temperature_2m_max], degrees_unit),
         temp_high_feels_like_formatted: format(day[:apparent_temperature_max], degrees_unit),
-        temp_low_formatted: format(day[:temperature_2m_max], degrees_unit),
+        temp_low_formatted: format(day[:temperature_2m_min], degrees_unit),
         temp_low_feels_like_formatted: format(day[:apparent_temperature_min], degrees_unit),
 
         precipitation: day[:precipitation_sum],

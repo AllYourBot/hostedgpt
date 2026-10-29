@@ -23,3 +23,14 @@ test('Disable stops the typing sounds', async() => {
   expect(Listener.disabled).toStrictEqual(true)
   expect(Speaker.$.audioService.$.loopHandler.cleared).toStrictEqual(true)
 })
+
+test('Disable stops the speaker mid-sentence so the next reply can still be read aloud', async() => {
+  Listener.$.processing = true
+  Speaker.$.audioService.$.speaking = true
+  Speaker.$.audioService.$.queue.push({ index: 0, words: 'Unread.', generated: true, errored: false })
+
+  await Disable.Listener()
+
+  expect(Speaker.$.audioService.$.speaking).toStrictEqual(false)
+  expect(Speaker.$.audioService.$.queue.length).toEqual(0)
+})

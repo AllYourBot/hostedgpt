@@ -36,6 +36,22 @@ class NavColumnTest < ApplicationSystemTestCase
     end
   end
 
+  test "hovering the Assistants heading shows a plus icon that opens the New Assistant page" do
+    with_assistants_page(true) do
+      login_as @user
+      visit root_url
+      assert_current_path root_path
+
+      plus = find("#nav-scrollable a[data-role='new-assistant']", visible: :all)
+      refute plus.find(".icon", visible: :all).visible?, "The plus icon should stay hidden until the Assistants heading is hovered"
+
+      find_link(I18n.t("app.navigation.assistants")).hover
+      assert_shows_tooltip plus, I18n.t("app.settings.assistants.menu.new")
+      click_element plus
+      assert_current_path new_settings_assistant_path
+    end
+  end
+
   test "clicking conversations in the left side updates the right column and path when assistants page is enabled" do
     with_assistants_page(true) do
       assistant = @user.assistants.ordered.first
@@ -187,5 +203,23 @@ class NavColumnTest < ApplicationSystemTestCase
     assert_shows_tooltip pencil_on_second_assistant, "New"
     click_element pencil_on_second_assistant
     assert_current_path new_assistant_message_path(assistant2)
+  end
+
+  test "a long assistant name truncates before the context files icon so the selected assistant still shows it" do
+    assistant = assistants(:samantha)
+    assistant.update!(name: "Samantha the very helpful personal assistant with a long name")
+    visit new_assistant_message_path(assistant)
+    assert_selected_assistant assistant
+
+    name = find("#assistant_#{assistant.id} a[data-role='name']")
+    assert_true "the name should be truncated" do
+      name.evaluate_script("this.querySelector('.truncate').scrollWidth > this.querySelector('.truncate').clientWidth")
+    end
+    assert_true "the context files icon should not be cut off" do
+      name.evaluate_script("this.querySelector(\"[data-role='context-files']\").getBoundingClientRect().right <= this.getBoundingClientRect().right")
+    end
+
+    name.hover
+    assert_selector ".overflow-expand-popout [data-role='context-files']", visible: :all
   end
 end

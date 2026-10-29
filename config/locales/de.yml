@@ -18,6 +18,7 @@ de:
         table:
           name: "Name"
           url: "URL"
+          service_type: "Typ"
           driver: "Treiber"
         new_title: "Neuer API-Dienst"
         back: "Zurück"
@@ -91,6 +92,9 @@ de:
           language_model: "Sprachmodell"
           description: "Beschreibung"
           instructions: "Eigene Anweisungen"
+          conversation_starters: "Gesprächseinstiege"
+          conversation_starters_hint: "Bis zu %{count} Fragen, die vorgeschlagen werden, wenn Sie eine neue Konversation mit diesem Assistenten beginnen. Lassen Sie alle leer, um die Standardvorschläge zu erhalten."
+          conversation_starter: "Gesprächseinstieg %{number}"
           save: "Speichern"
           saving: "Speichere..."
           errors_title:
@@ -131,12 +135,23 @@ de:
         title: "Assistenten-Erinnerungen"
         menu:
           title: "Assistenten-Erinnerungen"
-        description: "Dies sind die Dinge, die aus allen vergangenen Konversationen gemerkt wurden. Alle Assistenten teilen sich diese Erinnerung."
+        description: "Dies sind die Dinge, die aus allen vergangenen Konversationen gemerkt wurden. Alle Assistenten teilen sich eine Erinnerung, es sei denn, sie wurde nur für einen von ihnen gespeichert."
+        form:
+          detail: "Erinnerung hinzufügen"
+          placeholder: "z. B. Ich bevorzuge metrische Einheiten"
+          assistant: "Merken für"
+          add: "Merken"
+          adding: "Merke..."
+          errors_title:
+            one: "%{count} Fehler hat das Speichern dieser Erinnerung verhindert:"
+            other: "%{count} Fehler haben das Speichern dieser Erinnerung verhindert:"
+        all_assistants: "Alle Assistenten"
         none: "Keine Erinnerungen"
         clear_all: "Alle Erinnerungen löschen"
         confirm_clear: "Sind Sie sicher?"
         table:
           memory: "Erinnerung"
+          assistant: "Assistent"
         forget: "Vergessen"
       people:
         menu:
@@ -165,7 +180,7 @@ de:
             dark: "Dunkel"
             light: "Hell"
             system: "System"
-          show_thinking: "Erweitertes Denken von Claude anzeigen"
+          show_thinking: "Erweitertes Denken anzeigen"
           ai_backends: "KI-Backends"
           ai_backends_description: "Welche Implementierung jeden Anbieter bedient. Standard folgt der globalen Einstellung (aktuell %{current})."
           backend_choice_default: "Standard"
@@ -200,6 +215,9 @@ de:
       retry:
         interrupted: "Die Antwort wurde unterbrochen."
         button: "Erneut versuchen"
+      continue:
+        truncated: "Die Antwort hat ihre Längenbegrenzung erreicht."
+        button: "Weiter"
       edit: "Bearbeiten"
       copy: "Kopieren"
       copied: "Kopiert!"
@@ -270,6 +288,7 @@ de:
         new: "Neu"
         more: "Mehr"
         show_all: "Alle anzeigen"
+        context_files: "Kontextdateien werden jeder Unterhaltung hinzugefügt"
     conversations:
       editing_title: "Konversation bearbeiten"
       show_title: "Diese Konversation anzeigen"
@@ -384,6 +403,7 @@ de:
         deleted: "Gelöscht"
         not_found: "Der API-Dienst konnte nicht gefunden werden"
       memories:
+        remembered: "Gemerkt"
         forgotten: "Vergessen"
         cleared: "Speicher gelöscht"
       documents:
@@ -430,6 +450,8 @@ de:
           attributes:
             slug:
               taken: "ist bereits vergeben"
+            conversation_starters:
+              too_long: "darf höchstens %{count} Fragen enthalten"
       person:
         errors:
           personable_id:

@@ -37,7 +37,7 @@ class LanguageModelTest < ActiveSupport::TestCase
   end
 
   test "ai_backend works as a delegated attribute" do
-    assert_equal AIBackend::OpenAI, language_models(:gpt_best).ai_backend
+    assert_equal AIBackend::RubyLLM, language_models(:gpt_best).ai_backend
   end
 
   test "logo_filename comes from the api service, whatever the model is named" do

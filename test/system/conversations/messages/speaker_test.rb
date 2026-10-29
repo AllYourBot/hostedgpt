@@ -230,6 +230,57 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
     end
   end
 
+  test "while a reply is read aloud its play button shows stop, and clicking stop ends the reading but not the next reply" do
+    stub_features(voice: true) do
+      visit conversation_messages_path(@conversation)
+
+      enable_mic.click
+
+      user_speaks "Write me a poem."
+      stream_ai_reply "This is the first sentence of a long reply. The quick brown fox jumped over the lazy dog. ", thinking: true
+      assert_spoke_to_sentence "1", assistant_messages[2]
+
+      reply = assistant_messages[2]
+      reply.hover
+      assert_true "The reply being read aloud should show stop" do
+        reply.find_role("stop").visible?
+      end
+
+      reply.find_role("stop").click
+      reply.hover
+      assert_true "Clicking stop should flip it back to play" do
+        reply.find_role("play").visible?
+      end
+
+      stream_ai_reply "This is the first sentence of a long reply. The quick brown fox jumped over the lazy dog. A final sentence."
+      assert_spoke_to_sentence "1", assistant_messages[2]
+
+      user_speaks "You there?"
+      stream_ai_reply "Yes, I'm here. Are you there?"
+
+      assert_finished_speaking Message.last
+      assert_spoke_to_sentence "2", assistant_messages[3]
+    end
+  end
+
+  test "once a reply has been read aloud its play button goes back from stop to play" do
+    stub_features(voice: true) do
+      visit conversation_messages_path(@conversation)
+
+      enable_mic.click
+
+      user_speaks "You there?"
+      stream_ai_reply "Yes, I'm here. Are you there?"
+      assert_finished_speaking Message.last
+
+      reply = assistant_messages[2]
+      reply.hover
+      assert_true "The play button should reappear once the reply has been read" do
+        reply.find_role("play").visible?
+      end
+    end
+  end
+
   # TODO: What about clicking play button while speaking is engaged. Should this be supported, or should
   # the play buttons be hidden, or should clicking play disable speaking?
   #

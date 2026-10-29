@@ -36,6 +36,7 @@ export default class extends Service {
 
   async _doThePlaying(audioUrlOrName, onEnd, rate = 1) {
     $.playing = true
+    _cancelBrowserVoice()
     try {
       if ($.playerSource) {
         $.playerSource.onended = null
@@ -81,7 +82,7 @@ export default class extends Service {
       $.playerSource.onended = null
       $.playerSource.stop()
     }
-    _cancelSkipNotice()
+    _cancelBrowserVoice()
     _resetQueue()
     $.speaking = false
     $.playing = false
@@ -147,6 +148,10 @@ export default class extends Service {
         job.spoken = true
         _sayOnceThatPartWasSkipped(() => _speakingLoop('playback'))
         return
+      } else if (job.browserVoice && !$.speaking) {
+        job.spoken = true
+        _sayWithBrowserVoice(job.words, () => _speakingLoop('playback'))
+        return
       } else if (job.generated && !$.speaking && !job.errored) {
         job.spoken = true
         _speakThenLoop(job.index, job.words, job.audioUrl)
@@ -181,20 +186,31 @@ export default class extends Service {
 
   // Uses the browser's own voice: the /speech endpoint that just failed would likely fail for this too
   _sayOnceThatPartWasSkipped(onEnd) {
-    if ($.skipNotice !== undefined || !w.speechSynthesis) return onEnd()
+    if ($.skipNoticeSaid) return onEnd()
 
+    $.skipNoticeSaid = true
+    _sayWithBrowserVoice("Sorry, I couldn't read part of that.", onEnd)
+  }
+
+  _sayWithBrowserVoice(words, onEnd) {
+    if (!w.speechSynthesis) return onEnd()
+
+    stopLooping()
+    log(`Speaking with the browser voice: ${words}`)
     $.speaking = true
-    $.skipNotice = new SpeechSynthesisUtterance("Sorry, I couldn't read part of that.")
-    $.skipNotice.onend = $.skipNotice.onerror = () => {
+    $.utterance = new SpeechSynthesisUtterance(words)
+    $.utterance.onend = $.utterance.onerror = () => {
+      $.utterance = undefined
       $.speaking = false
       onEnd()
     }
-    w.speechSynthesis.speak($.skipNotice)
+    w.speechSynthesis.speak($.utterance)
   }
 
-  _cancelSkipNotice() {
-    if (!$.skipNotice) return
-    $.skipNotice.onend = $.skipNotice.onerror = null
+  _cancelBrowserVoice() {
+    if (!$.utterance) return
+    $.utterance.onend = $.utterance.onerror = null
+    $.utterance = undefined
     w.speechSynthesis.cancel()
   }
 
@@ -206,7 +222,8 @@ export default class extends Service {
   }
 
   _resetQueue() {
-    $.skipNotice = undefined
+    $.skipNoticeSaid = false
+    $.utterance = undefined
     $.queue.reset()
     $.queue = new QueueService()
   }

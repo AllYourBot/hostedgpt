@@ -9,7 +9,7 @@ export default class extends Controller {
   static classes = ["popout"]
 
   show() {
-    if (this.element.scrollWidth <= this.element.clientWidth) return // not actually truncated, nothing to do
+    if (!this.truncated) return // nothing is actually cut off, nothing to do
 
     const rect = this.element.getBoundingClientRect()
     const clone = this.element.cloneNode(true)
@@ -20,6 +20,7 @@ export default class extends Controller {
     clone.setAttribute('tabindex', '-1')
     clone.setAttribute('aria-hidden', 'true')
     clone.classList.remove('truncate', 'flex-1')
+    clone.querySelectorAll('.truncate').forEach(el => el.classList.remove('truncate'))
     clone.classList.add('overflow-expand-popout', ...this.popoutClasses)
     Object.assign(clone.style, {
       position: 'fixed',
@@ -37,6 +38,13 @@ export default class extends Controller {
 
     this.boundHide = () => this.hide()
     window.addEventListener('scroll', this.boundHide, { capture: true, once: true })
+  }
+
+  // A label can truncate just its text (e.g. to keep a trailing icon visible), so check
+  // the inner .truncate elements as well as the element itself.
+  get truncated() {
+    return [this.element, ...this.element.querySelectorAll('.truncate')]
+      .some(el => el.scrollWidth > el.clientWidth)
   }
 
   hide() {

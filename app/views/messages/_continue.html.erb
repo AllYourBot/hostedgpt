@@ -1,0 +1,36 @@
+<%# locals: (message:) -%>
+<%# Shown under the latest reply when the provider stopped it at its output token limit. Continue sends a
+    follow-up message asking the assistant to pick up where it left off. -%>
+
+<div
+  data-role="continue"
+  class="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
+>
+  <span data-role="continue-explanation">
+    <%= t("app.messages.continue.truncated") %>
+  </span>
+
+  <%= button_to assistant_messages_path(message.assistant),
+    method: :post,
+    form_class: "inline-block p-0",
+    class: %|
+      flex items-center gap-1
+      px-2 py-1
+      rounded-md border border-gray-300 dark:border-gray-500
+      cursor-pointer hover:text-gray-900 dark:hover:text-white
+    |,
+    params: { message: {
+      conversation_id: message.conversation_id,
+      assistant_id: message.assistant_id,
+      content_text: t("app.messages.continue.button"),
+      index: message.index + 1,
+      version: message.version
+    } },
+    data: {
+      role: "continue-button",
+      turbo_frame: "_top",
+  } do %>
+    <%= icon "arrow-right", variant: :outline, size: 16 %>
+    <%= t("app.messages.continue.button") %>
+  <% end %>
+</div>

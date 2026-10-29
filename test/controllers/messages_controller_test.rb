@@ -28,6 +28,26 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "new should mark the assistants that HAVE context files in the nav column" do
+    get new_assistant_message_url(@assistant)
+    assert_response :success
+
+    assert_select "#assistant_#{assistants(:samantha).id} [data-role='context-files'][title=?]", I18n.t("app.assistants.ui.context_files"), { count: 1 },
+      "The assistant with an uploaded context file should show the context files icon"
+    assert_select "#assistants [data-role='context-files']", { count: 1 }, "Assistants without context files should not show the icon"
+  end
+
+  test "new should NOT mark an assistant whose only documents are the images it generated" do
+    documents(:background).destroy!
+    GeneratedImage.new(Base64.strict_encode64(file_fixture("cat.png").binread)).attach_to!(messages(:image_generation_explained))
+    assert_equal assistants(:samantha), messages(:image_generation_explained).documents.last.assistant, "The generated image should record the assistant that made it"
+
+    get new_assistant_message_url(@assistant)
+    assert_response :success
+
+    assert_select "#assistants [data-role='context-files']", { count: 0 }, "A generated image is not a context file, so no assistant should show the icon"
+  end
+
   test "should show message" do
     get message_url(@message)
     assert_response :success
@@ -42,6 +62,20 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal 4, starter_titles.size
     assert_equal 1, (starter_titles & image_starter_titles).size
+  end
+
+  test "should get new WITH the assistant's own conversation starters in place of the default ones" do
+    questions = ["What should I cook tonight?", "Plan my week"]
+    @assistant.update!(conversation_starters: questions)
+
+    get new_assistant_message_url(@assistant)
+    assert_response :success
+
+    assert_equal questions, assigns(:conversation_starters).map(&:first), "The assistant's starters should be shown in the order they were saved"
+    questions.each do |question|
+      assert_select "form[action=?] input[name=?][value=?]", assistant_messages_path(@assistant), "message[content_text]", question,
+        { count: 1 }, "Clicking a starter should send its question as written"
+    end
   end
 
   test "should NOT show message when not owned by the logged in user" do
@@ -245,6 +279,30 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   test "index shows no retry button for a message which generated successfully" do
     get conversation_messages_url(@conversation, version: 1)
     assert_select '[data-role="retry"]', false
+  end
+
+  test "index shows a continue button for the latest reply when it WAS CUT OFF at the token limit" do
+    latest_message = @conversation.latest_message_for_version(:latest)
+    latest_message.update! truncated_at: Time.current
+
+    get conversation_messages_url(@conversation, version: latest_message.version)
+    assert_select '[data-role="continue"]', 1, "The cut-off reply should offer Continue"
+    assert_select '[data-role="continue-button"]', 1, "The Continue button should be rendered"
+    assert_select '[data-role="retry"]', false, "A cut-off reply did not fail, so it should not offer Retry"
+  end
+
+  test "index shows no continue button for a cut-off reply which IS NO LONGER the latest message" do
+    latest_message = @conversation.latest_message_for_version(:latest)
+    latest_message.update! truncated_at: Time.current
+    @conversation.messages.create! role: :user, content_text: "Never mind", assistant: @assistant
+
+    get conversation_messages_url(@conversation, version: latest_message.version)
+    assert_select '[data-role="continue"]', false, "Continue only makes sense on the conversation's latest reply"
+  end
+
+  test "index shows no continue button for a reply which finished on its own" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select '[data-role="continue"]', false, "A complete reply should not offer Continue"
   end
 
   test "without an app_url, index embeds only the thumbnails and leaves each modal image to load when opened" do

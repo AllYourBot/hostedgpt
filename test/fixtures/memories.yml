@@ -7,3 +7,8 @@ pet:
   user: keith
   message: identify_photo
   detail: He owns a cat
+
+haiku:
+  user: keith
+  assistant: keith_gpt3
+  detail: He likes the Zen perspective summed up in a haiku

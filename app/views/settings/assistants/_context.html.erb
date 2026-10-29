@@ -1,10 +1,13 @@
 <div class="my-5" id="context">
-  <h2 class="font-medium"><%= t("app.settings.assistants.context.title") %></h2>
+  <h2 class="font-medium flex items-center gap-1">
+    <%= t("app.settings.assistants.context.title") %>
+    <%= icon "paper-clip", variant: :micro %>
+  </h2>
   <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t("app.settings.assistants.context.hint") %></p>
 
-  <% if assistant.documents.any? %>
+  <% if assistant.context_documents.any? %>
     <ul class="mt-3 divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-md">
-      <% assistant.documents.order(:created_at).each do |document| %>
+      <% assistant.context_documents.each do |document| %>
         <li class="flex items-center justify-between px-3 py-2" id="<%= dom_id(document) %>">
           <span class="truncate">
             <%= document.filename %>

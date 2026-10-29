@@ -47,6 +47,7 @@ en:
         table:
           name: "Name"
           url: "URL"
+          service_type: "Type"
           driver: "Driver"
         new_title: "New API Service"
         back: "Back"
@@ -120,6 +121,9 @@ en:
           language_model: "Language model"
           description: "Description"
           instructions: "Custom Instructions"
+          conversation_starters: "Conversation starters"
+          conversation_starters_hint: "Up to %{count} questions to suggest when you start a new conversation with this assistant. Leave them all blank to get the default suggestions."
+          conversation_starter: "Conversation starter %{number}"
           save: "Save"
           saving: "Saving..."
           errors_title:
@@ -160,12 +164,23 @@ en:
         title: "Assistant Memories"
         menu:
           title: "Assistant Memories"
-        description: "These are the things remembered from all past conversations. All assistants share this memory."
+        description: "These are the things remembered from all past conversations. All assistants share a memory unless it was saved for just one of them."
+        form:
+          detail: "Add a memory"
+          placeholder: "e.g. I prefer metric units"
+          assistant: "Remember for"
+          add: "Remember"
+          adding: "Remembering..."
+          errors_title:
+            one: "%{count} error prohibited this memory from being saved:"
+            other: "%{count} errors prohibited this memory from being saved:"
+        all_assistants: "All assistants"
         none: "No memories"
         clear_all: "Clear All Memories"
         confirm_clear: "Are you sure?"
         table:
           memory: "Memory"
+          assistant: "Assistant"
         forget: "Forget"
       people:
         menu:
@@ -194,7 +209,7 @@ en:
             dark: "Dark"
             light: "Light"
             system: "System"
-          show_thinking: "Show Claude's extended thinking"
+          show_thinking: "Show extended thinking"
           ai_backends: "AI backends"
           ai_backends_description: "Which implementation handles each provider. Default follows the site-wide setting (currently %{current})."
           backend_choice_default: "Default"
@@ -229,6 +244,9 @@ en:
       retry:
         interrupted: "The response was interrupted."
         button: "Retry"
+      continue:
+        truncated: "The response reached its length limit."
+        button: "Continue"
       edit: "Edit"
       copy: "Copy"
       copied: "Copied!"
@@ -299,6 +317,7 @@ en:
         new: "New"
         more: "More"
         show_all: "Show All"
+        context_files: "Context files are added to every conversation"
     conversations:
       editing_title: "Editing conversation"
       show_title: "Show this conversation"
@@ -417,6 +436,7 @@ en:
         deleted: "Deleted"
         not_found: "The API Service could not be found"
       memories:
+        remembered: "Remembered"
         forgotten: "Forgotten"
         cleared: "Cleared memory"
       documents:
@@ -463,6 +483,8 @@ en:
           attributes:
             slug:
               taken: "has already been taken"
+            conversation_starters:
+              too_long: "can have at most %{count} questions"
       person:
         errors:
           personable_id:

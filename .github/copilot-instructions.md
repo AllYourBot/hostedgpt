@@ -15,10 +15,10 @@ HostedGPT is a Ruby on Rails 8.1 application providing a multi‑provider conver
 - Rails MVC + Hotwire (Turbo + Stimulus), Tailwind for styling.
 - Background job queue: SolidQueue (runs in Puma with `RUN_SOLID_QUEUE_IN_PUMA=true`).
 - Streaming tokens: ActionCable (PostgreSQL enhanced adapter).
-- AI abstraction: `AIBackend::<Provider>` classes in `app/services/ai_backend/`, dispatched by **provider identity** (`APIService#provider_identity`: driver + canonical URL for openai-dialect vendors) to the identity's `sdk_backend`, with `AIBackend::RubyLLM` as an alternative transport selected by per-identity choices or the `use_ruby_llm` flag.
+- AI abstraction: `app/services/ai_backend/ruby_llm.rb` (`AIBackend::RubyLLM`) is the transport for every chat provider identity, riding the `ruby_llm` gem. Per-provider facts and policy live in `app/services/ai_backend/policy/` — one PORO class per identity (OpenAI, Anthropic, Gemini, Groq, OpenRouter). A service's provider identity (`APIService#provider_identity`: driver plus canonical URL for openai-dialect vendors) resolves its policy class and dispatch: `APIService#ai_backend` returns `AIBackend::RubyLLM` for every chat identity and `nil` for identities RubyLLM can't serve (brave, or a nil driver).
 - Dynamic model & assistant provisioning: YAML seeds (`models.yml`, `assistants.yml`) imported per user on registration (`User::Registerable`).
 - Feature flags & settings: `config/options.yml` accessed through `Feature.*` / `Setting.*` helpers.
-- Message flow: `MessagesController` creates user messages; async job fetches assistant reply; streaming handled in backend-specific service.
+- Message flow: `MessagesController` creates user messages; async job fetches assistant reply; streaming handled in the unified transport service.
 - Soft deletion pattern: `deleted_at` timestamp + scopes (`not_deleted`).
 
 ## Key Directories / Files
@@ -33,16 +33,14 @@ HostedGPT is a Ruby on Rails 8.1 application providing a multi‑provider conver
 - `test/` – Minitest (system + unit); some provider calls mocked
 
 ## Supported Providers & Notes
-OpenAI, Anthropic, Groq (OpenAI-compatible), Google Gemini, OpenRouter. Provider selection logic: `APIService#ai_backend` (identity → `sdk_backend`, or `AIBackend::RubyLLM` per choice/flag). Tools/function calling gated by both provider support and `language_model.supports_tools?` (Groq's denial is pinned in `AIBackend::Groq.supports_tools?` and flows through the identity's backend regardless of transport).
+OpenAI, Anthropic, Groq (OpenAI-compatible), Google Gemini, OpenRouter. Provider selection logic: `APIService#ai_backend` (identity → `AIBackend::RubyLLM`, or `nil` for identities RubyLLM can't serve). Tools/function calling gated by `language_model.supports_tools?` (Groq's denial is pinned in `AIBackend::Policy::Groq.supports_tools?`).
 
 ## Adding a New AI Provider (Guideline)
-1. Add a base URL constant and map the provider in `APIService#provider_identity`, add an `sdk_backend` arm, and register it in `APIService.chat_provider_identities` (an unmapped driver silently yields nil backends).
-2. Implement `AIBackend::<NewProvider>` (model naming & streaming semantics similar to existing backends). Reuse shared utility methods in base `AIBackend` class.
-3. Handle test client stub for deterministic tests.
+1. Add a base URL constant and map it in `APIService#provider_identity`.
+2. Add an `AIBackend::Policy::<NewProvider>` class and register it in `AIBackend::Policy::POLICY_CLASSES` — the policy class owns `key_error_message`, `billing_url`, display name, and tool policy. RubyLLM usually speaks the provider natively, or via the openai-compatible path with a base-URL override; add provider-specific transport bits (e.g. header injection) only when needed.
+3. Add default models to `models.yml`.
 4. Extend seeding (user registration hook) if you want automatic creation.
-5. Update `models.yml` with default models (capabilities: images, tools, costs, system message support).
-6. Ensure `supports_tools?` logic works or adapt as needed.
-7. Add minimal tests: service connectivity test + message generation path.
+5. Add minimal tests: service connectivity test + message generation path, stubbed through `TestClient::RubyLLM`.
 
 ## Adding / Modifying Language Models
 Edit `models.yml`. Fields:
@@ -63,7 +61,7 @@ Settings via `Setting.*` (default tokens, Cloudflare creds, SMTP/Postmark config
 - Tests: Minitest style; place shared helpers in `test/support/`.
 
 ## Testing Guidance
-- For provider tests, stub network classes (see OpenAI test client approach) instead of recording cassettes.
+- For provider tests, stub network classes (see `test/support/test_client/ruby_llm.rb`) instead of recording cassettes.
 - System tests run outside Docker CI (headless browser). Keep selectors semantic (`data-testid` if needed – add sparingly).
 - When changing streaming logic, add a test ensuring partial token emission order and final persistence.
 
@@ -89,7 +87,7 @@ Settings via `Setting.*` (default tokens, Cloudflare creds, SMTP/Postmark config
 - Hard-coding model lists in code (use YAML + import tasks).
 
 ## When Unsure
-Inspect existing provider implementation (e.g., `ai_backend/open_ai.rb`) and mirror structure. Keep method naming consistent: `set_client_config`, `client_method_name`, `test_execute` pattern.
+Inspect `app/services/ai_backend/ruby_llm.rb` (transport integration points: `configure_context`, `build_chat`, `test_execute`) and `app/services/ai_backend/policy/` (per-identity facts), mirroring an existing identity's structure.
 
 ## Quick Reference Snippets
 - Import models for all users: `rails models:import`.

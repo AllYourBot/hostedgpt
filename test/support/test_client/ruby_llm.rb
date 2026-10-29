@@ -6,6 +6,7 @@ module TestClient
       def initialize(model:, provider: nil, assume_model_exists: nil, context: nil)
         @@model = model
         self.class.instance_variable_set(:@thinking_config, nil)
+        self.class.instance_variable_set(:@provider_options, nil)
         @headers = {}
         @messages = []
         @last_response = nil
@@ -57,7 +58,7 @@ module TestClient
 
         response = self.class.api_streaming_response
         block&.call(response) if response.content.present?
-        message_double(content: response.content, tool_calls: nil)
+        message_double(content: response.content, tool_calls: nil, finish_reason: self.class.finish_reason)
       end
 
       def complete(&block)
@@ -94,13 +95,13 @@ module TestClient
             thought_signature: self.class.thought_signature
           )
         end
-        message = message_double(content: nil, tool_calls: tool_calls.to_h { |tc| [tc.id, tc] })
+        message = message_double(content: nil, tool_calls: tool_calls.to_h { |tc| [tc.id, tc] }, finish_reason: :tool_calls)
         @messages << message
         message
       end
 
-      def message_double(content:, tool_calls:)
-        OpenStruct.new(role: :assistant, content:, tool_calls:)
+      def message_double(content:, tool_calls:, finish_reason:)
+        OpenStruct.new(role: :assistant, content:, tool_calls:, finish_reason:, max_tokens?: finish_reason == :max_tokens)
       end
 
       def self.api_oneoff_response
@@ -133,7 +134,7 @@ module TestClient
       end
 
       # Returns the name of the tool the model "requested"; nil means the model
-      # responds with text instead. Mirrors TestClient::OpenAI#function.
+      # responds with text instead.
       def self.function
         nil
       end
@@ -160,6 +161,12 @@ module TestClient
 
       def self.blank_response
         false
+      end
+
+      # Why the model stopped; :max_tokens means it hit its output token limit.
+      # Stub this to simulate a reply cut off at that limit.
+      def self.finish_reason
+        :stop
       end
 
       def self.error_to_raise
@@ -198,7 +205,7 @@ module TestClient
       def speak(text, **kwargs)
         raise self.class.speak_error_to_raise if self.class.speak_error_to_raise
 
-        self.class.last_speak_call = { text: text, kwargs: kwargs, openai_api_key: openai_api_key }
+        self.class.last_speak_call = { text: text, kwargs: kwargs, openai_api_key: openai_api_key, gemini_api_key: gemini_api_key }
         SpeechBytes.new(self.class.speech_data || "RUBYLLM_WAV_BYTES")
       end
 

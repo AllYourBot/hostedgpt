@@ -79,7 +79,7 @@ class ConversationTest < ActiveSupport::TestCase
     assistants(:samantha).language_model.update!(supports_tools: false)
 
     perform_enqueued_jobs do
-      TestClient::OpenAI.stub :text, "{\"topic\":\"Hear me\"}" do
+      TestClient::RubyLLM::Chat.stub :text, "{\"topic\":\"Hear me\"}" do
         conversation = users(:keith).conversations.create!(assistant: assistants(:samantha))
         assert_nil conversation.title
 

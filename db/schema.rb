@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,11 +57,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.datetime "updated_at", null: false
     t.string "url", null: false
     t.bigint "user_id", null: false
+    t.string "service_type", null: false
     t.index ["user_id", "deleted_at"], name: "index_api_services_on_user_id_and_deleted_at"
     t.index ["user_id"], name: "index_api_services_on_user_id"
   end
 
   create_table "assistants", force: :cascade do |t|
+    t.jsonb "conversation_starters", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "deleted_at", precision: nil
     t.string "description"
@@ -196,11 +198,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   end
 
   create_table "memories", force: :cascade do |t|
+    t.bigint "assistant_id"
     t.datetime "created_at", null: false
     t.string "detail"
     t.bigint "message_id"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["assistant_id"], name: "index_memories_on_assistant_id"
     t.index ["message_id"], name: "index_memories_on_message_id"
     t.index ["user_id"], name: "index_memories_on_user_id"
   end
@@ -228,6 +232,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.text "thinking_signature"
     t.text "thinking_text"
     t.string "tool_call_id"
+    t.datetime "truncated_at"
     t.datetime "updated_at", null: false
     t.integer "version", null: false
     t.index ["assistant_id"], name: "index_messages_on_assistant_id"
@@ -465,6 +470,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   add_foreign_key "documents", "users"
   add_foreign_key "language_models", "api_services"
   add_foreign_key "language_models", "users"
+  add_foreign_key "memories", "assistants"
   add_foreign_key "memories", "messages"
   add_foreign_key "memories", "users"
   add_foreign_key "messages", "assistants"

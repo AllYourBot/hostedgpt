@@ -7,11 +7,14 @@ class AIBackend::RubyLLM < AIBackend
   IMAGE_MODEL = "gpt-image-2.5-flare"
   SPEECH_MODEL = "tts-1"
   SPEECH_VOICE = "nova"
+  GEMINI_SPEECH_MODEL = "gemini-3.8-flash-tts"
+  GEMINI_SPEECH_VOICE = "Kore"
 
   # "high" is the API's own default effort. Thinking counts toward max_tokens, so
   # the 4096 RubyLLM falls back to for an assumed model can be spent before the
   # answer starts.
   THINKING_EFFORT = "high"
+  THINKING_BUDGET = 16_000
   THINKING_MAX_TOKENS = 16_000
 
   CONFIGURATION_ERRORS = [
@@ -36,7 +39,7 @@ class AIBackend::RubyLLM < AIBackend
     Rails.env.test? ? ::TestClient::RubyLLM : ::RubyLLM
   end
 
-  # Error-detail parity with the SDK transports, whose failures name the model.
+  # Error details name the model and include a redacted body excerpt so failures are diagnosable.
   ERROR_BODY_EXCERPT_LENGTH = 200
   API_KEY_LIKE = /(sk-|gsk_|gsk-|AIza)[\w\-]+/.freeze
 
@@ -57,14 +60,18 @@ class AIBackend::RubyLLM < AIBackend
     Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::RubyLLM::Chat
   end
 
-  # One stanza per provider credential: the key plus, for openai-compatible
-  # vendors (anything not the canonical OpenAI URL), the base URL override and
-  # the traditional system role those servers expect.
+  # One stanza per provider credential: the key plus, when the service URL is
+  # not the provider's canonical one, the base URL override (and, for
+  # openai-compatible vendors, the traditional system role those servers expect).
   def self.configure_context(context, provider:, url:, token:)
     context.public_send("#{provider}_api_key=", token)
     if provider == :openai && url != APIService::URL_OPEN_AI
       context.openai_api_base = url
       context.openai_use_system_role = true
+    elsif provider == :anthropic && url != APIService::URL_ANTHROPIC
+      context.anthropic_api_base = url
+    elsif provider == :gemini && url != APIService::URL_GEMINI
+      context.gemini_api_base = url
     end
   end
 
@@ -73,6 +80,10 @@ class AIBackend::RubyLLM < AIBackend
   def self.canonical_openai_token(user)
     service = user.api_services.find_by(driver: :openai, url: APIService::URL_OPEN_AI)
     service&.effective_token
+  end
+
+  def self.canonical_gemini_token(user)
+    user.api_services.find_by(driver: :gemini, url: APIService::URL_GEMINI)&.effective_token
   end
 
   def self.provider_for_url(url)
@@ -85,8 +96,8 @@ class AIBackend::RubyLLM < AIBackend
     end
   end
 
-  def self.test_execute(url, token, api_name)
-    provider = provider_for_url(url)
+  def self.test_execute(url, token, api_name, driver: nil)
+    provider = test_provider(driver, url)
     Rails.logger.info "Connecting to AI API server at #{url} with access token of length #{token.to_s.length}"
     Rails.logger.info "Testing using model #{api_name} for provider #{provider}"
     context = client.context { |c| configure_context(c, provider: provider, url: url, token: token) }
@@ -95,6 +106,15 @@ class AIBackend::RubyLLM < AIBackend
     chat.complete.content
   rescue ::RubyLLM::Error, ::Faraday::Error => e
     "Error: #{e.message}"
+  end
+
+  # The service row's driver is the dialect's source of truth, so a proxy URL
+  # on an anthropic or gemini row is probed in its own dialect; the URL
+  # substring guess only stands in for rows that don't say (blank or unknown drivers).
+  def self.test_provider(driver, url)
+    return driver.to_sym if APIService::DIRECT_DRIVERS.include?(driver)
+
+    provider_for_url(url)
   end
 
   # Always paints through the user's OpenAI service, even for an Anthropic or Gemini assistant.
@@ -122,41 +142,29 @@ class AIBackend::RubyLLM < AIBackend
     { b64_json: image.data, model: IMAGE_MODEL, provider: "OpenAI" }
   end
 
-  # Always speaks through the user's OpenAI service, even for an Anthropic or
-  # Gemini assistant — the same key-scoping image generation uses.
   def self.generate_speech(text:, user:)
-    token = canonical_openai_token(user)
-
-    # Context-free on purpose: the controller, not the Toolbox, renders the
-    # policy key message for speech.
-    raise ConfigurationError if token.blank?
-
-    context = client.context { |c| c.openai_api_key = token }
-    speech = begin
-      context.speak(
-        text,
-        model: SPEECH_MODEL,
-        provider: :openai,
-        assume_model_exists: true,
-        voice: SPEECH_VOICE,
-        format: "wav",
-        provider_options: { speed: 1.0 },
-      )
-    rescue ::RubyLLM::BadRequestError => e
-      # A request rejection (e.g. text over the TTS cap) is not a key problem:
-      # land it on the controller's 502 rescue, like the legacy path does.
-      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::BadRequestError)
-    rescue *CONFIGURATION_ERRORS => e
-      raise mapped_error(e, model: SPEECH_MODEL, as: ConfigurationError)
-    rescue *RATE_LIMIT_ERRORS => e
-      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::TooManyRequestsError)
-    rescue ::RubyLLM::Error => e
-      # Fallback so an unmapped upstream 5xx lands on the controller's 502
-      # rescue instead of a bare 500 — today every upstream failure does.
-      raise mapped_error(e, model: SPEECH_MODEL, as: ::Faraday::ServerError)
+    if (token = canonical_openai_token(user)).present?
+      speak(text, provider: :openai, token:, model: SPEECH_MODEL, voice: SPEECH_VOICE,
+        format: "wav", provider_options: { speed: 1.0 })
+    elsif (token = canonical_gemini_token(user)).present?
+      WavAudio.from_pcm(speak(text, provider: :gemini, token:, model: GEMINI_SPEECH_MODEL, voice: GEMINI_SPEECH_VOICE))
+    else
+      raise ConfigurationError # message-free: the controller renders the key message
     end
+  end
 
-    speech.to_blob
+  def self.speak(text, provider:, token:, model:, **options)
+    context = client.context { |c| c.public_send("#{provider}_api_key=", token) }
+    context.speak(text, model:, provider:, assume_model_exists: true, **options).to_blob
+  rescue ::RubyLLM::BadRequestError => e # ahead of CONFIGURATION_ERRORS, which also holds it
+    gemini_rejected_key = e.message.match?(/api key/i)
+    raise mapped_error(e, model:, as: gemini_rejected_key ? ConfigurationError : ::Faraday::BadRequestError)
+  rescue *CONFIGURATION_ERRORS => e
+    raise mapped_error(e, model:, as: ConfigurationError)
+  rescue *RATE_LIMIT_ERRORS => e
+    raise mapped_error(e, model:, as: ::Faraday::TooManyRequestsError)
+  rescue ::RubyLLM::Error => e
+    raise mapped_error(e, model:, as: ::Faraday::ServerError)
   end
 
   def initialize(user, assistant, conversation = nil, message = nil)
@@ -194,8 +202,8 @@ class AIBackend::RubyLLM < AIBackend
     preceding_conversation_messages.each { |msg| chat.add_message(msg) }
     chat.with_tools(*tool_instances) if tools_enabled?
     if thinking_enabled?
-      chat.with_thinking(effort: THINKING_EFFORT, display: "summarized")
-      chat.with_provider_options(max_tokens: THINKING_MAX_TOKENS)
+      chat.with_thinking(**thinking_options)
+      chat.with_provider_options(max_tokens: THINKING_MAX_TOKENS) if provider_slug == :anthropic
     end
 
     begin
@@ -214,6 +222,10 @@ class AIBackend::RubyLLM < AIBackend
     return format_tool_calls(tool_calls) if tool_calls.present?
 
     raise ::Faraday::ParsingError if @stream_response_text.blank?
+
+    # The provider stopped at its output token limit, so the reply ends mid-thought
+    # and the view offers a Continue button.
+    @message.truncated_at = Time.current if response.max_tokens?
     nil
   end
 
@@ -305,13 +317,20 @@ class AIBackend::RubyLLM < AIBackend
   # RubyLLM formats each attachment for the provider: a PDF becomes Anthropic's document block,
   # OpenAI's file part, or Gemini's inline data.
   def user_message(message, documents, with_time:)
-    attachments = documents.select { |document| @assistant.natively_readable?(document) }.map { |document| ::RubyLLM::Attachment.new(document.file) }
+    attachments = documents.select { |document| @assistant.natively_readable?(document) }.map { |document| attachment_for(document) }
     pdf_texts = documents.select { |document| document.has_document_pdf? && !@assistant.supports_pdf? }.map(&:pdf_as_text)
     text = [message.content_text, *pdf_texts, (current_time_note if with_time)].compact.join("\n\n")
 
     msg = { role: message.role, content: text }
     msg[:attachments] = attachments if attachments.any?
     msg
+  end
+
+  # Images go as the :large variant: an original photo can exceed a provider's
+  # limit (5 MB for Anthropic), and the history resends it every turn.
+  def attachment_for(document)
+    file = document.has_image? ? document.image_variant(:large).processed.image : document.file
+    ::RubyLLM::Attachment.new(file)
   end
 
   # Reconstructs the stored OpenAI-shaped content_tool_calls (serialized via
@@ -350,18 +369,6 @@ class AIBackend::RubyLLM < AIBackend
     end
   end
 
-  def client_method_name
-    raise NotImplementedError
-  end
-
-  def configuration_error
-    raise NotImplementedError
-  end
-
-  def set_client_config(*)
-    raise NotImplementedError
-  end
-
   def tools_enabled?
     # The provider's tool policy is a provider fact, not a transport one:
     # LanguageModel#supports_tools? already consults the identity's policy,
@@ -370,7 +377,13 @@ class AIBackend::RubyLLM < AIBackend
   end
 
   def thinking_enabled?
-    provider_slug == :anthropic && @assistant.language_model.supports_thinking?
+    @assistant.language_model.supports_thinking?
+  end
+
+  def thinking_options
+    return { budget: THINKING_BUDGET, display: "summarized" } if provider_slug == :gemini && @api_name.start_with?("gemini-2.5")
+
+    { effort: THINKING_EFFORT, display: "summarized" }
   end
 
   def tool_instances
@@ -389,16 +402,5 @@ class AIBackend::RubyLLM < AIBackend
         thought_signature: tc.thought_signature,
         function: { name: tc.name, arguments: tc.arguments.to_json } }.compact
     end
-  end
-
-  # RubyLLM returns tool calls already separated, so these defensive identities
-  # satisfy the AIBackend::Tools contract even though
-  # stream_next_conversation_message never calls them.
-  def format_parallel_tool_calls(content_tool_calls)
-    content_tool_calls
-  end
-
-  def parallel_tool_calls(content_tool_calls)
-    content_tool_calls
   end
 end

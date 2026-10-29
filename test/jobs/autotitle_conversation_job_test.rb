@@ -5,7 +5,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation = conversations(:greeting)
     conversation.update!(title: nil)
 
-    TestClient::OpenAI.stub :text, "{\"topic\":\"Hear me\"}" do
+    TestClient::RubyLLM::Chat.stub :text, "{\"topic\":\"Hear me\"}" do
       AutotitleConversationJob.perform_now(conversation.id)
     end
 
@@ -17,7 +17,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation.latest_message_for_version(:latest).destroy!
     conversation.update!(title: nil)
 
-    TestClient::OpenAI.stub :text, "{\"topic\":\"Javascript popState\"}" do
+    TestClient::RubyLLM::Chat.stub :text, "{\"topic\":\"Javascript popState\"}" do
       AutotitleConversationJob.perform_now(conversation.id)
     end
 
@@ -28,7 +28,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation = conversations(:hello_claude)
     conversation.update!(title: nil)
 
-    TestClient::Anthropic.stub :text, "{\"topic\":\"Claude Summary\"}" do
+    TestClient::RubyLLM::Chat.stub :text, "{\"topic\":\"Claude Summary\"}" do
       AutotitleConversationJob.perform_now(conversation.id)
     end
 
@@ -39,7 +39,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation = conversations(:hello_claude)
     conversation.update!(title: nil)
 
-    TestClient::Anthropic.stub :text, "```json\n{ \"topic\": \"Vermont's capital\" }\n```" do
+    TestClient::RubyLLM::Chat.stub :text, "```json\n{ \"topic\": \"Vermont's capital\" }\n```" do
       AutotitleConversationJob.perform_now(conversation.id)
     end
 
@@ -50,7 +50,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation = conversations(:gemini_conversation)
     conversation.update!(title: nil)
 
-    TestClient::Gemini.stub :text, "{\"topic\":\"Gemini Summary\"}" do
+    TestClient::RubyLLM::Chat.stub :text, "{\"topic\":\"Gemini Summary\"}" do
       AutotitleConversationJob.perform_now(conversation.id)
     end
 
@@ -70,7 +70,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation.update!(title: "Already Named")
 
     assert_nothing_raised do
-      TestClient::OpenAI.stub :text, -> { raise "provider reached" } do
+      TestClient::RubyLLM::Chat.stub :text, -> { raise "provider reached" } do
         AutotitleConversationJob.perform_now(conversation.id)
       end
     end
@@ -82,16 +82,16 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation = conversations(:greeting)
     conversation.update!(title: nil)
 
-    twin_class = Class.new(TestClient::OpenAI) do
+    twin_class = Class.new(TestClient::RubyLLM::Chat) do
       define_singleton_method(:text) { "{\"topic\":\"Ladder Topic\"}" }
 
-      define_method(:chat) do |**args|
+      define_method(:complete) do |&block|
         conversation.update!(title: "Twin Title")
-        super(**args)
+        super(&block)
       end
     end
 
-    AIBackend::OpenAI.stub :client, twin_class do
+    AIBackend::RubyLLM.stub :gem_class, twin_class do
       AutotitleConversationJob.perform_now(conversation.id)
     end
 
@@ -102,12 +102,12 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation = conversations(:greeting)
     conversation.update!(title: nil)
 
-    failing_class = Class.new(TestClient::OpenAI) do
-      define_method(:chat) { |**args| raise Faraday::ConnectionFailed, "connection refused" }
+    failing_class = Class.new(TestClient::RubyLLM::Chat) do
+      define_method(:complete) { |&block| raise Faraday::ConnectionFailed, "connection refused" }
     end
 
     warnings = []
-    AIBackend::OpenAI.stub :client, failing_class do
+    AIBackend::RubyLLM.stub :gem_class, failing_class do
       Rails.logger.stub :warn, ->(message) { warnings << message } do
         AutotitleConversationJob.perform_now(conversation.id)
       end
@@ -123,7 +123,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     conversation.update!(title: nil)
 
     warnings = []
-    AIBackend::OpenAI.stub_any_instance :get_oneoff_message, -> (*) { raise AIBackend::ConfigurationError } do
+    AIBackend::RubyLLM.stub_any_instance :get_oneoff_message, -> (*) { raise AIBackend::ConfigurationError } do
       Rails.logger.stub :warn, ->(message) { warnings << message } do
         assert AutotitleConversationJob.perform_now(conversation.id)
       end
@@ -134,30 +134,42 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     assert_nil conversation.reload.title
   end
 
-  test "a stalled provider call times out instead of pinning the worker" do
-    conversation = conversations(:greeting)
+  test "a blank key skips title generation before any provider call" do
+    conversation = conversations(:hello_groq)
     conversation.update!(title: nil)
 
-    slow_class = Class.new(TestClient::OpenAI) do
-      define_singleton_method(:text) { "{\"topic\":\"Late Reply\"}" }
+    stub_features(default_llm_keys: false) do
+      conversation.assistant.language_model.api_service.update!(token: "")
 
-      define_method(:chat) do |**args|
-        sleep 0.3
-        super(**args)
-      end
-    end
-
-    warnings = []
-    AIBackend::OpenAI.stub :client, slow_class do
-      AIBackend::OpenAI.stub :oneoff_timeout_seconds, 0.05 do
-        Rails.logger.stub :warn, ->(message) { warnings << message } do
-          AutotitleConversationJob.perform_now(conversation.id)
-        end
+      assert_no_enqueued_jobs only: AutotitleConversationJob do
+        refute AutotitleConversationJob.perform_now(conversation.id)
       end
     end
 
     assert_nil conversation.reload.title
-    assert warnings.any? { |w| w.include?("Provider failure") }, "expected a provider-failure warning, got #{warnings.inspect}"
+  end
+
+  test "a stalled provider call surfaces the HTTP timeout instead of dead-lettering" do
+    # A stalled call stops at the HTTP layer (config.request_timeout) and
+    # surfaces as Faraday::TimeoutError, which the job degrades like any
+    # Faraday::Error — so this test raises rather than sleeping.
+    conversation = conversations(:greeting)
+    conversation.update!(title: nil)
+
+    timing_out_class = Class.new(TestClient::RubyLLM::Chat) do
+      define_method(:complete) { |&block| raise Faraday::TimeoutError, "execution expired" }
+    end
+
+    warnings = []
+    AIBackend::RubyLLM.stub :gem_class, timing_out_class do
+      Rails.logger.stub :warn, ->(message) { warnings << message } do
+        assert AutotitleConversationJob.perform_now(conversation.id)
+      end
+    end
+
+    assert_equal 1, warnings.length
+    assert_includes warnings.first, "Provider failure"
+    assert_nil conversation.reload.title
   end
 
   UNUSABLE_REPLIES = {
@@ -184,7 +196,7 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
       warnings = []
       begin
         Rails.logger.stub :warn, ->(message) { warnings << message } do
-          TestClient::OpenAI.stub :text, reply do
+          TestClient::RubyLLM::Chat.stub :text, reply do
             AutotitleConversationJob.perform_now(conversation.id)
           end
         end
@@ -197,27 +209,12 @@ class AutotitleConversationJobTest < ActiveJob::TestCase
     end
   end
 
-  test "safety-blocked gemini replies keep the prior title too" do
-    conversation = conversations(:gemini_conversation)
-    conversation.update!(title: nil)
-
-    TestClient::Gemini.blocked = true
-
-    assert_nothing_raised do
-      AutotitleConversationJob.perform_now(conversation.id)
-    end
-
-    assert_nil conversation.reload.title
-  ensure
-    TestClient::Gemini.blocked = false
-  end
-
   test "the topic is not set if the conversation has no messages" do
     conversation = users(:keith).conversations.create!(assistant: assistants(:samantha))
     conversation.update!(updated_at: Time.current) # update is what triggers the callback
 
     assert_nothing_raised do # confirms the exception did not raise outside the job
-      TestClient::OpenAI.stub :text, "{\"topic\":\"Javascript popState\"}" do
+      TestClient::RubyLLM::Chat.stub :text, "{\"topic\":\"Javascript popState\"}" do
         AutotitleConversationJob.perform_now(conversation.id)
       end
     end

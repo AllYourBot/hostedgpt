@@ -2,11 +2,13 @@
 
 # HostedGPT
 
-HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.  Your assistant will also do web searches itself if you get a free Brave Search API key.
+HostedGPT is a free, open-source alternative to ChatGPT also supporting other providers (Anthropic, Google, Llama, Groq, etc.). It's a Ruby on Rails app so you can run it on any server or even your own computer. Just bring your own API keys.
+
+You can have multiple users so it is great for a family or group.
 
 You can also switch providers and models in the middle of a conversation, so it is great for comparing different models!
 
-And you can attach your Google email and tasks account and manipulate them in your conversation. Calendar soon.
+And you can attach your Google email and tasks account and manipulate them in your conversation. Your assistant can also do web searches itself if you get a free Brave Search API key.
 
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
@@ -14,6 +16,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 
 - **Use OpenAI, Anthropic Claude, Google Gemini, Ollama models (and others) without multiple $20 / month subscriptions, you don't even need a single $20 subscription!** You only pay as much as you use. The HostedGPT app is free so you just pay for your OpenAI, Anthropic, and Google API usage to use the latest models.  There are hosting costs if not running locally.
 - **A polished interface with mobile support** You can "install" on your mobile phone by opening your instance of HostedGPT in your Safari browser, tapping the Share icon, and then selecting "Add to Home Screen".
+- **Multiple users for family or group use.**
 - **German localization included.**
 - **You will rarely hit the '_You've reached the current usage cap_' errors**.
 - **Collect and easily search and share all of your conversions** You can search across conversations and providers.
@@ -29,6 +32,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 - [Deploy the app on Render](#deploy-the-app-on-render)
 - [Deploy the app on Fly.io](#deploy-the-app-on-flyio)
 - [Deploy the app on Heroku](#deploy-the-app-on-heroku)
+- [Deploy the app with Kamal](#deploy-the-app-with-kamal)
 - [Deploy on your own server](#deploy-on-your-own-server)
 - [Running locally on your computer](#running-locally-on-your-computer)
   - [Alternatively, you can run outside of Docker](#alternatively-you-can-run-outside-of-docker)
@@ -46,7 +50,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 
 For the easiest way to get started, deploy a full version of HostedGPT to the hosting service, Render, for free. This free app works for 90 days and then the database will stop working.
 
-UPDATE: The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid service in Render, which is $7 / month. Alternatively, you can also run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
+UPDATE: The free service appears to not have enough memory HostedGPT, so you will probably need to upgrade to a paid service in Render, which is currently $7 / month. Alternatively, you can run it off your local computer. Jump down to the [Developer Instructions](#contribute-as-a-developer) if you want to run it locally.
 
 1. Click Fork > Create New Fork at the top of this repository
 2. Create an account on Render.com and login. If you are new to Render, you may be prompted to add a credit card to your account. However, you will be on their free plan by default unless you choose to upgrade.
@@ -60,7 +64,7 @@ UPDATE: The free service appears to not have enough memory HostedGPT, so you wil
 7. You should see two "Service Names" called "hostedgpt-..." (the name you picked), click the one that is of type **Web Service**
 8. On the details screen, click the URL that looks something like _hostedgpt-XXX.onrender.com_
 
-**NOTE: After 15 minutes of not using the app with the free service your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. You probably need to upgrade $7 per month anyway:**
+**NOTE: After 15 minutes of not using the app with the free service your Render server will pause. Next time you visit the first request will auto-resume the server, but this resume is slow. You probably need to upgrade to $7 per month anyway (see above), which won't have the pause:**
 
 1. To upgrade, go to your [Render Dashboard](https://dashboard.render.com/)
 2. Click "HostedGPT" or whatever you named your Web Service
@@ -118,6 +122,70 @@ Eligible students can apply for Heroku platform credits through [Heroku for GitH
    [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/heroku/nodejs-getting-start)
 
 You may want to read about [configuring optional features](#configure-optional-features).
+
+## Deploy the app with Kamal
+
+Kamal deploys the app as a Docker container with automatic HTTPS, zero-downtime rollover, and **no accounts on any external service**: no Docker Hub, no container registry, no Redis. The only things you need are a server, a domain name, and SSH access to it.
+
+### Prerequisites
+
+- Your local machine: Ruby matching this repo's `.ruby-version` (bundler enforces it exactly) with `bundle install` run, and Docker running (Kamal builds the image and hosts a private registry locally, so the server never sees your source or credentials)
+- A Linux server with at least 2 GB RAM and 20 GB disk, **amd64** architecture (arm64 hosts work only after a one-line change, see below), Ubuntu LTS family validated
+- Inbound TCP 80 and 443 reachable from the internet. Open them at your **cloud provider's security group or edge firewall** (a host firewall alone is not enough, and Docker-published ports bypass host-firewall rules entirely)
+- A DNS A-record pointing your domain (e.g. `chat.example.com`) at the server
+- SSH access to the server (key-based auth recommended; you'll typically run as root)
+
+### One-time setup
+
+1. Generate your production secrets; each command prints a value you'll use in the next step. These guard every API key your users store in HostedGPT, so **back them up offline in encrypted form before continuing: if you lose them, all stored credentials are permanently unreadable** (recovery requires re-encrypting every stored token). **Migrating an existing HostedGPT deployment from Render or Fly?** Reuse your *original* `ACTIVE_RECORD_ENCRYPTION_*` values instead of generating fresh ones; new keys leave every stored credential permanently undecryptable.
+
+   ```
+   bin/rails secret   # → RAILS_MASTER_KEY
+   bin/rails secret   # → SECRET_KEY_BASE
+   bin/rails secret   # → ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+   bin/rails secret   # → ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+   bin/rails secret   # → ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+   bin/rails secret   # → HOSTED_DB_PASSWORD
+   ```
+
+2. Create `.kamal/secrets` in the repo root with owner-only permissions (`chmod 600 .kamal/secrets`) and these contents (paste your generated values):
+
+   ```
+   RAILS_MASTER_KEY=<value>
+   SECRET_KEY_BASE=<value>
+   ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=<value>
+   ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=<value>
+   ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=<value>
+   HOSTED_DB_PASSWORD=<value>
+   ```
+
+   This file is gitignored and excluded from Docker builds. Never paste its contents anywhere. (No `POSTGRES_PASSWORD` entry is needed: the deploy config injects `HOSTED_DB_PASSWORD` into the database container as `POSTGRES_PASSWORD`, so the app and database can never drift.)
+3. Edit `config/deploy.yml`: set your server's IP in `servers.web` and in the `db` accessory's `host`, and your domain in `proxy.host`.
+4. Commit nothing; your edits stay local to your deployment.
+
+### Deploy
+
+```
+bundle exec kamal setup
+```
+
+That single command installs Docker on the server, starts the proxy and the Postgres database, builds the app image on your machine, transfers it, runs migrations, and brings up HostedGPT with HTTPS. First deploy takes a while: the image transfers through a tunnel from your machine to the server, so duration depends on your upload bandwidth, and your machine must stay awake throughout. Subsequent deploys are `bundle exec kamal deploy`.
+
+A few things worth knowing:
+
+- **Rolling back** needs the machine that deployed: previous images are kept on your local registry, so `bundle exec kamal rollback` works from the same machine with the registry container running. Rolling forward works from anywhere with the repo.
+- **Migrations run at container boot** and bound deploy time. For a lengthy migration, run it first via `bundle exec kamal app exec --reuse "bin/rails db:migrate"` (mirroring Fly's release-command pattern), then deploy.
+- **Base images pull anonymously from Docker Hub.** If `kamal setup` fails with a pull error on a shared IP, wait and retry; rate limits are per-IP and temporary.
+- **Never expose the database port.** The accessory has no published host port by design; if you ever add one, it must be loopback-only (`127.0.0.1:5432:5432`); Docker-published ports bypass host-firewall rules.
+- **Back up your database**: all conversations live in the Postgres data directory on the server (the `db` accessory's `data` directory under your deploy directory). Periodically dump it, encrypted, somewhere outside this repo; the dump contains every conversation:
+
+  ```
+  bundle exec kamal accessory exec db --reuse --raw -q -- "pg_dump -U hostedgpt hostedgpt_production" | gpg --encrypt --recipient you@example.com > ~/backups/hostedgpt-$(date +%F).sql.gpg
+  ```
+
+  (`--reuse` runs inside the live database container; `--raw` keeps kamal's host banners out of the dump; sanity-check the file starts with a pg_dump header.)
+
+Once it's up, you may want to read about [configuring optional features](#configure-optional-features). To run without Docker instead, follow [Deploy on your own server](#deploy-on-your-own-server).
 
 ## Deploy on your own server
 
@@ -237,16 +305,14 @@ There are a number of optional feature flags that can be set and settings that c
   - `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
   - `CLOUDFLARE_SECRET_ACCESS_KEY` - Your Cloudflare Secret Access Key
   - `CLOUDFLARE_BUCKET` - The name of the bucket you created
-- `GOOGLE_TOOLS_FEATURE` is `false` by default because this feature is still in development. Set this to `true` if you would like to try the experimental feature where your assistant can access your Gmail, Google Tasks, and soon Google Calendar. After enabling, you need to set up Google OAuth and include the apps as part of the consent flow. See [Configure Google Tools](#configuring-google-tools). After this is done, when each user goes to Settings within the app, there will be a button to explicitly connect their account to Gmail, Google Tasks, and/or Google Calendar. Review `gmail.rb` and `google_tasks.rb` in the directory `app/services/toolbox/` to see what capabilities have currently been built.
-- `VOICE_FEATURE` is `false` by default. This is an experimental feature to have spoken conversation with your assistant. It's still a bit buggy but it's coming along.
+- `GOOGLE_TOOLS_FEATURE` is `true` by default. Set this to `false` if you would not like this feature where your assistant can access your Gmail, Google Tasks, and soon Google Calendar. If enabled, you need to set up Google OAuth and include the apps as part of the consent flow. See [Configure Google Tools](#configuring-google-tools). After this is done, when each user goes to Settings within the app, there will be a button to explicitly connect their account to Gmail, Google Tasks, and/or Google Calendar. Review `gmail.rb` and `google_tasks.rb` in the directory `app/services/toolbox/` to see what capabilities have currently been built.
+- `VOICE_FEATURE` is `true` by default. This feature provides a microphone icon for spoken conversation with your assistant.
 - `PASSWORD_AUTHENTICATION_FEATURE` is `true` by default, see the [Authentication](#authentication) section for more details.
 - `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
 - `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
 - `ASSISTANTS_PAGE_FEATURE` is true by default. Is shows the word Assistants obove the list of Assistants, which when clicked on shows a page with all of the Assistants in square boxes. Turn this off by setting it to `false`.
 
 ### Configuring Google Tools
-
-**NOTE: Some users experience failures with this feature.  Expected to be fixed next version**
 
 You first need to follow all the steps in the [Google OAuth instructions](#google-oauth-authentication). The only step that is optional is that you can leave `GOOGLE_AUTHENTICATION_FEATURE` set to false, which means you don't have to enable new users to register with Google. However, following all the steps will also set up Google Auth so you can connect Google Tools to your assistants. After, you complete those steps, here is the additional configuration you need to do in order to enable the Google tools:
 
@@ -258,7 +324,7 @@ You first need to follow all the steps in the [Google OAuth instructions](#googl
      - https://www.googleapis.com/auth/gmail.modify (then click "Add To Table")
      - https://www.googleapis.com/auth/tasks (then click "Add To Table")
 
-2. **Finally, set `GOOGLE_TOOLS_FEATURE` to true**
+2. **Finally, make sure `GOOGLE_TOOLS_FEATURE` is true**
 
 ### Authentication
 

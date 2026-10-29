@@ -42,3 +42,35 @@ test('queueRequest marks a job errored with the last failure after three attempt
   expect(obj0.errored).toStrictEqual(true)
   expect(obj0.error).toEqual('Service is currently unavailable')
 })
+
+describe('when the server has no voice to speak with', () => {
+  let originalSpeechService, attempts
+
+  beforeEach(() => {
+    originalSpeechService = SpeechService
+    attempts = 0
+    SpeechService = class { async audioFromOpenAI() {
+      attempts++
+      throw Object.assign(new Error('No OpenAI key'), { serverVoiceUnavailable: true })
+    } }
+  })
+
+  afterEach(() => { SpeechService = originalSpeechService })
+
+  test('queueRequest stops retrying and hands the job to the browser voice', async () => {
+    await queue.queueRequest(0, "Keith")
+
+    expect(attempts).toEqual(1)
+    expect(obj0.browserVoice).toStrictEqual(true)
+    expect(obj0.generated).toStrictEqual(true)
+    expect(obj0.errored).toBeUndefined()
+  })
+
+  test('later sentences of the reply skip the server entirely', async () => {
+    await queue.queueRequest(0, "Keith")
+    await queue.queueRequest(1, "Steve")
+
+    expect(attempts).toEqual(1)
+    expect(obj1.browserVoice).toStrictEqual(true)
+  })
+})

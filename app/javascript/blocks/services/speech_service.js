@@ -32,7 +32,8 @@ export default class extends Service {
         const { message } = await ttsResponse.json()
         errorMessage = message;
       } catch (error) {}
-      throw new Error(errorMessage);
+      const serverVoiceUnavailable = ttsResponse.status == 422
+      throw Object.assign(new Error(errorMessage), { serverVoiceUnavailable })
     }
 
     const blob = await ttsResponse.blob()
@@ -49,6 +50,6 @@ export default class extends Service {
     if (!text) return []
     text = text.replace(". . .", "...")
     const thoughts = text.split(/(?<=[^ ][\.:!\?;…] |[\n，。．！？；：])/)
-    return thoughts.reject(t => t.strip().empty()).map(t => t.replace(/''/g, "'"))
+    return thoughts.reject(t => t.strip().empty())
   }
 }
