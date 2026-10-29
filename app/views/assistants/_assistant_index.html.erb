@@ -7,12 +7,7 @@
       <span class="absolute inset-0" aria-hidden="true"></span>
       <p class="flex items-center text-sm font-medium text-gray-900">
         <span class="truncate"><%= assistant.name %></span>
-        <% if assistant.context_documents.any? %>
-          <% context_files = t("app.assistants.ui.context_files") %>
-          <span class="ml-1.5 flex-shrink-0 text-gray-500" role="img" aria-label="<%= context_files %>" title="<%= context_files %>" data-role="context-files">
-            <%= icon "paper-clip", variant: :micro %>
-          </span>
-        <% end %>
+        <%= render "assistants/context_files_icon", assistant: %>
       </p>
       <p class="text-sm text-gray-500"><%= assistant.description %> (<%= assistant.language_model_api_name %>)</p>
     <% end %>
