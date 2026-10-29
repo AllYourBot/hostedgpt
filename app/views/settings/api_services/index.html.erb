@@ -23,7 +23,7 @@
     <thead>
       <tr class="bg-gray-200 dark:bg-gray-900">
         <th><%= t("app.settings.api_services.table.name") %></th>
-        <th><%= t("app.settings.api_services.table.url") %></th>
+        <th><%= t("app.settings.api_services.table.service_type") %></th>
         <th><%= t("app.settings.api_services.table.driver") %></th>
       </tr>
     </thead>
@@ -37,7 +37,7 @@
             data-clickable-row-url-value="<%= edit_settings_api_service_path(api_service) %>"
           >
             <td class="underline"><%= api_service.name %></td>
-            <td><%= api_service.url %></td>
+            <td><%= api_service.service_type %></td>
             <td><%= api_service.driver %></td>
           </tr>
         <% end %>
