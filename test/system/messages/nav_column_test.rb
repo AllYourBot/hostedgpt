@@ -188,4 +188,22 @@ class NavColumnTest < ApplicationSystemTestCase
     click_element pencil_on_second_assistant
     assert_current_path new_assistant_message_path(assistant2)
   end
+
+  test "a long assistant name truncates before the context files icon so the selected assistant still shows it" do
+    assistant = assistants(:samantha)
+    assistant.update!(name: "Samantha the very helpful personal assistant with a long name")
+    visit new_assistant_message_path(assistant)
+    assert_selected_assistant assistant
+
+    name = find("#assistant_#{assistant.id} a[data-role='name']")
+    assert_true "the name should be truncated" do
+      name.evaluate_script("this.querySelector('.truncate').scrollWidth > this.querySelector('.truncate').clientWidth")
+    end
+    assert_true "the context files icon should not be cut off" do
+      name.evaluate_script("this.querySelector(\"[data-role='context-files']\").getBoundingClientRect().right <= this.getBoundingClientRect().right")
+    end
+
+    name.hover
+    assert_selector ".overflow-expand-popout [data-role='context-files']", visible: :all
+  end
 end
