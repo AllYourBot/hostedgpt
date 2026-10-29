@@ -84,9 +84,9 @@ class MessagesHelperTest < ActionView::TestCase
 
     html = view.format_for_display(message)
 
-    refute_includes html, "<script>"
-    assert_includes html, "&lt;script&gt;"
-    assert_includes html, '\\(x^2\\)'
+    refute_includes html, "<script>", "assistant markup must not render raw"
+    assert_includes html, "&lt;script&gt;", "assistant markup should render escaped"
+    assert_includes html, '\\(x^2\\)', "math delimiters should survive the escape"
   end
 
   private

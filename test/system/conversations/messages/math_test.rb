@@ -14,8 +14,8 @@ class ConversationMessagesMathTest < ApplicationSystemTestCase
 
   test "math typesets on page load instead of showing raw delimiters" do
     msg = find("#message_#{messages(:im_a_bot).id}")
-    msg.assert_selector(".katex")
-    msg.assert_no_text("$$")
+    assert msg.has_selector?(".katex"), "math should typeset on load"
+    assert msg.has_no_text?("$$"), "no raw delimiters should remain"
   end
 
   test "streamed math typesets after a turbo broadcast" do

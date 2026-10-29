@@ -14,9 +14,9 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
 
   test "mermaid block renders a diagram preview and keeps its source" do
     msg = find("#message_#{messages(:im_a_bot).id}")
-    msg.assert_selector(".mermaid-preview svg")
-    msg.assert_selector("details", text: "Diagram source")
-    msg.assert_selector("details pre", text: "A-->B", visible: :all)
+    assert msg.has_selector?(".mermaid-preview svg"), "the fence should preview as a diagram"
+    assert msg.has_selector?("details", text: "Diagram source"), "the source should sit in a disclosure"
+    assert msg.has_selector?("details pre", text: "A-->B", visible: :all), "the original source should be kept"
   end
 
   test "invalid diagram leaves readable source and breaks nothing" do
@@ -24,14 +24,10 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     visit_and_scroll_wait conversation_messages_path(@conversation)
 
     msg = find("#message_#{messages(:im_a_bot).id}")
-    msg.assert_no_selector(".mermaid-preview svg")
+    assert msg.has_no_selector?(".mermaid-preview svg"), "an invalid diagram should not preview"
     assert_includes msg.text, "not a diagram", "the broken fence stays as readable source"
 
-    # Out of the failed-render window (debounce + first mermaid warm-up):
-    # mermaid's temp wrapper (a direct body child) and the message-scoped
-    # error svg would still be in the DOM now if the catch-path cleanup
-    # missed them. Direct-body-child scoping keeps valid preview svgs on
-    # other messages out of this count.
+    # Past the debounce and mermaid's first warm-up, so a failed render has finished.
     sleep 2.5
     message_scope = "#message_#{messages(:im_a_bot).id}"
     leftovers = page.evaluate_script(
@@ -46,13 +42,9 @@ class ConversationMessagesDiagramTest < ApplicationSystemTestCase
     assert msg.has_selector?(".mermaid-preview svg"), "the first render produced a preview"
     first_id = msg.find(".mermaid-preview svg")[:id]
 
-    # Module-level mermaid state survives Turbo visits, so an in-app theme
-    # flip (settings turbo form, page never reloads) must re-key the cache.
-    # Choose the flip direction from the browser's preferred scheme so the
-    # effective mermaid theme definitely changes. The preview-removal below
-    # is the actual DOM mutation the observer sees (attribute and flag
-    # changes are unobserved); it schedules a fresh theme-checked render
-    # pass, which must mint a new svg id instead of reusing the cached one.
+    # Flip away from the browser's preferred scheme so the effective theme
+    # really changes. Removing the previews is the mutation that triggers a
+    # re-render; the class changes alone are unobserved.
     if page.evaluate_script("matchMedia('(prefers-color-scheme: dark)').matches")
       page.execute_script(
         "document.documentElement.classList.remove('dark','system');" \

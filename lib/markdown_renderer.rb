@@ -2,26 +2,14 @@ require "commonmarker"
 require "nokogiri"
 
 class MarkdownRenderer
-  COMMONMARKER_EXTENSIONS = {
-    strikethrough: true,
-    tagfilter: true,
-    table: true,
-    autolink: true,
-    tasklist: true,
-    alerts: true,
-    footnotes: true,
-    underline: true,
-  }.freeze
-
   class << self
     def render_for_speaking(markdown)
       CustomSpeakingRenderer.new.render(markdown.to_s)
     end
 
     def render_for_display(markdown, options = {})
-      # Input contract: content arrives HTML-escaped once upstream (the XSS
-      # contract lives at the helper). This layer parses markdown; it does
-      # not escape raw markup itself.
+      # Callers must HTML-escape the markdown first (see format_for_display):
+      # this layer does not escape raw markup itself.
       block_code_proc = options.delete(:block_code)
 
       markdown = ensure_blank_line_before_code_block_start(markdown)
@@ -29,7 +17,18 @@ class MarkdownRenderer
       markdown = markdown.dup.force_encoding(Encoding::UTF_8).scrub
       html = Commonmarker.to_html(
         markdown,
-        options: { extension: COMMONMARKER_EXTENSIONS }
+        options: {
+          extension: {
+            strikethrough: true,
+            tagfilter: true,
+            table: true,
+            autolink: true,
+            tasklist: true,
+            alerts: true,
+            footnotes: true,
+            underline: true,
+          },
+        }
       )
       html = apply_block_code_proc(html, block_code_proc)
       restore_math_spans(html, math_spans)
@@ -76,12 +75,8 @@ class MarkdownRenderer
       "\uE000"
     end
 
-    # Commonmarker has no block_code callback, so the helper's copy-header
-    # structure is applied as a post-process: each <pre> is replaced by
-    # whatever the proc returns for its (code_html, language). Code content
-    # arrives double-protected (escaped once upstream, once by comrak), so
-    # text nodes get decoded twice wherever no proc/fragment round-trip
-    # provides the second unwrap.
+    # Code arrives escaped twice (once upstream, once by comrak), so code text
+    # is decoded twice unless the proc's fragment round-trip does the second.
     def apply_block_code_proc(html, block_code_proc)
       return html unless html.include?("<code")
 
