@@ -155,10 +155,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_120000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["external_id"], name: "index_credentials_on_external_id"
-    t.index ["type", "external_id"], name: "index_credentials_on_type_and_external_id", unique: true, where: "((type)::text = ANY ((ARRAY['GoogleCredential'::character varying, 'MicrosoftGraphCredential'::character varying, 'HttpHeaderCredential'::character varying])::text[]))"
-    t.index ["type", "oauth_email"], name: "index_credentials_on_type_and_oauth_email", unique: true, where: "((type)::text = ANY ((ARRAY['GoogleCredential'::character varying, 'MicrosoftGraphCredential'::character varying])::text[]))"
-    t.index ["type", "user_id", "external_id"], name: "index_credentials_on_type_user_id_and_external_id", unique: true, where: "((type)::text = ANY ((ARRAY['GmailCredential'::character varying, 'GoogleTasksCredential'::character varying])::text[]))"
-    t.index ["type", "user_id", "oauth_email"], name: "index_credentials_on_type_user_id_and_oauth_email", unique: true, where: "((type)::text = ANY ((ARRAY['GmailCredential'::character varying, 'GoogleTasksCredential'::character varying])::text[]))"
+    t.index ["type", "external_id"], name: "index_credentials_on_type_and_external_id", unique: true, where: "((type)::text = ANY (ARRAY[('GoogleCredential'::character varying)::text, ('MicrosoftGraphCredential'::character varying)::text, ('HttpHeaderCredential'::character varying)::text]))"
+    t.index ["type", "oauth_email"], name: "index_credentials_on_type_and_oauth_email", unique: true, where: "((type)::text = ANY (ARRAY[('GoogleCredential'::character varying)::text, ('MicrosoftGraphCredential'::character varying)::text]))"
+    t.index ["type", "user_id", "external_id"], name: "index_credentials_on_type_user_id_and_external_id", unique: true, where: "((type)::text = ANY (ARRAY[('GmailCredential'::character varying)::text, ('GoogleTasksCredential'::character varying)::text]))"
+    t.index ["type", "user_id", "oauth_email"], name: "index_credentials_on_type_user_id_and_oauth_email", unique: true, where: "((type)::text = ANY (ARRAY[('GmailCredential'::character varying)::text, ('GoogleTasksCredential'::character varying)::text]))"
     t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 
