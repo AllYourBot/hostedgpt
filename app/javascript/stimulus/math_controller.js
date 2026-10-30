@@ -1,5 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
-import renderMathInElement from "katex-auto-render"
+
+let renderMathInElementModule
+// Loaded only when math delimiters are actually present (see #typeset's gate):
+// katex.mjs is ~286KB of the runtime a plain-text page doesn't need.
+async function loadRenderMathInElement() {
+  renderMathInElementModule ??= (await import("katex-auto-render")).default
+  return renderMathInElementModule
+}
 
 export default class extends Controller {
   #timer
@@ -25,11 +32,12 @@ export default class extends Controller {
     return this.element.dataset.streaming === "true"
   }
 
-  #typeset() {
+  async #typeset() {
     if (this.#streaming) return
     if (!/\$\$|\\\(|\\\[/.test(this.element.textContent)) return
 
     try {
+      const renderMathInElement = await loadRenderMathInElement()
       renderMathInElement(this.element, {
         delimiters: [ // no single-$ delimiter: currency like $5 would become math
           { left: "$$", right: "$$", display: true },

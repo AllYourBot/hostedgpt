@@ -36,6 +36,8 @@ end.each do |file|
 end
 pin "tailwindcss-safe-area" # @0.5.1
 pin "tailwindcss/plugin", to: "tailwindcss--plugin.js" # @3.4.4
-pin "katex", to: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.mjs", integrity: "sha384-jedKqQ2avB8pVdicoYScbJrLo+QCOkeNRKJl9vYz9vRHjP4VYoJFGCelkRVBCZAe"
-pin "katex-auto-render", to: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/contrib/auto-render.mjs", integrity: "sha384-TVzn2BhpYt3oVSkcw7UsqrtOiRjYZclHsyRByxnksSdM08YtpNkb7RLhhACRu3OA"
-pin "mermaid", to: "https://cdn.jsdelivr.net/npm/mermaid@12.2.0/dist/mermaid.esm.min.mjs", integrity: "sha384-1zE8eD4a3qmTtl4mMJrmjzEupBhNg25KA88b0P9vQee9I6JEDc8yxcUY4s4pDjuN"
+# preload: false: left to the lazy conditional imports inside math/diagram
+# controllers (importmap-rails pins default to preload: true)
+pin "katex", to: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.mjs", integrity: "sha384-jedKqQ2avB8pVdicoYScbJrLo+QCOkeNRKJl9vYz9vRHjP4VYoJFGCelkRVBCZAe", preload: false
+pin "katex-auto-render", to: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/contrib/auto-render.mjs", integrity: "sha384-TVzn2BhpYt3oVSkcw7UsqrtOiRjYZclHsyRByxnksSdM08YtpNkb7RLhhACRu3OA", preload: false
+pin "mermaid", to: "https://cdn.jsdelivr.net/npm/mermaid@12.2.0/dist/mermaid.esm.min.mjs", integrity: "sha384-1zE8eD4a3qmTtl4mMJrmjzEupBhNg25KA88b0P9vQee9I6JEDc8yxcUY4s4pDjuN", preload: false
