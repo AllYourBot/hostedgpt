@@ -1,11 +1,21 @@
 class AddBrave < ActiveRecord::Migration[8.1]
+  class User < ActiveRecord::Base
+    self.table_name = "users"
+  end
+
+  class APIService < ActiveRecord::Base
+    self.table_name = "api_services"
+  end
+
+  URL_BRAVE = "https://api.search.brave.com/res/v1/"
+
   def up
-    User.all.find_each do |user|
-      user.api_services.create!(url: APIService::URL_BRAVE, driver: :brave, name: "Brave")
+    User.ids.each do |user_id|
+      APIService.create!(user_id:, url: URL_BRAVE, driver: "brave", name: "Brave")
     end
   end
 
   def down
-    APIService.where(url: APIService::URL_BRAVE, driver: :brave).destroy_all
+    APIService.where(url: URL_BRAVE, driver: "brave").delete_all
   end
 end
