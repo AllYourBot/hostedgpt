@@ -1,9 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
-import mermaid from "mermaid"
 
 let initializedTheme
 let renderCounter = 0
 const renderedDiagrams = new Map()
+
+let mermaidModule
+// Loaded only when a diagram is actually present: mermaid.esm.min.mjs is
+// ~1MB, so an eager import would tax every page load, diagram or not. The
+// module-level memo keeps re-renders from touching the module graph again
+// (dynamic import alone also memoizes, but this makes intent explicit).
+async function loadMermaid() {
+  mermaidModule ??= (await import("mermaid")).default
+  return mermaidModule
+}
 
 export default class extends Controller {
   #timer
@@ -35,7 +44,8 @@ export default class extends Controller {
       if (!source || (!source.includes("\n") && !/-->|---/.test(source))) continue
       const id = `mermaid-${++renderCounter}`
       try {
-        this.#initializeMermaidForCurrentTheme()
+        const mermaid = await loadMermaid()
+        this.#initializeMermaidForCurrentTheme(mermaid)
         let svg = renderedDiagrams.get(source)
         if (!svg) {
           const result = await mermaid.render(id, source)
@@ -71,7 +81,7 @@ export default class extends Controller {
     return this.element.dataset.streaming === "true"
   }
 
-  #initializeMermaidForCurrentTheme() {
+  #initializeMermaidForCurrentTheme(mermaid) {
     const theme = this.#theme()
     if (initializedTheme !== theme) {
       mermaid.initialize({ startOnLoad: false, theme })
