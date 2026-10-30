@@ -54,11 +54,3 @@ Don't add descriptions of what code does, standard conventions, or "useful backg
 ## Step 6: Run the tests
 
 Run `bin/rails test` and `bin/rubocop` (and `bin/blocks test` if `app/javascript/blocks/` changed). System tests run in CI on the PR. Fix failures before committing; report any you can't fix.
-
-## Step 7: Commit
-
-If Steps 2–5 changed anything, stage the files explicitly and commit with a message describing the review changes, separate from feature commits.
-
-## Step 8: Link the PR
-
-End with the PR URL (`gh pr view --json url -q .url`). If no PR exists yet, say so and suggest `/pr`.
