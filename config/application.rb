@@ -16,6 +16,7 @@ Bundler.require(*Rails.groups)
 
 module HostedGPT
   class Application < Rails::Application
+    ENV.delete_if { |name, _| name.end_with?("_FEATURE") } if Rails.env.test? # tests opt into features with stub_features, not the host's .env
     config.options = config_for(:options)
 
     # Initialize configuration defaults for originally generated Rails version.

@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 10
     services:
       postgres:
-        image: postgres:16.1
+        image: postgres:16
         ports:
           - "5432:5432"
         env:
@@ -91,7 +91,7 @@ jobs:
       cancel-in-progress: true
     services:
       postgres:
-        image: postgres:16.1
+        image: postgres:16
         ports:
           - "5432:5432"
         env:
