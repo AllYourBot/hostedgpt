@@ -310,3 +310,12 @@ openrouter_gpt5:
   api_service: keith_openrouter_service
   supports_images: true
   supports_tools: true
+
+cheaper_inference_deepseek_v4_flash:
+  position: 26
+  user: keith
+  name: DeepSeek V4 Flash
+  api_name: deepseek-v4-flash
+  api_service: keith_cheaper_inference_service
+  supports_images: false
+  supports_tools: true

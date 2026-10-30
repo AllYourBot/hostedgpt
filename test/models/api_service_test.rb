@@ -45,6 +45,7 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal "claude_logo.svg", api_services(:keith_anthropic_service).logo_filename
     assert_equal "groq_logo.svg", api_services(:keith_groq_service).logo_filename
     assert_equal "openrouter_logo.png", api_services(:keith_openrouter_service).logo_filename
+    assert_equal "cheaper_inference_logo.svg", api_services(:keith_cheaper_inference_service).logo_filename
     assert_equal "google_gemini_logo.svg", api_services(:keith_gemini_service).logo_filename
     assert_nil api_services(:keith_other_service).logo_filename
   end
@@ -53,6 +54,7 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal AIBackend::RubyLLM, language_models(:gpt_best).ai_backend
     assert_equal AIBackend::RubyLLM, language_models(:llama_3_3_70b_versatile).ai_backend
     assert_equal AIBackend::RubyLLM, language_models(:openrouter_gpt5).ai_backend
+    assert_equal AIBackend::RubyLLM, language_models(:cheaper_inference_deepseek_v4_flash).ai_backend
     assert_equal AIBackend::RubyLLM, language_models(:alpaca).ai_backend
     assert_equal AIBackend::RubyLLM, language_models(:claude_best).ai_backend
     assert_equal AIBackend::RubyLLM, language_models(:gemini_flash_1_5).ai_backend
@@ -64,6 +66,7 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal :openai, api_services(:keith_openai_service).provider_identity
     assert_equal :groq, api_services(:keith_groq_service).provider_identity
     assert_equal :openrouter, api_services(:keith_openrouter_service).provider_identity
+    assert_equal :cheaper_inference, api_services(:keith_cheaper_inference_service).provider_identity
     assert_equal :anthropic, api_services(:keith_anthropic_service).provider_identity
     assert_equal :gemini, api_services(:keith_gemini_service).provider_identity
     assert_nil api_services(:keith_brave_service).provider_identity
@@ -80,12 +83,18 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal AIBackend::Policy::OpenRouter.key_error_message, openrouter.key_error_message
     assert_equal "https://openrouter.ai/credits", openrouter.billing_url
     assert_equal "OpenRouter", openrouter.reload.provider_name
+
+    cheaper_inference = api_services(:keith_cheaper_inference_service)
+    assert_equal AIBackend::Policy::CheaperInference.key_error_message, cheaper_inference.key_error_message
+    assert_equal "https://cheaperinference.com/", cheaper_inference.billing_url
+    assert_equal "Cheaper Inference", cheaper_inference.provider_name
   end
 
   test "official providers require a token and custom URLs do not" do
     assert api_services(:keith_openai_service).requires_token?
     assert api_services(:keith_groq_service).requires_token?
     assert api_services(:keith_openrouter_service).requires_token?
+    assert api_services(:keith_cheaper_inference_service).requires_token?
     refute api_services(:keith_other_service).requires_token?
   end
 
@@ -174,13 +183,15 @@ class APIServiceTest < ActiveSupport::TestCase
     api_services(:keith_anthropic_service).update!(token: "")
     api_services(:keith_groq_service).update!(token: nil)
     api_services(:keith_openrouter_service).update!(token: nil)
+    api_services(:keith_cheaper_inference_service).update!(token: nil)
 
     stub_features(default_llm_keys: true) do
-      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123", default_groq_key: "groq123", default_openrouter_key: "openrouter123") do
+      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123", default_groq_key: "groq123", default_openrouter_key: "openrouter123", default_cheaper_inference_key: "ci123") do
         assert_equal "gpt321", api_services(:keith_openai_service).effective_token
         assert_equal "claude123", api_services(:keith_anthropic_service).effective_token
         assert_equal "groq123", api_services(:keith_groq_service).effective_token
         assert_equal "openrouter123", api_services(:keith_openrouter_service).effective_token
+        assert_equal "ci123", api_services(:keith_cheaper_inference_service).effective_token
       end
     end
   end
@@ -213,6 +224,7 @@ class APIServiceTest < ActiveSupport::TestCase
       anthropic: [ :anthropic, APIService::URL_ANTHROPIC ],
       groq: [ :openai, APIService::URL_GROQ ],
       openrouter: [ :openai, APIService::URL_OPENROUTER ],
+      cheaper_inference: [ :openai, APIService::URL_CHEAPER_INFERENCE ],
       gemini: [ :gemini, APIService::URL_GEMINI ],
     }.each do |identity, (driver, url)|
       service = APIService.new(driver: driver, url: url)

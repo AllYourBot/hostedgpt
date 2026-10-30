@@ -30,6 +30,13 @@ keith_openrouter_service:
   driver: openai
   service_type: AI
 
+keith_cheaper_inference_service:
+  name: Cheaper Inference
+  user: keith
+  url: https://api.cheaperinference.com/v1/
+  token: abc-secret
+  driver: openai
+
 keith_other_service:
   name: Keith Server
   user: keith

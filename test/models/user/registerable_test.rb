@@ -17,4 +17,10 @@ class User::RegisterableTest < ActiveSupport::TestCase
     user = people(:ali_invited).user
     assert user.api_services.exists?(name: "OpenRouter", url: APIService::URL_OPENROUTER, driver: "openai")
   end
+
+  test "it provisions a Cheaper Inference service for the new user" do
+    people(:ali_invited).update!(personable_type: "User", personable_attributes: { first_name: "John", last_name: "Doe", })
+    user = people(:ali_invited).user
+    assert user.api_services.exists?(name: "Cheaper Inference", url: APIService::URL_CHEAPER_INFERENCE, driver: "openai")
+  end
 end

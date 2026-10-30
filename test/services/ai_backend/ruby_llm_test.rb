@@ -17,6 +17,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert AIBackend::RubyLLM.supports_identity?(:gemini)
     assert AIBackend::RubyLLM.supports_identity?(:groq)      # openai-compatible path
     assert AIBackend::RubyLLM.supports_identity?(:openrouter) # native provider
+    assert AIBackend::RubyLLM.supports_identity?(:cheaper_inference) # openai-compatible path
     refute AIBackend::RubyLLM.supports_identity?(:brave)
     refute AIBackend::RubyLLM.supports_identity?(nil)
   end
@@ -360,6 +361,15 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
 
     context = backend.send(:ruby_llm_context)
     assert_equal APIService::URL_OPENROUTER, context.openai_api_base
+    assert_equal true, context.openai_use_system_role
+  end
+
+  test "ruby_llm_context sets openai_api_base and the system role for Cheaper Inference" do
+    @assistant.language_model.api_service.update!(url: APIService::URL_CHEAPER_INFERENCE, driver: "openai")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    context = backend.send(:ruby_llm_context)
+    assert_equal APIService::URL_CHEAPER_INFERENCE, context.openai_api_base
     assert_equal true, context.openai_use_system_role
   end
 
