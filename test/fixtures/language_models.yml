@@ -310,3 +310,12 @@ openrouter_gpt5:
   api_service: keith_openrouter_service
   supports_images: true
   supports_tools: true
+
+Qwen3_8b:
+  position: 26
+  user: keith
+  name: Qwen3 8B
+  api_name: qwen3:8b
+  api_service: keith_ollama_service
+  supports_images: false
+  supports_tools: true

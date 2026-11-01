@@ -5,6 +5,8 @@ class APIService < ApplicationRecord
   URL_OPENROUTER = "https://openrouter.ai/api/v1/"
   URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/"
   URL_BRAVE = "https://api.search.brave.com/res/v1/"
+  URL_OLLAMA = "http://localhost:11434/v1/"
+  TOKEN_REQUIRED_URLS = [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI, URL_BRAVE, URL_GROQ, URL_OPENROUTER].freeze
   SERVICE_TYPES = %w[AI Search Other].freeze
 
   belongs_to :user
@@ -62,7 +64,7 @@ class APIService < ApplicationRecord
   end
 
   def requires_token?
-    [URL_OPEN_AI, URL_ANTHROPIC, URL_GEMINI, URL_BRAVE, URL_GROQ, URL_OPENROUTER].include?(url) # other services may require it but we don't always know
+    TOKEN_REQUIRED_URLS.include?(url) # other services may require it but we don't always know
   end
 
   def logo_filename

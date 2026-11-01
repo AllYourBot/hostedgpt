@@ -60,7 +60,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       user = Person.find_by(email: email).user
       assert_equal "John", user.first_name
       assert_equal "Doe", user.last_name
-      assert_equal 6, user.assistants.count, "This new user did not get the expected number of assistants"
+      assert_equal 7, user.assistants.count, "This new user did not get the expected number of assistants"
 
       assert_redirected_to root_path
       follow_redirect!
@@ -77,7 +77,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       user = Person.find_by(email: email).user
       assert_equal "John", user.first_name
       assert_equal "Doe", user.last_name
-      assert_equal 6, user.assistants.count, "This new user did not get the expected number of assistants"
+      assert_equal 7, user.assistants.count, "This new user did not get the expected number of assistants"
 
       assert_redirected_to root_path
       follow_redirect!

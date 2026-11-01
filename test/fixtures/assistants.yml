@@ -61,6 +61,14 @@ keith_groq:
   instructions:
   tools: []
 
+keith_qwen3:
+  user: keith
+  slug: qwen3-8b
+  language_model: Qwen3_8b
+  name: Qwen3 8B
+  description: Qwen3 8B
+  instructions:
+  tools: []
 
 rob_gpt4:
   user: rob

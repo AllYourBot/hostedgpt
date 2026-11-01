@@ -14,6 +14,7 @@ module User::Registerable
     api_services.create!(url: APIService::URL_OPENROUTER, driver: :openai, name: "OpenRouter")
     api_services.create!(url: APIService::URL_GEMINI, driver: :gemini, name: "Google Gemini")
     api_services.create!(url: APIService::URL_BRAVE, driver: :brave, name: "Brave")
+    api_services.create!(url: APIService::URL_OLLAMA, driver: :openai, name: "Ollama")
 
     LanguageModel.import_from_file(users: [self])
     Assistant.import_from_file(users: [self])

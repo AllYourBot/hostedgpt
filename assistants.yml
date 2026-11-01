@@ -1,5 +1,9 @@
 ---
 assistants:
+- name: Qwen3 8B
+  slug: qwen3-8b
+  description: "Model qwen3:8b on Ollama"
+  language_model_api_name: qwen3:8b
 - name: GPT-5
   slug: gpt-5
   description: "Model gpt-5 on OpenAI"
