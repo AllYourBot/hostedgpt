@@ -37,6 +37,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 - [Running locally on your computer](#running-locally-on-your-computer)
   - [Alternatively, you can run outside of Docker](#alternatively-you-can-run-outside-of-docker)
 - [Configure optional features](#configure-optional-features)
+  - [Use local models with Ollama](#using-ollama)
   - [Give assistant access to your Google apps](#configuring-google-tools)
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
@@ -311,6 +312,15 @@ There are a number of optional feature flags that can be set and settings that c
 - `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
 - `HTTP_HEADER_AUTHENTICATION_FEATURE` is `false` by default. If this is set to `true` it automatically disables Password and Google Authentication Features. See the [Authentication](#authentication) section for more details.
 - `ASSISTANTS_PAGE_FEATURE` is true by default. Is shows the word Assistants obove the list of Assistants, which when clicked on shows a page with all of the Assistants in square boxes. Turn this off by setting it to `false`.
+
+### Using Ollama
+
+Every user gets an Ollama API service pointed at `http://localhost:11434/v1/`, a `qwen3:8b` language model, and a Qwen3 8B assistant. Ollama doesn't need an API key, so the token can stay blank.
+
+1. [Install Ollama](https://ollama.com/download) and pull the model: `ollama pull qwen3:8b`
+2. Start a conversation with the Qwen3 8B assistant.
+
+If HostedGPT runs in Docker, `localhost` is the container itself. Change the Ollama API service URL in Settings to `http://host.docker.internal:11434/v1/`. On Linux, also add `extra_hosts: ["host.docker.internal:host-gateway"]` to the `base` service in `docker-compose.yml` and start Ollama with `OLLAMA_HOST=0.0.0.0` so it accepts connections from the container. To use other models, add them in Settings under the Ollama API service.
 
 ### Configuring Google Tools
 

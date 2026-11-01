@@ -363,6 +363,28 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_equal true, context.openai_use_system_role
   end
 
+  test "ruby_llm_context uses a placeholder key for a keyless openai-compatible server" do
+    @assistant.language_model.api_service.update!(url: APIService::URL_OLLAMA, driver: "openai", token: "")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    context = backend.send(:ruby_llm_context)
+    assert_equal APIService::URL_OLLAMA, context.openai_api_base
+    assert_equal AIBackend::RubyLLM::KEYLESS_OPENAI_KEY, context.openai_api_key
+  end
+
+  test "ruby_llm_context keeps the user's key for an openai-compatible server" do
+    @assistant.language_model.api_service.update!(url: APIService::URL_OLLAMA, driver: "openai", token: "local-key")
+    backend = AIBackend::RubyLLM.new(@user, @assistant)
+
+    assert_equal "local-key", backend.send(:ruby_llm_context).openai_api_key
+  end
+
+  test "configure_context does not invent a key for a provider that requires one" do
+    context = TestClient::RubyLLM::ContextDouble.new
+    AIBackend::RubyLLM.configure_context(context, provider: :openai, url: APIService::URL_GROQ, token: nil)
+    assert_nil context.openai_api_key
+  end
+
   test "ruby_llm_context does not set openai_api_base for canonical OpenAI URL" do
     @assistant.language_model.api_service.update!(url: APIService::URL_OPEN_AI, driver: "openai")
     backend = AIBackend::RubyLLM.new(@user, @assistant)

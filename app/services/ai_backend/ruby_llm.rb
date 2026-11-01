@@ -63,9 +63,13 @@ class AIBackend::RubyLLM < AIBackend
   # One stanza per provider credential: the key plus, when the service URL is
   # not the provider's canonical one, the base URL override (and, for
   # openai-compatible vendors, the traditional system role those servers expect).
+  KEYLESS_OPENAI_KEY = "none"
+
   def self.configure_context(context, provider:, url:, token:)
     context.public_send("#{provider}_api_key=", token)
     if provider == :openai && url != APIService::URL_OPEN_AI
+      # Keyless openai-compatible servers (Ollama, LM Studio) ignore the key, but RubyLLM won't run without one.
+      context.openai_api_key = KEYLESS_OPENAI_KEY if token.blank? && APIService::TOKEN_REQUIRED_URLS.exclude?(url)
       context.openai_api_base = url
       context.openai_use_system_role = true
     elsif provider == :anthropic && url != APIService::URL_ANTHROPIC
