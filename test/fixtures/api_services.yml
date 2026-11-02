@@ -100,5 +100,5 @@ keith_ollama_service:
   name: Ollama
   user: keith
   url: http://localhost:11434/v1/
-  driver: ollama
+  driver: openai
   service_type: AI

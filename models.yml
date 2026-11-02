@@ -48,7 +48,7 @@ models:
 - api_name: qwen3:8b
   name: Qwen3 8B (Ollama)
   supports_images: false
-  supports_tools: false
+  supports_tools: true
   supports_system_message: true
   supports_pdf: false
   api_service_name: Ollama
