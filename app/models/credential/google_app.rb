@@ -10,10 +10,12 @@ module Credential::GoogleApp
     validates :oauth_email, presence: true, uniqueness: { scope: :user_id }, format: { with: URI::MailTo::EMAIL_REGEXP }
 
     normalizes :oauth_email, with: -> email { email.downcase.strip }
+
+    store_accessor :properties, :scope
   end
 
   def permissions
-    properties.dig(:scope)&.split&.map { |p| p.split("/").last } || []
+    scope&.split&.map { |p| p.split("/").last } || []
   end
 
   def has_permission?(perm)

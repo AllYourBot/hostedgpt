@@ -8,6 +8,8 @@ class MicrosoftGraphCredential < Credential
 
   normalizes :oauth_email, with: -> email { email.downcase.strip }
 
+  store_accessor :properties, :expires_at
+
   # Use this method to retrieve the latest oauth_token.
   # Token will be automatically renewed as necessary
   def token
@@ -16,7 +18,7 @@ class MicrosoftGraphCredential < Credential
   end
 
   def expires_at
-    Time.at(properties[:expires_at]) if properties[:expires_at]
+    Time.at(super) if super
   rescue
     nil
   end
@@ -30,7 +32,7 @@ class MicrosoftGraphCredential < Credential
     update(
       oauth_token: new_token.token,
       oauth_refresh_token: new_token.refresh_token,
-      properties: { expires_at: new_token.expires_at }
+      expires_at: new_token.expires_at
     )
   end
 

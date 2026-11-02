@@ -29,7 +29,7 @@ class Feature
 
     def enabled?(feature)
       feature_value = if defined?(Current)
-        Current.user&.preferences&.dig(:feature, feature.to_sym)
+        Current.user&.feature&.dig(feature.to_s)
       end
 
       begin

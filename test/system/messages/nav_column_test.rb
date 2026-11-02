@@ -149,6 +149,22 @@ class NavColumnTest < ApplicationSystemTestCase
     assert_visible "nav", "The nav bar should have stayed opened."
   end
 
+  test "the assistants page has a handle which closes the sidebar and keeps it closed after a refresh" do
+    with_assistants_page(true) do
+      login_as @user
+      visit root_url
+      assert_current_path root_path
+
+      assert_visible "nav", "The nav column should start open"
+      click_element "#handle"
+      assert_hidden "nav", "Clicking the handle should close the nav column"
+      sleep 0.3
+
+      visit current_path
+      assert_hidden "nav", "The nav column should have stayed closed after a refresh"
+    end
+  end
+
   test "meta+. opens and closes nav column" do
     assert_visible "nav"
 

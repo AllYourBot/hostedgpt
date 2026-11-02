@@ -221,6 +221,6 @@ class AuthenticationsController::GoogleOauthControllerTest < ActionDispatch::Int
     assert_equal details[:info][:email], credential.oauth_email
     assert_equal details[:credentials][:token], credential.oauth_token
     assert_equal details[:credentials][:refresh_token], credential.oauth_refresh_token
-    assert_equal details[:credentials].except(:token, :refresh_token), credential.properties
+    assert_equal details[:credentials].except(:token, :refresh_token).deep_stringify_keys, credential.properties
   end
 end

@@ -37,12 +37,7 @@ class User < ApplicationRecord
   validate :profile_picture_validation
 
   accepts_nested_attributes_for :credentials
-  serialize :preferences, coder: JsonSerializer
-  store_accessor :preferences, :dark_mode, :nav_closed, :show_thinking
-
-  def preferences
-    attributes["preferences"] || {}
-  end
+  store_accessor :preferences, :dark_mode, :nav_closed, :show_thinking, :feature
 
   def dark_mode
     super.presence || "system"

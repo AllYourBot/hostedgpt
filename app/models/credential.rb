@@ -5,6 +5,4 @@ class Credential < ApplicationRecord
   has_many :authentications_including_deleted, class_name: "Authentication", inverse_of: :credential, dependent: :destroy
 
   encrypts :external_id, :oauth_email, :oauth_token, :oauth_refresh_token, deterministic: true
-
-  serialize :properties, coder: JsonSerializer
 end
