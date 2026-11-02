@@ -23,7 +23,7 @@ class User::RegisterableTest < ActiveSupport::TestCase
     user = people(:ali_invited).user
     service = user.api_services.find_by(name: "Ollama", url: APIService::URL_OLLAMA, driver: "openai")
     assert service
-    assert user.language_models.exists?(api_name: "qwen3:8b", api_service: service)
+    assert user.language_models.find_by(api_name: "qwen3:8b", api_service: service).supports_tools?
     assert user.assistants.exists?(slug: "qwen3-8b")
   end
 end
