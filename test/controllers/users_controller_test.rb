@@ -88,17 +88,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "preferences merge preserves unrelated keys when setting nav_closed" do
     user = users(:keith)
-    user.preferences = { dark_mode: "light", feature: { some_custom_feature: true } }
-    user.save!
+    user.update!(dark_mode: "light", feature: { "some_custom_feature" => true })
     login_as user
 
-    patch user_url(user), params: { user: { preferences: { nav_closed: true } } }
+    patch user_url(user), params: { user: { nav_closed: true } }
     assert_response :redirect
     user.reload
 
-    assert user.preferences[:nav_closed]
-    assert_equal "light", user.preferences[:dark_mode]
-    assert_equal({ some_custom_feature: true }, user.preferences[:feature])
+    assert user.nav_closed
+    assert_equal "light", user.dark_mode
+    assert_equal({ "some_custom_feature" => true }, user.feature)
   end
 
   test "updates nav_closed preference without touching other preferences" do
@@ -106,7 +105,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     user.update!(dark_mode: "dark", nav_closed: false)
     login_as user
 
-    patch user_url(user), params: { user: { preferences: { nav_closed: "true" } } }
+    patch user_url(user), params: { user: { nav_closed: "true" } }
     assert_response :redirect
     user.reload
 

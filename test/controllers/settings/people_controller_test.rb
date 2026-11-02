@@ -184,7 +184,7 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
 
   test "updating dark_mode leaves nav_closed and feature opinions intact" do
     @user.update!(nav_closed: true)
-    @user.update!(preferences: @user.preferences.merge(feature: { some_custom_feature: "sdk" }))
+    @user.update!(feature: { "some_custom_feature" => "sdk" })
 
     params = person_params
     params["personable_attributes"]["dark_mode"] = "dark"
@@ -196,7 +196,7 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     @user.reload
     assert_equal "dark", @user.dark_mode
     assert_equal true, @user.nav_closed
-    assert_equal "sdk", @user.preferences[:feature][:some_custom_feature]
+    assert_equal "sdk", @user.feature["some_custom_feature"]
   end
 
   private

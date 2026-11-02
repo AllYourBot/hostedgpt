@@ -22,7 +22,7 @@ class MicrosoftGraphCredentialTest < ActiveSupport::TestCase
 
   test "token expired" do
     credential = credentials(:keith_microsoft_graph)
-    credential.update(properties: { expires_at: 1.minute.ago.to_i })
+    credential.update(expires_at: 1.minute.ago.to_i)
     assert credential.expired?
   end
 end

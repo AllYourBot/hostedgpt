@@ -2,40 +2,27 @@ require "test_helper"
 
 class User::PreferenceTest < ActiveSupport::TestCase
   test "boolean values within preferences get converted back and forth properly" do
-    assert_nil users(:keith).preferences[:nav_closed]
-    assert_nil users(:keith).preferences[:kids]
-    assert_nil users(:keith).preferences[:city]
+    user = users(:keith)
+    assert_nil user.nav_closed
 
-    users(:keith).update!(preferences: {
-      nav_closed: true,
-      kids: 2,
-      city: "Austin"
-    })
-    users(:keith).reload
+    user.update!(nav_closed: true)
+    assert_equal true, user.reload.nav_closed
 
-    assert users(:keith).preferences[:nav_closed]
-    assert_equal 2, users(:keith).preferences[:kids]
-    assert_equal "Austin", users(:keith).preferences[:city]
-
-    users(:keith).update!(preferences: {
-      nav_closed: "false",
-
-    })
-
-    refute users(:keith).preferences[:nav_closed]
+    user.update!(nav_closed: "false")
+    assert_equal false, user.reload.nav_closed
   end
 
   test "dark_mode preference defaults to system and it can update user dark_mode preference" do
     new_user = User.create!(first_name: "First", last_name: "Last")
     assert_equal "system", new_user.dark_mode
 
-    new_user.update!(preferences: { dark_mode: "light" })
+    new_user.update!(dark_mode: "light")
     assert_equal "light", new_user.dark_mode
 
-    new_user.update!(preferences: { dark_mode: "dark" })
+    new_user.update!(dark_mode: "dark")
     assert_equal "dark", new_user.dark_mode
 
-    new_user.update!(preferences: { dark_mode: "system" })
+    new_user.update!(dark_mode: "system")
     assert_equal "system", new_user.dark_mode
   end
 
@@ -45,22 +32,22 @@ class User::PreferenceTest < ActiveSupport::TestCase
 
     user.update!(show_thinking: "0")
     refute user.reload.show_thinking?
-    assert_equal false, user.preferences[:show_thinking]
+    assert_equal false, user.preferences["show_thinking"]
 
     user.update!(show_thinking: "1")
     assert user.reload.show_thinking?
   end
 
-  test "accessor writes persist through the reworked preferences getter" do
+  test "accessor writes mark preferences as changed and persist" do
     user = User.create!(first_name: "First", last_name: "Last")
-    assert_nil user.preferences[:dark_mode]
+    assert_nil user.preferences
 
     user.dark_mode = "dark"
     assert_predicate user, :will_save_change_to_preferences?
     user.save!
     user.reload
 
-    assert_equal "dark", user.preferences[:dark_mode]
+    assert_equal({ "dark_mode" => "dark" }, user.preferences)
   end
 
   test "accessors coerce form payloads and round-trip through save and reload" do
@@ -72,7 +59,7 @@ class User::PreferenceTest < ActiveSupport::TestCase
     user.reload
 
     assert_equal "dark", user.dark_mode
-    assert_equal true, user.reload.preferences[:nav_closed]
+    assert_equal true, user.reload.preferences["nav_closed"]
     assert_equal true, user.nav_closed
 
     user.nav_closed = "false"

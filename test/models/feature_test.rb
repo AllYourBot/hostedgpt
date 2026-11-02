@@ -33,8 +33,7 @@ class FeatureTest < ActiveSupport::TestCase
 
   test "a user's preferences can ENABLE a feature which is globally DISABLED" do
     user = users(:keith)
-    user.preferences = user.preferences.merge(feature: { my_feature: true })
-    user.save!
+    user.update!(feature: { "my_feature" => true })
 
     stub_features(my_feature: false) do
       Current.set(user: user) do
@@ -45,8 +44,7 @@ class FeatureTest < ActiveSupport::TestCase
 
   test "a user's preferences can DISABLE a feature which is globally ENABLED" do
     user = users(:keith)
-    user.preferences = user.preferences.merge(feature: { my_feature: false })
-    user.save!
+    user.update!(feature: { "my_feature" => false })
 
     stub_features(my_feature: true) do
       Current.set(user: user) do
