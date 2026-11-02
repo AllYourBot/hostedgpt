@@ -4,7 +4,12 @@
 
 <% content_for :messages do %>
 
-  <%= turbo_stream_from @conversation %>
+  <%= turbo_stream_from @conversation,
+    data: {
+      controller: "stream-reconnect",
+      action: "turbo:before-morph-attribute->stream-reconnect#keepConnectedAttribute"
+    }
+  %>
 
   <div
     class="min-w-full"
