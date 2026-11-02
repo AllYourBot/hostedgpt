@@ -482,7 +482,24 @@ See https://github.com/allyourbot/hostedgpt/blob/main/CONTRIBUTING.md
 
 (Notable features planned for v0.8: Voice mode, pin conversations, bookmarks, multiple service image generation/tool calling)
 
-V0.7 - Released on 8/18/2025
+v0.8 - Released on 11/2/2026
+- Migrate backend to RubyLLM
+- Multiple images on single message
+- Retry button on failed responses
+- Brave as new Web Search tool
+- Home page for assistants
+- Fix gmail and tasks tools
+- Profile pic upload
+- PWA improvements/fixes
+- Kamal deployment support
+- Context files per Assistant
+- Finalize voice mode
+- Show extended thinking
+- Render math, code, and diagrams
+- Continue button at token limit
+- Ollama API service configuration
+
+v0.7 - Released on 8/18/2025
 - Anthropic Claude, Google Gemini, Llama, and Groq services support
 - Tools (OpenAI) for memory, weather, images, google search
 - Conversation search across conversations/assistants
