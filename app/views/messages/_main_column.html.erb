@@ -3,37 +3,7 @@
   class="relative flex flex-col flex-1 min-w-0"
   data-turbo-action="advance"
 >
-  <%= button_to user_path(Current.user),
-    id: "handle",
-    form_class: %|
-      hidden md:flex
-      absolute left-0 -mt-10 top-1/2
-      z-20
-      cursor-pointer
-      group
-    |,
-    method: :patch,
-    params: { user: { nav_closed: !Current.user.nav_closed } },
-    class: %| flex-1 flex w-8 h-20
-    |,
-    data: {
-      turbo_frame: "_top",
-      controller: "keyboard",
-      action: %|
-        nav#toggleColumn
-
-        keydown.meta+shift+s@document->keyboard#click
-        keydown.ctrl+shift+s@document->keyboard#click
-        keydown.meta+period@document->keyboard#click
-        keydown.ctrl+period@document->keyboard#click
-      |,
-  } do
-  %>
-    <%= render "messages/main_column/sidebar_handle", side: "left", visibility: "hidden nav-open:!flex", tip: t("app.conversations.ui.close_sidebar"),
-      top_tilt: "group-hover:rotate-12", bottom_tilt: "group-hover:-rotate-12" %>
-    <%= render "messages/main_column/sidebar_handle", side: "right", visibility: "flex nav-open:!hidden", tip: t("app.conversations.ui.open_sidebar"),
-      top_tilt: "-rotate-12", bottom_tilt: "rotate-12" %>
-  <% end %>
+  <%= render "messages/main_column/sidebar_toggle" %>
 
   <!-- Only one of these headers is visible at a time, depending on width -->
   <header id="wide-header" class="justify-between flex-none hidden h-10 mt-2 mb-3 ml-2 text-lg text-gray-950 dark:text-gray-100 md:flex">
