@@ -101,13 +101,19 @@ en:
           one: "%{count} error prohibited this API service from being saved:"
           other: "%{count} errors prohibited this API service from being saved:"
       assistants:
+        index_title: "Assistants"
         new_title: "New Assistant"
         edit_title: "Configure Assistant"
         delete: "Delete"
         confirm_delete: "Are you sure?"
         cancel: "Cancel"
         menu:
+          index: "Assistants"
           new: "New Assistant"
+        table:
+          name: "Name"
+          description: "Description"
+          language_model: "Language Model"
         context:
           title: "Context"
           hint: "Text, PDF, and image files uploaded here are given to this assistant on every conversation. Images are shown only when its language model supports images."

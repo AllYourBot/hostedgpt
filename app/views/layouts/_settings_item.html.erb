@@ -1,6 +1,5 @@
 <% item, link = settings_item %>
 <% selected = (controller.to_s == controller_name.to_s) %>
-<% selected = selected && params[:id] == item.try(:id)&.to_s if controller.to_s == "assistants" %>
 <div
   class="
     flex justify-between items-center
@@ -23,11 +22,7 @@
     |,
     data: { role: "name" } do
   %>
-    <% if item.is_a?(Assistant) %>
-      <%= render partial: "layouts/assistant_avatar", locals: { assistant: item, size: 7, classes: "mr-2" } %>
-    <% end %>
-
-    <span class="<%= !item.is_a?(Assistant) && "ml-1 text-base" %>">
+    <span class="ml-1 text-base">
       <%= item %>
     </span>
   <% end %>

@@ -54,11 +54,10 @@ class Settings::PeopleTest < ApplicationSystemTestCase
     assert_equal attr.except(:email), @person.user.slice(:first_name, :last_name).symbolize_keys
   end
 
-  test "assistants in the settings sidebar render their service logo avatars" do
-    assert_selector "section#menu picture img[src*='groq_logo']" # Groq Llama 3.3
-    assert_selector "section#menu picture img[src*='openai_logo']", count: 3 # Samantha, GPT 3.5, OpenAI GPT-4o
-    assert_selector "section#menu picture img[src*='claude_logo']", count: 2
-    assert_equal "block", page.evaluate_script("getComputedStyle(document.querySelector('section#menu picture')).display")
+  test "the settings sidebar links to the assistants page instead of listing each assistant" do
+    within("section#menu") { click_text "Assistants" }
+    assert_current_path settings_assistants_path
+    assert_no_selector "section#menu picture"
   end
 
 end

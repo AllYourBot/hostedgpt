@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   resource :speech, only: :create
 
   namespace :settings do
-    resources :assistants, except: [:index, :show] do
+    resources :assistants, except: [:show] do
       resources :documents, only: [:create, :destroy]
     end
     resource :person, only: [:edit, :update]
