@@ -72,13 +72,19 @@ de:
           one: "%{count} Fehler hat das Speichern dieses API-Dienstes verhindert:"
           other: "%{count} Fehler haben das Speichern dieses API-Dienstes verhindert:"
       assistants:
+        index_title: "Assistenten"
         new_title: "Neuer Assistent"
         edit_title: "Assistent konfigurieren"
         delete: "Löschen"
         confirm_delete: "Sind Sie sicher?"
         cancel: "Abbrechen"
         menu:
+          index: "Assistenten"
           new: "Neuer Assistent"
+        table:
+          name: "Name"
+          description: "Beschreibung"
+          language_model: "Sprachmodell"
         context:
           title: "Kontext"
           hint: "Hier hochgeladene Text- und PDF-Dateien werden in jeder Unterhaltung in die Anweisungen dieses Assistenten aufgenommen."

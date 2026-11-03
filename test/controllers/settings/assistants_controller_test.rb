@@ -46,7 +46,24 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_assistant_url(@assistant)
     assert_response :success
     assert_contains_text "div#nav-container", "Your Account"
-    assert_contains_text "div#nav-container", "New Assistant"
+    assert_contains_text "div#nav-container", "Assistants"
+  end
+
+  test "should get index listing the user's assistants" do
+    get settings_assistants_url
+    assert_response :success
+    assert_select "a[href=?]", new_settings_assistant_path, text: "New Assistant"
+    @user.assistants.each do |assistant|
+      assert_select "#assistants tr[data-clickable-row-url-value=?]", edit_settings_assistant_path(assistant)
+    end
+    assert_select "#assistants tbody tr", count: @user.assistants.count
+  end
+
+  test "settings sidebar has one Assistants entry above the memories" do
+    get settings_assistants_url
+    assert_equal ["Your Account", "Assistants", "Assistant Memories", "Language Models", "API Services"],
+      css_select("section#menu a").map { |link| link.text.strip }
+    assert_select "section#menu a[href=?]", edit_settings_assistant_path(@assistant), count: 0
   end
 
   test "form should display a DELETE button if this is not your last assistant" do
@@ -143,7 +160,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert @assistant.reload.deleted?
-    assert_redirected_to new_settings_assistant_url
+    assert_redirected_to settings_assistants_url
     assert flash[:notice].present?, "There should have been a success message"
     refute flash[:alert].present?, "There should NOT have been an error message"
   end
@@ -157,7 +174,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
     end
 
     refute @assistant.reload.deleted?
-    assert_redirected_to new_settings_assistant_url
+    assert_redirected_to settings_assistants_url
     refute flash[:notice].present?, "There should NOT have been a success message"
     assert flash[:alert].present?, "There should have been an error message"
   end

@@ -1,0 +1,43 @@
+<h1 class="text-3xl"><%= t("app.settings.assistants.index_title") %></h1>
+
+<p class="my-8">
+  <%= link_to t("app.settings.assistants.menu.new"), new_settings_assistant_path,
+    class: %|
+      inline-block font-bold
+      bg-gray-200 dark:bg-gray-900
+      border border-gray-400
+      rounded-lg py-3 px-5
+      cursor-pointer
+    |
+  %>
+</p>
+
+<table id="assistants" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
+  <thead>
+    <tr class="bg-gray-200 dark:bg-gray-900">
+      <th><%= t("app.settings.assistants.table.name") %></th>
+      <th><%= t("app.settings.assistants.table.description") %></th>
+      <th><%= t("app.settings.assistants.table.language_model") %></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @assistants.each do |assistant| %>
+      <tr
+        id="<%= dom_id(assistant) %>"
+        class="<%= cycle("bg-gray-100 dark:bg-gray-600", "bg-white dark:bg-gray-900") %> cursor-pointer"
+        data-controller="clickable-row"
+        data-clickable-row-url-value="<%= edit_settings_assistant_path(assistant) %>"
+      >
+        <td>
+          <span class="flex items-center">
+            <%= render partial: "layouts/assistant_avatar", locals: { assistant: assistant, size: 7, classes: "mr-2" } %>
+            <span class="underline"><%= assistant.name %></span>
+          </span>
+        </td>
+        <td><%= assistant.description %></td>
+        <td><%= assistant.language_model&.name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

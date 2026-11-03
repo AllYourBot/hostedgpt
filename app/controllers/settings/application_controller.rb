@@ -20,15 +20,13 @@ class Settings::ApplicationController < ApplicationController
   I18n.t("app.settings.people.menu.account") => edit_settings_person_path,
       },
 
+      assistants: {
+  I18n.t("app.settings.assistants.menu.index") => settings_assistants_path,
+      },
+
       memories: {
   I18n.t("app.settings.memories.menu.title") => settings_memories_path,
       },
-
-      assistants: Current.user.assistants.ordered.includes(language_model: :api_service).map {
-        |assistant| [ assistant, edit_settings_assistant_path(assistant) ]
-      }.to_h.merge({
-  I18n.t("app.settings.assistants.menu.new") => new_settings_assistant_path
-      }),
 
       language_models: {
   I18n.t("app.settings.language_models.menu.index") => settings_language_models_path,

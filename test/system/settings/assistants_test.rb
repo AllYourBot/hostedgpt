@@ -6,6 +6,14 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     login_as @assistant.user
   end
 
+  test "the assistants page renders each assistant with its service logo avatar" do
+    visit settings_assistants_url
+    assert_selector "#assistants picture img[src*='groq_logo']" # Groq Llama 3.3
+    assert_selector "#assistants picture img[src*='openai_logo']", count: 3 # Samantha, GPT 3.5, OpenAI GPT-4o
+    assert_selector "#assistants picture img[src*='claude_logo']", count: 2
+    assert_equal "block", page.evaluate_script("getComputedStyle(document.querySelector('#assistants picture')).display")
+  end
+
   test "should create assistant" do
     visit new_settings_assistant_url
 
