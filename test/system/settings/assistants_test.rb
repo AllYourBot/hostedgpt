@@ -11,6 +11,7 @@ class Settings::AssistantsTest < ApplicationSystemTestCase
     assert_selector "#assistants picture img[src*='groq_logo']" # Groq Llama 3.3
     assert_selector "#assistants picture img[src*='openai_logo']", count: 3 # Samantha, GPT 3.5, OpenAI GPT-4o
     assert_selector "#assistants picture img[src*='claude_logo']", count: 2
+    assert_selector "#assistants picture img[src*='ollama_logo']" # Qwen3 8B
     assert_equal "block", page.evaluate_script("getComputedStyle(document.querySelector('#assistants picture')).display")
   end
 

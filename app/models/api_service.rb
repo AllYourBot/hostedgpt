@@ -74,6 +74,7 @@ class APIService < ApplicationRecord
     when URL_GROQ then "groq_logo.svg"
     when URL_OPENROUTER then "openrouter_logo.png"
     when URL_GEMINI then "google_gemini_logo.svg"
+    when URL_OLLAMA then "ollama_logo.png"
     end
   end
 

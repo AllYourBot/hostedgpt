@@ -46,6 +46,8 @@ class APIServiceTest < ActiveSupport::TestCase
     assert_equal "groq_logo.svg", api_services(:keith_groq_service).logo_filename
     assert_equal "openrouter_logo.png", api_services(:keith_openrouter_service).logo_filename
     assert_equal "google_gemini_logo.svg", api_services(:keith_gemini_service).logo_filename
+    assert_equal "ollama_logo.png", api_services(:keith_ollama_service).logo_filename,
+      "Ollama assistants get the llama mark instead of the bare initials circle"
     assert_nil api_services(:keith_other_service).logo_filename
   end
 
