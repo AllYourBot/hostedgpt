@@ -33,27 +33,15 @@ class SDK
   # Ruby >= 3.4 qualifies backtrace labels with the defining class, e.g. "SDK#get"
   # instead of just "get", and "block in Toolbox::Gmail#get_user_profile" instead of
   # "block in get_user_profile". Strip both so callers only see the bare method name.
-  def bare_label(location)
-    location&.label&.gsub("block in ", "")&.split("#")&.last
-  end
+  def bare_label(location) = location&.label&.gsub("block in ", "")&.split("#")&.last
 
-  def key
-    raise "self.key is undefined. You need to override this method."
-  end
+  def key = raise "self.key is undefined. You need to override this method."
 
-  def bearer_token
-    nil
-  end
+  def bearer_token = nil
 
-  def expected_status
-    nil
-  end
+  def expected_status = nil
 
-  def header
-    nil
-  end
+  def header = nil
 
-  def param
-    nil
-  end
+  def param = nil
 end

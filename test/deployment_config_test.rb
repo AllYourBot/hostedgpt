@@ -53,7 +53,7 @@ class DeploymentConfigTest < ActiveSupport::TestCase
     config = YAML.load_file(Rails.root.join("config/deploy.yml"))
     stages = File.read(Rails.root.join("Dockerfile"))
       .lines.grep(/^FROM /)
-    stage_names = stages.map { |line| line.split(/ as /i).last.strip }
+    stage_names = stages.map { it.split(/ as /i).last.strip }
     parents = stages.to_h { |line|
       _, parent, name = line.match(/^FROM\s+(\S+)\s+AS\s+(\S+)/).to_a
       [name, parent]
@@ -80,7 +80,7 @@ class DeploymentConfigTest < ActiveSupport::TestCase
 
   test "dockerignore excludes the kamal secrets directory" do
     active_lines = File.read(Rails.root.join(".dockerignore"))
-      .lines.map(&:strip).reject { |line| line.empty? || line.start_with?("#") }
+      .lines.map(&:strip).reject { it.empty? || it.start_with?("#") }
 
     assert_includes active_lines, "/.kamal",
       ".kamal/secrets must never enter a Docker build context"
@@ -88,7 +88,7 @@ class DeploymentConfigTest < ActiveSupport::TestCase
 
   test "production keeps force_ssl with the /up health-check redirect exemption" do
     active_lines = File.read(Rails.root.join("config/environments/production.rb"))
-      .lines.map(&:strip).reject { |line| line.empty? || line.start_with?("#") }
+      .lines.map(&:strip).reject { it.empty? || it.start_with?("#") }
 
     assert_includes active_lines, "config.force_ssl = true"
     assert_includes active_lines,

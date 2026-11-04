@@ -114,9 +114,7 @@ class Authenticate::ByHttpHeaderTest < ActionDispatch::IntegrationTest
     assert_logged_in(user)
   end
 
-  def existing_http_auth_user
-    { Setting.http_header_auth_uid => credentials(:rob_http_header).auth_uid }
-  end
+  def existing_http_auth_user = { Setting.http_header_auth_uid => credentials(:rob_http_header).auth_uid }
 
   def new_http_auth_user
     {

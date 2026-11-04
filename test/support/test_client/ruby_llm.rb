@@ -72,9 +72,7 @@ module TestClient
         self
       end
 
-      def content
-        @last_response
-      end
+      def content = @last_response
 
       def ask(message = nil, with: nil, &block)
         add_message({role: "user", content: message}) if message
@@ -95,7 +93,7 @@ module TestClient
             thought_signature: self.class.thought_signature
           )
         end
-        message = message_double(content: nil, tool_calls: tool_calls.to_h { |tc| [tc.id, tc] }, finish_reason: :tool_calls)
+        message = message_double(content: nil, tool_calls: tool_calls.to_h { [it.id, it] }, finish_reason: :tool_calls)
         @messages << message
         message
       end
@@ -135,55 +133,33 @@ module TestClient
 
       # Returns the name of the tool the model "requested"; nil means the model
       # responds with text instead.
-      def self.function
-        nil
-      end
+      def self.function = nil
 
-      def self.num_tool_calls
-        1
-      end
+      def self.num_tool_calls = 1
 
       # Gemini attaches a thought signature to each tool call; other providers
       # issue none. Stub this to simulate Gemini.
-      def self.thought_signature
-        nil
-      end
+      def self.thought_signature = nil
 
       # A ::RubyLLM::Thinking streamed ahead of the response; nil means the model
       # didn't think. Stub this to simulate extended thinking.
-      def self.thinking
-        nil
-      end
+      def self.thinking = nil
 
-      def self.default_text
-        "Hello this is model #{@@model}! How can I assist you today?"
-      end
+      def self.default_text = "Hello this is model #{@@model}! How can I assist you today?"
 
-      def self.blank_response
-        false
-      end
+      def self.blank_response = false
 
       # Why the model stopped; :max_tokens means it hit its output token limit.
       # Stub this to simulate a reply cut off at that limit.
-      def self.finish_reason
-        :stop
-      end
+      def self.finish_reason = :stop
 
-      def self.error_to_raise
-        nil
-      end
+      def self.error_to_raise = nil
 
-      def self.tokens
-        { input: 8, output: 9 }
-      end
+      def self.tokens = { input: 8, output: 9 }
 
-      def self.arguments
-        {city: "Austin", state: "TX", country: "US"}.to_json
-      end
+      def self.arguments = {city: "Austin", state: "TX", country: "US"}.to_json
 
-      def self.id
-        "call_BlAN9iRiAD6aCzmBWCjzYxjj"
-      end
+      def self.id = "call_BlAN9iRiAD6aCzmBWCjzYxjj"
 
       class << self
         attr_reader :instructions, :cache_until_here, :provider_options, :tools, :thinking_config
@@ -213,9 +189,7 @@ module TestClient
         attr_accessor :image_url, :paint_error_to_raise, :last_paint_call,
           :speech_data, :speak_error_to_raise, :last_speak_call
 
-        def image_data
-          @image_data || "RUBYLLM_BASE64_IMAGE_DATA"
-        end
+        def image_data = @image_data || "RUBYLLM_BASE64_IMAGE_DATA"
 
         def reset_recordings!
           @last_paint_call = nil
@@ -231,9 +205,7 @@ module TestClient
 
     # Mirrors RubyLLM::Speech#to_blob for the fake: carries the raw audio bytes.
     SpeechBytes = Struct.new(:data) do
-      def to_blob
-        data
-      end
+      def to_blob = data
     end
 
     def self.context(&block)

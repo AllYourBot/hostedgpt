@@ -31,7 +31,5 @@ class PasswordCredentialsController < ApplicationController
     redirect_to login_path, alert: I18n.t("app.flashes.password_resets.token_expired")
   end
 
-  def update_params
-    params.permit(:password)
-  end
+  def update_params = params.permit(:password)
 end

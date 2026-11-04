@@ -4,7 +4,5 @@ class AIBackend::Policy::OpenAI < AIBackend::Policy::Base
       "left and then Settings and then **API Services**. You will find OpenAI Key instructions.)"
   end
 
-  def self.billing_url
-    "https://platform.openai.com/account/billing/overview"
-  end
+  def self.billing_url = "https://platform.openai.com/account/billing/overview"
 end

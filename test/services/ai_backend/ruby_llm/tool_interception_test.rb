@@ -15,9 +15,7 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
     )
   end
 
-  def tool_call(id, location)
-    RubyLLM::ToolCall.new(id: id, name: "get_weather", arguments: { location: location })
-  end
+  def tool_call(id, location) = RubyLLM::ToolCall.new(id: id, name: "get_weather", arguments: { location: location })
 
   def build_chat
     chat = RubyLLM::Chat.new(model: "gpt-4o", provider: :openai, assume_model_exists: true)
@@ -30,7 +28,7 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
     response = RubyLLM::Message.new(
       role: :assistant,
       content: nil,
-      tool_calls: tool_calls.to_h { |tc| [tc.id, tc] }
+      tool_calls: tool_calls.to_h { [it.id, it] }
     )
     chat.stub(:provider_completion, response, &)
   end
@@ -43,7 +41,7 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
     assert response.tool_call?, "the returned message should carry tool calls"
     assert_equal ["call_abc123"], response.tool_calls.values.map(&:id)
     assert_equal ["get_weather"], response.tool_calls.values.map(&:name)
-    assert_equal ["Austin"], response.tool_calls.values.map { |tc| tc.arguments[:location] }
+    assert_equal ["Austin"], response.tool_calls.values.map { it.arguments[:location] }
   end
 
   test "every requested tool call is captured, parallel calls included" do
@@ -53,7 +51,7 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
     response = stub_tool_call_response(chat, calls) { chat.generate }
 
     assert_equal ["call_abc123", "call_def456"], response.tool_calls.values.map(&:id)
-    assert_equal ["Austin", "Boston"], response.tool_calls.values.map { |tc| tc.arguments[:location] }
+    assert_equal ["Austin", "Boston"], response.tool_calls.values.map { it.arguments[:location] }
   end
 
   test "execution halts cleanly: no tool result is appended and the chat does not auto-continue" do
@@ -61,9 +59,9 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
 
     stub_tool_call_response(chat, [tool_call("call_abc123", "Austin")]) { chat.generate }
 
-    assert_empty chat.messages.select { |m| m.role == :tool },
+    assert_empty chat.messages.select { it.role == :tool },
       "no role: :tool result message should be appended"
-    assert_equal 1, chat.messages.count { |m| m.role == :assistant },
+    assert_equal 1, chat.messages.count { it.role == :assistant },
       "the chat should not have auto-continued with a follow-up assistant message"
   end
 
@@ -77,7 +75,7 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
     response = stub_tool_call_response(chat, [hallucinated]) { chat.generate }
 
     assert_equal "not_a_registered_tool", response.tool_calls["call_halluc"].name
-    assert_empty chat.messages.select { |m| m.role == :tool },
+    assert_empty chat.messages.select { it.role == :tool },
       "no role: :tool result message should be appended for an unregistered tool"
   end
 
@@ -97,7 +95,7 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
       }
     end
 
-    context = RubyLLM.context { |c| c.openai_api_key = "test-key" }
+    context = RubyLLM.context { it.openai_api_key = "test-key" }
     chat = RubyLLM::Chat.new(model: "gpt-4o", provider: :openai, assume_model_exists: true, context:)
     chat.add_message(role: :user, content: "What's the weather?")
     chat.with_tools(build_tool)

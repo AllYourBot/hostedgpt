@@ -24,7 +24,7 @@ class LanguageModel::RefreshFromRubyLLM
       refresh_api_service(api_service, models_by_provider)
     end
 
-    configured_providers = api_services.filter_map { |api_service| api_service.provider_identity&.to_s }.uniq
+    configured_providers = api_services.filter_map { it.provider_identity&.to_s }.uniq
     missing_provider_identities = APIService.chat_provider_identities.filter_map do |provider|
       provider_name = provider.to_s
       provider_name if configured_providers.include?(provider_name) && models_by_provider[provider_name].blank?
@@ -35,9 +35,7 @@ class LanguageModel::RefreshFromRubyLLM
 
   private
 
-  def canonical_chat_service?(api_service)
-    CANONICAL_PROVIDER_URLS[api_service.provider_identity] == api_service.url
-  end
+  def canonical_chat_service?(api_service) = CANONICAL_PROVIDER_URLS[api_service.provider_identity] == api_service.url
 
   def refresh_api_service(api_service, models_by_provider)
     provider = api_service.provider_identity&.to_s

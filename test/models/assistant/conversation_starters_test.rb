@@ -14,14 +14,14 @@ class Assistant::ConversationStartersTest < ActiveSupport::TestCase
 
   test "conversation_starters IS valid with up to the maximum number of questions" do
     assistant = assistants(:samantha)
-    assistant.conversation_starters = Array.new(Assistant::MAX_CONVERSATION_STARTERS) { |index| "Question #{index}" }
+    assistant.conversation_starters = Array.new(Assistant::MAX_CONVERSATION_STARTERS) { "Question #{it}" }
 
     assert assistant.valid?, "An assistant should accept #{Assistant::MAX_CONVERSATION_STARTERS} starters"
   end
 
   test "conversation_starters IS NOT valid with more than the maximum number of questions" do
     assistant = assistants(:samantha)
-    assistant.conversation_starters = Array.new(Assistant::MAX_CONVERSATION_STARTERS + 1) { |index| "Question #{index}" }
+    assistant.conversation_starters = Array.new(Assistant::MAX_CONVERSATION_STARTERS + 1) { "Question #{it}" }
 
     refute assistant.valid?, "An assistant should not accept more than #{Assistant::MAX_CONVERSATION_STARTERS} starters"
     assert_includes assistant.errors.full_messages, "Conversation starters can have at most #{Assistant::MAX_CONVERSATION_STARTERS} questions",

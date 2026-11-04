@@ -223,7 +223,7 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     end
 
     assistant_reply = @conversation.messages.reload.order(:index).last
-    assert_equal ["PNG call_dog_1", "PNG call_dog_2"], assistant_reply.documents.map { |document| document.file.download }.sort, "Both generated images should be attached to the reply"
+    assert_equal ["PNG call_dog_1", "PNG call_dog_2"], assistant_reply.documents.map { it.file.download }.sort, "Both generated images should be attached to the reply"
   end
 
   test "a config error renders key_error_message and marks the message failed" do

@@ -20,7 +20,7 @@ module Message::Version
     scope :for_conversation_version, ->(version) do
       version ||= :latest
       raise I18n.t("app.models.message.errors.version.invalid_argument") if version != :latest && version.to_s.to_i.to_s != version.to_s
-      c_id = all.where_clause.send(:predicates).find { |p| p.left.name == "conversation_id" }&.right&.value
+      c_id = all.where_clause.send(:predicates).find { it.left.name == "conversation_id" }&.right&.value
       raise I18n.t("app.models.message.errors.version.latest_scope_missing") if c_id.nil?
 
       if version.to_s == "latest"
@@ -50,9 +50,7 @@ module Message::Version
     super.to_s.split(",").map(&:to_i).uniq.sort
   end
 
-  def full_version
-    "#{index}.#{version}".to_f
-  end
+  def full_version = "#{index}.#{version}".to_f
 
   private
 

@@ -38,13 +38,9 @@ class SDK::Verb
     end
   end
 
-  def json_content
-    header(content_type: "application/json")
-  end
+  def json_content = header(content_type: "application/json")
 
-  def www_content
-    header(content_type: "application/x-www-form-urlencoded")
-  end
+  def www_content = header(content_type: "application/x-www-form-urlencoded")
 
   def header(h)
     raise "Header expects a hash" unless h.is_a?(Hash)
@@ -56,9 +52,7 @@ class SDK::Verb
     self.class.new(**smart_merge(args, { expected_status: s }))
   end
 
-  def no_params
-    param
-  end
+  def no_params = param
 
   private
 

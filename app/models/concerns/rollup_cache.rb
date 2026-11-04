@@ -31,12 +31,12 @@ module RollupCache
       multiple_belongs_to_models.each do |model|
         @_rollup_cache << [ name.to_sym, opts.except(:belongs_to).merge(belongs_to: model) ]
 
-        cache_onto_association = self.reflect_on_all_associations.find { |a| a.name == model }
+        cache_onto_association = self.reflect_on_all_associations.find { it.name == model }
         raise "#{self} defines a rollup_cache #{name} which references #{model} but that association cannot be found" if cache_onto_association.nil?
 
         cache_onto_obj = cache_onto_association.klass
 
-        if opts[:sum] && self.columns.find { |c| c.name == opts[:sum].to_s }.nil?
+        if opts[:sum] && self.columns.find { it.name == opts[:sum].to_s }.nil?
           raise "#{self} defines a rollup_cache #{name} which references #{opts[:sum]} but that column does not exist on #{self}"
         end
 
@@ -66,9 +66,7 @@ module RollupCache
       end
     end
 
-    def _rollup_cache
-      @_rollup_cache
-    end
+    def _rollup_cache = @_rollup_cache
   end
 
   included do
@@ -111,17 +109,11 @@ module RollupCache
       end
     end
 
-    def _update_rollup_cache_for_update
-      _update_rollup_cache(:update)
-    end
+    def _update_rollup_cache_for_update = _update_rollup_cache(:update)
 
-    def _update_rollup_cache_for_create
-      _update_rollup_cache(:create)
-    end
+    def _update_rollup_cache_for_create = _update_rollup_cache(:create)
 
-    def _update_rollup_cache_for_destroy
-      _update_rollup_cache(:destroy)
-    end
+    def _update_rollup_cache_for_destroy = _update_rollup_cache(:destroy)
 
     def _update_rollup_cache(mode)
       return unless self.class._rollup_cache
@@ -172,13 +164,13 @@ module RollupCache
     def _rollup_cache_config_for(name, opts)
       @_passes_if_before_update ||= {}
 
-      association = self.class.reflect_on_all_associations.find { |a| a.name == opts[:belongs_to] }
+      association = self.class.reflect_on_all_associations.find { it.name == opts[:belongs_to] }
       raise "#{self} defines a rollup_cache #{name} specified belongs_to of '#{opts[:belongs_to]}' but this association was not found." if association.nil?
       obj             = association.klass
       obj_instance    = self.send(opts[:belongs_to])
       obj_id = self.send(opts[:belongs_to])&.id
 
-      rollup_cache_column = obj.columns.find { |c| c.name == name.to_s }
+      rollup_cache_column = obj.columns.find { it.name == name.to_s }
       raise "The column #{name} does not exist on #{obj}" if rollup_cache_column.nil?
 
       passes_if_now = opts[:if].nil? ? true : self.send(opts[:if])

@@ -44,7 +44,5 @@ class ConversationsController < ApplicationController
     @conversation = Current.user.conversations.find_by(id: params[:id] || params[:conversation_id])
   end
 
-  def conversation_params
-    params.require(:conversation).permit(:user_id, :assistant_id, :title)
-  end
+  def conversation_params = params.require(:conversation).permit(:user_id, :assistant_id, :title)
 end

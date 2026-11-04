@@ -44,9 +44,7 @@ class Authentications::MicrosoftGraphOauthController < ApplicationController
 
   private
 
-  def credential_type
-    "MicrosoftGraphCredential"
-  end
+  def credential_type = "MicrosoftGraphCredential"
 
   def third_party_connections
     ["Microsoft third-party connections", "https://account.microsoft.com/privacy/app-access"]

@@ -1,9 +1,7 @@
 class Toolbox::OpenWeather < Toolbox
   # Followed this guide: https://openweathermap.org/current
 
-  def self.key
-    Setting.openweather_key
-  end
+  def self.key = Setting.openweather_key
 
   describe :get_current_and_todays_weather, <<~S
     Retrieves the current weather and today's forecast for a given location. The location must be specified with a valid city

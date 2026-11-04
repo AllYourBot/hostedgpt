@@ -8,7 +8,5 @@ module Authenticate::ByCookie
     Client.find_by(token: session_token) unless session_token.blank?
   end
 
-  def session_token
-    session[:client_token] || cookies.signed[:client_token]
-  end
+  def session_token = session[:client_token] || cookies.signed[:client_token]
 end

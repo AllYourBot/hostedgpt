@@ -62,7 +62,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
   test "settings sidebar has one Assistants entry above the memories" do
     get settings_assistants_url
     assert_equal ["Your Account", "Assistants", "Assistant Memories", "Language Models", "API Services"],
-      css_select("section#menu a").map { |link| link.text.strip }
+      css_select("section#menu a").map { it.text.strip }
     assert_select "section#menu a[href=?]", edit_settings_assistant_path(@assistant), count: 0
   end
 
@@ -95,7 +95,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update assistant" do
-    params = assistants(:samantha).slice(:name, :description, :instructions).transform_values { |value| "#{value}-2" }
+    params = assistants(:samantha).slice(:name, :description, :instructions).transform_values { "#{it}-2" }
     patch settings_assistant_url(@assistant), params: { assistant: params }
 
     assert_redirected_to edit_settings_assistant_url(@assistant)
@@ -121,7 +121,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should show error when updating conversation_starters with TOO MANY questions" do
-    params = { conversation_starters: Array.new(Assistant::MAX_CONVERSATION_STARTERS + 1) { |index| "Question #{index}" } }
+    params = { conversation_starters: Array.new(Assistant::MAX_CONVERSATION_STARTERS + 1) { "Question #{it}" } }
     patch settings_assistant_url(@assistant), params: { assistant: params }
 
     assert_response :unprocessable_content

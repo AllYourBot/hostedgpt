@@ -14,9 +14,7 @@ module Scopes::Lib::LikeAndIs
       column.type.in? [:integer, :float, :decimal]
     end
 
-    def self.wrap_like_query(q)
-      /%/.match?(q) ? q : "%#{q}%"
-    end
+    def self.wrap_like_query(q) = /%/.match?(q) ? q : "%#{q}%"
 
     text_columns.each do |column|
       auto_scope "#{column.name}_like", -> (q) { where "lower(#{table_name}.#{column.name}) like ?", wrap_like_query(q.downcase) }, column: column.name

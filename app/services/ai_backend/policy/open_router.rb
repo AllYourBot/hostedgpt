@@ -10,7 +10,5 @@ class AIBackend::Policy::OpenRouter < AIBackend::Policy::Base
       "left and then Settings and then **API Services**. You will find OpenRouter Key instructions.)"
   end
 
-  def self.billing_url
-    "https://openrouter.ai/credits"
-  end
+  def self.billing_url = "https://openrouter.ai/credits"
 end

@@ -1,15 +1,15 @@
 class JsonSerializer
   def self.dump(object)
-    transformed_object = deep_transform(object) { |value| convert_value(value) }
+    transformed_object = deep_transform(object) { convert_value(it) }
     transformed_object.to_json
   end
 
   def self.deep_transform(object, &block)
     case object
     when Hash
-      object.transform_values { |value| deep_transform(value, &block) }
+      object.transform_values { deep_transform(it, &block) }
     when Array
-      object.map { |value| deep_transform(value, &block) }
+      object.map { deep_transform(it, &block) }
     else
       yield(object)
     end

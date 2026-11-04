@@ -136,9 +136,7 @@ module ActiveStorage
       end
     end
 
-    def headers_for_direct_upload(key, content_type:, **)
-      { "Content-Type" => content_type }
-    end
+    def headers_for_direct_upload(key, content_type:, **) = { "Content-Type" => content_type }
 
     protected
 

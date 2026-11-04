@@ -102,11 +102,7 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
 
   private
 
-  def first_assistant_message
-    find_messages.second
-  end
+  def first_assistant_message = find_messages.second
 
-  def second_assistant_message
-    find_messages.fourth
-  end
+  def second_assistant_message = find_messages.fourth
 end

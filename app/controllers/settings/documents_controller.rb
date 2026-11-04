@@ -22,7 +22,5 @@ class Settings::DocumentsController < Settings::ApplicationController
     @assistant = Current.user.assistants.find(params[:assistant_id])
   end
 
-  def document_params
-    params.fetch(:document, {}).permit(:file)
-  end
+  def document_params = params.fetch(:document, {}).permit(:file)
 end

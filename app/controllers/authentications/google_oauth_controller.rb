@@ -47,11 +47,7 @@ class Authentications::GoogleOauthController < ApplicationController
 
   private
 
-  def credential_type
-    "GoogleCredential"
-  end
+  def credential_type = "GoogleCredential"
 
-  def third_party_connections
-    ["Google third-party connections", "https://myaccount.google.com/connections"]
-  end
+  def third_party_connections = ["Google third-party connections", "https://myaccount.google.com/connections"]
 end

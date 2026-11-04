@@ -4,7 +4,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   include NavigationHelper
 
   setup do
-    15.times { |i| users(:keith).conversations.create!(assistant: assistants(:samantha), title: "Conversation #{i+1}") }
+    15.times { users(:keith).conversations.create!(assistant: assistants(:samantha), title: "Conversation #{it+1}") }
 
     @user = users(:keith)
     login_as @user
@@ -55,7 +55,7 @@ class ConversationMessagesTest < ApplicationSystemTestCase
   end
 
   test "regenerate menu keeps every assistant reachable when it is taller than the space above a short conversation" do
-    6.times { |i| @user.assistants.create!(name: "Extra Assistant #{i + 1}", language_model: language_models(:gpt_4o)) }
+    6.times { @user.assistants.create!(name: "Extra Assistant #{it + 1}", language_model: language_models(:gpt_4o)) }
     top_assistant = @user.assistants.ordered.first
     visit_and_scroll_wait conversation_messages_path(conversations(:ruby_version))
 
@@ -165,7 +165,5 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     @conversation.messages.create! role: :user, content_text: "Are you still there?", assistant: @conversation.assistant
   end
 
-  def latest_message
-    @conversation.latest_message_for_version(:latest)
-  end
+  def latest_message = @conversation.latest_message_for_version(:latest)
 end

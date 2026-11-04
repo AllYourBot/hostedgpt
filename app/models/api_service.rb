@@ -30,9 +30,7 @@ class APIService < ApplicationRecord
 
   scope :ordered, -> { order(:name) }
 
-  def self.chat_provider_identities
-    AIBackend::Policy.chat_provider_identities
-  end
+  def self.chat_provider_identities = AIBackend::Policy.chat_provider_identities
 
   DIRECT_DRIVERS = %w[openai anthropic gemini].freeze
 
@@ -44,24 +42,16 @@ class APIService < ApplicationRecord
 
   # RubyLLM is the transport for every chat provider identity. An identity
   # it can't serve (brave, or a nil driver) yields nil, silently.
-  def ai_backend
-    AIBackend::RubyLLM.supports_identity?(provider_identity) ? AIBackend::RubyLLM : nil
-  end
+  def ai_backend = AIBackend::RubyLLM.supports_identity?(provider_identity) ? AIBackend::RubyLLM : nil
 
   # Error facts resolve through the identity's policy class, so a Groq
   # or OpenRouter conversation still speaks Groq's or
   # OpenRouter's copy and billing URL, never the generic ones.
-  def key_error_message
-    AIBackend::Policy.key_error_message_for(provider_identity)
-  end
+  def key_error_message = AIBackend::Policy.key_error_message_for(provider_identity)
 
-  def billing_url
-    AIBackend::Policy.billing_url_for(provider_identity)
-  end
+  def billing_url = AIBackend::Policy.billing_url_for(provider_identity)
 
-  def provider_name
-    AIBackend::Policy.for_identity(provider_identity)&.display_name || "AI"
-  end
+  def provider_name = AIBackend::Policy.for_identity(provider_identity)&.display_name || "AI"
 
   def requires_token?
     TOKEN_REQUIRED_URLS.include?(url) # other services may require it but we don't always know
@@ -78,9 +68,7 @@ class APIService < ApplicationRecord
     end
   end
 
-  def effective_token
-    token.presence || default_token
-  end
+  def effective_token = token.presence || default_token
 
   def test_api_service(url = nil, token = nil)
     backend = ai_backend
@@ -109,7 +97,5 @@ class APIService < ApplicationRecord
     return Setting.default_openrouter_key if url == URL_OPENROUTER
   end
 
-  def soft_delete_language_models
-    language_models.each { |language_model| language_model.deleted! }
-  end
+  def soft_delete_language_models = language_models.each { it.deleted! }
 end

@@ -57,7 +57,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     get new_assistant_message_url(@assistant)
     assert_response :success
 
-    image_starter_titles = I18n.t("app.conversations.image_starters").map { |s| s[:title] }
+    image_starter_titles = I18n.t("app.conversations.image_starters").map { it[:title] }
     starter_titles = assigns(:conversation_starters).map(&:first)
 
     assert_equal 4, starter_titles.size
@@ -308,7 +308,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   test "without an app_url, index embeds only the thumbnails and leaves each modal image to load when opened" do
     conversation = conversations(:attachments)
     images = conversation.messages.flat_map(&:documents).select(&:has_image?)
-    images.each { |document| document.send(:wait_for_file_variant_to_process!, :small) }
+    images.each { it.send(:wait_for_file_variant_to_process!, :small) }
 
     downloads = 0
     counter = ActiveSupport::Notifications.subscribe("service_download.active_storage") { downloads += 1 }

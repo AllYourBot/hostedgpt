@@ -4,7 +4,5 @@ class AIBackend::Policy::Anthropic < AIBackend::Policy::Base
       "left and then Settings and then **API Services**. You will find Anthropic Key instructions.)"
   end
 
-  def self.billing_url
-    "https://console.anthropic.com/settings/plans"
-  end
+  def self.billing_url = "https://console.anthropic.com/settings/plans"
 end

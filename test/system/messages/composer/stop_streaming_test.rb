@@ -68,7 +68,5 @@ class MessagesComposerStopStreamingTest < ApplicationSystemTestCase
     end
   end
 
-  def finish_streaming
-    @conversation.broadcast_refresh
-  end
+  def finish_streaming = @conversation.broadcast_refresh
 end

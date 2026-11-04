@@ -151,7 +151,7 @@ class Toolbox::OpenMeteo < Toolbox
     dailies = data.daily
 
     dailies.time.map.with_index do |date, i|
-      day = dailies.to_h.transform_values { |v| v[i] }
+      day = dailies.to_h.transform_values { it[i] }
       {
         date: day[:time],
         in: "#{location.name}, #{location.admin1}, #{location.country}",
@@ -197,7 +197,7 @@ class Toolbox::OpenMeteo < Toolbox
     countries = locations.map(&:country)
     country = countries[ best_match_index(country_s, countries) ]
 
-    locations.select { |l| l.country == country }
+    locations.select { it.country == country }
   end
 
   def pick_by_region(region_s, locations:)
@@ -241,9 +241,7 @@ class Toolbox::OpenMeteo < Toolbox
     })
   end
 
-  def unit(u)
-    u.gsub("°", "degrees ").gsub("F", "fahrenheit").gsub("C", "celcius")
-  end
+  def unit(u) = u.gsub("°", "degrees ").gsub("F", "fahrenheit").gsub("C", "celcius")
 
   def weather_code_to_description(code)
     # it's 85 degrees with

@@ -99,7 +99,7 @@ class LanguageModelTest < ActiveSupport::TestCase
 
   test "models.yml has 25 OpenRouter entries that import successfully" do
     storage = YAML.load_file(Rails.root.join("models.yml"))
-    openrouter_models = storage["models"].select { |m| m["api_service_name"] == "OpenRouter" }
+    openrouter_models = storage["models"].select { it["api_service_name"] == "OpenRouter" }
     assert_equal 25, openrouter_models.count
 
     user = users(:keith)

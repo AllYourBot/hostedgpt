@@ -2,13 +2,9 @@
 
 class Feature
   class << self
-    def raw_features
-      Rails.application.config.options.features
-    end
+    def raw_features = Rails.application.config.options.features
 
-    def features_hash
-      defined?(@@features_hash) && @@features_hash.present? ? @@features_hash : nil
-    end
+    def features_hash = defined?(@@features_hash) && @@features_hash.present? ? @@features_hash : nil
 
     def features_hash=(features)
       @@features_hash = features
@@ -41,9 +37,7 @@ class Feature
       feature_value.to_b
     end
 
-    def disabled?(feature)
-      !enabled?(feature)
-    end
+    def disabled?(feature) = !enabled?(feature)
 
     def method_missing(method_name, *arguments, &block)
       if method_name.to_s.end_with?("?")

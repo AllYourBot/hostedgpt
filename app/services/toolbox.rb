@@ -17,7 +17,7 @@ class Toolbox < SDK
 
   def self.call(name, args)
     kname, method = name.split("_", 2)
-    klass = Toolbox.descendants.find { |k| k.to_s.downcase == "toolbox::#{kname}" }
+    klass = Toolbox.descendants.find { it.to_s.downcase == "toolbox::#{kname}" }
     raise "'#{kname}' does not match a class which is a descendant of SDK. Your function name should be prepended with the class name." if klass.nil?
     instance = klass.new
     raise "'#{method} does not exist on this class" if klass.functions.exclude?(method.to_sym)
@@ -32,17 +32,13 @@ class Toolbox < SDK
   end
 
   class << self
-    def method_descriptions
-      (@method_descriptions ||= {}).symbolize_keys
-    end
+    def method_descriptions = (@method_descriptions ||= {}).symbolize_keys
 
     def describe(method_name, description)
       (@method_descriptions ||= {})[method_name] = description.gsub("\n", " ")
     end
 
-    def description(method_name)
-      (@method_descriptions ||= {})[method_name] || default_description_for(method_name)
-    end
+    def description(method_name) = (@method_descriptions ||= {})[method_name] || default_description_for(method_name)
 
     def default_description_for(name)
       name.to_s.split("_").join(" ").capitalize + " given " +
@@ -77,16 +73,12 @@ class Toolbox < SDK
     end
   end
 
-  def self.functions
-    self.instance_methods(false) - Toolbox.instance_methods
-  end
+  def self.functions = self.instance_methods(false) - Toolbox.instance_methods
 
-  def self.function_parameters(name)
-    self.instance_method(name).parameters.map(&:second)
-  end
+  def self.function_parameters(name) = self.instance_method(name).parameters.map(&:second)
 
   def self.formatted_function_parameters_with_types(name)
-    function_parameters(name).map { |param| formatted_param_properties(param) }.to_h
+    function_parameters(name).map { formatted_param_properties(it) }.to_h
   end
 
   def self.formatted_param_properties(param)
@@ -120,7 +112,7 @@ class Toolbox < SDK
     not_named = params.map(&:first) - [:keyreq, :key]
     raise "Your method '#{name}' needs to use named parameters." if not_named.present?
 
-    params.select { |p| p.first == :keyreq }.map do |_, param|
+    params.select { it.first == :keyreq }.map do |_, param|
       formatted_param_properties(param).first
     end
   end
@@ -145,8 +137,8 @@ class Toolbox < SDK
   # when even the closest doesn't score above threshold.
   def best_match_index(input, options, threshold: nil)
     matcher = Amatch::JaroWinkler.new(input)
-    scores = options.map { |option| matcher.match(option) }
-    index = scores.each_index.max_by { |i| [scores[i], -i] }
+    scores = options.map { matcher.match(it) }
+    index = scores.each_index.max_by { [scores[it], -it] }
     index unless index.nil? || (threshold && scores[index] <= threshold)
   end
 end

@@ -35,7 +35,7 @@ class Assistant < ApplicationRecord
     ids = ids.map(&:to_i)
 
     transaction do
-      where(id: ids).each { |assistant| assistant.update_column(:position, ids.index(assistant.id)) }
+      where(id: ids).each { it.update_column(:position, ids.index(it.id)) }
     end
   end
 
@@ -48,9 +48,7 @@ class Assistant < ApplicationRecord
       parts[1]&.try(:[], 0)&.capitalize.to_s
   end
 
-  def to_s
-    name
-  end
+  def to_s = name
 
   def language_model_api_name=(api_name)
     self.language_model = LanguageModel.for_user(user).find_by(api_name:)

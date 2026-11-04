@@ -72,9 +72,7 @@ class Message < ApplicationRecord
     )
   end
 
-  def set_last_assistant_message
-    conversation.update!(last_assistant_message: self)
-  end
+  def set_last_assistant_message = conversation.update!(last_assistant_message: self)
 
   def update_assistant_on_conversation
     return if conversation.assistant == assistant

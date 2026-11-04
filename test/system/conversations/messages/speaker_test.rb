@@ -289,13 +289,9 @@ class ConversationMessagesPlaybackTest < ApplicationSystemTestCase
 
   private
 
-  def assistant_messages
-    page.all("[data-subrole='assistant-message']")
-  end
+  def assistant_messages = page.all("[data-subrole='assistant-message']")
 
-  def speaker
-    page.find("[data-controller~='speaker']")
-  end
+  def speaker = page.find("[data-controller~='speaker']")
 
   def user_speaks(text)
     if current_path.include?("/conversation")

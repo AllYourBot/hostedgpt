@@ -23,9 +23,7 @@ class Toolbox::BraveSearch < Toolbox
 
   # The one builder for Brave search deep links; the message helper's legacy
   # fallback for pre-link_url rows uses it too.
-  def self.search_url(query_s)
-    "https://search.brave.com/search?q=#{URI.encode_www_form_component(query_s)}"
-  end
+  def self.search_url(query_s) = "https://search.brave.com/search?q=#{URI.encode_www_form_component(query_s)}"
 
   private
 

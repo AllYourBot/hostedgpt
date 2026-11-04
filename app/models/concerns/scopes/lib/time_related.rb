@@ -3,9 +3,7 @@ module Scopes::Lib
     extend ActiveSupport::Concern
 
     included do
-      def self.add_time_scopes
-        ::Scopes::Lib::AddTimeRelated.new(self).add_scopes_to
-      end
+      def self.add_time_scopes = ::Scopes::Lib::AddTimeRelated.new(self).add_scopes_to
 
       add_time_scopes
 
@@ -57,7 +55,7 @@ module Scopes::Lib
           "<"  => %w[before more_than_this_long_ago more_than],
           "<=" => %w[before_or_equal more_than_or_equal_to_this_long_ago more_than_or_equal_to]
         }.each do |operator, suffixes|
-          suffixes.each { |suffix| add_time_comparison_scope(column, "#{label}_#{suffix}", table_column, operator) }
+          suffixes.each { add_time_comparison_scope(column, "#{label}_#{it}", table_column, operator) }
         end
         @ar_class.auto_scope "#{label}_between", -> (a, b) {
           where("#{table_column} >= ?", input_to_time(a)).
@@ -157,9 +155,7 @@ module Scopes::Lib
       end
     end
 
-    def current_time_for(column)
-      column.type == :date ? -> { Date.current } : -> { Time.current }
-    end
+    def current_time_for(column) = column.type == :date ? -> { Date.current } : -> { Time.current }
 
     def time_related_columns(klass=nil)
       (klass || @ar_class).columns.select do |column|
@@ -173,9 +169,7 @@ module Scopes::Lib
       end
     end
 
-    def date_and_time_columns
-      time_related_columns + date_related_columns
-    end
+    def date_and_time_columns = time_related_columns + date_related_columns
 
     def self.scope_usage(name)
       case

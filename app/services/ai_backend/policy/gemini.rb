@@ -4,7 +4,5 @@ class AIBackend::Policy::Gemini < AIBackend::Policy::Base
       "Click your Profile in the bottom left and then Settings and then **API Services**. You will find Gemini there.)"
   end
 
-  def self.billing_url
-    "https://aistudio.google.com/app/apikey"
-  end
+  def self.billing_url = "https://aistudio.google.com/app/apikey"
 end

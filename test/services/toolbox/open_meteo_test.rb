@@ -29,7 +29,7 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
     stub_weather_api do
       result = @open_meteo.get_current_and_todays_weather(city_s: "Austin", state_province_or_region_s: "Texas")
 
-      assert result.values.all? { |value| value.present? }
+      assert result.values.all? { it.present? }
       assert_equal "Austin, Texas, United States", result[:in]
       assert_equal "72 degrees fahrenheit", result[:right_now]
       assert_equal "+3.0 degrees fahrenheit", result[:today_high_change_from_yesterday]
@@ -41,7 +41,7 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
     stub_weather_api do
       result = Toolbox.call("openmeteo_get_current_and_todays_weather", city: "Austin", state_province_or_region: "Texas")
 
-      assert result.values.all? { |value| value.present? }
+      assert result.values.all? { it.present? }
       assert_equal "Austin, Texas, United States", result[:in]
     end
   end
@@ -56,9 +56,9 @@ class Toolbox::OpenMeteoTest < ActiveSupport::TestCase
           date_span_end_s: "2020-01-02",
         )
 
-        assert_equal [ 50.0, 52.0 ], result.map { |day| day[:temp_high] }
-        assert_equal [ 31.0, 33.0 ], result.map { |day| day[:temp_low] }
-        assert_equal [ "31 degrees fahrenheit", "33 degrees fahrenheit" ], result.map { |day| day[:temp_low_formatted] }
+        assert_equal [ 50.0, 52.0 ], result.map { it[:temp_high] }
+        assert_equal [ 31.0, 33.0 ], result.map { it[:temp_low] }
+        assert_equal [ "31 degrees fahrenheit", "33 degrees fahrenheit" ], result.map { it[:temp_low_formatted] }
       end
     end
   end

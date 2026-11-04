@@ -79,9 +79,7 @@ def ensure_master_key
   end
 end
 
-def master_key_path
-  Rails.root.join("config", "master.key")
-end
+def master_key_path = Rails.root.join("config", "master.key")
 
 def master_key_exception
   <<~END

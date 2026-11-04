@@ -20,7 +20,7 @@ module AIBackend::Utilities
 
     def self.deep_json_parse(obj)
       if obj.is_a?(Array)
-        obj.map { |item| deep_json_parse(item) }
+        obj.map { deep_json_parse(it) }
       else
         converted_hash = {}
         obj.each do |key, value|

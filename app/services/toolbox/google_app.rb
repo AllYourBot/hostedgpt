@@ -1,9 +1,7 @@
 module Toolbox::GoogleApp
   extend ActiveSupport::Concern
 
-  def app_name
-    self.class.to_s.gsub("Toolbox::", "").gsub(/(?<!\A)([A-Z])/, ' \1')
-  end
+  def app_name = self.class.to_s.gsub("Toolbox::", "").gsub(/(?<!\A)([A-Z])/, ' \1')
 
   def refresh_token_if_needed(&block)
     2.times do |i|
@@ -26,9 +24,7 @@ module Toolbox::GoogleApp
     end
   end
 
-  def uid
-    app_credential&.oauth_id
-  end
+  def uid = app_credential&.oauth_id
 
   def bearer_token
     token = app_credential&.oauth_token
@@ -43,7 +39,5 @@ module Toolbox::GoogleApp
     }
   end
 
-  def expected_status
-    [200, 204, 401, 403]
-  end
+  def expected_status = [200, 204, 401, 403]
 end

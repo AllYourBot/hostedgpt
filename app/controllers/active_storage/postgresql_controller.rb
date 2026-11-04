@@ -58,13 +58,9 @@ class ActiveStorage::PostgresqlController < ActiveStorage::BaseController
 
   private
 
-  def postgresql_service
-    ActiveStorage::Blob.service
-  end
+  def postgresql_service = ActiveStorage::Blob.service
 
-  def decode_verified_key
-    ActiveStorage.verifier.verified(params[:encoded_key], purpose: :blob_key)&.symbolize_keys
-  end
+  def decode_verified_key = ActiveStorage.verifier.verified(params[:encoded_key], purpose: :blob_key)&.symbolize_keys
 
   def decode_verified_token
     ActiveStorage.verifier.verified(params[:encoded_token], purpose: :blob_token)&.symbolize_keys

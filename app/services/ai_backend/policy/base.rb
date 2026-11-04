@@ -4,19 +4,11 @@ class AIBackend::Policy::Base
       "Click your Profile in the bottom left and then Settings and then **API Services**.)"
   end
 
-  def self.billing_url
-    nil
-  end
+  def self.billing_url = nil
 
-  def self.supports_tools?
-    true
-  end
+  def self.supports_tools? = true
 
-  def self.display_name
-    name.demodulize
-  end
+  def self.display_name = name.demodulize
 
-  def self.attribution_headers
-    {}
-  end
+  def self.attribution_headers = {}
 end

@@ -6,11 +6,7 @@ class AIBackend::Policy::Groq < AIBackend::Policy::Base
       "left and then Settings and then **API Services**. You will find Groq Key instructions.)"
   end
 
-  def self.billing_url
-    "https://console.groq.com/keys"
-  end
+  def self.billing_url = "https://console.groq.com/keys"
 
-  def self.supports_tools?
-    false
-  end
+  def self.supports_tools? = false
 end

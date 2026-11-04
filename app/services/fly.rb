@@ -8,7 +8,7 @@ class Fly < SDK
     swap = swap.to_i
 
     apps = get_apps
-    app_id = apps.find { |m| m.name == app_name }&.id
+    app_id = apps.find { it.name == app_name }&.id
     if app_id.nil?
       Rails.logger.info "Could not find the app named #{app_name}. Aborting."
       Rails.logger.info "These are all the app names on your Fly account: #{apps.map(&:name).join(", ")}"
@@ -31,13 +31,9 @@ class Fly < SDK
     Rails.logger.info "Updated machine id #{machine.id} on #{app_name} to #{swap}mb. It make take a minute for the machine to finish booting."
   end
 
-  def get_apps
-    get("https://api.machines.dev/v1/apps").param(org_slug: "personal").apps
-  end
+  def get_apps = get("https://api.machines.dev/v1/apps").param(org_slug: "personal").apps
 
-  def get_machines(app_name)
-    get("https://api.machines.dev/v1/apps/#{app_name}/machines").no_params
-  end
+  def get_machines(app_name) = get("https://api.machines.dev/v1/apps/#{app_name}/machines").no_params
 
   def patch_machine(app_name, id, config)
     post("https://api.machines.dev/v1/apps/#{app_name}/machines/#{id}").param(config: config)
@@ -49,7 +45,5 @@ class Fly < SDK
     @bearer_token ||= `fly auth token`.chop.split.last
   end
 
-  def header
-    { content_type: "application/json" }
-  end
+  def header = { content_type: "application/json" }
 end

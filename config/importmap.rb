@@ -15,7 +15,7 @@ pin "blocks", to: "blocks/index.js", preload: true
 
 Dir["app/javascript/blocks/**/*"].select do |file|
   !File.directory?(file) &&
-    !["package.json"].any? { |f| file.include?(f) }
+    !["package.json"].any? { file.include?(it) }
 end.each do |file|
   file = file.remove("app/javascript/")
   name = file.remove("blocks/")

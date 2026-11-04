@@ -13,14 +13,12 @@ class LanguageModel < ApplicationRecord
     gemini: %w[gemini-2.5 gemini-3],
   }.freeze
 
-  def self.adaptive_thinking?(api_name)
-    api_name.to_s.start_with?(*ADAPTIVE_THINKING_PREFIXES)
-  end
+  def self.adaptive_thinking?(api_name) = api_name.to_s.start_with?(*ADAPTIVE_THINKING_PREFIXES)
 
   def self.supports_thinking?(provider, api_name)
     return adaptive_thinking?(api_name) if provider.to_s == "anthropic"
 
-    REASONING_SUMMARY_PREFIXES.fetch(provider.to_sym, []).any? { |prefix| api_name.to_s.start_with?(prefix) }
+    REASONING_SUMMARY_PREFIXES.fetch(provider.to_sym, []).any? { api_name.to_s.start_with?(it) }
   end
 
   belongs_to :user
@@ -41,9 +39,7 @@ class LanguageModel < ApplicationRecord
   delegate :ai_backend, to: :api_service
   delegate :name, to: :api_service, prefix: true, allow_nil: true
 
-  def created_by_current_user?
-    user == Current.user
-  end
+  def created_by_current_user? = user == Current.user
 
   def supports_tools?
     # The identity's policy owns the provider policy (Groq's denial, say),
@@ -51,13 +47,9 @@ class LanguageModel < ApplicationRecord
     attributes["supports_tools"] && AIBackend::Policy.for_identity(api_service.provider_identity)&.supports_tools?
   end
 
-  def logo_filename
-    api_service.logo_filename
-  end
+  def logo_filename = api_service.logo_filename
 
-  def test(api_name = nil)
-    ai_backend.test_language_model(self, api_name)
-  end
+  def test(api_name = nil) = ai_backend.test_language_model(self, api_name)
 
   private
 
@@ -65,8 +57,6 @@ class LanguageModel < ApplicationRecord
     self.position = (user&.language_models&.maximum(:position) || 0) + 1
   end
 
-  def soft_delete_assistants
-    assistants.update_all(deleted_at: Time.current)
-  end
+  def soft_delete_assistants = assistants.update_all(deleted_at: Time.current)
 
 end

@@ -11,9 +11,7 @@ class Client < ApplicationRecord
 
   scope :ordered, -> { order(updated_at: :asc) }
 
-  def authenticated?
-    authentication.present? && authentication.persisted?
-  end
+  def authenticated? = authentication.present? && authentication.persisted?
 
   def authenticate_with!(credential)
     if authentication
@@ -35,7 +33,5 @@ class Client < ApplicationRecord
     "#{id}:#{token}"
   end
 
-  def to_s
-    token
-  end
+  def to_s = token
 end

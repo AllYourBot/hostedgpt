@@ -83,7 +83,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
     TestClient::RubyLLM::Chat.stub :text, "Streaming response" do
       chunks = []
-      result = backend.stream_next_conversation_message { |c| chunks << c }
+      result = backend.stream_next_conversation_message { chunks << it }
       assert_equal ["Streaming response"], chunks
       assert_nil result
     end
@@ -577,7 +577,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
     TestClient::RubyLLM::Chat.stub :text, "Claude streaming" do
       chunks = []
-      result = backend.stream_next_conversation_message { |c| chunks << c }
+      result = backend.stream_next_conversation_message { chunks << it }
       assert_equal ["Claude streaming"], chunks
       assert_nil result
     end
@@ -597,7 +597,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
     TestClient::RubyLLM::Chat.stub :text, "Gemini streaming" do
       chunks = []
-      result = backend.stream_next_conversation_message { |c| chunks << c }
+      result = backend.stream_next_conversation_message { chunks << it }
       assert_equal ["Gemini streaming"], chunks
       assert_nil result
     end
@@ -620,7 +620,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     msgs = backend.send(:preceding_conversation_messages)
 
-    message_with_attachments = msgs.find { |m| m[:attachments].present? }
+    message_with_attachments = msgs.find { it[:attachments].present? }
     assert message_with_attachments, "Should find a message with attachments for image attachments"
     assert message_with_attachments[:attachments].any?, "The message should have attachments"
   end
@@ -655,7 +655,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     msgs = backend.send(:preceding_conversation_messages)
 
-    msgs_with_attachments = msgs.filter_map { |m| m if m[:attachments].present? }
+    msgs_with_attachments = msgs.filter_map { it if it[:attachments].present? }
     assert_empty msgs_with_attachments, "Should not have any attachments when supports_images is false"
   end
 
@@ -803,7 +803,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     TestClient::RubyLLM::Chat.stub :text, "I see a cat" do
       chunks = []
-      result = backend.stream_next_conversation_message { |c| chunks << c }
+      result = backend.stream_next_conversation_message { chunks << it }
       assert_equal ["I see a cat"], chunks
       assert_nil result
     end
@@ -825,7 +825,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     TestClient::RubyLLM::Chat.stub :text, "OpenAI sees a feline" do
       chunks = []
-      result = backend.stream_next_conversation_message { |c| chunks << c }
+      result = backend.stream_next_conversation_message { chunks << it }
       assert_equal ["OpenAI sees a feline"], chunks
       assert_nil result
     end
@@ -847,7 +847,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     TestClient::RubyLLM::Chat.stub :text, "Claude sees a feline" do
       chunks = []
-      result = backend.stream_next_conversation_message { |c| chunks << c }
+      result = backend.stream_next_conversation_message { chunks << it }
       assert_equal ["Claude sees a feline"], chunks
       assert_nil result
     end
@@ -869,7 +869,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     TestClient::RubyLLM::Chat.stub :text, "Gemini sees a feline" do
       chunks = []
-      result = backend.stream_next_conversation_message { |c| chunks << c }
+      result = backend.stream_next_conversation_message { chunks << it }
       assert_equal ["Gemini sees a feline"], chunks
       assert_nil result
     end
@@ -890,7 +890,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, assistant, conversation, message)
     msgs = backend.send(:preceding_conversation_messages)
 
-    mixed_msg = msgs.find { |m| m[:attachments].present? }
+    mixed_msg = msgs.find { it[:attachments].present? }
     assert mixed_msg, "Should find a message with mixed content"
     assert mixed_msg[:content].present?, "Content text should be preserved alongside attachments"
     assert mixed_msg[:attachments].any?, "Attachments should be present"
@@ -922,7 +922,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, @assistant)
     instances = backend.send(:tool_instances)
 
-    assert instances.all? { |i| i.is_a?(AIBackend::RubyLLM::ToolSchema) }
+    assert instances.all? { it.is_a?(AIBackend::RubyLLM::ToolSchema) }
     assert_includes instances.map(&:name), "helloworld_hi"
     assert_includes instances.map(&:name), "openmeteo_get_current_and_todays_weather"
   end
@@ -1011,8 +1011,8 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
       TestClient::RubyLLM::Chat.stub :num_tool_calls, 2 do
         result = backend.stream_next_conversation_message { |c| }
         assert_equal 2, result.length
-        assert_equal [0, 1], result.map { |tc| tc[:index] }
-        assert_operator result.map { |tc| tc[:id] }.uniq.length, :>, 1
+        assert_equal [0, 1], result.map { it[:index] }
+        assert_operator result.map { it[:id] }.uniq.length, :>, 1
       end
     end
   end
@@ -1079,7 +1079,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, @assistant, conversation, follow_up)
     msgs = backend.send(:preceding_conversation_messages)
 
-    assistant_replay = msgs.find { |m| m[:role] == :assistant && m[:tool_calls].present? }
+    assistant_replay = msgs.find { it[:role] == :assistant && it[:tool_calls].present? }
     assert_equal "sig-abc", assistant_replay[:tool_calls]["call_123"].thought_signature
   end
 
@@ -1114,12 +1114,12 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, @assistant, conversation, follow_up)
     msgs = backend.send(:preceding_conversation_messages)
 
-    tool_replay = msgs.find { |m| m[:role] == :tool }
+    tool_replay = msgs.find { it[:role] == :tool }
     assert tool_replay, "expected a tool result message to be replayed"
     assert_equal "call_123", tool_replay[:tool_call_id]
     assert_equal "Hello, Keith!".to_json, tool_replay[:content]
 
-    assistant_replay = msgs.find { |m| m[:role] == :assistant && m[:tool_calls].present? }
+    assistant_replay = msgs.find { it[:role] == :assistant && it[:tool_calls].present? }
     assert assistant_replay, "expected the assistant tool-call message to be replayed"
     assert_equal "helloworld_hi", assistant_replay[:tool_calls]["call_123"].name
     assert_equal({ "name" => "Keith" }, assistant_replay[:tool_calls]["call_123"].arguments)
@@ -1256,7 +1256,7 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     chunks = []
     TestClient::RubyLLM::Chat.stub :thinking, thinking do
       TestClient::RubyLLM::Chat.stub :text, "The answer is 42." do
-        backend.stream_next_conversation_message { |c| chunks << c }
+        backend.stream_next_conversation_message { chunks << it }
       end
     end
 
@@ -1325,11 +1325,11 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, follow_up)
     msgs = backend.send(:preceding_conversation_messages)
 
-    tool_call_replay = msgs.find { |m| m[:role] == :assistant && m[:tool_calls].present? }
+    tool_call_replay = msgs.find { it[:role] == :assistant && it[:tool_calls].present? }
     assert_equal "I should look it up.", tool_call_replay[:thinking].text
     assert_equal "sig-tool", tool_call_replay[:thinking].signature
 
-    text_replay = msgs.find { |m| m[:content] == "Hi Keith" }
+    text_replay = msgs.find { it[:content] == "Hi Keith" }
     assert_equal "sig-text", text_replay[:thinking].signature
   end
 
@@ -1346,8 +1346,8 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, follow_up)
     msgs = backend.send(:preceding_conversation_messages)
 
-    replay = msgs.find { |m| m[:content] == "Partial" }
+    replay = msgs.find { it[:content] == "Partial" }
     refute replay.key?(:thinking)
-    msgs.each { |m| refute m.key?(:thinking) }
+    msgs.each { refute it.key?(:thinking) }
   end
 end
