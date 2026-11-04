@@ -191,16 +191,12 @@ class Toolbox::GoogleTasks < Toolbox
   end
 
   def pick_best(input:, options: [], key:, error_type:)
-    index = best_match_index(input, options.map { |o| o.send(key) }, threshold: 0.7)
+    index = best_match_index(input, options.map { it.send(key) }, threshold: 0.7)
     raise "Unable to find a #{error_type} with the name '#{input}'" if index.nil?
     options[index]
   end
 
-  def undo_task(name, params)
-    "#{name}(#{params.map { |k,v| "#{k}: \"#{v.to_s.gsub('"', '\"')}\"" }.join(", ")})"
-  end
+  def undo_task(name, params) = "#{name}(#{params.map { |k,v| "#{k}: \"#{v.to_s.gsub('"', '\"')}\"" }.join(", ")})"
 
-  def app_credential
-    Current.user&.google_tasks_credential
-  end
+  def app_credential = Current.user&.google_tasks_credential
 end

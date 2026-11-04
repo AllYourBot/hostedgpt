@@ -14,9 +14,7 @@ module Credential::GoogleApp
     store_accessor :properties, :scope
   end
 
-  def permissions
-    scope&.split&.map { |p| p.split("/").last } || []
-  end
+  def permissions = scope&.split&.map { it.split("/").last } || []
 
   def has_permission?(perm)
     missing_permissions = Array(perm) - permissions

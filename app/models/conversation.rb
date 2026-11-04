@@ -84,7 +84,5 @@ class Conversation < ApplicationRecord
     self.share_token = SecureRandom.urlsafe_base64(32)
   end
 
-  def set_title_async
-    AutotitleConversationJob.perform_later(id)
-  end
+  def set_title_async = AutotitleConversationJob.perform_later(id)
 end

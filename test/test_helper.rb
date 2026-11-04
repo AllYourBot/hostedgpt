@@ -5,20 +5,16 @@ require "minitest/autorun"
 require "minitest/retry"
 require "webmock/minitest"
 
-Dir[Rails.root.join("test/support/**/*.rb")].sort.each { |file| require file }
+Dir[Rails.root.join("test/support/**/*.rb")].sort.each { require it }
 
 Dir[File.join(Rails.root, "lib", "rails_extensions", "**/*.rb")].each do |path|
   require path
 end
 
 class Capybara::Node::Element
-  def obsolete?
-    inspect.include?("Obsolete")
-  end
+  def obsolete? = inspect.include?("Obsolete")
 
-  def exists?
-    !obsolete?
-  end
+  def exists? = !obsolete?
 end
 
 Minitest::Retry.use!(

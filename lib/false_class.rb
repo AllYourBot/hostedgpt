@@ -1,5 +1,3 @@
 class FalseClass
-  def to_b
-    false
-  end
+  def to_b = false
 end

@@ -9,7 +9,5 @@ module Message::Cancellable
 
   private
 
-  def set_cancelled_by
-    Current.user&.update!(last_cancelled_message: self)
-  end
+  def set_cancelled_by = Current.user&.update!(last_cancelled_message: self)
 end

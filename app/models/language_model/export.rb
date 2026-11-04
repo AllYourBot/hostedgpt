@@ -14,15 +14,11 @@ module LanguageModel::Export
 
   DEFAULT_MODEL_FILE = "models.yml"
 
-  def attributes
-    super.merge("api_service_name" => api_service_name)
-  end
+  def attributes = super.merge("api_service_name" => api_service_name)
 
   # Unsure why this needs to re-defined, but the original ActiveModel::Serialization
   # implementation is ignoring the #attributes method above.
-  def attribute_names_for_serialization
-    attributes.keys
-  end
+  def attribute_names_for_serialization = attributes.keys
 
   class_methods do
     def export_to_file(path: Rails.root.join(DEFAULT_MODEL_FILE), models:, only: DEFAULT_EXPORT_ONLY)

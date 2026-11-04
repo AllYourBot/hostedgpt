@@ -42,7 +42,7 @@ class MessagesComposerAttachmentTest < ApplicationSystemTestCase
     ], make_visible: true
 
     assert_equal 2, find_previews.length
-    find_previews.each { |preview| assert preview.visible? }
+    find_previews.each { assert it.visible? }
     refute @submit.visible?
     assert_active @input_selector
   end
@@ -68,8 +68,6 @@ class MessagesComposerAttachmentTest < ApplicationSystemTestCase
 
   private
 
-  def find_previews
-    all("#document-previews [data-role='preview']").to_a
-  end
+  def find_previews = all("#document-previews [data-role='preview']").to_a
 
 end

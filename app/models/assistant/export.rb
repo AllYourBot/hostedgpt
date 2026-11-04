@@ -11,15 +11,11 @@ module Assistant::Export
 
   DEFAULT_ASSISTANT_FILE = "assistants.yml"
 
-  def attributes
-    super.merge("language_model_api_name" => language_model_api_name)
-  end
+  def attributes = super.merge("language_model_api_name" => language_model_api_name)
 
   # Unsure why this needs to re-defined, but the original ActiveModel::Serialization
   # implementation is ignoring the #attributes method above.
-  def attribute_names_for_serialization
-    attributes.keys
-  end
+  def attribute_names_for_serialization = attributes.keys
 
   class_methods do
     def export_to_file(path: Rails.root.join(DEFAULT_ASSISTANT_FILE), assistants:, only: DEFAULT_EXPORT_ONLY)

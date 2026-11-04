@@ -6,15 +6,11 @@ module Assistant::Context
     sections.join("\n\n") if sections.any?
   end
 
-  def context_attachments
-    context_documents.select { |document| natively_readable?(document) }
-  end
+  def context_attachments = context_documents.select { natively_readable?(it) }
 
   # The files uploaded on the assistant's settings page. Documents that belong to a message, like the
   # images the assistant generates in a conversation, also record the assistant but are not context.
-  def context_documents
-    documents.where(message: nil).order(:created_at)
-  end
+  def context_documents = documents.where(message: nil).order(:created_at)
 
   def natively_readable?(document)
     (document.has_image? && supports_images?) || (document.has_document_pdf? && supports_pdf?)
@@ -23,7 +19,7 @@ module Assistant::Context
   private
 
   def context_files_section
-    files = context_documents.reject { |document| natively_readable?(document) }.filter_map do |document|
+    files = context_documents.reject { natively_readable?(it) }.filter_map do |document|
       text = document.text_content
       %|<file name="#{document.filename}">\n#{text}\n</file>| if text.present?
     end

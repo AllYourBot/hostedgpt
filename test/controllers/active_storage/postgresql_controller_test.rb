@@ -150,9 +150,7 @@ class ActiveStorage::PostgresqlControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def url_method
-    ActiveStorage::Blob.method_defined?(:url) ? :url : :service_url
-  end
+  def url_method = ActiveStorage::Blob.method_defined?(:url) ? :url : :service_url
 
   def with_service(service_name)
     previous_service = ActiveStorage::Blob.service

@@ -53,7 +53,7 @@ class Toolbox::Gmail::MessageTest < ActiveSupport::TestCase
   end
 
   test "headers are nil when the message DOES NOT HAVE them" do
-    bcc_only_headers = headers.reject { |h| h[:name] == "To" }
+    bcc_only_headers = headers.reject { it[:name] == "To" }
     message = gmail_message(payload: text_part("text/plain", "Sent to an undisclosed list").merge(headers: bcc_only_headers))
 
     assert_nil message.to, "A message sent only to Bcc recipients has no To header"

@@ -10,20 +10,12 @@ module AIBackend::Policy
   }.freeze
 
   class << self
-    def for_identity(identity)
-      POLICY_CLASSES[identity&.to_sym]&.constantize
-    end
+    def for_identity(identity) = POLICY_CLASSES[identity&.to_sym]&.constantize
 
-    def chat_provider_identities
-      POLICY_CLASSES.keys
-    end
+    def chat_provider_identities = POLICY_CLASSES.keys
 
-    def key_error_message_for(identity)
-      for_identity(identity)&.key_error_message || Base.key_error_message
-    end
+    def key_error_message_for(identity) = for_identity(identity)&.key_error_message || Base.key_error_message
 
-    def billing_url_for(identity)
-      for_identity(identity)&.billing_url
-    end
+    def billing_url_for(identity) = for_identity(identity)&.billing_url
   end
 end

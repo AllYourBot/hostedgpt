@@ -2,9 +2,7 @@ require "./lib/markdown_renderer"
 
 module MessagesHelper
   # Every model can take a PDF (as extracted text if nothing else), but only some can see images.
-  def attachment_types_for(assistant)
-    assistant.supports_images? ? "image/*,.pdf" : ".pdf"
-  end
+  def attachment_types_for(assistant) = assistant.supports_images? ? "image/*,.pdf" : ".pdf"
 
   def render_avatar_for(message)
     if message.user?
@@ -23,13 +21,9 @@ module MessagesHelper
       end
   end
 
-  def format_for_copying(text)
-    text
-  end
+  def format_for_copying(text) = text
 
-  def format_for_speaking(text)
-    ::MarkdownRenderer.render_for_speaking(text)
-  end
+  def format_for_speaking(text) = ::MarkdownRenderer.render_for_speaking(text)
 
   def format_for_display(message, append_inside_tag: nil)
     parsed_tool_result = message_to_user_hash(message)
@@ -92,9 +86,7 @@ module MessagesHelper
     )
   end
 
-  def message_to_user_from_tool_call?(message)
-    message_to_user_hash(message).present?
-  end
+  def message_to_user_from_tool_call?(message) = message_to_user_hash(message).present?
 
   private
 
@@ -122,9 +114,7 @@ module MessagesHelper
 
   # Tool-result deep links are https-only. Anything else (javascript:, data:,
   # malformed) falls back to plain text rather than rendering as an anchor.
-  def safe_tool_link_url(url)
-    url.to_s.start_with?("https://") && url
-  end
+  def safe_tool_link_url(url) = url.to_s.start_with?("https://") && url
 
   def tool_result_link_to(text, url)
     link_to text, url, target: :_blank, data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline"

@@ -8,9 +8,7 @@ module ApplicationHelper
     16 => "w-16 h-16",
   }.freeze
 
-  def square_size_classes(size)
-    SQUARE_SIZE_CLASSES.fetch(size)
-  end
+  def square_size_classes(size) = SQUARE_SIZE_CLASSES.fetch(size)
 
   def at_most_two_initials(initials)
     return initials if initials.nil? || initials.length <= 2
@@ -92,25 +90,15 @@ module ApplicationHelper
     tag_with_content_or_block(:div, content_or_options_with_block, options, &block)
   end
 
-  def meta_tag(name, content)
-    tag.meta(name:, content:)
-  end
+  def meta_tag(name, content) = tag.meta(name:, content:)
 
-  def charset_tag(charset)
-    tag.meta(charset:)
-  end
+  def charset_tag(charset) = tag.meta(charset:)
 
-  def viewport_tag(content)
-    tag.meta(name: "viewport", content:)
-  end
+  def viewport_tag(content) = tag.meta(name: "viewport", content:)
 
-  def n_a_if_blank(value, n_a = I18n.t("app.helpers.application.not_available"))
-    value.blank? ? n_a : value.to_s
-  end
+  def n_a_if_blank(value, n_a = I18n.t("app.helpers.application.not_available")) = value.blank? ? n_a : value.to_s
 
-  def to_dollars(cents, precision: 2)
-    number_to_currency(cents / 100.0, precision:)
-  end
+  def to_dollars(cents, precision: 2) = number_to_currency(cents / 100.0, precision:)
 
   # Profile picture helper methods
   def user_avatar_image_tag(user, variant: :small, **options)

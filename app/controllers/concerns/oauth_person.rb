@@ -11,21 +11,13 @@ module OauthPerson
     raise NotImplementedError, "#{self.class} must return [link text, url] for the page where a user revokes access"
   end
 
-  def auth
-    request.env["omniauth.auth"]&.deep_symbolize_keys || {}
-  end
+  def auth = request.env["omniauth.auth"]&.deep_symbolize_keys || {}
 
-  def auth_email
-    auth.dig(:info, :email)
-  end
+  def auth_email = auth.dig(:info, :email)
 
-  def auth_name
-    { first_name: auth[:info][:first_name], last_name: auth[:info][:last_name] }
-  end
+  def auth_name = { first_name: auth[:info][:first_name], last_name: auth[:info][:last_name] }
 
-  def credential_association
-    credential_type.underscore
-  end
+  def credential_association = credential_type.underscore
 
   def init_for_user(user)
     user.public_send(credential_association)&.destroy
@@ -70,7 +62,7 @@ module OauthPerson
 
   def person_errors_message
     @person&.errors&.delete :personable
-    msg = @person.errors.full_messages.map { |m| m.gsub(/Personable |credentials /, "") }.to_sentence.capitalize
+    msg = @person.errors.full_messages.map { it.gsub(/Personable |credentials /, "") }.to_sentence.capitalize
     return msg unless msg.downcase.include?("oauth refresh token can't be blank")
 
     msg + " " + helpers.link_to(*third_party_connections, class: "underline") + " search for website, and delete all it's connections. Then try again."

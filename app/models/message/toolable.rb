@@ -12,11 +12,7 @@ module Message::Toolable
     normalizes :tool_call_id, with: -> tool_call_id { tool_call_id[0...40] }
   end
 
-  def only_tool_response?
-    tool? || (content_tool_calls.present? && content_text.blank?)
-  end
+  def only_tool_response? = tool? || (content_tool_calls.present? && content_text.blank?)
 
-  def tool_related?
-    only_tool_response? || content_tool_calls.present?
-  end
+  def tool_related? = only_tool_response? || content_tool_calls.present?
 end

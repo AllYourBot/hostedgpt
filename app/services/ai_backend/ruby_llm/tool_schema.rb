@@ -13,15 +13,9 @@ class AIBackend::RubyLLM::ToolSchema < ::RubyLLM::Tool
 
   # Overrides are required: the base class otherwise derives `name` from the
   # class name, collapsing every registered tool into one garbage entry.
-  def name
-    @name
-  end
+  def name = @name
 
-  def description
-    @description
-  end
+  def description = @description
 
-  def execute(**)
-    raise NotImplementedError, "HostedGPT executes tools via Toolbox.call, never through RubyLLM"
-  end
+  def execute(**) = raise NotImplementedError, "HostedGPT executes tools via Toolbox.call, never through RubyLLM"
 end

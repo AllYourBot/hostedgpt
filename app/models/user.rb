@@ -39,26 +39,20 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :credentials
   store_accessor :preferences, :dark_mode, :nav_closed, :show_thinking, :feature
 
-  def dark_mode
-    super.presence || "system"
-  end
+  def dark_mode = super.presence || "system"
 
   def nav_closed=(value)
     super(value.nil? ? nil : value.to_b)
   end
 
-  def show_thinking?
-    show_thinking.nil? || show_thinking.to_b
-  end
+  def show_thinking? = show_thinking.nil? || show_thinking.to_b
 
   def show_thinking=(value)
     super(value.nil? ? nil : value.to_b)
   end
 
   # Profile picture helper methods
-  def has_profile_picture?
-    profile_picture.attached?
-  end
+  def has_profile_picture? = profile_picture.attached?
 
   def profile_picture_url(variant = :small)
     return nil unless has_profile_picture?

@@ -31,9 +31,9 @@ class Message::DocumentImageTest < ActiveSupport::TestCase
     assert message.has_document_image?
 
     stub_custom_config_value(:app_url, "") do
-      urls = message.documents.map { |document| document.image_url(:small) }
+      urls = message.documents.map { it.image_url(:small) }
       assert_equal 2, urls.length
-      urls.each { |url| assert url.starts_with?("data:image/png;base64,") }
+      urls.each { assert it.starts_with?("data:image/png;base64,") }
     end
   end
 end

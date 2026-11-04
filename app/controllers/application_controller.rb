@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
 
   def default_render(*args)
     if api_request?
-      json_payload = user_defined_ivars.map { |i| [ i.to_s[1..], instance_variable_get(i) ] }.to_h
+      json_payload = user_defined_ivars.map { [ it.to_s[1..], instance_variable_get(it) ] }.to_h
       render json: json_payload, status: :ok
     else
       super(*args)
@@ -42,9 +42,7 @@ class ApplicationController < ActionController::Base
     nil
   end
 
-  def default_url_options
-    { locale: (I18n.locale unless I18n.locale == I18n.default_locale) }.compact
-  end
+  def default_url_options = { locale: (I18n.locale unless I18n.locale == I18n.default_locale) }.compact
 
   def set_nav_conversations
     @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user)
@@ -58,21 +56,15 @@ class ApplicationController < ActionController::Base
     @system_ivars = public_ivars
   end
 
-  def public_ivars
-    instance_variables.select { |i| !i.to_s.starts_with?("@_") }
-  end
+  def public_ivars = instance_variables.select { !it.to_s.starts_with?("@_") }
 
-  def api_request?
-    request.format.json?
-  end
+  def api_request? = request.format.json?
 
   def mobile_device?
     request.user_agent.to_s.match?(/iPhone|iPod|Android.*Mobile|Windows Phone|BlackBerry|Opera Mini|IEMobile/i)
   end
 
-  def user_defined_ivars
-    public_ivars - @system_ivars - ["system_ivar"]
-  end
+  def user_defined_ivars = public_ivars - @system_ivars - ["system_ivar"]
 
   def ensure_manual_login_allowed
     return if manual_login_allowed?

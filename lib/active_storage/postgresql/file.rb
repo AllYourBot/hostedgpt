@@ -34,9 +34,7 @@ class ActiveStorage::Postgresql::File < ApplicationRecord
     raise ActiveStorage::IntegrityError unless digest.base64digest == checksum
   end
 
-  def self.open(key, &block)
-    find_by!(key: key).open(&block)
-  end
+  def self.open(key, &block) = find_by!(key: key).open(&block)
 
   def open(*args)
     transaction do
@@ -54,22 +52,16 @@ class ActiveStorage::Postgresql::File < ApplicationRecord
     digest.update(content)
   end
 
-  def read(bytes=size)
-    lo_read(@lo, bytes)
-  end
+  def read(bytes=size) = lo_read(@lo, bytes)
 
-  def seek(position, whence=PG::SEEK_SET)
-    lo_seek(@lo, position, whence)
-  end
+  def seek(position, whence=PG::SEEK_SET) = lo_seek(@lo, position, whence)
 
   def import(path)
     self.oid = lo_import(path)
     self.digest = Digest::MD5.file(path)
   end
 
-  def tell
-    lo_tell(@lo)
-  end
+  def tell = lo_tell(@lo)
 
   def size
     current_position = tell
@@ -79,7 +71,5 @@ class ActiveStorage::Postgresql::File < ApplicationRecord
     end
   end
 
-  def unlink
-    lo_unlink(oid)
-  end
+  def unlink = lo_unlink(oid)
 end

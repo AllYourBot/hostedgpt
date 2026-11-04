@@ -58,9 +58,7 @@ class AIBackend
     end
   end
 
-  def preceding_conversation_messages
-    raise NotImplementedError
-  end
+  def preceding_conversation_messages = raise NotImplementedError
 
   def conversation_history
     @conversation.messages.for_conversation_version(@message.version).where("messages.index < ?", @message.index).to_a
@@ -68,9 +66,7 @@ class AIBackend
 
   # The current time rides on the newest message the user wrote rather than in the system prompt,
   # so the instructions and the history before that message stay a stable prefix providers can cache.
-  def latest_user_message(history)
-    history.select(&:user?).last
-  end
+  def latest_user_message(history) = history.select(&:user?).last
 
   # On the first message rather than the latest, so the attachments stay in the prefix providers cache.
   def documents_for(message, history)

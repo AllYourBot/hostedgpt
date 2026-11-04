@@ -26,7 +26,7 @@ class AIBackend::RubyLLM::ThinkingConfigurationTest < ActiveSupport::TestCase
   end
 
   def build_chat(model = "claude-opus-5-5")
-    context = RubyLLM.context { |c| c.anthropic_api_key = "test-key" }
+    context = RubyLLM.context { it.anthropic_api_key = "test-key" }
     RubyLLM::Chat.new(model:, provider: :anthropic, assume_model_exists: true, context:)
   end
 
@@ -67,7 +67,7 @@ class AIBackend::RubyLLM::ThinkingConfigurationTest < ActiveSupport::TestCase
     chat.add_message(role: :tool, content: "Sunny", tool_call_id: "call_1")
     chat.generate
 
-    assistant = @requests.sole["messages"].find { |m| m["role"] == "assistant" }
+    assistant = @requests.sole["messages"].find { it["role"] == "assistant" }
     assert_equal({ "type" => "thinking", "thinking" => "I should look it up.", "signature" => "sig-tool" }, assistant["content"].first)
     assert_equal "tool_use", assistant["content"].last["type"]
   end

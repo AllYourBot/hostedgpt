@@ -12,7 +12,7 @@ module Toolbox::GoogleTasks::APIHelpers
   end
 
   def get_list(title)
-    list = get_lists&.find { |l| l.title == title }
+    list = get_lists&.find { it.title == title }
     raise "Could not find a task list named '#{title}'" if list.nil?
     list
   end
@@ -22,7 +22,7 @@ module Toolbox::GoogleTasks::APIHelpers
   end
 
   def snoozed_list # optional, so nil when the user doesn't have one
-    @snoozed_list ||= get_lists&.find { |l| l.title == "Snoozed" }
+    @snoozed_list ||= get_lists&.find { it.title == "Snoozed" }
   end
 
   def get_tasks_for_list(list, due_min: nil, due_max: nil)
@@ -126,9 +126,7 @@ module Toolbox::GoogleTasks::APIHelpers
     end
   end
 
-  def list_id_of(task)
-    task.selfLink.match(/lists\/(.*)\/tasks/).try(:[], 1)
-  end
+  def list_id_of(task) = task.selfLink.match(/lists\/(.*)\/tasks/).try(:[], 1)
 
   def format_time(due)
     if due.is_a?(String) && due == "clear"
@@ -149,7 +147,5 @@ module Toolbox::GoogleTasks::APIHelpers
     raise "#{error_field} is a boolean but it was set to a value other than true or false"
   end
 
-  def task_for_display(task)
-    task.to_h.slice(:id, :title, :notes, :due, :status)
-  end
+  def task_for_display(task) = task.to_h.slice(:id, :title, :notes, :due, :status)
 end

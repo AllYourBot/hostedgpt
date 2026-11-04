@@ -172,7 +172,5 @@ class Toolbox::Gmail < Toolbox
   #   end
   # end
 
-  def app_credential
-    Current.user&.gmail_credential
-  end
+  def app_credential = Current.user&.gmail_credential
 end

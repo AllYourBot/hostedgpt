@@ -1,5 +1,3 @@
 class TrueClass
-  def to_b
-    true
-  end
+  def to_b = true
 end

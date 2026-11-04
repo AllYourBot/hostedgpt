@@ -53,7 +53,7 @@ class ConversationMessagesImagesTest < ApplicationSystemTestCase
 
     assert_equal 2, previews.length
     assert_equal 2, modals.length
-    modals.each { |modal| refute modal.visible? }
+    modals.each { refute it.visible? }
 
     previews.first.click
     assert_true "first modal should be visible" do

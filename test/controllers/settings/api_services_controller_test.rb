@@ -16,7 +16,7 @@ class Settings::APIServicesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get index without table if user has none" do
-    @user.api_services.each { |r| r.deleted! }
+    @user.api_services.each { it.deleted! }
     get settings_api_services_url
     assert_response :success
     assert_select "table", count: 0

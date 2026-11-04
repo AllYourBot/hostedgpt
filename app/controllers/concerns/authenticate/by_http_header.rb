@@ -17,9 +17,7 @@ module Authenticate::ByHttpHeader
 
   alias_method :find_client_by_http_header, :find_or_create_client_by_http_header
 
-  def find_credential_by_http_header
-    HttpHeaderCredential.find_by(auth_uid: auth_uid)
-  end
+  def find_credential_by_http_header = HttpHeaderCredential.find_by(auth_uid: auth_uid)
 
   def create_credential_by_http_header
     http_header_email = request.headers[Setting.http_header_auth_email]
@@ -32,9 +30,7 @@ module Authenticate::ByHttpHeader
     end
   end
 
-  def auth_uid
-    request.headers[Setting.http_header_auth_uid]
-  end
+  def auth_uid = request.headers[Setting.http_header_auth_uid]
 
   def fallback_name_from(email)
     first_part = email.split("@").first

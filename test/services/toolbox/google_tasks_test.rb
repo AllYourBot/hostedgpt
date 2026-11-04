@@ -423,9 +423,7 @@ class Toolbox::GoogleTasksTest < ActiveSupport::TestCase
     ]}
   end
 
-  def lists_data_without_snoozed
-    { items: lists_data[:items].reject { |l| l[:title] == "Snoozed" } }
-  end
+  def lists_data_without_snoozed = { items: lists_data[:items].reject { it[:title] == "Snoozed" } }
 
   def task_data(title: "Title of task", notes: "notes for task", deleted: false, due: nil, completed: false)
     {

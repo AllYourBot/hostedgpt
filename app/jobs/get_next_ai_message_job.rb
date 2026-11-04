@@ -201,7 +201,7 @@ class GetNextAIMessageJob < ApplicationJob
       index: index += 1
     )
 
-    generated_images.each { |generated_image| generated_image.attach_to!(assistant_reply) }
+    generated_images.each { it.attach_to!(assistant_reply) }
 
     GetNextAIMessageJob.perform_later(
       @user.id,
@@ -226,7 +226,5 @@ class GetNextAIMessageJob < ApplicationJob
       (@cancel_counter > 1 && @message.id != @conversation.reload.last_assistant_message_id)
   end
 
-  def message_is_populated?
-    @message.content_text.present?
-  end
+  def message_is_populated? = @message.content_text.present?
 end

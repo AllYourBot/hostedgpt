@@ -137,9 +137,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     element.send_keys key_array
   end
 
-  def click_text(text, params = {})
-    click_on text, **params
-  end
+  def click_text(text, params = {}) = click_on text, **params
 
   def click_element(selector_or_element, wait: Capybara.default_max_wait_time)
     element = if selector_or_element.is_a?(Capybara::Node::Element)
@@ -155,9 +153,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     page.evaluate_script("document.querySelector('#{selector}').scrollTop + document.querySelector('#{selector}').clientHeight").to_i
   end
 
-  def get_bottom_position(selector)
-    page.evaluate_script("document.querySelector('#{selector}').scrollHeight").to_i
-  end
+  def get_bottom_position(selector) = page.evaluate_script("document.querySelector('#{selector}').scrollHeight").to_i
 
   def scroll_to_bottom(selector)
     page.execute_script("document.querySelector('#{selector}').scrollTop = document.querySelector('#{selector}').scrollHeight")
@@ -229,9 +225,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_equal position, get_scroll_top(selector), error_msg || "The #{selector} should have stayed scrolled to #{position}"
   end
 
-  def get_scroll_top(selector)
-    page.evaluate_script("document.querySelector('#{selector}').scrollTop").to_i
-  end
+  def get_scroll_top(selector) = page.evaluate_script("document.querySelector('#{selector}').scrollTop").to_i
 
   def assert_stopped_scrolling(selector = "section #messages")
     assert_true "The #{selector} should have stopped scrolling" do
@@ -265,29 +259,17 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_at_bottom(selector)
   end
 
-  def resize_browser_to(width, height)
-    page.driver.browser.manage.window.resize_to(width, height)
-  end
+  def resize_browser_to(width, height) = page.driver.browser.manage.window.resize_to(width, height)
 
-  def find_messages
-    all("#conversation [data-role='message']").to_a
-  end
+  def find_messages = all("#conversation [data-role='message']").to_a
 
-  def last_message
-    find_messages.last
-  end
+  def last_message = find_messages.last
 
-  def last_user_message
-    find_messages.last(2).first
-  end
+  def last_user_message = find_messages.last(2).first
 
-  def first_message
-    find_messages.first
-  end
+  def first_message = find_messages.first
 
-  def clipboard
-    page.evaluate_script("window.clipboardForSystemTestsToCheck")
-  end
+  def clipboard = page.evaluate_script("window.clipboardForSystemTestsToCheck")
 
   def assert_true(msg = nil, opts = {}, &block)
     timeout = opts[:wait] || Capybara.default_max_wait_time
@@ -340,13 +322,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
   end
 
-  def composer
-    find(composer_selector)
-  end
+  def composer = find(composer_selector)
 
-  def composer_selector
-    "#composer textarea"
-  end
+  def composer_selector = "#composer textarea"
 
   def hover_last_message
     msg = last_message
@@ -354,9 +332,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     msg
   end
 
-  def assert_selected_assistant(assistant)
-    assert_selector "#assistants .relationship", text: assistant.name
-  end
+  def assert_selected_assistant(assistant) = assert_selector "#assistants .relationship", text: assistant.name
 
   def assert_first_message(message)
     assert_selector "#messages > :first-child [data-role='content-text']", text: message.content_text
@@ -385,11 +361,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 end
 
 class Capybara::Node::Element
-  def find_role(label)
-    find("[data-role='#{label}']", visible: :all)
-  end
+  def find_role(label) = find("[data-role='#{label}']", visible: :all)
 
-  def find_target(label, controller:)
-    find("[data-#{controller}-target='#{label}']", visible: :all)
-  end
+  def find_target(label, controller:) = find("[data-#{controller}-target='#{label}']", visible: :all)
 end

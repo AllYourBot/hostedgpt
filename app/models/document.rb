@@ -96,9 +96,7 @@ class Document < ApplicationRecord
     @file_base64[variant.to_sym] ||= encode_file_base64(variant)
   end
 
-  def has_document_pdf?
-    file.attached? && file.content_type == "application/pdf"
-  end
+  def has_document_pdf? = file.attached? && file.content_type == "application/pdf"
 
   TEXT_CONTENT_TYPES = %w[application/json application/xml application/x-yaml application/yaml application/javascript].freeze
 
@@ -166,9 +164,7 @@ class Document < ApplicationRecord
     Base64.strict_encode64(file_contents)
   end
 
-  def file_data_url(variant = :large)
-    "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
-  end
+  def file_data_url(variant = :large) = "data:#{file.blob.content_type};base64,#{file_base64(variant)}"
 
   def set_default_user
     self.user ||= assistant&.user || message&.conversation&.user

@@ -2,9 +2,7 @@
 
 class Setting
   class << self
-    def settings
-      Rails.application.config.options.settings
-    end
+    def settings = Rails.application.config.options.settings
 
     def method_missing(method_name, *arguments, &block)
       if settings.keys.exclude?(method_name.to_sym)
@@ -28,8 +26,6 @@ class Setting
       end
     end
 
-    def key_set?(key)
-      send(key).present?
-    end
+    def key_set?(key) = send(key).present?
   end
 end

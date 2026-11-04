@@ -37,7 +37,5 @@ class Settings::MemoriesController < Settings::ApplicationController
     @memory = Current.user.memories.find_by(id: params[:id])
   end
 
-  def memory_params
-    params.require(:memory).permit(:detail, :assistant_id)
-  end
+  def memory_params = params.require(:memory).permit(:detail, :assistant_id)
 end

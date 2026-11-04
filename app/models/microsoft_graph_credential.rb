@@ -23,9 +23,7 @@ class MicrosoftGraphCredential < Credential
     nil
   end
 
-  def expired?
-    expires_at && expires_at < Time.current
-  end
+  def expired? = expires_at && expires_at < Time.current
 
   def renew_token!
     new_token = current_token.refresh!

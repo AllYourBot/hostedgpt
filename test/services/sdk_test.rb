@@ -5,37 +5,25 @@ class SDKTest < ActiveSupport::TestCase
   end
 
   class HeaderService < SDK
-    def header
-      { "Content-Type": "text/plain", Type: "test" }
-    end
+    def header = { "Content-Type": "text/plain", Type: "test" }
   end
 
   class BearerService < SDK
-    def bearer_token
-      "abc123"
-    end
+    def bearer_token = "abc123"
   end
 
   class HeaderBearerService < SDK
-    def header
-      { "Content-Type": "text/plain", Type: "test" }
-    end
+    def header = { "Content-Type": "text/plain", Type: "test" }
 
-    def bearer_token
-      "abc123"
-    end
+    def bearer_token = "abc123"
   end
 
   class StatusService < SDK
-    def expected_status
-      301
-    end
+    def expected_status = 301
   end
 
   class CallingMethodService < SDK
-    def fetch_widgets
-      get("http://dummy")
-    end
+    def fetch_widgets = get("http://dummy")
 
     def fetch_widgets_from_a_block
       request = nil

@@ -54,7 +54,5 @@ class ActionDispatch::RequestTest < ActiveSupport::TestCase
 
   private
 
-  def request_with_agent(agent_str)
-    ActionDispatch::Request.new("HTTP_USER_AGENT" => agent_str)
-  end
+  def request_with_agent(agent_str) = ActionDispatch::Request.new("HTTP_USER_AGENT" => agent_str)
 end

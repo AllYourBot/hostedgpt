@@ -35,9 +35,7 @@ class AIBackend::RubyLLM < AIBackend
     identity.present? && APIService.chat_provider_identities.include?(identity.to_sym)
   end
 
-  def self.client
-    Rails.env.test? ? ::TestClient::RubyLLM : ::RubyLLM
-  end
+  def self.client = Rails.env.test? ? ::TestClient::RubyLLM : ::RubyLLM
 
   # Error details name the model and include a redacted body excerpt so failures are diagnosable.
   ERROR_BODY_EXCERPT_LENGTH = 200
@@ -52,13 +50,9 @@ class AIBackend::RubyLLM < AIBackend
     detail
   end
 
-  def self.mapped_error(error, model:, as:)
-    as.new("#{error.message} (#{error_detail(error, model: model)})")
-  end
+  def self.mapped_error(error, model:, as:) = as.new("#{error.message} (#{error_detail(error, model: model)})")
 
-  def self.gem_class
-    Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::RubyLLM::Chat
-  end
+  def self.gem_class = Rails.env.test? ? ::TestClient::RubyLLM::Chat : ::RubyLLM::Chat
 
   # One stanza per provider credential: the key plus, when the service URL is
   # not the provider's canonical one, the base URL override (and, for
@@ -104,7 +98,7 @@ class AIBackend::RubyLLM < AIBackend
     provider = test_provider(driver, url)
     Rails.logger.info "Connecting to AI API server at #{url} with access token of length #{token.to_s.length}"
     Rails.logger.info "Testing using model #{api_name} for provider #{provider}"
-    context = client.context { |c| configure_context(c, provider: provider, url: url, token: token) }
+    context = client.context { configure_context(it, provider: provider, url: url, token: token) }
     chat = gem_class.new(model: api_name, provider: provider, assume_model_exists: true, context: context)
     chat.add_message({ role: "user", content: "Hello!" })
     chat.complete.content
@@ -128,7 +122,7 @@ class AIBackend::RubyLLM < AIBackend
     # Context-free on purpose: Toolbox::Image#generate_with_error_context appends which assistant asked.
     raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services" if token.blank?
 
-    context = client.context { |c| c.openai_api_key = token }
+    context = client.context { it.openai_api_key = token }
     image = begin
       context.paint(
         prompt,
@@ -159,7 +153,7 @@ class AIBackend::RubyLLM < AIBackend
   end
 
   def self.speak(text, provider:, token:, model:, **options)
-    context = client.context { |c| c.public_send("#{provider}_api_key=", token) }
+    context = client.context { it.public_send("#{provider}_api_key=", token) }
     context.speak(text, model:, provider:, assume_model_exists: true, **options).to_blob
   rescue ::RubyLLM::BadRequestError => e # ahead of CONFIGURATION_ERRORS, which also holds it
     gemini_rejected_key = e.message.match?(/api key/i)
@@ -186,7 +180,7 @@ class AIBackend::RubyLLM < AIBackend
 
     chat = build_chat
     chat.with_instructions(instructions)
-    preceding_messages(messages).each { |msg| chat.add_message(msg) }
+    preceding_messages(messages).each { chat.add_message(it) }
     chat.with_provider_options(**params) if params.present?
     chat.complete.content
   rescue *CONFIGURATION_ERRORS => e
@@ -204,7 +198,7 @@ class AIBackend::RubyLLM < AIBackend
     # prompt as the cache boundary. OpenAI and Gemini cache a repeated prefix
     # on their own.
     chat.with_instructions(instructions, cache_until_here: provider_slug == :anthropic) if instructions.present?
-    preceding_conversation_messages.each { |msg| chat.add_message(msg) }
+    preceding_conversation_messages.each { chat.add_message(it) }
     chat.with_tools(*tool_instances) if tools_enabled?
     if thinking_enabled?
       chat.with_thinking(**thinking_options)
@@ -214,7 +208,7 @@ class AIBackend::RubyLLM < AIBackend
     begin
       # `generate` streams chunks and never executes tools — the tool calls come
       # back on the returned message for the job to run through Toolbox.call.
-      response = chat.generate { |chunk| stream_handler.call(chunk, chunk_handler) }
+      response = chat.generate { stream_handler.call(it, chunk_handler) }
     rescue *CONFIGURATION_ERRORS => e
       raise self.class.mapped_error(e, model: @api_name, as: ConfigurationError)
     rescue *RATE_LIMIT_ERRORS => e
@@ -236,9 +230,7 @@ class AIBackend::RubyLLM < AIBackend
 
   private
 
-  def provider_slug
-    @api_service.driver.to_sym
-  end
+  def provider_slug = @api_service.driver.to_sym
 
   def build_chat
     chat = self.class.gem_class.new(model: @api_name, provider: provider_slug, assume_model_exists: true, context: ruby_llm_context)
@@ -247,7 +239,7 @@ class AIBackend::RubyLLM < AIBackend
   end
 
   def ruby_llm_context
-    self.class.client.context { |c| self.class.configure_context(c, provider: provider_slug, url: @api_service.url, token: @token) }
+    self.class.client.context { self.class.configure_context(it, provider: provider_slug, url: @api_service.url, token: @token) }
   end
 
   def stream_handler
@@ -322,8 +314,8 @@ class AIBackend::RubyLLM < AIBackend
   # RubyLLM formats each attachment for the provider: a PDF becomes Anthropic's document block,
   # OpenAI's file part, or Gemini's inline data.
   def user_message(message, documents, with_time:)
-    attachments = documents.select { |document| @assistant.natively_readable?(document) }.map { |document| attachment_for(document) }
-    pdf_texts = documents.select { |document| document.has_document_pdf? && !@assistant.supports_pdf? }.map(&:pdf_as_text)
+    attachments = documents.select { @assistant.natively_readable?(it) }.map { attachment_for(it) }
+    pdf_texts = documents.select { it.has_document_pdf? && !@assistant.supports_pdf? }.map(&:pdf_as_text)
     text = [message.content_text, *pdf_texts, (current_time_note if with_time)].compact.join("\n\n")
 
     msg = { role: message.role, content: text }
@@ -381,9 +373,7 @@ class AIBackend::RubyLLM < AIBackend
     @assistant.language_model.supports_tools?
   end
 
-  def thinking_enabled?
-    @assistant.language_model.supports_thinking?
-  end
+  def thinking_enabled? = @assistant.language_model.supports_thinking?
 
   def thinking_options
     return { budget: THINKING_BUDGET, display: "summarized" } if provider_slug == :gemini && @api_name.start_with?("gemini-2.5")

@@ -4,9 +4,7 @@ module Email
     SMTP = "smtp".freeze
 
     class << self
-      def all
-        constants.map { |c| const_get(c) }
-      end
+      def all = constants.map { const_get(it) }
     end
   end
   Providers.freeze

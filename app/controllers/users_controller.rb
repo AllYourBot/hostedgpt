@@ -47,9 +47,7 @@ class UsersController < ApplicationController
     @user = Current.user if params[:id].to_i == Current.user.id
   end
 
-  def prettify_flash_error_messages
-    flash[:errors]&.each { |error| @person.errors.add(:base, error) }
-  end
+  def prettify_flash_error_messages = flash[:errors]&.each { @person.errors.add(:base, it) }
 
   def person_params
     h = params.require(:person).permit(:email, :personable_type, personable_attributes: [
@@ -58,7 +56,5 @@ class UsersController < ApplicationController
     format_and_strip_all_but_first_valid_credential(h)
   end
 
-  def user_params
-    params.require(:user).permit(:nav_closed, :dark_mode)
-  end
+  def user_params = params.require(:user).permit(:nav_closed, :dark_mode)
 end

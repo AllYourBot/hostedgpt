@@ -22,17 +22,11 @@ module Authenticate
 
   private
 
-  def signed_in?
-    Current.user.present?
-  end
+  def signed_in? = Current.user.present?
 
-  def require_authentication
-    restore_authentication || request_authentication
-  end
+  def require_authentication = restore_authentication || request_authentication
 
-  def restore_authentication
-    Current.initialize_with(client: find_client)
-  end
+  def restore_authentication = Current.initialize_with(client: find_client)
 
   def request_authentication
     return if performed?
@@ -49,11 +43,7 @@ module Authenticate
     redirect_to root_url if signed_in?
   end
 
-  def find_client
-    find_client_by_cookie || find_client_by_http_header || find_client_by_bearer_token
-  end
+  def find_client = find_client_by_cookie || find_client_by_http_header || find_client_by_bearer_token
 
-  def post_authenticating_url
-    session.delete(:return_to_after_authenticating) || root_url
-  end
+  def post_authenticating_url = session.delete(:return_to_after_authenticating) || root_url
 end

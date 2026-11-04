@@ -3,7 +3,7 @@ class OpenData
 
   def self.for(input)
     if input.is_a?(Array)
-      input.map { |i| OpenData.new(i) }
+      input.map { OpenData.new(it) }
     else
       OpenData.new(input)
     end
@@ -23,42 +23,26 @@ class OpenData
     end
   end
 
-  def to_h
-    recursive_to_h(self)
-  end
+  def to_h = recursive_to_h(self)
 
-  def keys
-    to_h.keys
-  end
+  def keys = to_h.keys
 
-  def values
-    to_h.values
-  end
+  def values = to_h.values
 
   def merge!(input)
     @data = parse_hash(self.to_h.merge(input.to_h))
     self
   end
 
-  def merge(input)
-    OpenData.new(self.to_h.merge(input.to_h))
-  end
+  def merge(input) = OpenData.new(self.to_h.merge(input.to_h))
 
-  def try(name)
-    super || @data.try(name)
-  end
+  def try(name) = super || @data.try(name)
 
-  def ==(other)
-    to_h == other.to_h
-  end
+  def ==(other) = to_h == other.to_h
 
-  def eql?(other)
-    self == other
-  end
+  def eql?(other) = self == other
 
-  def inspect
-    @data.inspect.gsub("<data", "<OpenData")
-  end
+  def inspect = @data.inspect.gsub("<data", "<OpenData")
 
   private
 
@@ -76,7 +60,7 @@ class OpenData
     if value.is_a?(Hash)
       self.class.new(value)
     elsif value.is_a?(Array)
-      value.map { |v| parse_value(v) }
+      value.map { parse_value(it) }
     else
       value
     end

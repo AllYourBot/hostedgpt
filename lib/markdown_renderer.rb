@@ -3,9 +3,7 @@ require "nokogiri"
 
 class MarkdownRenderer
   class << self
-    def render_for_speaking(markdown)
-      CustomSpeakingRenderer.new.render(markdown.to_s)
-    end
+    def render_for_speaking(markdown) = CustomSpeakingRenderer.new.render(markdown.to_s)
 
     def render_for_display(markdown, options = {})
       # Callers must HTML-escape the markdown first (see format_for_display):
@@ -41,8 +39,8 @@ class MarkdownRenderer
       markdown = markdown.gsub(/\\\\\((.+?)\\\\\)|\\\\\[(.+?)\\\\\]/m) do |m|
         lift_math_span(spans, "\\(#{m[3..-4]}\\)")
       end
-      markdown = markdown.gsub(/\$\$.+?\$\$/m) { |m| lift_math_span(spans, m) }
-      markdown = markdown.gsub(/\\\(.+?\\\)|\\\[.+?\\\]/m) { |m| lift_math_span(spans, m) }
+      markdown = markdown.gsub(/\$\$.+?\$\$/m) { lift_math_span(spans, it) }
+      markdown = markdown.gsub(/\\\(.+?\\\)|\\\[.+?\\\]/m) { lift_math_span(spans, it) }
       [ markdown, spans ]
     end
 
@@ -65,15 +63,11 @@ class MarkdownRenderer
       end
     end
 
-    def math_placeholder(index)
-      "#{math_placeholder_delimiter}#{index}#{math_placeholder_delimiter}"
-    end
+    def math_placeholder(index) = "#{math_placeholder_delimiter}#{index}#{math_placeholder_delimiter}"
 
     # Private-use characters delimit the placeholder: no markdown syntax or
     # plausible model output collides with them, unlike an ASCII token.
-    def math_placeholder_delimiter
-      "\uE000"
-    end
+    def math_placeholder_delimiter = "\uE000"
 
     # Code arrives escaped twice (once upstream, once by comrak), so code text
     # is decoded twice unless the proc's fragment round-trip does the second.
@@ -99,12 +93,8 @@ class MarkdownRenderer
       doc.to_html
     end
 
-    def decode_code_text_nodes(code)
-      code.xpath(".//text()").each { |node| node.content = CGI.unescapeHTML(node.content) }
-    end
+    def decode_code_text_nodes(code) = code.xpath(".//text()").each { it.content = CGI.unescapeHTML(it.content) }
 
-    def ensure_blank_line_before_code_block_start(markdown)
-      markdown.to_s.gsub(/(\n*)( *)(```.*?```)/m, "\n\n\\2\\3")
-    end
+    def ensure_blank_line_before_code_block_start(markdown) = markdown.to_s.gsub(/(\n*)( *)(```.*?```)/m, "\n\n\\2\\3")
   end
 end

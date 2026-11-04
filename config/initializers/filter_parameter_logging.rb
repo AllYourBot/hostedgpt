@@ -5,7 +5,7 @@ def filter_regexp(filter_key, exemptions = [])
 
   # Join the exemptions array into a pattern for negative look-ahead
   unless exemptions.empty?
-    exemptions_pattern = exemptions.map { |exemption| Regexp.escape(exemption.to_s) }.join("|")
+    exemptions_pattern = exemptions.map { Regexp.escape(it.to_s) }.join("|")
     pattern = "^(?!.*(?:#{exemptions_pattern})).*(#{filter_key_pattern}).*$"
   else
     pattern = ".*(#{filter_key_pattern}).*"

@@ -24,7 +24,7 @@ module Assistant::Slug
     base_slug = name.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/-$/, "")
 
     existing_base_slugs = user.assistants.where("slug LIKE ?", "#{base_slug}%").pluck(:slug)
-    largest_slug_number = existing_base_slugs.map { |slug| slug.split("--").last.to_i }.max
+    largest_slug_number = existing_base_slugs.map { it.split("--").last.to_i }.max
     self.slug = if largest_slug_number.present?
       "#{base_slug}--#{largest_slug_number + 1}"
     elsif existing_base_slugs.any?
