@@ -25,6 +25,7 @@ class User < ApplicationRecord
   has_one :google_credential, -> { type_is("GoogleCredential") }, class_name: "Credential", inverse_of: :user
   has_one :gmail_credential, -> { type_is("GmailCredential") }, class_name: "Credential", inverse_of: :user
   has_one :google_tasks_credential, -> { type_is("GoogleTasksCredential") }, class_name: "Credential", inverse_of: :user
+  has_one :google_calendar_credential, -> { type_is("GoogleCalendarCredential") }, class_name: "Credential", inverse_of: :user
   has_one :microsoft_graph_credential, -> { type_is("MicrosoftGraphCredential") }, class_name: "Credential", inverse_of: :user
   has_one :http_header_credential, -> { type_is("HttpHeaderCredential") }, class_name: "Credential", inverse_of: :user
 

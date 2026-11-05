@@ -15,13 +15,13 @@ class GoogleSDKTest < ActiveSupport::TestCase
     @user = users(:keith)
   end
 
-  test "prune_revoked_credentials! reauthenticates every Gmail and Google Tasks credential, and nothing else" do
+  test "prune_revoked_credentials! reauthenticates every Gmail, Google Tasks, and Google Calendar credential, and nothing else" do
     seen = []
     GoogleSDK.stub :reauthenticate_credential, ->(credential) { seen << credential; true } do
       GoogleSDK.prune_revoked_credentials!(@user)
     end
 
-    assert_equal [ credentials(:keith_gmail), credentials(:keith_google_tasks) ].sort_by(&:id), seen.sort_by(&:id)
+    assert_equal [ credentials(:keith_gmail), credentials(:keith_google_tasks), credentials(:keith_google_calendar) ].sort_by(&:id), seen.sort_by(&:id)
   end
 
   test "reauthenticate_credential destroys the credential when Google reports the refresh token was revoked" do

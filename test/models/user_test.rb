@@ -29,6 +29,10 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of GoogleTasksCredential, users(:keith).google_tasks_credential
   end
 
+  test "has an associated google_calendar_credential" do
+    assert_instance_of GoogleCalendarCredential, users(:keith).google_calendar_credential
+  end
+
   test "has an associated microsoft_graph_credential" do
     assert_instance_of MicrosoftGraphCredential, users(:keith).microsoft_graph_credential
   end

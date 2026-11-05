@@ -18,7 +18,7 @@ module Toolbox::GoogleApp
 
   def refresh_token!
     if ! ::GoogleSDK.reauthenticate_credential(app_credential)
-      raise "Gmail no longer connected"
+      raise "#{app_name} no longer connected"
     else
       true
     end

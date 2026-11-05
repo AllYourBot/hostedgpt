@@ -60,6 +60,49 @@ class AuthenticationsController::GoogleOauthControllerTest < ActionDispatch::Int
     assert_credential_matches_details(user.reload.google_tasks_credential, details)
   end
 
+  test "should add a GoogleCalendarCredential and redirect to edit_settings" do
+    user = users(:rob)
+    login_as user
+    details = {
+      uid: "rob-abc123",
+      credentials: {
+        token: "abc123",
+        refresh_token: "xyz789",
+        scope: "https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.email"
+      },
+      info: { email: "rob.personal@gmail.com" }
+    }
+    OmniAuth.config.add_mock(:google_calendar, details)
+
+    refute user.google_calendar_credential.present?
+    get google_oauth_path(provider: "google_calendar")
+
+    assert_redirected_to edit_settings_person_path
+    assert_equal "Saved", flash[:notice]
+    assert_credential_matches_details(user.reload.google_calendar_credential, details)
+  end
+
+  test "show error and should NOT add a GoogleCalendarCredential when the calendar permission is NOT granted" do
+    user = users(:rob)
+    login_as user
+    details = {
+      uid: "rob-abc123",
+      credentials: {
+        token: "abc123",
+        refresh_token: "xyz789",
+        scope: "https://www.googleapis.com/auth/userinfo.email"
+      },
+      info: { email: "rob.personal@gmail.com" }
+    }
+    OmniAuth.config.add_mock(:google_calendar, details)
+
+    get google_oauth_path(provider: "google_calendar")
+
+    assert_redirected_to edit_settings_person_path
+    assert_match "You did not check all the permission boxes", flash[:alert], "The user should be told to grant every permission"
+    refute user.reload.google_calendar_credential.present?, "No credential should be saved without the calendar permission"
+  end
+
   test "show error and should NOT add a GmailCredential when not all permissions are granted" do
     user = users(:rob)
     login_as user

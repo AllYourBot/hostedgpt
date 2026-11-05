@@ -196,7 +196,7 @@ de:
           backend_choice_aria_ruby_llm: "%{provider}: RubyLLM"
           backend_choice_aria_sdk: "%{provider}: integriertes SDK"
           enable_tools: "Tools für Assistenten aktivieren"
-          enable_tools_note: "Hinweis für Entwickler: Die entsprechende API (Gmail, Google Tasks) muss auch in der Google Cloud Console für das Projekt hinter dem OAuth-Client dieser App aktiviert sein, sonst schlägt die Verbindung fehl."
+          enable_tools_note: "Hinweis für Entwickler: Die entsprechende API (Gmail, Google Tasks, Google Calendar) muss auch in der Google Cloud Console für das Projekt hinter dem OAuth-Client dieser App aktiviert sein, sonst schlägt die Verbindung fehl."
           gmail_section: "Gmail:"
           gmail_trouble: "Probleme? Versuchen Sie"
           deleting_connection: "Verbindung zu löschen"
@@ -204,6 +204,8 @@ de:
           enable_gmail: "Gmail aktivieren"
           google_tasks_section: "Google Tasks:"
           enable_google_tasks: "Google Tasks aktivieren"
+          google_calendar_section: "Google Calendar:"
+          enable_google_calendar: "Google Calendar aktivieren"
           save: "Speichern"
           saving: "Speichere..."
           cancel: "Abbrechen"
@@ -211,6 +213,7 @@ de:
         buttons:
           gmail: "Gmail"
           google_tasks: "Google Tasks"
+          google_calendar: "Google Calendar"
       generic:
         "yes": "Ja"
         "no": "Nein"

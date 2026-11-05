@@ -8,7 +8,7 @@ You can have multiple users so it is great for a family or group.
 
 You can also switch providers and models in the middle of a conversation, so it is great for comparing different models!
 
-And you can attach your Google email and tasks account and manipulate them in your conversation. Your assistant can also do web searches itself if you get a free Brave Search API key.
+And you can attach your Google email, tasks, and calendar accounts and manipulate them in your conversation. Your assistant can also do web searches itself if you get a free Brave Search API key.
 
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
@@ -306,7 +306,7 @@ There are a number of optional feature flags that can be set and settings that c
   - `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
   - `CLOUDFLARE_SECRET_ACCESS_KEY` - Your Cloudflare Secret Access Key
   - `CLOUDFLARE_BUCKET` - The name of the bucket you created
-- `GOOGLE_TOOLS_FEATURE` is `true` by default. Set this to `false` if you would not like this feature where your assistant can access your Gmail, Google Tasks, and soon Google Calendar. If enabled, you need to set up Google OAuth and include the apps as part of the consent flow. See [Configure Google Tools](#configuring-google-tools). After this is done, when each user goes to Settings within the app, there will be a button to explicitly connect their account to Gmail, Google Tasks, and/or Google Calendar. Review `gmail.rb` and `google_tasks.rb` in the directory `app/services/toolbox/` to see what capabilities have currently been built.
+- `GOOGLE_TOOLS_FEATURE` is `true` by default. Set this to `false` if you would not like this feature where your assistant can access your Gmail, Google Tasks, and Google Calendar. If enabled, you need to set up Google OAuth and include the apps as part of the consent flow. See [Configure Google Tools](#configuring-google-tools). After this is done, when each user goes to Settings within the app, there will be a button to explicitly connect their account to Gmail, Google Tasks, and/or Google Calendar. Review `gmail.rb`, `google_tasks.rb`, and `google_calendar.rb` in the directory `app/services/toolbox/` to see what capabilities have currently been built.
 - `VOICE_FEATURE` is `true` by default. This feature provides a microphone icon for spoken conversation with your assistant.
 - `PASSWORD_AUTHENTICATION_FEATURE` is `true` by default, see the [Authentication](#authentication) section for more details.
 - `GOOGLE_AUTHENTICATION_FEATURE` is `false` by default, see the [Authentication](#authentication) section for more details.
@@ -333,6 +333,7 @@ You first need to follow all the steps in the [Google OAuth instructions](#googl
    - Click "Add or Remove Scopes", check "userinfo.email" and then in "Manually add scopes" paste these URLs, one at a time:
      - https://www.googleapis.com/auth/gmail.modify (then click "Add To Table")
      - https://www.googleapis.com/auth/tasks (then click "Add To Table")
+     - https://www.googleapis.com/auth/calendar.events (then click "Add To Table")
 
 2. **Finally, make sure `GOOGLE_TOOLS_FEATURE` is true**
 
@@ -397,6 +398,8 @@ google:
      - **Authorized Redirect URIs:** Add these paths but replace the base URL with yours:
        - `https://example.com/auth/google/callback`
        - `https://example.com/auth/gmail/callback`
+       - `https://example.com/auth/google_tasks/callback`
+       - `https://example.com/auth/google_calendar/callback`
    - Click "Create"
 
 4. **Set Environment Variables:**
