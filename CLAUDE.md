@@ -50,7 +50,7 @@ HostedGPT is a Ruby on Rails 8.1 app providing a multi-provider conversational A
 ### Identity model: Person / User / Client / Credential
 - `Person` is a `delegated_type` (`personable: User | Tombstone`) — the stable identity record; `User` is the "real" account data, `Tombstone` represents a deleted-but-referenced person (e.g. left behind so old messages still resolve an author).
 - `Client` (`belongs_to :person`) represents one login session/device (`platform`: ios/android/web/api) and has at most one active `Authentication` at a time (`authenticate_with!` / `logout!` soft-delete the old one).
-- `Credential` is an STI-ish per-auth-method row (`password_credential`, `google_credential`, `gmail_credential`, `google_tasks_credential`, `microsoft_graph_credential`, `http_header_credential`, `google_app.rb`) belonging to `User`, each holding encrypted OAuth/external identifiers.
+- `Credential` is an STI-ish per-auth-method row (`password_credential`, `google_credential`, `gmail_credential`, `google_tasks_credential`, `google_calendar_credential`, `microsoft_graph_credential`, `http_header_credential`, `google_app.rb`) belonging to `User`, each holding encrypted OAuth/external identifiers.
 - Multiple auth methods (password, Google OAuth, Microsoft Graph OAuth, HTTP header) are gated by feature flags; enabling HTTP header auth automatically disables password and Google auth (see `Feature.features`).
 
 ### Feature flags & settings

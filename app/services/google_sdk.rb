@@ -1,5 +1,5 @@
 class GoogleSDK < SDK
-  APP_CREDENTIAL_TYPES = %w[GmailCredential GoogleTasksCredential]
+  APP_CREDENTIAL_TYPES = %w[GmailCredential GoogleTasksCredential GoogleCalendarCredential]
 
   def self.reauthenticate_credential(credential)
     # from here: https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code

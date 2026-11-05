@@ -2,6 +2,7 @@ class Toolbox < SDK
   def self.descendants
     gmail_active = Feature.google_tools? && Current.user&.gmail_credential || nil
     tasks_active = Feature.google_tools? && Current.user&.google_tasks_credential || nil
+    calendar_active = Feature.google_tools? && Current.user&.google_calendar_credential || nil
     brave_active = Current.user&.api_services&.find_by(driver: :brave)&.effective_token.present? || nil
     test_env = Rails.env.test? || nil
     [
@@ -12,6 +13,7 @@ class Toolbox < SDK
       brave_active && Toolbox::BraveSearch,
       gmail_active && Toolbox::Gmail,
       tasks_active && Toolbox::GoogleTasks,
+      calendar_active && Toolbox::GoogleCalendar,
     ].compact
   end
 

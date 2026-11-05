@@ -16,6 +16,12 @@ class Authentications::GoogleOauthController < ApplicationController
       raise "You did not check all the permission boxes. Try again." unless cred.has_permission? %w(userinfo.email tasks)
       cred.save! && redirect_to(edit_settings_person_path, notice: I18n.t("app.flashes.language_models.saved")) && return
 
+    elsif auth[:provider] == "google_calendar" && Current.user
+      Current.user.google_calendar_credential&.destroy
+      _, cred = add_person_credentials("GoogleCalendarCredential")
+      raise "You did not check all the permission boxes. Try again." unless cred.has_permission? %w(userinfo.email calendar.events)
+      cred.save! && redirect_to(edit_settings_person_path, notice: I18n.t("app.flashes.language_models.saved")) && return
+
     elsif auth[:provider] == "google"          && credential = GoogleCredential.find_by(oauth_id: auth[:uid])
       @person = credential.user.person
 

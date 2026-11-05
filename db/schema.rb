@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_01_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -157,8 +157,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_120000) do
     t.index ["external_id"], name: "index_credentials_on_external_id"
     t.index ["type", "external_id"], name: "index_credentials_on_type_and_external_id", unique: true, where: "((type)::text = ANY (ARRAY[('GoogleCredential'::character varying)::text, ('MicrosoftGraphCredential'::character varying)::text, ('HttpHeaderCredential'::character varying)::text]))"
     t.index ["type", "oauth_email"], name: "index_credentials_on_type_and_oauth_email", unique: true, where: "((type)::text = ANY (ARRAY[('GoogleCredential'::character varying)::text, ('MicrosoftGraphCredential'::character varying)::text]))"
-    t.index ["type", "user_id", "external_id"], name: "index_credentials_on_type_user_id_and_external_id", unique: true, where: "((type)::text = ANY (ARRAY[('GmailCredential'::character varying)::text, ('GoogleTasksCredential'::character varying)::text]))"
-    t.index ["type", "user_id", "oauth_email"], name: "index_credentials_on_type_user_id_and_oauth_email", unique: true, where: "((type)::text = ANY (ARRAY[('GmailCredential'::character varying)::text, ('GoogleTasksCredential'::character varying)::text]))"
+    t.index ["type", "user_id", "external_id"], name: "index_credentials_on_type_user_id_and_external_id", unique: true, where: "((type)::text = ANY (ARRAY[('GmailCredential'::character varying)::text, ('GoogleTasksCredential'::character varying)::text, ('GoogleCalendarCredential'::character varying)::text]))"
+    t.index ["type", "user_id", "oauth_email"], name: "index_credentials_on_type_user_id_and_oauth_email", unique: true, where: "((type)::text = ANY (ARRAY[('GmailCredential'::character varying)::text, ('GoogleTasksCredential'::character varying)::text, ('GoogleCalendarCredential'::character varying)::text]))"
     t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 

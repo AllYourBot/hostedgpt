@@ -28,6 +28,16 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     prompt: "consent"
   }
 
+  provider :google_oauth2, Setting.google_auth_client_id, Setting.google_auth_client_secret, {
+    name: "google_calendar",
+    scope: %|
+      email
+      https://www.googleapis.com/auth/calendar.events
+    |,
+    include_granted_scopes: true,
+    prompt: "consent"
+  }
+
   provider :microsoft_graph, Setting.microsoft_graph_auth_client_id, Setting.microsoft_graph_auth_client_secret, {
     name: "microsoft_graph",
     scope: Setting.microsoft_graph_scope.presence || %|

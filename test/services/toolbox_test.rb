@@ -32,6 +32,28 @@ class ToolboxTest < ActiveSupport::TestCase
     end
   end
 
+  test "tools includes google calendar if enabled and the user connected it" do
+    stub_features(google_tools: true) do
+      Current.set(user: users(:keith)) do
+        assert users(:keith).google_calendar_credential
+        assert Toolbox.descendants.include?(Toolbox::GoogleCalendar), "Keith connected Google Calendar"
+      end
+
+      Current.set(user: users(:rob)) do
+        refute users(:rob).google_calendar_credential
+        refute Toolbox.descendants.include?(Toolbox::GoogleCalendar), "Rob never connected Google Calendar"
+      end
+    end
+  end
+
+  test "tools excludes google calendar if google tools are disabled" do
+    stub_features(google_tools: false) do
+      Current.set(user: users(:keith)) do
+        refute Toolbox.descendants.include?(Toolbox::GoogleCalendar), "Google tools are turned off"
+      end
+    end
+  end
+
   test "tools includes brave search if the user has a Brave API key configured" do
     Current.set(user: users(:keith)) do
       assert Toolbox.descendants.include? Toolbox::BraveSearch
