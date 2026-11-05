@@ -182,6 +182,33 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=checkbox][name='person[personable_attributes][show_thinking]'][checked]"
   end
 
+  test "turning off ask_follow_ups keeps the other preferences" do
+    @user.update!(dark_mode: "dark", show_thinking: false)
+
+    params = person_params
+    params["personable_attributes"]["ask_follow_ups"] = "0"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+
+    @user.reload
+    refute @user.ask_follow_ups?, "Follow-ups should be turned off"
+    assert_equal "dark", @user.dark_mode, "dark_mode should not have changed"
+    refute @user.show_thinking?, "show_thinking should not have changed"
+  end
+
+  test "the settings form shows the ask_follow_ups checkbox checked by default" do
+    get edit_settings_person_url
+    assert_select "input[type=checkbox][name='person[personable_attributes][ask_follow_ups]'][checked]"
+  end
+
+  test "the settings form shows the ask_follow_ups checkbox UNCHECKED once the user turned follow-ups off" do
+    @user.update!(ask_follow_ups: false)
+
+    get edit_settings_person_url
+    assert_select "input[type=checkbox][name='person[personable_attributes][ask_follow_ups]']:not([checked])"
+  end
+
   test "updating dark_mode leaves nav_closed and feature opinions intact" do
     @user.update!(nav_closed: true)
     @user.update!(feature: { "some_custom_feature" => "sdk" })
