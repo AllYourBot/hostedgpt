@@ -38,6 +38,18 @@ class User::PreferenceTest < ActiveSupport::TestCase
     assert user.reload.show_thinking?
   end
 
+  test "ask_follow_ups defaults to on and takes a form checkbox value" do
+    user = User.create!(first_name: "First", last_name: "Last")
+    assert user.ask_follow_ups?, "Follow-ups should be on for a user who never changed the setting"
+
+    user.update!(ask_follow_ups: "0")
+    refute user.reload.ask_follow_ups?, "Unchecking the box should turn follow-ups off"
+    assert_equal false, user.preferences["ask_follow_ups"], "The preference should be stored as a boolean"
+
+    user.update!(ask_follow_ups: "1")
+    assert user.reload.ask_follow_ups?, "Checking the box should turn follow-ups back on"
+  end
+
   test "accessor writes mark preferences as changed and persist" do
     user = User.create!(first_name: "First", last_name: "Last")
     assert_nil user.preferences

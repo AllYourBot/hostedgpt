@@ -18,7 +18,7 @@ class Settings::PeopleController < Settings::ApplicationController
   def person_params
     h = params.require(:person).permit(:email, personable_attributes: [
       :id, :first_name, :last_name, :password, :profile_picture, :remove_profile_picture,
-      :dark_mode, :show_thinking,
+      :dark_mode, :show_thinking, :ask_follow_ups,
       credentials_attributes: [ :id, :type, :password ]
     ]).to_h
 

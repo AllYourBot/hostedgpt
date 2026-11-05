@@ -8,6 +8,7 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
   test "full_instructions is blank when nothing is provided, because the time rides on the newest user message" do
     users(:keith).memories.delete_all
     assistants(:samantha).update!(instructions: nil)
+    users(:keith).update!(ask_follow_ups: false)
 
     backend = AIBackend.new(
       users(:keith),
@@ -113,5 +114,25 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
     backend = AIBackend.new(users(:keith), assistants(:samantha), conversations(:greeting), messages(:yes_i_do))
 
     assert backend.send(:full_instructions).ends_with?(AIBackend::VOICE_INSTRUCTIONS)
+  end
+
+  test "full_instructions ends with follow-up instructions when the user has NOT turned them off" do
+    backend = AIBackend.new(users(:keith), assistants(:samantha), conversations(:greeting), messages(:yes_i_do))
+
+    assert backend.send(:full_instructions).ends_with?(AIBackend::FOLLOW_UP_INSTRUCTIONS), "Follow-ups are on by default"
+  end
+
+  test "full_instructions DOES NOT INCLUDE follow-up instructions when the user turned them off" do
+    users(:keith).update!(ask_follow_ups: false)
+    backend = AIBackend.new(users(:keith), assistants(:samantha), conversations(:greeting), messages(:yes_i_do))
+
+    refute_includes backend.send(:full_instructions), AIBackend::FOLLOW_UP_INSTRUCTIONS
+  end
+
+  test "full_instructions DOES NOT INCLUDE follow-up instructions when the user spoke their message" do
+    messages(:hear_me).update!(spoken: true)
+    backend = AIBackend.new(users(:keith), assistants(:samantha), conversations(:greeting), messages(:yes_i_do))
+
+    refute_includes backend.send(:full_instructions), AIBackend::FOLLOW_UP_INSTRUCTIONS, "A reply read aloud should stay brief"
   end
 end

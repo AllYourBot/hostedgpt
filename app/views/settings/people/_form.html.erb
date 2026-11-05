@@ -101,6 +101,11 @@
       <%= user_fields.label :show_thinking, t("app.settings.people.form.show_thinking") %>
     </div>
 
+    <div class="my-5 flex items-center gap-2">
+      <%= user_fields.check_box :ask_follow_ups, checked: person.personable.ask_follow_ups? %>
+      <%= user_fields.label :ask_follow_ups, t("app.settings.people.form.ask_follow_ups") %>
+    </div>
+
     <% if Feature.google_tools? %>
       <div class="my-5" data-controller="transition" data-transition-toggle-class="hidden">
         <%= user_fields.label :enable_tools, t("app.settings.people.form.enable_tools") %>

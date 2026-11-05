@@ -11,6 +11,11 @@ class AIBackend
     If the user asks for code or something long, summarize it in a sentence or two and offer to type out the details.
   TEXT
 
+  FOLLOW_UP_INSTRUCTIONS = <<~TEXT.squish
+    End your reply with a few short follow-up questions the user might want to explore next,
+    such as "Do you want to know more about X?".
+  TEXT
+
   def initialize(user, assistant, conversation = nil, message = nil)
     @user = user
     @assistant = assistant
@@ -92,7 +97,11 @@ class AIBackend
       s += "\n\n#{context}"
     end
 
-    s += "\n\n#{VOICE_INSTRUCTIONS}" if @message&.replying_to_speech?
+    if @message&.replying_to_speech?
+      s += "\n\n#{VOICE_INSTRUCTIONS}"
+    elsif @user.ask_follow_ups?
+      s += "\n\n#{FOLLOW_UP_INSTRUCTIONS}"
+    end
     s.strip
   end
 end
