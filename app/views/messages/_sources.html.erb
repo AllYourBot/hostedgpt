@@ -1,0 +1,10 @@
+<% if (sources = message_sources(message)).any? %>
+  <div data-role="sources" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+    <div class="font-medium"><%= t("app.messages.sources") %></div>
+    <ul class="list-disc pl-5">
+      <% sources.each do |source| %>
+        <li><%= link_to source[:title], source[:url], target: :_blank, rel: "noopener", data: { turbo_frame: "_top" }, class: "underline" %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

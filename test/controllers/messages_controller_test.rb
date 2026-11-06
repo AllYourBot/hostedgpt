@@ -246,6 +246,19 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-role="retry-button"]'
   end
 
+  test "index shows the sources an assistant reply CITED" do
+    latest_message = @conversation.latest_message_for_version(:latest)
+    latest_message.update! content_citations: [{ "url" => "https://rubyonrails.org/", "title" => "Ruby on Rails" }]
+
+    get conversation_messages_url(@conversation, version: latest_message.version)
+    assert_select '[data-role="sources"] a[href="https://rubyonrails.org/"]', { text: "Ruby on Rails" }, "The cited source should be listed under the reply"
+  end
+
+  test "index shows NO sources list for a reply WITHOUT citations" do
+    get conversation_messages_url(@conversation, version: 1)
+    assert_select '[data-role="sources"]', { count: 0 }, "There should be no sources list without citations"
+  end
+
   test "index hides the retry button behind the watchdog while a message is still generating" do
     @conversation.messages.create! role: :user, content_text: "You there?", assistant: @assistant
 

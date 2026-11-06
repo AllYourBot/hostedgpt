@@ -252,6 +252,7 @@ en:
       empty_state:
         greeting: "How can I help you today?"
     messages:
+      sources: "Sources"
       retry:
         interrupted: "The response was interrupted."
         button: "Retry"

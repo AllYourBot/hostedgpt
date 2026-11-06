@@ -223,6 +223,7 @@ de:
       empty_state:
         greeting: "Wie kann ich dir heute helfen?"
     messages:
+      sources: "Quellen"
       retry:
         interrupted: "Die Antwort wurde unterbrochen."
         button: "Erneut versuchen"
