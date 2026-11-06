@@ -209,6 +209,26 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=checkbox][name='person[personable_attributes][ask_follow_ups]']:not([checked])"
   end
 
+  test "turning on provider_web_search keeps the other preferences" do
+    @user.update!(dark_mode: "dark", ask_follow_ups: false)
+
+    params = person_params
+    params["personable_attributes"]["provider_web_search"] = "1"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+
+    @user.reload
+    assert @user.provider_web_search?, "Provider web search should be turned on"
+    assert_equal "dark", @user.dark_mode, "dark_mode should not have changed"
+    refute @user.ask_follow_ups?, "ask_follow_ups should not have changed"
+  end
+
+  test "the settings form shows the provider_web_search checkbox unchecked by default" do
+    get edit_settings_person_url
+    assert_select "input[type=checkbox][name='person[personable_attributes][provider_web_search]']:not([checked])"
+  end
+
   test "updating dark_mode leaves nav_closed and feature opinions intact" do
     @user.update!(nav_closed: true)
     @user.update!(feature: { "some_custom_feature" => "sdk" })

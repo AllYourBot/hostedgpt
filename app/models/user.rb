@@ -38,7 +38,7 @@ class User < ApplicationRecord
   validate :profile_picture_validation
 
   accepts_nested_attributes_for :credentials
-  store_accessor :preferences, :dark_mode, :nav_closed, :show_thinking, :ask_follow_ups, :feature
+  store_accessor :preferences, :dark_mode, :nav_closed, :show_thinking, :ask_follow_ups, :provider_web_search, :feature
 
   def dark_mode = super.presence || "system"
 
@@ -55,6 +55,13 @@ class User < ApplicationRecord
   def ask_follow_ups? = ask_follow_ups.nil? || ask_follow_ups.to_b
 
   def ask_follow_ups=(value)
+    super(value.nil? ? nil : value.to_b)
+  end
+
+  # Off by default: Anthropic bills each web search.
+  def provider_web_search? = provider_web_search.to_b
+
+  def provider_web_search=(value)
     super(value.nil? ? nil : value.to_b)
   end
 
