@@ -1173,7 +1173,101 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     end
   end
 
+
+  # Provider web search
+
+  test "stream_next_conversation_message sends web_search and web_fetch to an ANTHROPIC model when the user turned provider web search on" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: true)
+    @user.update!(provider_web_search: true)
+
+    stream_text_reply
+
+    assert_equal [:web_search, :web_fetch], TestClient::RubyLLM::Chat.provider_tools, "Anthropic should get its server-side web tools"
+  end
+
+  test "stream_next_conversation_message sends no provider tools when the user LEFT provider web search OFF" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: true)
+
+    stream_text_reply
+
+    assert_empty TestClient::RubyLLM::Chat.provider_tools, "Provider tools are opt-in"
+  end
+
+  test "stream_next_conversation_message sends no provider tools to an OPENAI model even with the setting on" do
+    @assistant.language_model.update!(supports_tools: true)
+    @user.update!(provider_web_search: true)
+
+    stream_text_reply
+
+    assert_empty TestClient::RubyLLM::Chat.provider_tools, "Only Anthropic gets provider tools for now"
+  end
+
+  test "stream_next_conversation_message sends no provider tools to an Anthropic model WITHOUT tool support" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: false)
+    @user.update!(provider_web_search: true)
+
+    stream_text_reply
+
+    assert_empty TestClient::RubyLLM::Chat.provider_tools, "A model that can't take tools can't take provider tools"
+  end
+
+  test "stream_next_conversation_message still returns a HostedGPT tool call when provider tools are on" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: true)
+    @user.update!(provider_web_search: true)
+    message = thinking_message
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+      result = backend.stream_next_conversation_message { |_| }
+      assert_equal "helloworld_hi", result[0][:function][:name], "The Toolbox call should come back for the job to run"
+    end
+    assert_nil message.content_citations, "A tool-call message carries no citations"
+  end
+
+  test "stream_next_conversation_message saves the reply's citations on the message" do
+    message = thinking_message
+    citations = [
+      ::RubyLLM::Citation.new(url: "https://rubyonrails.org/", title: "Ruby on Rails", cited_text: "Rails 9 is out"),
+      ::RubyLLM::Citation.new(url: "https://guides.rubyonrails.org/", title: nil, cited_text: nil),
+    ]
+
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :citations, citations do
+      TestClient::RubyLLM::Chat.stub :text, "Rails 9 is out" do
+        backend.stream_next_conversation_message { |_| }
+      end
+    end
+
+    assert_equal(
+      [
+        { "url" => "https://rubyonrails.org/", "title" => "Ruby on Rails", "cited_text" => "Rails 9 is out" },
+        { "url" => "https://guides.rubyonrails.org/", "title" => nil, "cited_text" => nil },
+      ],
+      message.content_citations,
+      "Each citation should be saved with its url, title and cited text"
+    )
+  end
+
+  test "stream_next_conversation_message leaves content_citations nil for a reply WITHOUT citations" do
+    message = thinking_message
+
+    stream_text_reply(message)
+
+    assert_nil message.content_citations, "No citations means nothing to store"
+  end
+
   private
+
+  def stream_text_reply(message = thinking_message)
+    backend = AIBackend::RubyLLM.new(@user, @assistant, @conversation, message)
+    TestClient::RubyLLM::Chat.stub :text, "Hello" do
+      backend.stream_next_conversation_message { |_| }
+    end
+  end
 
   def backend_replying_to_pdf(assistant, filename, pdf_bytes)
     conversation = Conversation.create!(user: @user, assistant: assistant, title: "PDF Test")

@@ -8,6 +8,9 @@ class AIBackend::Policy::Base
 
   def self.supports_tools? = true
 
+  # Tools the provider runs itself inside one response (RubyLLM's with_provider_tools).
+  def self.provider_tools = []
+
   def self.display_name = name.demodulize
 
   def self.attribution_headers = {}
