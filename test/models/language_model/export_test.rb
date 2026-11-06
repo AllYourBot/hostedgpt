@@ -44,7 +44,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     storage = {
       "models" => models
     }
-    path = Rails.root.join("tmp/newmodels.yml")
+    path = Rails.root.join("tmp/language_model_import_1.yml")
     File.write(path, storage.to_yaml)
     assert_difference "LanguageModel.count", 1 do
       LanguageModel.import_from_file(path:, users: users(:rob))
@@ -77,7 +77,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
       name: "new model",
       api_service_name: "Nonexistent Service",
     }]
-    path = Rails.root.join("tmp/newmodels.yml")
+    path = Rails.root.join("tmp/language_model_import_2.yml")
     File.write(path, { "models" => models }.to_yaml)
     assert_no_difference "LanguageModel.count", "No model should be created without its api service" do
       assert_output("", "") do
@@ -99,7 +99,7 @@ class LanguageModel::ExportTest < ActiveSupport::TestCase
     storage = {
       "models" => models
     }
-    path = Rails.root.join("tmp/newmodels.yml")
+    path = Rails.root.join("tmp/language_model_import_3.yml")
     File.write(path, storage.to_yaml)
     assert_no_difference "LanguageModel.count" do
       LanguageModel.import_from_file(path:, users: [user])
