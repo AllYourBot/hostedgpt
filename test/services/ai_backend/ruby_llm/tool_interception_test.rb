@@ -2,17 +2,19 @@ require "test_helper"
 
 # Runs the real RubyLLM 2.0 gem: `generate` streams and never executes tools,
 # so the tool calls arrive on the returned message for the job to run through
-# Toolbox.call. The private `provider_completion` stub bypasses only the
+# Chat#run_tools. The private `provider_completion` stub bypasses only the
 # network — a private touchpoint pinned by the ~> 2.0.0 patchlock.
 class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
   OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 
   def build_tool
-    AIBackend::RubyLLM::ToolSchema.new(
-      name: "get_weather",
-      description: "Get the current weather for a location",
-      parameters_schema: { type: "object", properties: { location: { type: "string" } } }
-    )
+    Toolbox::RubyLLMTool.new({
+      function: {
+        name: "get_weather",
+        description: "Get the current weather for a location",
+        parameters: { type: "object", properties: { location: { type: "string" } } },
+      },
+    })
   end
 
   def tool_call(id, location) = RubyLLM::ToolCall.new(id: id, name: "get_weather", arguments: { location: location })
@@ -79,10 +81,10 @@ class AIBackend::RubyLLM::ToolInterceptionTest < ActiveSupport::TestCase
       "no role: :tool result message should be appended for an unregistered tool"
   end
 
-  # The ToolSchema carrier must serialize into the real OpenAI wire payload;
+  # A Toolbox::RubyLLMTool must serialize into the real OpenAI wire payload;
   # this also proves the initializer's Chat Completions protocol pin is live
   # (2.0 defaults OpenAI to the Responses API, whose endpoint differs).
-  test "ToolSchema renders its name, description, and parameters into the request payload" do
+  test "a Toolbox::RubyLLMTool renders its name, description, and parameters into the request payload" do
     @requests = []
     stub_request(:post, OPENAI_URL).to_return do |request|
       @requests << JSON.parse(request.body)

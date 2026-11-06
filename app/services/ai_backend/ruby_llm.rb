@@ -207,7 +207,7 @@ class AIBackend::RubyLLM < AIBackend
 
     begin
       # `generate` streams chunks and never executes tools — the tool calls come
-      # back on the returned message for the job to run through Toolbox.call.
+      # back on the returned message for the job to run through Chat#run_tools.
       response = chat.generate { stream_handler.call(it, chunk_handler) }
     rescue *CONFIGURATION_ERRORS => e
       raise self.class.mapped_error(e, model: @api_name, as: ConfigurationError)
@@ -381,15 +381,7 @@ class AIBackend::RubyLLM < AIBackend
     { effort: THINKING_EFFORT, display: "summarized" }
   end
 
-  def tool_instances
-    Toolbox.tools.map do |tool|
-      AIBackend::RubyLLM::ToolSchema.new(
-        name: tool.dig(:function, :name),
-        description: tool.dig(:function, :description),
-        parameters_schema: tool.dig(:function, :parameters),
-      )
-    end
-  end
+  def tool_instances = Toolbox.ruby_llm_tools
 
   def format_tool_calls(tool_calls)
     tool_calls.values.map.with_index do |tc, i|

@@ -132,7 +132,7 @@ class Assistant::ExportTest < ActiveSupport::TestCase
     storage = {
       "assistants" => assistants
     }
-    path = Rails.root.join("tmp/newmodels.yml")
+    path = Rails.root.join("tmp/assistant_import_by_name.yml")
     File.write(path, storage.to_yaml)
     assert_difference "Assistant.count", 1 do
       Assistant.import_from_file(path:, users: [user])
@@ -174,7 +174,7 @@ class Assistant::ExportTest < ActiveSupport::TestCase
     storage = {
       "assistants" => assistants
     }
-    path = Rails.root.join("tmp/newmodels.yml")
+    path = Rails.root.join("tmp/assistant_import_by_slug.yml")
     File.write(path, storage.to_yaml)
     assert_no_difference "Assistant.count" do
       Assistant.import_from_file(path:, users: [user])
