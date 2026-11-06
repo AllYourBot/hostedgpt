@@ -918,11 +918,11 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     refute_includes TestClient::RubyLLM::Chat.instructions, "Respond with ONLY valid JSON"
   end
 
-  test "tool_instances maps each Toolbox tool to a ToolSchema" do
+  test "tool_instances maps each Toolbox tool to a RubyLLM tool" do
     backend = AIBackend::RubyLLM.new(@user, @assistant)
     instances = backend.send(:tool_instances)
 
-    assert instances.all? { it.is_a?(AIBackend::RubyLLM::ToolSchema) }
+    assert instances.all? { it.is_a?(Toolbox::RubyLLMTool) }, "Every tool should be a Toolbox::RubyLLMTool"
     assert_includes instances.map(&:name), "helloworld_hi"
     assert_includes instances.map(&:name), "openmeteo_get_current_and_todays_weather"
   end

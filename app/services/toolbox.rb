@@ -48,6 +48,8 @@ class Toolbox < SDK
     end
   end
 
+  def self.ruby_llm_tools = tools.map { Toolbox::RubyLLMTool.new(it) }
+
   def self.tools
     if self == Toolbox
       descendants.map(&:function_tools).flatten
