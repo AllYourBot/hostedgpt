@@ -183,6 +183,8 @@ end %>
           <%= formatted_text = format_for_display message, append_inside_tag: thinking_html(message, thinking) %>
         </div>
 
+        <%= render "messages/sources", message: message if message.assistant? %>
+
         <% if message.assistant? && message.assistant.not_deleted? && (message.failed? || thinking) %>
           <%= render "messages/retry", message: message, failed: message.failed? %>
         <% end %>

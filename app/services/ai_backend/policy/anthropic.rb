@@ -5,4 +5,6 @@ class AIBackend::Policy::Anthropic < AIBackend::Policy::Base
   end
 
   def self.billing_url = "https://console.anthropic.com/settings/plans"
+
+  def self.provider_tools = [:web_search, :web_fetch]
 end

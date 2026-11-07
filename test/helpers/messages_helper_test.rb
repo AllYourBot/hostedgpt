@@ -2,6 +2,27 @@ require "test_helper"
 
 class MessagesHelperTest < ActionView::TestCase
 
+  test "message_sources DEDUPES by url, DROPS unsafe or missing urls and falls back to the host for a title" do
+    message = Message.new(content_citations: [
+      { "url" => "https://a.test/page", "title" => "A", "cited_text" => "one" },
+      { "url" => "https://a.test/page", "title" => "A again", "cited_text" => "two" },
+      { "url" => "https://b.test/", "title" => nil },
+      { "url" => "javascript:alert(1)", "title" => "Bad" },
+      { "url" => "http://plain.test/", "title" => "Plain" },
+      { "url" => nil, "title" => "Nowhere" },
+    ])
+
+    assert_equal(
+      [{ url: "https://a.test/page", title: "A" }, { url: "https://b.test/", title: "b.test" }],
+      message_sources(message),
+      "Only https sources should show, once each, titled by host when untitled"
+    )
+  end
+
+  test "message_sources is EMPTY for a message without citations" do
+    assert_empty message_sources(Message.new), "No citations means no sources"
+  end
+
   test "message_to_user_from_tool_call responds properly for tool result" do
     message = messages(:keep_memory_tool_result)
     assert message_to_user_from_tool_call?(message)

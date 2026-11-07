@@ -200,6 +200,7 @@ class AIBackend::RubyLLM < AIBackend
     chat.with_instructions(instructions, cache_until_here: provider_slug == :anthropic) if instructions.present?
     preceding_conversation_messages.each { chat.add_message(it) }
     chat.with_tools(*tool_instances) if tools_enabled?
+    chat.with_provider_tools(*provider_tools) if provider_tools.any?
     if thinking_enabled?
       chat.with_thinking(**thinking_options)
       chat.with_provider_options(max_tokens: THINKING_MAX_TOKENS) if provider_slug == :anthropic
@@ -221,6 +222,8 @@ class AIBackend::RubyLLM < AIBackend
     return format_tool_calls(tool_calls) if tool_calls.present?
 
     raise ::Faraday::ParsingError if @stream_response_text.blank?
+
+    @message.content_citations = citations_from(response)
 
     # The provider stopped at its output token limit, so the reply ends mid-thought
     # and the view offers a Continue button.
@@ -375,13 +378,32 @@ class AIBackend::RubyLLM < AIBackend
 
   def thinking_enabled? = @assistant.language_model.supports_thinking?
 
+  # Server-side tools (Anthropic's web search and fetch) run inside the
+  # provider's one response, so they never reach the job's Toolbox loop.
+  def provider_tools
+    return [] unless tools_enabled? && @user.provider_web_search?
+
+    AIBackend::Policy.for_identity(@api_service.provider_identity)&.provider_tools || []
+  end
+
+  def citations_from(response)
+    Array(response.citations).map { { "url" => it.url, "title" => it.title, "cited_text" => it.cited_text } }.presence
+  end
+
   def thinking_options
     return { budget: THINKING_BUDGET, display: "summarized" } if provider_slug == :gemini && @api_name.start_with?("gemini-2.5")
 
     { effort: THINKING_EFFORT, display: "summarized" }
   end
 
-  def tool_instances = Toolbox.ruby_llm_tools
+  def tool_instances
+    tools = Toolbox.ruby_llm_tools
+    return tools unless provider_web_search_replaces_brave?
+
+    tools.reject { it.name.start_with?("bravesearch_") }
+  end
+
+  def provider_web_search_replaces_brave? = provider_tools.include?(:web_search)
 
   def format_tool_calls(tool_calls)
     tool_calls.values.map.with_index do |tc, i|

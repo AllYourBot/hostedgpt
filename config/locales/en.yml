@@ -217,6 +217,7 @@ en:
             system: "System"
           show_thinking: "Show extended thinking"
           ask_follow_ups: "Ask follow-ups"
+          provider_web_search: "Let Claude search and read the web (billed by Anthropic)"
           ai_backends: "AI backends"
           ai_backends_description: "Which implementation handles each provider. Default follows the site-wide setting (currently %{current})."
           backend_choice_default: "Default"
@@ -251,6 +252,7 @@ en:
       empty_state:
         greeting: "How can I help you today?"
     messages:
+      sources: "Sources"
       retry:
         interrupted: "The response was interrupted."
         button: "Retry"

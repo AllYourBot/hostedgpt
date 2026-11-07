@@ -143,4 +143,11 @@ class AIBackend::PolicyTest < ActiveSupport::TestCase
       assert_not_includes raised.message, long_body
     end
   end
+
+  test "Anthropic offers web_search and web_fetch as provider tools and the others offer none" do
+    assert_equal [:web_search, :web_fetch], AIBackend::Policy::Anthropic.provider_tools, "Anthropic runs web search and fetch itself"
+    [:openai, :groq, :openrouter, :gemini].each do |identity|
+      assert_empty AIBackend::Policy.for_identity(identity).provider_tools, "#{identity} should offer no provider tools yet"
+    end
+  end
 end
