@@ -188,6 +188,7 @@ de:
             system: "System"
           show_thinking: "Erweitertes Denken anzeigen"
           ask_follow_ups: "Anschlussfragen stellen"
+          provider_web_search: "Claude im Web suchen und lesen lassen (von Anthropic abgerechnet)"
           ai_backends: "KI-Backends"
           ai_backends_description: "Welche Implementierung jeden Anbieter bedient. Standard folgt der globalen Einstellung (aktuell %{current})."
           backend_choice_default: "Standard"
@@ -222,6 +223,7 @@ de:
       empty_state:
         greeting: "Wie kann ich dir heute helfen?"
     messages:
+      sources: "Quellen"
       retry:
         interrupted: "Die Antwort wurde unterbrochen."
         button: "Erneut versuchen"

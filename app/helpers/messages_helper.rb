@@ -116,6 +116,14 @@ module MessagesHelper
   # malformed) falls back to plain text rather than rendering as an anchor.
   def safe_tool_link_url(url) = url.to_s.start_with?("https://") && url
 
+  # The web pages a reply cited, once each, https-only like tool links.
+  def message_sources(message)
+    Array(message.content_citations)
+      .select { safe_tool_link_url(it["url"]) }
+      .uniq { it["url"] }
+      .map { { url: it["url"], title: it["title"].presence || URI(it["url"]).host } }
+  end
+
   def tool_result_link_to(text, url)
     link_to text, url, target: :_blank, data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline"
   end

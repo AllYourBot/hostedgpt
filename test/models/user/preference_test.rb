@@ -50,6 +50,18 @@ class User::PreferenceTest < ActiveSupport::TestCase
     assert user.reload.ask_follow_ups?, "Checking the box should turn follow-ups back on"
   end
 
+  test "provider_web_search defaults to off and takes a form checkbox value" do
+    user = User.create!(first_name: "First", last_name: "Last")
+    refute user.provider_web_search?, "Provider web search should be off for a user who never changed the setting"
+
+    user.update!(provider_web_search: "1")
+    assert user.reload.provider_web_search?, "Checking the box should turn provider web search on"
+    assert_equal true, user.preferences["provider_web_search"], "The preference should be stored as a boolean"
+
+    user.update!(provider_web_search: "0")
+    refute user.reload.provider_web_search?, "Unchecking the box should turn provider web search off"
+  end
+
   test "accessor writes mark preferences as changed and persist" do
     user = User.create!(first_name: "First", last_name: "Last")
     assert_nil user.preferences

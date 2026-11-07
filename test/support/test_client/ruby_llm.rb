@@ -7,6 +7,7 @@ module TestClient
         @@model = model
         self.class.instance_variable_set(:@thinking_config, nil)
         self.class.instance_variable_set(:@provider_options, nil)
+        self.class.instance_variable_set(:@provider_tools, [])
         @headers = {}
         @messages = []
         @last_response = nil
@@ -35,6 +36,11 @@ module TestClient
 
       def with_tools(*tools)
         self.class.instance_variable_set(:@tools, tools)
+        self
+      end
+
+      def with_provider_tools(*tools)
+        self.class.instance_variable_set(:@provider_tools, tools)
         self
       end
 
@@ -99,7 +105,8 @@ module TestClient
       end
 
       def message_double(content:, tool_calls:, finish_reason:)
-        OpenStruct.new(role: :assistant, content:, tool_calls:, finish_reason:, max_tokens?: finish_reason == :max_tokens)
+        OpenStruct.new(role: :assistant, content:, tool_calls:, finish_reason:, max_tokens?: finish_reason == :max_tokens,
+          citations: self.class.citations)
       end
 
       def self.api_oneoff_response
@@ -153,6 +160,8 @@ module TestClient
       # Stub this to simulate a reply cut off at that limit.
       def self.finish_reason = :stop
 
+      def self.citations = []
+
       def self.error_to_raise = nil
 
       def self.tokens = { input: 8, output: 9 }
@@ -162,7 +171,7 @@ module TestClient
       def self.id = "call_BlAN9iRiAD6aCzmBWCjzYxjj"
 
       class << self
-        attr_reader :instructions, :cache_until_here, :provider_options, :tools, :thinking_config
+        attr_reader :instructions, :cache_until_here, :provider_options, :tools, :thinking_config, :provider_tools
       end
     end
 
