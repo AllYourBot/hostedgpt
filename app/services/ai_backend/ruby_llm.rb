@@ -396,7 +396,14 @@ class AIBackend::RubyLLM < AIBackend
     { effort: THINKING_EFFORT, display: "summarized" }
   end
 
-  def tool_instances = Toolbox.ruby_llm_tools
+  def tool_instances
+    tools = Toolbox.ruby_llm_tools
+    return tools unless provider_web_search_replaces_brave?
+
+    tools.reject { it.name.start_with?("bravesearch_") }
+  end
+
+  def provider_web_search_replaces_brave? = provider_tools.include?(:web_search)
 
   def format_tool_calls(tool_calls)
     tool_calls.values.map.with_index do |tc, i|

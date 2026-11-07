@@ -1186,6 +1186,27 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_equal [:web_search, :web_fetch], TestClient::RubyLLM::Chat.provider_tools, "Anthropic should get its server-side web tools"
   end
 
+  test "stream_next_conversation_message LEAVES OUT brave search when Anthropic's web search is on" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: true)
+    @user.update!(provider_web_search: true)
+
+    Current.set(user: @user) { stream_text_reply }
+
+    tool_names = TestClient::RubyLLM::Chat.tools.map(&:name)
+    refute tool_names.any? { it.start_with?("bravesearch_") }, "The model should see only one search tool"
+    assert_includes tool_names, "helloworld_hi", "The other HostedGPT tools should still be offered"
+  end
+
+  test "stream_next_conversation_message KEEPS brave search when provider web search is off" do
+    @assistant.language_model.api_service.update!(driver: "anthropic")
+    @assistant.language_model.update!(supports_tools: true)
+
+    Current.set(user: @user) { stream_text_reply }
+
+    assert_includes TestClient::RubyLLM::Chat.tools.map(&:name), "bravesearch_brave_search", "Brave search is the web search without the setting"
+  end
+
   test "stream_next_conversation_message sends no provider tools when the user LEFT provider web search OFF" do
     @assistant.language_model.api_service.update!(driver: "anthropic")
     @assistant.language_model.update!(supports_tools: true)
