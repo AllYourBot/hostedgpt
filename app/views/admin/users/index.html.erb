@@ -1,32 +1,4 @@
-<div class="mx-auto w-full">
-  <%= render "admin/tabs" %>
-
-  <h1 class="text-3xl mb-5"><%= t("app.admin.users.index.title") %></h1>
-
-  <p class="mb-5">
-    <%= link_to t("app.admin.users.index.add_new"), new_admin_user_path,
-      class: %|
-        inline-block font-bold
-        bg-gray-200 dark:bg-gray-900
-        border border-gray-400
-        rounded-lg py-3 px-5
-        cursor-pointer
-      |
-    %>
-  </p>
-
-  <table id="users" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
-    <thead>
-      <tr class="bg-gray-200 dark:bg-gray-900 text-left">
-        <th class="px-2 py-1"><%= t("app.admin.users.index.name") %></th>
-        <th class="px-2 py-1"><%= t("app.admin.users.index.email") %></th>
-        <th class="px-2 py-1"><%= t("app.admin.users.index.registered") %></th>
-        <th class="px-2 py-1"><%= t("app.admin.users.index.admin") %></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <%= render partial: "user", collection: @users %>
-    </tbody>
-  </table>
-</div>
+<%= render layout: "admin/page", locals: { title: t("app.admin.users.index.title"), add_new_path: new_admin_user_path, wide: true } do %>
+  <%= render "admin/table", id: "users", row_partial: "admin/users/user", rows: @users,
+    headers: %w[name email registered admin].map { t("app.admin.users.index.#{it}") } %>
+<% end %>

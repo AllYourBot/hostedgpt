@@ -1,0 +1,21 @@
+<div class="mx-auto w-full <%= "md:w-2/3" unless local_assigns[:wide] %>">
+  <%= render "admin/tabs" %>
+
+  <h1 class="text-3xl mb-5"><%= title %></h1>
+
+  <% if local_assigns[:add_new_path] %>
+    <p class="mb-5">
+      <%= link_to t("app.admin.add_new"), add_new_path,
+        class: %|
+          inline-block font-bold
+          bg-gray-200 dark:bg-gray-900
+          border border-gray-400
+          rounded-lg py-3 px-5
+          cursor-pointer
+        |
+      %>
+    </p>
+  <% end %>
+
+  <%= yield %>
+</div>

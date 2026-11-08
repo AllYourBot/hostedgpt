@@ -2,11 +2,8 @@
   <%= render "layouts/form_errors", record: api_service, title: t("app.admin.api_services.form.errors_title", count: api_service.errors.count) %>
 
   <% if api_service.new_record? %>
-    <div class="my-5">
-      <%= form.label :user_id, t("app.admin.api_services.form.owner") %>
-      <%= form.select :user_id, User.includes(:person).ordered.map { [ "#{it.name.full} (#{it.email})", it.id ] }, {},
-        class: "block border border-gray-200 outline-none shadow rounded-md px-3 py-2 mt-2 w-full dark:text-black" %>
-    </div>
+    <%= labeled_select form, :user_id, t("app.admin.api_services.form.owner"),
+      User.includes(:person).ordered.map { [ "#{it.name.full} (#{it.email})", it.id ] } %>
   <% else %>
     <p id="owner" class="mt-2 text-gray-600 dark:text-gray-400">
       <%= t("app.admin.api_services.form.owner") %>: <%= api_service.user.name.full %> (<%= api_service.user.email %>)
@@ -15,17 +12,9 @@
 
   <%= labeled_text_field form, :name, t("app.admin.api_services.form.name") %>
 
-  <div class="my-5">
-    <%= form.label :service_type, t("app.admin.api_services.form.service_type") %>
-    <%= form.select :service_type, APIService::SERVICE_TYPES, {},
-      class: "block border border-gray-200 outline-none shadow rounded-md px-3 py-2 mt-2 w-full dark:text-black" %>
-  </div>
+  <%= labeled_select form, :service_type, t("app.admin.api_services.form.service_type"), APIService::SERVICE_TYPES %>
 
-  <div class="my-5">
-    <%= form.label :driver, t("app.admin.api_services.form.driver") %>
-    <%= form.select :driver, APIService.drivers.keys, {},
-      class: "block border border-gray-200 outline-none shadow rounded-md px-3 py-2 mt-2 w-full dark:text-black" %>
-  </div>
+  <%= labeled_select form, :driver, t("app.admin.api_services.form.driver"), APIService.drivers.keys %>
 
   <%= labeled_text_field form, :url, t("app.admin.api_services.form.url") %>
 
@@ -34,17 +23,6 @@
     autocomplete: "off",
     placeholder: (t("app.admin.api_services.form.#{api_service.token_was.present? ? "token_placeholder_set" : "token_placeholder_unset"}") if api_service.persisted?) %>
 
-  <div class="inline">
-    <%= form.submit t("app.admin.api_services.form.save"),
-      class: %|
-        inline-block font-bold
-        bg-gray-200 dark:bg-gray-900
-        border border-gray-400
-        rounded-lg py-3 px-5
-        cursor-pointer
-      |,
-      data: { turbo_submits_with: t("app.admin.api_services.form.saving") }
-    %>
-    <%= link_to t("app.admin.api_services.form.back"), admin_api_services_path, class: "float-right inline-block ml-5 py-3" %>
-  </div>
+  <%= render "layouts/form_actions", form:, back_path: admin_api_services_path,
+    submit: t("app.admin.save"), submitting: t("app.admin.saving"), back: t("app.admin.back") %>
 <% end %>

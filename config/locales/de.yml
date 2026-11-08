@@ -7,13 +7,17 @@ de:
       assistants: "Assistenten"
     admin:
       menu: "Admin"
+      add_new: "Neu hinzufügen"
+      edit: "Bearbeiten"
+      save: "Speichern"
+      saving: "Wird gespeichert..."
+      back: "Zurück"
       tabs:
         users: "Benutzer"
         api_services: "API-Dienste"
       api_services:
         index:
           title: "API-Dienste"
-          add_new: "Neu hinzufügen"
           owner: "Besitzer"
           name: "Name"
           service_type: "Typ"
@@ -21,7 +25,6 @@ de:
           url: "URL"
           token: "Schlüssel"
           token_set: "Gesetzt"
-          edit: "Bearbeiten"
         new:
           title: "Neuer API-Dienst"
         edit:
@@ -40,18 +43,13 @@ de:
           token: "Schlüssel"
           token_placeholder_set: "Ein Schlüssel ist gesetzt. Leer lassen, um ihn zu behalten."
           token_placeholder_unset: "Kein Schlüssel gesetzt."
-          save: "Speichern"
-          saving: "Wird gespeichert..."
-          back: "Zurück"
       users:
         index:
           title: "Benutzer"
-          add_new: "Neu hinzufügen"
           name: "Name"
           email: "E-Mail"
           registered: "Registriert"
           admin: "Admin"
-          edit: "Bearbeiten"
         new:
           title: "Neuer Benutzer"
         edit:
@@ -68,9 +66,6 @@ de:
           password: "Passwort"
           admin: "Admin"
           own_admin_note: "Sie können Ihre eigenen Admin-Rechte nicht entfernen."
-          save: "Speichern"
-          saving: "Wird gespeichert..."
-          back: "Zurück"
     settings:
       title: "Einstellungen"
       home: "Startseite"

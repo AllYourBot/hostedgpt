@@ -143,19 +143,8 @@
 
   <% end %>
 
-  <div class="inline">
-    <%= form.submit t("app.settings.people.form.save"),
-      class: %|
-        inline-block font-bold
-        bg-gray-200 dark:bg-gray-900
-        border border-gray-400
-        rounded-lg py-3 px-5
-        cursor-pointer
-      |,
-      data: { turbo_submits_with: t("app.settings.people.form.saving") }
-    %>
-    <%= link_to t("app.settings.people.form.cancel"), root_path, class: "float-right inline-block ml-5 py-3" %>
-  </div>
+  <%= render "layouts/form_actions", form:, back_path: root_path,
+    submit: t("app.settings.people.form.save"), submitting: t("app.settings.people.form.saving"), back: t("app.settings.people.form.cancel") %>
 <% end # form %>
 
 <% %w[gmail google_tasks google_calendar].each do |tool| %>

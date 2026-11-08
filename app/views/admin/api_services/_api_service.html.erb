@@ -5,9 +5,5 @@
   <td class="px-2 py-1"><%= api_service.driver %></td>
   <td class="px-2 py-1 break-all"><%= api_service.url %></td>
   <td class="px-2 py-1" data-role="token"><%= t("app.admin.api_services.index.token_set") if api_service.token.present? %></td>
-  <td class="px-2 py-1 text-right">
-    <%= link_to edit_admin_api_service_path(api_service), class: "inline-block cursor-pointer align-middle group" do %>
-      <%= action_icon "pencil", title: t("app.admin.api_services.index.edit"), tooltip: :left %>
-    <% end %>
-  </td>
+  <%= render "admin/edit_cell", path: edit_admin_api_service_path(api_service) %>
 </tr>

@@ -1,7 +1,3 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <%= render "admin/tabs" %>
-
-  <h1 class="text-3xl"><%= t("app.admin.api_services.new.title") %></h1>
-
+<%= render layout: "admin/page", locals: { title: t("app.admin.api_services.new.title") } do %>
   <%= render "form", api_service: @api_service %>
-</div>
+<% end %>

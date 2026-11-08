@@ -36,13 +36,17 @@ en:
       assistants: "Assistants"
     admin:
       menu: "Admin"
+      add_new: "Add New"
+      edit: "Edit"
+      save: "Save"
+      saving: "Saving..."
+      back: "Back"
       tabs:
         users: "Users"
         api_services: "API Services"
       api_services:
         index:
           title: "API Services"
-          add_new: "Add New"
           owner: "Owner"
           name: "Name"
           service_type: "Type"
@@ -50,7 +54,6 @@ en:
           url: "URL"
           token: "Key"
           token_set: "Set"
-          edit: "Edit"
         new:
           title: "New API Service"
         edit:
@@ -69,18 +72,13 @@ en:
           token: "Key"
           token_placeholder_set: "A key is set. Leave blank to keep it."
           token_placeholder_unset: "No key is set."
-          save: "Save"
-          saving: "Saving..."
-          back: "Back"
       users:
         index:
           title: "Users"
-          add_new: "Add New"
           name: "Name"
           email: "Email"
           registered: "Registered"
           admin: "Admin"
-          edit: "Edit"
         new:
           title: "New User"
         edit:
@@ -97,9 +95,6 @@ en:
           password: "Password"
           admin: "Admin"
           own_admin_note: "You can't remove your own admin rights."
-          save: "Save"
-          saving: "Saving..."
-          back: "Back"
     settings:
       title: "Settings"
       home: "Home"

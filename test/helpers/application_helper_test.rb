@@ -66,6 +66,16 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_includes html, "dark:text-black", "the text field should get the shared input classes"
   end
 
+  test "labeled_select wraps a label and a styled select" do
+    form = ActionView::Helpers::FormBuilder.new(:api_service, api_services(:keith_openai_service), self, {})
+    html = labeled_select(form, :service_type, "Type", APIService::SERVICE_TYPES, data: { role: "type" })
+    assert_includes html, '<div class="my-5">', "the select should sit in the spaced wrapper"
+    assert_includes html, '<label for="api_service_service_type">Type</label>', "the label should use the given text"
+    assert_includes html, '<option selected="selected" value="AI">AI</option>', "the record's value should be selected"
+    assert_includes html, 'data-role="type"', "extra options should reach the select"
+    assert_includes html, "dark:text-black", "the select should get the shared input classes"
+  end
+
   # Profile picture helper tests
   test "user_avatar_image_tag returns nil when user has no profile picture" do
     user = users(:keith)

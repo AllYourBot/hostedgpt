@@ -3,9 +3,5 @@
   <td class="px-2 py-1 break-all"><%= user.email %></td>
   <td class="px-2 py-1 whitespace-nowrap"><%= l(user.registered_at.to_date) if user.registered_at %></td>
   <td class="px-2 py-1" data-role="admin"><%= icon("check", variant: :outline, size: 18, title: t("app.admin.users.index.admin")) if user.admin? %></td>
-  <td class="px-2 py-1 text-right">
-    <%= link_to edit_admin_user_path(user), class: "inline-block cursor-pointer align-middle group" do %>
-      <%= action_icon "pencil", title: t("app.admin.users.index.edit"), tooltip: :left %>
-    <% end %>
-  </td>
+  <%= render "admin/edit_cell", path: edit_admin_user_path(user) %>
 </tr>

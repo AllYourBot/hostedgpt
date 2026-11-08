@@ -48,17 +48,6 @@
     <% end %>
   <% end %>
 
-  <div class="inline">
-    <%= form.submit t("app.admin.users.form.save"),
-      class: %|
-        inline-block font-bold
-        bg-gray-200 dark:bg-gray-900
-        border border-gray-400
-        rounded-lg py-3 px-5
-        cursor-pointer
-      |,
-      data: { turbo_submits_with: t("app.admin.users.form.saving") }
-    %>
-    <%= link_to t("app.admin.users.form.back"), admin_users_path, class: "float-right inline-block ml-5 py-3" %>
-  </div>
+  <%= render "layouts/form_actions", form:, back_path: admin_users_path,
+    submit: t("app.admin.save"), submitting: t("app.admin.saving"), back: t("app.admin.back") %>
 <% end %>

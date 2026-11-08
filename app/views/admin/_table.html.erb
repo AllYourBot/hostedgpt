@@ -1,0 +1,13 @@
+<table id="<%= id %>" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
+  <thead>
+    <tr class="bg-gray-200 dark:bg-gray-900 text-left">
+      <% headers.each do |header| %>
+        <th class="px-2 py-1"><%= header %></th>
+      <% end %>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= render partial: row_partial, collection: rows %>
+  </tbody>
+</table>
