@@ -39,6 +39,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 - [Configure optional features](#configure-optional-features)
   - [Use local models with Ollama](#using-ollama)
   - [Give assistant access to your Google apps](#configuring-google-tools)
+  - [Admin users](#admin-users)
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
     - [Google OAuth authentication](#google-oauth-authentication)
@@ -336,6 +337,22 @@ You first need to follow all the steps in the [Google OAuth instructions](#googl
      - https://www.googleapis.com/auth/calendar.events (then click "Add To Table")
 
 2. **Finally, make sure `GOOGLE_TOOLS_FEATURE` is true**
+
+### Admin users
+
+Admins see an **Admin** item in the Settings sidebar. It opens pages listing every user and every user's API services, where an admin can create, edit and delete them. Deleting a user permanently removes their account along with their conversations, assistants and API services. API keys are never shown on these pages: an admin can set a new key, and leaving the key field blank keeps the current one.
+
+The first user created on a fresh install becomes an admin automatically. After that, an admin can make another user an admin by checking **Admin** on that user's edit page.
+
+To make someone an admin from the command line, for example on an install that already had users before this feature existed, run:
+
+```
+bin/rails "admin:grant[someone@example.com]"
+```
+
+With Docker, run `docker compose run base rails "admin:grant[someone@example.com]"`. On a hosting provider, run it from the app's console or shell.
+
+An admin can't remove their own admin rights or delete their own account, so there is always at least one admin.
 
 ### Authentication
 

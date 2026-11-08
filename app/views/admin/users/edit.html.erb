@@ -1,0 +1,23 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <%= render "admin/tabs" %>
+
+  <h1 class="text-3xl"><%= t("app.admin.users.edit.title") %></h1>
+
+  <%= render "form", person: @person %>
+
+  <% unless @person.personable == Current.user %>
+    <%= button_to t("app.admin.users.edit.delete"), admin_user_path(@person.personable),
+      method: :delete,
+      data: { turbo_confirm: t("app.admin.users.edit.confirm_delete") },
+      form: { class: "mt-8" },
+      class: %|
+        py-3 px-5
+        bg-red-100 dark:bg-red-900 dark:text-white
+        border border-red-400
+        rounded-lg
+        font-medium
+        cursor-pointer
+      |
+    %>
+  <% end %>
+</div>

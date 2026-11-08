@@ -2,10 +2,15 @@ module User::Registerable
   extend ActiveSupport::Concern
 
   included do
+    before_create :make_admin_if_first_user
     after_create :create_initial_assistants_etc
   end
 
   private
+
+  def make_admin_if_first_user
+    self.admin = true unless User.exists?
+  end
 
   def create_initial_assistants_etc
     api_services.create!(url: APIService::URL_OPEN_AI, driver: :openai, name: "OpenAI")

@@ -31,6 +31,8 @@ class User < ApplicationRecord
 
   belongs_to :last_cancelled_message, class_name: "Message", optional: true
 
+  scope :ordered, -> { order(:registered_at) }
+
   validates :first_name, presence: true
   validates :last_name, presence: true, on: :create, unless: :creating_google_credential?
 

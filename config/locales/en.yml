@@ -34,6 +34,72 @@ en:
       settings: "Settings"
       logout: "Logout"
       assistants: "Assistants"
+    admin:
+      menu: "Admin"
+      tabs:
+        users: "Users"
+        api_services: "API Services"
+      api_services:
+        index:
+          title: "API Services"
+          add_new: "Add New"
+          owner: "Owner"
+          name: "Name"
+          service_type: "Type"
+          driver: "Driver"
+          url: "URL"
+          token: "Key"
+          token_set: "Set"
+          edit: "Edit"
+        new:
+          title: "New API Service"
+        edit:
+          title: "Edit API Service"
+          delete: "Delete API Service"
+          confirm_delete: "Delete this API service? Its language models will stop being available to the user."
+        form:
+          owner: "Owner"
+          errors_title:
+            one: "%{count} error prohibited this API service from being saved:"
+            other: "%{count} errors prohibited this API service from being saved:"
+          name: "Name"
+          service_type: "Type"
+          driver: "Driver"
+          url: "URL"
+          token: "Key"
+          token_placeholder_set: "A key is set. Leave blank to keep it."
+          token_placeholder_unset: "No key is set."
+          save: "Save"
+          saving: "Saving..."
+          back: "Back"
+      users:
+        index:
+          title: "Users"
+          add_new: "Add New"
+          name: "Name"
+          email: "Email"
+          registered: "Registered"
+          admin: "Admin"
+          edit: "Edit"
+        new:
+          title: "New User"
+        edit:
+          title: "Edit User"
+          delete: "Delete User"
+          confirm_delete: "Delete this user along with all of their conversations, assistants and API services? This can't be undone."
+        form:
+          errors_title:
+            one: "%{count} error prohibited this user from being saved:"
+            other: "%{count} errors prohibited this user from being saved:"
+          email: "Email"
+          first_name: "First name"
+          last_name: "Last name"
+          password: "Password"
+          admin: "Admin"
+          own_admin_note: "You can't remove your own admin rights."
+          save: "Save"
+          saving: "Saving..."
+          back: "Back"
     settings:
       title: "Settings"
       home: "Home"
@@ -422,6 +488,16 @@ en:
         - title: "Design a book cover image"
           description: "for a new fantasy novel set in a magical forest"
     flashes:
+      admin:
+        users:
+          created: "User created"
+          saved: "User saved"
+          deleted: "User deleted"
+          cannot_delete_self: "You can't delete your own account"
+        api_services:
+          created: "API service created"
+          saved: "API service saved"
+          deleted: "API service deleted"
       auth:
         invalid_login: "Invalid email or password"
         registration_disabled: "Registration is disabled"
@@ -491,6 +567,12 @@ en:
           slug:
             taken: "has already been taken"
   activerecord:
+    attributes:
+      person/personable:
+        first_name: "First name"
+        last_name: "Last name"
+      person/personable/credentials:
+        password: "Password"
     errors:
       models:
         assistant:

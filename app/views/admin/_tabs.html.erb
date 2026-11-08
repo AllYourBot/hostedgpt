@@ -1,0 +1,10 @@
+<nav id="admin-tabs" class="flex gap-2 mb-6 border-b border-gray-300 dark:border-gray-600">
+  <% { users: admin_users_path, api_services: admin_api_services_path }.each do |tab, path| %>
+    <%= link_to t("app.admin.tabs.#{tab}"), path,
+      aria: { current: (controller_name == tab.to_s ? "page" : nil) },
+      class: %|
+        px-4 py-2 -mb-px border-b-2
+        #{controller_name == tab.to_s ? "border-gray-900 dark:border-gray-100 font-bold" : "border-transparent hover:border-gray-400"}
+      | %>
+  <% end %>
+</nav>
