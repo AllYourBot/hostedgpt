@@ -128,7 +128,7 @@ de:
           api_service: "API-Dienst"
           supports_images: "Unterstützt Bilder?"
           supports_tools: "Unterstützt Tools (Function Calling)?"
-          supports_thinking: "Unterstützt erweitertes Denken (Anthropic)?"
+          supports_thinking: "Unterstützt erweitertes Denken?"
           supports_system_message: "Unterstützt Systemnachricht (Anweisungen)?"
           supports_pdf: "Unterstützt PDFs?"
           test: "Test"
