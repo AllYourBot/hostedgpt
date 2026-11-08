@@ -35,3 +35,7 @@ The request log prints every param at `info`, and `config/initializers/filter_pa
 
 - Entries substring-match, so `:token` also hides `token_count`; that is why `filter_regexp` takes exemptions. Add an exemption when a short key has diagnostic siblings.
 - `Rails.logger` interpolation bypasses the filter entirely. Log a record's id or a token's length, never the value.
+
+## A `.json` request renders every ivar, including what the HTML view hides
+
+`ApplicationController#default_render` answers any `.json` request by serializing the action's ivars with `as_json`, so an encrypted column comes back decrypted (`APIService#token`) even when the view deliberately never prints it. When a controller exposes records whose secrets belong to someone other than the viewer, refuse API requests (`head :not_acceptable if api_request?`), as `Admin::ApplicationController` does, and test the `.json` URL.

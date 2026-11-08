@@ -1,0 +1,53 @@
+<% user = person.personable %>
+<% editing_self = user == Current.user %>
+<%= form_with(model: person, url: person.new_record? ? admin_users_path : admin_user_path(user), class: "contents") do |form| %>
+  <%= render "layouts/form_errors", record: person, title: t("app.admin.users.form.errors_title", count: person.errors.count) %>
+
+  <%= labeled_text_field form, :email, t("app.admin.users.form.email") %>
+
+  <%= form.fields_for :personable_attributes, user do |user_fields| %>
+    <%= labeled_text_field user_fields, :first_name, t("app.admin.users.form.first_name") %>
+
+    <%= labeled_text_field user_fields, :last_name, t("app.admin.users.form.last_name") %>
+
+    <% if person.new_record? && Feature.password_authentication? %>
+      <%= user_fields.fields_for :credentials_attributes, PasswordCredential.new, index: 0 do |credential_fields| %>
+        <div class="my-5">
+          <%= credential_fields.label :password, t("app.admin.users.form.password") %>
+          <%= credential_fields.password_field :password, autocomplete: "new-password",
+            class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <div class="my-5">
+      <%= user_fields.label :dark_mode, t("app.settings.people.form.color_theme") %>
+      <div class="flex items-center justify-between pl-3 py-2 mt-2 w-full gap-1">
+        <% %w[dark light system].each do |value| %>
+          <div class="flex items-center gap-2">
+            <%= user_fields.radio_button :dark_mode, value, checked: user.dark_mode == value %>
+            <%= user_fields.label "dark_mode_#{value}", t("app.settings.people.form.theme_options.#{value}") %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% { show_thinking: user.show_thinking?, ask_follow_ups: user.ask_follow_ups?, provider_web_search: user.provider_web_search? }.each do |preference, enabled| %>
+      <div class="my-5 flex items-center gap-2">
+        <%= user_fields.check_box preference, checked: enabled %>
+        <%= user_fields.label preference, t("app.settings.people.form.#{preference}") %>
+      </div>
+    <% end %>
+
+    <div class="my-5 flex items-center gap-2">
+      <%= user_fields.check_box :admin, disabled: editing_self %>
+      <%= user_fields.label :admin, t("app.admin.users.form.admin") %>
+    </div>
+    <% if editing_self %>
+      <p class="-mt-3 mb-5 text-sm text-gray-500 dark:text-gray-400"><%= t("app.admin.users.form.own_admin_note") %></p>
+    <% end %>
+  <% end %>
+
+  <%= render "layouts/form_actions", form:, back_path: admin_users_path,
+    submit: t("app.admin.save"), submitting: t("app.admin.saving"), back: t("app.admin.back") %>
+<% end %>

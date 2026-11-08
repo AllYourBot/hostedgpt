@@ -1,0 +1,9 @@
+<tr id="<%= dom_id(api_service) %>" class="<%= cycle("bg-gray-100 dark:bg-gray-600", "bg-white dark:bg-gray-900") %>">
+  <td class="px-2 py-1" data-role="owner"><%= api_service.user.name.full %></td>
+  <td class="px-2 py-1"><%= api_service.name %></td>
+  <td class="px-2 py-1"><%= api_service.service_type %></td>
+  <td class="px-2 py-1"><%= api_service.driver %></td>
+  <td class="px-2 py-1 break-all"><%= api_service.url %></td>
+  <td class="px-2 py-1" data-role="token"><%= t("app.admin.api_services.index.token_set") if api_service.token.present? %></td>
+  <%= render "admin/edit_cell", path: edit_admin_api_service_path(api_service) %>
+</tr>

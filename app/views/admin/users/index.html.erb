@@ -1,0 +1,4 @@
+<%= render layout: "admin/page", locals: { title: t("app.admin.users.index.title"), add_new_path: new_admin_user_path, wide: true } do %>
+  <%= render "admin/table", id: "users", row_partial: "admin/users/user", rows: @users,
+    headers: %w[name email registered admin].map { t("app.admin.users.index.#{it}") } %>
+<% end %>

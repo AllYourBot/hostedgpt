@@ -1,0 +1,4 @@
+<%= render layout: "admin/page", locals: { title: t("app.admin.api_services.index.title"), add_new_path: new_admin_api_service_path, wide: true } do %>
+  <%= render "admin/table", id: "api-services", row_partial: "admin/api_services/api_service", rows: @api_services,
+    headers: %w[owner name service_type driver url token].map { t("app.admin.api_services.index.#{it}") } %>
+<% end %>

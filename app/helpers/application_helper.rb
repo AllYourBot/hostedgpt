@@ -82,6 +82,13 @@ module ApplicationHelper
     end
   end
 
+  def labeled_select(form, attribute, label, choices, **options)
+    div_tag class: "my-5" do
+      form.label(attribute, label) +
+        form.select(attribute, choices, {}, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black", **options)
+    end
+  end
+
   def span_tag(content_or_options_with_block = nil, options = nil, &block)
     tag_with_content_or_block(:span, content_or_options_with_block, options, &block)
   end

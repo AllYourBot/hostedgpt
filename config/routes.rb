@@ -34,6 +34,11 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :admin do
+    resources :users, except: :show
+    resources :api_services, except: :show
+  end
+
   get "/login", to: "authentications#new"
   post "/login", to: "authentications#create"
   get "/register", to: "users#new"

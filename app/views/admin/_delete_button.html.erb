@@ -1,0 +1,13 @@
+<%= button_to label, path,
+  method: :delete,
+  data: { turbo_confirm: confirm },
+  form: { class: "mt-8" },
+  class: %|
+    py-3 px-5
+    bg-red-100 dark:bg-red-900 dark:text-white
+    border border-red-400
+    rounded-lg
+    font-medium
+    cursor-pointer
+  |
+%>

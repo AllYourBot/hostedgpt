@@ -1,0 +1,28 @@
+<%= form_with(model: [:admin, api_service], class: "contents") do |form| %>
+  <%= render "layouts/form_errors", record: api_service, title: t("app.admin.api_services.form.errors_title", count: api_service.errors.count) %>
+
+  <% if api_service.new_record? %>
+    <%= labeled_select form, :user_id, t("app.admin.api_services.form.owner"),
+      User.includes(:person).ordered.map { [ "#{it.name.full} (#{it.email})", it.id ] } %>
+  <% else %>
+    <p id="owner" class="mt-2 text-gray-600 dark:text-gray-400">
+      <%= t("app.admin.api_services.form.owner") %>: <%= api_service.user.name.full %> (<%= api_service.user.email %>)
+    </p>
+  <% end %>
+
+  <%= labeled_text_field form, :name, t("app.admin.api_services.form.name") %>
+
+  <%= labeled_select form, :service_type, t("app.admin.api_services.form.service_type"), APIService::SERVICE_TYPES %>
+
+  <%= labeled_select form, :driver, t("app.admin.api_services.form.driver"), APIService.drivers.keys %>
+
+  <%= labeled_text_field form, :url, t("app.admin.api_services.form.url") %>
+
+  <%= labeled_text_field form, :token, t("app.admin.api_services.form.token"),
+    value: nil,
+    autocomplete: "off",
+    placeholder: (t("app.admin.api_services.form.#{api_service.token_was.present? ? "token_placeholder_set" : "token_placeholder_unset"}") if api_service.persisted?) %>
+
+  <%= render "layouts/form_actions", form:, back_path: admin_api_services_path,
+    submit: t("app.admin.save"), submitting: t("app.admin.saving"), back: t("app.admin.back") %>
+<% end %>

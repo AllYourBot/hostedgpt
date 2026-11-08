@@ -5,6 +5,67 @@ de:
       settings: "Einstellungen"
       logout: "Abmelden"
       assistants: "Assistenten"
+    admin:
+      menu: "Admin"
+      add_new: "Neu hinzufügen"
+      edit: "Bearbeiten"
+      save: "Speichern"
+      saving: "Wird gespeichert..."
+      back: "Zurück"
+      tabs:
+        users: "Benutzer"
+        api_services: "API-Dienste"
+      api_services:
+        index:
+          title: "API-Dienste"
+          owner: "Besitzer"
+          name: "Name"
+          service_type: "Typ"
+          driver: "Treiber"
+          url: "URL"
+          token: "Schlüssel"
+          token_set: "Gesetzt"
+        new:
+          title: "Neuer API-Dienst"
+        edit:
+          title: "API-Dienst bearbeiten"
+          delete: "API-Dienst löschen"
+          confirm_delete: "Diesen API-Dienst löschen? Seine Sprachmodelle stehen dem Benutzer dann nicht mehr zur Verfügung."
+        form:
+          owner: "Besitzer"
+          errors_title:
+            one: "%{count} Fehler verhinderte das Speichern dieses API-Dienstes:"
+            other: "%{count} Fehler verhinderten das Speichern dieses API-Dienstes:"
+          name: "Name"
+          service_type: "Typ"
+          driver: "Treiber"
+          url: "URL"
+          token: "Schlüssel"
+          token_placeholder_set: "Ein Schlüssel ist gesetzt. Leer lassen, um ihn zu behalten."
+          token_placeholder_unset: "Kein Schlüssel gesetzt."
+      users:
+        index:
+          title: "Benutzer"
+          name: "Name"
+          email: "E-Mail"
+          registered: "Registriert"
+          admin: "Admin"
+        new:
+          title: "Neuer Benutzer"
+        edit:
+          title: "Benutzer bearbeiten"
+          delete: "Benutzer löschen"
+          confirm_delete: "Diesen Benutzer samt allen Unterhaltungen, Assistenten und API-Diensten löschen? Dies kann nicht rückgängig gemacht werden."
+        form:
+          errors_title:
+            one: "%{count} Fehler verhinderte das Speichern dieses Benutzers:"
+            other: "%{count} Fehler verhinderten das Speichern dieses Benutzers:"
+          email: "E-Mail"
+          first_name: "Vorname"
+          last_name: "Nachname"
+          password: "Passwort"
+          admin: "Admin"
+          own_admin_note: "Sie können Ihre eigenen Admin-Rechte nicht entfernen."
     settings:
       title: "Einstellungen"
       home: "Startseite"
@@ -389,6 +450,16 @@ de:
         - title: "Entwirf ein Buchcover-Bild."
           description: "für einen neuen Fantasy-Roman, der in einem magischen Wald spielt"
     flashes:
+      admin:
+        users:
+          created: "Benutzer erstellt"
+          saved: "Benutzer gespeichert"
+          deleted: "Benutzer gelöscht"
+          cannot_delete_self: "Sie können Ihr eigenes Konto nicht löschen"
+        api_services:
+          created: "API-Dienst erstellt"
+          saved: "API-Dienst gespeichert"
+          deleted: "API-Dienst gelöscht"
       auth:
         invalid_login: "Ungültige E-Mail oder Passwort"
         registration_disabled: "Registrierung ist deaktiviert"
@@ -458,6 +529,12 @@ de:
           slug:
             taken: "ist bereits vergeben"
   activerecord:
+    attributes:
+      person/personable:
+        first_name: "Vorname"
+        last_name: "Nachname"
+      person/personable/credentials:
+        password: "Passwort"
     errors:
       models:
         assistant:

@@ -1,9 +1,12 @@
 class Settings::ApplicationController < ApplicationController
   before_action :set_settings_menu
+  helper_method :settings_menu_key
 
   layout "settings"
 
   private
+
+  def settings_menu_key = controller_name.to_sym
 
   def redirect_or_render(saved, notice:, template:)
     if saved
@@ -36,5 +39,7 @@ class Settings::ApplicationController < ApplicationController
   I18n.t("app.settings.api_services.menu.index") => settings_api_services_path,
       },
     }
+
+    @settings_menu[:admin] = { I18n.t("app.admin.menu") => admin_users_path } if Current.user.admin?
   end
 end

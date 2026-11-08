@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -448,6 +448,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_120000) do
     t.string "last_name"
     t.jsonb "preferences"
     t.datetime "registered_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.boolean "admin", default: false, null: false
     t.index ["last_cancelled_message_id"], name: "index_users_on_last_cancelled_message_id"
   end
 

@@ -59,6 +59,10 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  test "ordered lists users by registration date" do
+    assert_equal User.all.sort_by(&:registered_at), User.ordered.to_a, "Users should be ordered oldest registration first"
+  end
+
   test "associations are deleted upon destroy" do
     assert_difference "APIService.count", -users(:keith).api_services_including_deleted.count do
       assert_difference "LanguageModel.count", -users(:keith).language_models_including_deleted.count do

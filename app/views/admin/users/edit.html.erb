@@ -1,0 +1,8 @@
+<%= render layout: "admin/page", locals: { title: t("app.admin.users.edit.title") } do %>
+  <%= render "form", person: @person %>
+
+  <% unless @person.personable == Current.user %>
+    <%= render "admin/delete_button", label: t("app.admin.users.edit.delete"), path: admin_user_path(@person.personable),
+      confirm: t("app.admin.users.edit.confirm_delete") %>
+  <% end %>
+<% end %>
