@@ -1083,6 +1083,42 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_equal "sig-abc", assistant_replay[:tool_calls]["call_123"].thought_signature
   end
 
+  test "stream_next_conversation_message does NOT offer AskUser when replying to speech" do
+    @assistant.language_model.update!(supports_tools: true)
+    @conversation.messages.create!(role: :user, content_text: "Help me pick", assistant: @assistant, spoken: true)
+    reply = @conversation.latest_message_for_version(:latest)
+
+    stream_text_reply(reply)
+
+    tool_names = TestClient::RubyLLM::Chat.tools.map(&:name)
+    refute_includes tool_names, "askuser_ask_user", "A spoken conversation can't show buttons, so the model shouldn't ask with them"
+    assert_includes tool_names, "helloworld_hi", "The other tools should still be offered"
+  end
+
+  test "stream_next_conversation_message OFFERS AskUser for a typed message" do
+    @assistant.language_model.update!(supports_tools: true)
+
+    stream_text_reply
+
+    assert_includes TestClient::RubyLLM::Chat.tools.map(&:name), "askuser_ask_user", "A typed conversation can show the choices"
+  end
+
+  test "preceding_conversation_messages replays an answered AskUser as tool result THEN user message" do
+    @assistant.language_model.update!(supports_tools: true)
+    ask_call = { type: "function", id: "call_ask", function: { name: "askuser_ask_user", arguments: '{"question":"Which?","choices":["A","B"]}' } }
+    @conversation.messages.create!(role: :assistant, content_text: nil, assistant: @assistant, content_tool_calls: [ask_call])
+    @conversation.messages.create!(role: :tool, assistant: @assistant, tool_call_id: "call_ask", content_tool_calls: ask_call,
+      content_text: { message_to_user: "Which?", choices: ["A", "B"] }.to_json)
+    @conversation.messages.create!(role: :user, content_text: "A", assistant: @assistant)
+    reply = @conversation.latest_message_for_version(:latest)
+
+    msgs = AIBackend::RubyLLM.new(@user, @assistant, @conversation, reply).send(:preceding_conversation_messages)
+
+    assert_equal [:assistant, :tool, :user], msgs.last(3).map { it[:role].to_sym }, "The answer should follow the question's tool result"
+    assert_equal "call_ask", msgs.last(2).first[:tool_call_id], "The tool result should answer the AskUser call"
+    assert_equal "A", msgs.last[:content].split("\n\n").first, "The picked choice should be the user's message"
+  end
+
   test "preceding_conversation_messages replays tool calls and tool results" do
     @assistant.language_model.update!(supports_tools: true)
     conversation = @conversation

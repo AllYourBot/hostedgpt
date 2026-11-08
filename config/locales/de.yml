@@ -223,6 +223,8 @@ de:
       empty_state:
         greeting: "Wie kann ich dir heute helfen?"
     messages:
+      ask_user:
+        hint: "Wähle eine Antwort oder schreib deine eigene."
       sources: "Quellen"
       retry:
         interrupted: "Die Antwort wurde unterbrochen."

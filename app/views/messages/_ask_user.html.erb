@@ -1,0 +1,29 @@
+<%# locals: (message:, choices:) -%>
+<%# Shown under the latest AskUser question. Each choice posts as the user's next message, which continues the reply. -%>
+
+<div data-role="ask-user" class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+  <div class="flex flex-wrap gap-2">
+    <% choices.each do |choice| %>
+      <%= button_to choice, assistant_messages_path(message.assistant),
+        method: :post,
+        form_class: "inline-block p-0",
+        class: %|
+          px-3 py-1
+          rounded-md border border-gray-300 dark:border-gray-500
+          cursor-pointer hover:text-gray-900 dark:hover:text-white
+        |,
+        params: { message: {
+          conversation_id: message.conversation_id,
+          assistant_id: message.assistant_id,
+          content_text: choice,
+          index: message.index + 1,
+          version: message.version
+        } },
+        data: {
+          role: "ask-user-choice",
+          turbo_frame: "_top",
+        } %>
+    <% end %>
+  </div>
+  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400"><%= t("app.messages.ask_user.hint") %></p>
+</div>

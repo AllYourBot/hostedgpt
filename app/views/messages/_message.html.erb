@@ -189,6 +189,10 @@ end %>
           <%= render "messages/retry", message: message, failed: message.failed? %>
         <% end %>
 
+        <% if message.tool? && last_message && (choices = ask_user_choices(message)).any? %>
+          <%= render "messages/ask_user", message:, choices: %>
+        <% end %>
+
         <% if message.assistant? && message.assistant.not_deleted? && message.truncated? && last_message %>
           <%= render "messages/continue", message: message %>
         <% end %>

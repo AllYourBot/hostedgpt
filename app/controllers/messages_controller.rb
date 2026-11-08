@@ -21,6 +21,7 @@ class MessagesController < ApplicationController
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
       content_text: [nil, ""],
+      content_tool_calls: nil,
       cancelled_at: nil
     ).find_by(id: @conversation.last_assistant_message_id)
   end

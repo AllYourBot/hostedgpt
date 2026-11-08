@@ -82,6 +82,13 @@ class ToolboxTest < ActiveSupport::TestCase
     assert_equal "Get eligibility given birthdate and gender", tool.dig(:function, :description)
   end
 
+  test "a parameter ending in _a is described as a list of strings" do
+    parameters = Toolbox::AskUser.tools.first.dig(:function, :parameters)
+
+    assert_equal({ type: "array", items: { type: "string" } }, parameters[:properties]["choices"], "choices_a should be a list of strings")
+    assert_equal ["question"], parameters[:required], "Only the question is required"
+  end
+
   test "call executes a tool" do
     assert_equal "Hello, World!", Toolbox.call("helloworld_hi", { name: "World" })
   end

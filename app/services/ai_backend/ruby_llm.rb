@@ -398,9 +398,9 @@ class AIBackend::RubyLLM < AIBackend
 
   def tool_instances
     tools = Toolbox.ruby_llm_tools
-    return tools unless provider_web_search_replaces_brave?
-
-    tools.reject { it.name.start_with?("bravesearch_") }
+    tools = tools.reject { it.name.start_with?("bravesearch_") } if provider_web_search_replaces_brave?
+    tools = tools.reject { it.name == Toolbox::AskUser::FUNCTION_NAME } if @message&.replying_to_speech?
+    tools
   end
 
   def provider_web_search_replaces_brave? = provider_tools.include?(:web_search)
