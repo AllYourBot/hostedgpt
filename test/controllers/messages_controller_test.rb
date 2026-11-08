@@ -304,6 +304,13 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-role='ask-user'] input[name='message[index]'][value='#{question.index + 1}']", 2, "The answer should go right after the question"
   end
 
+  test "index shows NO stop button while an AskUser question waits for an answer" do
+    question = ask_user_question(choices: ["Free", "Pro"])
+
+    get conversation_messages_url(@conversation, version: question.version)
+    assert_select "#cancel", false, "A paused reply is not still generating, so there is nothing to stop"
+  end
+
   test "index shows NO choice buttons once the question is no longer the latest message" do
     question = ask_user_question(choices: ["Free", "Pro"])
     @conversation.messages.create! role: :user, content_text: "Pro", assistant: @assistant
@@ -457,7 +464,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   def ask_user_question(choices:)
     call = { type: "function", id: "call_ask", function: { name: "askuser_ask_user", arguments: { question: "Which plan?", choices: } } }
-    @conversation.messages.create!(role: :assistant, content_text: nil, assistant: @assistant, content_tool_calls: [call], processed_at: Time.current, version: :latest)
+    @conversation.messages.create!(role: :assistant, content_text: "", assistant: @assistant, content_tool_calls: [call], processed_at: Time.current, version: :latest)
     @conversation.messages.create!(role: :tool, assistant: @assistant, tool_call_id: "call_ask", content_tool_calls: call,
       content_text: { message_to_user: "Which plan?", choices: }.to_json, processed_at: Time.current, version: :latest)
   end

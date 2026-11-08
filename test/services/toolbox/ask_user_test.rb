@@ -26,4 +26,15 @@ class Toolbox::AskUserTest < ActiveSupport::TestCase
       "The model's question and choices arguments should reach the method"
     )
   end
+
+  test "ask_user REFUSES a blank question" do
+    error = assert_raises(ArgumentError, "A blank question has nothing to show the user") do
+      Toolbox::AskUser.new.ask_user(question_s: " ", choices_a: ["A"])
+    end
+    assert_includes error.message, "question", "The model should be told what was missing"
+  end
+
+  test "ask_user reads choices sent as a JSON STRING" do
+    assert_equal ["A", "B"], Toolbox::AskUser.new.ask_user(question_s: "Which?", choices_a: '["A","B"]')[:choices], "A stringified list should still become separate buttons"
+  end
 end

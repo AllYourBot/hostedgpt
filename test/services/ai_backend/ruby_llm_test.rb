@@ -1083,6 +1083,26 @@ class AIBackend::RubyLLMTest < ActiveSupport::TestCase
     assert_equal "sig-abc", assistant_replay[:tool_calls]["call_123"].thought_signature
   end
 
+  test "stream_next_conversation_message does NOT offer AskUser when replying to speech" do
+    @assistant.language_model.update!(supports_tools: true)
+    @conversation.messages.create!(role: :user, content_text: "Help me pick", assistant: @assistant, spoken: true)
+    reply = @conversation.latest_message_for_version(:latest)
+
+    stream_text_reply(reply)
+
+    tool_names = TestClient::RubyLLM::Chat.tools.map(&:name)
+    refute_includes tool_names, "askuser_ask_user", "A spoken conversation can't show buttons, so the model shouldn't ask with them"
+    assert_includes tool_names, "helloworld_hi", "The other tools should still be offered"
+  end
+
+  test "stream_next_conversation_message OFFERS AskUser for a typed message" do
+    @assistant.language_model.update!(supports_tools: true)
+
+    stream_text_reply
+
+    assert_includes TestClient::RubyLLM::Chat.tools.map(&:name), "askuser_ask_user", "A typed conversation can show the choices"
+  end
+
   test "preceding_conversation_messages replays an answered AskUser as tool result THEN user message" do
     @assistant.language_model.update!(supports_tools: true)
     ask_call = { type: "function", id: "call_ask", function: { name: "askuser_ask_user", arguments: '{"question":"Which?","choices":["A","B"]}' } }

@@ -9,9 +9,19 @@ class Toolbox::AskUser < Toolbox
   S
 
   def ask_user(question_s:, choices_a: [])
-    {
-      message_to_user: question_s,
-      choices: Array(choices_a).map { it.to_s.strip }.compact_blank.uniq,
-    }
+    raise ArgumentError, "question can't be blank" if question_s.blank?
+
+    { message_to_user: question_s, choices: listed(choices_a).map { it.to_s.strip }.compact_blank.uniq }
+  end
+
+  private
+
+  # Some models send a list parameter as a JSON string.
+  def listed(choices)
+    return Array(choices) unless choices.is_a?(String) && choices.lstrip.start_with?("[")
+
+    Array(JSON.parse(choices))
+  rescue JSON::ParserError
+    [choices]
   end
 end

@@ -165,6 +165,7 @@ class GetNextAIMessageJob < ApplicationJob
     end
     index = @message.index
     generated_images = []
+    msgs = msgs.partition { !ask_user_question?(it) }.flatten(1) # the question goes last so its choices render under it
     msgs.each do |tool_message| # one message for each tool executed
       parsed = JSON.parse(tool_message[:content]) rescue nil
 
@@ -211,7 +212,14 @@ class GetNextAIMessageJob < ApplicationJob
     ) # now AI decides what to say based on the tool responses. It may also execute more tools
   end
 
-  def asked_the_user?(tool_messages) = tool_messages.any? { it.dig(:content_tool_calls, :function, :name) == Toolbox::AskUser::FUNCTION_NAME }
+  def asked_the_user?(tool_messages) = tool_messages.any? { ask_user_question?(it) }
+
+  def ask_user_question?(tool_message)
+    return false unless tool_message.dig(:content_tool_calls, :function, :name) == Toolbox::AskUser::FUNCTION_NAME
+
+    result = JSON.parse(tool_message[:content]) rescue nil
+    result.is_a?(Hash) && result["message_to_user"].present?
+  end
 
   def generation_was_cancelled?
     @cancel_counter = @cancel_counter.to_i + 1 # we want to skip redis on first cancel check to ensure test env runs does a second check

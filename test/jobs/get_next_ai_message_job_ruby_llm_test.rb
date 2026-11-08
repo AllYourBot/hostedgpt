@@ -203,6 +203,40 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     assert_equal ["call_hi", "call_ask"], @conversation.messages.reload.order(:index).last(2).map(&:tool_call_id), "Both results should be saved in call order"
   end
 
+  test "an AskUser call WITHOUT a question gets a normal follow-up reply instead of pausing" do
+    @assistant.language_model.update!(supports_tools: true)
+
+    assert_difference "@conversation.messages.reload.length", 2, "The failed tool result and a follow-up reply should be added" do
+      assert_enqueued_with(job: GetNextAIMessageJob) do
+        TestClient::RubyLLM::Chat.stub :function, "askuser_ask_user" do
+          TestClient::RubyLLM::Chat.stub :arguments, { choices: ["A", "B"] }.to_json do
+            assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id), "The job should finish"
+          end
+        end
+      end
+    end
+
+    assert @conversation.messages.reload.order(:index).last.assistant?, "The model should get to explain instead of leaving the user stuck"
+  end
+
+  test "an AskUser call made BEFORE another tool is saved last so its buttons show" do
+    @assistant.language_model.update!(supports_tools: true)
+    tool_messages = [
+      { role: "tool", tool_call_id: "call_ask", content: { message_to_user: "Which?", choices: ["A"] }.to_json,
+        content_tool_calls: { id: "call_ask", function: { name: "askuser_ask_user", arguments: { question: "Which?", choices: ["A"] } } } },
+      { role: "tool", tool_call_id: "call_hi", content: "Hello, Keith!".to_json,
+        content_tool_calls: { id: "call_hi", function: { name: "helloworld_hi", arguments: { name: "Keith" } } } },
+    ]
+
+    TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+      AIBackend::RubyLLM.stub :get_tool_messages_by_calling, tool_messages do
+        assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id), "The job should finish"
+      end
+    end
+
+    assert_equal "call_ask", @conversation.messages.reload.order(:index).last.tool_call_id, "The question should be the conversation's latest message"
+  end
+
   test "the assistant's tool-call signature persists for replay on the follow-up request" do
     @assistant.language_model.update!(supports_tools: true)
 
