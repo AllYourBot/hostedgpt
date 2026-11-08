@@ -109,6 +109,25 @@ class ConversationMessagesTest < ApplicationSystemTestCase
     assert_selector "[data-role='continue']", count: 0
   end
 
+  test "an AskUser question shows its choices as buttons and clicking one answers it" do
+    call = { type: "function", id: "call_ask", function: { name: "askuser_ask_user", arguments: { question: "Which plan?", choices: ["Free", "Pro"] } } }
+    @conversation.messages.create!(role: :assistant, content_text: nil, assistant: @conversation.assistant, content_tool_calls: [call], processed_at: Time.current, version: :latest)
+    @conversation.messages.create!(role: :tool, assistant: @conversation.assistant, tool_call_id: "call_ask", content_tool_calls: call,
+      content_text: { message_to_user: "Which plan?", choices: ["Free", "Pro"] }.to_json, processed_at: Time.current, version: :latest)
+    visit_and_scroll_wait conversation_messages_path(@conversation)
+
+    assert_text "Which plan?"
+    pro = last_message.find("[data-role='ask-user-choice']", text: "Pro")
+    assert pro.visible?, "The choices should show as buttons without hovering"
+
+    pro.click
+
+    assert_true "Clicking Pro should send Pro as the user's answer" do
+      find_messages[-2].text.include?("Pro")
+    end
+    assert_selector "[data-role='ask-user']", count: 0
+  end
+
   test "a stalled response shows a retry button once the stream goes quiet" do
     ask_a_question # the assistant's reply is created blank and is never filled in
     visit_and_scroll_wait conversation_messages_path(@conversation)

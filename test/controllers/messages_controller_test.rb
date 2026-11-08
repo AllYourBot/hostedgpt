@@ -294,6 +294,53 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-role="retry"]', false
   end
 
+  test "index shows a button for each AskUser choice under the LATEST question" do
+    question = ask_user_question(choices: ["Free", "Pro"])
+
+    get conversation_messages_url(@conversation, version: question.version)
+    assert_select '[data-role="ask-user"]', 1, "The latest question should offer its choices"
+    assert_select '[data-role="ask-user-choice"]', 2, "There should be one button per choice"
+    assert_select "[data-role='ask-user'] input[name='message[content_text]'][value='Pro']", 1, "Picking Pro should send Pro as the user's message"
+    assert_select "[data-role='ask-user'] input[name='message[index]'][value='#{question.index + 1}']", 2, "The answer should go right after the question"
+  end
+
+  test "index shows NO choice buttons once the question is no longer the latest message" do
+    question = ask_user_question(choices: ["Free", "Pro"])
+    @conversation.messages.create! role: :user, content_text: "Pro", assistant: @assistant
+
+    get conversation_messages_url(@conversation, version: question.version)
+    assert_select '[data-role="ask-user"]', false, "An answered question should not offer its choices again"
+  end
+
+  test "index shows NO choice buttons for an AskUser question WITHOUT choices" do
+    question = ask_user_question(choices: [])
+
+    get conversation_messages_url(@conversation, version: question.version)
+    assert_select '[data-role="ask-user"]', false, "With no choices the user just types their answer"
+  end
+
+  test "index ESCAPES html in an AskUser choice" do
+    question = ask_user_question(choices: ["<b>bold</b>"])
+
+    get conversation_messages_url(@conversation, version: question.version)
+    assert_select '[data-role="ask-user-choice"] b', false, "A choice's markup should not render"
+    assert_select '[data-role="ask-user-choice"]', { text: "<b>bold</b>" }, "A choice should be shown as plain text"
+  end
+
+  test "create with a picked choice saves it as the user's message and queues the reply" do
+    question = ask_user_question(choices: ["Free", "Pro"])
+
+    assert_enqueued_with(job: GetNextAIMessageJob) do
+      post assistant_messages_url(@assistant), params: { message: {
+        conversation_id: @conversation.id, assistant_id: @assistant.id, content_text: "Pro", index: question.index + 1, version: question.version,
+      } }
+    end
+
+    answer = @conversation.messages.user.order(:created_at).last
+    assert_equal "Pro", answer.content_text, "The picked choice should be the user's message"
+    assert_equal question.index + 1, answer.index, "The answer should follow the question"
+  end
+
   test "index shows a continue button for the latest reply when it WAS CUT OFF at the token limit" do
     latest_message = @conversation.latest_message_for_version(:latest)
     latest_message.update! truncated_at: Time.current
@@ -404,5 +451,14 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
         assert_select %{div.hidden[data-role="assistant"][data-radio-behavior-id-param="#{assistant.id}"] a[data-role="name"]}
       end
     end
+  end
+
+  private
+
+  def ask_user_question(choices:)
+    call = { type: "function", id: "call_ask", function: { name: "askuser_ask_user", arguments: { question: "Which plan?", choices: } } }
+    @conversation.messages.create!(role: :assistant, content_text: nil, assistant: @assistant, content_tool_calls: [call], processed_at: Time.current, version: :latest)
+    @conversation.messages.create!(role: :tool, assistant: @assistant, tool_call_id: "call_ask", content_tool_calls: call,
+      content_text: { message_to_user: "Which plan?", choices: }.to_json, processed_at: Time.current, version: :latest)
   end
 end
