@@ -192,6 +192,7 @@ class GetNextAIMessageJob < ApplicationJob
       )
 
     end
+    return if asked_the_user?(msgs)
 
     assistant_reply = @conversation.messages.create!(
       assistant: @assistant,
@@ -209,6 +210,8 @@ class GetNextAIMessageJob < ApplicationJob
       @assistant.id
     ) # now AI decides what to say based on the tool responses. It may also execute more tools
   end
+
+  def asked_the_user?(tool_messages) = tool_messages.any? { it.dig(:content_tool_calls, :function, :name) == Toolbox::AskUser::FUNCTION_NAME }
 
   def generation_was_cancelled?
     @cancel_counter = @cancel_counter.to_i + 1 # we want to skip redis on first cancel check to ensure test env runs does a second check

@@ -163,6 +163,46 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     assert second_new_message.content_text.nil?
   end
 
+  test "an AskUser call saves the question and PAUSES without queuing a reply" do
+    @assistant.language_model.update!(supports_tools: true)
+
+    assert_difference "@conversation.messages.reload.length", 1, "Only the question should be added, no assistant reply" do
+      assert_no_enqueued_jobs only: GetNextAIMessageJob do
+        TestClient::RubyLLM::Chat.stub :function, "askuser_ask_user" do
+          TestClient::RubyLLM::Chat.stub :arguments, { question: "Which?", choices: ["A", "B"] }.to_json do
+            assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id), "The job should finish"
+          end
+        end
+      end
+    end
+
+    question = @conversation.messages.reload.order(:index).last
+    assert question.tool?, "The conversation should end on the question"
+    assert_equal ["A", "B"], JSON.parse(question.content_text)["choices"], "The choices should be saved with the question"
+  end
+
+  test "an AskUser call alongside ANOTHER tool saves both results and still pauses" do
+    @assistant.language_model.update!(supports_tools: true)
+    tool_messages = [
+      { role: "tool", tool_call_id: "call_hi", content: "Hello, Keith!".to_json,
+        content_tool_calls: { id: "call_hi", function: { name: "helloworld_hi", arguments: { name: "Keith" } } } },
+      { role: "tool", tool_call_id: "call_ask", content: { message_to_user: "Which?", choices: ["A"] }.to_json,
+        content_tool_calls: { id: "call_ask", function: { name: "askuser_ask_user", arguments: { question: "Which?", choices: ["A"] } } } },
+    ]
+
+    assert_difference "@conversation.messages.reload.length", 2, "Both tool results should be saved, and no assistant reply" do
+      assert_no_enqueued_jobs only: GetNextAIMessageJob do
+        TestClient::RubyLLM::Chat.stub :function, "helloworld_hi" do
+          AIBackend::RubyLLM.stub :get_tool_messages_by_calling, tool_messages do
+            assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id), "The job should finish"
+          end
+        end
+      end
+    end
+
+    assert_equal ["call_hi", "call_ask"], @conversation.messages.reload.order(:index).last(2).map(&:tool_call_id), "Both results should be saved in call order"
+  end
+
   test "the assistant's tool-call signature persists for replay on the follow-up request" do
     @assistant.language_model.update!(supports_tools: true)
 
