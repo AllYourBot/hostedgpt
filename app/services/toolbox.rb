@@ -10,6 +10,7 @@ class Toolbox < SDK
       Toolbox::OpenMeteo,
       Toolbox::Image,
       Toolbox::Memory,
+      Toolbox::AskUser,
       brave_active && Toolbox::BraveSearch,
       gmail_active && Toolbox::Gmail,
       tasks_active && Toolbox::GoogleTasks,
@@ -106,6 +107,8 @@ class Toolbox < SDK
       [ name.join("_"), { type: "integer" } ]
     in *name, last  if last == "f"
       [ name.join("_"), { type: "number" } ]
+    in *name, last  if last == "a"
+      [ name.join("_"), { type: "array", items: { type: "string" } } ]
     else
       raise "Unable to infer type for parameter '#{param}'"
     end
