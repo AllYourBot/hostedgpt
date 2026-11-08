@@ -33,6 +33,33 @@ class MessagesHelperTest < ActionView::TestCase
     assert_nil from_name_for(message)
   end
 
+  test "an AskUser result renders the question as regular text, not a grey tool note" do
+    message = tool_result_message(function_name: "askuser_ask_user", result: { message_to_user: "Which plan?", choices: ["Free", "Pro"] })
+
+    html = format_for_display(message)
+
+    assert_includes html, "Which plan?", "The question should be shown"
+    refute_includes html, "text-gray-400", "The question is part of the conversation, not a tool note"
+  end
+
+  test "an AskUser result ESCAPES html in the question" do
+    message = tool_result_message(function_name: "askuser_ask_user", result: { message_to_user: "<b>x</b>", choices: [] })
+
+    html = format_for_display(message)
+
+    assert_includes html, "&lt;b&gt;x&lt;/b&gt;", "The model's question should be escaped"
+    refute_includes html, "<b>", "No markup from the model should reach the page"
+  end
+
+  test "ask_user_choices returns the choices of an AskUser result and NOTHING for other tools" do
+    ask = tool_result_message(function_name: "askuser_ask_user", result: { message_to_user: "Which?", choices: ["A", "B"] })
+    other = tool_result_message(function_name: "helloworld_hi", result: { message_to_user: "Hi", choices: ["A"] })
+
+    assert_equal ["A", "B"], ask_user_choices(ask), "An AskUser result offers its choices"
+    assert_empty ask_user_choices(other), "Another tool's result offers no choices"
+    assert_empty ask_user_choices(Message.new(role: :assistant, content_text: "Hello")), "A plain reply offers no choices"
+  end
+
   test "a tool result carrying link_url renders as a link to the URL the tool built" do
     message = tool_result_message(
       function_name: "bravesearch_brave_search",

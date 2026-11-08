@@ -46,6 +46,8 @@ module MessagesHelper
         return link_to message_to_user,
         settings_memories_path,
         { data: { turbo_frame: "_top" }, class: "text-gray-400 dark:!text-gray-500 font-normal no-underline" }
+      when Toolbox::AskUser::FUNCTION_NAME
+        return content_tag(:span, message_to_user)
       when *LEGACY_SEARCH_TOOL_NAMES
         return tool_result_link_to(message_to_user, legacy_search_url(function_name, message_to_user))
       else
@@ -87,6 +89,12 @@ module MessagesHelper
   end
 
   def message_to_user_from_tool_call?(message) = message_to_user_hash(message).present?
+
+  def ask_user_choices(message)
+    return [] unless message.tool? && message.content_tool_calls&.dig(:function, :name) == Toolbox::AskUser::FUNCTION_NAME
+
+    Array(message_to_user_hash(message)&.dig("choices"))
+  end
 
   private
 
