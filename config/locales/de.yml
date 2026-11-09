@@ -155,7 +155,6 @@ de:
           confirm_remove: "Diese Datei entfernen?"
         form:
           name: "Name"
-          slug: "Slug"
           language_model: "Sprachmodell"
           description: "Beschreibung"
           instructions: "Eigene Anweisungen"

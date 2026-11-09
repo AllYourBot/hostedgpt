@@ -3,10 +3,6 @@
 
   <%= labeled_text_field form, :name, t("app.settings.assistants.form.name"), autofocus: assistant.new_record? %>
 
-  <% unless assistant.new_record? %>
-    <%= labeled_text_field form, :slug, t("app.settings.assistants.form.slug") %>
-  <% end %>
-
   <div class="my-5">
     <%= form.label :language_model_id, t("app.settings.assistants.form.language_model") %><br/>
     <%= form.select :language_model_id,
