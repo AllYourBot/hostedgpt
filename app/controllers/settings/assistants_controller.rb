@@ -53,6 +53,6 @@ class Settings::AssistantsController < Settings::ApplicationController
   end
 
   def assistant_params
-    params.require(:assistant).permit(:name, :slug, :description, :instructions, :language_model_id, conversation_starters: [])
+    params.require(:assistant).permit(:name, :description, :instructions, :language_model_id, conversation_starters: [])
   end
 end

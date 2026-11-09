@@ -184,7 +184,6 @@ en:
           confirm_remove: "Remove this file?"
         form:
           name: "Name"
-          slug: "Slug"
           language_model: "Language model"
           description: "Description"
           instructions: "Custom Instructions"
