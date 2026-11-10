@@ -27,6 +27,7 @@ class Admin::UsersController < Admin::ApplicationController
     if @person.update(person_params)
       redirect_to admin_users_path, notice: I18n.t("app.flashes.admin.users.saved"), status: :see_other
     else
+      @person.errors.delete(:personable)
       render :edit, status: :unprocessable_content
     end
   end

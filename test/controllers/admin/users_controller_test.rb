@@ -243,7 +243,8 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     patch admin_user_url(@user), params: { person: { personable_attributes: { new_password: "abc" } } }
 
     assert_response :unprocessable_content
-    assert_select "#error_explanation", 1, "The errors should be shown"
+    assert_contains_text "#error_explanation", "Password is too short"
+    assert_select "#error_explanation li", 1, "Only the password error should be listed, not a generic personable one"
     assert @user.reload.password_credential.authenticate("secret"), "The current password should still work"
   end
 
