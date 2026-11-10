@@ -193,6 +193,70 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     assert @admin.reload.admin?, "The admin should still be an admin"
   end
 
+  test "should edit user with a new password field" do
+    login_as @admin
+    get edit_admin_user_url(@user)
+    assert_select "input[type=password][name=?]", "person[personable_attributes][new_password]", 1,
+      "A new password field should be shown"
+  end
+
+  test "should edit user WITHOUT a new password field when password authentication IS DISABLED" do
+    login_as @admin
+    stub_features(password_authentication: false) do
+      get edit_admin_user_url(@user)
+    end
+    assert_response :success
+    assert_select "input[type=password]", 0, "No password field should be shown"
+  end
+
+  test "should change the user's password" do
+    login_as @admin
+    patch admin_user_url(@user), params: { person: { personable_attributes: { new_password: "newsecret" } } }
+
+    assert_redirected_to admin_users_url
+    credential = @user.reload.password_credential
+    assert credential.authenticate("newsecret"), "The user should log in with the new password"
+    refute credential.authenticate("secret"), "The old password should no longer work"
+  end
+
+  test "should keep the user's password when new password IS BLANK" do
+    login_as @admin
+    patch admin_user_url(@user), params: { person: { personable_attributes: { first_name: "Robert", new_password: "" } } }
+
+    assert_redirected_to admin_users_url
+    assert @user.reload.password_credential.authenticate("secret"), "The current password should still work"
+  end
+
+  test "should give a password to a user who HAS NONE" do
+    taylor = users(:taylor)
+    login_as @admin
+    assert_difference "PasswordCredential.count", 1 do
+      patch admin_user_url(taylor), params: { person: { personable_attributes: { new_password: "newsecret" } } }
+    end
+
+    assert_redirected_to admin_users_url
+    assert taylor.reload.password_credential.authenticate("newsecret"), "The user should log in with the new password"
+  end
+
+  test "should render edit with errors when new password IS TOO SHORT" do
+    login_as @admin
+    patch admin_user_url(@user), params: { person: { personable_attributes: { new_password: "abc" } } }
+
+    assert_response :unprocessable_content
+    assert_select "#error_explanation", 1, "The errors should be shown"
+    assert @user.reload.password_credential.authenticate("secret"), "The current password should still work"
+  end
+
+  test "should NOT change the password when password authentication IS DISABLED" do
+    login_as @admin
+    stub_features(password_authentication: false) do
+      patch admin_user_url(@user), params: { person: { personable_attributes: { new_password: "newsecret" } } }
+    end
+
+    assert_redirected_to admin_users_url
+    assert @user.reload.password_credential.authenticate("secret"), "The current password should still work"
+  end
+
   test "should render edit with errors when update IS INVALID" do
     login_as @admin
     patch admin_user_url(@user), params: { person: { email: "not-an-email", personable_attributes: { first_name: "" } } }

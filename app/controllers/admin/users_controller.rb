@@ -57,7 +57,10 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def person_params
-    params.require(:person).permit(:email, personable_attributes: user_attributes).tap do |permitted|
+    attributes = user_attributes
+    attributes << :new_password if Feature.password_authentication?
+
+    params.require(:person).permit(:email, personable_attributes: attributes).tap do |permitted|
       permitted[:personable_attributes]&.merge!(id: @person.personable_id)
     end
   end

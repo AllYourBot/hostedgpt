@@ -93,6 +93,8 @@ en:
           first_name: "First name"
           last_name: "Last name"
           password: "Password"
+          new_password: "New password"
+          new_password_note: "Leave blank to keep the current password."
           admin: "Admin"
           own_admin_note: "You can't remove your own admin rights."
     settings:
