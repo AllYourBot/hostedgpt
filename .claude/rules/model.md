@@ -61,6 +61,10 @@ When another table has a foreign key pointing at this model, the FK is enforced 
 
 Inside a scope lambda `self` is the relation being chained, so a bare class method or sibling scope runs *inside that chain*: `user.assistants.some_scope` quietly narrows the inner lookup to that user's rows too. Qualify any lookup that is global by intent with the class name. Stubbing the class method in tests hides this — cover it with one test that chains the scope onto a narrower relation and leaves the method real.
 
+## Change a credential through `credentials`, not its `has_one`
+
+`User#password_credential` and its sibling `has_one`s have no `autosave`, so `user.password_credential.password = x; user.save!` saves the user and silently drops the credential change (a `has_one` saves only a new record). `accepts_nested_attributes_for :credentials` turns autosave on for the `has_many`, so find or build the credential in `credentials` instead, as `User#new_password=` does.
+
 ## Soft deletion
 
 A model with `deleted_at` is soft-deleted, not destroyed (see CLAUDE.md). New associations to one come in pairs: `has_many :things` scoped `not_deleted`, and `has_many :things_including_deleted` for code that must still resolve historical rows.

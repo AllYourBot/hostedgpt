@@ -18,6 +18,13 @@
             class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
         </div>
       <% end %>
+    <% elsif Feature.password_authentication? %>
+      <div class="my-5">
+        <%= user_fields.label :new_password, t("app.admin.users.form.new_password") %>
+        <%= user_fields.password_field :new_password, autocomplete: "new-password",
+          class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black" %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"><%= t("app.admin.users.form.new_password_note") %></p>
+      </div>
     <% end %>
 
     <div class="my-5">

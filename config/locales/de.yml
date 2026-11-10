@@ -64,6 +64,8 @@ de:
           first_name: "Vorname"
           last_name: "Nachname"
           password: "Passwort"
+          new_password: "Neues Passwort"
+          new_password_note: "Leer lassen, um das aktuelle Passwort beizubehalten."
           admin: "Admin"
           own_admin_note: "Sie können Ihre eigenen Admin-Rechte nicht entfernen."
     settings:

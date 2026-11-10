@@ -100,6 +100,28 @@ class UserTest < ActiveSupport::TestCase
 
   # Tests for creating_google_credential? are in person_test
 
+  test "new_password= CHANGES the existing password credential" do
+    user = users(:rob)
+    assert_no_difference "Credential.count" do
+      user.update!(new_password: "newsecret")
+    end
+    assert user.reload.password_credential.authenticate("newsecret"), "The new password should work"
+  end
+
+  test "new_password= BUILDS a password credential when the user has none" do
+    user = users(:taylor)
+    assert_difference "PasswordCredential.count", 1 do
+      user.update!(new_password: "newsecret")
+    end
+    assert user.reload.password_credential.authenticate("newsecret"), "The new password should work"
+  end
+
+  test "new_password= IGNORES a blank password" do
+    user = users(:rob)
+    user.update!(new_password: "")
+    assert user.reload.password_credential.authenticate("secret"), "The current password should still work"
+  end
+
   # Profile picture tests
   test "has_profile_picture? returns false when no profile picture attached" do
     user = users(:keith)

@@ -67,6 +67,14 @@ class User < ApplicationRecord
     super(value.nil? ? nil : value.to_b)
   end
 
+  # Not via password_credential: that has_one doesn't autosave a changed existing record.
+  def new_password=(password)
+    return if password.blank?
+
+    credential = credentials.find { it.is_a?(PasswordCredential) } || credentials.build(type: "PasswordCredential")
+    credential.password = password
+  end
+
   # Profile picture helper methods
   def has_profile_picture? = profile_picture.attached?
 
