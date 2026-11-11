@@ -54,4 +54,17 @@ class AIBackend::ToolsTest < ActiveSupport::TestCase
 
     assert_equal "sig-123", msg[:content_tool_calls][:thought_signature], "Gemini rejects a replayed call without its signature"
   end
+
+  test "get_tool_messages_by_calling RUNS a connector's tool on its MCP server" do
+    connector = connectors(:github)
+    stub_mcp_server(connector.url, call_result: { content: [{ type: "text", text: "#12 Crash on save" }] })
+    tool_calls = messages(:weather_tool_call).content_tool_calls
+    tool_calls[0][:function][:name] = "connector#{connector.id}_search_issues"
+    tool_calls[0][:function][:arguments] = { query: "crash" }
+
+    msg = Current.set(user: users(:keith)) { AIBackend::RubyLLM.get_tool_messages_by_calling(tool_calls).first }
+
+    assert_equal({ "message_to_user" => "GitHub: search_issues", "result" => "#12 Crash on save" }, JSON.parse(msg[:content]), "The server's answer should be the tool result")
+    assert_requested :post, connector.url, body: hash_including("params" => { "name" => "search_issues", "arguments" => { "query" => "crash" } })
+  end
 end

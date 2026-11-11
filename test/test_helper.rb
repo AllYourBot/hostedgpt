@@ -60,7 +60,7 @@ module ActiveSupport
   class TestCase
     include Turbo::TestAssertions
     include ActiveJob::TestHelper
-    include OptionsHelpers, ViewHelpers, SDKHelpers, ConfigHelpers
+    include OptionsHelpers, ViewHelpers, SDKHelpers, ConfigHelpers, MCPServerHelper
 
     parallelize(workers: :number_of_processors)
     fixtures :all

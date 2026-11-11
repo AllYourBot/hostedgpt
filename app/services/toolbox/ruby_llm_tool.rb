@@ -19,7 +19,7 @@ class Toolbox::RubyLLMTool < ::RubyLLM::Tool
   def parameters_schema = @parameters_schema
 
   def execute(**arguments)
-    Toolbox.call(name, arguments).to_json
+    result_for(arguments).to_json
   rescue => e
     Rails.logger.info "## Handled error calling tools: #{e.message}" unless Rails.env.test?
     Rails.logger.info e.backtrace.join("\n") unless Rails.env.test?
@@ -30,4 +30,8 @@ class Toolbox::RubyLLMTool < ::RubyLLM::Tool
       different query OR let the user know you attempted to retrieve some information but the website is having difficulties at this time.
     STR
   end
+
+  private
+
+  def result_for(arguments) = Toolbox.call(name, arguments)
 end

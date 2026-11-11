@@ -1,0 +1,38 @@
+<%= form_with(model: [:settings, connector], class: "contents") do |form| %>
+  <%= render "layouts/form_errors", record: connector, title: t("app.settings.connectors.form.errors_title", count: connector.errors.count) %>
+
+  <%= labeled_text_field form, :name, t("app.settings.connectors.form.name"), placeholder: t("app.settings.connectors.form.name_placeholder") %>
+
+  <%= labeled_text_field form, :url, t("app.settings.connectors.form.url"), placeholder: "https://example.com/mcp" %>
+
+  <%= labeled_text_field form, :token, t("app.settings.connectors.form.token"),
+    value: nil,
+    autocomplete: "off",
+    placeholder: t("app.settings.connectors.form.#{connector.token_was.present? ? "token_placeholder_set" : "token_placeholder_unset"}") %>
+
+  <% if connector.tools.present? %>
+    <fieldset id="connector-tools" class="my-5">
+      <legend><%= t("app.settings.connectors.form.tools") %></legend>
+      <%= form.collection_check_boxes :enabled_tool_names, connector.tools, ->(tool) { tool["name"] }, ->(tool) { tool["name"] } do |b| %>
+        <div class="my-2">
+          <%= b.check_box %>
+          <%= b.label class: "font-mono" %>
+          <% if (description = b.object["description"]).present? %>
+            <p class="ml-6 text-sm text-gray-600 dark:text-gray-400"><%= description.truncate(200) %></p>
+          <% end %>
+        </div>
+      <% end %>
+    </fieldset>
+  <% end %>
+
+  <%= form.submit t("app.settings.connectors.save"),
+    class: %|
+      inline-block font-bold
+      bg-gray-200 dark:bg-gray-900
+      border border-gray-400
+      rounded-lg py-3 px-5
+      cursor-pointer
+    |,
+    data: { turbo_submits_with: t("app.settings.connectors.saving") }
+  %>
+<% end %>

@@ -49,7 +49,11 @@ class Toolbox < SDK
     end
   end
 
-  def self.ruby_llm_tools = tools.map { Toolbox::RubyLLMTool.new(it) }
+  # The user's connectors add their MCP servers' tools alongside the Toolbox's own.
+  def self.ruby_llm_tools
+    tools.map { Toolbox::RubyLLMTool.new(it) } +
+      Array(Current.user&.connectors).flat_map(&:ruby_llm_tools)
+  end
 
   def self.tools
     if self == Toolbox

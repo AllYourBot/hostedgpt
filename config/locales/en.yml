@@ -250,6 +250,36 @@ en:
           memory: "Memory"
           assistant: "Assistant"
         forget: "Forget"
+      connectors:
+        index_title: "Connectors"
+        menu:
+          index: "Connectors"
+        description: "A connector links your assistants to a remote MCP (Model Context Protocol) server, such as one for GitHub or your calendar. Every assistant whose language model supports tools can use the tools you leave checked."
+        none: "You have no connectors."
+        add_new: "Add New"
+        table:
+          name: "Name"
+          url: "URL"
+          tools: "Tools"
+          tools_enabled: "%{enabled} of %{total}"
+        new_title: "New Connector"
+        editing_title: "Editing %{name}"
+        back: "Back"
+        delete: "Delete"
+        confirm_delete: "Are you sure?"
+        save: "Save"
+        saving: "Connecting..."
+        form:
+          errors_title:
+            one: "%{count} error prohibited this connector from being saved:"
+            other: "%{count} errors prohibited this connector from being saved:"
+          name: "Name"
+          name_placeholder: "e.g. GitHub"
+          url: "MCP server URL"
+          token: "Token"
+          token_placeholder_set: "A token is set. Leave blank to keep it."
+          token_placeholder_unset: "Optional. Sent as a Bearer token if the server needs one."
+          tools: "Tools your assistants can use"
       people:
         menu:
           account: "Your Account"
@@ -521,6 +551,10 @@ en:
         tested: "Tested: %{answer}"
         deleted: "Deleted"
         not_found: "The API Service could not be found"
+      connectors:
+        saved: "Saved"
+        deleted: "Deleted"
+        not_found: "The connector could not be found"
       memories:
         remembered: "Remembered"
         forgotten: "Forgotten"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -121,6 +121,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_collections_on_user_id"
+  end
+
+  create_table "connectors", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "disabled_tool_names", default: [], null: false
+    t.string "name", null: false
+    t.string "token"
+    t.jsonb "tools", default: [], null: false, comment: "The tools the MCP server listed when the connector was last saved"
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_connectors_on_user_id"
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -462,6 +474,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
   add_foreign_key "chats", "users"
   add_foreign_key "clients", "people"
   add_foreign_key "collections", "users"
+  add_foreign_key "connectors", "users"
   add_foreign_key "conversations", "assistants"
   add_foreign_key "conversations", "messages", column: "last_assistant_message_id"
   add_foreign_key "conversations", "users"

@@ -1,0 +1,50 @@
+<h1 class="text-3xl"><%= t("app.settings.connectors.index_title") %></h1>
+
+<p class="pt-3">
+  <%= t("app.settings.connectors.description") %>
+</p>
+
+<% if @connectors.empty? %>
+  <p id="no-connectors" class="my-8">
+    <%= t("app.settings.connectors.none") %>
+  </p>
+<% end %>
+
+<p class="my-8">
+  <%= link_to t("app.settings.connectors.add_new"), new_settings_connector_path,
+    class: %|
+      inline-block font-bold
+      bg-gray-200 dark:bg-gray-900
+      border border-gray-400
+      rounded-lg py-3 px-5
+      cursor-pointer
+    |
+  %>
+</p>
+
+<% if @connectors.present? %>
+  <table id="connectors" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
+    <thead>
+      <tr class="bg-gray-200 dark:bg-gray-900">
+        <th><%= t("app.settings.connectors.table.name") %></th>
+        <th><%= t("app.settings.connectors.table.url") %></th>
+        <th><%= t("app.settings.connectors.table.tools") %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @connectors.each do |connector| %>
+        <tr
+          id="<%= dom_id(connector) %>"
+          class="<%= cycle("bg-gray-100 dark:bg-gray-600", "bg-white dark:bg-gray-900") %> cursor-pointer"
+          data-controller="clickable-row"
+          data-clickable-row-url-value="<%= edit_settings_connector_path(connector) %>"
+        >
+          <td class="underline"><%= connector.name %></td>
+          <td class="break-all"><%= connector.url %></td>
+          <td><%= t("app.settings.connectors.table.tools_enabled", enabled: connector.enabled_tools.size, total: connector.tools.size) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
