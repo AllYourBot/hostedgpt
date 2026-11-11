@@ -221,6 +221,36 @@ de:
           memory: "Erinnerung"
           assistant: "Assistent"
         forget: "Vergessen"
+      connectors:
+        index_title: "Konnektoren"
+        menu:
+          index: "Konnektoren"
+        description: "Ein Konnektor verbindet Ihre Assistenten mit einem entfernten MCP-Server (Model Context Protocol), etwa für GitHub oder Ihren Kalender. Jeder Assistent, dessen Sprachmodell Tools unterstützt, kann die Tools verwenden, die Sie angehakt lassen."
+        none: "Sie haben keine Konnektoren."
+        add_new: "Neu hinzufügen"
+        table:
+          name: "Name"
+          url: "URL"
+          tools: "Tools"
+          tools_enabled: "%{enabled} von %{total}"
+        new_title: "Neuer Konnektor"
+        editing_title: "%{name} bearbeiten"
+        back: "Zurück"
+        delete: "Löschen"
+        confirm_delete: "Sind Sie sicher?"
+        save: "Speichern"
+        saving: "Verbinde..."
+        form:
+          errors_title:
+            one: "%{count} Fehler hat das Speichern dieses Konnektors verhindert:"
+            other: "%{count} Fehler haben das Speichern dieses Konnektors verhindert:"
+          name: "Name"
+          name_placeholder: "z. B. GitHub"
+          url: "MCP-Server-URL"
+          token: "Token"
+          token_placeholder_set: "Ein Token ist gesetzt. Leer lassen, um es zu behalten."
+          token_placeholder_unset: "Optional. Wird als Bearer-Token gesendet, falls der Server eines verlangt."
+          tools: "Tools, die Ihre Assistenten verwenden können"
       people:
         menu:
           account: "Ihr Konto"
@@ -488,6 +518,10 @@ de:
         tested: "Getestet: %{answer}"
         deleted: "Gelöscht"
         not_found: "Der API-Dienst konnte nicht gefunden werden"
+      connectors:
+        saved: "Gespeichert"
+        deleted: "Gelöscht"
+        not_found: "Der Konnektor wurde nicht gefunden"
       memories:
         remembered: "Gemerkt"
         forgotten: "Vergessen"

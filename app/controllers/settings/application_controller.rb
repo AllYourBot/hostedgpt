@@ -31,6 +31,10 @@ class Settings::ApplicationController < ApplicationController
   I18n.t("app.settings.memories.menu.title") => settings_memories_path,
       },
 
+      connectors: {
+  I18n.t("app.settings.connectors.menu.index") => settings_connectors_path,
+      },
+
       language_models: {
   I18n.t("app.settings.language_models.menu.index") => settings_language_models_path,
       },

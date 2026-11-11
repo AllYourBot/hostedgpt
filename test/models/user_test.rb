@@ -45,6 +45,10 @@ class UserTest < ActiveSupport::TestCase
     assert_instance_of Memory, users(:keith).memories.first
   end
 
+  test "has associated connectors" do
+    assert_instance_of Connector, users(:keith).connectors.first
+  end
+
   test "has a last_cancelled_message but can be nil" do
     assert_equal messages(:dont_know_day), users(:keith).last_cancelled_message
     assert_nil users(:rob).last_cancelled_message
@@ -70,7 +74,9 @@ class UserTest < ActiveSupport::TestCase
           assert_difference "Conversation.count", -users(:keith).conversations.count do
             assert_difference "Credential.count", -users(:keith).credentials.count do
               assert_difference "Memory.count", -users(:keith).memories.count do
-                users(:keith).destroy
+                assert_difference "Connector.count", -users(:keith).connectors.count do
+                  users(:keith).destroy
+                end
               end
             end
           end

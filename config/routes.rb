@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     resources :memories, only: [:index, :create, :destroy] do
       delete :destroy, to: "memories#destroy_all", on: :collection
     end
+    resources :connectors, except: [:show]
   end
 
   namespace :admin do

@@ -52,7 +52,7 @@ class Settings::AssistantsControllerTest < ActionDispatch::IntegrationTest
 
   test "settings sidebar has one Assistants entry above the memories" do
     get settings_assistants_url
-    assert_equal ["Your Account", "Assistants", "Assistant Memories", "Language Models", "API Services", "Admin"],
+    assert_equal ["Your Account", "Assistants", "Assistant Memories", "Connectors", "Language Models", "API Services", "Admin"],
       css_select("section#menu a").map { it.text.strip }
     assert_select "section#menu a[href=?]", edit_settings_assistant_path(@assistant), count: 0
   end

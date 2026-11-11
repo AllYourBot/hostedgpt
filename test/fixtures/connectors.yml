@@ -1,0 +1,29 @@
+github:
+  user: keith
+  name: GitHub
+  url: https://mcp.example.com/github
+  token: ghp-secret
+  tools:
+    - name: search_issues
+      description: Search issues and pull requests across repositories
+      inputSchema:
+        type: object
+        properties:
+          query:
+            type: string
+        required:
+          - query
+    - name: create_issue
+      description: Open a new issue in a repository
+      inputSchema:
+        type: object
+        properties:
+          repo:
+            type: string
+          title:
+            type: string
+        required:
+          - repo
+          - title
+  disabled_tool_names:
+    - create_issue

@@ -1,0 +1,7 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <h1 class="text-3xl"><%= t("app.settings.connectors.new_title") %></h1>
+
+  <%= render "form", connector: @connector %>
+
+  <%= link_to t("app.settings.connectors.back"), settings_connectors_path, class: "float-right inline-block ml-5 py-3" %>
+</div>

@@ -8,7 +8,7 @@ You can have multiple users so it is great for a family or group.
 
 You can also switch providers and models in the middle of a conversation, so it is great for comparing different models!
 
-And you can attach your Google email, tasks, and calendar accounts and manipulate them in your conversation. Your assistant can also do web searches itself if you get a free Brave Search API key.
+And you can attach your Google email, tasks, and calendar accounts and manipulate them in your conversation. Your assistant can also do web searches itself if you get a free Brave Search API key, and use the tools of any remote MCP server you add as a connector.
 
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
@@ -39,6 +39,7 @@ This project is led by an experienced rails developer, but we're actively lookin
 - [Configure optional features](#configure-optional-features)
   - [Use local models with Ollama](#using-ollama)
   - [Give assistant access to your Google apps](#configuring-google-tools)
+  - [Connect MCP servers](#connectors)
   - [Admin users](#admin-users)
   - [Authentication](#authentication)
     - [Password authentication](#password-authentication)
@@ -337,6 +338,17 @@ You first need to follow all the steps in the [Google OAuth instructions](#googl
      - https://www.googleapis.com/auth/calendar.events (then click "Add To Table")
 
 2. **Finally, make sure `GOOGLE_TOOLS_FEATURE` is true**
+
+### Connectors
+
+A connector gives your assistants the tools of a remote [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server, such as one for GitHub, Notion or your own services. Each user adds their own under **Settings > Connectors**:
+
+1. Click **Add New**, give the connector a name, and paste the server's URL (for example `https://api.githubcopilot.com/mcp/`). HostedGPT speaks the Streamable HTTP transport.
+2. If the server needs a key, paste it as the token; HostedGPT sends it as `Authorization: Bearer <token>`. Servers that only support an OAuth sign-in flow can't be connected yet.
+3. Click **Save**. HostedGPT connects to the server and lists its tools; if it can't, the error is shown and nothing is saved.
+4. On the connector's page, uncheck any tool you don't want your assistants to use, for example one that sends messages or deletes data.
+
+Every assistant whose language model supports tools can then call the checked tools. Saving a connector again refreshes its list of tools, and a tool the server adds later starts out checked. Keep in mind that the HostedGPT server makes these requests, so a URL like `http://localhost:8000/mcp` points at the machine HostedGPT runs on.
 
 ### Admin users
 

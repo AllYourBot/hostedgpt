@@ -9,6 +9,17 @@ class Toolbox::RubyLLMToolTest < ActiveSupport::TestCase
     assert Toolbox.ruby_llm_tools.all? { it.is_a?(::RubyLLM::Tool) }, "Each tool should be a real RubyLLM::Tool"
   end
 
+  test "ruby_llm_tools ADDS the enabled tools of the current user's connectors" do
+    connector = connectors(:github)
+
+    names = Current.set(user: users(:keith)) { Toolbox.ruby_llm_tools.map(&:name) }
+    assert_includes names, "connector#{connector.id}_search_issues", "Keith's enabled connector tool should be offered"
+    refute_includes names, "connector#{connector.id}_create_issue", "A disabled connector tool should not be offered"
+
+    names = Current.set(user: users(:rob)) { Toolbox.ruby_llm_tools.map(&:name) }
+    refute names.any? { it.start_with?("connector") }, "Another user's connector tools should not be offered"
+  end
+
   test "call RUNS the Toolbox method and returns its result as JSON" do
     assert_equal "\"Hello, World!\"", hello_tool.call(name: "World"), "The Toolbox method should run with mapped parameters"
   end
