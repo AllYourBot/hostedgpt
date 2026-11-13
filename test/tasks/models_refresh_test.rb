@@ -194,6 +194,30 @@ class ModelsRefreshTest < ActiveSupport::TestCase
     refute users(:keith).language_models_including_deleted.exists?(api_name: "unwritten-model")
   end
 
+  test "models:refresh saves the refreshed RubyLLM registry to its JSON file" do
+    published = RubyLLM::Models::Registry::PublishedSource::Result.new(
+      [registry_model("published-model", "Published model", "openai", input: %w[text])], nil, false
+    )
+    no_provider_models = { models: [], fetched_providers: [], configured_names: [], failed: [], empty: [] }
+
+    Dir.mktmpdir do |dir|
+      registry_file = File.join(dir, "models.json")
+      RubyLLM.config.stub :model_registry_file, registry_file do
+        RubyLLM::Models.stub :fetch_published_registry, published do
+          RubyLLM::Models.stub :fetch_provider_models, no_provider_models do
+            RubyLLM.stub :models, RubyLLM::Models.new([]) do
+              assert_output(/Added/, //) { invoke_refresh_task }
+            end
+          end
+        end
+      end
+
+      assert_includes File.read(registry_file), "published-model", "The refreshed registry should be saved to RubyLLM's JSON file"
+    end
+    assert users(:keith).language_models.exists?(api_service: api_services(:keith_openai_service), api_name: "published-model"),
+      "The published model should be added"
+  end
+
   test "models:refresh leaves the database unchanged when the registry is empty" do
     registry = RubyLLM::Models.new([])
 

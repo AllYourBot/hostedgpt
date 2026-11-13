@@ -35,10 +35,25 @@ class Admin::APIServicesController < Admin::ApplicationController
     redirect_to admin_api_services_path, notice: I18n.t("app.flashes.admin.api_services.deleted"), status: :see_other
   end
 
+  def sync_models
+    result = LanguageModel::RefreshFromRubyLLM.new.call
+    redirect_to admin_api_services_path, notice: models_synced_notice(result), status: :see_other
+  rescue RubyLLM::ModelRegistryError => e
+    redirect_to admin_api_services_path, alert: I18n.t("app.flashes.admin.api_services.sync_failed", error: e.message), status: :see_other
+  end
+
   private
 
   def set_api_service
     @api_service = APIService.not_deleted.find(params[:id])
+  end
+
+  def models_synced_notice(result)
+    notice = I18n.t("app.flashes.admin.api_services.models_synced", count: result.added_count)
+    return notice if result.missing_provider_identities.empty?
+
+    providers = result.missing_provider_identities.map { AIBackend::Policy.for_identity(it).display_name }
+    "#{notice} #{I18n.t("app.flashes.admin.api_services.no_registry_models", providers: providers.join(", "))}"
   end
 
   # Admins never see another user's key, so a blank key field means "keep the current one".

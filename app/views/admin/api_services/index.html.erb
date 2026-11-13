@@ -1,4 +1,18 @@
 <%= render layout: "admin/page", locals: { title: t("app.admin.api_services.index.title"), add_new_path: new_admin_api_service_path, wide: true } do %>
   <%= render "admin/table", id: "api-services", row_partial: "admin/api_services/api_service", rows: @api_services,
     headers: %w[owner name service_type driver url token].map { t("app.admin.api_services.index.#{it}") } %>
+
+  <section id="sync-models" class="mt-8">
+    <p class="mb-3"><%= t("app.admin.api_services.index.sync_models_note") %></p>
+    <%= button_to t("app.admin.api_services.index.sync_models"), sync_models_admin_api_services_path,
+      data: { turbo_submits_with: t("app.admin.api_services.index.syncing_models") },
+      class: %|
+        font-bold
+        bg-gray-200 dark:bg-gray-900
+        border border-gray-400
+        rounded-lg py-3 px-5
+        cursor-pointer
+      |
+    %>
+  </section>
 <% end %>

@@ -10,3 +10,7 @@ RubyLLM.configure do |config|
   config.logger = Rails.logger
   config.request_timeout = Rails.env.production? ? 120 : 30
 end
+
+# RubyLLM's Rails integration saves its model registry to a ruby_llm_models table, which
+# HostedGPT doesn't have, so RubyLLM.models.refresh keeps it in RubyLLM's JSON cache file instead.
+ActiveSupport.on_load(:active_record) { RubyLLM.config.model_registry_store = nil }

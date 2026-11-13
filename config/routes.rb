@@ -37,7 +37,9 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :users, except: :show
-    resources :api_services, except: :show
+    resources :api_services, except: :show do
+      post :sync_models, on: :collection
+    end
   end
 
   get "/login", to: "authentications#new"

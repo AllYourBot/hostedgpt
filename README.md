@@ -302,7 +302,7 @@ There are a number of optional feature flags that can be set and settings that c
   - `DEFAULT_OPENROUTER_KEY` will be used by the pre-configured OpenRouter API Service
 - `BRAVE_API_KEY` will be used as the default Brave Search API key for tool based web searches
 - Edit `models.yml` to modify which Language Models are automatically created for new users upon signing up. Any changes to this file will be applied to existing users when `rails models:import` is run, or when `rails db:prepare` is run, or when the server is restarted. If you ever need to export your list of models you can do `rails models:export[tmp/models.json]`.
-- Run `rails models:refresh` to add missing chat models from RubyLLM for the five pre-configured chat providers. The task warns when a provider has no registry models, including Groq with RubyLLM 1.16. Custom API service URLs and Brave Search are skipped. Existing and soft-deleted models stay unchanged, and `models.yml` remains the signup-default source.
+- Run `rails models:refresh` to add missing chat models from RubyLLM for the five pre-configured chat providers. The task warns when a provider has no registry models, including Groq with RubyLLM 1.16. Custom API service URLs and Brave Search are skipped. Existing and soft-deleted models stay unchanged, and `models.yml` remains the signup-default source. Admins can also run it from the app (see [Admin users](#admin-users)).
 - `CLOUDFLARE_STORAGE_FEATURE` is `false` by default so any files that are uploaded while chatting with your assistant will be stored in postgres. This is recommended for small deployments. Set this to `true` if you would like to store message attachments in Cloudflare's R2 storage (this mimics AWS S3). You must also sign up for Cloudflare. The free tier allows 10 GB of storage. After you sign up, you need to create a new bucket and an API token. The API token should have "Object Read and Write" access to your bucket. Take note of your Access Key ID and your Secret Access Key along with your Account ID. Set the following environment variables:
   - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare Account ID
   - `CLOUDFLARE_ACCESS_KEY_ID` - Your Cloudflare Access Key ID
@@ -353,6 +353,8 @@ Every assistant whose language model supports tools can then call the checked to
 ### Admin users
 
 Admins see an **Admin** item in the Settings sidebar. It opens pages listing every user and every user's API services, where an admin can create, edit and delete them. Deleting a user permanently removes their account along with their conversations, assistants and API services. API keys are never shown on these pages: an admin can set a new key, and leaving the key field blank keeps the current one.
+
+The API Services page also has a **Sync models with RubyLLM** button. It does what `rails models:refresh` does: it adds the chat models in RubyLLM's model registry that are missing from every user's OpenAI, Anthropic, Gemini, OpenRouter and Groq API services, and says how many it added. Models a user already has or has deleted are left alone, and API services with a custom URL are skipped.
 
 The first user created on a fresh install becomes an admin automatically. After that, an admin can make another user an admin by checking **Admin** on that user's edit page.
 
