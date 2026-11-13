@@ -1,16 +1,35 @@
 <h1 class="text-3xl"><%= t("app.settings.language_models.index_title") %></h1>
 
-<p class="my-8">
-  <%= link_to t("app.settings.language_models.add_new"), new_settings_language_model_path,
-    class: %|
-      inline-block font-bold
-      bg-gray-200 dark:bg-gray-900
-      border border-gray-400
-      rounded-lg py-3 px-5
-      cursor-pointer
-    |
-  %>
-</p>
+<div class="my-8 flex flex-wrap items-center gap-6">
+  <p>
+    <%= link_to t("app.settings.language_models.add_new"), new_settings_language_model_path,
+      class: %|
+        inline-block font-bold
+        bg-gray-200 dark:bg-gray-900
+        border border-gray-400
+        rounded-lg py-3 px-5
+        cursor-pointer
+      |
+    %>
+  </p>
+
+  <%= form_with url: settings_language_models_path, method: :get, id: "language-models-filter",
+    class: "flex items-center gap-3",
+    data: { controller: "form", turbo_action: "replace" } do |form| %>
+    <%= form.label :api_service_id, t("app.settings.language_models.filter.api_service") %>
+    <%= form.select :api_service_id,
+      Current.user.api_services.ordered.pluck(:name, :id),
+      { include_blank: t("app.settings.language_models.filter.all"), selected: params[:api_service_id] },
+      data: { action: "change->form#submit" },
+      class: %|
+        border border-gray-200 outline-none
+        shadow rounded-md
+        px-3 py-2
+        dark:text-black
+      |
+    %>
+  <% end %>
+</div>
 
 <table id="language-models" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
   <thead>

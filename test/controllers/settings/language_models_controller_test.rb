@@ -12,6 +12,29 @@ class Settings::LanguageModelsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "table#language-models tbody tr", count: @user.language_models.count
     assert_select "p a", "Add New"
+    names = css_select("table#language-models tbody tr td:first-child").map { it.text.strip }
+    assert_equal "camel", names.first, "Language models should be listed alphabetically by api name"
+    assert_equal "qwen3:8b", names.last, "Language models should be listed alphabetically by api name"
+  end
+
+  test "index should filter by api service when it IS THE USER'S" do
+    api_service = api_services(:keith_anthropic_service)
+
+    get settings_language_models_url(api_service_id: api_service.id)
+
+    assert_response :success
+    assert_select "table#language-models tbody tr", { count: api_service.language_models.count },
+      "Only the models of the chosen api service should be listed"
+    assert_select "#language-models-filter select option[selected][value=?]", api_service.id.to_s, true,
+      "The chosen api service should stay selected in the filter"
+  end
+
+  test "index should ignore the api service filter when it IS ANOTHER USER'S" do
+    get settings_language_models_url(api_service_id: api_services(:rob_openai_service).id)
+
+    assert_response :success
+    assert_select "table#language-models tbody tr", { count: @user.language_models.count },
+      "Every one of the user's models should be listed"
   end
 
   test "should get new" do

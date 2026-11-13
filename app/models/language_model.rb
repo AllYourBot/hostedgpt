@@ -34,6 +34,7 @@ class LanguageModel < ApplicationRecord
   before_save :soft_delete_assistants, if: -> { has_attribute?(:deleted_at) && deleted_at && deleted_at_changed? && deleted_at_was.nil? }
 
   scope :ordered, -> { order(:position) }
+  scope :alphabetical, -> { order(:api_name) }
   scope :for_user, ->(user) { where(user_id: user.id).not_deleted }
 
   delegate :ai_backend, to: :api_service

@@ -125,6 +125,12 @@ class LanguageModelTest < ActiveSupport::TestCase
     assert list.include?("alpaca:medium")
   end
 
+  test "alphabetical scope" do
+    list = LanguageModel.for_user(users(:keith)).alphabetical.pluck(:api_name)
+    assert_equal "camel", list.first, "The alphabetically first api_name should come first, not position 0"
+    assert_equal "qwen3:8b", list.last, "The alphabetically last api_name should come last"
+  end
+
   private
 
   def create_params
