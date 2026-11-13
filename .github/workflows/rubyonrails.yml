@@ -27,6 +27,11 @@ jobs:
           --health-retries 5
     env:
       RAILS_ENV: test
+      HOSTED_DB_USERNAME: rails
+      HOSTED_DB_PASSWORD: password
+      HOSTED_DB_HOST: localhost
+      HOSTED_DB_PORT: 5432
+      HOSTED_DB_NAME: hostedgpt
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
       APP_URL_PROTOCOL: "http"
       APP_URL_HOST: "localhost"
@@ -111,6 +116,11 @@ jobs:
           --health-retries 5
     env:
       RAILS_ENV: test
+      HOSTED_DB_USERNAME: rails
+      HOSTED_DB_PASSWORD: password
+      HOSTED_DB_HOST: localhost
+      HOSTED_DB_PORT: 5432
+      HOSTED_DB_NAME: hostedgpt
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
       APP_URL_PROTOCOL: "http"
       APP_URL_HOST: "localhost"
