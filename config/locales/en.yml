@@ -54,6 +54,9 @@ en:
           url: "URL"
           token: "Key"
           token_set: "Set"
+          sync_models: "Sync models with RubyLLM"
+          syncing_models: "Syncing models..."
+          sync_models_note: "Adds the chat models in RubyLLM's model registry that are missing from every user's API services. Models a user already has or has deleted are left as they are, and API services with a custom URL are skipped."
         new:
           title: "New API Service"
         edit:
@@ -524,6 +527,12 @@ en:
           created: "API service created"
           saved: "API service saved"
           deleted: "API service deleted"
+          models_synced:
+            zero: "Every language model in RubyLLM's registry is already added."
+            one: "Added %{count} language model from RubyLLM's registry."
+            other: "Added %{count} language models from RubyLLM's registry."
+          no_registry_models: "RubyLLM's registry has no chat models for %{providers}."
+          sync_failed: "Couldn't sync the models: %{error}"
       auth:
         invalid_login: "Invalid email or password"
         registration_disabled: "Registration is disabled"

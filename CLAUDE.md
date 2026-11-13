@@ -22,6 +22,7 @@ HostedGPT is a Ruby on Rails 8.1 app providing a multi-provider conversational A
 - Re-import after editing `models.yml`: `rails models:import` (also runs automatically on `db:prepare` / server restart).
 - Export current models: `rails models:export[tmp/models.json]`.
 - Similar `rails assistants:import` / `assistants:export[path]` tasks exist for `assistants.yml`.
+- `rails models:refresh` and the admin **Sync models with RubyLLM** button (Admin > API Services) both run `LanguageModel::RefreshFromRubyLLM`, which adds the chat models in RubyLLM's registry that the canonical provider services are missing. RubyLLM keeps that registry in its JSON cache file: `config/initializers/ruby_llm.rb` clears the `ruby_llm_models` table store its Rails integration would set.
 
 ### Linting
 - RuboCop is configured (`.rubocop.yml`, parser target Ruby 3.4 while the app runs Ruby 4.0, Rails cops enabled).

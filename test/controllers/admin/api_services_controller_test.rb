@@ -165,4 +165,90 @@ class Admin::APIServicesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_nil api_services(:keith_openai_service).reload.deleted_at, "The API service should be untouched"
   end
+
+  test "should show a sync models button on index" do
+    login_as @admin
+    get admin_api_services_url
+    assert_select "#sync-models form[action=?][method=post] button", sync_models_admin_api_services_path, 1, "There should be a sync models button"
+  end
+
+  test "should sync models from RubyLLM for every user's canonical api services" do
+    login_as @admin
+    openai_services = APIService.not_deleted.where(url: APIService::URL_OPEN_AI)
+    registry = RubyLLM::Models.new([
+      registry_model("synced-model", "Synced model", "openai"),
+      registry_model("synced-model", "Synced model", "anthropic"),
+      registry_model("synced-model", "Synced model", "gemini"),
+      registry_model("synced-model", "Synced model", "openrouter")
+    ])
+
+    with_registry(registry) do
+      post sync_models_admin_api_services_url
+    end
+
+    assert_redirected_to admin_api_services_url
+    added = LanguageModel.where(api_name: "synced-model")
+    assert added.any?, "Models should be added"
+    openai_services.each do |service|
+      assert added.exists?(user: service.user, api_service: service), "#{service.user.first_name}'s OpenAI service should get the model"
+    end
+    refute added.exists?(api_service: api_services(:rob_other_service)), "A custom URL service should be skipped"
+    assert_equal "Added #{added.count} language models from RubyLLM's registry. RubyLLM's registry has no chat models for Groq.",
+      flash[:notice], "The notice should say how many models were added and which providers had none"
+  end
+
+  test "should say every model IS ALREADY ADDED when a sync adds nothing" do
+    login_as @admin
+    registry = RubyLLM::Models.new([registry_model("synced-model", "Synced model", "openai")])
+
+    with_registry(registry) do
+      post sync_models_admin_api_services_url
+      assert_no_difference "LanguageModel.count" do
+        post sync_models_admin_api_services_url
+      end
+    end
+
+    assert_redirected_to admin_api_services_url
+    assert_match "Every language model in RubyLLM's registry is already added.", flash[:notice], "The notice should say nothing was missing"
+  end
+
+  test "should show an alert and add nothing when the RubyLLM registry CANNOT BE REACHED" do
+    login_as @admin
+    registry = RubyLLM::Models.new([registry_model("unsynced-model", "Unsynced model", "openai")])
+    refresh = -> { raise RubyLLM::ModelRegistryError, "Could not refresh the model registry" }
+
+    with_registry(registry, refresh:) do
+      assert_no_difference "LanguageModel.count" do
+        post sync_models_admin_api_services_url
+      end
+    end
+
+    assert_redirected_to admin_api_services_url
+    assert_equal "Couldn't sync the models: Could not refresh the model registry", flash[:alert], "The error should be shown"
+    assert_nil flash[:notice], "There should be no notice"
+  end
+
+  test "should return not found for sync models when user IS NOT an admin" do
+    login_as users(:rob)
+    registry = RubyLLM::Models.new([registry_model("synced-model", "Synced model", "openai")])
+
+    with_registry(registry) do
+      post sync_models_admin_api_services_url
+    end
+
+    assert_response :not_found
+    refute LanguageModel.exists?(api_name: "synced-model"), "No models should be added"
+  end
+
+  private
+
+  def registry_model(id, name, provider)
+    RubyLLM::Model.new(id:, name:, provider:, modalities: { input: ["text"], output: ["text"] })
+  end
+
+  def with_registry(registry, refresh: -> {}, &block)
+    RubyLLM.stub :models, registry do
+      registry.stub :refresh, refresh, &block
+    end
+  end
 end

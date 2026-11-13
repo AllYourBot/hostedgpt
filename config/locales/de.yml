@@ -25,6 +25,9 @@ de:
           url: "URL"
           token: "Schlüssel"
           token_set: "Gesetzt"
+          sync_models: "Modelle mit RubyLLM synchronisieren"
+          syncing_models: "Modelle werden synchronisiert..."
+          sync_models_note: "Fügt die Chat-Modelle aus der Modellliste von RubyLLM hinzu, die in den API-Diensten der Benutzer fehlen. Modelle, die ein Benutzer bereits hat oder gelöscht hat, bleiben unverändert, und API-Dienste mit einer eigenen URL werden übersprungen."
         new:
           title: "Neuer API-Dienst"
         edit:
@@ -491,6 +494,12 @@ de:
           created: "API-Dienst erstellt"
           saved: "API-Dienst gespeichert"
           deleted: "API-Dienst gelöscht"
+          models_synced:
+            zero: "Alle Sprachmodelle aus der Modellliste von RubyLLM sind bereits hinzugefügt."
+            one: "%{count} Sprachmodell aus der Modellliste von RubyLLM hinzugefügt."
+            other: "%{count} Sprachmodelle aus der Modellliste von RubyLLM hinzugefügt."
+          no_registry_models: "Die Modellliste von RubyLLM enthält keine Chat-Modelle für %{providers}."
+          sync_failed: "Die Modelle konnten nicht synchronisiert werden: %{error}"
       auth:
         invalid_login: "Ungültige E-Mail oder Passwort"
         registration_disabled: "Registrierung ist deaktiviert"
