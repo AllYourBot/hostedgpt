@@ -44,11 +44,12 @@ jobs:
 
       - name: Install ImageMagick
         run: |
-          sudo apt-get update && sudo apt-get install -y imagemagick
-          policy_file="$(find /etc -type f -path '/etc/ImageMagick-*/policy.xml' -print -quit)"
-          if [ -z "$policy_file" ]; then
-            echo "ImageMagick policy.xml not found under /etc/ImageMagick-*"
-            find /etc -name policy.xml -print
+          shopt -s nullglob
+          policy_files=(/etc/ImageMagick-*/policy.xml)
+
+          if ((${#policy_files[@]} == 0)); then
+            echo "ImageMagick policy.xml not found"
+            sudo find /etc -name policy.xml -print 2>/dev/null || true
             exit 1
           fi
           sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' "$policy_file"
@@ -153,6 +154,14 @@ jobs:
 
       - name: Install ImageMagick
         run: |
+          shopt -s nullglob
+          policy_files=(/etc/ImageMagick-*/policy.xml)
+
+          if ((${#policy_files[@]} == 0)); then
+            echo "ImageMagick policy.xml not found"
+            sudo find /etc -name policy.xml -print 2>/dev/null || true
+            exit 1
+          fi
           sudo apt-get update && sudo apt-get install -y imagemagick
           sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
           sudo sed -i 's/<policy domain="coder" rights="none" pattern="PS" \/>/<policy domain="coder" rights="read|write" pattern="PS" \/>/' /etc/ImageMagick-6/policy.xml
