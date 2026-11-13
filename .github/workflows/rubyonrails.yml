@@ -21,29 +21,46 @@ jobs:
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd="pg_isready -U rails -d hostedgpt_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     env:
       RAILS_ENV: test
+      HOSTED_DB_USERNAME: rails
+      HOSTED_DB_PASSWORD: password
+      HOSTED_DB_HOST: localhost
+      HOSTED_DB_PORT: 5432
+      HOSTED_DB_NAME: hostedgpt
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
       APP_URL_PROTOCOL: "http"
       APP_URL_HOST: "localhost"
       APP_URL_PORT: "3000"
+      PGUSER: rails
+      PGPASSWORD: password
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install ImageMagick
         run: |
-          sudo apt-get update && sudo apt-get install -y imagemagick
-          sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PS" \/>/<policy domain="coder" rights="read|write" pattern="PS" \/>/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="coder" rights="none" pattern="EPS" \/>/<policy domain="coder" rights="read|write" pattern="EPS" \/>/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="coder" rights="none" pattern="XPS" \/>/<policy domain="coder" rights="read|write" pattern="XPS" \/>/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="path" rights="none" pattern="@\*" \/>/<policy domain="path" rights="read|write" pattern="@\*" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
+          policy_file=$(find /etc -path '*/ImageMagick*/policy.xml' -print -quit 2>/dev/null || true)
+
+          if [ -z "$policy_file" ]; then
+            echo "ImageMagick policy.xml not found"
+            find /etc -name policy.xml -print 2>/dev/null || true
+            exit 1
+          fi
+
+          sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' "$policy_file"
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PS" \/>/<policy domain="coder" rights="read|write" pattern="PS" \/>/' "$policy_file"
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="EPS" \/>/<policy domain="coder" rights="read|write" pattern="EPS" \/>/' "$policy_file"
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' "$policy_file"
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="XPS" \/>/<policy domain="coder" rights="read|write" pattern="XPS" \/>/' "$policy_file"
+          sudo sed -i 's/<policy domain="path" rights="none" pattern="@\*" \/>/<policy domain="path" rights="read|write" pattern="@\*" \/>/' "$policy_file"
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -99,17 +116,24 @@ jobs:
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd="pg_isready -U rails -d hostedgpt_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     env:
       RAILS_ENV: test
+      HOSTED_DB_USERNAME: rails
+      HOSTED_DB_PASSWORD: password
+      HOSTED_DB_HOST: localhost
+      HOSTED_DB_PORT: 5432
+      HOSTED_DB_NAME: hostedgpt
       DATABASE_URL: "postgres://rails:password@localhost:5432/hostedgpt_test"
       APP_URL_PROTOCOL: "http"
       APP_URL_HOST: "localhost"
       APP_URL_PORT: "3000"
       DISPLAY: "=:99"
+      PGUSER: rails
+      PGPASSWORD: password
 
     steps:
       - name: Setup Chrome
@@ -133,13 +157,23 @@ jobs:
 
       - name: Install ImageMagick
         run: |
-          sudo apt-get update && sudo apt-get install -y imagemagick
-          sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PS" \/>/<policy domain="coder" rights="read|write" pattern="PS" \/>/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="coder" rights="none" pattern="EPS" \/>/<policy domain="coder" rights="read|write" pattern="EPS" \/>/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="coder" rights="none" pattern="XPS" \/>/<policy domain="coder" rights="read|write" pattern="XPS" \/>/' /etc/ImageMagick-6/policy.xml
-          sudo sed -i 's/<policy domain="path" rights="none" pattern="@\*" \/>/<policy domain="path" rights="read|write" pattern="@\*" \/>/' /etc/ImageMagick-6/policy.xml
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
+          policy_file=$(find /etc -path '*/ImageMagick*/policy.xml' -print -quit 2>/dev/null || true)
+
+          if [ -z "$policy_file" ]; then
+            echo "ImageMagick policy.xml not found"
+            find /etc -name policy.xml -print 2>/dev/null || true
+            exit 1
+          fi
+
+          sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' "$policy_file"
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PS" \/>/<policy domain="coder" rights="read|write" pattern="PS" \/>/' "$policy_file"
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="EPS" \/>/<policy domain="coder" rights="read|write" pattern="EPS" \/>/' "$policy_file"
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' "$policy_file"
+          sudo sed -i 's/<policy domain="coder" rights="none" pattern="XPS" \/>/<policy domain="coder" rights="read|write" pattern="XPS" \/>/' "$policy_file"
+          sudo sed -i 's/<policy domain="path" rights="none" pattern="@\*" \/>/<policy domain="path" rights="read|write" pattern="@\*" \/>/' "$policy_file"
 
       - name: Set up database schema
         run: bin/rails db:prepare
