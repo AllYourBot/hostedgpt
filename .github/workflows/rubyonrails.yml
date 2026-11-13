@@ -156,8 +156,6 @@ jobs:
           bundler-cache: true
 
       - name: Install ImageMagick
-
-      - name: Install ImageMagick
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
