@@ -3,7 +3,9 @@ class Settings::LanguageModelsController < Settings::ApplicationController
   before_action :set_system_language_model, only: [:show]
 
   def index
-    @language_models = LanguageModel.for_user(Current.user).ordered
+    @language_models = LanguageModel.for_user(Current.user).alphabetical
+    api_service = Current.user.api_services.find_by(id: params[:api_service_id])
+    @language_models = @language_models.where(api_service:) if api_service
   end
 
   def edit

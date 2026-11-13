@@ -210,6 +210,9 @@ en:
         delete: "Delete"
         confirm_delete: "Are you sure?"
         back: "Back"
+        filter:
+          api_service: "API Service"
+          all: "All"
         table:
           name: "API Name"
           description: "Description"
