@@ -36,6 +36,8 @@ jobs:
       APP_URL_PROTOCOL: "http"
       APP_URL_HOST: "localhost"
       APP_URL_PORT: "3000"
+      PGUSER: rails
+      PGPASSWORD: password
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -126,6 +128,8 @@ jobs:
       APP_URL_HOST: "localhost"
       APP_URL_PORT: "3000"
       DISPLAY: "=:99"
+      PGUSER: rails
+      PGPASSWORD: password
 
     steps:
       - name: Setup Chrome
