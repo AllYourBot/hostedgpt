@@ -5,6 +5,8 @@ class AIBackend::RubyLLM < AIBackend
   class ConfigurationError < AIBackend::ConfigurationError; end
 
   IMAGE_MODEL = "gpt-image-2.5-flare"
+  GEMINI_IMAGE_MODEL = "gemini-3.1-flash-image"
+  IMAGE_PROVIDER_NAMES = { openai: "OpenAI", gemini: "Gemini" }.freeze
   SPEECH_MODEL = "tts-1"
   SPEECH_VOICE = "nova"
   GEMINI_SPEECH_MODEL = "gemini-3.8-flash-tts"
@@ -115,30 +117,26 @@ class AIBackend::RubyLLM < AIBackend
     provider_for_url(url)
   end
 
-  # Always paints through the user's OpenAI service, even for an Anthropic or Gemini assistant.
+  # Paints through the user's OpenAI service, or their Gemini service when they
+  # have no OpenAI key, whatever provider the assistant itself uses.
   def self.generate_image(prompt:, user:)
-    token = canonical_openai_token(user)
+    if (token = canonical_openai_token(user)).present?
+      paint(prompt, provider: :openai, token:, model: IMAGE_MODEL, provider_options: { quality: "high" })
+    elsif (token = canonical_gemini_token(user)).present?
+      paint(prompt, provider: :gemini, token:, model: GEMINI_IMAGE_MODEL)
+    else
+      # Context-free on purpose: Toolbox::Image#generate_with_error_context appends which assistant asked.
+      raise "OpenAI or Gemini API key not found. Image generation requires an OpenAI or Gemini API key. Please configure one in Settings > API Services"
+    end
+  end
 
-    # Context-free on purpose: Toolbox::Image#generate_with_error_context appends which assistant asked.
-    raise "OpenAI API key not found. Image generation requires an OpenAI API key. Please configure your OpenAI API key in Settings > API Services" if token.blank?
-
-    context = client.context { it.openai_api_key = token }
-    image = begin
-      context.paint(
-        prompt,
-        model: IMAGE_MODEL,
-        provider: :openai,
-        assume_model_exists: true,
-        size: "1024x1024",
-        provider_options: { quality: "high" },
-      )
-    rescue *CONFIGURATION_ERRORS => e
-      raise mapped_error(e, model: IMAGE_MODEL, as: ConfigurationError)
-    rescue *RATE_LIMIT_ERRORS => e
-      raise mapped_error(e, model: IMAGE_MODEL, as: ::Faraday::TooManyRequestsError)
+  def self.paint(prompt, provider:, token:, model:, **options)
+    context = client.context { it.public_send("#{provider}_api_key=", token) }
+    image = with_mapped_errors(model:) do # a Gemini reply with text but no image is a plain RubyLLM::Error
+      context.paint(prompt, model:, provider:, assume_model_exists: true, size: "1024x1024", **options)
     end
 
-    { b64_json: image.data, model: IMAGE_MODEL, provider: "OpenAI" }
+    { b64_json: image.data, model:, provider: IMAGE_PROVIDER_NAMES.fetch(provider) }
   end
 
   def self.generate_speech(text:, user:)
@@ -154,10 +152,17 @@ class AIBackend::RubyLLM < AIBackend
 
   def self.speak(text, provider:, token:, model:, **options)
     context = client.context { it.public_send("#{provider}_api_key=", token) }
-    context.speak(text, model:, provider:, assume_model_exists: true, **options).to_blob
-  rescue ::RubyLLM::BadRequestError => e # ahead of CONFIGURATION_ERRORS, which also holds it
-    gemini_rejected_key = e.message.match?(/api key/i)
-    raise mapped_error(e, model:, as: gemini_rejected_key ? ConfigurationError : ::Faraday::BadRequestError)
+    with_mapped_errors(model:) do
+      context.speak(text, model:, provider:, assume_model_exists: true, **options).to_blob
+    rescue ::RubyLLM::BadRequestError => e # ahead of CONFIGURATION_ERRORS, which also holds it
+      gemini_rejected_key = e.message.match?(/api key/i)
+      raise mapped_error(e, model:, as: gemini_rejected_key ? ConfigurationError : ::Faraday::BadRequestError)
+    end
+  end
+
+  # Maps a RubyLLM media call's failures (paint, speak) onto the backend error contract, naming the model.
+  def self.with_mapped_errors(model:)
+    yield
   rescue *CONFIGURATION_ERRORS => e
     raise mapped_error(e, model:, as: ConfigurationError)
   rescue *RATE_LIMIT_ERRORS => e
