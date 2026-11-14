@@ -183,7 +183,7 @@ module TestClient
       def paint(prompt, **kwargs)
         raise self.class.paint_error_to_raise if self.class.paint_error_to_raise
 
-        self.class.last_paint_call = { prompt: prompt, kwargs: kwargs, openai_api_key: openai_api_key }
+        self.class.last_paint_call = { prompt: prompt, kwargs: kwargs, openai_api_key: openai_api_key, gemini_api_key: gemini_api_key }
         OpenStruct.new(data: self.class.image_data, url: self.class.image_url, mime_type: "image/png")
       end
 

@@ -54,7 +54,7 @@ class Toolbox::ImageTest < ActiveSupport::TestCase
     Current.set(user: users(:keith), message: messages(:image_generation_tool_call)) do
       error = assert_raises(RuntimeError) { @tool.generate_an_image(image_generation_prompt_s: @prompt) }
       expected_backend = messages(:image_generation_tool_call).assistant.language_model.api_service.name
-      assert_includes error.message, "OpenAI API key not found"
+      assert_includes error.message, "OpenAI or Gemini API key not found"
       assert_includes error.message, "to use image generation with #{expected_backend}."
     end
   end

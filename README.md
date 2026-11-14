@@ -10,6 +10,8 @@ You can also switch providers and models in the middle of a conversation, so it 
 
 And you can attach your Google email, tasks, and calendar accounts and manipulate them in your conversation. Your assistant can also do web searches itself if you get a free Brave Search API key, and use the tools of any remote MCP server you add as a connector.
 
+Any assistant whose model supports tools can generate images for you. It uses your OpenAI API key, or your Google Gemini API key if you haven't added an OpenAI one.
+
 This project is led by an experienced rails developer, but we're actively looking for contributors to help!
 
 ## Top features of HostedGPT
