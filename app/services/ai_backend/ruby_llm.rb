@@ -132,15 +132,11 @@ class AIBackend::RubyLLM < AIBackend
 
   def self.paint(prompt, provider:, token:, model:, **options)
     context = client.context { it.public_send("#{provider}_api_key=", token) }
-    image = context.paint(prompt, model:, provider:, assume_model_exists: true, size: "1024x1024", **options)
+    image = with_mapped_errors(model:) do # a Gemini reply with text but no image is a plain RubyLLM::Error
+      context.paint(prompt, model:, provider:, assume_model_exists: true, size: "1024x1024", **options)
+    end
 
     { b64_json: image.data, model:, provider: IMAGE_PROVIDER_NAMES.fetch(provider) }
-  rescue *CONFIGURATION_ERRORS => e
-    raise mapped_error(e, model:, as: ConfigurationError)
-  rescue *RATE_LIMIT_ERRORS => e
-    raise mapped_error(e, model:, as: ::Faraday::TooManyRequestsError)
-  rescue ::RubyLLM::Error => e # e.g. a Gemini reply with text but no image
-    raise mapped_error(e, model:, as: ::Faraday::ServerError)
   end
 
   def self.generate_speech(text:, user:)
@@ -156,10 +152,17 @@ class AIBackend::RubyLLM < AIBackend
 
   def self.speak(text, provider:, token:, model:, **options)
     context = client.context { it.public_send("#{provider}_api_key=", token) }
-    context.speak(text, model:, provider:, assume_model_exists: true, **options).to_blob
-  rescue ::RubyLLM::BadRequestError => e # ahead of CONFIGURATION_ERRORS, which also holds it
-    gemini_rejected_key = e.message.match?(/api key/i)
-    raise mapped_error(e, model:, as: gemini_rejected_key ? ConfigurationError : ::Faraday::BadRequestError)
+    with_mapped_errors(model:) do
+      context.speak(text, model:, provider:, assume_model_exists: true, **options).to_blob
+    rescue ::RubyLLM::BadRequestError => e # ahead of CONFIGURATION_ERRORS, which also holds it
+      gemini_rejected_key = e.message.match?(/api key/i)
+      raise mapped_error(e, model:, as: gemini_rejected_key ? ConfigurationError : ::Faraday::BadRequestError)
+    end
+  end
+
+  # Maps a RubyLLM media call's failures (paint, speak) onto the backend error contract, naming the model.
+  def self.with_mapped_errors(model:)
+    yield
   rescue *CONFIGURATION_ERRORS => e
     raise mapped_error(e, model:, as: ConfigurationError)
   rescue *RATE_LIMIT_ERRORS => e
