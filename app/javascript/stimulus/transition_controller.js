@@ -90,4 +90,9 @@ export default class extends Controller {
     if (!this.onValue) return
     this.toggleClass()
   }
+
+  toggleClassOnWhenFrameLoads(event) {
+    if (event.target.id != event.params.frame) return
+    this.toggleClassOn()
+  }
 }

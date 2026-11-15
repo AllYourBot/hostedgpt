@@ -107,6 +107,24 @@ class ConversationsTest < ApplicationSystemTestCase
     end
   end
 
+  test "the deleted conversation alert goes away when you open another conversation" do
+    convo = hover_conversation conversations(:greeting)
+    delete = convo.find_role("delete")
+
+    convo.find_role("options").click
+    assert_true { delete.visible? }
+    delete.click
+
+    assert_alert "Deleted conversation"
+    hover_conversation conversations(:javascript)
+    assert_visible "#alerts .alert", "The alert should stay up while the sidebar conversations load"
+
+    find("#conversation-#{conversations(:javascript).id} a[data-role='title']").click
+
+    assert_current_path conversation_messages_path(conversations(:javascript)), ignore_query: true
+    assert_hidden "#alerts .alert", "The alert should be dismissed once another conversation opens"
+  end
+
   test "on a narrow screen, clicking a conversation closes the nav drawer so the conversation is visible" do
     on_a_narrow_screen do
       find("[data-role='nav-toggle']").click
