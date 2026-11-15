@@ -17,6 +17,8 @@
       data-controller="transition"
       data-transition-toggle-class="hidden"
       data-transition-target="transitionable"
+      data-action="turbo:frame-load@document->transition#toggleClassOnWhenFrameLoads"
+      data-transition-frame-param="conversation"
     >
       <% flash.each do |type, text| %>
         <div
