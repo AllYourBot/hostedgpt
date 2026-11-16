@@ -330,6 +330,10 @@ en:
           gmail_trouble: "Trouble? Try"
           deleting_connection: "Deleting connection"
           enabled: "Enabled"
+          disconnect: "Disconnect"
+          confirm_disconnect_gmail: "Disconnect Gmail? Your assistants will stop using your email until you enable it again."
+          confirm_disconnect_google_tasks: "Disconnect Google Tasks? Your assistants will stop using your tasks until you enable it again."
+          confirm_disconnect_google_calendar: "Disconnect Google Calendar? Your assistants will stop using your calendar until you enable it again."
           enable_gmail: "Enable Gmail"
           google_tasks_section: "Google Tasks:"
           enable_google_tasks: "Enable Google Tasks"
@@ -567,6 +571,9 @@ en:
         saved: "Saved"
         deleted: "Deleted"
         not_found: "The connector could not be found"
+      google_app_credentials:
+        disconnected: "Disconnected"
+        not_found: "The connection could not be found"
       memories:
         remembered: "Remembered"
         forgotten: "Forgotten"

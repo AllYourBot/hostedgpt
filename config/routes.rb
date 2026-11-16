@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       delete :destroy, to: "memories#destroy_all", on: :collection
     end
     resources :connectors, except: [:show]
+    resources :google_app_credentials, only: :destroy
   end
 
   namespace :admin do
