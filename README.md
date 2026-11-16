@@ -91,7 +91,7 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 ## Deploy the app on Fly.io
 
-**NOTE: The instructions below have not been verified in a while.  It needes to be tested and possibly fixes will be required.**
+**NOTE: The instructions below have not been verified in a while.  It needs to be tested and possibly fixes will be required.**
 
 Deploying to Fly.io is another option. It's not quite one-click like Render and it's not 100% free. We've made the configuration really easy for you but it appears that it now costs $38 to activate the Postgres database.
 
