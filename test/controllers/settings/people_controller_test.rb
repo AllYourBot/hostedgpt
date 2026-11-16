@@ -152,6 +152,38 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "edit shows a Disconnect button for each CONNECTED Google tool" do
+    with_feature(:google_tools, true) do
+      GoogleSDK.stub :reauthenticate_credential, ->(credential) { true } do
+        get edit_settings_person_url
+      end
+
+      assert_response :success
+      { gmail: :keith_gmail, google_tasks: :keith_google_tasks, google_calendar: :keith_google_calendar }.each do |tool, fixture|
+        assert_select "label[for=person_disconnect_#{tool}]", { text: "Disconnect" }, "#{tool} should offer Disconnect"
+        assert_select "form[action='#{settings_google_app_credential_path(credentials(fixture))}'] input[name=_method][value=delete]", 1,
+          "#{tool} should have a delete form for its credential"
+        assert_select "button#person_disconnect_#{tool}[data-turbo-confirm]", 1, "#{tool} should confirm before disconnecting"
+      end
+    end
+  end
+
+  test "edit shows Enable INSTEAD OF Disconnect for a Google tool that is NOT connected" do
+    credentials(:keith_gmail).destroy!
+
+    with_feature(:google_tools, true) do
+      GoogleSDK.stub :reauthenticate_credential, ->(credential) { true } do
+        get edit_settings_person_url
+      end
+
+      assert_response :success
+      assert_select "label[for=person_authorize_gmail]", { text: I18n.t("app.settings.people.form.enable_gmail") }, "Gmail should offer Enable"
+      assert_select "label[for=person_disconnect_gmail]", false, "Gmail should not offer Disconnect"
+      assert_select "button#person_disconnect_gmail", false, "Gmail should have no disconnect form"
+      assert_select "label[for=person_disconnect_google_tasks]", 1, "Google Tasks should still offer Disconnect"
+    end
+  end
+
   test "edit does not call GoogleSDK when the google_tools feature is disabled" do
     with_feature(:google_tools, false) do
       GoogleSDK.stub :prune_revoked_credentials!, ->(*) { raise "should not be called" } do

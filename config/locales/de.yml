@@ -298,6 +298,10 @@ de:
           gmail_trouble: "Probleme? Versuchen Sie"
           deleting_connection: "Verbindung zu löschen"
           enabled: "Aktiviert"
+          disconnect: "Trennen"
+          confirm_disconnect_gmail: "Gmail trennen? Ihre Assistenten verwenden Ihre E-Mails nicht mehr, bis Sie es wieder aktivieren."
+          confirm_disconnect_google_tasks: "Google Tasks trennen? Ihre Assistenten verwenden Ihre Aufgaben nicht mehr, bis Sie es wieder aktivieren."
+          confirm_disconnect_google_calendar: "Google Calendar trennen? Ihre Assistenten verwenden Ihren Kalender nicht mehr, bis Sie es wieder aktivieren."
           enable_gmail: "Gmail aktivieren"
           google_tasks_section: "Google Tasks:"
           enable_google_tasks: "Google Tasks aktivieren"
@@ -531,6 +535,9 @@ de:
         saved: "Gespeichert"
         deleted: "Gelöscht"
         not_found: "Der Konnektor wurde nicht gefunden"
+      google_app_credentials:
+        disconnected: "Getrennt"
+        not_found: "Die Verbindung wurde nicht gefunden"
       memories:
         remembered: "Gemerkt"
         forgotten: "Vergessen"
