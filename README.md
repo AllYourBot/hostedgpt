@@ -259,7 +259,7 @@ If you want to run your LLM locally so the app has no online dependencies, see [
 
 ### Using "Just"
 
-If you have ths `just` tool installed, there are a couple of easy tasks that have been configured for you to start and debug the application:
+If you have this `just` tool installed, there are a couple of easy tasks that have been configured for you to start and debug the application:
 
 - `just start` will start the application, this is the best way if you start from 0
 - `just bash` will give you a bash console inside the running Rails Docker container
