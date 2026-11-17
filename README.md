@@ -91,7 +91,7 @@ If you encountered an error while waiting for the services to be deployed on Ren
 
 ## Deploy the app on Fly.io
 
-**NOTE: The instructions below have not been verified in a while.  It needes to be tested and possibly fixes will be required.**
+**NOTE: The instructions below have not been verified in a while.  It needs to be tested and possibly fixes will be required.**
 
 Deploying to Fly.io is another option. It's not quite one-click like Render and it's not 100% free. We've made the configuration really easy for you but it appears that it now costs $38 to activate the Postgres database.
 
@@ -259,7 +259,7 @@ If you want to run your LLM locally so the app has no online dependencies, see [
 
 ### Using "Just"
 
-If you have ths `just` tool installed, there are a couple of easy tasks that have been configured for you to start and debug the application:
+If you have this `just` tool installed, there are a couple of easy tasks that have been configured for you to start and debug the application:
 
 - `just start` will start the application, this is the best way if you start from 0
 - `just bash` will give you a bash console inside the running Rails Docker container
