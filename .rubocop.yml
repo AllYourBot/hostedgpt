@@ -19,6 +19,7 @@ AllCops:
     - "**/vendor/**/*"
     - "**/node_modules/**/*"
     - "bin/*"
+    - "config/cucumber.yml"
     - "native/**/*"
 
 Performance:

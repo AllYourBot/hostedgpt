@@ -194,6 +194,9 @@ jobs:
           path: tmp/screenshots/
           if-no-files-found: ignore
 
+      - name: Run cucumber features
+        run: bin/cucumber
+
   lint:
     runs-on: ubuntu-latest
     concurrency:
