@@ -95,6 +95,7 @@ class APIService < ApplicationRecord
     return Setting.default_anthropic_key if url == URL_ANTHROPIC
     return Setting.default_groq_key if url == URL_GROQ
     return Setting.default_openrouter_key if url == URL_OPENROUTER
+    return Setting.default_gemini_key if url == URL_GEMINI
   end
 
   def soft_delete_language_models = language_models.each { it.deleted! }

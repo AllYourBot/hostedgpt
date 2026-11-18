@@ -302,6 +302,7 @@ There are a number of optional feature flags that can be set and settings that c
   - `DEFAULT_ANTHROPIC_KEY` will be used by the pre-configured Anthropic API Service
   - `DEFAULT_GROQ_KEY` will be used by the pre-configured Groq API Service
   - `DEFAULT_OPENROUTER_KEY` will be used by the pre-configured OpenRouter API Service
+  - `DEFAULT_GEMINI_KEY` will be used by the pre-configured Gemini API Service
 - `BRAVE_API_KEY` will be used as the default Brave Search API key for tool based web searches
 - Edit `models.yml` to modify which Language Models are automatically created for new users upon signing up. Any changes to this file will be applied to existing users when `rails models:import` is run, or when `rails db:prepare` is run, or when the server is restarted. If you ever need to export your list of models you can do `rails models:export[tmp/models.json]`.
 - Run `rails models:refresh` to add missing chat models from RubyLLM for the five pre-configured chat providers. The task warns when a provider has no registry models, including Groq with RubyLLM 1.16. Custom API service URLs and Brave Search are skipped. Existing and soft-deleted models stay unchanged, and `models.yml` remains the signup-default source. Admins can also run it from the app (see [Admin users](#admin-users)).
