@@ -176,13 +176,15 @@ class APIServiceTest < ActiveSupport::TestCase
     api_services(:keith_anthropic_service).update!(token: "")
     api_services(:keith_groq_service).update!(token: nil)
     api_services(:keith_openrouter_service).update!(token: nil)
+    api_services(:keith_gemini_service).update!(token: nil)
 
     stub_features(default_llm_keys: true) do
-      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123", default_groq_key: "groq123", default_openrouter_key: "openrouter123") do
+      stub_settings(default_openai_key: "gpt321", default_anthropic_key: "claude123", default_groq_key: "groq123", default_openrouter_key: "openrouter123", default_gemini_key: "gemini123") do
         assert_equal "gpt321", api_services(:keith_openai_service).effective_token
         assert_equal "claude123", api_services(:keith_anthropic_service).effective_token
         assert_equal "groq123", api_services(:keith_groq_service).effective_token
         assert_equal "openrouter123", api_services(:keith_openrouter_service).effective_token
+        assert_equal "gemini123", api_services(:keith_gemini_service).effective_token
       end
     end
   end
