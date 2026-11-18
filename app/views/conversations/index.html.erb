@@ -46,6 +46,14 @@
       data-radio-behavior-selected-class="relationship"
       class="block mb-24" <%# ensures the last conversation's menu has room to open %>
     >
+      <% if @pinned_conversations.any? %>
+        <header data-role="pinned-header" class="mx-2 mt-6 mb-2 text-xs font-semibold text-gray-300 text-opacity-1 dark:text-gray-500">
+          <%= t("app.conversations.pinned") %>
+        </header>
+
+        <%= render @pinned_conversations %>
+      <% end %>
+
       <% @nav_conversations.each do |named_time_span, conversations| %>
         <header class="mx-2 mt-6 mb-2 text-xs font-semibold text-gray-300 text-opacity-1 dark:text-gray-500">
           <%= translated_time_span(named_time_span) %>

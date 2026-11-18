@@ -62,6 +62,22 @@
             <% end %>
           </li>
           <li>
+            <% pinned = conversation.pinned? %>
+            <%= button_to conversation_pin_path(conversation),
+              method: pinned ? :delete : :post,
+              data: {
+                role: pinned ? "unpin" : "pin",
+              },
+              form: {
+                class: "inline-block p-0",
+                data: { turbo_frame: "_top" },
+              },
+              class: "flex gap-2 w-full py-2 px-4" do
+            %>
+              <%= icon "star", variant: pinned ? :solid : :outline, size: 18 %><%= pinned ? t("app.conversations.unpin") : t("app.conversations.pin") %>
+            <% end %>
+          </li>
+          <li>
             <%= button_to conversation_path(conversation),
               method: :delete,
               data: {

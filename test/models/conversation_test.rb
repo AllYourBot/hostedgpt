@@ -231,4 +231,32 @@ class ConversationTest < ActiveSupport::TestCase
 
     assert_equal [pinned], users(:keith).conversations.pinned.to_a
   end
+
+  test "#grouped_by_increasing_time_interval_for_user includes pinned conversations by default" do
+    pinned = conversations(:greeting)
+    pinned.pin!
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(users(:keith)).values.flatten
+
+    assert_includes grouped_conversations, pinned
+  end
+
+  test "#grouped_by_increasing_time_interval_for_user with exclude_pinned leaves out pinned conversations" do
+    pinned = conversations(:greeting)
+    unpinned = conversations(:ruby_version)
+    pinned.pin!
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(users(:keith), exclude_pinned: true).values.flatten
+
+    assert_not_includes grouped_conversations, pinned
+    assert_includes grouped_conversations, unpinned
+  end
+
+  test "#grouped_by_increasing_time_interval_for_user with exclude_pinned and a query leaves out pinned conversations" do
+    conversations(:ruby_version).pin!
+
+    grouped_conversations = Conversation.grouped_by_increasing_time_interval_for_user(users(:keith), "Ruby", exclude_pinned: true).values.flatten
+
+    assert_empty grouped_conversations
+  end
 end

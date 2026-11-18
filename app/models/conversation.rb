@@ -21,6 +21,9 @@ class Conversation < ApplicationRecord
   #
   # Empty intervals are removed from the hash.
   #
+  # Pass exclude_pinned: true to leave pinned conversations out; the sidebar lists those in their own
+  # section above these groups.
+  #
   # {
   #  "Today" => relation,
   #  "Yesterday" => relation,
@@ -29,7 +32,7 @@ class Conversation < ApplicationRecord
   #  "Last Month" => relation,
   #  "Older" => relation
   # }
-  def self.grouped_by_increasing_time_interval_for_user(user, query = nil)
+  def self.grouped_by_increasing_time_interval_for_user(user, query = nil, exclude_pinned: false)
     if query.blank?
       nav_conversations = user.conversations.ordered
     else
@@ -37,6 +40,8 @@ class Conversation < ApplicationRecord
         or(user.conversations.ordered.where("title ILIKE ?", "%#{query}%")).
         select("DISTINCT conversations.*")
     end
+
+    nav_conversations = nav_conversations.where(pin_position: nil) if exclude_pinned
 
     # NOTE: These keys intentionally remain static for test stability. UI layers may translate.
     keys = ["Today", "Yesterday", "This Week", "This Month", "Last Month", "Older"]
