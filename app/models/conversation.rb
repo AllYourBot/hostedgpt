@@ -13,6 +13,7 @@ class Conversation < ApplicationRecord
   after_touch :set_title_async, if: -> { title.blank? && messages.count >= 2 }
 
   scope :ordered, -> { order(updated_at: :desc, id: :desc) }
+  scope :pinned, -> { where.not(pin_position: nil).order(:pin_position, id: :desc) }
 
   broadcasts_refreshes
 
@@ -76,6 +77,23 @@ class Conversation < ApplicationRecord
       update_column(:share_token, SecureRandom.urlsafe_base64(32))
     end
     share_token
+  end
+
+  def pinned? = pin_position.present?
+
+  # A newly pinned conversation goes to the top of the pinned list, the same convention the assistants
+  # list uses for a new assistant. Pinning one that is already pinned leaves it where it is.
+  #
+  # update_columns skips callbacks and timestamps on purpose: pinning is not activity in the
+  # conversation, so it must not bump updated_at, which decides the time group it sits in.
+  def pin!
+    return if pinned?
+
+    update_columns(pin_position: (user.conversations.minimum(:pin_position) || 0) - 1)
+  end
+
+  def unpin!
+    update_columns(pin_position: nil)
   end
 
   private

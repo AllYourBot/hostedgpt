@@ -159,4 +159,76 @@ class ConversationTest < ActiveSupport::TestCase
       conversations(:ruby_version).id # matches "latest" in messages
     ].sort, grouped_conversations.map(&:id).sort, "Should have returned these conversations based on title and message content"
   end
+
+  test "is not pinned by default" do
+    conversation = conversations(:greeting)
+
+    assert_nil conversation.pin_position
+    assert_not conversation.pinned?
+  end
+
+  test "#pin! pins the conversation" do
+    conversation = conversations(:greeting)
+
+    conversation.pin!
+
+    assert conversation.reload.pinned?
+  end
+
+  test "#pin! puts the newest pin at the top of the pinned list" do
+    first = conversations(:greeting)
+    second = conversations(:ruby_version)
+
+    first.pin!
+    second.pin!
+
+    assert_equal [second, first], users(:keith).conversations.pinned.to_a
+  end
+
+  test "#pin! leaves an already pinned conversation where it is" do
+    first = conversations(:greeting)
+    second = conversations(:ruby_version)
+    first.pin!
+    second.pin!
+
+    assert_no_changes -> { first.reload.pin_position } do
+      first.pin!
+    end
+    assert_equal [second, first], users(:keith).conversations.pinned.to_a
+  end
+
+  test "#pin! does not change updated_at" do
+    conversation = conversations(:greeting)
+
+    assert_no_changes -> { conversation.reload.updated_at } do
+      conversation.pin!
+    end
+  end
+
+  test "#pin! numbers each user's pins on their own" do
+    rob_conversation = conversations(:debugging)
+    keith_conversation = conversations(:greeting)
+
+    rob_conversation.pin!
+    keith_conversation.pin!
+
+    assert_equal rob_conversation.reload.pin_position, keith_conversation.reload.pin_position
+  end
+
+  test "#unpin! removes the pin" do
+    conversation = conversations(:greeting)
+    conversation.pin!
+
+    conversation.unpin!
+
+    assert_nil conversation.reload.pin_position
+    assert_not conversation.pinned?
+  end
+
+  test ".pinned only includes pinned conversations" do
+    pinned = conversations(:greeting)
+    pinned.pin!
+
+    assert_equal [pinned], users(:keith).conversations.pinned.to_a
+  end
 end

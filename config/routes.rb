@@ -10,6 +10,7 @@ Rails.application.routes.draw do
 
   resources :conversations, only: [:index, :show, :edit, :update, :destroy] do
     resources :messages, only: [:index]
+    resource :pin, only: [:create, :destroy]
   end
 
   get "share/:share_token", to: "conversations#public_show", as: :public_conversation

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_101500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -142,6 +142,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
     t.integer "input_token_total_count", default: 0, null: false
     t.bigint "last_assistant_message_id"
     t.integer "output_token_total_count", default: 0, null: false
+    t.integer "pin_position"
     t.string "share_token"
     t.string "title"
     t.datetime "updated_at", null: false
@@ -151,6 +152,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
     t.index ["share_token"], name: "index_conversations_on_share_token"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
+    t.index ["user_id", "pin_position"], name: "index_conversations_on_user_id_and_pin_position"
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end
 
