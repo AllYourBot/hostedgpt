@@ -1,0 +1,18 @@
+<%# locals: (conversation:, toggled:, toggle_params: {}) %>
+<%# One bookmark toggle button for the sidebar row, redrawn by the nav frame the toggle's
+    response re-renders. The form breaks out of the row's turbo-frame with _top so the
+    whole nav updates, flipping this button's icon with the bounced-back state. %>
+<%= button_to toggled ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
+  method: :post,
+  params: toggle_params,
+  data: { role: toggled ? "unbookmark" : "bookmark" },
+  form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
+  class: "p-1 leading-none",
+  title: t("app.conversations.ui.#{toggled ? "un" : ""}bookmark") do
+%>
+  <%= icon "bookmark",
+    variant: toggled ? :solid : :outline,
+    size: 16,
+    class: "text-gray-500 dark:text-gray-300"
+  %>
+<% end %>

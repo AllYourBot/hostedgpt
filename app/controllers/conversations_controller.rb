@@ -1,5 +1,6 @@
 class ConversationsController < ApplicationController
-  before_action :set_conversation, except: [:public_show]
+  before_action :set_conversation, except: [:public_show, :bookmark, :unbookmark]
+  before_action :set_toggled_conversation, only: [:bookmark, :unbookmark]
   before_action :set_nav_assistants, except: [:public_show]
   allow_unauthenticated_access only: [:public_show]
 
@@ -11,6 +12,16 @@ class ConversationsController < ApplicationController
     # in its time group like any other instead of being pulled out into the Pinned section.
     @pinned_conversations = searching ? [] : Current.user.conversations.pinned.to_a
     @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query, exclude_pinned: !searching)
+  end
+
+  def bookmark
+    @toggled_conversation.bookmark!(Current.user)
+    render_sidebar
+  end
+
+  def unbookmark
+    @toggled_conversation.unbookmark!(Current.user)
+    render_sidebar
   end
 
   def show
@@ -52,6 +63,26 @@ class ConversationsController < ApplicationController
 
   def set_conversation
     @conversation = Current.user.conversations.find_by(id: params[:id] || params[:conversation_id])
+  end
+
+  # find (not find_by): someone else's conversation, or a missing one, is a 404 — the pins
+  # controller precedent. Toggle endpoints never silently no-op.
+  def set_toggled_conversation
+    @toggled_conversation = Current.user.conversations.find(params[:id])
+  end
+
+  # Sidebar toggles answer with the re-rendered nav frame, not a page refresh: the response
+  # morphs exactly the list the user is looking at (search included, per the bounced-back
+  # query), so the icon flips with no reload and no scroll loss. Autofocus is suppressed so a
+  # toggle never steals focus, and plain requests still answer 204.
+  def render_sidebar
+    @query = params[:query]
+    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
+
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.update("nav-conversations", partial: "conversations/nav", locals: { autofocus: false }) }
+      format.html { head :no_content }
+    end
   end
 
   def conversation_params = params.require(:conversation).permit(:user_id, :assistant_id, :title)

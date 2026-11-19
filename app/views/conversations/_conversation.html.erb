@@ -32,6 +32,9 @@
     %>
 
     <div class="items-center hidden gap-2 pl-2 relationship:flex group-hover:flex">
+      <span id="<%= dom_id(conversation) %>-bookmark">
+        <%= render "conversations/save_toggle_button", conversation: conversation, toggled: conversation.bookmarked?(Current.user) %>
+      </span>
       <div class="dropdown !inline-flex dropdown-end outline-none pr-2">
         <%= icon "ellipsis-horizontal",
           tabindex: 0,

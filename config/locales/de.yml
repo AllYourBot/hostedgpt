@@ -451,6 +451,8 @@ de:
         voice_mode: "Sprachmodus"
         send_message: "Nachricht senden"
         search_placeholder: "Suchen"
+        bookmark: "Lesezeichen"
+        unbookmark: "Lesezeichen entfernen"
         scroll_down: "Nach unten scrollen"
         share: "Konversation teilen"
         share_unavailable: "Konversation teilen (keine Konversation zum Teilen)"

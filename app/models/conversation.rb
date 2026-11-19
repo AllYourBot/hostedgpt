@@ -34,11 +34,11 @@ class Conversation < ApplicationRecord
   # }
   def self.grouped_by_increasing_time_interval_for_user(user, query = nil, exclude_pinned: false)
     if query.blank?
-      nav_conversations = user.conversations.ordered
+      nav_conversations = user.conversations.ordered.preload(:bookmarks, :assistant)
     else
       nav_conversations = user.conversations.joins(:messages).ordered.where("messages.content_text ILIKE ?", "%#{query}%").
         or(user.conversations.ordered.where("title ILIKE ?", "%#{query}%")).
-        select("DISTINCT conversations.*")
+        select("DISTINCT conversations.*").preload(:bookmarks, :assistant)
     end
 
     nav_conversations = nav_conversations.where(pin_position: nil) if exclude_pinned

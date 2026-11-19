@@ -145,4 +145,66 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :no_content
     assert_equal original_position, @conversation.reload.pin_position
   end
+
+  test "bookmark toggle answers a turbo-stream update targeting the nav frame" do
+    post bookmark_conversation_url(@conversation), as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, %(turbo-stream action="update" target="nav-conversations")
+    assert_includes response.body, %(data-role="unbookmark")
+    assert @conversation.bookmarked?(@conversation.user)
+  end
+
+  test "unbookmark toggle answers a turbo-stream update and removes the bookmark" do
+    @conversation.bookmark!(@conversation.user)
+
+    post unbookmark_conversation_url(@conversation), as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, %(turbo-stream action="update" target="nav-conversations")
+    assert_includes response.body, %(data-role="bookmark")
+    assert_not @conversation.bookmarked?(@conversation.user)
+  end
+
+  test "non-JS toggle post answers 204 no content" do
+    post bookmark_conversation_url(@conversation)
+
+    assert_response :no_content
+    assert @conversation.bookmarked?(@conversation.user)
+  end
+
+  test "toggle with an active search keeps the query in the re-rendered form and the filter intact" do
+    post bookmark_conversation_url(@conversation), params: {query: "hear"}, as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, 'value="hear"'
+    assert_includes response.body, "Meeting Samantha"
+    assert_not_includes response.body, "Ruby version"
+  end
+
+  test "bookmarking another user's conversation is a 404 and bookmarks nothing" do
+    foreign = conversations(:debugging)
+
+    assert_no_difference "Bookmark.count" do
+      post bookmark_conversation_url(foreign)
+    end
+
+    assert_response :not_found
+    assert_not foreign.bookmarked?(foreign.user)
+  end
+
+  test "toggling leaves updated_at and sidebar grouping untouched" do
+    assert_no_changes -> { @conversation.reload.updated_at } do
+      post bookmark_conversation_url(@conversation)
+      post unbookmark_conversation_url(@conversation)
+    end
+  end
+
+  test "unauthenticated toggle post redirects to login" do
+    reset!
+
+    post bookmark_conversation_url(@conversation)
+
+    assert_redirected_to login_path
+  end
 end
