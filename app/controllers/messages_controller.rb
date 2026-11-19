@@ -74,18 +74,18 @@ class MessagesController < ApplicationController
     entry = Current.user.bookmarks.find_by(bookmarkable: @message) if params[:from_bookmarks]
     @message.unbookmark!(Current.user)
 
-    respond_to do |format|
-      format.turbo_stream do
-        if params[:from_bookmarks]
+    if params[:from_bookmarks]
+      respond_to do |format|
+        format.turbo_stream do
           streams = []
           streams << turbo_stream.remove(helpers.dom_id(entry)) if entry
           streams << nav_refresh_stream
           render turbo_stream: streams
-        else
-          render_message_bookmark
         end
+        format.html { head :no_content }
       end
-      format.html { head :no_content }
+    else
+      render_message_bookmark
     end
   end
 

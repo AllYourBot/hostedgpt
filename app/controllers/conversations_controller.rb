@@ -1,7 +1,7 @@
 class ConversationsController < ApplicationController
   before_action :set_conversation, except: [:public_show, :bookmark, :unbookmark, :bookmarked_page]
   before_action :set_toggled_conversation, only: [:bookmark, :unbookmark]
-  before_action :set_nav_assistants, except: [:public_show]
+  before_action :set_nav_assistants, except: [:public_show, :bookmark, :unbookmark]
   allow_unauthenticated_access only: [:public_show]
 
   def index
@@ -25,7 +25,7 @@ class ConversationsController < ApplicationController
     @bookmarked_messages = Current.user.bookmarks
       .where(bookmarkable_type: "Message")
       .order(created_at: :desc, id: :desc)
-      .preload(:bookmarkable)
+      .preload(bookmarkable: [:bookmarks, :assistant, {conversation: :user}])
   end
 
   def bookmark
@@ -95,11 +95,13 @@ class ConversationsController < ApplicationController
   # the nav frame so the sidebar's icon un-flips too. Autofocus is suppressed so a toggle
   # never steals focus, and plain requests still answer 204.
   def render_sidebar(entry_to_remove: nil)
-    @query = params[:query]
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
-
     respond_to do |format|
       format.turbo_stream do
+        # Computed lazily inside the stream branch: the 204 fallback discards it, and the
+        # recompute itself is required — the nav partial consumes the relation.
+        @query = params[:query]
+        @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
+
         streams = []
         streams << turbo_stream.remove(helpers.dom_id(entry_to_remove)) if entry_to_remove
         streams << turbo_stream.update("nav-conversations", partial: "conversations/nav", locals: {autofocus: false})

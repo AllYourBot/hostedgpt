@@ -20,7 +20,7 @@
   <% end %>
 >
   <turbo-frame id="conversation-<%= conversation.id %>" class="flex-1 flex justify-between items-center">
-    <%= link_to conversation.title.presence || t("app.conversations.new_chat"),
+    <%= link_to conversation_title_or_new_chat(conversation),
       conversation_messages_path(conversation),
       class: "flex-1 pl-2 py-2 truncate text-sm text-opacity-1 w-5 radio-behavior",
       draggable: ("false" if sortable), # so dragging the title picks up the row rather than the link

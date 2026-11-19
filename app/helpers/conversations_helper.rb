@@ -12,4 +12,9 @@ module ConversationsHelper
     message.content_text.presence ||
       t("app.conversations.ui.message_no_content", name: from_name_for(message))
   end
+
+  # The sidebar row and both /bookmarks entry types share the untitled-conversation fallback.
+  def conversation_title_or_new_chat(conversation)
+    conversation.title.presence || t("app.conversations.new_chat")
+  end
 end

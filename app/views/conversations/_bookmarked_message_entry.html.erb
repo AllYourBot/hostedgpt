@@ -15,7 +15,7 @@
         <%= truncate(bookmarked_message_snippet(message), length: 120) %>
       </span>
       <span class="block truncate text-xs text-gray-400 dark:text-gray-500">
-        <%= message.conversation.title.presence || t("app.conversations.new_chat") %>
+        <%= conversation_title_or_new_chat(message.conversation) %>
       </span>
     <% end %>
     <span class="flex items-center">
