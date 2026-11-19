@@ -1,6 +1,9 @@
 class User < ApplicationRecord
   include Personable, Registerable
 
+  # The interface size, as a percent of the default size.
+  UI_SCALE_RANGE = 70..170
+
   has_secure_password validations: false
   has_person_name
 
@@ -41,7 +44,7 @@ class User < ApplicationRecord
   validate :profile_picture_validation
 
   accepts_nested_attributes_for :credentials
-  store_accessor :preferences, :dark_mode, :nav_closed, :show_thinking, :ask_follow_ups, :provider_web_search, :feature
+  store_accessor :preferences, :dark_mode, :nav_closed, :show_thinking, :ask_follow_ups, :provider_web_search, :ui_scale, :feature
 
   def dark_mode = super.presence || "system"
 
@@ -66,6 +69,13 @@ class User < ApplicationRecord
 
   def provider_web_search=(value)
     super(value.nil? ? nil : value.to_b)
+  end
+
+  def ui_scale = super || 100
+
+  # Kept inside the slider's range, and anything that isn't a whole number goes back to the default.
+  def ui_scale=(value)
+    super(Integer(value.to_s, 10, exception: false)&.clamp(UI_SCALE_RANGE))
   end
 
   # Not via password_credential: that has_one doesn't autosave a changed existing record.

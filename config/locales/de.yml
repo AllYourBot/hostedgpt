@@ -281,6 +281,8 @@ de:
             dark: "Dunkel"
             light: "Hell"
             system: "System"
+          ui_scale: "Größe der Oberfläche"
+          ui_scale_note: "Macht Text und alles andere größer oder kleiner. 100 % ist die Standardgröße."
           show_thinking: "Erweitertes Denken anzeigen"
           ask_follow_ups: "Anschlussfragen stellen"
           provider_web_search: "Claude im Web suchen und lesen lassen"
