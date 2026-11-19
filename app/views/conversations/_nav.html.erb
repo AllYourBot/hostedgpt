@@ -2,7 +2,7 @@
 <%# The sidebar's inner content, extracted so toggle and search responses can re-render it
     in place as a turbo-stream update of the nav-conversations frame: index.html.erb
     supplies only the surrounding turbo-frame. %>
-<%# The single retrieval surface for bookmarks sits above the search (R9), navigating away
+<%# The single retrieval surface for bookmarks sits above the search, navigating away
     to the full page rather than filtering in place. %>
 <div class="flex items-center mr-5 pt-6">
   <%= link_to bookmarked_page_path,

@@ -1,7 +1,7 @@
 <%# locals: (bookmark:) %>
 <%# One bookmarked-message entry: the message's snippet (or a role label when content is
     blank) over its conversation's title, deep-linking into that conversation at that
-    message's pinned version (KTD5). Vanished targets are skipped. %>
+    message's pinned version. Vanished targets are skipped. %>
 <% message = bookmark.bookmarkable %>
 <% if message %>
   <li id="<%= dom_id(bookmark) %>"

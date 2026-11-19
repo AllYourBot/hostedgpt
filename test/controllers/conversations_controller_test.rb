@@ -152,6 +152,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, %(turbo-stream action="update" target="nav-conversations")
     assert_includes response.body, %(data-role="unbookmark")
+    assert_select "div[data-role='conversation'].relationship" # the viewed row stays highlighted
     assert @conversation.bookmarked?(@conversation.user)
   end
 
@@ -253,6 +254,14 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, %(turbo-stream action="remove" target="#{dom_id(bookmark)}")
     assert_includes response.body, %(turbo-stream action="update" target="nav-conversations")
+    assert_not @conversation.bookmarked?(@conversation.user)
+  end
+
+  test "unbookmarking from the page with a stale (already-removed) entry converges with a refresh" do
+    post unbookmark_conversation_url(@conversation), params: {from_bookmarks: true}, as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, %(turbo-stream action="refresh")
     assert_not @conversation.bookmarked?(@conversation.user)
   end
 

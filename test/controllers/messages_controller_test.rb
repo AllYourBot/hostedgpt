@@ -37,6 +37,28 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert @message.bookmarked?(@user)
   end
 
+  test "bookmarked and unbookmarked messages render their icon states through the preloaded fast path" do
+    messages(:yes_i_do).bookmark!(@user)
+
+    get conversation_messages_url(@conversation, version: 1)
+
+    assert_response :success
+    assert_select "#message_#{messages(:yes_i_do).id}-bookmark [data-role='unbookmark-message']"
+    assert_select "#message_#{messages(:hear_me).id}-bookmark [data-role='bookmark-message']"
+  end
+
+  test "unbookmarking from the page removes the entry and refreshes the nav frame" do
+    @message.bookmark!(@user)
+    bookmark = @message.user.bookmarks.find_by(bookmarkable: @message)
+
+    post unbookmark_message_url(@message), params: {from_bookmarks: true}, as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, %(turbo-stream action="remove" target="#{dom_id(bookmark)}")
+    assert_includes response.body, %(turbo-stream action="update" target="nav-conversations")
+    assert_not @message.bookmarked?(@user)
+  end
+
   test "unbookmark toggle re-renders the outline state and removes the bookmark" do
     @message.bookmark!(@user)
 

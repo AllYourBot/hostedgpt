@@ -214,10 +214,7 @@ end %>
           <%= !last_message && done_thinking && "invisible" %> group-tap:visible
         ">
           <% if message.user? || message.assistant? %>
-            <%# Twitter-style per-message bookmark with a stable morph target: the toggle
-                response re-renders this span alone, no reload. Streamed broadcasts redraw the
-                whole partial, and the button's state is computed from message.user, so it
-                survives chunk updates. Tool-call messages have no one to save. %>
+            <%# The span is the toggle's morph target; tool-call messages have no one to save. %>
             <span id="<%= dom_id(message) %>-bookmark" class="flex items-center">
               <%= render "messages/message_toggle_button", message: message %>
             </span>

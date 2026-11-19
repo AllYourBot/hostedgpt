@@ -1,6 +1,7 @@
 class MessagesController < ApplicationController
   include ActiveStorage::SetCurrent
   include HasConversationStarter
+  include SidebarRefreshable
 
   before_action :set_version,               only: [:index, :update]
   before_action :set_conversation,          only: [:index]
@@ -67,23 +68,12 @@ class MessagesController < ApplicationController
   end
 
   def unbookmark
-    # Page-context forms mark themselves with from_bookmarks: their entry element is
-    # identified before the row is destroyed so the response can remove it in place
-    # (KTD4's contract, shared with ConversationsController). Sidebar-context unbookmarks
-    # re-render the row's own button, mirroring bookmark.
+    # The entry element is identified before the row is destroyed so the response can remove it in place.
     entry = Current.user.bookmarks.find_by(bookmarkable: @message) if params[:from_bookmarks]
     @message.unbookmark!(Current.user)
 
     if params[:from_bookmarks]
-      respond_to do |format|
-        format.turbo_stream do
-          streams = []
-          streams << turbo_stream.remove(helpers.dom_id(entry)) if entry
-          streams << nav_refresh_stream
-          render turbo_stream: streams
-        end
-        format.html { head :no_content }
-      end
+      render_sidebar(entry_to_remove: entry, page_context: true)
     else
       render_message_bookmark
     end
@@ -111,7 +101,7 @@ class MessagesController < ApplicationController
   end
 
   # Message bookmarks answer with one stream — the row's own bookmark button — since bookmarks
-  # are per-message state with no section to refresh. Plain requests still answer 204.
+  # are per-message state with no section to refresh.
   def render_message_bookmark
     respond_to do |format|
       format.turbo_stream do
@@ -119,16 +109,6 @@ class MessagesController < ApplicationController
       end
       format.html { head :no_content }
     end
-  end
-
-  # The /bookmarks page's unbookmark forms refresh the sidebar's nav frame along with their
-  # entry removal, so its bookmark icons re-render with current state. Same computation the
-  # conversations controller's render_sidebar does; duplicated here because the message
-  # controller has no other reason to know about the sidebar.
-  def nav_refresh_stream
-    @query = params[:query]
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
-    turbo_stream.update("nav-conversations", partial: "conversations/nav", locals: {autofocus: false})
   end
 
   def set_nav_assistants
