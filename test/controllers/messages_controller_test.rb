@@ -28,6 +28,78 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "bookmark toggle answers a turbo-stream update of the message's bookmark span" do
+    post bookmark_message_url(@message), as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, %(turbo-stream action="update" target="message_#{@message.id}-bookmark")
+    assert_includes response.body, %(data-role="unbookmark-message")
+    assert @message.bookmarked?(@user)
+  end
+
+  test "unbookmark toggle re-renders the outline state and removes the bookmark" do
+    @message.bookmark!(@user)
+
+    post unbookmark_message_url(@message), as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, %(data-role="bookmark-message")
+    assert_not @message.bookmarked?(@user)
+  end
+
+  test "non-JS bookmark post answers 204 no content" do
+    post bookmark_message_url(@message)
+
+    assert_response :no_content
+    assert @message.bookmarked?(@user)
+  end
+
+  test "rapid double-post stays idempotent" do
+    post bookmark_message_url(@message)
+    post bookmark_message_url(@message)
+
+    assert_response :no_content
+    assert_equal 1, @message.bookmarks.count
+  end
+
+  test "foreign message id follows set_message's redirect behavior" do
+    foreign = messages(:filter_map)
+
+    assert_no_difference "Bookmark.count" do
+      post bookmark_message_url(foreign)
+    end
+
+    assert_response :unauthorized
+  end
+
+  test "user and assistant messages render the bookmark toggle; tool messages do not" do
+    tool_message = messages(:weather_tool_result)
+
+    get conversation_messages_url(@conversation, version: 1)
+    assert_response :success
+    assert_select "#message_#{messages(:hear_me).id}-bookmark"
+    assert_select "#message_#{messages(:yes_i_do).id}-bookmark"
+
+    get conversation_messages_url(tool_message.conversation, version: 1)
+    assert_response :success
+    assert_select "#message_#{tool_message.id}-bookmark", count: 0
+  end
+
+  test "a streamed partial re-render of a bookmarked message still shows the solid icon" do
+    Current.user = nil # the streaming job renders broadcasts without a signed-in user
+    message = messages(:yes_i_do)
+    message.bookmark!(message.user)
+
+    html = ApplicationController.render(
+      partial: "messages/message",
+      locals: {message:, streamed: true, only_scroll_down_if_was_bottom: true, message_counter: message.index}
+    )
+
+    assert_includes html, %(data-role="unbookmark-message")
+  ensure
+    Current.user = nil
+  end
+
   test "new should mark the assistants that HAVE context files in the nav column" do
     get new_assistant_message_url(@assistant)
     assert_response :success

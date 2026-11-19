@@ -485,6 +485,8 @@ en:
         search_placeholder: "Search"
         bookmark: "Bookmark"
         unbookmark: "Unbookmark"
+        bookmark_message: "Bookmark message"
+        unbookmark_message: "Unbookmark message"
         scroll_down: "Scroll down"
         share: "Share conversation"
         share_unavailable: "Share conversation (no conversation to share)"

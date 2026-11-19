@@ -20,7 +20,12 @@ Rails.application.routes.draw do
 
   get "share/:share_token", to: "conversations#public_show", as: :public_conversation
 
-  resources :messages, only: [:show, :update]
+  resources :messages, only: [:show, :update] do
+    member do
+      post :bookmark
+      post :unbookmark
+    end
+  end
 
   resource :speech, only: :create
 

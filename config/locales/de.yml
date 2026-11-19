@@ -453,6 +453,8 @@ de:
         search_placeholder: "Suchen"
         bookmark: "Lesezeichen"
         unbookmark: "Lesezeichen entfernen"
+        bookmark_message: "Nachricht merken"
+        unbookmark_message: "Lesezeichen entfernen"
         scroll_down: "Nach unten scrollen"
         share: "Konversation teilen"
         share_unavailable: "Konversation teilen (keine Konversation zum Teilen)"

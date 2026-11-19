@@ -1,0 +1,19 @@
+<%# locals: (message:) %>
+<%# Twitter-style per-message bookmark toggle, re-rendered in place by its toggle's
+    turbo-stream response so the icon flips with no reload. Toggled state is computed from
+    the message's owner, not Current.user: the generation job broadcasts partial re-renders
+    of this row without a Current.user context, and a Current.user-sourced icon would flip
+    back mid-stream. Owner-only endpoints make the two identical for every interactive request. %>
+<% toggled = message.bookmarked? %>
+<% verb = toggled ? "un" : "" %>
+<%= button_to toggled ? unbookmark_message_path(message) : bookmark_message_path(message),
+  method: :post,
+  data: { role: "#{verb}bookmark-message" },
+  form: { class: "flex items-center", data: { turbo_frame: "_top" } },
+  class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
+  title: t("app.conversations.ui.#{verb}bookmark_message") do %>
+  <%= icon "bookmark",
+    variant: toggled ? :solid : :outline,
+    size: 18
+  %>
+<% end %>
