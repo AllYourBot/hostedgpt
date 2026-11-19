@@ -5,4 +5,11 @@ module ConversationsHelper
   def translated_time_span(named_time_span)
     t("app.conversations.time_groups.#{named_time_span.parameterize(separator: '_')}")
   end
+
+  # A bookmarked message shows its text, or a role label when content is blank — a streaming
+  # or tool-call reply can carry no content_text, and a blank row would look broken (R7).
+  def bookmarked_message_snippet(message)
+    message.content_text.presence ||
+      t("app.conversations.ui.message_no_content", name: from_name_for(message))
+  end
 end

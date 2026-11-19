@@ -207,4 +207,85 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to login_path
   end
+
+  test "the bookmarks page lists bookmarked conversations and messages in bookmark-recency order" do
+    conversations(:ruby_version).bookmark!(@conversation.user) # oldest bookmark
+    messages(:yes_i_do).bookmark!(@conversation.user)
+    @conversation.bookmark!(@conversation.user) # newest bookmark
+
+    get bookmarked_page_path
+
+    assert_response :success
+    assert_select "li[data-role='bookmarked-conversation']", count: 2
+    assert_select "li[data-role='bookmarked-message']", count: 1
+    conversation_titles = css_select("li[data-role='bookmarked-conversation'] a[data-role='bookmarked-conversation-link']").map { |link| link.text.strip }
+    assert_equal ["Meeting Samantha", "Ruby version"], conversation_titles
+  end
+
+  test "a bookmarked message entry links into its conversation at that message and version" do
+    message = messages(:yes_i_do)
+    message.bookmark!(@conversation.user)
+
+    get bookmarked_page_path
+
+    assert_response :success
+    assert_select "a[data-role='bookmarked-message-link'][href=?]",
+      conversation_messages_path(message.conversation, version: message.version, anchor: "message_#{message.id}")
+  end
+
+  test "landing on a bookmarked message's deep link renders that message's version" do
+    message = messages(:message2_v1)
+    message.bookmark!(message.user)
+
+    get conversation_messages_url(message.conversation, version: message.version, anchor: "message_#{message.id}")
+
+    assert_response :success
+    assert_select "#message_#{message.id}"
+    assert_select "#message_#{messages(:message2_v2).id}", count: 0
+  end
+
+  test "unbookmarking from the page removes the entry in place and refreshes the nav frame" do
+    @conversation.bookmark!(@conversation.user)
+    bookmark = @conversation.user.bookmarks.find_by(bookmarkable: @conversation)
+
+    post unbookmark_conversation_url(@conversation), params: {from_bookmarks: true}, as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, %(turbo-stream action="remove" target="#{dom_id(bookmark)}")
+    assert_includes response.body, %(turbo-stream action="update" target="nav-conversations")
+    assert_not @conversation.bookmarked?(@conversation.user)
+  end
+
+  test "a blank-content bookmarked message renders the role-label fallback, not a blank row" do
+    message = messages(:yes_i_do)
+    message.update_columns(content_text: nil)
+    message.bookmark!(@conversation.user)
+
+    get bookmarked_page_path
+
+    assert_response :success
+    assert_includes response.body, I18n.t("app.conversations.ui.message_no_content", name: "Samantha")
+  end
+
+  test "zero bookmarks renders the empty state" do
+    get bookmarked_page_path
+
+    assert_response :success
+    assert_select "[data-role='empty-bookmarks']"
+  end
+
+  test "the sidebar link to the bookmarks page is always present" do
+    get conversations_path
+
+    assert_response :success
+    assert_select "a[data-role='open-bookmarks-page']"
+  end
+
+  test "another user's bookmarks never appear" do
+    conversations(:debugging).bookmark!(users(:rob))
+
+    get bookmarked_page_path
+
+    assert_select "[data-role='empty-bookmarks']"
+  end
 end

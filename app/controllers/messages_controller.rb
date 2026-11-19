@@ -67,8 +67,26 @@ class MessagesController < ApplicationController
   end
 
   def unbookmark
+    # Page-context forms mark themselves with from_bookmarks: their entry element is
+    # identified before the row is destroyed so the response can remove it in place
+    # (KTD4's contract, shared with ConversationsController). Sidebar-context unbookmarks
+    # re-render the row's own button, mirroring bookmark.
+    entry = Current.user.bookmarks.find_by(bookmarkable: @message) if params[:from_bookmarks]
     @message.unbookmark!(Current.user)
-    render_message_bookmark
+
+    respond_to do |format|
+      format.turbo_stream do
+        if params[:from_bookmarks]
+          streams = []
+          streams << turbo_stream.remove(helpers.dom_id(entry)) if entry
+          streams << nav_refresh_stream
+          render turbo_stream: streams
+        else
+          render_message_bookmark
+        end
+      end
+      format.html { head :no_content }
+    end
   end
 
   private
@@ -101,6 +119,16 @@ class MessagesController < ApplicationController
       end
       format.html { head :no_content }
     end
+  end
+
+  # The /bookmarks page's unbookmark forms refresh the sidebar's nav frame along with their
+  # entry removal, so its bookmark icons re-render with current state. Same computation the
+  # conversations controller's render_sidebar does; duplicated here because the message
+  # controller has no other reason to know about the sidebar.
+  def nav_refresh_stream
+    @query = params[:query]
+    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
+    turbo_stream.update("nav-conversations", partial: "conversations/nav", locals: {autofocus: false})
   end
 
   def set_nav_assistants

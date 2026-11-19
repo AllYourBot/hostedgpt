@@ -18,6 +18,8 @@ Rails.application.routes.draw do
     end
   end
 
+  get "/bookmarks", to: "conversations#bookmarked_page", as: :bookmarked_page
+
   get "share/:share_token", to: "conversations#public_show", as: :public_conversation
 
   resources :messages, only: [:show, :update] do

@@ -1,5 +1,5 @@
 class ConversationsController < ApplicationController
-  before_action :set_conversation, except: [:public_show, :bookmark, :unbookmark]
+  before_action :set_conversation, except: [:public_show, :bookmark, :unbookmark, :bookmarked_page]
   before_action :set_toggled_conversation, only: [:bookmark, :unbookmark]
   before_action :set_nav_assistants, except: [:public_show]
   allow_unauthenticated_access only: [:public_show]
@@ -14,14 +14,31 @@ class ConversationsController < ApplicationController
     @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query, exclude_pinned: !searching)
   end
 
+  def bookmarked_page
+    # One retrieval surface for both target types (KD4): each section lists the user's own
+    # bookmarks, most recently bookmarked first. Bookmarks whose target no longer resolves
+    # are skipped by the entry partials, not here — the preload already paid for the load.
+    @bookmarked_conversations = Current.user.bookmarks
+      .where(bookmarkable_type: "Conversation")
+      .order(created_at: :desc, id: :desc)
+      .preload(:bookmarkable)
+    @bookmarked_messages = Current.user.bookmarks
+      .where(bookmarkable_type: "Message")
+      .order(created_at: :desc, id: :desc)
+      .preload(:bookmarkable)
+  end
+
   def bookmark
     @toggled_conversation.bookmark!(Current.user)
     render_sidebar
   end
 
   def unbookmark
+    # Page-context forms mark themselves with from_bookmarks: their entry element is
+    # identified before the row is destroyed so the response can remove it in place.
+    entry = Current.user.bookmarks.find_by(bookmarkable: @toggled_conversation) if params[:from_bookmarks]
     @toggled_conversation.unbookmark!(Current.user)
-    render_sidebar
+    render_sidebar(entry_to_remove: entry)
   end
 
   def show
@@ -73,14 +90,21 @@ class ConversationsController < ApplicationController
 
   # Sidebar toggles answer with the re-rendered nav frame, not a page refresh: the response
   # morphs exactly the list the user is looking at (search included, per the bounced-back
-  # query), so the icon flips with no reload and no scroll loss. Autofocus is suppressed so a
-  # toggle never steals focus, and plain requests still answer 204.
-  def render_sidebar
+  # query), so the icon flips with no reload and no scroll loss. Page-context unbookmarks
+  # (the /bookmarks page, marked from_bookmarks) first remove their list entry, then refresh
+  # the nav frame so the sidebar's icon un-flips too. Autofocus is suppressed so a toggle
+  # never steals focus, and plain requests still answer 204.
+  def render_sidebar(entry_to_remove: nil)
     @query = params[:query]
     @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
 
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.update("nav-conversations", partial: "conversations/nav", locals: { autofocus: false }) }
+      format.turbo_stream do
+        streams = []
+        streams << turbo_stream.remove(helpers.dom_id(entry_to_remove)) if entry_to_remove
+        streams << turbo_stream.update("nav-conversations", partial: "conversations/nav", locals: {autofocus: false})
+        render turbo_stream: streams
+      end
       format.html { head :no_content }
     end
   end

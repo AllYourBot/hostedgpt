@@ -2,6 +2,17 @@
 <%# The sidebar's inner content, extracted so toggle and search responses can re-render it
     in place as a turbo-stream update of the nav-conversations frame: index.html.erb
     supplies only the surrounding turbo-frame. %>
+<%# The single retrieval surface for bookmarks sits above the search (R9), navigating away
+    to the full page rather than filtering in place. %>
+<div class="flex items-center mr-5 pt-6">
+  <%= link_to bookmarked_page_path,
+    data: { role: "open-bookmarks-page", turbo_frame: "_top" },
+    class: "flex items-center flex-1 py-1 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" do %>
+    <%= icon "bookmark", variant: :outline, size: 16, class: "text-gray-500 dark:text-gray-300" %>
+    <span class="ml-2 font-semibold"><%= t("app.conversations.ui.bookmarks_page") %></span>
+  <% end %>
+</div>
+
 <section id="search" class="pt-6 text-gray-950 dark:text-gray-100 select-none">
   <%= form_with(url: conversations_path,
     data: { turbo_frame: "nav-conversations", controller: "search" },
