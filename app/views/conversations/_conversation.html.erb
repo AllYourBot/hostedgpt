@@ -1,4 +1,4 @@
-<%# locals: (conversation:, settings: true) %>
+<%# locals: (conversation:, settings: true, sortable: false) %>
 <% selected = conversation == @conversation %>
 
 <div
@@ -12,11 +12,18 @@
   data-role="conversation"
   data-radio-behavior-target="radio"
   data-radio-behavior-also-select-id="<%= conversation.assistant.id %>"
+  <% if sortable %>
+    draggable="true"
+    data-sortable-target="item"
+    data-sortable-id="<%= conversation.id %>"
+    data-action="dragstart->sortable#start dragend->sortable#end"
+  <% end %>
 >
   <turbo-frame id="conversation-<%= conversation.id %>" class="flex-1 flex justify-between items-center">
     <%= link_to conversation.title.presence || t("app.conversations.new_chat"),
       conversation_messages_path(conversation),
       class: "flex-1 pl-2 py-2 truncate text-sm text-opacity-1 w-5 radio-behavior",
+      draggable: ("false" if sortable), # so dragging the title picks up the row rather than the link
       data: {
         turbo_frame: "conversation",
         action: "radio-behavior#select nav#closeDrawer",

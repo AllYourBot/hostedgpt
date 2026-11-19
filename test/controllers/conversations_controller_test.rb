@@ -49,7 +49,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-role='pinned-header']", count: 1
-    assert_select "[data-role='pinned-header'] + [data-role='conversation'] #conversation-#{@conversation.id}", count: 1
+    assert_select "[data-role='pinned-header'] + [data-controller='sortable'] #conversation-#{@conversation.id}", count: 1
   end
 
   test "index lists a pinned conversation only once" do
@@ -92,5 +92,57 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "#conversation-#{@conversation.id} [data-role='unpin']", count: 1
     assert_select "#conversation-#{@conversation.id} [data-role='pin']", count: 0
+  end
+
+  test "index makes the pinned conversations draggable" do
+    @conversation.pin!
+
+    get_nav_conversations
+
+    assert_select "[data-controller='sortable'] [data-sortable-id='#{@conversation.id}'][draggable='true']", count: 1
+  end
+
+  test "index does not make unpinned conversations draggable" do
+    get_nav_conversations
+
+    assert_select "[data-sortable-target='item']", count: 0
+  end
+
+  test "index does not make conversations draggable while searching" do
+    @conversation.pin!
+
+    get_nav_conversations(query: "Samantha")
+
+    assert_select "[data-sortable-target='item']", count: 0
+  end
+
+  test "reorder saves the order the ids arrive in" do
+    ids = %i[greeting ruby_version attachment].map { |name| conversations(name).tap(&:pin!).id }
+
+    post reorder_conversations_url, params: { ids: ids }
+
+    assert_response :no_content
+    assert_equal ids, users(:keith).conversations.pinned.pluck(:id)
+  end
+
+  test "reorder leaves another user's conversations alone" do
+    rob_conversation = conversations(:debugging)
+    rob_conversation.pin!
+    original_position = rob_conversation.pin_position
+
+    post reorder_conversations_url, params: { ids: [rob_conversation.id] }
+
+    assert_response :no_content
+    assert_equal original_position, rob_conversation.reload.pin_position
+  end
+
+  test "reorder without ids changes nothing" do
+    @conversation.pin!
+    original_position = @conversation.pin_position
+
+    post reorder_conversations_url
+
+    assert_response :no_content
+    assert_equal original_position, @conversation.reload.pin_position
   end
 end

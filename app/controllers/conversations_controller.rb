@@ -36,6 +36,11 @@ class ConversationsController < ApplicationController
     end
   end
 
+  def reorder
+    Current.user.conversations.reposition(params[:ids] || [])
+    head :no_content
+  end
+
   def public_show
     @conversation = Conversation.find_by!(share_token: params[:share_token])
     @messages = @conversation.messages.includes(:assistant).ordered
