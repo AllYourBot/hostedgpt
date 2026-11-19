@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :language_models_including_deleted, class_name: "LanguageModel", dependent: :destroy
   has_many :api_services, -> { not_deleted }
   has_many :api_services_including_deleted, class_name: "APIService", dependent: :destroy
+  has_many :bookmarks, dependent: :destroy
   has_many :conversations, dependent: :destroy
   has_many :credentials, dependent: :destroy
   has_many :memories, dependent: :destroy
