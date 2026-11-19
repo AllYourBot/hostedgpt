@@ -259,4 +259,42 @@ class ConversationTest < ActiveSupport::TestCase
 
     assert_empty grouped_conversations
   end
+
+  test ".reposition renumbers the pinned conversations to match the order of the ids it is given" do
+    keith = users(:keith)
+    ids = %i[greeting ruby_version attachment].map { |name| conversations(name).tap(&:pin!).id }
+    assert_equal ids.reverse, keith.conversations.pinned.pluck(:id), "The newest pin starts on top"
+
+    keith.conversations.reposition(ids.map(&:to_s)) # the ids arrive from the browser as strings
+
+    assert_equal ids, keith.conversations.pinned.pluck(:id)
+  end
+
+  test ".reposition ignores conversations outside the collection it is called on" do
+    rob_conversation = conversations(:debugging)
+    rob_conversation.pin!
+    original_position = rob_conversation.pin_position
+    greeting = conversations(:greeting).tap(&:pin!)
+
+    users(:keith).conversations.reposition([rob_conversation.id, greeting.id])
+
+    assert_equal original_position, rob_conversation.reload.pin_position
+  end
+
+  test ".reposition does not pin a conversation that is not pinned" do
+    unpinned = conversations(:ruby_version)
+    pinned = conversations(:greeting).tap(&:pin!)
+
+    users(:keith).conversations.reposition([unpinned.id, pinned.id])
+
+    assert_nil unpinned.reload.pin_position
+  end
+
+  test ".reposition does not change updated_at" do
+    pinned = conversations(:greeting).tap(&:pin!)
+
+    assert_no_changes -> { pinned.reload.updated_at } do
+      users(:keith).conversations.reposition([pinned.id])
+    end
+  end
 end

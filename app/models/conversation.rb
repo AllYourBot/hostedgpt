@@ -72,6 +72,20 @@ class Conversation < ApplicationRecord
   end
 
 
+  # Renumbers the pinned conversations in this collection to match the order of ids, which is how the
+  # sidebar hands back a Pinned list the user has dragged into shape. Ids that are not pinned, or that
+  # the collection does not contain, are simply ignored: a user-scoped relation cannot be talked into
+  # reordering someone else's conversations, and a stale page cannot pin a conversation by dragging it.
+  #
+  # update_column skips timestamps on purpose, for the same reason pin! does.
+  def self.reposition(ids)
+    ids = ids.map(&:to_i)
+
+    transaction do
+      pinned.where(id: ids).each { it.update_column(:pin_position, ids.index(it.id)) }
+    end
+  end
+
   def generate_shareable_url(request)
     ensure_share_token!
     Rails.application.routes.url_helpers.public_conversation_url(share_token, host: request.host_with_port)
