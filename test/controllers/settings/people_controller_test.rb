@@ -261,6 +261,42 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=checkbox][name='person[personable_attributes][provider_web_search]']:not([checked])"
   end
 
+  test "setting ui_scale saves it and sizes every page with it" do
+    @user.update!(dark_mode: "dark")
+
+    params = person_params
+    params["personable_attributes"]["ui_scale"] = "120"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+
+    @user.reload
+    assert_equal 120, @user.ui_scale, "The interface size should be saved"
+    assert_equal "dark", @user.dark_mode, "dark_mode should not have changed"
+
+    get edit_settings_person_url
+    assert_select "html[style='--ui-scale: 1.2']", true, "The page should be rendered at the saved size"
+    assert_select "body[data-ui-scale-percent-value='120']", true, "The body should re-apply the saved size on Turbo visits"
+    assert_select "input[type=range][name='person[personable_attributes][ui_scale]'][value='120']"
+    assert_select "[data-ui-scale-target=label]", "120%"
+  end
+
+  test "the settings form shows the ui_scale slider at 100% by default" do
+    get edit_settings_person_url
+    assert_select "html[style='--ui-scale: 1.0']", true, "The page should be rendered at the default size"
+    assert_select "input[type=range][name='person[personable_attributes][ui_scale]'][value='100'][min='70'][max='170'][step='5']"
+    assert_select "[data-ui-scale-target=label]", "100%"
+  end
+
+  test "setting ui_scale OUTSIDE the slider's range saves the nearest size" do
+    params = person_params
+    params["personable_attributes"]["ui_scale"] = "500"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+    assert_equal 170, @user.reload.ui_scale, "The interface size should stop at the largest size"
+  end
+
   test "updating dark_mode leaves nav_closed and feature opinions intact" do
     @user.update!(nav_closed: true)
     @user.update!(feature: { "some_custom_feature" => "sdk" })

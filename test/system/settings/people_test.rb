@@ -74,10 +74,36 @@ class Settings::PeopleTest < ApplicationSystemTestCase
     assert @person.user.google_tasks_credential.present?, "Google Tasks should still be connected"
   end
 
+  test "dragging the Interface size slider previews the size, and saving keeps it on every page" do
+    default_font_size = root_font_size
+    slider = find("input[type=range][name='person[personable_attributes][ui_scale]']")
+
+    slider.set(150)
+    assert_text "150%"
+    assert_true("The page should grow while the slider is dragged") { root_font_size == default_font_size * 1.5 }
+
+    click_text "Back"
+    assert_no_current_path edit_settings_person_url
+    assert_true("Leaving without saving should go back to the saved size") { root_font_size == default_font_size }
+
+    visit edit_settings_person_url
+    find("input[type=range][name='person[personable_attributes][ui_scale]']").set(150)
+    click_text "Save"
+    assert_alert "Saved"
+    assert_equal 150, @person.user.reload.ui_scale, "The interface size should be saved"
+
+    click_text "Back"
+    assert_no_current_path edit_settings_person_url
+    assert_true("The saved size should stay on other pages") { root_font_size == default_font_size * 1.5 }
+  end
+
   test "the settings sidebar links to the assistants page instead of listing each assistant" do
     within("section#menu") { click_text "Assistants" }
     assert_current_path settings_assistants_path
     assert_no_selector "section#menu picture"
   end
 
+  private
+
+  def root_font_size = page.evaluate_script("parseFloat(getComputedStyle(document.documentElement).fontSize)")
 end

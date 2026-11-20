@@ -313,6 +313,8 @@ en:
             dark: "Dark"
             light: "Light"
             system: "System"
+          ui_scale: "Interface size"
+          ui_scale_note: "Makes text and everything else bigger or smaller. 100% is the default size."
           show_thinking: "Show extended thinking"
           ask_follow_ups: "Ask follow-ups"
           provider_web_search: "Let Claude search and read the web"

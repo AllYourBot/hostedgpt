@@ -1,6 +1,6 @@
 <% content_for :title, Setting.product_name %>
 <!DOCTYPE html>
-<html data-role="<%= Rails.env %>">
+<html data-role="<%= Rails.env %>" style="--ui-scale: <%= Current.user.ui_scale / 100.0 %>">
   <%= render "head" %>
   <body
     class="
@@ -9,11 +9,12 @@
       <%= Current.user.dark_mode %>
       bg-white dark:bg-gray-800
     "
-    data-controller="transition focus-restore nav"
+    data-controller="transition focus-restore nav ui-scale"
     data-transition-toggle-class="nav-closed"
     data-transition-target="transitionable"
     data-nav-drawer-closed-class="nav-closed"
     data-nav-column-open-class="nav-open"
+    data-ui-scale-percent-value="<%= Current.user.ui_scale %>"
   >
     <nav
       id="nav-column"
