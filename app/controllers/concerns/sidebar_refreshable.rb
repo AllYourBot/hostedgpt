@@ -11,8 +11,7 @@ module SidebarRefreshable
   def render_sidebar(entry_to_remove: nil, page_context: false)
     respond_to do |format|
       format.turbo_stream do
-        @query = params[:query]
-        @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query)
+        set_nav_conversations
 
         streams = []
         if page_context && entry_to_remove.nil?
@@ -26,5 +25,15 @@ module SidebarRefreshable
       end
       format.html { head :no_content }
     end
+  end
+
+  # The nav's data, shared by index and the toggle re-renders: while searching, results are one
+  # flat list of matches, so a pinned conversation shows up in its time group like any other
+  # instead of being pulled out into the Pinned section.
+  def set_nav_conversations
+    @query = params[:query]
+    searching = @query.present?
+    @pinned_conversations = searching ? [] : Current.user.conversations.pinned.to_a
+    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query, exclude_pinned: !searching)
   end
 end

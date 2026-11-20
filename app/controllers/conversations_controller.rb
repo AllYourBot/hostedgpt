@@ -7,13 +7,7 @@ class ConversationsController < ApplicationController
   allow_unauthenticated_access only: [:public_show]
 
   def index
-    @query = params[:query]
-    searching = @query.present?
-
-    # Search results are one flat list of matches, so while searching a pinned conversation shows up
-    # in its time group like any other instead of being pulled out into the Pinned section.
-    @pinned_conversations = searching ? [] : Current.user.conversations.pinned.to_a
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query, exclude_pinned: !searching)
+    set_nav_conversations
   end
 
   def bookmarked_page
