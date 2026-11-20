@@ -17,21 +17,14 @@
         <%= t("app.conversations.ui.no_bookmarks_yet") %>
       </p>
     <% else %>
-      <% if @bookmarked_conversations.present? %>
-        <h2 class="mt-4 mb-2 text-base font-semibold text-gray-400 dark:text-gray-500">
-          <%= t("app.conversations.ui.bookmarked_conversations") %>
-        </h2>
+      <% [
+        [t("app.conversations.ui.bookmarked_conversations"), @bookmarked_conversations, "conversations/bookmarked_conversation_entry"],
+        [t("app.conversations.ui.bookmarked_messages"), @bookmarked_messages, "conversations/bookmarked_message_entry"]
+      ].each do |title, bookmarks, entry_partial| %>
+        <% next if bookmarks.blank? %>
+        <h2 class="mt-6 mb-2 text-base font-semibold text-gray-400 dark:text-gray-500"><%= title %></h2>
         <ul class="flex flex-col gap-1">
-          <%= render partial: "conversations/bookmarked_conversation_entry", collection: @bookmarked_conversations, as: :bookmark %>
-        </ul>
-      <% end %>
-
-      <% if @bookmarked_messages.present? %>
-        <h2 class="mt-6 mb-2 text-base font-semibold text-gray-400 dark:text-gray-500">
-          <%= t("app.conversations.ui.bookmarked_messages") %>
-        </h2>
-        <ul class="flex flex-col gap-1">
-          <%= render partial: "conversations/bookmarked_message_entry", collection: @bookmarked_messages, as: :bookmark %>
+          <%= render partial: entry_partial, collection: bookmarks, as: :bookmark %>
         </ul>
       <% end %>
     <% end %>
