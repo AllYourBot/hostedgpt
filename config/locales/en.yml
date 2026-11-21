@@ -318,6 +318,8 @@ en:
           show_thinking: "Show extended thinking"
           ask_follow_ups: "Ask follow-ups"
           provider_web_search: "Let Claude search and read the web"
+          use_ip_location: "Use location from IP address"
+          use_ip_location_note: "Tells the AI your approximate city, looked up from your IP address by ipinfo.io."
           ai_backends: "AI backends"
           ai_backends_description: "Which implementation handles each provider. Default follows the site-wide setting (currently %{current})."
           backend_choice_default: "Default"
