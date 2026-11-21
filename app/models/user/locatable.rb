@@ -31,8 +31,7 @@ module User::Locatable
 
   private
 
-  # Sets only this key in the database: saving the whole preferences hash from this possibly stale user
-  # would undo any preference changed since it was loaded.
+  # Not update!: saving this possibly stale user's whole preferences hash would undo newer preference changes.
   def remember_ip_location(value)
     User.where(id:).update_all(
       ["preferences = jsonb_set(coalesce(preferences, '{}'::jsonb), '{ip_location}', ?::jsonb)", value.to_json]
