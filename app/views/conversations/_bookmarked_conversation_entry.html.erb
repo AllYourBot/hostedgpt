@@ -1,0 +1,21 @@
+<%# locals: (bookmark:) %>
+<%# One bookmarked-conversation entry on the /bookmarks page. Vanished targets (an orphaned
+    bookmark whose conversation is gone) are skipped rather than rendering an empty row. %>
+<% conversation = bookmark.bookmarkable %>
+<% if conversation %>
+  <li id="<%= dom_id(bookmark) %>"
+    class="flex items-center justify-between gap-2 py-2 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+    data-role="bookmarked-conversation"
+  >
+    <%= link_to conversation_messages_path(conversation),
+      class: "flex-1 min-w-0",
+      data: { role: "bookmarked-conversation-link" } do %>
+      <span class="block truncate text-sm text-gray-950 dark:text-gray-100">
+        <%= conversation_title_or_new_chat(conversation) %>
+      </span>
+    <% end %>
+    <span class="flex items-center">
+      <%= render "conversations/save_toggle_button", conversation: conversation, toggled: true, toggle_params: {from_bookmarks: true} %>
+    </span>
+  </li>
+<% end %>

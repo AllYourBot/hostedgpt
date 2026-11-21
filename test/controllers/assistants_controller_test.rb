@@ -30,6 +30,14 @@ class AssistantsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[data-role='new-assistant'][href=?] [data-tip=?]", new_settings_assistant_path, I18n.t("app.settings.assistants.menu.new"), { count: 1 }, "The Assistants heading should have a plus icon that opens the New Assistant page"
   end
 
+  test "index carries the bookmarks entry point in the narrow header and the ribbon" do
+    stub_features(assistants_page: true) do
+      get assistants_url
+    end
+    assert_response :success
+    assert_select "a[data-role='open-bookmarks-page'][data-turbo-frame='_top'][href=?]", bookmarked_page_path, { count: 2 }, "The assistants page should offer the bookmarks entry point on both breakpoints (ribbon + narrow header)"
+  end
+
   test "index should mark the assistant cards that HAVE context files" do
     stub_features(assistants_page: true) do
       get assistants_url

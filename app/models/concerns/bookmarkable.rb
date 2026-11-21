@@ -1,0 +1,36 @@
+module Bookmarkable
+  extend ActiveSupport::Concern
+
+  included do
+    # Plain polymorphic membership: conversations and messages are hard-deleted, so bookmarks
+    # cascade with an explicit destroy rather than lingering.
+    has_many :bookmarks, as: :bookmarkable, dependent: :destroy
+
+    scope :bookmarked_for, ->(user) { joins(:bookmarks).where(bookmarks: { user: user }) }
+  end
+
+  # Membership only — toggling never disturbs sidebar order. The find runs first so double
+  # bookmarks never touch the database twice; the RecordNotUnique rescue covers the
+  # concurrent-insert window.
+  def bookmark!(bookmarking_user = user)
+    begin
+      bookmarks.find_or_create_by!(user: bookmarking_user)
+    rescue ActiveRecord::RecordNotUnique
+      bookmarks.find_by!(user: bookmarking_user)
+    end
+  end
+
+  def unbookmark!(bookmarking_user = user)
+    bookmarks.where(user: bookmarking_user).destroy_all
+  end
+
+  def bookmarked?(bookmarking_user = user)
+    # Reads the preloaded membership when the caller already loaded it, so rows render with no
+    # per-row query; falls back to the exists? check everywhere else. Same answer either way.
+    if bookmarks.loaded?
+      bookmarks.any? { |bookmark| bookmark.user_id == bookmarking_user&.id }
+    else
+      bookmarks.exists?(user: bookmarking_user)
+    end
+  end
+end

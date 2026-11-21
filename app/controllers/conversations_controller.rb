@@ -1,16 +1,36 @@
 class ConversationsController < ApplicationController
-  before_action :set_conversation, except: [:public_show]
-  before_action :set_nav_assistants, except: [:public_show]
+  include SidebarRefreshable
+
+  before_action :set_conversation, except: [:public_show, :bookmark, :unbookmark, :bookmarked_page]
+  before_action :set_toggled_conversation, only: [:bookmark, :unbookmark]
+  before_action :set_nav_assistants, except: [:public_show, :bookmark, :unbookmark]
   allow_unauthenticated_access only: [:public_show]
 
   def index
-    @query = params[:query]
-    searching = @query.present?
+    set_nav_conversations
+  end
 
-    # Search results are one flat list of matches, so while searching a pinned conversation shows up
-    # in its time group like any other instead of being pulled out into the Pinned section.
-    @pinned_conversations = searching ? [] : Current.user.conversations.pinned.to_a
-    @nav_conversations = Conversation.grouped_by_increasing_time_interval_for_user(Current.user, @query, exclude_pinned: !searching)
+  def bookmarked_page
+    @bookmarked_conversations = Current.user.bookmarks
+      .where(bookmarkable_type: "Conversation")
+      .order(created_at: :desc, id: :desc)
+      .preload(:bookmarkable)
+    @bookmarked_messages = Current.user.bookmarks
+      .where(bookmarkable_type: "Message")
+      .order(created_at: :desc, id: :desc)
+      .preload(bookmarkable: [:bookmarks, :assistant, {conversation: :user}])
+  end
+
+  def bookmark
+    @toggled_conversation.bookmark!(Current.user)
+    render_sidebar(toggled_conversation: @toggled_conversation)
+  end
+
+  def unbookmark
+    # The entry element is identified before the row is destroyed so the response can remove it in place.
+    entry = Current.user.bookmarks.find_by(bookmarkable: @toggled_conversation) if params[:from_bookmarks]
+    @toggled_conversation.unbookmark!(Current.user)
+    render_sidebar(entry_to_remove: entry, page_context: params[:from_bookmarks].present?, toggled_conversation: @toggled_conversation)
   end
 
   def show
@@ -52,6 +72,14 @@ class ConversationsController < ApplicationController
 
   def set_conversation
     @conversation = Current.user.conversations.find_by(id: params[:id] || params[:conversation_id])
+  end
+
+  # find (not find_by): someone else's conversation, or a missing one, is a 404 — the pins
+  # controller precedent. Toggle endpoints never silently no-op.
+  def set_toggled_conversation
+    @toggled_conversation = Current.user.conversations.find(params[:id])
+    # Keep the viewed conversation highlighted when the toggle re-renders the nav.
+    @conversation = @toggled_conversation
   end
 
   def conversation_params = params.require(:conversation).permit(:user_id, :assistant_id, :title)
