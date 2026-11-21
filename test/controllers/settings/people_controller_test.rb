@@ -261,6 +261,20 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=checkbox][name='person[personable_attributes][provider_web_search]']:not([checked])"
   end
 
+  test "the settings form shows the use_ip_location checkbox UNCHECKED by default" do
+    get edit_settings_person_url
+    assert_select "input[type=checkbox][name='person[personable_attributes][use_ip_location]']:not([checked])"
+  end
+
+  test "turning on use_ip_location saves it" do
+    params = person_params
+    params["personable_attributes"]["use_ip_location"] = "1"
+
+    patch settings_person_url, params: { person: params }
+    assert_redirected_to edit_settings_person_url
+    assert @user.reload.use_ip_location?, "Using the IP location should be turned on"
+  end
+
   test "setting ui_scale saves it and sizes every page with it" do
     @user.update!(dark_mode: "dark")
 

@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  include Personable, Registerable
+  include Personable, Registerable, Locatable
 
   # The interface size, as a percent of the default size.
   UI_SCALE_RANGE = 70..170

@@ -160,12 +160,14 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
       "Ask follow-ups should default to checked"
     assert_select "input[type=checkbox][name=?][checked]", "person[personable_attributes][provider_web_search]", 1,
       "Web search should be checked"
+    assert_select "input[type=checkbox][name=?]:not([checked])", "person[personable_attributes][use_ip_location]", 1,
+      "IP location should default to unchecked"
   end
 
   test "should update user preferences" do
     login_as @admin
     patch admin_user_url(@user), params: { person: { personable_attributes: {
-      dark_mode: "light", show_thinking: "0", ask_follow_ups: "0", provider_web_search: "1"
+      dark_mode: "light", show_thinking: "0", ask_follow_ups: "0", provider_web_search: "1", use_ip_location: "1"
     } } }
 
     assert_redirected_to admin_users_url
@@ -174,6 +176,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     refute @user.show_thinking?, "Show thinking should be off"
     refute @user.ask_follow_ups?, "Ask follow-ups should be off"
     assert @user.provider_web_search?, "Web search should be on"
+    assert @user.use_ip_location?, "IP location should be on"
   end
 
   test "should update the user in the url EVEN IF params name another user" do
