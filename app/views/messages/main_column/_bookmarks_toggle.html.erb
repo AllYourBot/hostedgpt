@@ -1,0 +1,32 @@
+<%# locals: (conversation:, show_label: false) %>
+<%# The chat header's stateful bookmark control: outline with the bookmark action when
+    unbookmarked, solid with the reverse action once bookmarked; render_sidebar re-renders
+    both header variants of this partial (see SidebarRefreshable). Without a persisted
+    conversation there is nothing to bookmark: renders disabled with an unavailable
+    tooltip, mirroring the share button. %>
+<% toggled = conversation&.persisted? && conversation.bookmarked?(conversation.user) %>
+<% if conversation&.persisted? %>
+  <%= button_to toggled ? unbookmark_conversation_path(conversation) : bookmark_conversation_path(conversation),
+    method: :post,
+    data: {
+      role: toggled ? "unbookmark-conversation" : "bookmark-conversation",
+      tip: t("app.conversations.ui.#{toggled ? "unbookmark_conversation" : "bookmark"}")
+    },
+    form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
+    class: "inline-flex items-center gap-1 px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 tooltip tooltip-left hover:tooltip-open" do %>
+    <%= icon "bookmark", variant: toggled ? :solid : :outline, size: 20, class: "text-gray-950 dark:text-gray-100" %>
+    <% if show_label %>
+      <span class="text-sm text-gray-600 dark:text-gray-400"><%= t("app.conversations.ui.bookmark") %></span>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= button_tag type: "button",
+    disabled: true,
+    class: "inline-flex items-center gap-1 px-2 py-2 cursor-pointer group rounded-xl opacity-50 cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 tooltip tooltip-left hover:tooltip-open",
+    data: { tip: t("app.conversations.ui.bookmark_unavailable") } do %>
+    <%= icon "bookmark", variant: :outline, size: 20, class: "text-gray-950 dark:text-gray-100" %>
+    <% if show_label %>
+      <span class="text-sm text-gray-600 dark:text-gray-400"><%= t("app.conversations.ui.bookmark") %></span>
+    <% end %>
+  <% end %>
+<% end %>

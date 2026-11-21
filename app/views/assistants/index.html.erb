@@ -5,15 +5,6 @@
 <turbo-frame id="conversation" class="relative flex flex-col flex-1 min-w-0" data-turbo-action="advance">
   <%= render "messages/main_column/sidebar_toggle" %>
 
-  <%# A bookmark ribbon hanging from the page's top edge — the /bookmarks entry point,
-      sized and placed to read as an actual bookmark tab. Hung at the title's indent,
-      desktop only: on mobile the narrow header carries the icon instead. %>
-  <%= link_to bookmarked_page_path,
-    class: "absolute top-0 left-8 z-10 hidden md:block text-gray-400 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300 transition-colors",
-    data: { role: "open-bookmarks-page", turbo_frame: "_top" } do %>
-    <%= icon "bookmark", variant: :solid, size: 32, class: "-ml-2", title: t("app.conversations.ui.bookmarks_page"), tooltip: :bottom %>
-  <% end %>
-
   <header id="narrow-header" class="flex-none text-lg h-14 md:hidden">
     <div class="flex items-center justify-between flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
       <%= render "layouts/nav_toggle" %>
@@ -23,6 +14,18 @@
       </div>
     </div>
   </header>
+
+  <%# A bookmark ribbon hanging from the page's top edge — the /bookmarks entry point,
+      sized and placed to read as an actual bookmark tab, with the page's name beside it.
+      Hung at a -ml-1.5 nudge so the icon's visible ink (the heroicon leaves ~6px of
+      internal inset) lines up with the "Assistants" title's indent, desktop only: on
+      mobile the narrow header carries the link instead. %>
+  <%= link_to bookmarked_page_path,
+    class: "absolute top-0 left-8 z-10 hidden md:flex items-center gap-1 -ml-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300 transition-colors",
+    data: { role: "open-bookmarks-page", turbo_frame: "_top" } do %>
+    <%= icon "bookmark", variant: :solid, size: 32 %>
+    <span class="text-xl font-semibold tracking-tighter"><%= t("app.conversations.ui.bookmarks_page") %></span>
+  <% end %>
 
   <div class="px-[2rem] mb-[4rem] mt-4 md:mt-[4rem]">
     <h1 class="text-2xl mb-4 font-semibold tracking-tighter"><%= t("app.assistants.index_title") %></h1>

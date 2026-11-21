@@ -1,12 +1,14 @@
+<%# locals: (conversation:, show_label: false) %>
+<%# The tooltip lives on the button, not the icon: the label widens the hover target, and a
+    button-level tip appears as soon as the pointer enters the pill. It opens leftward so it
+    never bleeds off the page's right edge, like the new-chat icon beside it. %>
 <%= button_tag type: "button",
-  class: "inline-flex px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 #{"opacity-50 cursor-not-allowed" unless conversation&.persisted?}",
+  class: "inline-flex items-center gap-1 px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 tooltip tooltip-left hover:tooltip-open #{"opacity-50 cursor-not-allowed" unless conversation&.persisted?}",
+  data: { tip: conversation&.persisted? ? t("app.conversations.ui.share") : t("app.conversations.ui.share_unavailable") },
   onclick: conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
   disabled: !conversation&.persisted? do %>
-  <%= icon "arrow-up-tray",
-    variant: :outline,
-    size: 20,
-    class: "text-gray-950 dark:text-gray-100",
-    title: conversation&.persisted? ? t("app.conversations.ui.share") : t("app.conversations.ui.share_unavailable"),
-    tooltip: :bottom
-  %>
+  <%= icon "arrow-up-tray", variant: :outline, size: 20, class: "text-gray-950 dark:text-gray-100" %>
+  <% if show_label %>
+    <span class="text-sm text-gray-600 dark:text-gray-400"><%= t("app.conversations.ui.share_button") %></span>
+  <% end %>
 <% end %>

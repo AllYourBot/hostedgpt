@@ -19,7 +19,16 @@ class BookmarksTest < ApplicationSystemTestCase
     first("[data-role='bookmark-message']").click
     assert_selector("[data-role='unbookmark-message']")
 
-    # Both entries show on the /bookmarks page.
+    # The chat header's bookmark control mirrors the conversation's state and toggles in place:
+    # solid with the reverse action after the sidebar bookmark, back to outline when undone.
+    first("[data-role='unbookmark-conversation']").click
+    assert_selector("[data-role='bookmark-conversation']")
+    first("[data-role='bookmark-conversation']").click
+    assert_selector("[data-role='unbookmark-conversation']")
+
+    # Both entries show on the /bookmarks page — reached from here through the assistants
+    # page's ribbon, since the chat header's control toggles instead of navigating.
+    visit root_path
     click_element "a[data-role='open-bookmarks-page']"
     assert_selector("[data-role='bookmarked-conversation']")
     assert_selector("[data-role='bookmarked-message']")
@@ -47,8 +56,9 @@ class BookmarksTest < ApplicationSystemTestCase
     end
     assert scrolled_into_view, "the deep link should scroll the bookmarked message into view (#{diagnostics})"
 
-    # Unbookmarking from the page removes the entry in place.
-    click_element "a[data-role='open-bookmarks-page']"
+    # Unbookmarking from the page removes the entry in place. The conversation page has no
+    # /bookmarks link anymore — its header control toggles instead — so visit directly.
+    visit bookmarked_page_path
     find("[data-role='bookmarked-message'] [data-role='unbookmark-message']").click
     assert_no_selector("[data-role='bookmarked-message']")
   end

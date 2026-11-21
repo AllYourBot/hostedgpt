@@ -7,8 +7,11 @@ module SidebarRefreshable
   # bounced-back query), so the icon flips with no reload and no scroll loss. Page-context
   # unbookmarks (the /bookmarks page, marked from_bookmarks) first remove their list entry,
   # then refresh the nav frame so the sidebar's icon un-flips too. Autofocus is suppressed
-  # so a toggle never steals focus, and plain requests answer 204.
-  def render_sidebar(entry_to_remove: nil, page_context: false)
+  # so a toggle never steals focus, and plain requests answer 204. A conversation toggle
+  # additionally flips the chat header's stateful bookmark control: the targets are scoped
+  # to the toggled conversation — a foreign toggle matches nothing — and split by variant,
+  # because the wide header labels the control and the narrow one doesn't.
+  def render_sidebar(entry_to_remove: nil, page_context: false, toggled_conversation: nil)
     respond_to do |format|
       format.turbo_stream do
         set_nav_conversations
@@ -21,10 +24,24 @@ module SidebarRefreshable
           streams << turbo_stream.remove(helpers.dom_id(entry_to_remove)) if entry_to_remove
           streams << turbo_stream.update("nav-conversations", partial: "conversations/nav", locals: {autofocus: false})
         end
+        if toggled_conversation
+          streams << header_bookmark_stream(toggled_conversation, labeled: true)
+          streams << header_bookmark_stream(toggled_conversation, labeled: false)
+        end
         render turbo_stream: streams
       end
       format.html { head :no_content }
     end
+  end
+
+  private
+
+  def header_bookmark_stream(conversation, labeled:)
+    turbo_stream.update_all(
+      "[data-conversation-bookmark-toggle#{labeled ? "-labeled" : ""}='#{conversation.id}']",
+      partial: "messages/main_column/bookmarks_toggle",
+      locals: {conversation: conversation, show_label: labeled}
+    )
   end
 
   # The nav's data, shared by index and the toggle re-renders: while searching, results are one

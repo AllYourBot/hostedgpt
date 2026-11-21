@@ -28,6 +28,12 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "the new-chat page renders the disabled bookmark control with its unavailable tooltip" do
+    get new_assistant_message_url(@assistant)
+    assert_response :success
+    assert_select "button[disabled][data-tip=?]", I18n.t("app.conversations.ui.bookmark_unavailable"), count: 2 # both header variants render the disabled branch
+  end
+
   test "bookmark toggle answers a turbo-stream update of the message's bookmark span" do
     post bookmark_message_url(@message), as: :turbo_stream
 
@@ -56,6 +62,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, %(turbo-stream action="remove" target="#{dom_id(bookmark)}")
     assert_includes response.body, %(turbo-stream action="update" target="nav-conversations")
+    assert_not_includes response.body, "data-conversation-bookmark-toggle" # a message toggle never touches the chat header's conversation control
     assert_not @message.bookmarked?(@user)
   end
 

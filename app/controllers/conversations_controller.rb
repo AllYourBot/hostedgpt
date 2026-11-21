@@ -23,14 +23,14 @@ class ConversationsController < ApplicationController
 
   def bookmark
     @toggled_conversation.bookmark!(Current.user)
-    render_sidebar
+    render_sidebar(toggled_conversation: @toggled_conversation)
   end
 
   def unbookmark
     # The entry element is identified before the row is destroyed so the response can remove it in place.
     entry = Current.user.bookmarks.find_by(bookmarkable: @toggled_conversation) if params[:from_bookmarks]
     @toggled_conversation.unbookmark!(Current.user)
-    render_sidebar(entry_to_remove: entry, page_context: params[:from_bookmarks].present?)
+    render_sidebar(entry_to_remove: entry, page_context: params[:from_bookmarks].present?, toggled_conversation: @toggled_conversation)
   end
 
   def show
