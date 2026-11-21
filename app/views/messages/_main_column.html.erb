@@ -10,7 +10,11 @@
     <%= render "messages/main_column/assistant_header" %>
 
     <div class="flex items-center gap-2">
-      <%= render "messages/main_column/share_button", conversation: @conversation %>
+      <div class="flex items-center" data-conversation-bookmark-toggle-labeled="<%= @conversation.id if @conversation&.persisted? %>">
+        <%= render "messages/main_column/bookmarks_toggle", conversation: @conversation, show_label: true %>
+      </div>
+
+      <%= render "messages/main_column/share_button", conversation: @conversation, show_label: true %>
 
       <%= link_to new_assistant_message_path(@assistant),
         target: "_top",
@@ -37,6 +41,10 @@
       <%= render "messages/main_column/assistant_header" %>
 
       <div class="flex items-center gap-2">
+        <div class="flex items-center" data-conversation-bookmark-toggle="<%= @conversation.id if @conversation&.persisted? %>">
+          <%= render "messages/main_column/bookmarks_toggle", conversation: @conversation %>
+        </div>
+
         <%= render "messages/main_column/share_button", conversation: @conversation %>
 
         <%= link_to new_assistant_message_path(@assistant), target: "_top", class: "block cursor-pointer inline-flex mr-1 px-2 group", data: { role: "new" } do %>

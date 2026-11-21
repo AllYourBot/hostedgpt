@@ -1,0 +1,28 @@
+<%# locals: (bookmark:) %>
+<%# One bookmarked-message entry: the message's snippet (or a role label when content is
+    blank) over its conversation's title, deep-linking into that conversation at that
+    message's pinned version. Vanished targets are skipped. %>
+<% message = bookmark.bookmarkable %>
+<% if message %>
+  <li id="<%= dom_id(bookmark) %>"
+    class="flex items-center justify-between gap-2 py-2 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+    data-role="bookmarked-message"
+  >
+    <%= link_to conversation_messages_path(message.conversation, version: message.version, anchor: "message_#{message.id}"),
+      class: "flex-1 min-w-0",
+      data: {
+        role: "bookmarked-message-link",
+        turbo: false # a full browser load so the native #anchor scroll positions the message; Turbo's visit sets the hash after the page scrolls
+      } do %>
+      <span class="block truncate text-sm text-gray-950 dark:text-gray-100">
+        <%= truncate(bookmarked_message_snippet(message), length: 120) %>
+      </span>
+      <span class="block truncate text-xs text-gray-400 dark:text-gray-500">
+        <%= conversation_title_or_new_chat(message.conversation) %>
+      </span>
+    <% end %>
+    <span class="flex items-center">
+      <%= render "messages/message_toggle_button", message: message, toggle_params: {from_bookmarks: true}, size: 16 %>
+    </span>
+  </li>
+<% end %>

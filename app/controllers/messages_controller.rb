@@ -1,11 +1,12 @@
 class MessagesController < ApplicationController
   include ActiveStorage::SetCurrent
   include HasConversationStarter
+  include SidebarRefreshable
 
   before_action :set_version,               only: [:index, :update]
   before_action :set_conversation,          only: [:index]
   before_action :set_assistant,             only: [:index, :new, :edit, :create]
-  before_action :set_message,               only: [:show, :edit, :update]
+  before_action :set_message,               only: [:show, :edit, :update, :bookmark, :unbookmark]
   before_action :set_nav_assistants,        only: [:index, :new]
   before_action :set_conversation_starters, only: [:new]
 
@@ -17,7 +18,7 @@ class MessagesController < ApplicationController
       end
     end
 
-    @messages = @conversation.messages.for_conversation_version(@version)
+    @messages = @conversation.messages.for_conversation_version(@version).preload(:bookmarks)
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
       content_text: [nil, ""],
@@ -62,6 +63,23 @@ class MessagesController < ApplicationController
     end
   end
 
+  def bookmark
+    @message.bookmark!(Current.user)
+    render_message_bookmark
+  end
+
+  def unbookmark
+    # The entry element is identified before the row is destroyed so the response can remove it in place.
+    entry = Current.user.bookmarks.find_by(bookmarkable: @message) if params[:from_bookmarks]
+    @message.unbookmark!(Current.user)
+
+    if params[:from_bookmarks]
+      render_sidebar(entry_to_remove: entry, page_context: true)
+    else
+      render_message_bookmark
+    end
+  end
+
   private
 
   def set_version
@@ -81,6 +99,17 @@ class MessagesController < ApplicationController
   def set_message
     @message = Message.find(params[:id])
     redirect_to root_url, status: :unauthorized if @message.conversation.user != Current.user
+  end
+
+  # Message bookmarks answer with one stream — the row's own bookmark button — since bookmarks
+  # are per-message state with no section to refresh.
+  def render_message_bookmark
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update("#{helpers.dom_id(@message)}-bookmark", partial: "messages/message_toggle_button", locals: {message: @message})
+      end
+      format.html { head :no_content }
+    end
   end
 
   def set_nav_assistants
