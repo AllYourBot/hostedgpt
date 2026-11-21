@@ -8,7 +8,5 @@
   onclick: conversation&.persisted? ? "document.getElementById('share-modal').showModal()" : nil,
   disabled: !conversation&.persisted? do %>
   <%= icon "arrow-up-tray", variant: :outline, size: 20, class: "text-gray-950 dark:text-gray-100" %>
-  <% if show_label %>
-    <span class="text-sm text-gray-600 dark:text-gray-400"><%= t("app.conversations.ui.share_button") %></span>
-  <% end %>
+  <%= render "messages/main_column/button_label", show_label: show_label, text: t("app.conversations.ui.share_button") %>
 <% end %>

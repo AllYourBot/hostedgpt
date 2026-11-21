@@ -15,9 +15,7 @@
     form: { class: "inline-block p-0", data: { turbo_frame: "_top" } },
     class: "inline-flex items-center gap-1 px-2 py-2 cursor-pointer group rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 tooltip tooltip-left hover:tooltip-open" do %>
     <%= icon "bookmark", variant: toggled ? :solid : :outline, size: 20, class: "text-gray-950 dark:text-gray-100" %>
-    <% if show_label %>
-      <span class="text-sm text-gray-600 dark:text-gray-400"><%= t("app.conversations.ui.bookmark") %></span>
-    <% end %>
+    <%= render "messages/main_column/button_label", show_label: show_label, text: t("app.conversations.ui.bookmark") %>
   <% end %>
 <% else %>
   <%= button_tag type: "button",
@@ -25,8 +23,6 @@
     class: "inline-flex items-center gap-1 px-2 py-2 cursor-pointer group rounded-xl opacity-50 cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 tooltip tooltip-left hover:tooltip-open",
     data: { tip: t("app.conversations.ui.bookmark_unavailable") } do %>
     <%= icon "bookmark", variant: :outline, size: 20, class: "text-gray-950 dark:text-gray-100" %>
-    <% if show_label %>
-      <span class="text-sm text-gray-600 dark:text-gray-400"><%= t("app.conversations.ui.bookmark") %></span>
-    <% end %>
+    <%= render "messages/main_column/button_label", show_label: show_label, text: t("app.conversations.ui.bookmark") %>
   <% end %>
 <% end %>
