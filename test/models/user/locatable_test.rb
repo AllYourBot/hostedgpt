@@ -13,26 +13,26 @@ class User::LocatableTest < ActiveSupport::TestCase
     assert_equal true, @user.preferences["use_ip_location"], "The preference should be stored as a boolean"
   end
 
-  test "located_at! does nothing while the setting is off" do
+  test "located_at! DOES NOTHING while the setting is off" do
     @user.located_at!("1.2.3.4")
     assert_nil @user.reload.ip_location, "No IP address should be stored while the setting is off"
   end
 
-  test "located_at! stores a new address and forgets the old place" do
+  test "located_at! STORES a new address and forgets the old place" do
     @user.update!(use_ip_location: true, ip_location: { "ip" => "5.6.7.8", "name" => "Paris, FR" })
 
     @user.located_at!("1.2.3.4")
     assert_equal({ "ip" => "1.2.3.4" }, @user.reload.ip_location, "A new address should replace the old place")
   end
 
-  test "located_at! keeps the place when the address is unchanged" do
+  test "located_at! KEEPS the place when the address is unchanged" do
     @user.update!(use_ip_location: true, ip_location: { "ip" => "1.2.3.4", "name" => "Austin, Texas, US" })
 
     @user.located_at!("1.2.3.4")
     assert_equal "Austin, Texas, US", @user.reload.ip_location["name"], "The remembered place should be kept"
   end
 
-  test "location looks the place up once and remembers it" do
+  test "location LOOKS UP the place once and remembers it" do
     @user.update!(use_ip_location: true, ip_location: { "ip" => "1.2.3.4" })
 
     stub_get_response(:get_location, status: 200, response: { city: "Austin", region: "Texas", country: "US" }) do
@@ -41,7 +41,19 @@ class User::LocatableTest < ActiveSupport::TestCase
     assert_equal "Austin, Texas, US", @user.reload.location, "The place should be remembered without another lookup"
   end
 
-  test "location is nil while the setting is off" do
+  test "location KEEPS preferences another request changed since this user was loaded" do
+    @user.update!(use_ip_location: true, ip_location: { "ip" => "1.2.3.4" })
+    User.find(@user.id).update!(nav_closed: true)
+
+    stub_get_response(:get_location, status: 200, response: { city: "Austin", region: "Texas", country: "US" }) do
+      @user.location
+    end
+    @user.reload
+    assert_equal true, @user.nav_closed, "Remembering the place should not undo another preference change"
+    assert_equal "Austin, Texas, US", @user.ip_location["name"], "The place should still be remembered"
+  end
+
+  test "location IS NIL while the setting is off" do
     @user.update!(ip_location: { "ip" => "1.2.3.4", "name" => "Austin, Texas, US" })
     assert_nil @user.location, "No location should be given while the setting is off"
   end
