@@ -135,4 +135,19 @@ class AIBackend::MemoryTest < ActiveSupport::TestCase
 
     refute_includes backend.send(:full_instructions), AIBackend::FOLLOW_UP_INSTRUCTIONS, "A reply read aloud should stay brief"
   end
+
+  test "full_instructions INCLUDES the user's location when they use their IP location" do
+    users(:keith).update!(use_ip_location: true, ip_location: { "ip" => "1.2.3.4", "name" => "Austin, Texas, US" })
+    backend = AIBackend.new(users(:keith), assistants(:samantha), conversations(:greeting), messages(:yes_i_do))
+
+    assert_includes backend.send(:full_instructions), "location, based on their IP address, is Austin, Texas, US",
+      "The location should be in the system message"
+  end
+
+  test "full_instructions LEAVES OUT the user's location when they don't use their IP location" do
+    users(:keith).update!(ip_location: { "ip" => "1.2.3.4", "name" => "Austin, Texas, US" })
+    backend = AIBackend.new(users(:keith), assistants(:samantha), conversations(:greeting), messages(:yes_i_do))
+
+    refute_includes backend.send(:full_instructions), "Austin, Texas, US", "The location should not be sent"
+  end
 end

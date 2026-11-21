@@ -67,7 +67,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def user_attributes
-    attributes = [:first_name, :last_name, :dark_mode, :show_thinking, :ask_follow_ups, :provider_web_search]
+    attributes = [:first_name, :last_name, :dark_mode, :show_thinking, :ask_follow_ups, :provider_web_search, :use_ip_location]
     @person&.personable == Current.user ? attributes : attributes + [:admin]
   end
 end

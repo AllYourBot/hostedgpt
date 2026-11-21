@@ -435,6 +435,20 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-role="ask-user-choice"]', { text: "<b>bold</b>" }, "A choice should be shown as plain text"
   end
 
+  test "create RECORDS the user's IP address when they use their IP location" do
+    @user.update!(use_ip_location: true)
+
+    post assistant_messages_url(@assistant), params: { message: { conversation_id: @conversation.id, content_text: "Hi" } },
+      env: { "REMOTE_ADDR" => "1.2.3.4" }
+    assert_equal "1.2.3.4", @user.reload.ip_location["ip"], "The request's IP address should be stored"
+  end
+
+  test "create DOES NOT RECORD the user's IP address when they don't use their IP location" do
+    post assistant_messages_url(@assistant), params: { message: { conversation_id: @conversation.id, content_text: "Hi" } },
+      env: { "REMOTE_ADDR" => "1.2.3.4" }
+    assert_nil @user.reload.ip_location, "No IP address should be stored"
+  end
+
   test "create with a picked choice saves it as the user's message and queues the reply" do
     question = ask_user_question(choices: ["Free", "Pro"])
 

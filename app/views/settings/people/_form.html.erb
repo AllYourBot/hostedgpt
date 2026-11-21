@@ -96,6 +96,21 @@
       </div>
     </div>
 
+    <div class="my-5">
+      <div class="flex items-center justify-between">
+        <%= user_fields.label :ui_scale, t("app.settings.people.form.ui_scale") %>
+        <span data-ui-scale-target="label"><%= person.personable.ui_scale %>%</span>
+      </div>
+      <%= user_fields.range_field :ui_scale,
+        value: person.personable.ui_scale,
+        min: User::UI_SCALE_RANGE.min,
+        max: User::UI_SCALE_RANGE.max,
+        step: 5,
+        class: "range range-xs mt-2",
+        data: { action: "input->ui-scale#preview" } %>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t("app.settings.people.form.ui_scale_note") %></p>
+    </div>
+
     <div class="my-5 flex items-center gap-2">
       <%= user_fields.check_box :show_thinking, checked: person.personable.show_thinking? %>
       <%= user_fields.label :show_thinking, t("app.settings.people.form.show_thinking") %>
@@ -109,6 +124,14 @@
     <div class="my-5 flex items-center gap-2">
       <%= user_fields.check_box :provider_web_search, checked: person.personable.provider_web_search? %>
       <%= user_fields.label :provider_web_search, t("app.settings.people.form.provider_web_search") %>
+    </div>
+
+    <div class="my-5">
+      <div class="flex items-center gap-2">
+        <%= user_fields.check_box :use_ip_location, checked: person.personable.use_ip_location? %>
+        <%= user_fields.label :use_ip_location, t("app.settings.people.form.use_ip_location") %>
+      </div>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t("app.settings.people.form.use_ip_location_note") %></p>
     </div>
 
     <% if Feature.google_tools? %>

@@ -62,6 +62,37 @@ class User::PreferenceTest < ActiveSupport::TestCase
     refute user.reload.provider_web_search?, "Unchecking the box should turn provider web search off"
   end
 
+  test "ui_scale defaults to 100 and takes a form slider value" do
+    user = User.create!(first_name: "First", last_name: "Last")
+    assert_equal 100, user.ui_scale, "The interface size should be 100% for a user who never changed the setting"
+
+    user.update!(ui_scale: "120")
+    assert_equal 120, user.reload.ui_scale, "Moving the slider should change the interface size"
+    assert_equal 120, user.preferences["ui_scale"], "The preference should be stored as an integer"
+
+    user.update!(ui_scale: "")
+    assert_equal 100, user.reload.ui_scale, "A blank value should go back to the default size"
+  end
+
+  test "ui_scale KEEPS a value inside the slider's range and resets one that isn't a whole number" do
+    user = users(:keith)
+
+    user.ui_scale = 500
+    assert_equal User::UI_SCALE_RANGE.max, user.ui_scale, "A size above the range should become the largest size"
+
+    user.ui_scale = "10"
+    assert_equal User::UI_SCALE_RANGE.min, user.ui_scale, "A size below the range should become the smallest size"
+
+    user.ui_scale = "085"
+    assert_equal 85, user.ui_scale, "A leading zero should still read as a decimal number"
+
+    user.ui_scale = "big"
+    assert_equal 100, user.ui_scale, "A value that isn't a number should go back to the default size"
+
+    user.ui_scale = "1.5"
+    assert_equal 100, user.ui_scale, "A fraction should go back to the default size"
+  end
+
   test "accessor writes mark preferences as changed and persist" do
     user = User.create!(first_name: "First", last_name: "Last")
     assert_nil user.preferences

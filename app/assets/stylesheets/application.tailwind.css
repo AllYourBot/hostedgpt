@@ -255,11 +255,13 @@ input:focus {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: -webkit-fill-available;
+    /* --ui-scale is the user's Interface size setting, kept in sync by ui_scale_controller.js. */
+    font-size: calc(100% * var(--ui-scale, 1));
   }
   /* A percentage, not px, so a user's larger browser font size still scales the page. */
   @screen lg {
     html {
-      font-size: 87.5%;
+      font-size: calc(87.5% * var(--ui-scale, 1));
     }
   }
   body {

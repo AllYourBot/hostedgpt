@@ -93,6 +93,10 @@ class AIBackend
       s += memories.join("\n")
     end
 
+    if (location = @user.location).present?
+      s += "\n\nThe user's approximate location, based on their IP address, is #{location}."
+    end
+
     if (context = @assistant.context_prompt).present?
       s += "\n\n#{context}"
     end
