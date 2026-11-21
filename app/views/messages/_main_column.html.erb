@@ -10,6 +10,8 @@
     <%= render "messages/main_column/assistant_header" %>
 
     <div class="flex items-center gap-2">
+      <%= render "messages/main_column/bookmarks_button" %>
+
       <%= render "messages/main_column/share_button", conversation: @conversation %>
 
       <%= link_to new_assistant_message_path(@assistant),
@@ -37,6 +39,8 @@
       <%= render "messages/main_column/assistant_header" %>
 
       <div class="flex items-center gap-2">
+        <%= render "messages/main_column/bookmarks_button" %>
+
         <%= render "messages/main_column/share_button", conversation: @conversation %>
 
         <%= link_to new_assistant_message_path(@assistant), target: "_top", class: "block cursor-pointer inline-flex mr-1 px-2 group", data: { role: "new" } do %>

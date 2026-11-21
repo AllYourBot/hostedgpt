@@ -452,7 +452,7 @@ de:
         send_message: "Nachricht senden"
         search_placeholder: "Suchen"
         bookmark: "Lesezeichen"
-        unbookmark: "Lesezeichen entfernen"
+        unbookmark_conversation: "Lesezeichen entfernen"
         bookmark_message: "Nachricht mit Lesezeichen versehen"
         unbookmark_message: "Lesezeichen entfernen"
         bookmarks_page: "Lesezeichen"

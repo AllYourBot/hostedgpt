@@ -5,9 +5,22 @@
 <turbo-frame id="conversation" class="relative flex flex-col flex-1 min-w-0" data-turbo-action="advance">
   <%= render "messages/main_column/sidebar_toggle" %>
 
+  <%# A bookmark ribbon hanging from the page's top edge — the /bookmarks entry point,
+      sized and placed to read as an actual bookmark tab. Hung at the title's indent,
+      desktop only: on mobile the narrow header carries the icon instead. %>
+  <%= link_to bookmarked_page_path,
+    class: "absolute top-0 left-8 z-10 hidden md:block text-gray-400 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300 transition-colors",
+    data: { role: "open-bookmarks-page", turbo_frame: "_top" } do %>
+    <%= icon "bookmark", variant: :solid, size: 32, class: "-ml-2", title: t("app.conversations.ui.bookmarks_page"), tooltip: :bottom %>
+  <% end %>
+
   <header id="narrow-header" class="flex-none text-lg h-14 md:hidden">
-    <div class="flex items-center flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
+    <div class="flex items-center justify-between flex-1 mb-2 border-b border-gray-300 text-gray-950 dark:text-gray-100 dark:border-gray-600 dark:bg-gray-800">
       <%= render "layouts/nav_toggle" %>
+
+      <div class="flex items-center gap-2 mr-1">
+        <%= render "messages/main_column/bookmarks_button" %>
+      </div>
     </div>
   </header>
 

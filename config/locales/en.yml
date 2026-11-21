@@ -484,7 +484,7 @@ en:
         send_message: "Send message"
         search_placeholder: "Search"
         bookmark: "Bookmark"
-        unbookmark: "Unbookmark"
+        unbookmark_conversation: "Unbookmark conversation"
         bookmark_message: "Bookmark message"
         unbookmark_message: "Unbookmark message"
         bookmarks_page: "Bookmarks"

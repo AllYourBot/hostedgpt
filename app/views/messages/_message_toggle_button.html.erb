@@ -6,6 +6,9 @@
     back mid-stream. Owner-only endpoints make the two identical for every interactive request. %>
 <% toggled = message.bookmarked? %>
 <% verb = toggled ? "un" : "" %>
+<%# On the /bookmarks page the toggled button renders as a trashcan — there the action
+    reads as "remove from this list", so the affordance follows the page, not the state. %>
+<% remove_from_list = toggle_params[:from_bookmarks] && toggled %>
 <%= button_to toggled ? unbookmark_message_path(message) : bookmark_message_path(message),
   method: :post,
   params: toggle_params,
@@ -13,8 +16,8 @@
   form: { class: "flex items-center", data: { turbo_frame: "_top" } },
   class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
   title: t("app.conversations.ui.#{verb}bookmark_message") do %>
-  <%= icon "bookmark",
-    variant: toggled ? :solid : :outline,
+  <%= icon remove_from_list ? "trash" : "bookmark",
+    variant: remove_from_list || !toggled ? :outline : :solid,
     size: size,
     class: "text-gray-500 dark:text-gray-300"
   %>

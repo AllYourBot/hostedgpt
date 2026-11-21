@@ -152,6 +152,8 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, %(turbo-stream action="update" target="nav-conversations")
     assert_includes response.body, %(data-role="unbookmark")
+    assert_select "form[action*='unbookmark'] svg path[d^='M6.32']", count: 1 # the toggled sidebar row keeps a solid bookmark
+    assert_select "form[action*='unbookmark'] svg path[d^='m14.74']", count: 0 # the trashcan is /bookmarks-only, even though row delete menus share the icon
     assert_select "div[data-role='conversation'].relationship" # the viewed row stays highlighted
     assert @conversation.bookmarked?(@conversation.user)
   end
@@ -219,6 +221,9 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "li[data-role='bookmarked-conversation']", count: 2
     assert_select "li[data-role='bookmarked-message']", count: 1
+    assert_select "li[data-role='bookmarked-conversation'] svg path[d^='m14.74']", count: 2 # the trashcan affordance, not a solid bookmark
+    assert_select "li[data-role='bookmarked-message'] svg path[d^='m14.74']", count: 1
+    assert_select "li[data-role='bookmarked-conversation'] button[title=?]", I18n.t("app.conversations.ui.unbookmark_conversation"), count: 2
     conversation_titles = css_select("li[data-role='bookmarked-conversation'] a[data-role='bookmarked-conversation-link']").map { |link| link.text.strip }
     assert_equal ["Meeting Samantha", "Ruby version"], conversation_titles
   end
@@ -283,8 +288,8 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-role='empty-bookmarks']"
   end
 
-  test "the sidebar link to the bookmarks page is always present" do
-    get conversations_path
+  test "the bookmarks page link is present in the chat header" do
+    get conversation_messages_url(@conversation, version: 1)
 
     assert_response :success
     assert_select "a[data-role='open-bookmarks-page']"
