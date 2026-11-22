@@ -66,6 +66,40 @@ Then("I am on my first assistant's new message page") do
   assert_current_path new_assistant_message_path(assistant)
 end
 
+Then("the email field is focused") do
+  assert_active "#email"
+end
+
+When("I log in with my email and password") do
+  fill_login_form users(:keith).email, "secret"
+  submit_login_form
+end
+
+When("I log in with my email and the wrong password") do
+  fill_login_form users(:keith).email, "wrong"
+  submit_login_form
+end
+
+Then("I see {string}") do |text|
+  assert_text text
+end
+
+Then("I do not see {string}") do |text|
+  assert_no_text text
+end
+
+Then("my email stays pre-filled") do
+  assert_equal users(:keith).email, find("#email").value
+end
+
+Then("the password field is focused") do
+  assert_active "#password"
+end
+
+Then("I stay on the login page") do
+  assert_current_path login_path, ignore_query: true
+end
+
 def fill_login_form(email, password)
   fill_in "Email address", with: email
   fill_in "Password", with: password
@@ -82,7 +116,13 @@ def submit_login_form
     click_on I18n.t("app.auth.login")
   else
     page.execute_script("document.querySelector(\"form[action='/login']\").submit()")
-    assert_selector "#assistants", wait: 10
+    # A successful login lands on the app (the assistants nav appears); a
+    # refused login lands back on the login page with the error flash. Wait
+    # for either so the step is outcome-agnostic.
+    assert_true "waiting for the login form submission to land" do
+      page.has_selector?("#assistants", wait: 0) ||
+        page.has_text?(I18n.t("app.flashes.auth.invalid_login"), wait: 0)
+    end
   end
 end
 

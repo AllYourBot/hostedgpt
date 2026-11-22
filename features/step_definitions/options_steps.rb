@@ -12,6 +12,22 @@ When("the assistants page feature is disabled") do
   stub_features assistants_page: false
 end
 
+When("the google authentication feature is enabled") do
+  stub_features google_authentication: true
+end
+
+When("the google authentication feature is disabled") do
+  stub_features google_authentication: false
+end
+
+When("the microsoft graph authentication feature is enabled") do
+  stub_features microsoft_graph_authentication: true
+end
+
+When("the microsoft graph authentication feature is disabled") do
+  stub_features microsoft_graph_authentication: false
+end
+
 When("I visit the root path") do
   visit root_path
 end
