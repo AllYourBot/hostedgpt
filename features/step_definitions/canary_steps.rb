@@ -1,0 +1,59 @@
+# frozen_string_literal: true
+
+# Canary steps for features/canary.feature — diagnostic-only (@wip), so helper
+# breakage surfaces here instead of mid-port. Disposition (keep or delete) is
+# decided when the port completes.
+
+Given("I am on the greeting conversation") do
+  visit_and_scroll_wait conversation_messages_path(conversations(:greeting))
+end
+
+Then("the message list has settled scrolled to the bottom") do
+  assert_at_bottom
+end
+
+Then("a polled assertion waits for messages to be present") do
+  assert_true "waiting for messages to appear" do
+    find_messages.any?
+  end
+end
+
+Then("the clipboard button on the last message shows its tooltip") do
+  assert_shows_tooltip hover_last_message.find_role("clipboard"), "Copy"
+end
+
+Then("the composer can receive the active element and keyboard events") do
+  click_element composer
+  assert_active composer
+  send_keys "esc"
+end
+
+Then("all image loaders have finished") do
+  wait_for_images_to_load
+end
+
+When("the assistants page feature is enabled") do
+  stub_features assistants_page: true
+end
+
+When("the assistants page feature is disabled") do
+  stub_features assistants_page: false
+end
+
+When("I visit the root path") do
+  visit root_path
+end
+
+Then("I am on the assistants page") do
+  assert_current_path root_path
+end
+
+Then("the root path redirects to a conversation page") do
+  assistant = users(:keith).assistants.ordered.first
+  assert_current_path new_assistant_message_path(assistant)
+end
+
+Then("active storage fixture blobs are loaded") do
+  assert ActiveStorage::Blob.count > 0, "expected active_storage fixture blobs to load"
+  assert ActiveStorage::Attachment.count > 0, "expected active_storage fixture attachments to load"
+end

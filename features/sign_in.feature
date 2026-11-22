@@ -7,7 +7,8 @@ Feature: Sign in
     When I sign in
     Then I reach my app
 
-  Scenario: Rejecting a wrong password
+  
+    Scenario: Rejecting a wrong password
     Given a user with a password
     When I sign in with the wrong password
     Then the sign in is refused
