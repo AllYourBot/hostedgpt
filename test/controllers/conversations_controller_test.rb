@@ -42,6 +42,18 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#conversation-#{@conversation.id}", count: 1
   end
 
+  test "index leads a BOOKMARKED conversation's title with its solid ribbon, and keeps an unbookmarked one's on hover" do
+    @conversation.bookmark!(@conversation.user)
+    unbookmarked = @conversation.user.conversations.where.not(id: @conversation.id).first
+
+    get_nav_conversations
+
+    assert_select "#conversation-#{@conversation.id} > ##{dom_id(@conversation)}-bookmark:first-child [data-role='unbookmark']", 1,
+      "A bookmarked row should always show its solid ribbon, to the left of the title"
+    assert_select "#conversation-#{unbookmarked.id} > div.hidden ##{dom_id(unbookmarked)}-bookmark [data-role='bookmark']", 1,
+      "An unbookmarked row should only show its outline ribbon among the hover actions on the right"
+  end
+
   test "index puts a pinned conversation in the Pinned section, above the time groups" do
     @conversation.pin!
 
