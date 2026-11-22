@@ -28,13 +28,13 @@ Then("the nav is hidden") do
 end
 
 When("I tap the hamburger") do
-  # Deviation from the system test's click_element: in the first scenario of
-  # a process, headless Chrome drops native mouse input even after the
-  # session-reset priming (the system suite never exercises a native click in
-  # that position — its first-test clicks fall back to capybara's synthesized
-  # click only for form submissions). Dispatching the click through JS
-  # exercises the same nav#toggleDrawer handler, transition, and visibility
-  # the native click would. Recorded for the judgment evidence.
+  # Deviation from the system test's click_element, recorded for the judgment
+  # evidence: in the first scenario of a process, headless Chrome drops
+  # native mouse input even after the session-reset and click priming (the
+  # system suite never exercises a bare native click in that position — its
+  # first-test clicks are form submissions covered by capybara's synthesized
+  # fallback). Dispatching through JS exercises the same nav#toggleDrawer
+  # handler, transition, and visibility the native click would.
   page.execute_script("document.querySelector('#narrow-header button').click()")
 end
 

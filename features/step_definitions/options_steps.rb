@@ -28,6 +28,10 @@ When("the microsoft graph authentication feature is disabled") do
   stub_features microsoft_graph_authentication: false
 end
 
+When("the google tools feature is enabled") do
+  stub_features google_tools: true
+end
+
 When("I visit the root path") do
   visit root_path
 end

@@ -46,6 +46,14 @@ module SystemParity
     unless SystemParity.pointer_primed
       SystemParity.pointer_primed = true
       Capybara.reset_sessions!
+
+      # Train native mouse input: the first browser session in a process drops
+      # mouse events; a throwaway capybara click (whose synthesized fallback
+      # re-dispatches through JS) primes delivery for the scenarios that
+      # follow, mirroring the system suite's click-through-login priming.
+      visit login_path
+      click_on I18n.t("app.auth.login")
+      visit login_path
     end
 
     yield

@@ -25,7 +25,10 @@ Given("I am signed in") do
   sign_in_as users(:keith)
 end
 
-def sign_in_as(user, password = "secret")
+def sign_in_as(user_or_person, password = "secret")
+  # Mirrors ApplicationSystemTestCase#login_as: accept a Person or a User.
+  user = user_or_person.is_a?(Person) ? user_or_person.user : user_or_person
+
   # Headless Chrome ignores mouse input for the whole of the first browser
   # session in a process, so the first sign-in resets the session once to prime
   # the pointer (mirrors ApplicationSystemTestCase#login_as).

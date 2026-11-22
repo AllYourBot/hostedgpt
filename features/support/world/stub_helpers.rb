@@ -56,6 +56,22 @@ module StubHelpers
     Rails.application.reloader.reload!
     @original_values = {}
   end
+
+  # Persistent form of the system suite's GoogleSDK.stub block stub
+  # (test/system/settings/people_test.rb): reauthenticate_credential always
+  # succeeds. Unstubbed by the After hook.
+  def stub_google_sdk_reauthentication
+    @original_google_sdk = GoogleSDK.method(:reauthenticate_credential)
+    GoogleSDK.define_singleton_method(:reauthenticate_credential) { |_credential| true }
+  end
+
+  def unstub_google_sdk_reauthentication
+    return unless @original_google_sdk
+
+    GoogleSDK.singleton_class.send(:remove_method, :reauthenticate_credential)
+    GoogleSDK.define_singleton_method(:reauthenticate_credential, @original_google_sdk)
+    @original_google_sdk = nil
+  end
 end
 
 World(StubHelpers)
@@ -64,4 +80,5 @@ After do
   unstub_features if @original_features
   unstub_settings if @original_settings
   unstub_custom_config_values if @original_values
+  unstub_google_sdk_reauthentication if @original_google_sdk
 end
