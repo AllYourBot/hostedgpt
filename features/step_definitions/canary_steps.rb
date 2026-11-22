@@ -32,27 +32,6 @@ Then("all image loaders have finished") do
   wait_for_images_to_load
 end
 
-When("the assistants page feature is enabled") do
-  stub_features assistants_page: true
-end
-
-When("the assistants page feature is disabled") do
-  stub_features assistants_page: false
-end
-
-When("I visit the root path") do
-  visit root_path
-end
-
-Then("I am on the assistants page") do
-  assert_current_path root_path
-end
-
-Then("the root path redirects to a conversation page") do
-  assistant = users(:keith).assistants.ordered.first
-  assert_current_path new_assistant_message_path(assistant)
-end
-
 Then("active storage fixture blobs are loaded") do
   assert ActiveStorage::Blob.count > 0, "expected active_storage fixture blobs to load"
   assert ActiveStorage::Attachment.count > 0, "expected active_storage fixture attachments to load"
