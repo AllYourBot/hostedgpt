@@ -73,6 +73,11 @@ Then("the email field is focused") do
   assert_active "#email"
 end
 
+When("I log out") do
+  visit logout_path
+  assert_current_path login_path
+end
+
 When("I log in with my email and password") do
   fill_login_form users(:keith).email, "secret"
   submit_login_form
