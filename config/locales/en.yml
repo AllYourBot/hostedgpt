@@ -535,6 +535,10 @@ en:
           description: "for making it through a day with no coffee"
         - title: "Help me plan"
           description: "a roadtrip from Charleston to Key West"
+        - title: "Create a simple Mermaid diagram"
+          description: "of a HTTP request/response"
+        - title: "Write a math display of the sum of squares identity"
+          description: "with proper subscripts: sum from i=1 to n of x_i squared"
       image_starters:
         - title: "Generate an image"
           description: "of a spooky black cat with glowing eyes"
