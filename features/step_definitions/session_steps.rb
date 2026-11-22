@@ -42,6 +42,8 @@ def sign_in_as(user_or_person, password = "secret")
   else
     assert_current_path new_assistant_message_path(user.assistants.ordered.first)
   end
+
+  @signed_in_path = current_path
 end
 
 # Mirrors ApplicationSystemTestCase#log_in: one navigation to the login page
