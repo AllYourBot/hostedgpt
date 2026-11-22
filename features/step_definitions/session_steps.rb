@@ -118,10 +118,16 @@ def submit_login_form
     page.execute_script("document.querySelector(\"form[action='/login']\").submit()")
     # A successful login lands on the app (the assistants nav appears); a
     # refused login lands back on the login page with the error flash. Wait
-    # for either so the step is outcome-agnostic.
+    # for either so the step is outcome-agnostic. The document is briefly
+    # mid-navigation during the poll, where DOM queries raise — treat those
+    # as "not yet".
     assert_true "waiting for the login form submission to land" do
-      page.has_selector?("#assistants", wait: 0) ||
-        page.has_text?(I18n.t("app.flashes.auth.invalid_login"), wait: 0)
+      begin
+        page.has_selector?("#assistants", wait: 0) ||
+          page.has_text?(I18n.t("app.flashes.auth.invalid_login"), wait: 0)
+      rescue Capybara::ElementNotFound, Capybara::NotSupportedByDriverError, Selenium::WebDriver::Error::WebDriverError
+        false
+      end
     end
   end
 end
