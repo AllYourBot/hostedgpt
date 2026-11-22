@@ -49,7 +49,13 @@ def log_in_with(user, password)
   assert_current_path login_path
   fill_in "email", with: user.email
   fill_in "password", with: password
-  click_on I18n.t("app.auth.login")
+  # The login form submits via Turbo; its redirect target renders in
+  # turbo-stream format and Turbo can leave the DOM on the login page (the
+  # server-side session is created either way). A native submit gives the
+  # deterministic full-page POST + redirect the system tests rely on. Wait
+  # for the assistants nav, which exists on every signed-in page.
+  page.execute_script("document.querySelector(\"form[action='/login']\").submit()")
+  assert_selector "#assistants", wait: 10
 end
 
 def sign_in_with(email, password)
