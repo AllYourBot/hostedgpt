@@ -47,14 +47,37 @@ end
 def log_in_with(user, password)
   visit logout_path
   assert_current_path login_path
-  fill_in "email", with: user.email
-  fill_in "password", with: password
-  # The login form submits via Turbo in a real browser; its redirect target
-  # renders in turbo-stream format and Turbo can leave the DOM on the login
-  # page (the server-side session is created either way). A native submit
-  # gives the deterministic full-page POST + redirect the system tests rely
-  # on. The rack-test driver (non-JS scenarios) submits natively anyway and
-  # cannot execute scripts, so it just clicks.
+  fill_login_form(user.email, password)
+  submit_login_form
+end
+
+When("I sign in from the root page") do
+  # Paths (not *_url helpers) here: the World's url generation has no request
+  # context, so *_url resolves to the default test host instead of the
+  # Capybara server.
+  visit root_path
+  assert_current_path login_path, ignore_query: true
+  fill_login_form users(:keith).email, "secret"
+  submit_login_form
+end
+
+Then("I am on my first assistant's new message page") do
+  assistant = users(:keith).assistants.ordered.first
+  assert_current_path new_assistant_message_path(assistant)
+end
+
+def fill_login_form(email, password)
+  fill_in "Email address", with: email
+  fill_in "Password", with: password
+end
+
+def submit_login_form
+  # The login form submits via Turbo; its redirect target renders in
+  # turbo-stream format and Turbo can leave the DOM on the login page (the
+  # server-side session is created either way). A native submit gives the
+  # deterministic full-page POST + redirect the system tests rely on. The
+  # rack-test driver (non-JS scenarios) submits natively anyway and cannot
+  # execute scripts, so it just clicks.
   if page.driver.is_a?(Capybara::RackTest::Driver)
     click_on I18n.t("app.auth.login")
   else
