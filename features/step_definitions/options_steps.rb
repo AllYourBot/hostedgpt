@@ -16,6 +16,10 @@ When("I visit the root path") do
   visit root_path
 end
 
+Given("I am on the root path") do
+  visit root_path
+end
+
 Then("I am on the assistants page") do
   assert_current_path root_path
 end
