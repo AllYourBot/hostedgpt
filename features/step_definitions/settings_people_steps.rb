@@ -79,10 +79,6 @@ When("I follow {string} within the settings menu") do |text|
   within("section#menu") { click_text text }
 end
 
-Then("I am on the settings assistants page") do
-  assert_current_path settings_assistants_path
-end
-
 Then("the settings menu has no assistant avatars") do
   assert_no_selector "section#menu picture"
 end
