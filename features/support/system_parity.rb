@@ -33,17 +33,21 @@ end
 
 # Headless Chrome ignores mouse input for the whole of the first browser
 # session in a process (see ApplicationSystemTestCase#prime_pointer). Reset the
-# session once, after a page has loaded, to prime it.
+# session once per process to prime it. Unlike the system suite — where the
+# browser persists across tests — cucumber resets the browser between
+# scenarios, so the wrapped block (the sign-in) must ALWAYS run: skipping it
+# would leave every scenario after the first logged out.
 module SystemParity
   class << self
     attr_accessor :pointer_primed
   end
 
   def prime_pointer
-    return if SystemParity.pointer_primed
-    SystemParity.pointer_primed = true
+    unless SystemParity.pointer_primed
+      SystemParity.pointer_primed = true
+      Capybara.reset_sessions!
+    end
 
-    Capybara.reset_sessions!
     yield
   end
 end
