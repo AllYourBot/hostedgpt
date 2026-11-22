@@ -3,7 +3,12 @@
 # inside the per-scenario transaction (non-javascript) or are committed for the
 # browser to see and truncated after (javascript).
 module FixturesSupport
-  FIXTURE_TABLES = Dir[Rails.root.join("test/fixtures/*.yml")].map { |path| File.basename(path, ".yml") }.freeze
+  # Include nested fixture directories (active_storage/*) so image/document
+  # scenarios can attach real fixture blobs, like the minitest suite does.
+  FIXTURE_TABLES = Dir[Rails.root.join("test/fixtures/**/*.yml")].sort.map do |path|
+    prefix = "#{Rails.root.join('test/fixtures')}/"
+    path.delete_prefix(prefix).delete_suffix(".yml")
+  end.freeze
 
   def load_fixtures
     # Without this, create_fixtures finds the sets cached from the previous

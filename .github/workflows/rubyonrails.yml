@@ -186,6 +186,9 @@ jobs:
           sed -i 's/hoverOnlyWhenSupported: true/hoverOnlyWhenSupported: false/' config/tailwind.config.js
           PARALLEL_WORKERS=2 bin/rails test:system
 
+      - name: Run cucumber features
+        run: bin/cucumber
+
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
         if: failure()
@@ -193,9 +196,6 @@ jobs:
           name: System Test Screenshots
           path: tmp/screenshots/
           if-no-files-found: ignore
-
-      - name: Run cucumber features
-        run: bin/cucumber
 
   lint:
     runs-on: ubuntu-latest
