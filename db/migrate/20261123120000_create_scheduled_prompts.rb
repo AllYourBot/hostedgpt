@@ -1,8 +1,6 @@
 class CreateScheduledPrompts < ActiveRecord::Migration[8.1]
   def change
-    # New table, so no backfill. next_run_at is what the every-minute dispatcher scans, so it is
-    # indexed; it is null only while a prompt is paused. prompt is left unencrypted like
-    # messages.content_text, which every run copies it into.
+    # prompt stays unencrypted: every run copies it into messages.content_text, which is not encrypted either.
     create_table :scheduled_prompts do |t|
       t.references :user, null: false, foreign_key: true
       t.references :assistant, null: false, foreign_key: true
@@ -12,10 +10,14 @@ class CreateScheduledPrompts < ActiveRecord::Migration[8.1]
       t.boolean :enabled, null: false, default: true
       t.datetime :next_run_at
       t.datetime :last_run_at
+      t.integer :consecutive_failures, null: false, default: 0
 
       t.timestamps
     end
 
     add_index :scheduled_prompts, :next_run_at
+
+    add_reference :conversations, :scheduled_prompt, foreign_key: true
+    add_column :conversations, :unread, :boolean, null: false, default: false
   end
 end

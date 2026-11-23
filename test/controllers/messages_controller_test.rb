@@ -34,6 +34,18 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       "A frame-only visit leaves the sidebar alone, so the page should remove the opened conversation's dot itself"
   end
 
+  test "index removes the sidebar dot even when opened through the VERSIONLESS sidebar link" do
+    @conversation.update_column(:unread, true)
+
+    get conversation_messages_url(@conversation)
+    assert_redirected_to conversation_messages_url(@conversation, version: 1)
+    assert @conversation.reload.unread?, "The redirecting request should leave the conversation for the page that renders"
+
+    follow_redirect!
+    assert_select "turbo-stream[action=remove][target=?]", "conversation_#{@conversation.id}-unread", 1,
+      "The page the sidebar link lands on should remove the dot"
+  end
+
   test "index of an ALREADY READ conversation removes nothing" do
     get conversation_messages_url(@conversation, version: 1)
 

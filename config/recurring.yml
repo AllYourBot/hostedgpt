@@ -1,4 +1,3 @@
-# SolidQueue's scheduler process loads this file (bin/rake solid_queue:start, or the Puma plugin).
 run_due_scheduled_prompts:
   class: RunDueScheduledPromptsJob
   schedule: every minute

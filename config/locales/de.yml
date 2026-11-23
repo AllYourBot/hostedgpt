@@ -1,4 +1,7 @@
 de:
+  time:
+    formats:
+      scheduled_run: "%d.%m.%Y, %H:%M Uhr"
   app:
     navigation:
       profile_fallback: "Profil"
@@ -284,7 +287,7 @@ de:
           prompt_placeholder: "z. B. Fasse das heutige Wetter und meinen Kalender zusammen"
           schedule: "Zeitplan"
           schedule_placeholder: "z. B. every weekday at 8am"
-          schedule_hint: "Englischer Klartext wie \"every monday at 9:30\" oder ein Cron-Ausdruck wie \"0 8 * * 1-5\". Höchstens alle 15 Minuten."
+          schedule_hint: "Englischer Klartext wie \"every monday at 9:30am\" oder ein Cron-Ausdruck wie \"0 8 * * 1-5\". Eine Uhrzeit ohne am oder pm gilt im 24-Stunden-Format. Höchstens alle 15 Minuten."
           time_zone: "Zeitzone"
           enabled: "Aktiviert"
           paused_for_failures: "Dieser Prompt wurde pausiert, weil seine letzten %{count} Läufe fehlgeschlagen sind, oft wegen eines API-Schlüssel- oder Abrechnungsproblems. Beheben Sie die Ursache und aktivieren Sie ihn dann wieder."
@@ -596,6 +599,7 @@ de:
         not_found: "Der Konnektor wurde nicht gefunden"
       scheduled_prompts:
         saved: "Gespeichert"
+        saved_with_next_run: "Gespeichert. Nächster Lauf: %{next_run}"
         deleted: "Gelöscht"
         not_found: "Der geplante Prompt wurde nicht gefunden"
       google_app_credentials:

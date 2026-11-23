@@ -14,7 +14,7 @@ class MessagesController < ApplicationController
     if @version.blank?
       version = @conversation.messages.order(:created_at).last&.version
       if version
-        redirect_to conversation_messages_path(params[:conversation_id], version: version), status: :see_other
+        return redirect_to conversation_messages_path(params[:conversation_id], version: version), status: :see_other
       end
     end
 

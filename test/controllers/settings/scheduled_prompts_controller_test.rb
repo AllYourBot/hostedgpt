@@ -7,13 +7,24 @@ class Settings::ScheduledPromptsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get index" do
+    @scheduled_prompt.update_column(:next_run_at, Time.utc(2026, 11, 24, 14))
+
     get settings_scheduled_prompts_url
     assert_response :success
     assert_contains_text "div#nav-container", "Scheduled Prompts"
     assert_select "table#scheduled-prompts tbody tr", count: users(:keith).scheduled_prompts.count
     assert_contains_text "#scheduled_prompt_#{@scheduled_prompt.id}", "every weekday at 8am"
     assert_contains_text "#scheduled_prompt_#{@scheduled_prompt.id}", "Samantha"
+    assert_contains_text "#scheduled_prompt_#{@scheduled_prompt.id}", "Tue Nov 24, 8:00 AM"
     assert_select "p#no-scheduled-prompts", false
+  end
+
+  test "should get index IN GERMAN" do
+    @scheduled_prompt.update_column(:next_run_at, Time.utc(2026, 11, 24, 14))
+
+    get settings_scheduled_prompts_url(locale: :de)
+    assert_response :success
+    assert_contains_text "#scheduled_prompt_#{@scheduled_prompt.id}", "24.11.2026, 08:00 Uhr"
   end
 
   test "should get index showing PAUSED for a disabled prompt" do
@@ -46,15 +57,17 @@ class Settings::ScheduledPromptsControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name=?] option[selected]", "scheduled_prompt[time_zone]", Time.zone.to_s
   end
 
-  test "should create scheduled prompt" do
-    assert_difference "ScheduledPrompt.count", 1 do
-      post settings_scheduled_prompts_url, params: { scheduled_prompt: {
-        assistant_id: assistants(:keith_claude35).id, prompt: "Weekly recap", schedule: "every friday at 5pm", time_zone: "Eastern Time (US & Canada)"
-      } }
+  test "should create scheduled prompt & name its first run" do
+    travel_to Time.utc(2026, 11, 23, 12) do # a Monday
+      assert_difference "ScheduledPrompt.count", 1 do
+        post settings_scheduled_prompts_url, params: { scheduled_prompt: {
+          assistant_id: assistants(:keith_claude35).id, prompt: "Weekly recap", schedule: "every friday at 5pm", time_zone: "Eastern Time (US & Canada)"
+        } }
+      end
     end
 
     assert_redirected_to settings_scheduled_prompts_url
-    assert_equal "Saved", flash[:notice]
+    assert_equal "Saved. Next run: Fri Nov 27, 5:00 PM", flash[:notice], "Naming the first run lets the user catch a misread schedule"
     scheduled_prompt = ScheduledPrompt.last
     assert_equal users(:keith), scheduled_prompt.user, "The scheduled prompt should belong to the current user"
     assert_equal assistants(:keith_claude35), scheduled_prompt.assistant
@@ -103,6 +116,7 @@ class Settings::ScheduledPromptsControllerTest < ActionDispatch::IntegrationTest
     patch settings_scheduled_prompt_url(@scheduled_prompt), params: { scheduled_prompt: { schedule: "every day at noon", enabled: "0" } }
 
     assert_redirected_to settings_scheduled_prompts_url
+    assert_equal "Saved", flash[:notice], "A disabled prompt has no next run to name"
     @scheduled_prompt.reload
     assert_equal "every day at noon", @scheduled_prompt.schedule
     refute @scheduled_prompt.enabled?, "The prompt should be disabled"

@@ -20,6 +20,8 @@ module ScheduledPrompt::Schedulable
     Fugit::Cron.parse("#{parsed.to_cron_s} #{zone.tzinfo.name}")
   end
 
+  def local_next_run_at = next_run_at&.in_time_zone(time_zone)
+
   # Compare-and-set on next_run_at, so only one dispatcher wins each run.
   def claim!
     self.class.where(id:, next_run_at:).update_all(next_run_at: following_run_at, last_run_at: Time.current) == 1

@@ -21,9 +21,7 @@ module ScheduledPrompt::Pausable
 
   private
 
-  def reply_to_the_prompt?(message)
-    message.conversation.messages.user.where(index: 1...message.index).none?
-  end
+  def reply_to_the_prompt?(message) = message.conversation.messages.user.where(index: 1...message.index).none?
 
   def record_failure!
     increment!(:consecutive_failures)
