@@ -1,0 +1,15 @@
+<%= render "settings/edit_page", record: @scheduled_prompt, title: t("app.settings.scheduled_prompts.editing_title") %>
+
+<div class="mx-auto md:w-2/3 w-full">
+  <%= button_to t("app.settings.scheduled_prompts.run_now"), run_settings_scheduled_prompt_path(@scheduled_prompt),
+    id: "run-now",
+    form: { class: "inline-block mt-5" },
+    class: %|
+      py-3 px-5
+      bg-white dark:bg-gray-500
+      border border-gray-300 dark:border-gray-500
+      rounded-lg
+      font-medium
+    |
+  %>
+</div>

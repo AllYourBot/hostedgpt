@@ -11,6 +11,7 @@ class Assistant < ApplicationRecord
   has_many :steps, dependent: :destroy
   has_many :messages, dependent: :destroy
   has_many :memories, dependent: :destroy
+  has_many :scheduled_prompts, dependent: :destroy
 
   delegate :supports_images?, to: :language_model
   delegate :supports_pdf?, to: :language_model

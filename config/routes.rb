@@ -46,6 +46,9 @@ Rails.application.routes.draw do
       delete :destroy, to: "memories#destroy_all", on: :collection
     end
     resources :connectors, except: [:show]
+    resources :scheduled_prompts, except: [:show] do
+      post :run, on: :member
+    end
     resources :google_app_credentials, only: :destroy
   end
 

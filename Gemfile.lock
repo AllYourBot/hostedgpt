@@ -604,6 +604,7 @@ DEPENDENCIES
   dockerfile-rails (>= 1.6)
   exhale
   ffi (~> 1.15.5)
+  fugit (~> 1.11.0)
   image_processing (~> 1.13.0)
   importmap-rails
   kamal (~> 2.12)

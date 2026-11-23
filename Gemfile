@@ -43,6 +43,7 @@ gem "amatch", "~> 0.4.1" # enables fuzzy comparison of strings, a tool uses this
 gem "rails_heroicon", "~> 2.2.0"
 gem "ruby_llm", "~> 2.0.0"
 gem "solid_queue", "~> 1.0.0"
+gem "fugit", "~> 1.11.0" # parses the cron and natural-language schedules of ScheduledPrompt
 gem "name_of_person"
 gem "actioncable-enhanced-postgresql-adapter" # longer paylaods w/ postgresql actioncable
 gem "aws-sdk-s3", require: false

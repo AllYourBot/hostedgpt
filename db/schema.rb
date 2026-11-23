@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_021618) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -322,6 +322,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_021618) do
     t.index ["conversation_id"], name: "index_runs_on_conversation_id"
   end
 
+  create_table "scheduled_prompts", force: :cascade do |t|
+    t.bigint "assistant_id", null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.datetime "last_run_at"
+    t.datetime "next_run_at"
+    t.text "prompt", null: false
+    t.string "schedule", null: false
+    t.string "time_zone", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["assistant_id"], name: "index_scheduled_prompts_on_assistant_id"
+    t.index ["next_run_at"], name: "index_scheduled_prompts_on_next_run_at"
+    t.index ["user_id"], name: "index_scheduled_prompts_on_user_id"
+  end
+  
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
     t.string "concurrency_key", null: false
     t.datetime "created_at", null: false
@@ -510,6 +526,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_021618) do
   add_foreign_key "replies", "notes"
   add_foreign_key "runs", "assistants"
   add_foreign_key "runs", "conversations"
+  add_foreign_key "scheduled_prompts", "assistants"
+  add_foreign_key "scheduled_prompts", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

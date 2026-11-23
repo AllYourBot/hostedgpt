@@ -35,6 +35,10 @@ class Settings::ApplicationController < ApplicationController
   I18n.t("app.settings.connectors.menu.index") => settings_connectors_path,
       },
 
+      scheduled_prompts: {
+  I18n.t("app.settings.scheduled_prompts.menu.index") => settings_scheduled_prompts_path,
+      },
+
       language_models: {
   I18n.t("app.settings.language_models.menu.index") => settings_language_models_path,
       },
