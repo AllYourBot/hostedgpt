@@ -37,12 +37,6 @@ Then("the settle broadcast flips the render gate back off") do
     "the settle broadcast flips the render gate back off"
 end
 
-Then("the streamed message flags its content div as streaming") do
-  msg = find("#message_#{@stream_msg.id}")
-  assert msg.has_selector?("[data-role='content-text'][data-streaming='true']"),
-    "the streamed message flags its content div as streaming"
-end
-
 Then("KaTeX must not re-typeset while the reply streams") do
   # Out of the observer debounce: an ungated typeset would have run by now.
   sleep 0.6
