@@ -28,6 +28,9 @@
 #       enabled: "ON"
 
 en:
+  time:
+    formats:
+      scheduled_run: "%a %b %-d, %-l:%M %p"
   app:
     navigation:
       profile_fallback: "Profile"
@@ -286,6 +289,41 @@ en:
           token_placeholder_set: "A token is set. Leave blank to keep it."
           token_placeholder_unset: "Optional. Sent as a Bearer token if the server needs one."
           tools: "Tools your assistants can use"
+      scheduled_prompts:
+        index_title: "Scheduled Prompts"
+        menu:
+          index: "Scheduled Prompts"
+        description: "A scheduled prompt asks one of your assistants the same thing on a schedule, such as a morning briefing every weekday. Each run starts a new conversation and uses your API key, so it costs the same as asking it yourself."
+        none: "You have no scheduled prompts."
+        add_new: "Add New"
+        table:
+          prompt: "Prompt"
+          assistant: "Assistant"
+          schedule: "Schedule"
+          next_run: "Next run"
+          paused: "Paused"
+          paused_for_failures: "Paused after %{count} failed runs"
+        new_title: "New Scheduled Prompt"
+        editing_title: "Editing Scheduled Prompt"
+        back: "Back"
+        delete: "Delete"
+        confirm_delete: "Are you sure?"
+        save: "Save"
+        run_now: "Run now"
+        form:
+          errors_title:
+            one: "%{count} error prohibited this scheduled prompt from being saved:"
+            other: "%{count} errors prohibited this scheduled prompt from being saved:"
+          assistant: "Assistant"
+          prompt: "Prompt"
+          prompt_placeholder: "e.g. Summarize today's weather and my calendar"
+          schedule: "Schedule"
+          schedule_placeholder: "e.g. every weekday at 8am"
+          schedule_hint: "Plain English like \"every monday at 9:30am\" or a cron expression like \"0 8 * * 1-5\". A time without am or pm is read on a 24-hour clock. At most every 15 minutes."
+          time_zone: "Time zone"
+          enabled: "Enabled"
+          paused_for_failures: "This prompt was paused because its last %{count} runs failed, often from an API key or billing problem. Fix the cause, then check Enabled to resume."
+          see_latest_run: "See the latest run"
       people:
         menu:
           account: "Your Account"
@@ -447,6 +485,7 @@ en:
       rename: "Rename"
       pin: "Pin"
       unpin: "Unpin"
+      unread: "Unread"
       pinned: "Pinned"
       delete: "Delete"
       shared_conversation: "Shared Conversation"
@@ -594,6 +633,11 @@ en:
         saved: "Saved"
         deleted: "Deleted"
         not_found: "The connector could not be found"
+      scheduled_prompts:
+        saved: "Saved"
+        saved_with_next_run: "Saved. Next run: %{next_run}"
+        deleted: "Deleted"
+        not_found: "The scheduled prompt could not be found"
       google_app_credentials:
         disconnected: "Disconnected"
         not_found: "The connection could not be found"

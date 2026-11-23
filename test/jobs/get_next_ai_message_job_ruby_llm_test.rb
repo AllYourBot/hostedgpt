@@ -56,6 +56,18 @@ class GetNextAIMessageJobRubyLLMTest < ActiveJob::TestCase
     assert @message.failed?, "The message should have been marked failed so a Retry button is offered"
   end
 
+  test "a failed reply to a scheduled prompt counts toward pausing it" do
+    scheduled_prompt = scheduled_prompts(:morning_briefing)
+    reply = scheduled_prompt.run!.conversation.latest_message_for_version(:latest)
+
+    TestClient::RubyLLM::Chat.stub :text, "" do
+      assert GetNextAIMessageJob.perform_now(@user.id, reply.id, @assistant.id)
+    end
+
+    assert reply.reload.failed?
+    assert_equal 1, scheduled_prompt.reload.consecutive_failures, "The job should report the failed run to its scheduled prompt"
+  end
+
   test "a message which generated successfully is not marked failed" do
     TestClient::RubyLLM::Chat.stub :text, "Hello" do
       assert GetNextAIMessageJob.perform_now(@user.id, @message.id, @assistant.id)

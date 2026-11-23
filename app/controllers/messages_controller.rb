@@ -14,10 +14,11 @@ class MessagesController < ApplicationController
     if @version.blank?
       version = @conversation.messages.order(:created_at).last&.version
       if version
-        redirect_to conversation_messages_path(params[:conversation_id], version: version), status: :see_other
+        return redirect_to conversation_messages_path(params[:conversation_id], version: version), status: :see_other
       end
     end
 
+    @marked_read = @conversation.mark_read!
     @messages = @conversation.messages.for_conversation_version(@version).preload(:bookmarks)
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
@@ -43,8 +44,7 @@ class MessagesController < ApplicationController
 
     if @message.save
       Current.user.located_at!(request.remote_ip)
-      after_create_assistant_reply = @message.conversation.latest_message_for_version(@message.version)
-      GetNextAIMessageJob.perform_later(Current.user.id, after_create_assistant_reply.id, @assistant.id)
+      @message.request_reply
       redirect_to conversation_messages_path(@message.conversation, version: @message.version), status: :see_other
     else
       # what's the right flow for a failed message create? it's not this, but hacking it so tests pass until we have a plan

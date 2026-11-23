@@ -1,0 +1,7 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <h1 class="text-3xl"><%= t("app.settings.scheduled_prompts.new_title") %></h1>
+
+  <%= render "form", scheduled_prompt: @scheduled_prompt %>
+
+  <%= link_to t("app.settings.scheduled_prompts.back"), settings_scheduled_prompts_path, class: "float-right inline-block ml-5 py-3" %>
+</div>

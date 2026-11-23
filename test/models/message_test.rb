@@ -57,6 +57,18 @@ class MessageTest < ActiveSupport::TestCase
     assert_nil messages(:weather_tool_result).name_for_api
   end
 
+  test "request_reply queues the job that fills in the reply created after the user's message" do
+    Current.user = users(:keith)
+    user_message = assistants(:samantha).messages.create!(content_text: "Hello")
+    reply = user_message.conversation.latest_message_for_version(user_message.version)
+
+    assert_enqueued_with(job: GetNextAIMessageJob, args: [users(:keith).id, reply.id, assistants(:samantha).id]) do
+      user_message.request_reply
+    end
+  ensure
+    Current.reset
+  end
+
   test "finished? returns true if processed and missing either content_text or content_tool_calls" do
     assert messages(:weather_tool_call).finished?
     messages(:weather_tool_call).content_tool_calls = []

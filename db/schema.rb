@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_021618) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -154,13 +154,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_021618) do
     t.bigint "last_assistant_message_id"
     t.integer "output_token_total_count", default: 0, null: false
     t.integer "pin_position"
+    t.bigint "scheduled_prompt_id"
     t.string "share_token"
     t.string "title"
+    t.boolean "unread", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["assistant_id"], name: "index_conversations_on_assistant_id"
     t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
+    t.index ["scheduled_prompt_id"], name: "index_conversations_on_scheduled_prompt_id"
     t.index ["share_token"], name: "index_conversations_on_share_token"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
     t.index ["user_id", "pin_position"], name: "index_conversations_on_user_id_and_pin_position"
@@ -320,6 +323,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_021618) do
     t.datetime "updated_at", null: false
     t.index ["assistant_id"], name: "index_runs_on_assistant_id"
     t.index ["conversation_id"], name: "index_runs_on_conversation_id"
+  end
+
+  create_table "scheduled_prompts", force: :cascade do |t|
+    t.bigint "assistant_id", null: false
+    t.integer "consecutive_failures", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.datetime "last_run_at"
+    t.datetime "next_run_at"
+    t.text "prompt", null: false
+    t.string "schedule", null: false
+    t.string "time_zone", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["assistant_id"], name: "index_scheduled_prompts_on_assistant_id"
+    t.index ["next_run_at"], name: "index_scheduled_prompts_on_next_run_at"
+    t.index ["user_id"], name: "index_scheduled_prompts_on_user_id"
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
@@ -491,6 +511,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_021618) do
   add_foreign_key "connectors", "users"
   add_foreign_key "conversations", "assistants"
   add_foreign_key "conversations", "messages", column: "last_assistant_message_id"
+  add_foreign_key "conversations", "scheduled_prompts"
   add_foreign_key "conversations", "users"
   add_foreign_key "credentials", "users"
   add_foreign_key "documents", "assistants"
@@ -510,6 +531,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_021618) do
   add_foreign_key "replies", "notes"
   add_foreign_key "runs", "assistants"
   add_foreign_key "runs", "conversations"
+  add_foreign_key "scheduled_prompts", "assistants"
+  add_foreign_key "scheduled_prompts", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

@@ -3,6 +3,7 @@ class Conversation < ApplicationRecord
 
   belongs_to :user
   belongs_to :assistant
+  belongs_to :scheduled_prompt, optional: true
 
   has_many :messages, dependent: :destroy
   has_many :runs, dependent: :destroy
@@ -113,6 +114,13 @@ class Conversation < ApplicationRecord
 
   def unpin!
     update_columns(pin_position: nil)
+  end
+
+  # update_column skips updated_at, which orders the sidebar.
+  def mark_read!
+    return false unless unread?
+
+    update_column(:unread, false)
   end
 
   private

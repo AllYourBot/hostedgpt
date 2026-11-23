@@ -16,3 +16,7 @@ Without `APP_URL` (the default in development), `image_url` returns a base64 `da
 ## A dropdown whose trigger only shows on hover must open flush against its row
 
 The sidebar's dots menus are daisyUI dropdowns, open only while the trigger holds focus (`:focus-within`), and the trigger is `invisible group-hover:visible` (or inside a `hidden group-hover:flex` wrapper). Leave any gap between the row and the menu, as `mt-7` did, and a pointer crossing it drops the row's hover, the trigger goes invisible, Chrome moves focus to `<body>`, and the menu closes before it can be clicked. A 1–2px gap is enough, and a test that moves the pointer in steps of more than 1px jumps over it. Anchor the menu at `top-full` of a dropdown that is `self-stretch` to the row's height, and add `group-focus-within:visible` (or `:flex`) to the trigger so it stays shown while its menu is open, as `collections/_nav.html.erb` does.
+
+## Localize times with a format defined in both locales
+
+`de.yml` has no `time.formats` and no day or month names, so `l(time, format: :short)` raises `I18n::MissingTranslationData` for every German viewer while English renders fine. Use a format declared under `time.formats` in both `en.yml` and `de.yml` (`:scheduled_run` is one), and keep `%a`/`%b` out of the German one.

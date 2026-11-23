@@ -1,4 +1,7 @@
 de:
+  time:
+    formats:
+      scheduled_run: "%d.%m.%Y, %H:%M Uhr"
   app:
     navigation:
       profile_fallback: "Profil"
@@ -254,6 +257,41 @@ de:
           token_placeholder_set: "Ein Token ist gesetzt. Leer lassen, um es zu behalten."
           token_placeholder_unset: "Optional. Wird als Bearer-Token gesendet, falls der Server eines verlangt."
           tools: "Tools, die Ihre Assistenten verwenden können"
+      scheduled_prompts:
+        index_title: "Geplante Prompts"
+        menu:
+          index: "Geplante Prompts"
+        description: "Ein geplanter Prompt stellt einem Ihrer Assistenten regelmäßig dieselbe Frage, etwa ein Morgen-Briefing an jedem Werktag. Jeder Lauf beginnt eine neue Unterhaltung und nutzt Ihren API-Schlüssel, kostet also so viel, als würden Sie selbst fragen."
+        none: "Sie haben keine geplanten Prompts."
+        add_new: "Neu hinzufügen"
+        table:
+          prompt: "Prompt"
+          assistant: "Assistent"
+          schedule: "Zeitplan"
+          next_run: "Nächster Lauf"
+          paused: "Pausiert"
+          paused_for_failures: "Pausiert nach %{count} fehlgeschlagenen Läufen"
+        new_title: "Neuer geplanter Prompt"
+        editing_title: "Geplanten Prompt bearbeiten"
+        back: "Zurück"
+        delete: "Löschen"
+        confirm_delete: "Sind Sie sicher?"
+        save: "Speichern"
+        run_now: "Jetzt ausführen"
+        form:
+          errors_title:
+            one: "%{count} Fehler hat das Speichern dieses geplanten Prompts verhindert:"
+            other: "%{count} Fehler haben das Speichern dieses geplanten Prompts verhindert:"
+          assistant: "Assistent"
+          prompt: "Prompt"
+          prompt_placeholder: "z. B. Fasse das heutige Wetter und meinen Kalender zusammen"
+          schedule: "Zeitplan"
+          schedule_placeholder: "z. B. every weekday at 8am"
+          schedule_hint: "Englischer Klartext wie \"every monday at 9:30am\" oder ein Cron-Ausdruck wie \"0 8 * * 1-5\". Eine Uhrzeit ohne am oder pm gilt im 24-Stunden-Format. Höchstens alle 15 Minuten."
+          time_zone: "Zeitzone"
+          enabled: "Aktiviert"
+          paused_for_failures: "Dieser Prompt wurde pausiert, weil seine letzten %{count} Läufe fehlgeschlagen sind, oft wegen eines API-Schlüssel- oder Abrechnungsproblems. Beheben Sie die Ursache und aktivieren Sie ihn dann wieder."
+          see_latest_run: "Letzten Lauf ansehen"
       people:
         menu:
           account: "Ihr Konto"
@@ -415,6 +453,7 @@ de:
       rename: "Umbenennen"
       pin: "Anheften"
       unpin: "Lösen"
+      unread: "Ungelesen"
       pinned: "Angeheftet"
       delete: "Löschen"
       shared_conversation: "Geteilte Konversation"
@@ -558,6 +597,11 @@ de:
         saved: "Gespeichert"
         deleted: "Gelöscht"
         not_found: "Der Konnektor wurde nicht gefunden"
+      scheduled_prompts:
+        saved: "Gespeichert"
+        saved_with_next_run: "Gespeichert. Nächster Lauf: %{next_run}"
+        deleted: "Gelöscht"
+        not_found: "Der geplante Prompt wurde nicht gefunden"
       google_app_credentials:
         disconnected: "Getrennt"
         not_found: "Die Verbindung wurde nicht gefunden"

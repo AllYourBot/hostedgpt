@@ -1,0 +1,60 @@
+<h1 class="text-3xl"><%= t("app.settings.scheduled_prompts.index_title") %></h1>
+
+<p class="pt-3">
+  <%= t("app.settings.scheduled_prompts.description") %>
+</p>
+
+<% if @scheduled_prompts.empty? %>
+  <p id="no-scheduled-prompts" class="my-8">
+    <%= t("app.settings.scheduled_prompts.none") %>
+  </p>
+<% end %>
+
+<p class="my-8">
+  <%= link_to t("app.settings.scheduled_prompts.add_new"), new_settings_scheduled_prompt_path,
+    class: %|
+      inline-block font-bold
+      bg-gray-200 dark:bg-gray-900
+      border border-gray-400
+      rounded-lg py-3 px-5
+      cursor-pointer
+    |
+  %>
+</p>
+
+<% if @scheduled_prompts.present? %>
+  <table id="scheduled-prompts" class="w-full table-auto border-b border-gray-300 dark:border-b-0">
+    <thead>
+      <tr class="bg-gray-200 dark:bg-gray-900">
+        <th><%= t("app.settings.scheduled_prompts.table.prompt") %></th>
+        <th><%= t("app.settings.scheduled_prompts.table.assistant") %></th>
+        <th><%= t("app.settings.scheduled_prompts.table.schedule") %></th>
+        <th><%= t("app.settings.scheduled_prompts.table.next_run") %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @scheduled_prompts.each do |scheduled_prompt| %>
+        <tr
+          id="<%= dom_id(scheduled_prompt) %>"
+          class="<%= cycle("bg-gray-100 dark:bg-gray-600", "bg-white dark:bg-gray-900") %> cursor-pointer"
+          data-controller="clickable-row"
+          data-clickable-row-url-value="<%= edit_settings_scheduled_prompt_path(scheduled_prompt) %>"
+        >
+          <td class="underline"><%= scheduled_prompt.prompt.truncate(60) %></td>
+          <td><%= scheduled_prompt.assistant.name %></td>
+          <td><%= scheduled_prompt.schedule %></td>
+          <td>
+            <% if scheduled_prompt.next_run_at %>
+              <%= l scheduled_prompt.local_next_run_at, format: :scheduled_run %>
+            <% elsif scheduled_prompt.paused_for_failures? %>
+              <%= t("app.settings.scheduled_prompts.table.paused_for_failures", count: scheduled_prompt.consecutive_failures) %>
+            <% else %>
+              <%= t("app.settings.scheduled_prompts.table.paused") %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

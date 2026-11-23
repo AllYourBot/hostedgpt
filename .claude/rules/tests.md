@@ -5,7 +5,7 @@ paths:
 
 # Tests (general)
 
-Always pass a failure message to assertions — they self-document the test:
+Always pass a failure message to assertions — they self-document the test. Two take none and raise `ArgumentError` if given one: ActiveSupport's `assert_nothing_raised` and this repo's `assert_contains_text`.
 
 ```ruby
 assert_equal x, y, "The value of y should not have changed"

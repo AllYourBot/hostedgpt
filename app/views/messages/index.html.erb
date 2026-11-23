@@ -3,6 +3,8 @@
 <% end %>
 
 <% content_for :messages do %>
+  <%# Opening a conversation from the sidebar only swaps this frame, so the sidebar's dot is removed from here. %>
+  <%= turbo_stream.remove "#{dom_id(@conversation)}-unread" if @marked_read %>
 
   <%= turbo_stream_from @conversation,
     data: {

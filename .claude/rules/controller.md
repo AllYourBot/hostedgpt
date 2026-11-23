@@ -39,3 +39,7 @@ The request log prints every param at `info`, and `config/initializers/filter_pa
 ## A `.json` request renders every ivar, including what the HTML view hides
 
 `ApplicationController#default_render` answers any `.json` request by serializing the action's ivars with `as_json`, so an encrypted column comes back decrypted (`APIService#token`) even when the view deliberately never prints it. When a controller exposes records whose secrets belong to someone other than the viewer, refuse API requests (`head :not_acceptable if api_request?`), as `Admin::ApplicationController` does, and test the `.json` URL.
+
+## `redirect_to` doesn't end the action
+
+Code after a conditional `redirect_to` still runs, on the request that redirects. `MessagesController#index` redirects a versionless URL (every sidebar link) to its versioned one, so a side effect placed below that branch, such as marking the conversation read, fires on the redirecting request and the page that actually renders sees it already done. Write `return redirect_to …` when anything follows.

@@ -152,6 +152,7 @@ class GetNextAIMessageJob < ApplicationJob
     GetNextAIMessageJob.broadcast_updated_message(@message, thinking: false)
     @message.save!
     @message.conversation.touch # updated_at change will bump it up your list + ensures it will be auto-titled
+    @message.conversation.scheduled_prompt&.record_reply(@message)
 
     Rails.logger.info "\n### Finished GetNextAIMessageJob.perform(#{@user.id}, #{@message.id}, #{@message.assistant_id}, #{@attempt})" unless Rails.env.test?
   end

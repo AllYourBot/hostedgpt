@@ -31,6 +31,13 @@
       <span id="<%= dom_id(conversation) %>-bookmark" class="flex items-center pl-1"><%= bookmark_toggle %></span>
     <% end %>
 
+    <% if conversation.unread? %>
+      <span id="<%= dom_id(conversation) %>-unread" data-role="unread" class="flex items-center pl-2">
+        <span class="size-2 rounded-full bg-blue-500" aria-hidden="true"></span>
+        <span class="sr-only"><%= t("app.conversations.unread") %></span>
+      </span>
+    <% end %>
+
     <%= link_to conversation_title_or_new_chat(conversation),
       conversation_messages_path(conversation),
       class: "flex-1 #{bookmarked ? "pl-0.5" : "pl-2"} py-2 truncate text-sm text-opacity-1 w-5 radio-behavior",

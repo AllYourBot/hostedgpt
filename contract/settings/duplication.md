@@ -8,6 +8,7 @@ The new and index templates and the test controller actions follow the scaffold 
 views/settings/language_models/new.html.erb
 views/settings/api_services/new.html.erb
 views/settings/connectors/new.html.erb
+views/settings/scheduled_prompts/new.html.erb
 views/documents/new.html.erb
 ```
 
@@ -20,4 +21,6 @@ Settings::APIServicesController#test
 views/settings/assistants/index.html.erb
 views/settings/api_services/index.html.erb
 views/settings/connectors/index.html.erb
+views/settings/language_models/index.html.erb
+views/settings/scheduled_prompts/index.html.erb
 ```
