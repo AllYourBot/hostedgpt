@@ -12,6 +12,10 @@ Given("I am on the memorize conversation") do
   visit_and_scroll_wait conversation_messages_path(conversations(:memorize))
 end
 
+Given("I am on the javascript conversation") do
+  visit_and_scroll_wait conversation_messages_path(conversations(:javascript))
+end
+
 Then("the message list has settled scrolled to the bottom") do
   assert_at_bottom
 end
