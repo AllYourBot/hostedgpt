@@ -3,6 +3,7 @@ class Conversation < ApplicationRecord
 
   belongs_to :user
   belongs_to :assistant
+  belongs_to :scheduled_prompt, optional: true
 
   has_many :messages, dependent: :destroy
   has_many :runs, dependent: :destroy
@@ -116,8 +117,6 @@ class Conversation < ApplicationRecord
   end
 
   # update_column skips updated_at, which orders the sidebar.
-  def mark_unread! = update_column(:unread, true)
-
   def mark_read!
     return false unless unread?
 

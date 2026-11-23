@@ -1,8 +1,10 @@
 class ScheduledPrompt < ApplicationRecord
-  include Schedulable
+  include Schedulable, Pausable
 
   belongs_to :user
   belongs_to :assistant
+
+  has_many :conversations, dependent: :nullify
 
   scope :ordered, -> { order(:created_at) }
 
@@ -10,8 +12,8 @@ class ScheduledPrompt < ApplicationRecord
   validate :assistant_belongs_to_user, if: -> { assistant.present? }
 
   def run!
-    message = Current.set(user:) { assistant.messages.create!(content_text: prompt) }
-    message.conversation.mark_unread!
+    conversation = conversations.create!(user:, assistant:, unread: true)
+    message = Current.set(user:) { assistant.messages.create!(conversation:, content_text: prompt) }
     message.request_reply
     message
   end

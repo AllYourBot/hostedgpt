@@ -11,6 +11,11 @@ class ScheduledPromptTest < ActiveSupport::TestCase
     assert_instance_of Assistant, scheduled_prompts(:morning_briefing).assistant
   end
 
+  test "has_many conversations, one per run" do
+    conversation = scheduled_prompts(:morning_briefing).run!.conversation
+    assert_equal [conversation], scheduled_prompts(:morning_briefing).conversations.to_a
+  end
+
   test "ordered lists scheduled prompts oldest first" do
     newer = users(:keith).scheduled_prompts.create!(assistant: assistants(:samantha), prompt: "Weekly recap", schedule: "every friday at 5pm")
     assert_equal [scheduled_prompts(:morning_briefing), newer], users(:keith).scheduled_prompts.ordered.to_a,
@@ -51,6 +56,15 @@ class ScheduledPromptTest < ActiveSupport::TestCase
     end
   end
 
+  test "destroying a scheduled prompt KEEPS the conversations it started" do
+    conversation = scheduled_prompts(:morning_briefing).run!.conversation
+
+    assert_no_difference "Conversation.count" do
+      scheduled_prompts(:morning_briefing).destroy!
+    end
+    assert_nil conversation.reload.scheduled_prompt_id, "The conversation should just lose its link to the prompt"
+  end
+
   # Method tests
 
   test "run! posts the prompt in a new conversation & queues the assistant's reply" do
@@ -67,6 +81,7 @@ class ScheduledPromptTest < ActiveSupport::TestCase
     assert_equal scheduled_prompt.prompt, message.content_text
     assert_equal users(:keith), message.conversation.user, "The conversation should belong to the prompt's user"
     assert_equal assistants(:samantha), message.conversation.assistant
+    assert_equal scheduled_prompt, message.conversation.scheduled_prompt, "The conversation should remember which prompt started it"
     assert message.conversation.unread?, "The user didn't watch it run, so the conversation should be marked unread"
     assert_nil Current.user, "run! should not leave Current.user set for the rest of the job"
   end

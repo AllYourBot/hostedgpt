@@ -24,7 +24,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index marks an UNREAD conversation read & removes its sidebar dot" do
-    @conversation.mark_unread!
+    @conversation.update_column(:unread, true)
 
     get conversation_messages_url(@conversation, version: 1)
 

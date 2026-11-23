@@ -1,6 +1,15 @@
 <%= form_with(model: [:settings, scheduled_prompt], class: "contents") do |form| %>
   <%= render "layouts/form_errors", record: scheduled_prompt, title: t("app.settings.scheduled_prompts.form.errors_title", count: scheduled_prompt.errors.count) %>
 
+  <% if scheduled_prompt.paused_for_failures? %>
+    <p id="paused-for-failures" class="my-5 p-3 rounded-md bg-amber-100 text-amber-900 dark:bg-amber-900 dark:text-amber-100">
+      <%= t("app.settings.scheduled_prompts.form.paused_for_failures", count: scheduled_prompt.consecutive_failures) %>
+      <% if (latest = scheduled_prompt.conversations.order(:created_at).last) %>
+        <%= link_to t("app.settings.scheduled_prompts.form.see_latest_run"), conversation_messages_path(latest), class: "underline" %>
+      <% end %>
+    </p>
+  <% end %>
+
   <%= labeled_select form, :assistant_id, t("app.settings.scheduled_prompts.form.assistant"),
     Current.user.assistants.ordered.map { [it.name, it.id] } %>
 

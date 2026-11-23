@@ -267,6 +267,7 @@ de:
           schedule: "Zeitplan"
           next_run: "Nächster Lauf"
           paused: "Pausiert"
+          paused_for_failures: "Pausiert nach %{count} fehlgeschlagenen Läufen"
         new_title: "Neuer geplanter Prompt"
         editing_title: "Geplanten Prompt bearbeiten"
         back: "Zurück"
@@ -286,6 +287,8 @@ de:
           schedule_hint: "Englischer Klartext wie \"every monday at 9:30\" oder ein Cron-Ausdruck wie \"0 8 * * 1-5\". Höchstens alle 15 Minuten."
           time_zone: "Zeitzone"
           enabled: "Aktiviert"
+          paused_for_failures: "Dieser Prompt wurde pausiert, weil seine letzten %{count} Läufe fehlgeschlagen sind, oft wegen eines API-Schlüssel- oder Abrechnungsproblems. Beheben Sie die Ursache und aktivieren Sie ihn dann wieder."
+          see_latest_run: "Letzten Lauf ansehen"
       people:
         menu:
           account: "Ihr Konto"

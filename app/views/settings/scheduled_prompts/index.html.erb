@@ -47,6 +47,8 @@
           <td>
             <% if scheduled_prompt.next_run_at %>
               <%= l scheduled_prompt.next_run_at.in_time_zone(scheduled_prompt.time_zone), format: :short %>
+            <% elsif scheduled_prompt.paused_for_failures? %>
+              <%= t("app.settings.scheduled_prompts.table.paused_for_failures", count: scheduled_prompt.consecutive_failures) %>
             <% else %>
               <%= t("app.settings.scheduled_prompts.table.paused") %>
             <% end %>

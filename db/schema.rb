@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_23_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_23_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -154,6 +154,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_150000) do
     t.bigint "last_assistant_message_id"
     t.integer "output_token_total_count", default: 0, null: false
     t.integer "pin_position"
+    t.bigint "scheduled_prompt_id"
     t.string "share_token"
     t.string "title"
     t.boolean "unread", default: false, null: false
@@ -162,6 +163,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_150000) do
     t.index ["assistant_id"], name: "index_conversations_on_assistant_id"
     t.index ["external_id"], name: "index_conversations_on_external_id", unique: true
     t.index ["last_assistant_message_id"], name: "index_conversations_on_last_assistant_message_id"
+    t.index ["scheduled_prompt_id"], name: "index_conversations_on_scheduled_prompt_id"
     t.index ["share_token"], name: "index_conversations_on_share_token"
     t.index ["updated_at"], name: "index_conversations_on_updated_at"
     t.index ["user_id", "pin_position"], name: "index_conversations_on_user_id_and_pin_position"
@@ -325,6 +327,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_150000) do
 
   create_table "scheduled_prompts", force: :cascade do |t|
     t.bigint "assistant_id", null: false
+    t.integer "consecutive_failures", default: 0, null: false
     t.datetime "created_at", null: false
     t.boolean "enabled", default: true, null: false
     t.datetime "last_run_at"
@@ -508,6 +511,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_150000) do
   add_foreign_key "connectors", "users"
   add_foreign_key "conversations", "assistants"
   add_foreign_key "conversations", "messages", column: "last_assistant_message_id"
+  add_foreign_key "conversations", "scheduled_prompts"
   add_foreign_key "conversations", "users"
   add_foreign_key "credentials", "users"
   add_foreign_key "documents", "assistants"

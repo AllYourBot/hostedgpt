@@ -22,6 +22,12 @@ class Settings::ScheduledPromptsControllerTest < ActionDispatch::IntegrationTest
     assert_contains_text "#scheduled_prompt_#{@scheduled_prompt.id}", "Paused"
   end
 
+  test "should get index showing WHY a prompt paused after failures" do
+    @scheduled_prompt.update!(enabled: false, consecutive_failures: 3)
+    get settings_scheduled_prompts_url
+    assert_contains_text "#scheduled_prompt_#{@scheduled_prompt.id}", "Paused after 3 failed runs"
+  end
+
   test "should get index WITHOUT a table when the user HAS NO scheduled prompts" do
     get logout_url
     login_as users(:rob)
@@ -79,6 +85,18 @@ class Settings::ScheduledPromptsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "input[name=?][value=?]", "scheduled_prompt[schedule]", "every weekday at 8am"
     assert_select "form[action=?] button#run-now", run_settings_scheduled_prompt_path(@scheduled_prompt)
+    assert_select "#paused-for-failures", false, "A healthy prompt should not explain a pause"
+  end
+
+  test "should edit a prompt PAUSED AFTER FAILURES with the reason & a link to its latest run" do
+    latest = @scheduled_prompt.run!.conversation
+    @scheduled_prompt.update!(enabled: false, consecutive_failures: 3)
+
+    get edit_settings_scheduled_prompt_url(@scheduled_prompt)
+
+    assert_response :success
+    assert_contains_text "#paused-for-failures", "its last 3 runs failed"
+    assert_select "#paused-for-failures a[href=?]", conversation_messages_path(latest), 1, "The notice should link to the latest run"
   end
 
   test "should update scheduled prompt" do

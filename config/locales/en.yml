@@ -299,6 +299,7 @@ en:
           schedule: "Schedule"
           next_run: "Next run"
           paused: "Paused"
+          paused_for_failures: "Paused after %{count} failed runs"
         new_title: "New Scheduled Prompt"
         editing_title: "Editing Scheduled Prompt"
         back: "Back"
@@ -318,6 +319,8 @@ en:
           schedule_hint: "Plain English like \"every monday at 9:30\" or a cron expression like \"0 8 * * 1-5\". At most every 15 minutes."
           time_zone: "Time zone"
           enabled: "Enabled"
+          paused_for_failures: "This prompt was paused because its last %{count} runs failed, often from an API key or billing problem. Fix the cause, then check Enabled to resume."
+          see_latest_run: "See the latest run"
       people:
         menu:
           account: "Your Account"

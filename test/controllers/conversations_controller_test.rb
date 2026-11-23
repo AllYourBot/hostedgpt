@@ -43,7 +43,7 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index shows a dot before an UNREAD conversation's title and none for a read one" do
-    @conversation.mark_unread!
+    @conversation.update_column(:unread, true)
     read = conversations(:ruby_version)
 
     get_nav_conversations
