@@ -67,6 +67,7 @@ class ScheduledPromptTest < ActiveSupport::TestCase
     assert_equal scheduled_prompt.prompt, message.content_text
     assert_equal users(:keith), message.conversation.user, "The conversation should belong to the prompt's user"
     assert_equal assistants(:samantha), message.conversation.assistant
+    assert message.conversation.unread?, "The user didn't watch it run, so the conversation should be marked unread"
     assert_nil Current.user, "run! should not leave Current.user set for the rest of the job"
   end
 end

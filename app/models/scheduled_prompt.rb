@@ -11,6 +11,7 @@ class ScheduledPrompt < ApplicationRecord
 
   def run!
     message = Current.set(user:) { assistant.messages.create!(content_text: prompt) }
+    message.conversation.mark_unread!
     message.request_reply
     message
   end

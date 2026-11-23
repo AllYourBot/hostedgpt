@@ -479,6 +479,7 @@ en:
       rename: "Rename"
       pin: "Pin"
       unpin: "Unpin"
+      unread: "Unread"
       pinned: "Pinned"
       delete: "Delete"
       shared_conversation: "Shared Conversation"

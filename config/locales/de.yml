@@ -447,6 +447,7 @@ de:
       rename: "Umbenennen"
       pin: "Anheften"
       unpin: "Lösen"
+      unread: "Ungelesen"
       pinned: "Angeheftet"
       delete: "Löschen"
       shared_conversation: "Geteilte Konversation"

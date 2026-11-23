@@ -160,6 +160,23 @@ class ConversationTest < ActiveSupport::TestCase
     ].sort, grouped_conversations.map(&:id).sort, "Should have returned these conversations based on title and message content"
   end
 
+  test "mark_unread! and mark_read! toggle unread WITHOUT changing updated_at" do
+    conversation = conversations(:greeting)
+    refute conversation.unread?, "A conversation should be read by default"
+
+    assert_no_changes -> { conversation.reload.updated_at }, "Being read should not move the conversation in the sidebar" do
+      conversation.mark_unread!
+      assert conversation.reload.unread?, "mark_unread! should mark it unread"
+
+      assert conversation.mark_read!, "mark_read! should report that it changed an unread conversation"
+      refute conversation.reload.unread?, "mark_read! should mark it read"
+    end
+  end
+
+  test "mark_read! reports NO CHANGE for a conversation that is already read" do
+    refute conversations(:greeting).mark_read!, "There was nothing to mark read"
+  end
+
   test "is not pinned by default" do
     conversation = conversations(:greeting)
 

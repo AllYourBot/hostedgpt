@@ -23,6 +23,24 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "index marks an UNREAD conversation read & removes its sidebar dot" do
+    @conversation.mark_unread!
+
+    get conversation_messages_url(@conversation, version: 1)
+
+    assert_response :success
+    refute @conversation.reload.unread?, "Opening the conversation should mark it read"
+    assert_select "turbo-stream[action=remove][target=?]", "conversation_#{@conversation.id}-unread", 1,
+      "A frame-only visit leaves the sidebar alone, so the page should remove the opened conversation's dot itself"
+  end
+
+  test "index of an ALREADY READ conversation removes nothing" do
+    get conversation_messages_url(@conversation, version: 1)
+
+    assert_response :success
+    assert_select "turbo-stream[action=remove]", false, "There is no dot to remove"
+  end
+
   test "should get new" do
     get new_assistant_message_url(@assistant)
     assert_response :success

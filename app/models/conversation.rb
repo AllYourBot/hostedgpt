@@ -115,6 +115,15 @@ class Conversation < ApplicationRecord
     update_columns(pin_position: nil)
   end
 
+  # update_column skips updated_at, which orders the sidebar.
+  def mark_unread! = update_column(:unread, true)
+
+  def mark_read!
+    return false unless unread?
+
+    update_column(:unread, false)
+  end
+
   private
 
   def generate_share_token

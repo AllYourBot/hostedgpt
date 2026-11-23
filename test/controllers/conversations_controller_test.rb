@@ -42,6 +42,19 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#conversation-#{@conversation.id}", count: 1
   end
 
+  test "index shows a dot before an UNREAD conversation's title and none for a read one" do
+    @conversation.mark_unread!
+    read = conversations(:ruby_version)
+
+    get_nav_conversations
+
+    assert_select "#conversation-#{@conversation.id} > ##{dom_id(@conversation)}-unread[data-role='unread'] + a[data-role='title']", 1,
+      "An unread conversation should show its dot just before the title"
+    assert_select "#conversation-#{@conversation.id} ##{dom_id(@conversation)}-unread .sr-only", "Unread",
+      "Screen readers should hear that it is unread"
+    assert_select "#conversation-#{read.id} [data-role='unread']", 0, "A read conversation should show no dot"
+  end
+
   test "index leads a BOOKMARKED conversation's title with its solid ribbon, and keeps an unbookmarked one's on hover" do
     @conversation.bookmark!(@conversation.user)
     unbookmarked = @conversation.user.conversations.where.not(id: @conversation.id).first

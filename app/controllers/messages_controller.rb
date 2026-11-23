@@ -18,6 +18,7 @@ class MessagesController < ApplicationController
       end
     end
 
+    @marked_read = @conversation.mark_read!
     @messages = @conversation.messages.for_conversation_version(@version).preload(:bookmarks)
     @new_message = @assistant.messages.new(conversation: @conversation)
     @streaming_message = Message.where(
