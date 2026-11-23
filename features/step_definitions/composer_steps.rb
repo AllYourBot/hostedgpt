@@ -94,6 +94,34 @@ When("I submit {string} to the existing conversation by clicking") do |text|
   end
 end
 
+When("I submit {string} with morphing and scrolling") do |text|
+  assert_page_morphed do
+    assert_scrolled_down do
+      send_keys text
+      send_keys "enter"
+    end
+  end
+end
+
+When("the assistant reply is stubbed with {string}") do |text|
+  assistant_reply = Message.last
+  assistant_reply.content_text = text
+  GetNextAIMessageJob.broadcast_updated_message(assistant_reply)
+end
+
+When("the conversation refreshes with a long reply") do
+  assert_page_morphed do
+    assert_scrolled_down do
+      assistant_reply = Message.last
+      assistant_reply.content_text = "Assistant reply has gotten really long so that I can ensure it wraps and the page " +
+        "will need to scroll down in order to accomodate the wrapped lines. The quick brown fox jumped over the lazy dog. " +
+        "The quick brown fox jumped over the lazy dog."
+      assistant_reply.save!
+      conversations(:greeting).broadcast_refresh_to conversations(:greeting)
+    end
+  end
+end
+
 When("I record the current path") do
   @recorded_path = URI.parse(current_url).path
 end
