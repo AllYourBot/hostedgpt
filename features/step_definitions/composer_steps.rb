@@ -66,4 +66,40 @@ Then("I am on the newest conversation's messages") do
   assert_equal conversation_messages_path(users(:keith).conversations.ordered.first), current_path, "Should have redirected to newly created conversation"
 end
 
+When("I press shift+enter") do
+  send_keys "shift+enter"
+end
+
+Then("the composer holds two lines") do
+  assert_equal "First line\nSecond line", composer.value
+end
+
+When("I submit with enter and the conversation navigation finishes") do
+  assert_conversation_navigation_finished do
+    send_keys "enter"
+  end
+end
+
+When("I submit {string} to the existing conversation with ENTER") do |text|
+  assert_page_morphed do
+    send_keys text
+    send_keys "enter"
+  end
+end
+
+When("I submit {string} to the existing conversation by clicking") do |text|
+  assert_page_morphed do
+    send_keys text
+    click_element submit_button
+  end
+end
+
+When("I record the current path") do
+  @recorded_path = URI.parse(current_url).path
+end
+
+Then("the path has not changed since I recorded it") do
+  assert_equal @recorded_path, URI.parse(current_url).path
+end
+
 def submit_button = find("#composer #send", visible: :all)
