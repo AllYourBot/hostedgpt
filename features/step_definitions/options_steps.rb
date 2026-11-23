@@ -32,6 +32,10 @@ When("the google tools feature is enabled") do
   stub_features google_tools: true
 end
 
+When("the voice feature is enabled") do
+  stub_features voice: true
+end
+
 When("I visit the root path") do
   visit root_path
 end
