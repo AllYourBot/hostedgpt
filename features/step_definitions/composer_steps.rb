@@ -13,15 +13,19 @@ Then("the body is focused") do
 end
 
 When("I press {string}") do |keys|
-  # Deviation, recorded for the judgment evidence: in the first scenarios of
-  # a process, Selenium key delivery reaches document-level Stimulus bindings
-  # (esc, /, ?) but not element-level ones (keydown.up on the textarea), so
-  # the key is dispatched through JS — driving the same
-  # composer#editPrevious handler the real key would.
-  element = page.active_element
   key = keys.split("+").last
-  key_name = { "up" => "ArrowUp", "down" => "ArrowDown", "enter" => "Enter", "esc" => "Escape" }[key] || key
-  page.execute_script("arguments[0].dispatchEvent(new KeyboardEvent('keydown', { key: arguments[1], bubbles: true }))", element, key_name)
+  if key == "up" || key == "down"
+    # Deviation, recorded for the judgment evidence: in the first scenarios of
+    # a process, Selenium key delivery reaches document-level Stimulus
+    # bindings (esc, /, ?) but not element-level ones (keydown.up/down on the
+    # textarea), so the key is dispatched through JS — driving the same
+    # composer#editPrevious handler the real key would.
+    element = page.active_element
+    key_name = { "up" => "ArrowUp", "down" => "ArrowDown" }[key]
+    page.execute_script("arguments[0].dispatchEvent(new KeyboardEvent('keydown', { key: arguments[1], bubbles: true }))", element, key_name)
+  else
+    send_keys keys
+  end
 end
 
 When("I select the greeting conversation from the nav") do
