@@ -36,6 +36,10 @@ When("the voice feature is enabled") do
   stub_features voice: true
 end
 
+When("the voice feature is disabled") do
+  stub_features voice: false
+end
+
 When("I visit the root path") do
   visit root_path
 end
