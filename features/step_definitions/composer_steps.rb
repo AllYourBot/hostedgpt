@@ -134,6 +134,72 @@ When("the conversation refreshes with a long reply") do
   end
 end
 
+When("I record the composer height") do
+  @composer_height = composer.native.property("clientHeight")
+end
+
+Then("the composer grows taller") do
+  assert composer.native.property("clientHeight") > @composer_height, "Input should have grown taller"
+end
+
+Then("the composer gets shorter") do
+  assert composer.native.property("clientHeight") < @composer_height, "Input should have gotten shorter"
+end
+
+Then("the composer keeps its height") do
+  assert composer.native.property("clientHeight") == @composer_height, "Input should not have changed height"
+end
+
+When("I press shift+enter and stay at the bottom") do
+  assert_stays_at_bottom do
+    send_keys "shift+enter"
+    sleep 0.3
+  end
+end
+
+When("I press backspace") do
+  assert_stays_at_bottom do
+    send_keys "backspace"
+    sleep 0.3
+  end
+end
+
+When("I press backspace twice") do
+  assert_stays_at_bottom do
+    send_keys "backspace+backspace"
+    sleep 0.3
+  end
+end
+
+When("I paste a large block of text staying at the bottom") do
+  assert_stays_at_bottom do
+    send_keys long_input_text
+  end
+end
+
+When("I paste a large block of text without scrolling") do
+  assert_did_not_scroll do
+    send_keys long_input_text
+  end
+end
+
+def long_input_text
+  text = <<~END
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+    The quick brown fox jumped over the lazy dog.
+  END
+  text.gsub(/\n/, " ")
+end
+
 When("I record the current path") do
   @recorded_path = URI.parse(current_url).path
 end
