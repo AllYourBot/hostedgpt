@@ -57,6 +57,13 @@ class ScheduledPrompt::SchedulableTest < ActiveSupport::TestCase
     assert_equal ["is not included in the list"], @scheduled_prompt.errors[:time_zone]
   end
 
+  test "the time zone may be ANY US ZONE the form offers, including IANA names like America/Detroit" do
+    ActiveSupport::TimeZone.us_zones.each do |zone|
+      @scheduled_prompt.time_zone = zone.name
+      assert @scheduled_prompt.valid?, "#{zone.name} is offered in the form, so it should be accepted"
+    end
+  end
+
   test "saving reads the schedule in the prompt's TIME ZONE" do
     travel_to Time.utc(2026, 11, 23, 12) do # a Monday, 6am in Chicago
       @scheduled_prompt.update!(schedule: "every day at 8am", time_zone: "Central Time (US & Canada)")

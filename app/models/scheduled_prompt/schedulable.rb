@@ -6,15 +6,13 @@ module ScheduledPrompt::Schedulable
 
     scope :due, -> { where(enabled: true, next_run_at: ..Time.current).joins(:assistant).merge(Assistant.not_deleted) }
 
-    validates :time_zone, inclusion: { in: -> _ { ActiveSupport::TimeZone.all.map(&:name) } }
-    validate :schedule_is_recognized, if: -> { schedule.present? }
+    validate :time_zone_is_known, :schedule_is_recognized
 
     before_save :schedule_next_run, if: -> { schedule_changed? || time_zone_changed? || enabled_changed? }
   end
 
   def cron
     parsed = Fugit.parse_cronish(schedule.to_s)
-    zone = ActiveSupport::TimeZone[time_zone.to_s]
     return unless parsed && zone
 
     Fugit::Cron.parse("#{parsed.to_cron_s} #{zone.tzinfo.name}")
@@ -35,7 +33,15 @@ module ScheduledPrompt::Schedulable
     self.next_run_at = enabled? ? following_run_at : nil
   end
 
+  def zone = ActiveSupport::TimeZone[time_zone.to_s]
+
+  def time_zone_is_known
+    errors.add(:time_zone, :inclusion) unless zone
+  end
+
   def schedule_is_recognized
+    return if schedule.blank? || zone.nil?
+
     if (schedule_cron = cron).nil?
       errors.add(:schedule, "isn't a schedule we recognize")
     elsif schedule_cron.rough_frequency < 15.minutes
