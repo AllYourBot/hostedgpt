@@ -103,6 +103,11 @@ module ApplicationHelper
 
   def viewport_tag(content) = tag.meta(name: "viewport", content:)
 
+  def path_in_locale(locale)
+    path, query = request.get? ? [request.path, request.query_parameters] : path_and_query_of_page_the_form_was_on
+    "#{path}?#{query.merge("locale" => locale.to_s).to_query}"
+  end
+
   def n_a_if_blank(value, n_a = I18n.t("app.helpers.application.not_available")) = value.blank? ? n_a : value.to_s
 
   def to_dollars(cents, precision: 2) = number_to_currency(cents / 100.0, precision:)
@@ -125,6 +130,14 @@ module ApplicationHelper
   end
 
   private
+
+  def path_and_query_of_page_the_form_was_on
+    referer = URI.parse(request.referer.to_s)
+    return [root_path, {}] if referer.path.blank?
+    [referer.path, Rack::Utils.parse_nested_query(referer.query)]
+  rescue URI::InvalidURIError
+    [root_path, {}]
+  end
 
   def tag_with_content_or_block(name, content_or_options_with_block, options, &block)
     if block_given?

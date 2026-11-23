@@ -83,6 +83,36 @@ class Settings::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil @controller.instance_variable_get("@person").errors
   end
 
+  test "after a failed update the language links go back to the edit page WITHOUT the submitted form" do
+    params = person_params
+    params["personable_attributes"].delete("id")
+
+    patch settings_person_url, params: { person: params, authenticity_token: "secret-token" },
+      headers: { "Referer" => edit_settings_person_url(locale: :de) }
+    assert_response :unprocessable_content
+
+    assert_select "a[href='#{edit_settings_person_path}?locale=en']", { count: 1 }, "The EN link should point back to the edit page"
+    assert_select "a[href='#{edit_settings_person_path}?locale=de']", { count: 1 }, "The DE link should point back to the edit page"
+    assert_select "a[href*='authenticity_token']", { count: 0 }, "No link should carry the CSRF token"
+    assert_select "a[href*='person%5B']", { count: 0 }, "No link should carry the submitted form"
+  end
+
+  test "after a failed update WITHOUT a referer the language links go to the root" do
+    params = person_params
+    params["personable_attributes"].delete("id")
+
+    patch settings_person_url, params: { person: params }
+    assert_response :unprocessable_content
+
+    assert_select "a[href='#{root_path}?locale=de']", { count: 1 }, "The DE link should fall back to the root"
+  end
+
+  test "on edit the language links keep the page's query string" do
+    get edit_settings_person_url(tab: "profile")
+
+    assert_select "a[href='#{edit_settings_person_path}?locale=de&tab=profile']", { count: 1 }, "The DE link should keep the tab param"
+  end
+
   test "should gracefully ignore an attempt to alter credential type" do
     assert @user.password_credential.authenticate("secret")
 
