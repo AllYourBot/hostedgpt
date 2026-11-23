@@ -106,6 +106,11 @@ When("I submit {string} to the existing conversation by clicking") do |text|
   end
 end
 
+When("I submit {string} with ENTER") do |text|
+  send_keys text
+  send_keys "enter"
+end
+
 When("I submit {string} with morphing and scrolling") do |text|
   assert_page_morphed do
     assert_scrolled_down do
