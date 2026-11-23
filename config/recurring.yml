@@ -2,3 +2,8 @@
 run_due_scheduled_prompts:
   class: RunDueScheduledPromptsJob
   schedule: every minute
+
+# SolidQueue keeps finished jobs until something clears them; this drops those older than a day.
+clear_finished_jobs:
+  command: "SolidQueue::Job.clear_finished_in_batches"
+  schedule: every hour
