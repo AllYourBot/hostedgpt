@@ -83,17 +83,9 @@ When("I toggle the nav open") do
   assert_visible "#nav-column"
 end
 
-Then("the nav column is visible") do
-  assert_visible "#nav-column"
-end
-
 When("I open the greeting conversation from the nav") do
   find("#conversation-#{conversations(:greeting).id} a[data-role='title']").click
 
-  assert_hidden "#nav-column"
-end
-
-Then("the nav column is hidden") do
   assert_hidden "#nav-column"
 end
 

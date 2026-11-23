@@ -7,3 +7,7 @@
 Then("this flow is not implemented yet") do
   assert true
 end
+
+Then("this scenario is skipped in the system suite") do
+  assert true
+end
