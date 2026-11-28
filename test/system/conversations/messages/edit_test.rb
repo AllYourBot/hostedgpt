@@ -72,4 +72,24 @@ class ConversationMessagesEditTest < ApplicationSystemTestCase
     @msg = last_user_message
     assert_equal @message.content_text, @msg.find_role("content-text").text
   end
+
+  test "clicking edit, changing text, saving in place updates the message without a new version and keeps the reply" do
+    message_count = find_messages.length
+
+    @btn.hover
+    @btn.click
+
+    fill_in "edit-message-#{@message.id}", with: "Don't think of a pink elephant."
+    @msg.find_role("save-in-place").click
+    assert_no_selector "[data-role='save-in-place']"
+
+    assert_current_path conversation_messages_path(@conversation, version: 1)
+    assert_text "Don't think of a pink elephant"
+
+    @msg = last_user_message
+    assert_equal "Don't think of a pink elephant.", @msg.find_role("content-text").text, "The message should show the edited text"
+    assert_includes last_message.find_role("content-text").text, "No, I'm a bot.", "The reply beneath it should be kept"
+    assert_equal message_count, find_messages.length, "Saving in place should not add any messages"
+    assert_no_selector "[data-role='previous']", visible: :all
+  end
 end

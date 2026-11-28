@@ -3,7 +3,7 @@ class MessagesController < ApplicationController
   include HasConversationStarter
   include SidebarRefreshable
 
-  before_action :set_version,               only: [:index, :update]
+  before_action :set_version,               only: [:index, :show, :edit, :update]
   before_action :set_conversation,          only: [:index]
   before_action :set_assistant,             only: [:index, :new, :edit, :create]
   before_action :set_message,               only: [:show, :edit, :update, :bookmark, :unbookmark]
@@ -55,10 +55,14 @@ class MessagesController < ApplicationController
     end
   end
 
+  # The Stop button, the version arrows and the edit form's Save all patch the message here. None of them may move it
+  # within the conversation, so the branching fields the edit form carries for Save & Submit are dropped.
   def update
-    if @message.update(message_params)
+    if @message.update(message_params.slice(:content_text, :cancelled_at))
       redirect_to conversation_messages_path(@message.conversation, version: @version || @message.version), status: :see_other
     else
+      @assistant = @message.assistant
+      @new_message = @assistant.messages.new
       render :edit, status: :unprocessable_content
     end
   end

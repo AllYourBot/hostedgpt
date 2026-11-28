@@ -387,6 +387,8 @@ de:
       editing_title: "Nachricht bearbeiten"
       form:
         save_and_submit: "Speichern & Senden (⌘ RETURN)"
+        save_in_place: "Speichern"
+        save_in_place_hint: "Diese Nachricht ändern, ohne die Unterhaltung zu verzweigen oder eine neue Antwort zu erhalten"
         saving: "Speichere..."
         cancel: "Abbrechen (ESC)"
         show: "Diese Nachricht anzeigen"

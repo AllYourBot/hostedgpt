@@ -24,7 +24,7 @@ class Message < ApplicationRecord
 
   after_create :start_assistant_reply, if: :user?
   after_create :set_last_assistant_message, if: :assistant?
-  after_save :update_assistant_on_conversation, if: -> { assistant.present? && conversation.present? }
+  after_save :update_assistant_on_conversation, if: -> { saved_change_to_assistant_id? && assistant.present? && conversation.present? }
 
   scope :ordered, -> { latest_version_for_conversation }
 

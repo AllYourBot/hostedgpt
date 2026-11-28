@@ -184,6 +184,19 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "index and show point the edit link at the version being viewed" do
+    message = messages(:message0_v1)
+    edit_path = edit_assistant_message_path(message.assistant, message, version: 2)
+
+    get conversation_messages_url(message.conversation, version: 2)
+    assert_select "#message_#{message.id} a[data-role='message-edit'][href=?]", edit_path, { count: 1 },
+      "Editing from the conversation should come back to the viewed version"
+
+    get message_url(message, version: 2)
+    assert_select "#message_#{message.id} a[data-role='message-edit'][href=?]", edit_path, { count: 1 },
+      "Editing again after Cancel should still come back to the viewed version"
+  end
+
   test "should get new WITH one image starter among the conversation starters" do
     get new_assistant_message_url(@assistant)
     assert_response :success
@@ -220,6 +233,20 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   test "should get edit" do
     get edit_assistant_message_url(@assistant, @message)
     assert_response :success
+  end
+
+  test "edit offers Save & Submit to branch AND Save to change the message in place, both keeping the viewed version" do
+    message = messages(:message0_v1)
+
+    get edit_assistant_message_url(message.assistant, message, version: 2)
+    assert_response :success
+
+    assert_select "form[action=?] input[name=?][value=?]", assistant_messages_path(message.assistant), "message[branched]", "true", { count: 1 },
+      "Save & Submit should still post a new branched version"
+    assert_select "button[data-role='save-in-place'][formaction=?][formmethod='post'][name='_method'][value='patch']",
+      message_path(message, version: 2), { count: 1 }, "Save should send the text to update and come back to the viewed version"
+    assert_select "a[data-role='cancel'][href=?]", message_path(message, version: 2), { count: 1 },
+      "Cancel should come back to the viewed version"
   end
 
   test "should create message when conversation_id is provided" do
@@ -366,6 +393,51 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     patch message_url(message, version: 2), params: { message: { id: message.id } }
     assert_redirected_to conversation_messages_url(message.conversation, version: 2)
+  end
+
+  test "update saves an edit IN PLACE, ignoring the branching fields the edit form carries for Save & Submit" do
+    message = messages(:message0_v1)
+
+    assert_no_difference "Message.count", "Saving in place should not add a new version" do
+      assert_no_enqueued_jobs only: GetNextAIMessageJob do
+        patch message_url(message, version: 2), params: { message: {
+          conversation_id: message.conversation_id,
+          index: message.index,
+          branched: true,
+          branched_from_version: message.version,
+          content_text: "What's your favorite food?",
+        } }
+      end
+    end
+    assert_redirected_to conversation_messages_url(message.conversation, version: 2)
+
+    message.reload
+    assert_equal "What's your favorite food?", message.content_text, "The edited text should be saved"
+    assert_equal [0, 1], [message.index, message.version], "The message should stay where it was in the conversation"
+    assert_not message.branched?, "The message should not be marked as branched"
+    assert_nil message.branched_from_version, "The message should not have branched from anything"
+    assert_includes message.conversation.messages.for_conversation_version(2).to_a, message,
+      "Every version sharing the message should show the edited text"
+  end
+
+  test "update with BLANK text saves nothing and shows the edit form again" do
+    message = messages(:message0_v1)
+
+    patch message_url(message, version: 2), params: { message: { content_text: "" } }
+    assert_response :unprocessable_content
+
+    assert_equal "What's your favorite color?", message.reload.content_text, "A blank edit should not be saved"
+    assert_select "textarea#edit-message-#{message.id}", { count: 1 }, "The edit form should be shown again"
+  end
+
+  test "update STOPS a reply by saving its cancelled_at" do
+    message = messages(:im_a_bot)
+
+    patch message_url(message), params: { message: { cancelled_at: Time.current } }
+    assert_redirected_to conversation_messages_url(message.conversation, version: 1)
+
+    assert_not_nil message.reload.cancelled_at, "The reply should be marked as stopped"
+    assert_equal message, @user.reload.last_cancelled_message, "The user should be recorded as stopping this reply"
   end
 
   test "index shows a retry button for a message which failed to generate" do
