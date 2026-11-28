@@ -17,6 +17,7 @@
       <%= form.text_area :content_text,
         id: "edit-message-#{@message.id}",
         value: @message.content_text,
+        required: true,
         autofocus: true,
         class: %|
           prose
@@ -37,7 +38,7 @@
         }
       %>
 
-      <div class="flex justify-center items-center text-sm font-medium">
+      <div class="flex flex-wrap justify-center items-center gap-y-2 text-sm font-medium">
         <%= form.submit t("app.messages.form.save_and_submit"),
           data: {
             role: "save",
@@ -49,7 +50,23 @@
             bg-gray-200 dark:bg-gray-900
             border border-gray-400
           | %>
-        <%= link_to t("app.messages.form.cancel"), @message,
+        <%# Changes this message where it stands: no new version, no new reply, and the replies below it are kept.
+            The form's hidden branching fields are for Save & Submit, so update ignores them. %>
+        <%= form.button t("app.messages.form.save_in_place"),
+          formaction: message_path(@message, version: @version),
+          formmethod: :patch,
+          title: t("app.messages.form.save_in_place_hint"),
+          data: {
+            role: "save-in-place",
+            turbo_submits_with: t("app.messages.form.saving")
+          },
+          class: %|
+            inline-block cursor-pointer
+            ml-3 rounded-lg py-2 px-3
+            bg-gray-200 dark:bg-gray-900
+            border border-gray-400
+          | %>
+        <%= link_to t("app.messages.form.cancel"), message_path(@message, version: @version),
           data: {
             controller: "keyboard",
             action: "keydown.esc@document->keyboard#click",

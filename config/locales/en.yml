@@ -419,6 +419,8 @@ en:
       editing_title: "Editing message"
       form:
         save_and_submit: "Save & Submit (⌘ RETURN)"
+        save_in_place: "Save"
+        save_in_place_hint: "Change this message without branching the conversation or getting a new reply"
         saving: "Saving..."
         cancel: "Cancel (ESC)"
         show: "Show this message"

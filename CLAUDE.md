@@ -49,6 +49,7 @@ HostedGPT is a Ruby on Rails 8.1 app providing a multi-provider conversational A
 ### Message versioning / branching
 - Conversations support editing a message and regenerating replies without losing history. Each `Message` has an `index` (position in the conversation) and a `version`; editing/regenerating creates a new `version` starting at that index, and `branched` + `branched_from_version` track where a version forked from another. See `app/models/message/version.rb` and `conversations.yml` fixtures (`:versioned` example) for the exact scheme.
 - Use `conversation.messages.for_conversation_version(version_or_:latest)` rather than querying `messages` directly — it resolves the correct set of messages across branches/versions via a real SQL join, not just an association scope.
+- The edit form's **Save & Submit** creates that new version and asks for a reply; its **Save** button instead patches the message's text in place through `MessagesController#update`, which only accepts `content_text` and `cancelled_at` (the Stop button) so the form's branching fields can't move the message. No version is created, so every version that shares that message row shows the new text, and the replies after it are kept as they were.
 
 ### Identity model: Person / User / Client / Credential
 - `Person` is a `delegated_type` (`personable: User | Tombstone`) — the stable identity record; `User` is the "real" account data, `Tombstone` represents a deleted-but-referenced person (e.g. left behind so old messages still resolve an author).

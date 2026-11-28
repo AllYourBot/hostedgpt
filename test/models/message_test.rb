@@ -238,6 +238,15 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal new_assistant, conversations(:greeting).reload.assistant
   end
 
+  test "editing an earlier message DOES NOT hand the conversation back to that message's assistant" do
+    conversation = conversations(:versioned)
+    conversation.update!(assistant: assistants(:keith_gpt4))
+
+    messages(:message0_v1).update!(content_text: "What's your favorite food?")
+    assert_equal assistants(:keith_gpt4), conversation.reload.assistant,
+      "The conversation should keep the assistant it moved to, not go back to the edited message's"
+  end
+
   test "messages are destroyed when a conversation is destroyed" do
     msg1 = messages(:popstate)
     msg2 = messages(:popstate_event)

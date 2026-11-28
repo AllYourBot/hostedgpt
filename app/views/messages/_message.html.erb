@@ -228,7 +228,7 @@ end %>
           <% end %>
 
           <% if message.user? && message.assistant.not_deleted? && !message.has_document_image? %>
-            <%= link_to edit_assistant_message_path(message.assistant, message),
+            <%= link_to edit_assistant_message_path(message.assistant, message, version: conversation_version),
               class: "cursor-pointer hover:text-gray-900 dark:hover:text-white flex items-center",
               data: {
                 role: "message-edit",
