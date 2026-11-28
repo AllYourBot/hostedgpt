@@ -44,6 +44,17 @@ class ConversationMessagesEditTest < ApplicationSystemTestCase
     assert_no_selector "[data-role='cancel']"
   end
 
+  test "clicking edit, changing text, and pressing CTRL+ENTER saves and submits like the button" do
+    @btn.hover
+    @btn.click
+
+    fill_in "edit-message-#{@message.id}", with: "Don't think of a pink elephant."
+    find_field("edit-message-#{@message.id}").send_keys [:control, :enter]
+
+    assert_current_path conversation_messages_path(@conversation, version: 2)
+    assert_text "Don't think of a pink elephant"
+  end
+
   test "clicking edit, changing text, saving updates the message text, previous navigates back" do
     @btn.hover
     @btn.click

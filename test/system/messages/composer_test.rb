@@ -36,6 +36,15 @@ class MessagesComposerTest < ApplicationSystemTestCase
     assert_equal "", composer.value
   end
 
+  test "when cursor is not focused in the text input, a / typed WITH SHIFT, as on a German keyboard, focuses it too" do
+    send_keys "esc"
+    assert_active "body"
+
+    # The test browser has a US layout, where Shift+/ types ?, so dispatch the keydown a German Shift+7 sends
+    page.execute_script("document.body.dispatchEvent(new KeyboardEvent('keydown', { key: '/', shiftKey: true, bubbles: true }))")
+    assert_active composer
+  end
+
   test "when cursor is focused in the text input, ? works as a key press" do
     assert_equal "", composer.value
     send_keys "?"
